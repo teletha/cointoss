@@ -29,7 +29,6 @@ import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
-import cointoss.util.Network;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import kiss.Decoder;
@@ -54,9 +53,6 @@ public abstract class MarketService implements Disposable {
 
     /** The service disposer. */
     protected final Disposable disposer = Disposable.empty();
-
-    /** The network accessor. */
-    protected Network network = new Network();
 
     /** The market configuration. */
     public final MarketSetting setting;

@@ -131,7 +131,7 @@ public class Notificator implements Storable<Notificator> {
 
                     // to LINE
                     if (onLine.is(true)) {
-                        I.make(Network.class).line(stripedTitle, stripedMessage, lineAccessToken.v).to(I.NoOP);
+                        Network.line(stripedTitle, stripedMessage, lineAccessToken.v).to(I.NoOP);
                     }
                 }
             }

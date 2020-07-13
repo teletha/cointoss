@@ -31,6 +31,7 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocket.IdentifiableTopic;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
@@ -196,7 +197,9 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderBookL2", marketName)).map(json -> json.find("data", "*")).map(this::convertOrderBook);
+        return clientRealtimely().subscribe(new Topic("orderBookL2", marketName))
+                .map(json -> json.find("data", "*"))
+                .map(this::convertOrderBook);
     }
 
     /**
@@ -294,7 +297,7 @@ class BitMexService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://www.bitmex.com/api/v1/" + path));
 
-        return network.rest(builder, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
     }
 
     /**

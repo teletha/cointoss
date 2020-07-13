@@ -622,7 +622,7 @@ class BitFlyerService extends MarketService {
             builder = builder.POST(BodyPublishers.ofString(bodyText));
         }
 
-        return network.rest(builder, Limit, client());
+        return Network.rest(builder, Limit, client());
     }
 
     /**
@@ -669,7 +669,7 @@ class BitFlyerService extends MarketService {
                         .POST(BodyPublishers
                                 .ofString("{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
 
-                new Network().rest(builder, Limit).to(I.NoOP);
+                Network.rest(builder, Limit).to(I.NoOP);
             });
         }
     }

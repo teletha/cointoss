@@ -24,7 +24,7 @@ public class Network {
     /**
      * Call REST API.
      */
-    public Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, HttpClient... client) {
+    public static Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, HttpClient... client) {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) limiter.acquire();
 
@@ -38,7 +38,7 @@ public class Network {
      * @param message A message to send
      * @param token Notify API token.
      */
-    public Signal<?> line(Object title, Object message, String token) {
+    public static Signal<?> line(Object title, Object message, String token) {
         if (token != null) {
             Builder request = HttpRequest.newBuilder()
                     .uri(URI.create("https://notify-api.line.me/api/notify"))

@@ -29,6 +29,7 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocket.IdentifiableTopic;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
@@ -291,7 +292,7 @@ class BitfinexService extends MarketService {
     private Signal<JSON> call(String method, String path, APILimiter limiter) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api-pub.bitfinex.com/v2/" + path));
 
-        return network.rest(builder, limiter).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
+        return Network.rest(builder, limiter, client()).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
     }
 
     /**

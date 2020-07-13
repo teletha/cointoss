@@ -29,6 +29,7 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocket.IdentifiableTopic;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
@@ -250,7 +251,7 @@ class BinanceService extends MarketService {
         String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
         Builder builder = HttpRequest.newBuilder(URI.create(uri + path));
 
-        return network.rest(builder, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
+        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
 
     /**

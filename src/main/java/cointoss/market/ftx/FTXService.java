@@ -27,6 +27,7 @@ import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
@@ -223,7 +224,7 @@ class FTXService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://ftx.com/api/" + path));
 
-        return network.rest(builder, Limit).retryWhen(retryPolicy(10, "FTX RESTCall"));
+        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "FTX RESTCall"));
     }
 
     public static void main(String[] args) throws InterruptedException {
