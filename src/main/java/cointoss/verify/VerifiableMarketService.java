@@ -38,6 +38,7 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import kiss.I;
@@ -97,6 +98,16 @@ public class VerifiableMarketService extends MarketService {
      */
     public VerifiableMarketService(MarketService delegation) {
         super(delegation.exchangeName, delegation.marketName, delegation.setting);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected EfficientWebSocket realtimely() {
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 
     /**

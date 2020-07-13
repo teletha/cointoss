@@ -27,6 +27,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
@@ -108,6 +109,13 @@ public abstract class MarketService implements Disposable {
     public final String marketReadableName() {
         return marketIdentity().replaceAll("_", "");
     }
+
+    /**
+     * Return the realtime communicator to use in this {@link MarketService}.
+     * 
+     * @return
+     */
+    protected abstract EfficientWebSocket realtimely();
 
     /**
      * Estimate the curernt order delay (second).

@@ -26,6 +26,7 @@ import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
@@ -53,6 +54,14 @@ class FTXService extends MarketService {
         super("BitMEX", marketName, setting);
 
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.baseCurrencyMinimumBidPrice;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected EfficientWebSocket realtimely() {
+        return null;
     }
 
     /**

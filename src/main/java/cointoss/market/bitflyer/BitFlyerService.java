@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.translate;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -71,8 +71,8 @@ class BitFlyerService extends MarketService {
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(500).refresh(Duration.ofMinutes(5));
 
-    /** The realtime communicator. */
-    static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", json -> {
+    /** The shared realtime communicator. It will be shared across all markets on this exchange. */
+    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", json -> {
         return json.find(String.class, "params", "channel").toString();
     });
 
@@ -124,6 +124,14 @@ class BitFlyerService extends MarketService {
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.schedule(0, 1, TimeUnit.SECONDS, false, scheduler()).map(v -> orders().toList()).share();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected EfficientWebSocket realtimely() {
+        return Realtime;
     }
 
     /**
@@ -287,7 +295,7 @@ class BitFlyerService extends MarketService {
     protected Signal<Execution> connectExecutionRealtimely() {
         String[] previous = new String[] {"", ""};
 
-        return Realtime.subscribe(new Topic("lightning_executions_", marketName))
+        return realtimely().subscribe(new Topic("lightning_executions_", marketName))
                 .flatIterable(json -> json.find("params", "message", "*"))
                 .map(e -> {
                     long id = e.get(Long.class, "id");
@@ -566,7 +574,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return Realtime.subscribe(new Topic("lightning_board_", marketName)).map(root -> {
+        return realtimely().subscribe(new Topic("lightning_board_", marketName)).map(root -> {
             JSON e = root.get("params").get("message");
 
             OrderBookPageChanges change = new OrderBookPageChanges();

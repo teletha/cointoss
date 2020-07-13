@@ -64,6 +64,14 @@ class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    protected EfficientWebSocket realtimely() {
+        return isFutures ? RealtimeFuture : Realtime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Integer> delay() {
         return I.signal();
     }
@@ -102,7 +110,7 @@ class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        return realtime().subscribe(new Topic("aggTrade", marketName)).map(json -> convert(json.get("data")));
+        return realtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> convert(json.get("data")));
     }
 
     /**
@@ -161,7 +169,7 @@ class BinanceService extends MarketService {
         String bidName = isFutures ? "b" : "bids";
         String askName = isFutures ? "a" : "asks";
 
-        return realtime().subscribe(new Topic("depth20@100ms", marketName))
+        return realtimely().subscribe(new Topic("depth20@100ms", marketName))
                 .map(json -> convertOrderBook(json.get("data"), bidName, askName));
     }
 
@@ -243,15 +251,6 @@ class BinanceService extends MarketService {
         Builder builder = HttpRequest.newBuilder(URI.create(uri + path));
 
         return network.rest(builder, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
-    }
-
-    /**
-     * Select realtime communicator.
-     * 
-     * @return
-     */
-    private EfficientWebSocket realtime() {
-        return isFutures ? RealtimeFuture : Realtime;
     }
 
     /**
