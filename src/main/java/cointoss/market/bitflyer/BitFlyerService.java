@@ -131,7 +131,9 @@ class BitFlyerService extends MarketService {
      */
     @Override
     protected EfficientWebSocket realtimely() {
-        return Realtime;
+        return new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", json -> {
+            return json.find(String.class, "params", "channel").toString();
+        });
     }
 
     /**
@@ -312,7 +314,7 @@ class BitFlyerService extends MarketService {
                     String buyer = e.text("buy_child_order_acceptance_id");
                     String seller = e.text("sell_child_order_acceptance_id");
                     String taker = direction.isBuy() ? buyer : seller;
-                    int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
+                    int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller, direction);
                     int delay = estimateDelay(taker, date);
 
                     Execution exe = Execution.with.direction(direction, size)
@@ -420,7 +422,7 @@ class BitFlyerService extends MarketService {
         String buyer = e.get(String.class, "buy_child_order_acceptance_id");
         String seller = e.get(String.class, "sell_child_order_acceptance_id");
         String taker = direction.isBuy() ? buyer : seller;
-        int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
+        int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller, direction);
         int delay = estimateDelay(taker, date);
 
         Execution exe = Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutiveType).delay(delay);
@@ -436,10 +438,10 @@ class BitFlyerService extends MarketService {
      * 
      * @param previous
      */
-    private int estimateConsecutiveType(String prevBuyer, String prevSeller, String buyer, String seller) {
+    private int estimateConsecutiveType(String prevBuyer, String prevSeller, String buyer, String seller, Direction side) {
         if (buyer.equals(prevBuyer)) {
             if (seller.equals(prevSeller)) {
-                return Execution.ConsecutiveSameBoth;
+                return side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
             } else {
                 return Execution.ConsecutiveSameBuyer;
             }

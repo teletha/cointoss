@@ -314,8 +314,6 @@ class ExecutionDeltaLoggerTest {
         exes.add(Execution.with.buy(1).price(10).consecutive(Execution.ConsecutiveSameSeller));
         exes.add(Execution.with.buy(1).price(10).consecutive(Execution.ConsecutiveSameBuyer));
         exes.add(Execution.with.buy(1).price(10).consecutive(Execution.ConsecutiveDifference));
-        exes.add(Execution.with.buy(1).price(10).consecutive(Execution.ConsecutiveSameBoth));
-        exes.add(Execution.with.buy(1).price(10).consecutive(Execution.ConsecutiveSameBoth));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);

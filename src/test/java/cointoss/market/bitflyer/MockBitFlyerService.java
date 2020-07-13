@@ -12,6 +12,8 @@ package cointoss.market.bitflyer;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import antibug.WebSocketServer;
+import antibug.WebSocketServer.WebSocketClient;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -26,6 +28,12 @@ class MockBitFlyerService extends BitFlyerService {
 
     /** The mockable network. */
     private final MockNetwork mockNetwork;
+
+    /** The mocked websocket server. */
+    protected final WebSocketServer websocketServer = new WebSocketServer();
+
+    /** The websocket client interface. */
+    protected final WebSocketClient websocketClient = websocketServer.websocketClient();
 
     /**
      * 
@@ -43,7 +51,7 @@ class MockBitFlyerService extends BitFlyerService {
      */
     @Override
     protected EfficientWebSocket realtimely() {
-        return super.realtimely();
+        return super.realtimely().clone().enableDebug(websocketServer.httpClient());
     }
 
     /**

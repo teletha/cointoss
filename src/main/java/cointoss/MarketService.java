@@ -111,7 +111,7 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
-     * Return the realtime communicator to use in this {@link MarketService}.
+     * Return the realtime communicator.
      * 
      * @return
      */

@@ -29,7 +29,7 @@ import kiss.JSON;
 import kiss.Observer;
 import kiss.Signal;
 
-public class EfficientWebSocket {
+public class EfficientWebSocket implements Cloneable {
 
     /** Logging utility. */
     private static final Logger logger = LogManager.getLogger();
@@ -280,6 +280,19 @@ public class EfficientWebSocket {
             cause = e.getCause();
         }
         return e;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public EfficientWebSocket clone() {
+        EfficientWebSocket cloned = new EfficientWebSocket(uri, extractId);
+        cloned.maximumSubscriptions(max);
+        cloned.updateIdBy(extractNewId);
+        cloned.ignoreMessageIf(reject);
+
+        return cloned;
     }
 
     /**

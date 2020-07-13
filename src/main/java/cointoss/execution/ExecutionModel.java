@@ -40,9 +40,6 @@ abstract class ExecutionModel implements Directional {
     /** The consecutive type. */
     public static final int ConsecutiveSameSeller = 2;
 
-    /** The consecutive type. */
-    public static final int ConsecutiveSameBoth = 3;
-
     /** The order delay type. (DEFAULT) */
     public static final int DelayInestimable = 0;
 
