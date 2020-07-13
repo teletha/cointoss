@@ -24,13 +24,6 @@ public class Network {
     /**
      * Call REST API.
      */
-    public final Signal<JSON> rest(HttpRequest.Builder request, HttpClient... client) {
-        return rest(request, null, client);
-    }
-
-    /**
-     * Call REST API.
-     */
     public Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, HttpClient... client) {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) limiter.acquire();
@@ -53,7 +46,7 @@ public class Network {
                     .header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
                     .POST(BodyPublishers.ofString("message=" + title + "\r\n" + message));
 
-            return rest(request);
+            return I.http(request, JSON.class);
         } else {
             return I.signal();
         }
