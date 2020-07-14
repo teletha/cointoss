@@ -17,12 +17,14 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.order.Order;
+import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 
 public class BitFlyerServiceTest {
 
     @Test
-    void parse() {
+    void parseVariousDateTimeFormat() {
         assert BitFlyerService.parse("2018-04-26T00:32:26.1234567Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.123"));
         assert BitFlyerService.parse("2018-04-26T00:32:26.19Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.190"));
         assert BitFlyerService.parse("2018-07-09T01:16:20Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:20.000"));
@@ -31,12 +33,171 @@ public class BitFlyerServiceTest {
     }
 
     @Test
-    void order() {
-        // MockBitFlyerService service = new MockBitFlyerService();
-        //
-        // service.ordersWillResponse(Order.with.buy(1).price(10), "FirstOrder");
-        // List<Order> orders = service.orders().toList();
-        // assert orders.size() == 1;
+    void orderActive() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("""
+                [
+                  {
+                    "id": 0,
+                    "child_order_id": "JFX20200714-015807-586848F",
+                    "product_code": "FX_BTC_JPY",
+                    "side": "SELL",
+                    "child_order_type": "LIMIT",
+                    "price": 1096329.0,
+                    "average_price": 0.0,
+                    "size": 0.01,
+                    "child_order_state": "ACTIVE",
+                    "expire_date": "2020-08-13T01:58:06",
+                    "child_order_date": "2020-07-14T01:58:06",
+                    "child_order_acceptance_id": "JRF20200714-015806-840451",
+                    "outstanding_size": 0.01,
+                    "cancel_size": 0.0,
+                    "executed_size": 0.0,
+                    "total_commission": 0.0
+                  }
+                ]
+                """);
+
+        List<Order> list = service.orders(OrderState.ACTIVE).toList();
+        assert list.size() == 1;
+
+        Order order = list.get(0);
+        assert order.id.equals("JRF20200714-015806-840451");
+        assert order.direction.isSell();
+        assert order.type.isMaker();
+        assert order.size.is(0.01);
+        assert order.remainingSize.is(0.01);
+        assert order.executedSize.is(0);
+        assert order.price.is(1096329);
+        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 14, 1, 58, 6, 0, Chrono.UTC));
+        assert order.isActive();
+        assert order.isNotCanceled();
+        assert order.isNotCompleted();
+        assert order.isNotExpired();
+        assert order.isNotTerminated();
+    }
+
+    @Test
+    void orderCompleted() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("""
+                [
+                  {
+                    "id": 2022690384,
+                    "child_order_id": "JFX20200710-956385-647201F",
+                    "product_code": "FX_BTC_JPY",
+                    "side": "BUY",
+                    "child_order_type": "LIMIT",
+                    "price": 986402.000000000000,
+                    "average_price": 986402.000000000000,
+                    "size": 0.500000000000,
+                    "child_order_state": "COMPLETED",
+                    "expire_date": "2020-08-09T09:01:43",
+                    "child_order_date": "2020-07-10T09:01:43",
+                    "child_order_acceptance_id": "JRF20200710-956385-394856",
+                    "outstanding_size": 0.000000000000,
+                    "cancel_size": 0.000000000000,
+                    "executed_size": 0.500000000000,
+                    "total_commission": 0.000000000000
+                  }
+                ]
+                """);
+
+        List<Order> list = service.orders(OrderState.COMPLETED).toList();
+        assert list.size() == 1;
+
+        Order order = list.get(0);
+        assert order.id.equals("JRF20200710-956385-394856");
+        assert order.direction.isBuy();
+        assert order.type.isMaker();
+        assert order.size.is(0.5);
+        assert order.remainingSize.is(0);
+        assert order.executedSize.is(0.5);
+        assert order.price.is(986402);
+        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 10, 9, 1, 43, 0, Chrono.UTC));
+        assert order.isNotActive();
+        assert order.isNotCanceled();
+        assert order.isCompleted();
+        assert order.isNotExpired();
+        assert order.isTerminated();
+    }
+
+    @Test
+    void orders() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("""
+                [
+                  {
+                    "id": 0,
+                    "child_order_id": "JFX20200714-015807-586848F",
+                    "product_code": "FX_BTC_JPY",
+                    "side": "SELL",
+                    "child_order_type": "LIMIT",
+                    "price": 1096329.0,
+                    "average_price": 0.0,
+                    "size": 0.01,
+                    "child_order_state": "ACTIVE",
+                    "expire_date": "2020-08-13T01:58:06",
+                    "child_order_date": "2020-07-14T01:58:06",
+                    "child_order_acceptance_id": "JRF20200714-015806-840451",
+                    "outstanding_size": 0.01,
+                    "cancel_size": 0.0,
+                    "executed_size": 0.0,
+                    "total_commission": 0.0
+                  },
+                  {
+                    "id": 2022690384,
+                    "child_order_id": "JFX20200710-956385-647201F",
+                    "product_code": "FX_BTC_JPY",
+                    "side": "BUY",
+                    "child_order_type": "LIMIT",
+                    "price": 986402.000000000000,
+                    "average_price": 986402.000000000000,
+                    "size": 0.500000000000,
+                    "child_order_state": "COMPLETED",
+                    "expire_date": "2020-08-09T09:01:43",
+                    "child_order_date": "2020-07-10T09:01:43",
+                    "child_order_acceptance_id": "JRF20200710-956385-394856",
+                    "outstanding_size": 0.000000000000,
+                    "cancel_size": 0.000000000000,
+                    "executed_size": 0.500000000000,
+                    "total_commission": 0.000000000000
+                  }
+                ]
+                """);
+
+        List<Order> list = service.orders().toList();
+        assert list.size() == 2;
+
+        Order order = list.get(0);
+        assert order.id.equals("JRF20200714-015806-840451");
+        assert order.direction.isSell();
+        assert order.type.isMaker();
+        assert order.size.is(0.01);
+        assert order.remainingSize.is(0.01);
+        assert order.executedSize.is(0);
+        assert order.price.is(1096329);
+        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 14, 1, 58, 6, 0, Chrono.UTC));
+        assert order.isActive();
+        assert order.isNotCanceled();
+        assert order.isNotCompleted();
+        assert order.isNotExpired();
+        assert order.isNotTerminated();
+
+        order = list.get(1);
+        assert order.id.equals("JRF20200710-956385-394856");
+        assert order.direction.isBuy();
+        assert order.type.isMaker();
+        assert order.size.is(0.5);
+        assert order.remainingSize.is(0);
+        assert order.executedSize.is(0.5);
+        assert order.price.is(986402);
+        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 10, 9, 1, 43, 0, Chrono.UTC));
+        assert order.isNotActive();
+        assert order.isNotCanceled();
+        assert order.isCompleted();
+        assert order.isNotExpired();
+        assert order.isTerminated();
     }
 
     @Test
@@ -195,18 +356,7 @@ public class BitFlyerServiceTest {
         assert list.size() == 1;
     }
 
-    @Test
-    void executionRealtimelyVariousDateTimeFormat() {
-        MockBitFlyerService service = new MockBitFlyerService();
-        service.websocketServer
-                .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
-                    server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
-                    server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'SELL','price':999469.0,'size':0.1,'exec_date':'2020-07-12T06:16:04Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
-                    server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991348,'side':'SELL','price':999467.0,'size':0.1,'exec_date':'2020-07-12T06:16Z','buy_child_order_acceptance_id':'JRF20200712-061603-372561','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
-                    server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991349,'side':'SELL','price':999468.0,'size':0.1,'exec_date':'2020-07-12T06Z','buy_child_order_acceptance_id':'JRF20200712-871603-173571','sell_child_order_acceptance_id':'JRF20200712-974067-087392'}]}}");
-                });
+    private static class RealtimeExecution {
 
-        List<Execution> list = service.executionsRealtimely().toList();
-        assert list.size() == 3;
     }
 }

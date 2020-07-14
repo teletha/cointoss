@@ -10,9 +10,9 @@
 package cointoss.market.bitflyer;
 
 import java.net.http.HttpClient;
-import java.util.ArrayList;
 
 import com.pgssoft.httpclient.HttpClientMock;
+import com.pgssoft.httpclient.RecordableHttpClientMock;
 
 import antibug.WebSocketServer;
 import antibug.WebSocketServer.WebSocketClient;
@@ -23,7 +23,7 @@ import cointoss.util.Num;
 class MockBitFlyerService extends BitFlyerService {
 
     /** The mocked http client interface. */
-    protected final HttpClientMock httpClient = new HttpClientMock();
+    protected final HttpClientMock httpClient = RecordableHttpClientMock.build();
 
     /** The mocked websocket server. */
     protected final WebSocketServer websocketServer = new WebSocketServer();
@@ -38,8 +38,6 @@ class MockBitFlyerService extends BitFlyerService {
         super("FX_BTC_JPY", true, MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.of("0.01"))
                 .orderBookGroupRanges(Num.ONE));
-
-        // network = httpServer = new MockNetwork();
     }
 
     /**
@@ -56,6 +54,13 @@ class MockBitFlyerService extends BitFlyerService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return super.clientRealtimely().clone().enableDebug(websocketServer.httpClient());
+    }
+
+    /**
+     * Start recording mode.
+     */
+    public void record() {
+        httpClient.debugOn();
     }
 
     // /**
@@ -91,13 +96,6 @@ class MockBitFlyerService extends BitFlyerService {
     //
     // httpServer.request("/v1/me/getchildorders").willResponse(array);
     // }
-
-    /**
-     * Root element.
-     */
-    @SuppressWarnings("serial")
-    private static class ChildOrderResponseList extends ArrayList<ChildOrderResponse> {
-    }
 
     // /**
     // * Set next response.
