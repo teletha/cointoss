@@ -78,6 +78,15 @@ public class BitFlyerServiceTest {
     }
 
     @Test
+    void orderActiveEmpty() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("[]");
+
+        List<Order> list = service.orders(OrderState.ACTIVE).toList();
+        assert list.size() == 0;
+    }
+
+    @Test
     void orderCompleted() {
         MockBitFlyerService service = new MockBitFlyerService();
         service.httpClient.onGet().doReturnJSON("""
@@ -198,6 +207,15 @@ public class BitFlyerServiceTest {
         assert order.isCompleted();
         assert order.isNotExpired();
         assert order.isTerminated();
+    }
+
+    @Test
+    void orderEmpty() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("[]");
+
+        List<Order> list = service.orders().toList();
+        assert list.size() == 0;
     }
 
     @Test
@@ -354,9 +372,5 @@ public class BitFlyerServiceTest {
 
         List<Execution> list = service.executionsRealtimely().toList();
         assert list.size() == 1;
-    }
-
-    private static class RealtimeExecution {
-
     }
 }
