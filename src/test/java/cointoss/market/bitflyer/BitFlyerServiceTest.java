@@ -68,6 +68,7 @@ public class BitFlyerServiceTest {
         assert order.size.is(0.01);
         assert order.remainingSize.is(0.01);
         assert order.executedSize.is(0);
+        assert order.canceledSize().is(0);
         assert order.price.is(1096329);
         assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 14, 1, 58, 6, 0, Chrono.UTC));
         assert order.isActive();
@@ -83,6 +84,61 @@ public class BitFlyerServiceTest {
         service.httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders(OrderState.ACTIVE).toList();
+        assert list.size() == 0;
+    }
+
+    @Test
+    void orderCanceled() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("""
+                [
+                  {
+                    "id": 2022690384,
+                    "child_order_id": "JFX20200710-956385-647201F",
+                    "product_code": "FX_BTC_JPY",
+                    "side": "BUY",
+                    "child_order_type": "LIMIT",
+                    "price": 986402.000000000000,
+                    "average_price": 986402.000000000000,
+                    "size": 0.500000000000,
+                    "child_order_state": "CANCELED",
+                    "expire_date": "2020-08-09T09:01:43",
+                    "child_order_date": "2020-07-10T09:01:43",
+                    "child_order_acceptance_id": "JRF20200710-956385-394856",
+                    "outstanding_size": 0.000000000000,
+                    "cancel_size": 0.200000000000,
+                    "executed_size": 0.300000000000,
+                    "total_commission": 0.000000000000
+                  }
+                ]
+                """);
+
+        List<Order> list = service.orders(OrderState.CANCELED).toList();
+        assert list.size() == 1;
+
+        Order order = list.get(0);
+        assert order.id.equals("JRF20200710-956385-394856");
+        assert order.direction.isBuy();
+        assert order.type.isMaker();
+        assert order.size.is(0.5);
+        assert order.remainingSize.is(0);
+        assert order.executedSize.is(0.3);
+        assert order.canceledSize().is(0.2);
+        assert order.price.is(986402);
+        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 10, 9, 1, 43, 0, Chrono.UTC));
+        assert order.isNotActive();
+        assert order.isCanceled();
+        assert order.isNotCompleted();
+        assert order.isNotExpired();
+        assert order.isTerminated();
+    }
+
+    @Test
+    void orderCanceledEmpty() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("[]");
+
+        List<Order> list = service.orders(OrderState.CANCELED).toList();
         assert list.size() == 0;
     }
 
@@ -122,6 +178,7 @@ public class BitFlyerServiceTest {
         assert order.size.is(0.5);
         assert order.remainingSize.is(0);
         assert order.executedSize.is(0.5);
+        assert order.canceledSize().is(0);
         assert order.price.is(986402);
         assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 10, 9, 1, 43, 0, Chrono.UTC));
         assert order.isNotActive();
@@ -129,6 +186,15 @@ public class BitFlyerServiceTest {
         assert order.isCompleted();
         assert order.isNotExpired();
         assert order.isTerminated();
+    }
+
+    @Test
+    void orderCompletedEmpty() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("[]");
+
+        List<Order> list = service.orders(OrderState.COMPLETED).toList();
+        assert list.size() == 0;
     }
 
     @Test
@@ -185,6 +251,7 @@ public class BitFlyerServiceTest {
         assert order.size.is(0.01);
         assert order.remainingSize.is(0.01);
         assert order.executedSize.is(0);
+        assert order.canceledSize().is(0);
         assert order.price.is(1096329);
         assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 14, 1, 58, 6, 0, Chrono.UTC));
         assert order.isActive();
@@ -200,6 +267,7 @@ public class BitFlyerServiceTest {
         assert order.size.is(0.5);
         assert order.remainingSize.is(0);
         assert order.executedSize.is(0.5);
+        assert order.canceledSize().is(0);
         assert order.price.is(986402);
         assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 10, 9, 1, 43, 0, Chrono.UTC));
         assert order.isNotActive();
@@ -210,7 +278,7 @@ public class BitFlyerServiceTest {
     }
 
     @Test
-    void orderEmpty() {
+    void ordersEmpty() {
         MockBitFlyerService service = new MockBitFlyerService();
         service.httpClient.onGet().doReturnJSON("[]");
 
