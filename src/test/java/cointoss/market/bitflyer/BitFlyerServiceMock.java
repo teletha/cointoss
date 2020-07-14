@@ -20,7 +20,7 @@ import cointoss.MarketSetting;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.Num;
 
-class MockBitFlyerService extends BitFlyerService {
+class BitFlyerServiceMock extends BitFlyerService {
 
     /** The mocked http client interface. */
     protected final HttpClientMock httpClient = RecordableHttpClientMock.build();
@@ -34,7 +34,7 @@ class MockBitFlyerService extends BitFlyerService {
     /**
      * 
      */
-    MockBitFlyerService() {
+    BitFlyerServiceMock() {
         super("FX_BTC_JPY", true, MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.of("0.01"))
                 .orderBookGroupRanges(Num.ONE));

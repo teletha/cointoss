@@ -34,7 +34,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void orderActive() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("""
                 [
                   {
@@ -80,7 +80,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void orderActiveEmpty() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders(OrderState.ACTIVE).toList();
@@ -89,7 +89,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void orderCanceled() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("""
                 [
                   {
@@ -135,7 +135,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void orderCanceledEmpty() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders(OrderState.CANCELED).toList();
@@ -144,7 +144,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void orderCompleted() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("""
                 [
                   {
@@ -190,7 +190,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void orderCompletedEmpty() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders(OrderState.COMPLETED).toList();
@@ -199,7 +199,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void orders() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("""
                 [
                   {
@@ -279,7 +279,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void ordersEmpty() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders().toList();
@@ -288,7 +288,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void executions() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("""
                 [
                     {
@@ -336,7 +336,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void executionLatest() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("""
                 [
                     {
@@ -364,7 +364,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void executionRealtimely() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.websocketServer
                 .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
@@ -398,7 +398,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void executionRealtimelyConsecutiveBuy() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.websocketServer
                 .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
@@ -414,7 +414,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void executionRealtimelyConsecutiveSell() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.websocketServer
                 .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
@@ -430,7 +430,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void executionRealtimelyWithMultipleChannels() {
-        MockBitFlyerService service = new MockBitFlyerService();
+        BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.websocketServer
                 .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
