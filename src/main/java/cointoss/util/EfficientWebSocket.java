@@ -238,6 +238,8 @@ public class EfficientWebSocket implements Cloneable {
         Supersonic signaling = signals.get(extractId.apply(json));
         if (signaling != null) {
             signaling.accept(json);
+        } else {
+            logger.warn("Unknown message was recieved. [{}] {}", uri, text);
         }
     }
 
