@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.*;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -847,11 +848,13 @@ class BitFlyerService extends MarketService {
     }
 
     /**
-     * 
+     * Topic on Realtime API.
      */
     static class Topic extends IdentifiableTopic<Topic> {
 
-        public long id = 123;
+        private static final AtomicInteger counter = new AtomicInteger();
+
+        public int id = counter.incrementAndGet();
 
         public String jsonrpc = "2.0";
 
