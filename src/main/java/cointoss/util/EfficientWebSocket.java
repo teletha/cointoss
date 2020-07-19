@@ -17,6 +17,9 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -24,6 +27,7 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
 import kiss.Observer;
@@ -42,12 +46,6 @@ public class EfficientWebSocket implements Cloneable {
 
     /** The ID extractor. */
     private final Function<JSON, String> extractId;
-
-    /**
-     * Updated ID extractor to deal with cases where ID is specified in the response of
-     * subscription.
-     */
-    private Function<JSON, String> extractNewId;
 
     /** The rejectable message pattern. */
     private Predicate<JSON> reject;
@@ -69,6 +67,9 @@ public class EfficientWebSocket implements Cloneable {
 
     /** The http client. */
     private HttpClient[] client = new HttpClient[0];
+
+    /** The current subscribing topics. */
+    private final Set<IdentifiableTopic> subscribings = ConcurrentHashMap.newKeySet();
 
     /**
      * @param uri
@@ -92,18 +93,6 @@ public class EfficientWebSocket implements Cloneable {
             size = Integer.MAX_VALUE;
         }
         this.max = size;
-        return this;
-    }
-
-    /**
-     * The subscription ID may be determined by the content of the response, so we must extract the
-     * new ID from the response.
-     * 
-     * @param extractNewId
-     * @return Chainable API.
-     */
-    public final EfficientWebSocket updateIdBy(Function<JSON, String> extractNewId) {
-        this.extractNewId = extractNewId;
         return this;
     }
 
@@ -152,6 +141,18 @@ public class EfficientWebSocket implements Cloneable {
     }
 
     /**
+     * The subscription ID may be determined by the content of the response, so we must extract the
+     * new ID from the response.
+     *
+     * @param topic A target topic to update.
+     * @param newId A new id of the topic.
+     */
+    public final void registerId(IdentifiableTopic topic, String newId) {
+        signals.put(newId, signals.get(topic.id));
+        logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", uri, topic.id, newId);
+    }
+
+    /**
      * Subscribe the specified topic.
      * 
      * @param topic A topic to subscribe.
@@ -160,11 +161,26 @@ public class EfficientWebSocket implements Cloneable {
         if (ws == null) {
             queue.add(topic);
         } else {
-            send(topic);
+            sendSubscription(topic);
         }
 
         if (subscriptions++ == 0) {
             connect();
+        }
+    }
+
+    /**
+     * Send subscription message to this websocket.
+     * 
+     * @param topic A topic to subscribe.
+     */
+    private void sendSubscription(IdentifiableTopic topic) {
+        if (ws != null) {
+            subscribings.add(topic);
+            topic.subscribing = I.schedule(0, 3, TimeUnit.SECONDS, true).to(count -> {
+                ws.sendText(I.write(topic), true);
+                logger.info("Sent websocket command {} to {}. @{}", topic, uri, count);
+            });
         }
     }
 
@@ -174,27 +190,14 @@ public class EfficientWebSocket implements Cloneable {
      * @param topic A topic to unsubscribe.
      */
     private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
-        send(topic.unsubscribe());
+        if (ws != null) {
+            ws.sendText(I.write(topic.unsubscribe()), true);
+            logger.info("Sent websocket command {} to {}.", topic, uri);
+        }
 
         if (subscriptions == 0 || --subscriptions == 0) {
             disconnect();
             queue.clear();
-        }
-    }
-
-    /**
-     * Send message to this websocket.
-     * 
-     * @param topic A topic to subscribe.
-     */
-    private void send(IdentifiableTopic topic) {
-        if (ws != null) {
-            try {
-                ws.sendText(I.write(topic), true);
-                logger.info("Send websocket command {} to {}.", topic, uri);
-            } catch (Throwable e) {
-                // ignore
-            }
         }
     }
 
@@ -209,7 +212,7 @@ public class EfficientWebSocket implements Cloneable {
 
             this.ws = ws;
             for (IdentifiableTopic command : queue) {
-                send(command);
+                sendSubscription(command);
             }
             queue.clear();
         }, client).to(debug ? I.bundle(this::debug, this::dispatch) : this::dispatch, e -> {
@@ -239,6 +242,15 @@ public class EfficientWebSocket implements Cloneable {
         if (signaling != null) {
             signaling.accept(json);
         } else {
+            for (IdentifiableTopic topic : subscribings) {
+                if (topic.verifySubscribedReply(json)) {
+                    subscribings.remove(topic);
+                    topic.subscribing.dispose();
+                    topic.subscribing = null;
+                    logger.info("Accepted websocket subscription [{}] {}.", uri, topic.id);
+                    return;
+                }
+            }
             logger.warn("Unknown message was recieved. [{}] {}", uri, text);
         }
     }
@@ -291,7 +303,6 @@ public class EfficientWebSocket implements Cloneable {
     public EfficientWebSocket clone() {
         EfficientWebSocket cloned = new EfficientWebSocket(uri, extractId);
         cloned.maximumSubscriptions(max);
-        cloned.updateIdBy(extractNewId);
         cloned.ignoreMessageIf(reject);
 
         return cloned;
@@ -307,6 +318,9 @@ public class EfficientWebSocket implements Cloneable {
 
         /** The unsubscription command builder. */
         private final Consumer<T> unsubscribeCommanBuilder;
+
+        /** The subscrib process. */
+        private Disposable subscribing = Disposable.empty();
 
         /**
          * @param id
@@ -340,10 +354,17 @@ public class EfficientWebSocket implements Cloneable {
         }
 
         /**
+         * Make sure your channel subscription has been properly accepted.
+         * 
+         * @return
+         */
+        protected abstract boolean verifySubscribedReply(JSON reply);
+
+        /**
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public final String toString() {
             return I.write(this).replaceAll("\\s", "");
         }
     }
@@ -355,9 +376,6 @@ public class EfficientWebSocket implements Cloneable {
 
         /** The associated topic. */
         private IdentifiableTopic topic;
-
-        /** State */
-        private boolean updating = false;
 
         /** The number of internal listeners. */
         private int size = 0;
@@ -374,7 +392,6 @@ public class EfficientWebSocket implements Cloneable {
             deploy();
 
             if (size == 1) {
-                if (extractNewId != null) new Updater();
                 sendSubscribe(topic);
             }
 
@@ -399,10 +416,8 @@ public class EfficientWebSocket implements Cloneable {
          * Deploy observers.
          */
         private void deploy() {
-            if (!updating) {
-                deployed = observers.toArray(new Observer[observers.size()]);
-                size = deployed.length;
-            }
+            deployed = observers.toArray(new Observer[observers.size()]);
+            size = deployed.length;
         }
 
         @Override
@@ -425,43 +440,6 @@ public class EfficientWebSocket implements Cloneable {
                 deployed[i].error(error);
             }
         }
-
-        /**
-         * The subscription ID may be determined by the content of the response.
-         */
-        private class Updater implements Observer<JSON> {
-
-            private Updater() {
-                // store original observers
-                updating = true;
-
-                // register this updater directly
-                size = 1;
-                deployed = new Observer[] {this};
-            }
-
-            @Override
-            public void accept(JSON json) {
-                // update id
-                String newId = extractNewId.apply(json);
-                signals.put(newId, signals.get(topic.id));
-                logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", uri, topic.id, newId);
-
-                // restore original observers
-                updating = false;
-                deploy();
-            }
-
-            @Override
-            public void error(Throwable e) {
-                observers.forEach(o -> o.error(e));
-            }
-
-            @Override
-            public void complete() {
-                observers.forEach(o -> o.complete());
-            }
-        }
     }
 
     // public static void main(String[] args) throws InterruptedException {
@@ -476,5 +454,4 @@ public class EfficientWebSocket implements Cloneable {
     //
     // Thread.sleep(1000 * 220);
     // }
-
 }

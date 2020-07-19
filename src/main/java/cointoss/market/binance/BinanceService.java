@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -259,15 +260,25 @@ class BinanceService extends MarketService {
      */
     static class Topic extends IdentifiableTopic<Topic> {
 
+        private static final AtomicInteger counter = new AtomicInteger();
+
         public String method = "SUBSCRIBE";
 
         public List<String> params = new ArrayList();
 
-        public int id = 0;
+        public int id = counter.incrementAndGet();
 
         private Topic(String channel, String market) {
             super(market.toLowerCase() + "@" + channel, topic -> topic.method = "UNSUBSCRIBE");
             this.params.add(market.toLowerCase() + "@" + channel);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected boolean verifySubscribedReply(JSON reply) {
+            return Integer.parseInt(reply.text("id")) == id;
         }
     }
 }

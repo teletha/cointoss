@@ -309,10 +309,21 @@ class BitMexService extends MarketService {
 
         public List<String> args = new ArrayList();
 
+        private final String id;
+
         private Topic(String channel, String market) {
             super(channel + "[" + market + "]", topic -> topic.op = "unsubscribe");
 
-            this.args.add(channel + ":" + market);
+            this.id = channel + ":" + market;
+            this.args.add(id);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected boolean verifySubscribedReply(JSON reply) {
+            return id.equals(reply.text("subscribe")) && Boolean.parseBoolean(reply.text("success"));
         }
     }
 }

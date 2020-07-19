@@ -14,6 +14,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
+import java.time.Duration;
 
 import kiss.I;
 import kiss.JSON;
@@ -28,7 +29,7 @@ public class Network {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) limiter.acquire();
 
-            return I.http(request, JSON.class, client).to(observer, disposer);
+            return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client).to(observer, disposer);
         });
     }
 

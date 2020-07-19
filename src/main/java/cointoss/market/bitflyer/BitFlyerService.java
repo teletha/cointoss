@@ -869,6 +869,14 @@ class BitFlyerService extends MarketService {
             super("[" + channel + marketName + "]", topic -> topic.method = "unsubscribe");
             params.put("channel", channel + marketName);
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected boolean verifySubscribedReply(JSON reply) {
+            return id == Integer.parseInt(reply.text("id")) && Boolean.parseBoolean(reply.text("result"));
+        }
     }
 
     /**

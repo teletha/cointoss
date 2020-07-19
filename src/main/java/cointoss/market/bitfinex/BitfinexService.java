@@ -15,7 +15,6 @@ import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -46,20 +45,8 @@ class BitfinexService extends MarketService {
     /** The API limit. */
     private static final APILimiter LimitForBook = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
-    /** Extract id from websocket stream. */
-    private static final Function<JSON, String> ExtractId = json -> {
-        String chanId = json.text("0");
-        if (chanId != null) {
-            return chanId;
-        } else {
-            // for initial subscribed response
-            return json.text("channel") + json.text("pair");
-        }
-    };
-
     /** The realtiem communicator. */
-    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://api-pub.bitfinex.com/ws/2", ExtractId)
-            .updateIdBy(json -> json.text("chanId"))
+    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://api-pub.bitfinex.com/ws/2", json -> json.text("0"))
             .ignoreMessageIf(json -> json.has("1", "hb")); // ignore heartbeat
 
     /**
@@ -310,6 +297,19 @@ class BitfinexService extends MarketService {
             super(channel + symbol, topic -> topic.event = "unsubscribe");
             this.channel = channel;
             this.symbol = symbol;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected boolean verifySubscribedReply(JSON reply) {
+            if ("subscribed".equals(reply.text("event")) && channel.equals(reply.text("channel")) && symbol.equals(reply.text("pair"))) {
+                Realtime.registerId(this, reply.text("chanId"));
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }
