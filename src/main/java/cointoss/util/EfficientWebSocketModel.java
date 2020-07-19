@@ -27,28 +27,18 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import icy.manipulator.Icy;
 import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
 import kiss.Observer;
 import kiss.Signal;
 
-public class EfficientWebSocket implements Cloneable {
+@Icy
+public abstract class EfficientWebSocketModel {
 
     /** Logging utility. */
     private static final Logger logger = LogManager.getLogger();
-
-    /** The connection address. */
-    private final String uri;
-
-    /** The maximum subscription size. */
-    private int max = 25;
-
-    /** The ID extractor. */
-    private final Function<JSON, String> extractId;
-
-    /** The rejectable message pattern. */
-    private Predicate<JSON> reject;
 
     /** The cached connection. */
     private WebSocket ws;
@@ -62,24 +52,20 @@ public class EfficientWebSocket implements Cloneable {
     /** The management of subscriptions. */
     private int subscriptions;
 
-    /** The flag for loggin in detail. */
-    private boolean debug;
-
-    /** The http client. */
-    private HttpClient[] client = new HttpClient[0];
-
     /** The current subscribing topics. */
     private final Set<IdentifiableTopic> subscribings = ConcurrentHashMap.newKeySet();
 
+    @Icy.Property(copiable = true)
+    public abstract String address();
+
     /**
-     * @param uri
-     * @param max
-     * @param extractId
+     * Extract channel id from massage.
+     * 
+     * @param extractId An id extractor.
+     * @return Chainable API.
      */
-    public EfficientWebSocket(String uri, Function<JSON, String> extractId) {
-        this.uri = Objects.requireNonNull(uri);
-        this.extractId = Objects.requireNonNull(extractId);
-    }
+    @Icy.Property
+    public abstract Function<JSON, String> extractId();
 
     /**
      * Sets the maximum number of subscriptions per connection. Default value is 25.
@@ -88,12 +74,9 @@ public class EfficientWebSocket implements Cloneable {
      *            to 0 is considered unlimited.
      * @return Chainable API.
      */
-    public final EfficientWebSocket maximumSubscriptions(int size) {
-        if (size <= 0) {
-            size = Integer.MAX_VALUE;
-        }
-        this.max = size;
-        return this;
+    @Icy.Property
+    public int maximumSubscriptions() {
+        return Integer.MAX_VALUE;
     }
 
     /**
@@ -103,9 +86,9 @@ public class EfficientWebSocket implements Cloneable {
      * @param condition
      * @return Chainable API.
      */
-    public final EfficientWebSocket ignoreMessageIf(Predicate<JSON> condition) {
-        this.reject = condition;
-        return this;
+    @Icy.Property
+    public Predicate<JSON> ignoreMessageIf() {
+        return null;
     }
 
     /**
@@ -113,9 +96,9 @@ public class EfficientWebSocket implements Cloneable {
      * 
      * @return Chainable API.
      */
-    public final EfficientWebSocket enableDebug() {
-        this.debug = true;
-        return this;
+    @Icy.Property
+    public boolean enableDebug() {
+        return false;
     }
 
     /**
@@ -123,9 +106,9 @@ public class EfficientWebSocket implements Cloneable {
      * 
      * @return Chainable API.
      */
-    public final EfficientWebSocket enableDebug(HttpClient client) {
-        this.client = client == null ? new HttpClient[0] : new HttpClient[] {client};
-        return this;
+    @Icy.Property(copiable = true)
+    public HttpClient client() {
+        return null;
     }
 
     /**
@@ -149,7 +132,7 @@ public class EfficientWebSocket implements Cloneable {
      */
     public final void registerId(IdentifiableTopic topic, String newId) {
         signals.put(newId, signals.get(topic.id));
-        logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", uri, topic.id, newId);
+        logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", address(), topic.id, newId);
     }
 
     /**
@@ -179,7 +162,7 @@ public class EfficientWebSocket implements Cloneable {
             subscribings.add(topic);
             topic.subscribing = I.schedule(0, 3, TimeUnit.SECONDS, true).to(count -> {
                 ws.sendText(I.write(topic), true);
-                logger.info("Sent websocket command {} to {}. @{}", topic, uri, count);
+                logger.info("Sent websocket command {} to {}. @{}", topic, address(), count);
             });
         }
     }
@@ -192,7 +175,7 @@ public class EfficientWebSocket implements Cloneable {
     private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
         if (ws != null) {
             ws.sendText(I.write(topic.unsubscribe()), true);
-            logger.info("Sent websocket command {} to {}.", topic, uri);
+            logger.info("Sent websocket command {} to {}.", topic, address());
         }
 
         if (subscriptions == 0 || --subscriptions == 0) {
@@ -205,22 +188,22 @@ public class EfficientWebSocket implements Cloneable {
      * Connect to the server by websocket.
      */
     private void connect() {
-        logger.info("Starting websocket [{}].", uri);
+        logger.info("Starting websocket [{}].", address());
 
-        I.http(uri, ws -> {
-            logger.info("Connected websocket [{}].", uri);
+        I.http(address(), ws -> {
+            logger.info("Connected websocket [{}].", address());
 
             this.ws = ws;
             for (IdentifiableTopic command : queue) {
                 sendSubscription(command);
             }
             queue.clear();
-        }, client).to(debug ? I.bundle(this::debug, this::dispatch) : this::dispatch, e -> {
-            logger.error("Disconnected websocket [{}].", uri, cause(e));
+        }, client()).to(enableDebug() ? I.bundle(this::debug, this::dispatch) : this::dispatch, e -> {
+            logger.error("Disconnected websocket [{}].", address(), cause(e));
             disconnect();
             signals.values().forEach(signal -> signal.error(e));
         }, () -> {
-            logger.info("Finished websocket [{}].", uri);
+            logger.info("Finished websocket [{}].", address());
             disconnect();
             signals.values().forEach(signal -> signal.complete());
         });
@@ -234,11 +217,12 @@ public class EfficientWebSocket implements Cloneable {
     private void dispatch(String text) {
         JSON json = I.json(text);
 
+        Predicate<JSON> reject = ignoreMessageIf();
         if (reject != null && reject.test(json)) {
             return;
         }
 
-        Supersonic signaling = signals.get(extractId.apply(json));
+        Supersonic signaling = signals.get(extractId().apply(json));
         if (signaling != null) {
             signaling.accept(json);
         } else {
@@ -247,11 +231,11 @@ public class EfficientWebSocket implements Cloneable {
                     subscribings.remove(topic);
                     topic.subscribing.dispose();
                     topic.subscribing = null;
-                    logger.info("Accepted websocket subscription [{}] {}.", uri, topic.id);
+                    logger.info("Accepted websocket subscription [{}] {}.", address(), topic.id);
                     return;
                 }
             }
-            logger.warn("Unknown message was recieved. [{}] {}", uri, text);
+            logger.warn("Unknown message was recieved. [{}] {}", address(), text);
         }
     }
 
@@ -294,18 +278,6 @@ public class EfficientWebSocket implements Cloneable {
             cause = e.getCause();
         }
         return e;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public EfficientWebSocket clone() {
-        EfficientWebSocket cloned = new EfficientWebSocket(uri, extractId);
-        cloned.maximumSubscriptions(max);
-        cloned.ignoreMessageIf(reject);
-
-        return cloned;
     }
 
     /**

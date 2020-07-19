@@ -30,7 +30,7 @@ import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
-import cointoss.util.EfficientWebSocket.IdentifiableTopic;
+import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.I;
@@ -49,8 +49,8 @@ class BitMexService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://www.bitmex.com/realtime", json -> json
-            .text("table") + json.find(String.class, "data", "0", "symbol"));
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://www.bitmex.com/realtime")
+            .extractId(json -> json.text("table") + json.find(String.class, "data", "0", "symbol"));
 
     /** The market id. */
     private final int marketId;

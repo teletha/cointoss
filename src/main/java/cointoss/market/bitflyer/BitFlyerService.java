@@ -47,7 +47,7 @@ import cointoss.order.OrderType;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
-import cointoss.util.EfficientWebSocket.IdentifiableTopic;
+import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -73,9 +73,8 @@ class BitFlyerService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(500).refresh(Duration.ofMinutes(5));
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
-    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", json -> {
-        return json.find(String.class, "params", "channel").toString();
-    });
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
+            .extractId(json -> json.find(String.class, "params", "channel").toString());
 
     /** The realtime data format */
     static final DateTimeFormatter RealtimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");

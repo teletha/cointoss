@@ -27,7 +27,7 @@ import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
-import cointoss.util.EfficientWebSocket.IdentifiableTopic;
+import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.I;
@@ -46,7 +46,8 @@ class BitfinexService extends MarketService {
     private static final APILimiter LimitForBook = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
     /** The realtiem communicator. */
-    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://api-pub.bitfinex.com/ws/2", json -> json.text("0"))
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api-pub.bitfinex.com/ws/2")
+            .extractId(json -> json.text("0"))
             .ignoreMessageIf(json -> json.has("1", "hb")); // ignore heartbeat
 
     /**

@@ -53,6 +53,6 @@ class BitFlyerServiceMock extends BitFlyerService {
      */
     @Override
     protected EfficientWebSocket clientRealtimely() {
-        return super.clientRealtimely().clone().enableDebug(websocketServer.httpClient());
+        return super.clientRealtimely().withClient(websocketServer.httpClient());
     }
 }

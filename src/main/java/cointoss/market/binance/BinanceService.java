@@ -29,7 +29,7 @@ import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
-import cointoss.util.EfficientWebSocket.IdentifiableTopic;
+import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.I;
@@ -42,12 +42,11 @@ class BinanceService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(600).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://stream.binance.com:9443/stream", json -> json
-            .text("stream"));
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.binance.com:9443/stream")
+            .extractId(json -> json.text("stream"));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket RealtimeFuture = new EfficientWebSocket("wss://fstream.binance.com/stream", json -> json
-            .text("stream"));
+    private static final EfficientWebSocket RealtimeFuture = Realtime.withAddress("wss://fstream.binance.com/stream");
 
     /** The market type. */
     private final boolean isFutures;
