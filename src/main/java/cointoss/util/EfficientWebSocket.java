@@ -317,25 +317,25 @@ public class EfficientWebSocket implements Cloneable {
         private final String id;
 
         /** The unsubscription command builder. */
-        private final Consumer<T> unsubscribeCommanBuilder;
+        private final Consumer<T> unsubscribeCommandBuilder;
 
         /** The subscrib process. */
         private Disposable subscribing = Disposable.empty();
 
         /**
          * @param id
-         * @param unsubscribeCommanBuilder
+         * @param unsubscribeCommandBuilder
          */
-        protected IdentifiableTopic(String id, Consumer<T> unsubscribeCommanBuilder) {
+        protected IdentifiableTopic(String id, Consumer<T> unsubscribeCommandBuilder) {
             if (id == null || id.isEmpty()) {
                 throw new IllegalArgumentException("ID must be non-empty value.");
             }
 
-            if (unsubscribeCommanBuilder == null) {
+            if (unsubscribeCommandBuilder == null) {
                 throw new IllegalArgumentException("Can't unsubscribe command.");
             }
             this.id = id;
-            this.unsubscribeCommanBuilder = unsubscribeCommanBuilder;
+            this.unsubscribeCommandBuilder = unsubscribeCommandBuilder;
         }
 
         /**
@@ -346,7 +346,7 @@ public class EfficientWebSocket implements Cloneable {
         private IdentifiableTopic unsubscribe() {
             try {
                 T cloned = (T) clone();
-                unsubscribeCommanBuilder.accept(cloned);
+                unsubscribeCommandBuilder.accept(cloned);
                 return cloned;
             } catch (Exception e) {
                 throw I.quiet(e);
