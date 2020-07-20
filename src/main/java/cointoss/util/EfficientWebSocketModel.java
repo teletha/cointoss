@@ -174,8 +174,9 @@ public abstract class EfficientWebSocketModel {
      */
     private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
         if (ws != null) {
-            ws.sendText(I.write(topic.unsubscribe()), true);
-            logger.info("Sent websocket command {} to {}.", topic, address());
+            IdentifiableTopic unsubscribe = topic.unsubscribe();
+            ws.sendText(I.write(unsubscribe), true);
+            logger.info("Sent websocket command {} to {}.", unsubscribe, address());
         }
 
         if (subscriptions == 0 || --subscriptions == 0) {

@@ -198,11 +198,11 @@ public abstract class MarketService implements Disposable {
      */
     public long estimateInitialExecutionId() {
         long start = 0;
-        long end = executionLatest().to().v.id;
+        long end = executionLatest().waitForTerminate().to().exact().id;
         long middle = (start + end) / 2;
 
         while (true) {
-            List<Execution> result = executions(start, middle).skipError().toList();
+            List<Execution> result = executions(start, middle).skipError().waitForTerminate().toList();
 
             if (result.isEmpty()) {
                 start = middle;
