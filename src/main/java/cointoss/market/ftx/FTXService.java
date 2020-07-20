@@ -208,7 +208,8 @@ class FTXService extends MarketService {
         Direction direction = Direction.parse(e.get(String.class, "side"));
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");
-        ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "time"), TimeFormat).withZoneSameLocal(Chrono.UTC);
+        System.out.println(e);
+        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat).withZoneSameLocal(Chrono.UTC);
         long id = e.get(Long.class, "id");
 
         return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(Execution.ConsecutiveDifference);
@@ -231,6 +232,8 @@ class FTXService extends MarketService {
         FTX.BTC_USD.executionLatest().to(e -> {
             System.out.println(e);
         });
+
+        Thread.sleep(1000 * 15);
     }
 
 }

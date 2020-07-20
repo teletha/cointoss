@@ -55,6 +55,8 @@ public abstract class EfficientWebSocketModel {
     /** The current subscribing topics. */
     private final Set<IdentifiableTopic> subscribings = ConcurrentHashMap.newKeySet();
 
+    private boolean debug;
+
     @Icy.Property(copiable = true)
     public abstract String address();
 
@@ -93,12 +95,9 @@ public abstract class EfficientWebSocketModel {
 
     /**
      * Outputs a detailed log.
-     * 
-     * @return Chainable API.
      */
-    @Icy.Property
-    public boolean enableDebug() {
-        return false;
+    public void enableDebug() {
+        this.debug = true;
     }
 
     /**
@@ -199,7 +198,7 @@ public abstract class EfficientWebSocketModel {
                 sendSubscription(command);
             }
             queue.clear();
-        }, client()).to(enableDebug() ? I.bundle(this::debug, this::dispatch) : this::dispatch, e -> {
+        }, client()).to(debug ? I.bundle(this::debug, this::dispatch) : this::dispatch, e -> {
             logger.error("Disconnected websocket [{}].", address(), cause(e));
             disconnect();
             signals.values().forEach(signal -> signal.error(e));

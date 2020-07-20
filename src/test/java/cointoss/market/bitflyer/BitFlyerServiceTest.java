@@ -17,11 +17,13 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.market.MarketServiceMock;
+import cointoss.market.MarketServiceTestBase;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 
-public class BitFlyerServiceTest {
+public class BitFlyerServiceTest extends MarketServiceTestBase {
 
     @Test
     void parseVariousDateTimeFormat() {
@@ -32,8 +34,9 @@ public class BitFlyerServiceTest {
         assert BitFlyerService.parse("2018-07-09T01Z").isEqual(LocalDateTime.parse("2018-07-09T01:00:00.000"));
     }
 
+    @Override
     @Test
-    void orderActive() {
+    protected void orderActive() {
         BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.httpClient.onGet().doReturnJSON("""
                 [
@@ -364,10 +367,11 @@ public class BitFlyerServiceTest {
 
     @Test
     void executionRealtimely() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
+        MarketServiceMock service = MarketServiceMock.mock(BitFlyer.FX_BTC_JPY).enableDebug();
         service.websocketServer
-                .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
-                    server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
+                .replyWhenJSON("{'id':0,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
+                    System.out.println("OK");
+                    server.sendJSON("{'jsonrpc':'2.0','id':1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991348,'side':'SELL','price':999467.0,'size':0.1,'exec_date':'2020-07-12T06:16:04.3243532Z','buy_child_order_acceptance_id':'JRF20200712-061603-372561','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
                 });

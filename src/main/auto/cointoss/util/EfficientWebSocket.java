@@ -63,9 +63,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     private static final MethodHandle ignoreMessageIfUpdater = updater("ignoreMessageIf");
 
     /** The final property updater. */
-    private static final MethodHandle enableDebugUpdater = updater("enableDebug");
-
-    /** The final property updater. */
     private static final MethodHandle clientUpdater = updater("client");
 
     /** The exposed property. */
@@ -81,9 +78,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     public final Predicate<JSON> ignoreMessageIf;
 
     /** The exposed property. */
-    public final boolean enableDebug;
-
-    /** The exposed property. */
     public final HttpClient client;
 
     /**
@@ -94,7 +88,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         this.extractId = null;
         this.maximumSubscriptions = super.maximumSubscriptions();
         this.ignoreMessageIf = super.ignoreMessageIf();
-        this.enableDebug = super.enableDebug();
         this.client = super.client();
     }
 
@@ -250,39 +243,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
      *  @return Chainable API.
      */
     @Override
-    public final boolean enableDebug() {
-        return this.enableDebug;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of enableDebug property.
-     */
-    @SuppressWarnings("unused")
-    private final boolean getEnableDebug() {
-        return this.enableDebug;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of enableDebug property to assign.
-     */
-    private final void setEnableDebug(boolean value) {
-        try {
-            enableDebugUpdater.invoke(this, value);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
-     * Outputs a detailed log.
-     *  
-     *  @return Chainable API.
-     */
-    @Override
     public final HttpClient client() {
         return this.client;
     }
@@ -325,7 +285,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         builder.append("extractId=").append(extractId).append(", ");
         builder.append("maximumSubscriptions=").append(maximumSubscriptions).append(", ");
         builder.append("ignoreMessageIf=").append(ignoreMessageIf).append(", ");
-        builder.append("enableDebug=").append(enableDebug).append(", ");
         builder.append("client=").append(client).append("]");
         return builder.toString();
     }
@@ -337,7 +296,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(address, extractId, maximumSubscriptions, ignoreMessageIf, enableDebug, client);
+        return Objects.hash(address, extractId, maximumSubscriptions, ignoreMessageIf, client);
     }
 
     /**
@@ -356,7 +315,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (!Objects.equals(extractId, other.extractId)) return false;
         if (maximumSubscriptions != other.maximumSubscriptions) return false;
         if (!Objects.equals(ignoreMessageIf, other.ignoreMessageIf)) return false;
-        if (enableDebug != other.enableDebug) return false;
         if (!Objects.equals(client, other.client)) return false;
         return true;
     }
@@ -371,7 +329,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.address == value) {
             return this;
         }
-        return with.address(value).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).enableDebug(this.enableDebug).client(this.client);
+        return with.address(value).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(this.client);
     }
 
     /**
@@ -384,7 +342,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.client == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).enableDebug(this.enableDebug).client(value);
+        return with.address(this.address).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(value);
     }
 
     /** The singleton builder. */
@@ -469,17 +427,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
 
         /**
-         * Assign enableDebug property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next enableDebug(boolean value) {
-            ((EfficientWebSocket) this).setEnableDebug(value);
-            return (Next) this;
-        }
-
-        /**
          * Assign client property.
          * 
          * @param value A new value to assign.
@@ -511,7 +458,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         static final String ExtractId = "extractId";
         static final String MaximumSubscriptions = "maximumSubscriptions";
         static final String IgnoreMessageIf = "ignoreMessageIf";
-        static final String EnableDebug = "enableDebug";
         static final String Client = "client";
     }
 }
