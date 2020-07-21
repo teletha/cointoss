@@ -11,13 +11,18 @@ package cointoss.market.ftx;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.execution.Execution;
+import cointoss.market.MarketServiceTestBase;
 
-class FTXServiceTest {
+class FTXServiceTest extends MarketServiceTestBase {
 
     @Test
     void latestExecution() {
-        FTXServiceMock service = new FTXServiceMock();
-        Execution latest = service.executionLatest().to().acquire();
+        // FTXServiceMock service = new FTXServiceMock();
+        // Execution latest = service.executionLatest().to().acquire();
+    }
+
+    @Test
+    @Override
+    protected void orderActive() {
     }
 }

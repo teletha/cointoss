@@ -9,7 +9,10 @@
  */
 package cointoss.market;
 
+import org.junit.jupiter.api.Test;
+
 public abstract class MarketServiceTestBase {
 
+    @Test
     protected abstract void orderActive();
 }
