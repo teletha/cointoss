@@ -14,6 +14,7 @@ import java.net.http.HttpClient;
 import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.RecordableHttpClientMock;
 
+import antibug.Chronus;
 import antibug.WebSocketServer;
 import antibug.WebSocketServer.WebSocketClient;
 import cointoss.MarketSetting;
@@ -30,6 +31,8 @@ class BitFlyerServiceMock extends BitFlyerService {
 
     /** The websocket client interface. */
     protected final WebSocketClient websocketClient = websocketServer.websocketClient();
+
+    protected final Chronus chronus = new Chronus();
 
     /**
      * 
@@ -53,6 +56,6 @@ class BitFlyerServiceMock extends BitFlyerService {
      */
     @Override
     protected EfficientWebSocket clientRealtimely() {
-        return super.clientRealtimely().withClient(websocketServer.httpClient());
+        return super.clientRealtimely().withClient(websocketServer.httpClient()).withScheduler(chronus);
     }
 }
