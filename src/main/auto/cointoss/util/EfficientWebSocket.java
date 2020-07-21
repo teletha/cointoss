@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.net.http.HttpClient;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.annotation.processing.Generated;
@@ -65,6 +66,9 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     /** The final property updater. */
     private static final MethodHandle clientUpdater = updater("client");
 
+    /** The final property updater. */
+    private static final MethodHandle schedulerUpdater = updater("scheduler");
+
     /** The exposed property. */
     public final String address;
 
@@ -80,6 +84,9 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     /** The exposed property. */
     public final HttpClient client;
 
+    /** The exposed property. */
+    public final ScheduledExecutorService scheduler;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -89,6 +96,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         this.maximumSubscriptions = super.maximumSubscriptions();
         this.ignoreMessageIf = super.ignoreMessageIf();
         this.client = super.client();
+        this.scheduler = super.scheduler();
     }
 
     /**
@@ -274,6 +282,42 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     }
 
     /**
+     * Outputs a detailed log.
+     *  
+     *  @return Chainable API.
+     */
+    @Override
+    public final ScheduledExecutorService scheduler() {
+        return this.scheduler;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of scheduler property.
+     */
+    @SuppressWarnings("unused")
+    private final ScheduledExecutorService getScheduler() {
+        return this.scheduler;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of scheduler property to assign.
+     */
+    private final void setScheduler(ScheduledExecutorService value) {
+        if (value == null) {
+            value = super.scheduler();
+        }
+        try {
+            schedulerUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Show all property values.
      *
      * @return All property values.
@@ -285,7 +329,8 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         builder.append("extractId=").append(extractId).append(", ");
         builder.append("maximumSubscriptions=").append(maximumSubscriptions).append(", ");
         builder.append("ignoreMessageIf=").append(ignoreMessageIf).append(", ");
-        builder.append("client=").append(client).append("]");
+        builder.append("client=").append(client).append(", ");
+        builder.append("scheduler=").append(scheduler).append("]");
         return builder.toString();
     }
 
@@ -296,7 +341,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(address, extractId, maximumSubscriptions, ignoreMessageIf, client);
+        return Objects.hash(address, extractId, maximumSubscriptions, ignoreMessageIf, client, scheduler);
     }
 
     /**
@@ -316,6 +361,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (maximumSubscriptions != other.maximumSubscriptions) return false;
         if (!Objects.equals(ignoreMessageIf, other.ignoreMessageIf)) return false;
         if (!Objects.equals(client, other.client)) return false;
+        if (!Objects.equals(scheduler, other.scheduler)) return false;
         return true;
     }
 
@@ -329,7 +375,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.address == value) {
             return this;
         }
-        return with.address(value).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(this.client);
+        return with.address(value).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(this.client).scheduler(this.scheduler);
     }
 
     /**
@@ -342,7 +388,20 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.client == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(value);
+        return with.address(this.address).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(value).scheduler(this.scheduler);
+    }
+
+    /**
+     * Create new {@link EfficientWebSocket} with the specified property and copy other properties from this model.
+     *
+     * @param value A new value to assign.
+     * @return A created new model instance.
+     */
+    public EfficientWebSocket withScheduler(ScheduledExecutorService value) {
+        if (this.scheduler == value) {
+            return this;
+        }
+        return with.address(this.address).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(this.client).scheduler(value);
     }
 
     /** The singleton builder. */
@@ -436,6 +495,17 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
             ((EfficientWebSocket) this).setClient(value);
             return (Next) this;
         }
+
+        /**
+         * Assign scheduler property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next scheduler(ScheduledExecutorService value) {
+            ((EfficientWebSocket) this).setScheduler(value);
+            return (Next) this;
+        }
     }
 
     /**
@@ -459,5 +529,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         static final String MaximumSubscriptions = "maximumSubscriptions";
         static final String IgnoreMessageIf = "ignoreMessageIf";
         static final String Client = "client";
+        static final String Scheduler = "scheduler";
     }
 }

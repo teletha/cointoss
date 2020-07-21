@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -111,6 +112,16 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
+     * Outputs a detailed log.
+     * 
+     * @return Chainable API.
+     */
+    @Icy.Property(copiable = true)
+    public ScheduledExecutorService scheduler() {
+        return null;
+    }
+
+    /**
      * Execute command on this connection.
      * 
      * @param topic A subscription command (i.e. bean-like object).
@@ -159,7 +170,7 @@ public abstract class EfficientWebSocketModel {
     private void sendSubscription(IdentifiableTopic topic) {
         if (ws != null) {
             subscribings.add(topic);
-            topic.subscribing = I.schedule(0, 3, TimeUnit.SECONDS, true).to(count -> {
+            topic.subscribing = I.schedule(0, 3, TimeUnit.SECONDS, true, scheduler()).to(count -> {
                 ws.sendText(I.write(topic), true);
                 logger.info("Sent websocket command {} to {}. @{}", topic, address(), count);
             });
