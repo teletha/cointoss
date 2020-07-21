@@ -368,8 +368,8 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
     void executionRealtimely() {
         BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.websocketServer
-                .replyWhenJSON("{'id':1,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
-                    server.sendJSON("{'jsonrpc':'2.0','id':1,'result':true}");
+                .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
+                    server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991348,'side':'SELL','price':999467.0,'size':0.1,'exec_date':'2020-07-12T06:16:04.3243532Z','buy_child_order_acceptance_id':'JRF20200712-061603-372561','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
                 });
@@ -402,8 +402,8 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
     void executionRealtimelyConsecutiveBuy() {
         BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.websocketServer
-                .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
-                    server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
+                .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
+                    server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991348,'side':'BUY','price':999467.0,'size':0.1,'exec_date':'2020-07-12T06:16:04.3243532Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
                 });
@@ -418,8 +418,8 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
     void executionRealtimelyConsecutiveSell() {
         BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.websocketServer
-                .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
-                    server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
+                .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
+                    server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'SELL','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-590195-152395','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991348,'side':'SELL','price':999467.0,'size':0.1,'exec_date':'2020-07-12T06:16:04.3243532Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
                 });
@@ -434,8 +434,8 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
     void executionRealtimelyWithMultipleChannels() {
         BitFlyerServiceMock service = new BitFlyerServiceMock();
         service.websocketServer
-                .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
-                    server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");
+                .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
+                    server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_IGNORED','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991348,'side':'SELL','price':999467.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.3243532Z','buy_child_order_acceptance_id':'JRF20200712-061603-372561','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
                 });
