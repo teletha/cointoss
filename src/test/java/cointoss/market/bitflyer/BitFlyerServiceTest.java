@@ -31,6 +31,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         return construct(BitFlyerService::new, BitFlyer.FX_BTC_JPY.marketName, BitFlyer.FX_BTC_JPY.setting, true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Test
     @Override
     protected void orderActive() {
@@ -77,6 +80,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.isNotTerminated();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Test
     @Override
     protected void orderActiveEmpty() {
@@ -86,6 +92,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert list.size() == 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void orderCanceled() {
@@ -132,6 +141,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.isTerminated();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void orderCanceledEmpty() {
@@ -141,6 +153,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert list.size() == 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void orderCompleted() {
@@ -187,6 +202,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.isTerminated();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void orderCompletedEmpty() {
@@ -196,6 +214,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert list.size() == 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void orders() {
@@ -276,6 +297,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.isTerminated();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void ordersEmpty() {
@@ -285,6 +309,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert list.size() == 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void executions() {
@@ -333,6 +360,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert e.consecutive == Execution.ConsecutiveSameBuyer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void executionLatest() {
@@ -361,6 +391,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert e.consecutive == Execution.ConsecutiveDifference;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void executionRealtimely() {
@@ -395,6 +428,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert exe.seller.equals("JRF20200712-061604-575165");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void executionRealtimelyConsecutiveBuy() {
@@ -411,6 +447,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert list.get(1).consecutive == Execution.ConsecutiveSameBuyer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void executionRealtimelyConsecutiveSell() {
@@ -427,6 +466,9 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert list.get(1).consecutive == Execution.ConsecutiveSameSeller;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Test
     protected void executionRealtimelyWithMultipleChannels() {

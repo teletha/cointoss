@@ -37,7 +37,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
-class BitMexService extends MarketService {
+public class BitMexService extends MarketService {
 
     /** The right padding for id. */
     private static final long PaddingForID = 100000;
@@ -62,7 +62,7 @@ class BitMexService extends MarketService {
      * @param marketName
      * @param setting
      */
-    BitMexService(int id, String marketName, MarketSetting setting) {
+    protected BitMexService(int id, String marketName, MarketSetting setting) {
         super("BitMEX", marketName, setting);
 
         this.marketId = id;

@@ -218,26 +218,22 @@ public class BinanceService extends MarketService {
     /**
      * Convert to {@link Execution}.
      * 
-     * @param json
-     * @param previous
+     * @param e
      * @return
      */
     private Execution convert(JSON e) {
-        Direction direction = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
+        long id = Long.parseLong(e.text("a"));
+        Direction side = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
         Num size = e.get(Num.class, "q");
         Num price = e.get(Num.class, "p");
-        long tradeTime = Long.parseLong(e.text("T"));
-        ZonedDateTime date = Chrono.utcByMills(tradeTime);
-        long tradeId = Long.parseLong(e.text("a"));
+        ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
 
-        Execution exe = Execution.with.direction(direction, size)
-                .id(tradeId)
+        return Execution.with.direction(side, size)
+                .id(id)
                 .price(price)
                 .date(date)
                 .consecutive(Execution.ConsecutiveDifference)
                 .delay(Execution.DelayInestimable);
-
-        return exe;
     }
 
     /**
