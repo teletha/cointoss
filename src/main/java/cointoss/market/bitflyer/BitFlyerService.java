@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.translate;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -62,7 +62,7 @@ import viewtify.Viewtify;
  * data may arrive before the order response, or execution data may arrive after the cancellation
  * response.
  */
-class BitFlyerService extends MarketService {
+public class BitFlyerService extends MarketService {
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
 
@@ -112,15 +112,19 @@ class BitFlyerService extends MarketService {
     /**
      * @param type
      */
-    BitFlyerService(String type, MarketSetting setting) {
-        this(type, false, setting);
+    protected BitFlyerService(String type, MarketSetting setting) {
+        this(type, setting, false);
     }
 
     /**
-     * @param type
+     * Market service for bitFlyer.
+     * 
+     * @param marketId A market identifier.
+     * @param setting A market setting.
+     * @param forTest
      */
-    BitFlyerService(String type, boolean forTest, MarketSetting setting) {
-        super("BitFlyer", type, setting);
+    protected BitFlyerService(String marketId, MarketSetting setting, boolean forTest) {
+        super("BitFlyer", marketId, setting);
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.schedule(0, 1, TimeUnit.SECONDS, false, scheduler()).map(v -> orders().toList()).share();

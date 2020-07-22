@@ -36,7 +36,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
-class BinanceService extends MarketService {
+public class BinanceService extends MarketService {
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(600).refresh(Duration.ofMinutes(1));
@@ -55,7 +55,7 @@ class BinanceService extends MarketService {
      * @param marketName
      * @param setting
      */
-    BinanceService(String marketName, boolean isFutures, MarketSetting setting) {
+    protected BinanceService(String marketName, boolean isFutures, MarketSetting setting) {
         super(isFutures ? "BinanceF" : "Binance", marketName, setting);
 
         this.isFutures = isFutures;

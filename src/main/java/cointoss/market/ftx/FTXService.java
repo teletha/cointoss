@@ -33,7 +33,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
-class FTXService extends MarketService {
+public class FTXService extends MarketService {
 
     /** The right padding for id. */
     private static final long PaddingForID = 100000;
@@ -51,7 +51,7 @@ class FTXService extends MarketService {
      * @param marketName
      * @param setting
      */
-    FTXService(String marketName, MarketSetting setting) {
+    protected FTXService(String marketName, MarketSetting setting) {
         super("BitMEX", marketName, setting);
 
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.baseCurrencyMinimumBidPrice;

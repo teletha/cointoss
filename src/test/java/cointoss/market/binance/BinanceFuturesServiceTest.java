@@ -7,21 +7,20 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.market.ftx;
+package cointoss.market.binance;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.market.MarketServiceTestTemplate;
 
-class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
+public class BinanceFuturesServiceTest extends MarketServiceTestTemplate<BinanceService> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @Test
-    protected FTXService constructMarketService() {
-        return construct(FTXService::new, FTX.BTC_USD.marketName, FTX.BTC_USD.setting);
+    protected BinanceService constructMarketService() {
+        return construct(BinanceService::new, Binance.FUTURE_BTC_USDT.marketName, true, Binance.FUTURE_BTC_USDT.setting);
     }
 
     /**

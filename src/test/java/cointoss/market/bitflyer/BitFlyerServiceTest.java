@@ -17,27 +17,25 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.market.MarketServiceTestBase;
+import cointoss.market.MarketServiceTestTemplate;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 
-public class BitFlyerServiceTest extends MarketServiceTestBase {
+public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerService> {
 
-    @Test
-    void parseVariousDateTimeFormat() {
-        assert BitFlyerService.parse("2018-04-26T00:32:26.1234567Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.123"));
-        assert BitFlyerService.parse("2018-04-26T00:32:26.19Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.190"));
-        assert BitFlyerService.parse("2018-07-09T01:16:20Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:20.000"));
-        assert BitFlyerService.parse("2018-07-09T01:16Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:00.000"));
-        assert BitFlyerService.parse("2018-07-09T01Z").isEqual(LocalDateTime.parse("2018-07-09T01:00:00.000"));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected BitFlyerService constructMarketService() {
+        return construct(BitFlyerService::new, BitFlyer.FX_BTC_JPY.marketName, BitFlyer.FX_BTC_JPY.setting, true);
     }
 
-    @Override
     @Test
+    @Override
     protected void orderActive() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("""
+        httpClient.onGet().doReturnJSON("""
                 [
                   {
                     "id": 0,
@@ -81,18 +79,18 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
     }
 
     @Test
-    void orderActiveEmpty() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("[]");
+    @Override
+    protected void orderActiveEmpty() {
+        httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders(OrderState.ACTIVE).toList();
         assert list.size() == 0;
     }
 
+    @Override
     @Test
-    void orderCanceled() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("""
+    protected void orderCanceled() {
+        httpClient.onGet().doReturnJSON("""
                 [
                   {
                     "id": 2022690384,
@@ -135,19 +133,19 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
         assert order.isTerminated();
     }
 
+    @Override
     @Test
-    void orderCanceledEmpty() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("[]");
+    protected void orderCanceledEmpty() {
+        httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders(OrderState.CANCELED).toList();
         assert list.size() == 0;
     }
 
+    @Override
     @Test
-    void orderCompleted() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("""
+    protected void orderCompleted() {
+        httpClient.onGet().doReturnJSON("""
                 [
                   {
                     "id": 2022690384,
@@ -190,19 +188,19 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
         assert order.isTerminated();
     }
 
+    @Override
     @Test
-    void orderCompletedEmpty() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("[]");
+    protected void orderCompletedEmpty() {
+        httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders(OrderState.COMPLETED).toList();
         assert list.size() == 0;
     }
 
+    @Override
     @Test
-    void orders() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("""
+    protected void orders() {
+        httpClient.onGet().doReturnJSON("""
                 [
                   {
                     "id": 0,
@@ -279,19 +277,19 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
         assert order.isTerminated();
     }
 
+    @Override
     @Test
-    void ordersEmpty() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("[]");
+    protected void ordersEmpty() {
+        httpClient.onGet().doReturnJSON("[]");
 
         List<Order> list = service.orders().toList();
         assert list.size() == 0;
     }
 
+    @Override
     @Test
-    void executions() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("""
+    protected void executions() {
+        httpClient.onGet().doReturnJSON("""
                 [
                     {
                         "id": 1828074165,
@@ -336,10 +334,10 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
         assert e.consecutive == Execution.ConsecutiveSameBuyer;
     }
 
+    @Override
     @Test
-    void executionLatest() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.httpClient.onGet().doReturnJSON("""
+    protected void executionLatest() {
+        httpClient.onGet().doReturnJSON("""
                 [
                     {
                         "id": 1828011727,
@@ -364,10 +362,10 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
         assert e.consecutive == Execution.ConsecutiveDifference;
     }
 
+    @Override
     @Test
-    void executionRealtimely() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.websocketServer
+    protected void executionRealtimely() {
+        websocketServer
                 .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
@@ -398,10 +396,10 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
         assert exe.seller.equals("JRF20200712-061604-575165");
     }
 
+    @Override
     @Test
-    void executionRealtimelyConsecutiveBuy() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.websocketServer
+    protected void executionRealtimelyConsecutiveBuy() {
+        websocketServer
                 .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
@@ -414,10 +412,10 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
         assert list.get(1).consecutive == Execution.ConsecutiveSameBuyer;
     }
 
+    @Override
     @Test
-    void executionRealtimelyConsecutiveSell() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.websocketServer
+    protected void executionRealtimelyConsecutiveSell() {
+        websocketServer
                 .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'SELL','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-590195-152395','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
@@ -430,10 +428,10 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
         assert list.get(1).consecutive == Execution.ConsecutiveSameSeller;
     }
 
+    @Override
     @Test
-    void executionRealtimelyWithMultipleChannels() {
-        BitFlyerServiceMock service = new BitFlyerServiceMock();
-        service.websocketServer
+    protected void executionRealtimelyWithMultipleChannels() {
+        websocketServer
                 .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
                     server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_IGNORED','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
@@ -442,5 +440,14 @@ public class BitFlyerServiceTest extends MarketServiceTestBase {
 
         List<Execution> list = service.executionsRealtimely().toList();
         assert list.size() == 1;
+    }
+
+    @Test
+    protected void parseVariousDateTimeFormat() {
+        assert BitFlyerService.parse("2018-04-26T00:32:26.1234567Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.123"));
+        assert BitFlyerService.parse("2018-04-26T00:32:26.19Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.190"));
+        assert BitFlyerService.parse("2018-07-09T01:16:20Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:20.000"));
+        assert BitFlyerService.parse("2018-07-09T01:16Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:00.000"));
+        assert BitFlyerService.parse("2018-07-09T01Z").isEqual(LocalDateTime.parse("2018-07-09T01:00:00.000"));
     }
 }
