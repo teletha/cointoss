@@ -34,7 +34,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
-class BitfinexService extends MarketService {
+public class BitfinexService extends MarketService {
 
     /** The right padding for id. */
     private static final long PaddingForID = 10000;
@@ -54,7 +54,7 @@ class BitfinexService extends MarketService {
      * @param marketName
      * @param setting
      */
-    BitfinexService(String marketName, MarketSetting setting) {
+    protected BitfinexService(String marketName, MarketSetting setting) {
         super("Bitfinex", marketName, setting);
     }
 

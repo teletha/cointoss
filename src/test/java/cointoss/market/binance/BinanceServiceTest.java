@@ -34,6 +34,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void orderActive() {
+        super.orderActive();
     }
 
     /**
@@ -42,6 +43,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void orderActiveEmpty() {
+        super.orderActiveEmpty();
     }
 
     /**
@@ -50,6 +52,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void orderCanceled() {
+        super.orderCanceled();
     }
 
     /**
@@ -58,6 +61,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void orderCanceledEmpty() {
+        super.orderCanceledEmpty();
     }
 
     /**
@@ -66,6 +70,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void orderCompleted() {
+        super.orderCompleted();
     }
 
     /**
@@ -74,6 +79,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void orderCompletedEmpty() {
+        super.orderCompletedEmpty();
     }
 
     /**
@@ -82,6 +88,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void orders() {
+        super.orders();
     }
 
     /**
@@ -90,6 +97,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void ordersEmpty() {
+        super.ordersEmpty();
     }
 
     /**

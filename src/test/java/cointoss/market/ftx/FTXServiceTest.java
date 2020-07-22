@@ -19,7 +19,6 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
      * {@inheritDoc}
      */
     @Override
-    @Test
     protected FTXService constructMarketService() {
         return construct(FTXService::new, FTX.BTC_USD.marketName, FTX.BTC_USD.setting);
     }
@@ -30,6 +29,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void orderActive() {
+        super.orderActive();
     }
 
     /**
@@ -38,6 +38,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void orderActiveEmpty() {
+        super.orderActiveEmpty();
     }
 
     /**
@@ -46,6 +47,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void orderCanceled() {
+        super.orderCanceled();
     }
 
     /**
@@ -54,6 +56,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void orderCanceledEmpty() {
+        super.orderCanceledEmpty();
     }
 
     /**
@@ -62,6 +65,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void orderCompleted() {
+        super.orderCompleted();
     }
 
     /**
@@ -70,6 +74,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void orderCompletedEmpty() {
+        super.orderCompletedEmpty();
     }
 
     /**
@@ -78,6 +83,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void orders() {
+        super.orders();
     }
 
     /**
@@ -86,6 +92,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void ordersEmpty() {
+        super.ordersEmpty();
     }
 
     /**
@@ -94,6 +101,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void executions() {
+        super.executions();
     }
 
     /**
@@ -102,6 +110,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void executionLatest() {
+        super.executionLatest();
     }
 
     /**
@@ -110,6 +119,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void executionRealtimely() {
+        super.executionRealtimely();
     }
 
     /**
@@ -118,6 +128,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void executionRealtimelyConsecutiveBuy() {
+        super.executionRealtimelyConsecutiveBuy();
     }
 
     /**
@@ -126,6 +137,7 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void executionRealtimelyConsecutiveSell() {
+        super.executionRealtimelyConsecutiveSell();
     }
 
     /**
@@ -134,5 +146,6 @@ class FTXServiceTest extends MarketServiceTestTemplate<FTXService> {
     @Override
     @Test
     protected void executionRealtimelyWithMultipleChannels() {
+        super.executionRealtimelyWithMultipleChannels();
     }
 }

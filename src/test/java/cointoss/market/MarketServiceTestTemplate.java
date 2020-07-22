@@ -18,6 +18,9 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.RecordableHttpClientMock;
@@ -38,6 +41,7 @@ import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.matcher.ElementMatchers;
 
+@Execution(ExecutionMode.SAME_THREAD)
 public abstract class MarketServiceTestTemplate<S extends MarketService> {
 
     /** The mocked http client interface. */
@@ -213,34 +217,83 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
         Configurator.setRootLevel(Level.DEBUG);
     }
 
+    /**
+     * Helper.
+     */
+    private void notImplemented() {
+        throw new UnsupportedOperationException("Please implement test case");
+    }
+
     // ========================================================================
     // Test Case Skeltons
     // ========================================================================
-    protected abstract void orderActive();
+    @Test
+    protected void orderActive() {
+        notImplemented();
+    }
 
-    protected abstract void orderActiveEmpty();
+    @Test
+    protected void orderActiveEmpty() {
+        notImplemented();
+    }
 
-    protected abstract void orderCanceled();
+    @Test
+    protected void orderCanceled() {
+        notImplemented();
+    }
 
-    protected abstract void orderCanceledEmpty();
+    @Test
+    protected void orderCanceledEmpty() {
+        notImplemented();
+    }
 
-    protected abstract void orderCompleted();
+    @Test
+    protected void orderCompleted() {
+        notImplemented();
+    }
 
-    protected abstract void orderCompletedEmpty();
+    @Test
+    protected void orderCompletedEmpty() {
+        notImplemented();
+    }
 
-    protected abstract void orders();
+    @Test
+    protected void orders() {
+        notImplemented();
+    }
 
-    protected abstract void ordersEmpty();
+    @Test
+    protected void ordersEmpty() {
+        notImplemented();
+    }
 
-    protected abstract void executions();
+    @Test
+    protected void executions() {
+        notImplemented();
+    }
 
-    protected abstract void executionLatest();
+    @Test
+    protected void executionLatest() {
+        notImplemented();
+    }
 
-    protected abstract void executionRealtimely();
+    @Test
+    protected void executionRealtimely() {
+        notImplemented();
+    }
 
-    protected abstract void executionRealtimelyConsecutiveBuy();
+    @Test
+    protected void executionRealtimelyConsecutiveBuy() {
+        notImplemented();
+    }
 
-    protected abstract void executionRealtimelyConsecutiveSell();
+    @Test
+    protected void executionRealtimelyConsecutiveSell() {
+        notImplemented();
+    }
 
-    protected abstract void executionRealtimelyWithMultipleChannels();
+    @Test
+    protected void executionRealtimelyWithMultipleChannels() {
+        notImplemented();
+    }
 }

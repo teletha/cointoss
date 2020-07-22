@@ -34,6 +34,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void orderActive() {
+        super.orderActive();
     }
 
     /**
@@ -42,6 +43,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void orderActiveEmpty() {
+        super.orderActiveEmpty();
     }
 
     /**
@@ -50,6 +52,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void orderCanceled() {
+        super.orderCanceled();
     }
 
     /**
@@ -58,6 +61,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void orderCanceledEmpty() {
+        super.orderCanceledEmpty();
     }
 
     /**
@@ -66,6 +70,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void orderCompleted() {
+        super.orderCompleted();
     }
 
     /**
@@ -74,6 +79,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void orderCompletedEmpty() {
+        super.orderCompletedEmpty();
     }
 
     /**
@@ -82,6 +88,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void orders() {
+        super.orders();
     }
 
     /**
@@ -90,6 +97,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void ordersEmpty() {
+        super.ordersEmpty();
     }
 
     /**
@@ -151,6 +159,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void executionLatest() {
+        super.executionLatest();
     }
 
     /**
@@ -159,6 +168,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void executionRealtimely() {
+        super.executionRealtimely();
     }
 
     /**
@@ -167,6 +177,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void executionRealtimelyConsecutiveBuy() {
+        super.executionRealtimelyConsecutiveBuy();
     }
 
     /**
@@ -175,6 +186,7 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void executionRealtimelyConsecutiveSell() {
+        super.executionRealtimelyConsecutiveSell();
     }
 
     /**
@@ -183,5 +195,6 @@ class BitMexServiceTest extends MarketServiceTestTemplate<BitMexService> {
     @Override
     @Test
     protected void executionRealtimelyWithMultipleChannels() {
+        super.executionRealtimelyWithMultipleChannels();
     }
 }
