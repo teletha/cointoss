@@ -15,11 +15,10 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.market.MarketServiceTestBase;
-import cointoss.market.PublicServiceTemplate;
+import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 
-class BitmexPublicServiceTest extends MarketServiceTestBase<BitMexService> implements PublicServiceTemplate {
+class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
 
     /**
      * {@inheritDoc}
@@ -88,7 +87,7 @@ class BitmexPublicServiceTest extends MarketServiceTestBase<BitMexService> imple
     @Override
     @Test
     public void executionLatest() {
-        PublicServiceTemplate.super.executionLatest();
+        super.executionLatest();
     }
 
     /**
@@ -97,7 +96,7 @@ class BitmexPublicServiceTest extends MarketServiceTestBase<BitMexService> imple
     @Override
     @Test
     public void executionRealtimely() {
-        PublicServiceTemplate.super.executionRealtimely();
+        super.executionRealtimely();
     }
 
     /**
@@ -106,7 +105,7 @@ class BitmexPublicServiceTest extends MarketServiceTestBase<BitMexService> imple
     @Override
     @Test
     public void executionRealtimelyConsecutiveBuy() {
-        PublicServiceTemplate.super.executionRealtimelyConsecutiveBuy();
+        super.executionRealtimelyConsecutiveBuy();
     }
 
     /**
@@ -115,7 +114,7 @@ class BitmexPublicServiceTest extends MarketServiceTestBase<BitMexService> imple
     @Override
     @Test
     public void executionRealtimelyConsecutiveSell() {
-        PublicServiceTemplate.super.executionRealtimelyConsecutiveSell();
+        super.executionRealtimelyConsecutiveSell();
     }
 
     /**
@@ -124,6 +123,6 @@ class BitmexPublicServiceTest extends MarketServiceTestBase<BitMexService> imple
     @Override
     @Test
     public void executionRealtimelyWithMultipleChannels() {
-        PublicServiceTemplate.super.executionRealtimelyWithMultipleChannels();
+        super.executionRealtimelyWithMultipleChannels();
     }
 }

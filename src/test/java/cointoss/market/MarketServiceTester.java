@@ -29,6 +29,7 @@ import antibug.WebSocketServer;
 import antibug.WebSocketServer.WebSocketClient;
 import cointoss.MarketService;
 import cointoss.util.EfficientWebSocket;
+import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiFunction;
 import kiss.WiseFunction;
@@ -41,7 +42,11 @@ import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.matcher.ElementMatchers;
 
 @Execution(ExecutionMode.SAME_THREAD)
-public abstract class MarketServiceTestBase<S extends MarketService> {
+public abstract class MarketServiceTester<S extends MarketService> {
+
+    static {
+        I.load(Num.class);
+    }
 
     /** The mocked http client interface. */
     protected final HttpClientMock httpClient = RecordableHttpClientMock.build();
@@ -72,7 +77,7 @@ public abstract class MarketServiceTestBase<S extends MarketService> {
      */
     @BeforeEach
     void before() {
-        base = (Class<S>) Model.collectParameters(getClass(), MarketServiceTestBase.class)[0];
+        base = (Class<S>) Model.collectParameters(getClass(), MarketServiceTester.class)[0];
         mocked = (Class<S>) new ByteBuddy().subclass(base, ConstructorStrategy.Default.IMITATE_SUPER_CLASS)
                 .method(ElementMatchers.namedOneOf("client", "clientRealtimely"))
                 .intercept(MethodDelegation.to(new MockedNetworkSupplier()))
@@ -123,9 +128,9 @@ public abstract class MarketServiceTestBase<S extends MarketService> {
      * Create a market service for testing.
      * 
      * @return
-     * @see MarketServiceTestBase#construct(WiseFunction, Object)
-     * @see MarketServiceTestBase#construct(WiseBiFunction, Object, Object)
-     * @see MarketServiceTestBase#construct(WiseTriFunction, Object, Object, Object)
+     * @see MarketServiceTester#construct(WiseFunction, Object)
+     * @see MarketServiceTester#construct(WiseBiFunction, Object, Object)
+     * @see MarketServiceTester#construct(WiseTriFunction, Object, Object, Object)
      */
     protected abstract S constructMarketService();
 
