@@ -10,7 +10,6 @@
 package cointoss.market.bitflyer;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -70,7 +69,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.executedSize.is(0);
         assert order.canceledSize().is(0);
         assert order.price.is(1096329);
-        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 14, 1, 58, 6, 0, Chrono.UTC));
+        assert order.creationTime.isEqual(Chrono.utc(2020, 7, 14, 1, 58, 6, 0));
         assert order.isActive();
         assert order.isNotCanceled();
         assert order.isNotCompleted();
@@ -125,7 +124,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.executedSize.is(0.3);
         assert order.canceledSize().is(0.2);
         assert order.price.is(986402);
-        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 10, 9, 1, 43, 0, Chrono.UTC));
+        assert order.creationTime.isEqual(Chrono.utc(2020, 7, 10, 9, 1, 43, 0));
         assert order.isNotActive();
         assert order.isCanceled();
         assert order.isNotCompleted();
@@ -180,7 +179,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.executedSize.is(0.5);
         assert order.canceledSize().is(0);
         assert order.price.is(986402);
-        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 10, 9, 1, 43, 0, Chrono.UTC));
+        assert order.creationTime.isEqual(Chrono.utc(2020, 7, 10, 9, 1, 43, 0));
         assert order.isNotActive();
         assert order.isNotCanceled();
         assert order.isCompleted();
@@ -253,7 +252,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.executedSize.is(0);
         assert order.canceledSize().is(0);
         assert order.price.is(1096329);
-        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 14, 1, 58, 6, 0, Chrono.UTC));
+        assert order.creationTime.isEqual(Chrono.utc(2020, 7, 14, 1, 58, 6, 0));
         assert order.isActive();
         assert order.isNotCanceled();
         assert order.isNotCompleted();
@@ -269,7 +268,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert order.executedSize.is(0.5);
         assert order.canceledSize().is(0);
         assert order.price.is(986402);
-        assert order.creationTime.isEqual(ZonedDateTime.of(2020, 7, 10, 9, 1, 43, 0, Chrono.UTC));
+        assert order.creationTime.isEqual(Chrono.utc(2020, 7, 10, 9, 1, 43, 0));
         assert order.isNotActive();
         assert order.isNotCanceled();
         assert order.isCompleted();
@@ -318,7 +317,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert e.direction == Direction.BUY;
         assert e.price.is(999224);
         assert e.size.is(0.1);
-        assert e.date.isEqual(ZonedDateTime.of(2020, 7, 13, 7, 41, 43, 97000000, Chrono.UTC));
+        assert e.date.isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
         assert e.buyer.equals("JRF20200713-074142-266150");
         assert e.seller.equals("JRF20200713-074142-809298");
         assert e.consecutive == Execution.ConsecutiveDifference;
@@ -328,7 +327,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert e.direction == Direction.BUY;
         assert e.price.is(999231);
         assert e.size.is(0.01);
-        assert e.date.isEqual(ZonedDateTime.of(2020, 7, 13, 7, 41, 43, 97000000, Chrono.UTC));
+        assert e.date.isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
         assert e.buyer.equals("JRF20200713-074142-266150");
         assert e.seller.equals("JRF20200713-074142-697549");
         assert e.consecutive == Execution.ConsecutiveSameBuyer;
@@ -356,7 +355,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert e.direction == Direction.BUY;
         assert e.price.is(999262);
         assert e.size.is(0.03954578);
-        assert e.date.isEqual(ZonedDateTime.of(2020, 7, 13, 6, 24, 54, 157000000, Chrono.UTC));
+        assert e.date.isEqual(Chrono.utc(2020, 7, 13, 6, 24, 54, 157));
         assert e.buyer.equals("JRF20200713-062454-244956");
         assert e.seller.equals("JRF20200713-062452-031817");
         assert e.consecutive == Execution.ConsecutiveDifference;
@@ -380,7 +379,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert exe.direction == Direction.BUY;
         assert exe.price.is(999469.0);
         assert exe.size.is(0.01);
-        assert exe.date.isEqual(ZonedDateTime.of(2020, 7, 12, 6, 16, 4, 307000000, Chrono.UTC));
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 307));
         assert exe.consecutive == Execution.ConsecutiveDifference;
         assert exe.buyer.equals("JRF20200712-061604-686433");
         assert exe.seller.equals("JRF20200712-061604-026331");
@@ -390,7 +389,7 @@ public class BitFlyerServiceTest extends MarketServiceTestTemplate<BitFlyerServi
         assert exe.direction == Direction.SELL;
         assert exe.price.is(999467.0);
         assert exe.size.is(0.1);
-        assert exe.date.isEqual(ZonedDateTime.of(2020, 7, 12, 6, 16, 4, 324000000, Chrono.UTC));
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 324));
         assert exe.consecutive == Execution.ConsecutiveDifference;
         assert exe.buyer.equals("JRF20200712-061603-372561");
         assert exe.seller.equals("JRF20200712-061604-575165");

@@ -14,8 +14,10 @@ import java.net.http.HttpClient;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import com.pgssoft.httpclient.HttpClientMock;
 import com.pgssoft.httpclient.RecordableHttpClientMock;
@@ -59,6 +61,9 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
     /** The mocked market service class. */
     private Class<S> mocked;
 
+    /** The debug state. */
+    private boolean usedRealWebSocket;
+
     /**
      * Create mocked class at runtime for each test case instances.
      */
@@ -79,6 +84,14 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
         }
     }
 
+    @AfterEach
+    void after() throws Exception {
+        if (usedRealWebSocket) {
+            Thread.sleep(2500);
+        }
+        Configurator.setRootLevel(Level.ERROR);
+    }
+
     /**
      * Returns a mocked API, overriding the API for network access.
      */
@@ -90,7 +103,13 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
 
         public EfficientWebSocket clientRealtimely(@SuperCall Callable<EfficientWebSocket> superMethod) {
             try {
-                return superMethod.call().withClient(websocketServer.httpClient()).withScheduler(chronus);
+                if (websocketServer.hasReplyRule()) {
+                    return superMethod.call().withClient(websocketServer.httpClient()).withScheduler(chronus);
+                } else {
+                    usedRealWebSocket = true;
+                    enableDebug();
+                    return superMethod.call().enableDebug();
+                }
             } catch (Exception e) {
                 throw I.quiet(e);
             }
@@ -187,6 +206,13 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
         return true;
     }
 
+    /**
+     * Display debug log.
+     */
+    protected final void enableDebug() {
+        Configurator.setRootLevel(Level.DEBUG);
+    }
+
     // ========================================================================
     // Test Case Skeltons
     // ========================================================================
@@ -207,11 +233,6 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
     protected abstract void ordersEmpty();
 
     protected abstract void executions();
-
-    @Test
-    void testName() {
-
-    }
 
     protected abstract void executionLatest();
 

@@ -97,8 +97,9 @@ public abstract class EfficientWebSocketModel {
     /**
      * Outputs a detailed log.
      */
-    public void enableDebug() {
+    public EfficientWebSocket enableDebug() {
         this.debug = true;
+        return (EfficientWebSocket) this;
     }
 
     /**
@@ -209,7 +210,7 @@ public abstract class EfficientWebSocketModel {
                 sendSubscription(command);
             }
             queue.clear();
-        }, client()).to(debug ? I.bundle(this::debug, this::dispatch) : this::dispatch, e -> {
+        }, client()).to(debug ? I.bundle(this::outputTestCode, this::dispatch) : this::dispatch, e -> {
             logger.error("Disconnected websocket [{}].", address(), cause(e));
             disconnect();
             signals.values().forEach(signal -> signal.error(e));
@@ -255,7 +256,7 @@ public abstract class EfficientWebSocketModel {
      * 
      * @param text
      */
-    private void debug(String text) {
+    private void outputTestCode(String text) {
         System.out.println("server.sendJSON(\"" + text.replace('"', '\'') + "\");");
     }
 
