@@ -11,9 +11,9 @@ package cointoss.market.bitfinex;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.market.MarketServiceTestTemplate;
+import cointoss.market.PublicServiceTestTemplate;
 
-class BitfinexServiceTest extends MarketServiceTestTemplate<BitfinexService> {
+class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexService> {
 
     /**
      * {@inheritDoc}
@@ -21,78 +21,6 @@ class BitfinexServiceTest extends MarketServiceTestTemplate<BitfinexService> {
     @Override
     protected BitfinexService constructMarketService() {
         return construct(BitfinexService::new, Bitfinex.BTC_USDT.marketName, Bitfinex.BTC_USDT.setting);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Test
-    protected void orderActive() {
-        super.orderActive();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Test
-    protected void orderActiveEmpty() {
-        super.orderActiveEmpty();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Test
-    protected void orderCanceled() {
-        super.orderCanceled();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Test
-    protected void orderCanceledEmpty() {
-        super.orderCanceledEmpty();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Test
-    protected void orderCompleted() {
-        super.orderCompleted();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Test
-    protected void orderCompletedEmpty() {
-        super.orderCompletedEmpty();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Test
-    protected void orders() {
-        super.orders();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Test
-    protected void ordersEmpty() {
-        super.ordersEmpty();
     }
 
     /**

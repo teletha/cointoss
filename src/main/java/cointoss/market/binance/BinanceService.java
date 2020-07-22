@@ -135,7 +135,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return I.signal();
+        throw new Error();
     }
 
     /**
@@ -143,7 +143,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Order> orders(OrderState state) {
-        return I.signal();
+        throw new Error();
     }
 
     /**
@@ -151,7 +151,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Order> connectOrdersRealtimely() {
-        return I.signal();
+        throw new Error();
     }
 
     /**
@@ -204,7 +204,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Num> baseCurrency() {
-        return I.signal();
+        throw new Error();
     }
 
     /**
@@ -212,7 +212,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Num> targetCurrency() {
-        return I.signal();
+        throw new Error();
     }
 
     /**
@@ -247,6 +247,13 @@ public class BinanceService extends MarketService {
         String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
         Builder builder = HttpRequest.newBuilder(URI.create(uri + path));
 
+        switch (method) {
+        case "GET":
+            break;
+
+        default:
+            throw new IllegalArgumentException("Unexpected value: " + method);
+        }
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
 

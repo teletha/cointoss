@@ -18,7 +18,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
@@ -202,6 +201,10 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
      * @return
      */
     private boolean matchParameterTypes(Class[] types, Object[] params) {
+        if (types.length != params.length) {
+            return false;
+        }
+
         for (int i = 0; i < types.length; i++) {
             if (!I.wrap(types[i]).isInstance(params[i])) {
                 return false;
@@ -220,80 +223,7 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
     /**
      * Helper.
      */
-    private void notImplemented() {
+    void notImplemented() {
         throw new UnsupportedOperationException("Please implement test case");
-    }
-
-    // ========================================================================
-    // Test Case Skeltons
-    // ========================================================================
-    @Test
-    protected void orderActive() {
-        notImplemented();
-    }
-
-    @Test
-    protected void orderActiveEmpty() {
-        notImplemented();
-    }
-
-    @Test
-    protected void orderCanceled() {
-        notImplemented();
-    }
-
-    @Test
-    protected void orderCanceledEmpty() {
-        notImplemented();
-    }
-
-    @Test
-    protected void orderCompleted() {
-        notImplemented();
-    }
-
-    @Test
-    protected void orderCompletedEmpty() {
-        notImplemented();
-    }
-
-    @Test
-    protected void orders() {
-        notImplemented();
-    }
-
-    @Test
-    protected void ordersEmpty() {
-        notImplemented();
-    }
-
-    @Test
-    protected void executions() {
-        notImplemented();
-    }
-
-    @Test
-    protected void executionLatest() {
-        notImplemented();
-    }
-
-    @Test
-    protected void executionRealtimely() {
-        notImplemented();
-    }
-
-    @Test
-    protected void executionRealtimelyConsecutiveBuy() {
-        notImplemented();
-    }
-
-    @Test
-    protected void executionRealtimelyConsecutiveSell() {
-        notImplemented();
-    }
-
-    @Test
-    protected void executionRealtimelyWithMultipleChannels() {
-        notImplemented();
     }
 }
