@@ -20,7 +20,7 @@ import cointoss.market.MarketServiceTestTemplate;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 
-class BitflyerPublicServiceTest extends MarketServiceTestTemplate<BitFlyerService> implements PublicServiceTestTemplate {
+class BitFlyerPublicServiceTest extends MarketServiceTestTemplate<BitFlyerService> implements PublicServiceTestTemplate {
 
     /**
      * {@inheritDoc}
