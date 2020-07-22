@@ -95,7 +95,7 @@ public abstract class MarketServiceTester<S extends MarketService> {
     @AfterEach
     void after() throws Exception {
         if (usedRealWebSocket) {
-            Thread.sleep(2500);
+            Thread.sleep(12500);
         }
         Configurator.setRootLevel(Level.ERROR);
     }
@@ -226,9 +226,9 @@ public abstract class MarketServiceTester<S extends MarketService> {
     }
 
     /**
-     * Helper.
+     * Notify no implementation error.
      */
-    static void notImplemented() {
+    void notImplemented() {
         throw new UnsupportedOperationException("Please implement test case");
     }
 }

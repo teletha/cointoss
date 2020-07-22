@@ -143,7 +143,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Order> orders(OrderState state) {
-        throw new Error();
+        return I.signal();
     }
 
     /**
@@ -151,7 +151,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Order> connectOrdersRealtimely() {
-        throw new Error();
+        return I.signal();
     }
 
     /**

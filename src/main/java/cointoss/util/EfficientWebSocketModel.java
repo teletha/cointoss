@@ -71,6 +71,17 @@ public abstract class EfficientWebSocketModel {
     public abstract Function<JSON, String> extractId();
 
     /**
+     * The subscription ID may be determined by the content of the response, so we must extract the
+     * new ID from the response.
+     * 
+     * @return Chainable API.
+     */
+    @Icy.Property
+    public Function<JSON, String> updateId() {
+        return null;
+    }
+
+    /**
      * Sets the maximum number of subscriptions per connection. Default value is 25.
      * 
      * @param size The maximum number of subscriptions per connection. A number less than or equal
@@ -132,18 +143,6 @@ public abstract class EfficientWebSocketModel {
         Objects.requireNonNull(topic);
 
         return signals.computeIfAbsent(topic.id, id -> new Supersonic(topic)).expose;
-    }
-
-    /**
-     * The subscription ID may be determined by the content of the response, so we must extract the
-     * new ID from the response.
-     *
-     * @param topic A target topic to update.
-     * @param newId A new id of the topic.
-     */
-    public final void registerId(IdentifiableTopic topic, String newId) {
-        signals.put(newId, signals.get(topic.id));
-        logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", address(), topic.id, newId);
     }
 
     /**
@@ -244,6 +243,13 @@ public abstract class EfficientWebSocketModel {
                     topic.subscribing.dispose();
                     topic.subscribing = null;
                     logger.info("Accepted websocket subscription [{}] {}.", address(), topic.id);
+
+                    Function<JSON, String> updater = updateId();
+                    if (updater != null) {
+                        String newId = updater.apply(json);
+                        signals.put(newId, signals.get(topic.id));
+                        logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", address(), topic.id, newId);
+                    }
                     return;
                 }
             }

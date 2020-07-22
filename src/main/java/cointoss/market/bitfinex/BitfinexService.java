@@ -48,6 +48,7 @@ public class BitfinexService extends MarketService {
     /** The realtiem communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api-pub.bitfinex.com/ws/2")
             .extractId(json -> json.text("0"))
+            .updateId(json -> json.text("chanId"))
             .ignoreMessageIf(json -> json.has("1", "hb")); // ignore heartbeat
 
     /**
@@ -118,7 +119,7 @@ public class BitfinexService extends MarketService {
         Object[] previous = new Object[2];
 
         return clientRealtimely().subscribe(new Topic("trades", marketName))
-                .take(e -> e.has("1", "tu"))
+                .take(e -> e.has("1", "te"))
                 .map(e -> convert(e.get("2"), increment, previous));
     }
 
@@ -305,12 +306,7 @@ public class BitfinexService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            if ("subscribed".equals(reply.text("event")) && channel.equals(reply.text("channel")) && symbol.equals(reply.text("pair"))) {
-                Realtime.registerId(this, reply.text("chanId"));
-                return true;
-            } else {
-                return false;
-            }
+            return "subscribed".equals(reply.text("event")) && channel.equals(reply.text("channel")) && symbol.equals(reply.text("pair"));
         }
     }
 }

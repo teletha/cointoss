@@ -58,6 +58,9 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     private static final MethodHandle extractIdUpdater = updater("extractId");
 
     /** The final property updater. */
+    private static final MethodHandle updateIdUpdater = updater("updateId");
+
+    /** The final property updater. */
     private static final MethodHandle maximumSubscriptionsUpdater = updater("maximumSubscriptions");
 
     /** The final property updater. */
@@ -74,6 +77,9 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
 
     /** The exposed property. */
     public final Function<JSON, String> extractId;
+
+    /** The exposed property. */
+    public final Function<JSON, String> updateId;
 
     /** The exposed property. */
     public final int maximumSubscriptions;
@@ -93,6 +99,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     protected EfficientWebSocket() {
         this.address = null;
         this.extractId = null;
+        this.updateId = super.updateId();
         this.maximumSubscriptions = super.maximumSubscriptions();
         this.ignoreMessageIf = super.ignoreMessageIf();
         this.client = super.client();
@@ -167,6 +174,43 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             extractIdUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * The subscription ID may be determined by the content of the response, so we must extract the
+     *  new ID from the response.
+     *  
+     *  @return Chainable API.
+     */
+    @Override
+    public final Function<JSON, String> updateId() {
+        return this.updateId;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of updateId property.
+     */
+    @SuppressWarnings("unused")
+    private final Function<JSON, String> getUpdateId() {
+        return this.updateId;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of updateId property to assign.
+     */
+    private final void setUpdateId(Function<JSON, String> value) {
+        if (value == null) {
+            value = super.updateId();
+        }
+        try {
+            updateIdUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -327,6 +371,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         StringBuilder builder = new StringBuilder("EfficientWebSocket [");
         builder.append("address=").append(address).append(", ");
         builder.append("extractId=").append(extractId).append(", ");
+        builder.append("updateId=").append(updateId).append(", ");
         builder.append("maximumSubscriptions=").append(maximumSubscriptions).append(", ");
         builder.append("ignoreMessageIf=").append(ignoreMessageIf).append(", ");
         builder.append("client=").append(client).append(", ");
@@ -341,7 +386,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(address, extractId, maximumSubscriptions, ignoreMessageIf, client, scheduler);
+        return Objects.hash(address, extractId, updateId, maximumSubscriptions, ignoreMessageIf, client, scheduler);
     }
 
     /**
@@ -358,6 +403,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         EfficientWebSocket other = (EfficientWebSocket) o;
         if (!Objects.equals(address, other.address)) return false;
         if (!Objects.equals(extractId, other.extractId)) return false;
+        if (!Objects.equals(updateId, other.updateId)) return false;
         if (maximumSubscriptions != other.maximumSubscriptions) return false;
         if (!Objects.equals(ignoreMessageIf, other.ignoreMessageIf)) return false;
         if (!Objects.equals(client, other.client)) return false;
@@ -375,7 +421,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.address == value) {
             return this;
         }
-        return with.address(value).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(this.client).scheduler(this.scheduler);
+        return with.address(value).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(this.client).scheduler(this.scheduler);
     }
 
     /**
@@ -388,7 +434,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.client == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(value).scheduler(this.scheduler);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(value).scheduler(this.scheduler);
     }
 
     /**
@@ -401,7 +447,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.scheduler == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(this.client).scheduler(value);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).client(this.client).scheduler(value);
     }
 
     /** The singleton builder. */
@@ -462,6 +508,17 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
      * Property assignment API.
      */
     public static interface ÅssignableÅrbitrary<Next extends EfficientWebSocket> {
+
+        /**
+         * Assign updateId property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next updateId(Function<JSON, String> value) {
+            ((EfficientWebSocket) this).setUpdateId(value);
+            return (Next) this;
+        }
 
         /**
          * Assign maximumSubscriptions property.
@@ -526,6 +583,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     static final class My {
         static final String Address = "address";
         static final String ExtractId = "extractId";
+        static final String UpdateId = "updateId";
         static final String MaximumSubscriptions = "maximumSubscriptions";
         static final String IgnoreMessageIf = "ignoreMessageIf";
         static final String Client = "client";
