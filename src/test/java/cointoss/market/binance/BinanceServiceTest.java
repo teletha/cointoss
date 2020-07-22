@@ -200,7 +200,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
         assert exe.direction == Direction.BUY;
         assert exe.price.is(9331.97);
         assert exe.size.is(0.001138);
-        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 7, 6, 5, 277)) : exe;
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 7, 6, 5, 277));
         assert exe.consecutive == Execution.ConsecutiveDifference;
 
         exe = list.get(2);
@@ -208,7 +208,7 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
         assert exe.direction == Direction.SELL;
         assert exe.price.is(9332.06);
         assert exe.size.is(0.006605);
-        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 7, 6, 5, 279)) : exe;
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 7, 6, 5, 279));
         assert exe.consecutive == Execution.ConsecutiveDifference;
     }
 
@@ -216,16 +216,16 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
      * {@inheritDoc}
      */
     @Override
-    @Test
     protected void executionRealtimelyConsecutiveBuy() {
+        // binance has no consecutive data
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @Test
     protected void executionRealtimelyConsecutiveSell() {
+        // binance has no consecutive data
     }
 
     /**
@@ -234,5 +234,21 @@ public class BinanceServiceTest extends MarketServiceTestTemplate<BinanceService
     @Override
     @Test
     protected void executionRealtimelyWithMultipleChannels() {
+        websocketServer.replyWhenJSON("{'id':(\\d+),'method':'SUBSCRIBE','params':['btcusdt@aggTrade']}", server -> {
+            server.sendJSON("{'result':null,'id':$1}");
+            server.sendJSON("{'stream':'ignored@aggTrade','data':{'e':'aggTrade','E':1595401565277,'s':'BTCUSDT','a':330377764,'p':'9331.91000000','q':'0.01160100','f':359665720,'l':359665720,'T':1595401565277,'m':false,'M':true}}");
+            server.sendJSON("{'stream':'btcusdt@aggTrade','data':{'e':'aggTrade','E':1595401565277,'s':'BTCUSDT','a':330377765,'p':'9331.97000000','q':'0.00113800','f':359665721,'l':359665721,'T':1595401565277,'m':false,'M':true}}");
+        });
+
+        List<Execution> list = service.executionsRealtimely().toList();
+        assert list.size() == 1;
+
+        Execution exe = list.get(0);
+        assert exe.id == 330377765;
+        assert exe.direction == Direction.BUY;
+        assert exe.price.is(9331.97);
+        assert exe.size.is(0.001138);
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 7, 6, 5, 277));
+        assert exe.consecutive == Execution.ConsecutiveDifference;
     }
 }
