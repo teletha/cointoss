@@ -15,11 +15,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.market.MarketServiceTestTemplate;
-import cointoss.market.PublicServiceTestTemplate;
+import cointoss.market.MarketServiceTestBase;
+import cointoss.market.PublicServiceTemplate;
 import cointoss.util.Chrono;
 
-public class BinancePublicServiceTest extends MarketServiceTestTemplate<BinanceService> implements PublicServiceTestTemplate {
+public class BinancePublicServiceTest extends MarketServiceTestBase<BinanceService> implements PublicServiceTemplate {
 
     /**
      * {@inheritDoc}

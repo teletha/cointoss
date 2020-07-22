@@ -16,11 +16,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.market.MarketServiceTestTemplate;
-import cointoss.market.PublicServiceTestTemplate;
+import cointoss.market.MarketServiceTestBase;
+import cointoss.market.PublicServiceTemplate;
 import cointoss.util.Chrono;
 
-class BitFlyerPublicServiceTest extends MarketServiceTestTemplate<BitFlyerService> implements PublicServiceTestTemplate {
+class BitFlyerPublicServiceTest extends MarketServiceTestBase<BitFlyerService> implements PublicServiceTemplate {
 
     /**
      * {@inheritDoc}

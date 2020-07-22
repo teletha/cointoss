@@ -41,7 +41,7 @@ import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.matcher.ElementMatchers;
 
 @Execution(ExecutionMode.SAME_THREAD)
-public abstract class MarketServiceTestTemplate<S extends MarketService> {
+public abstract class MarketServiceTestBase<S extends MarketService> {
 
     /** The mocked http client interface. */
     protected final HttpClientMock httpClient = RecordableHttpClientMock.build();
@@ -72,7 +72,7 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
      */
     @BeforeEach
     void before() {
-        base = (Class<S>) Model.collectParameters(getClass(), MarketServiceTestTemplate.class)[0];
+        base = (Class<S>) Model.collectParameters(getClass(), MarketServiceTestBase.class)[0];
         mocked = (Class<S>) new ByteBuddy().subclass(base, ConstructorStrategy.Default.IMITATE_SUPER_CLASS)
                 .method(ElementMatchers.namedOneOf("client", "clientRealtimely"))
                 .intercept(MethodDelegation.to(new MockedNetworkSupplier()))
@@ -123,9 +123,9 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
      * Create a market service for testing.
      * 
      * @return
-     * @see MarketServiceTestTemplate#construct(WiseFunction, Object)
-     * @see MarketServiceTestTemplate#construct(WiseBiFunction, Object, Object)
-     * @see MarketServiceTestTemplate#construct(WiseTriFunction, Object, Object, Object)
+     * @see MarketServiceTestBase#construct(WiseFunction, Object)
+     * @see MarketServiceTestBase#construct(WiseBiFunction, Object, Object)
+     * @see MarketServiceTestBase#construct(WiseTriFunction, Object, Object, Object)
      */
     protected abstract S constructMarketService();
 

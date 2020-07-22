@@ -9,39 +9,49 @@
  */
 package cointoss.market;
 
-import static cointoss.market.MarketServiceTestTemplate.notImplemented;
+import static cointoss.market.MarketServiceTestBase.notImplemented;
 
 import org.junit.jupiter.api.Test;
 
-public interface PublicServiceTestTemplate {
+public interface PrivateServiceTemplate {
 
     @Test
-    default void executions() {
+    default void orders() {
         notImplemented();
     }
 
     @Test
-    default void executionLatest() {
+    default void ordersEmpty() {
         notImplemented();
     }
 
     @Test
-    default void executionRealtimely() {
+    default void orderActive() {
         notImplemented();
     }
 
     @Test
-    default void executionRealtimelyConsecutiveBuy() {
+    default void orderActiveEmpty() {
         notImplemented();
     }
 
     @Test
-    default void executionRealtimelyConsecutiveSell() {
+    default void orderCanceled() {
         notImplemented();
     }
 
     @Test
-    default void executionRealtimelyWithMultipleChannels() {
+    default void orderCanceledEmpty() {
+        notImplemented();
+    }
+
+    @Test
+    default void orderCompleted() {
+        notImplemented();
+    }
+
+    @Test
+    default void orderCompletedEmpty() {
         notImplemented();
     }
 }

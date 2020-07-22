@@ -11,10 +11,10 @@ package cointoss.market.bitfinex;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.market.MarketServiceTestTemplate;
-import cointoss.market.PublicServiceTestTemplate;
+import cointoss.market.MarketServiceTestBase;
+import cointoss.market.PublicServiceTemplate;
 
-class BitfinexPublicServiceTest extends MarketServiceTestTemplate<BitfinexService> implements PublicServiceTestTemplate {
+class BitfinexPublicServiceTest extends MarketServiceTestBase<BitfinexService> implements PublicServiceTemplate {
 
     /**
      * {@inheritDoc}
@@ -30,7 +30,7 @@ class BitfinexPublicServiceTest extends MarketServiceTestTemplate<BitfinexServic
     @Override
     @Test
     public void executions() {
-        PublicServiceTestTemplate.super.executions();
+        PublicServiceTemplate.super.executions();
     }
 
     /**
@@ -39,7 +39,7 @@ class BitfinexPublicServiceTest extends MarketServiceTestTemplate<BitfinexServic
     @Override
     @Test
     public void executionLatest() {
-        PublicServiceTestTemplate.super.executionLatest();
+        PublicServiceTemplate.super.executionLatest();
     }
 
     /**
@@ -48,7 +48,7 @@ class BitfinexPublicServiceTest extends MarketServiceTestTemplate<BitfinexServic
     @Override
     @Test
     public void executionRealtimely() {
-        PublicServiceTestTemplate.super.executionRealtimely();
+        PublicServiceTemplate.super.executionRealtimely();
     }
 
     /**
@@ -57,7 +57,7 @@ class BitfinexPublicServiceTest extends MarketServiceTestTemplate<BitfinexServic
     @Override
     @Test
     public void executionRealtimelyConsecutiveBuy() {
-        PublicServiceTestTemplate.super.executionRealtimelyConsecutiveBuy();
+        PublicServiceTemplate.super.executionRealtimelyConsecutiveBuy();
     }
 
     /**
@@ -66,7 +66,7 @@ class BitfinexPublicServiceTest extends MarketServiceTestTemplate<BitfinexServic
     @Override
     @Test
     public void executionRealtimelyConsecutiveSell() {
-        PublicServiceTestTemplate.super.executionRealtimelyConsecutiveSell();
+        PublicServiceTemplate.super.executionRealtimelyConsecutiveSell();
     }
 
     /**
@@ -75,6 +75,6 @@ class BitfinexPublicServiceTest extends MarketServiceTestTemplate<BitfinexServic
     @Override
     @Test
     public void executionRealtimelyWithMultipleChannels() {
-        PublicServiceTestTemplate.super.executionRealtimelyWithMultipleChannels();
+        PublicServiceTemplate.super.executionRealtimelyWithMultipleChannels();
     }
 }

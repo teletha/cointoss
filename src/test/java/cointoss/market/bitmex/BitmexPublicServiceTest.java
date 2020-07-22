@@ -15,11 +15,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.market.MarketServiceTestTemplate;
-import cointoss.market.PublicServiceTestTemplate;
+import cointoss.market.MarketServiceTestBase;
+import cointoss.market.PublicServiceTemplate;
 import cointoss.util.Chrono;
 
-class BitmexPublicServiceTest extends MarketServiceTestTemplate<BitMexService> implements PublicServiceTestTemplate {
+class BitmexPublicServiceTest extends MarketServiceTestBase<BitMexService> implements PublicServiceTemplate {
 
     /**
      * {@inheritDoc}
@@ -88,7 +88,7 @@ class BitmexPublicServiceTest extends MarketServiceTestTemplate<BitMexService> i
     @Override
     @Test
     public void executionLatest() {
-        PublicServiceTestTemplate.super.executionLatest();
+        PublicServiceTemplate.super.executionLatest();
     }
 
     /**
@@ -97,7 +97,7 @@ class BitmexPublicServiceTest extends MarketServiceTestTemplate<BitMexService> i
     @Override
     @Test
     public void executionRealtimely() {
-        PublicServiceTestTemplate.super.executionRealtimely();
+        PublicServiceTemplate.super.executionRealtimely();
     }
 
     /**
@@ -106,7 +106,7 @@ class BitmexPublicServiceTest extends MarketServiceTestTemplate<BitMexService> i
     @Override
     @Test
     public void executionRealtimelyConsecutiveBuy() {
-        PublicServiceTestTemplate.super.executionRealtimelyConsecutiveBuy();
+        PublicServiceTemplate.super.executionRealtimelyConsecutiveBuy();
     }
 
     /**
@@ -115,7 +115,7 @@ class BitmexPublicServiceTest extends MarketServiceTestTemplate<BitMexService> i
     @Override
     @Test
     public void executionRealtimelyConsecutiveSell() {
-        PublicServiceTestTemplate.super.executionRealtimelyConsecutiveSell();
+        PublicServiceTemplate.super.executionRealtimelyConsecutiveSell();
     }
 
     /**
@@ -124,6 +124,6 @@ class BitmexPublicServiceTest extends MarketServiceTestTemplate<BitMexService> i
     @Override
     @Test
     public void executionRealtimelyWithMultipleChannels() {
-        PublicServiceTestTemplate.super.executionRealtimelyWithMultipleChannels();
+        PublicServiceTemplate.super.executionRealtimelyWithMultipleChannels();
     }
 }

@@ -13,13 +13,13 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.market.MarketServiceTestTemplate;
-import cointoss.market.PrivateServiceTestTemplate;
+import cointoss.market.MarketServiceTestBase;
+import cointoss.market.PrivateServiceTemplate;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 
-public class BitFlyerPrivateServiceTest extends MarketServiceTestTemplate<BitFlyerService> implements PrivateServiceTestTemplate {
+public class BitFlyerPrivateServiceTest extends MarketServiceTestBase<BitFlyerService> implements PrivateServiceTemplate {
 
     /**
      * {@inheritDoc}
