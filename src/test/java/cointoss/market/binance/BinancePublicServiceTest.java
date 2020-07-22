@@ -15,10 +15,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.market.MarketServiceTestTemplate;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 
-public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceService> {
+public class BinancePublicServiceTest extends MarketServiceTestTemplate<BinanceService> implements PublicServiceTestTemplate {
 
     /**
      * {@inheritDoc}
@@ -33,7 +34,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
      */
     @Override
     @Test
-    protected void executions() {
+    public void executions() {
         httpClient.onGet().doReturn("""
                 [
                    {
@@ -82,7 +83,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
      */
     @Override
     @Test
-    protected void executionLatest() {
+    public void executionLatest() {
         httpClient.onGet().doReturn("""
                 [
                   {
@@ -112,7 +113,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
      */
     @Override
     @Test
-    protected void executionRealtimely() {
+    public void executionRealtimely() {
         websocketServer.replyWhenJSON("{'id':(\\d+),'method':'SUBSCRIBE','params':['btcusdt@aggTrade']}", server -> {
             server.sendJSON("{'result':null,'id':$1}");
             server.sendJSON("{'stream':'btcusdt@aggTrade','data':{'e':'aggTrade','E':1595401565277,'s':'BTCUSDT','a':330377764,'p':'9331.91000000','q':'0.01160100','f':359665720,'l':359665720,'T':1595401565277,'m':false,'M':true}}");
@@ -152,7 +153,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
      * {@inheritDoc}
      */
     @Override
-    protected void executionRealtimelyConsecutiveBuy() {
+    public void executionRealtimelyConsecutiveBuy() {
         // binance has no consecutive data
     }
 
@@ -160,7 +161,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
      * {@inheritDoc}
      */
     @Override
-    protected void executionRealtimelyConsecutiveSell() {
+    public void executionRealtimelyConsecutiveSell() {
         // binance has no consecutive data
     }
 
@@ -169,7 +170,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
      */
     @Override
     @Test
-    protected void executionRealtimelyWithMultipleChannels() {
+    public void executionRealtimelyWithMultipleChannels() {
         websocketServer.replyWhenJSON("{'id':(\\d+),'method':'SUBSCRIBE','params':['btcusdt@aggTrade']}", server -> {
             server.sendJSON("{'result':null,'id':$1}");
             server.sendJSON("{'stream':'ignored@aggTrade','data':{'e':'aggTrade','E':1595401565277,'s':'BTCUSDT','a':330377764,'p':'9331.91000000','q':'0.01160100','f':359665720,'l':359665720,'T':1595401565277,'m':false,'M':true}}");

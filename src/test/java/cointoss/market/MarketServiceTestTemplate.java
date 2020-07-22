@@ -223,7 +223,7 @@ public abstract class MarketServiceTestTemplate<S extends MarketService> {
     /**
      * Helper.
      */
-    void notImplemented() {
+    static void notImplemented() {
         throw new UnsupportedOperationException("Please implement test case");
     }
 }

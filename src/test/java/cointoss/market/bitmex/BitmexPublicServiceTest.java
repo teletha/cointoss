@@ -15,10 +15,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.market.MarketServiceTestTemplate;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 
-class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
+class BitmexPublicServiceTest extends MarketServiceTestTemplate<BitMexService> implements PublicServiceTestTemplate {
 
     /**
      * {@inheritDoc}
@@ -33,7 +34,7 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
      */
     @Override
     @Test
-    protected void executions() {
+    public void executions() {
         httpClient.onGet().doReturn("""
                 [
                   {
@@ -86,8 +87,8 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
      */
     @Override
     @Test
-    protected void executionLatest() {
-        super.executionLatest();
+    public void executionLatest() {
+        PublicServiceTestTemplate.super.executionLatest();
     }
 
     /**
@@ -95,8 +96,8 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
      */
     @Override
     @Test
-    protected void executionRealtimely() {
-        super.executionRealtimely();
+    public void executionRealtimely() {
+        PublicServiceTestTemplate.super.executionRealtimely();
     }
 
     /**
@@ -104,8 +105,8 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
      */
     @Override
     @Test
-    protected void executionRealtimelyConsecutiveBuy() {
-        super.executionRealtimelyConsecutiveBuy();
+    public void executionRealtimelyConsecutiveBuy() {
+        PublicServiceTestTemplate.super.executionRealtimelyConsecutiveBuy();
     }
 
     /**
@@ -113,8 +114,8 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
      */
     @Override
     @Test
-    protected void executionRealtimelyConsecutiveSell() {
-        super.executionRealtimelyConsecutiveSell();
+    public void executionRealtimelyConsecutiveSell() {
+        PublicServiceTestTemplate.super.executionRealtimelyConsecutiveSell();
     }
 
     /**
@@ -122,7 +123,7 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
      */
     @Override
     @Test
-    protected void executionRealtimelyWithMultipleChannels() {
-        super.executionRealtimelyWithMultipleChannels();
+    public void executionRealtimelyWithMultipleChannels() {
+        PublicServiceTestTemplate.super.executionRealtimelyWithMultipleChannels();
     }
 }

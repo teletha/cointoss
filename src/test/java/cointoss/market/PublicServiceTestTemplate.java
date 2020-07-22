@@ -9,39 +9,39 @@
  */
 package cointoss.market;
 
+import static cointoss.market.MarketServiceTestTemplate.notImplemented;
+
 import org.junit.jupiter.api.Test;
 
-import cointoss.MarketService;
-
-public abstract class PublicServiceTestTemplate<S extends MarketService> extends MarketServiceTestTemplate<S> {
+public interface PublicServiceTestTemplate {
 
     @Test
-    protected void executions() {
+    default void executions() {
         notImplemented();
     }
 
     @Test
-    protected void executionLatest() {
+    default void executionLatest() {
         notImplemented();
     }
 
     @Test
-    protected void executionRealtimely() {
+    default void executionRealtimely() {
         notImplemented();
     }
 
     @Test
-    protected void executionRealtimelyConsecutiveBuy() {
+    default void executionRealtimelyConsecutiveBuy() {
         notImplemented();
     }
 
     @Test
-    protected void executionRealtimelyConsecutiveSell() {
+    default void executionRealtimelyConsecutiveSell() {
         notImplemented();
     }
 
     @Test
-    protected void executionRealtimelyWithMultipleChannels() {
+    default void executionRealtimelyWithMultipleChannels() {
         notImplemented();
     }
 }

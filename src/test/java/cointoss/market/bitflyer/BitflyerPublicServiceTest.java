@@ -16,10 +16,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.market.MarketServiceTestTemplate;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 
-class BitflyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerService> {
+class BitflyerPublicServiceTest extends MarketServiceTestTemplate<BitFlyerService> implements PublicServiceTestTemplate {
 
     /**
      * {@inheritDoc}
@@ -34,7 +35,7 @@ class BitflyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
      */
     @Override
     @Test
-    protected void executions() {
+    public void executions() {
         httpClient.onGet().doReturnJSON("""
                 [
                     {
@@ -85,7 +86,7 @@ class BitflyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
      */
     @Override
     @Test
-    protected void executionLatest() {
+    public void executionLatest() {
         httpClient.onGet().doReturnJSON("""
                 [
                     {
@@ -116,7 +117,7 @@ class BitflyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
      */
     @Override
     @Test
-    protected void executionRealtimely() {
+    public void executionRealtimely() {
         websocketServer
                 .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
@@ -153,7 +154,7 @@ class BitflyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
      */
     @Override
     @Test
-    protected void executionRealtimelyConsecutiveBuy() {
+    public void executionRealtimelyConsecutiveBuy() {
         websocketServer
                 .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
@@ -172,7 +173,7 @@ class BitflyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
      */
     @Override
     @Test
-    protected void executionRealtimelyConsecutiveSell() {
+    public void executionRealtimelyConsecutiveSell() {
         websocketServer
                 .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
@@ -191,7 +192,7 @@ class BitflyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
      */
     @Override
     @Test
-    protected void executionRealtimelyWithMultipleChannels() {
+    public void executionRealtimelyWithMultipleChannels() {
         websocketServer
                 .replyWhenJSON("{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
