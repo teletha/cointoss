@@ -311,6 +311,8 @@ public class ExecutionLog {
                         // Since there are too many data acquired,
                         // narrow the data range and get it again.
                         coefficient = Num.max(Num.ONE, coefficient.minus(5));
+                        System.out.println("Shurink retry  " + coefficient + "          " + rests.peekFirst() + "  " + rests
+                                .peekLast() + "      SIZE" + retrieved);
                         continue;
                     } else {
                         log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
@@ -982,64 +984,5 @@ public class ExecutionLog {
         cache2.writeNormal();
 
         Thread.sleep(30000);
-    }
-
-    /**
-     * Helper to collect log from the specified starting point. <br>
-     * 201908 - 308219999<br>
-     * 201907 - 276877099<br>
-     * 201906 - 246639999<br>
-     * 201904 - 204569409<br>
-     * 
-     * @param startId
-     */
-    private void fetch(long startId, ZonedDateTime startDay, ZonedDateTime endDay) {
-        Cache latestCache = new Cache(startDay);
-
-        while (latestCache.exist()) {
-            startDay = startDay.plusDays(1);
-            Cache nextCache = new Cache(startDay);
-
-            if (!nextCache.exist()) {
-                startId = latestCache.read().last().to().v.id;
-                break;
-            } else {
-                latestCache = nextCache;
-            }
-        }
-
-        // read from REST API
-        int size = service.setting.acquirableExecutionSize();
-        Num coefficient = Num.ONE;
-
-        while (true) {
-            ArrayDeque<Execution> executions = service.executions(startId, startId + coefficient.multiply(size).longValue())
-                    .effectOnError(Throwable::printStackTrace)
-                    .retry()
-                    .toCollection(new ArrayDeque(size));
-
-            int retrieved = executions.size();
-
-            if (retrieved != 0) {
-                if (size < retrieved) {
-                    // Since there are too many data acquired, narrow the data range and get it
-                    // again.
-                    coefficient = Num.max(Num.ONE, coefficient.minus(1));
-                    continue;
-                } else {
-                    log.info("REST write from {}.  size {} ({})", executions.getFirst().date, executions.size(), coefficient);
-                    executions.forEach(this::cache);
-                    startId = executions.getLast().id;
-
-                    // Since the number of acquired data is too small, expand the data range
-                    // slightly from next time.
-                    if (retrieved < size * 0.1) {
-                        coefficient = coefficient.plus("0.1");
-                    }
-                }
-            } else {
-                break;
-            }
-        }
     }
 }
