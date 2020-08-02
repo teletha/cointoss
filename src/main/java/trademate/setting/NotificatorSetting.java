@@ -120,9 +120,9 @@ class NotificatorSetting extends View {
 
         // For Desktop
         desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition);
-        desktopDuration.items(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
+        desktopDuration.items(I.signal(1).recurse(v -> v + 1).take(60).map(Duration::ofMinutes))
                 .sync(notificator.desktopDuration)
-                .format(duration -> String.valueOf(duration.getSeconds()) + en("seconds"));
+                .format(duration -> String.valueOf(duration.toMinutes()) + en("mins"));
 
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken).masking(true);
