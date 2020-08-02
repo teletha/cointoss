@@ -159,7 +159,8 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "depth?symbol=" + marketName + "&limit=1000").map(e -> convertOrderBook(e, "bids", "asks"));
+        return call("GET", "depth?symbol=" + marketName + "&limit=" + (isFutures ? "1000" : "5000"))
+                .map(e -> convertOrderBook(e, "bids", "asks"));
     }
 
     /**
@@ -170,7 +171,7 @@ public class BinanceService extends MarketService {
         String bidName = isFutures ? "b" : "bids";
         String askName = isFutures ? "a" : "asks";
 
-        return clientRealtimely().subscribe(new Topic("depth20@100ms", marketName))
+        return clientRealtimely().subscribe(new Topic("depth@100ms", marketName))
                 .map(json -> convertOrderBook(json.get("data"), bidName, askName));
     }
 
