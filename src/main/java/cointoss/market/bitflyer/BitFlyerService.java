@@ -363,11 +363,12 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long start, long end) {
+    public Signal<Execution> executions(long startId, double sizeFactor) {
         String[] previous = new String[] {"", ""};
+        long endId = startId + Math.round(setting.acquirableExecutionSize * sizeFactor);
 
         return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&before=" + end + "&after=" + start) //
+                .acquirableExecutionSize() + "&before=" + endId + "&after=" + startId) //
                         .flatIterable(e -> e.find("*"))
                         .reverse()
                         .map(e -> convertExecution(e, previous));

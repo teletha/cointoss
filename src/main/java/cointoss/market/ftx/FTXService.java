@@ -96,13 +96,13 @@ public class FTXService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executions(long startId, double sizeFactor) {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        double coefficient = (endId - startId) / (double) setting.acquirableExecutionSize;
         long startTime = ID.secs(startId);
-        long endTime = startTime + (long) (2 * coefficient);
+        long endTime = startId + Math.round(setting.acquirableExecutionSize * sizeFactor);
+        System.out.println(startId + "   " + sizeFactor + "          " + (sizeFactor - startId));
         return call("GET", "markets/" + marketName + "/trades?limit=200&start_time=" + startTime + "&end_time=" + endTime)
                 .flatIterable(e -> e.find("result", "*"))
                 .reverse()
@@ -261,7 +261,6 @@ public class FTXService extends MarketService {
      */
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://ftx.com/api/" + path));
-        System.out.println(builder.build());
 
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "FTX RESTCall"));
     }

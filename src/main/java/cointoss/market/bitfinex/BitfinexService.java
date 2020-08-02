@@ -99,11 +99,11 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long start, long end) {
-        long startTime = (start / PaddingForID) + 1;
-        long startingPoint = start % PaddingForID;
+    public Signal<Execution> executions(long startId, double sizeFactor) {
+        long startTime = (startId / PaddingForID) + 1;
+        long startingPoint = startId % PaddingForID;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, encodeId(start)};
+        Object[] previous = new Object[] {null, encodeId(startId)};
 
         return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=10000&start=" + startTime, LimitForTradeHistory)
                 .flatIterable(e -> e.find("*"))

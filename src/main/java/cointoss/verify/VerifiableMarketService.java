@@ -272,7 +272,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long start, long end) {
+    public Signal<Execution> executions(long startId, double sizeFactor) {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error();

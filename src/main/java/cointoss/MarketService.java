@@ -152,7 +152,7 @@ public abstract class MarketService implements Disposable {
      * @param key An execution sequencial key (i.e. ID, datetime etc).
      * @return This {@link Signal} will be completed immediately.
      */
-    public abstract Signal<Execution> executions(long startId, long endId);
+    public abstract Signal<Execution> executions(long startId, double sizeFactor);
 
     /**
      * Acquire execution log in realtime. This is infinitely.

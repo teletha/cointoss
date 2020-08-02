@@ -292,9 +292,7 @@ public class ExecutionLog {
 
             while (disposer.isNotDisposed()) {
                 ArrayDeque<Execution> rests = new ArrayDeque(size);
-                service.executions(startId, startId + coefficient.multiply(size).longValue())
-                        .waitForTerminate()
-                        .to(rests::add, observer::error);
+                service.executions(startId, coefficient.doubleValue()).waitForTerminate().to(rests::add, observer::error);
 
                 // Since the synchronous REST API did not return an error, it can be determined that
                 // the server is operating normally, so the real-time API is also connected.
@@ -310,9 +308,9 @@ public class ExecutionLog {
                     if (size <= retrieved && coefficient.isGreaterThan(1)) {
                         // Since there are too many data acquired,
                         // narrow the data range and get it again.
-                        coefficient = Num.max(Num.ONE, coefficient.minus(5));
                         System.out.println("Shurink retry  " + coefficient + "          " + rests.peekFirst() + "  " + rests
                                 .peekLast() + "      SIZE" + retrieved);
+                        coefficient = Num.max(Num.ONE, coefficient.minus(5));
                         continue;
                     } else {
                         log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);

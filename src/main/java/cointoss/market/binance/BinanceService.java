@@ -101,8 +101,8 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long start, long end) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (start + 1)).flatIterable(e -> e.find("*"))
+    public Signal<Execution> executions(long startId, double sizeFactor) {
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (startId + 1)).flatIterable(e -> e.find("*"))
                 .map(this::convert);
     }
 
@@ -171,7 +171,7 @@ public class BinanceService extends MarketService {
         String bidName = isFutures ? "b" : "bids";
         String askName = isFutures ? "a" : "asks";
 
-        return clientRealtimely().subscribe(new Topic("depth@100ms", marketName))
+        return clientRealtimely().subscribe(new Topic("depth", marketName))
                 .map(json -> convertOrderBook(json.get("data"), bidName, askName));
     }
 

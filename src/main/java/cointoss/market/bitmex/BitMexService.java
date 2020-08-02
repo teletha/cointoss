@@ -105,13 +105,13 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long start, long end) {
-        start++;
-        long startingPoint = start % PaddingForID;
+    public Signal<Execution> executions(long startId, double sizeFactor) {
+        startId++;
+        long startingPoint = startId % PaddingForID;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, encodeId(start)};
+        Object[] previous = new Object[] {null, encodeId(startId)};
 
-        return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(start) + "&start=" + startingPoint)
+        return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(startId) + "&start=" + startingPoint)
                 .flatIterable(e -> e.find("*"))
                 .map(json -> {
                     return convert(json, increment, previous);
