@@ -326,4 +326,16 @@ public class BitMexService extends MarketService {
             return id.equals(reply.text("subscribe")) && Boolean.parseBoolean(reply.text("success"));
         }
     }
+
+    public static void main(String[] args) throws InterruptedException {
+        Realtime.subscribe(new Topic("liquidation", "XBTUSD")).to(e -> {
+            System.out.println(e);
+        });
+
+        Realtime.subscribe(new Topic("liquidation", "ETHUSD")).to(e -> {
+            System.out.println(e);
+        });
+
+        Thread.sleep(1000 * 60 * 30);
+    }
 }

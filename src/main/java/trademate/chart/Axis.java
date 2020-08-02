@@ -297,8 +297,10 @@ public class Axis extends Region {
             scroll.setVisibleAmount(1);
         } else {
             double value = (low - min) / (logicalDiff - visualDiff);
-            scroll.setValue(isHorizontal() ? value : 1 - value);
-            scroll.setVisibleAmount(visualDiff / logicalDiff);
+            if (!Double.isNaN(value)) {
+                scroll.setValue(isHorizontal() ? value : 1 - value);
+                scroll.setVisibleAmount(visualDiff / logicalDiff);
+            }
         }
 
         // search nearest unit index
