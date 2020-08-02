@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.market.binance.Binance;
 import cointoss.market.bitmex.BitMex;
 import kiss.I;
 import kiss.Managed;
@@ -50,7 +51,7 @@ public class TradeTester extends View {
     protected void initialize() {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
 
-        List<MarketService> services = List.of(BitMex.ETH_USD);
+        List<MarketService> services = List.of(BitMex.ETH_USD, BitMex.XBT_USD, Binance.BTC_USDT);
 
         // ========================================================
         // Create Tab for each Markets

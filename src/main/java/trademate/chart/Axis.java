@@ -79,7 +79,7 @@ public class Axis extends Region {
     public final DoubleProperty visibleMinRange = new SimpleDoubleProperty(this, "visibleMinRange", 0);
 
     /** The visible padding size. */
-    public final DoubleProperty padding = new SimpleDoubleProperty(this, "padding", 60);
+    public final DoubleProperty padding = new SimpleDoubleProperty(this, "padding", 0);
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
@@ -191,6 +191,17 @@ public class Axis extends Region {
      */
     public final boolean isVertical() {
         return side.isVertical();
+    }
+
+    /**
+     * Configure left and bottom padding.
+     * 
+     * @param padding A size of padding.
+     * @return Chainable API.
+     */
+    public final Axis padding(double padding) {
+        this.padding.set(padding);
+        return this;
     }
 
     /**
