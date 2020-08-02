@@ -101,8 +101,7 @@ public class FTXService extends MarketService {
         Object[] previous = new Object[2];
 
         long startTime = ID.secs(startId);
-        long endTime = startId + Math.round(setting.acquirableExecutionSize * sizeFactor);
-        System.out.println(startId + "   " + sizeFactor + "          " + (sizeFactor - startId));
+        long endTime = startTime + Math.round(1 * sizeFactor);
         return call("GET", "markets/" + marketName + "/trades?limit=200&start_time=" + startTime + "&end_time=" + endTime)
                 .flatIterable(e -> e.find("result", "*"))
                 .reverse()

@@ -24,8 +24,7 @@ public final class FTX extends MarketServiceProvider {
             .orderBookGroupRanges(Num.of(1, 5, 10, 25, 50, 100))
             .baseCurrencyScaleSize(1)
             .targetCurrencyScaleSize(5)
-            .acquirableExecutionSize(200)
-            .acquirableExecutionSizeModifler(FTXService.ID.padding));
+            .acquirableExecutionSize(200));
 
     /**
      * {@inheritDoc}
