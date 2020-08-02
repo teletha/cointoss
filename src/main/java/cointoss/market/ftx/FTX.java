@@ -19,7 +19,7 @@ import kiss.I;
 public final class FTX extends MarketServiceProvider {
 
     /** Market */
-    public static final MarketService BTC_USD = new FTXService("BTC-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.5")
+    static final MarketService BTC_USD = new FTXService("BTC-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.5")
             .targetCurrencyMinimumBidSize("0.00001")
             .orderBookGroupRanges(Num.of(1, 5, 10, 25, 50, 100))
             .baseCurrencyScaleSize(1)

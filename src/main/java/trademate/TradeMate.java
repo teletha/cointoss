@@ -10,17 +10,12 @@
 package trademate;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
-import cointoss.MarketService;
-import cointoss.market.binance.Binance;
-import cointoss.market.bitfinex.Bitfinex;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitmex.BitMex;
+import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import kiss.I;
 import kiss.Managed;
@@ -60,20 +55,17 @@ public class TradeMate extends View {
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
 
-        List<MarketService> services = List
-                .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);
-
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        for (MarketService service : services) {
+        MarketServiceProvider.availableMarketServices().to(service -> {
             UITab tab = DockSystem.register(service.marketIdentity())
                     .closable(false)
                     .text(service.marketReadableName())
                     .contents(ui -> new TradingView(ui, service));
 
             loader.add(tab);
-        }
+        });
 
         // ========================================================
         // Clock in Title bar
