@@ -68,7 +68,18 @@ public class Numbering {
      * @param time A target time.
      * @return The computed ID.
      */
-    public long fromTime(ZonedDateTime time) {
+    public long fromTimeToMill(ZonedDateTime time) {
         return fromMilli(time.toInstant().toEpochMilli());
+    }
+
+    /**
+     * Calculate ID from date-time.
+     * 
+     * @param time A target time.
+     * @return The computed ID.
+     */
+    public long fromTimeToSec(ZonedDateTime time) {
+        System.out.println(time.toEpochSecond());
+        return fromSec(time.toEpochSecond());
     }
 }

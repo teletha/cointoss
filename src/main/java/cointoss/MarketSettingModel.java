@@ -17,7 +17,6 @@ import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
-import kiss.I;
 
 @Icy
 interface MarketSettingModel {
@@ -82,6 +81,16 @@ interface MarketSettingModel {
     @Icy.Property
     default int acquirableExecutionSize() {
         return 100;
+    }
+
+    /**
+     * Configure max acquirable execution size per one request.
+     * 
+     * @return
+     */
+    @Icy.Property
+    default int executionIdPadding() {
+        return 1;
     }
 
     /**

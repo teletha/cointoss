@@ -137,14 +137,6 @@ public class FTXService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public long estimateInitialExecutionId() {
-        return 1569888000000L * Numbering.padding;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<Order> orders() {
         return I.signal();
     }
@@ -228,7 +220,7 @@ public class FTXService extends MarketService {
         int consecutive;
 
         if (date.equals(previous[1])) {
-            id = Numbering.fromTime(date) + increment.incrementAndGet();
+            id = Numbering.fromTimeToSec(date) + increment.incrementAndGet();
 
             if (side != previous[0]) {
                 consecutive = Execution.ConsecutiveDifference;
@@ -238,7 +230,7 @@ public class FTXService extends MarketService {
                 consecutive = Execution.ConsecutiveSameSeller;
             }
         } else {
-            id = Numbering.fromTime(date);
+            id = Numbering.fromTimeToSec(date);
             increment.set(0);
             consecutive = Execution.ConsecutiveDifference;
         }

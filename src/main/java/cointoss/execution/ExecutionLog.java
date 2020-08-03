@@ -344,7 +344,7 @@ public class ExecutionLog {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
-                        startId += coefficient.multiply(size * 1000).intValue() - 1;
+                        startId += coefficient.multiply(size).intValue() - 1;
                         coefficient = coefficient.plus("0.1");
                         System.out.println("Update efficient " + startId + "   " + coefficient);
                         continue;
