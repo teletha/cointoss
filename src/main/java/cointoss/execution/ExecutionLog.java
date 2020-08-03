@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -309,7 +309,7 @@ public class ExecutionLog {
                         // Since there are too many data acquired,
                         // narrow the data range and get it again.
                         coefficient = Num
-                                .max(Num.ONE, coefficient.isGreaterThan(200) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
+                                .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
                         continue;
                     } else {
                         log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
@@ -328,12 +328,14 @@ public class ExecutionLog {
 
                         // The number of acquired data is too small,
                         // expand the data range slightly from next time.
-                        if (retrieved < size * 0.1) {
-                            coefficient = coefficient.plus("3");
+                        if (retrieved < size * 0.05) {
+                            coefficient = coefficient.plus("50");
+                        } else if (retrieved < size * 0.1) {
+                            coefficient = coefficient.plus("5");
                         } else if (retrieved < size * 0.3) {
-                            coefficient = coefficient.plus("0.5");
+                            coefficient = coefficient.plus("2");
                         } else if (retrieved < size * 0.5) {
-                            coefficient = coefficient.plus("0.3");
+                            coefficient = coefficient.plus("0.5");
                         } else if (retrieved < size * 0.7) {
                             coefficient = coefficient.plus("0.1");
                         }
@@ -344,9 +346,8 @@ public class ExecutionLog {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
-                        startId += coefficient.multiply(size).intValue() - 1;
-                        coefficient = coefficient.plus("0.1");
-                        System.out.println("Update efficient " + startId + "   " + coefficient);
+                        startId += coefficient.multiply(1000).intValue() - 1;
+                        coefficient = coefficient.plus("50");
                         continue;
                     }
 

@@ -386,6 +386,23 @@ public class BitFlyerService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> executionLatest(long id) {
+        String[] previous = new String[] {"", ""};
+
+        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=1").flatIterable(e -> e.find("*"))
+                .map(e -> convertExecution(e, previous));
+    }
+
+    public static void main(String[] args) {
+        BitFlyer.FX_BTC_JPY.executionLatest().to(e -> {
+            System.out.println(e);
+        });
+    }
+
+    /**
      * Convert to {@link Execution}.
      * 
      * @param json Message represents executed trade.

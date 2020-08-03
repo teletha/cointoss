@@ -156,6 +156,16 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Execution> executionLatest(long id) {
+        return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true&endTime=" + formatEncodedId(id))
+                .flatIterable(e -> e.find("*"))
+                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public long estimateInitialExecutionId() {
         return decodeId(Chrono.utc(2020, 1, 1).minusMinutes(3));
     }
@@ -328,14 +338,10 @@ public class BitMexService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Realtime.subscribe(new Topic("liquidation", "XBTUSD")).to(e -> {
+        BitMex.XBT_USD.executionLatest(Long.MAX_VALUE).to(e -> {
             System.out.println(e);
         });
 
-        Realtime.subscribe(new Topic("liquidation", "ETHUSD")).to(e -> {
-            System.out.println(e);
-        });
-
-        Thread.sleep(1000 * 60 * 30);
+        Thread.sleep(1000 * 4);
     }
 }

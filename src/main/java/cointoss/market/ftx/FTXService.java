@@ -40,7 +40,7 @@ import kiss.Signal;
 public class FTXService extends MarketService {
 
     /** The idetifier management. */
-    static final Numbering Numbering = new Numbering(1000);
+    static final Numbering Numbering = new Numbering(false, 1000);
 
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
@@ -100,15 +100,12 @@ public class FTXService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        long startTime = Numbering.secs(startId) + 1;
+        long startTime = Numbering.decode(startId) + 1;
         long endTime = startTime + Math.round(sizeFactor);
         return call("GET", "markets/" + marketName + "/trades?limit=" + setting.acquirableExecutionSize + "&start_time=" + startTime + "&end_time=" + endTime)
                 .flatIterable(e -> e.find("result", "*"))
                 .reverse()
-                .map(json -> convert(json, increment, previous))
-                .effectOnError(e -> {
-                    e.printStackTrace();
-                });
+                .map(json -> convert(json, increment, previous));
     }
 
     /**
@@ -130,6 +127,16 @@ public class FTXService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "markets/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("result", "*"))
+                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> executionLatest(long id) {
+        return call("GET", "markets/" + marketName + "/trades?limit=1&end_time=" + Numbering.decode(id))
+                .flatIterable(e -> e.find("result", "*"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
@@ -220,7 +227,7 @@ public class FTXService extends MarketService {
         int consecutive;
 
         if (date.equals(previous[1])) {
-            id = Numbering.fromTimeToSec(date) + increment.incrementAndGet();
+            id = Numbering.encode(date) + increment.incrementAndGet();
 
             if (side != previous[0]) {
                 consecutive = Execution.ConsecutiveDifference;
@@ -230,7 +237,7 @@ public class FTXService extends MarketService {
                 consecutive = Execution.ConsecutiveSameSeller;
             }
         } else {
-            id = Numbering.fromTimeToSec(date);
+            id = Numbering.encode(date);
             increment.set(0);
             consecutive = Execution.ConsecutiveDifference;
         }
@@ -262,7 +269,7 @@ public class FTXService extends MarketService {
     /**
      * 
      */
-    private static class Topic extends IdentifiableTopic<Topic> {
+    static class Topic extends IdentifiableTopic<Topic> {
 
         public String op = "subscribe";
 

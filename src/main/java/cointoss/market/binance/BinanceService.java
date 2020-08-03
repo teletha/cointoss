@@ -126,6 +126,14 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Execution> executionLatest(long id) {
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("*")).map(this::convert);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public long estimateInitialExecutionId() {
         return 0;
     }

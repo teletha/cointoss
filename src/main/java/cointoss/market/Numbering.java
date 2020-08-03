@@ -15,51 +15,24 @@ public class Numbering {
 
     public final long padding;
 
+    private final boolean milliBase;
+
     /**
      * @param padding
      */
-    public Numbering(long padding) {
+    public Numbering(boolean milliBase, long padding) {
         this.padding = padding;
+        this.milliBase = milliBase;
     }
 
     /**
-     * Calculate epoch milliseconds from ID.
-     * 
-     * @param id A target ID.
-     * @return Epoch milliseconds.
-     */
-    public long mills(long id) {
-        return id / padding;
-    }
-
-    /**
-     * Calculate epoch seconds from ID.
+     * Calculate epoch time from ID.
      * 
      * @param id A target ID.
      * @return Epoch seconds.
      */
-    public long secs(long id) {
-        return id / (padding * 1000);
-    }
-
-    /**
-     * Calculate ID from epoch milliseconds.
-     * 
-     * @param millis A target time.
-     * @return The computed ID.
-     */
-    public long fromMilli(long millis) {
-        return millis * padding;
-    }
-
-    /**
-     * Calculate ID from epoch seconds.
-     * 
-     * @param secs A target time.
-     * @return The computed ID.
-     */
-    public long fromSec(long secs) {
-        return secs * padding * 1000;
+    public long decode(long id) {
+        return id / padding;
     }
 
     /**
@@ -68,18 +41,8 @@ public class Numbering {
      * @param time A target time.
      * @return The computed ID.
      */
-    public long fromTimeToMill(ZonedDateTime time) {
-        return fromMilli(time.toInstant().toEpochMilli());
-    }
-
-    /**
-     * Calculate ID from date-time.
-     * 
-     * @param time A target time.
-     * @return The computed ID.
-     */
-    public long fromTimeToSec(ZonedDateTime time) {
-        System.out.println(time.toEpochSecond());
-        return fromSec(time.toEpochSecond());
+    public long encode(ZonedDateTime time) {
+        long epoch = milliBase ? time.toInstant().toEpochMilli() : time.toEpochSecond();
+        return epoch * padding;
     }
 }

@@ -181,6 +181,13 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Execution> executionLatest();
 
     /**
+     * Acquier the latest execution log.
+     * 
+     * @return A latest execution log.
+     */
+    public abstract Signal<Execution> executionLatest(long id);
+
+    /**
      * Checks whether the specified {@link Execution}s are the same.
      * 
      * @param one Non-null target.
@@ -202,7 +209,7 @@ public abstract class MarketService implements Disposable {
         long middle = (start + end) / 2;
 
         while (true) {
-            List<Execution> result = executions(start, middle).skipError().waitForTerminate().toList();
+            List<Execution> result = executionLatest(middle).skipError().waitForTerminate().toList();
 
             if (result.isEmpty()) {
                 start = middle;
