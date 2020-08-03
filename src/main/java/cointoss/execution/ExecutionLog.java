@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -308,9 +308,8 @@ public class ExecutionLog {
                     if (size <= retrieved && coefficient.isGreaterThan(1)) {
                         // Since there are too many data acquired,
                         // narrow the data range and get it again.
-                        System.out.println("Shurink retry  " + coefficient + "          " + rests.peekFirst() + "  " + rests
-                                .peekLast() + "      SIZE" + retrieved);
-                        coefficient = Num.max(Num.ONE, coefficient.minus(5));
+                        coefficient = Num
+                                .max(Num.ONE, coefficient.isGreaterThan(200) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
                         continue;
                     } else {
                         log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
@@ -345,8 +344,9 @@ public class ExecutionLog {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
-                        startId += coefficient.multiply(size).intValue() - 1;
+                        startId += coefficient.multiply(size * 1000).intValue() - 1;
                         coefficient = coefficient.plus("0.1");
+                        System.out.println("Update efficient " + startId + "   " + coefficient);
                         continue;
                     }
 

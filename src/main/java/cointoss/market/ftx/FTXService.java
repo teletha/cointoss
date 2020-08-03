@@ -23,7 +23,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.market.TimeBasedId;
+import cointoss.market.Numbering;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
@@ -39,8 +39,8 @@ import kiss.Signal;
 
 public class FTXService extends MarketService {
 
-    /** The id manager. */
-    static final TimeBasedId ID = new TimeBasedId(1000);
+    /** The idetifier management. */
+    static final Numbering Numbering = new Numbering(1000);
 
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
@@ -100,12 +100,15 @@ public class FTXService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        long startTime = ID.secs(startId);
-        long endTime = startTime + Math.round(1 * sizeFactor);
-        return call("GET", "markets/" + marketName + "/trades?limit=200&start_time=" + startTime + "&end_time=" + endTime)
+        long startTime = Numbering.secs(startId) + 1;
+        long endTime = startTime + Math.round(sizeFactor);
+        return call("GET", "markets/" + marketName + "/trades?limit=" + setting.acquirableExecutionSize + "&start_time=" + startTime + "&end_time=" + endTime)
                 .flatIterable(e -> e.find("result", "*"))
                 .reverse()
-                .map(json -> convert(json, increment, previous));
+                .map(json -> convert(json, increment, previous))
+                .effectOnError(e -> {
+                    e.printStackTrace();
+                });
     }
 
     /**
@@ -135,7 +138,7 @@ public class FTXService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return 1569888000000L * ID.padding;
+        return 1569888000000L * Numbering.padding;
     }
 
     /**
@@ -225,7 +228,7 @@ public class FTXService extends MarketService {
         int consecutive;
 
         if (date.equals(previous[1])) {
-            id = ID.decode(date) + increment.incrementAndGet();
+            id = Numbering.fromTime(date) + increment.incrementAndGet();
 
             if (side != previous[0]) {
                 consecutive = Execution.ConsecutiveDifference;
@@ -235,7 +238,7 @@ public class FTXService extends MarketService {
                 consecutive = Execution.ConsecutiveSameSeller;
             }
         } else {
-            id = ID.decode(date);
+            id = Numbering.fromTime(date);
             increment.set(0);
             consecutive = Execution.ConsecutiveDifference;
         }
@@ -276,7 +279,6 @@ public class FTXService extends MarketService {
         public String market;
 
         /**
-         * 
          * @param channel
          * @param market
          */

@@ -22,7 +22,7 @@ public final class FTX extends MarketServiceProvider {
             .targetCurrencyMinimumBidSize("0.00001")
             .baseCurrencyScaleSize(1)
             .targetCurrencyScaleSize(5)
-            .acquirableExecutionSize(200));
+            .acquirableExecutionSize(209));
 
     /**
      * {@inheritDoc}
