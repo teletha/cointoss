@@ -85,9 +85,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     private static final MethodHandle targetCurrencyMinimumBidSizeUpdater = updater("targetCurrencyMinimumBidSize");
 
     /** The final property updater. */
-    private static final MethodHandle orderBookGroupRangesUpdater = updater("orderBookGroupRanges");
-
-    /** The final property updater. */
     private static final MethodHandle targetCurrencyBidSizesUpdater = updater("targetCurrencyBidSizes");
 
     /** The final property updater. */
@@ -107,9 +104,6 @@ public abstract class MarketSetting implements MarketSettingModel {
 
     /** The exposed property. */
     public final Num targetCurrencyMinimumBidSize;
-
-    /** The exposed property. */
-    public final Num[] orderBookGroupRanges;
 
     /** The exposed property. */
     public final List<Num> targetCurrencyBidSizes;
@@ -132,7 +126,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     protected MarketSetting() {
         this.baseCurrencyMinimumBidPrice = null;
         this.targetCurrencyMinimumBidSize = null;
-        this.orderBookGroupRanges = null;
         this.targetCurrencyBidSizes = MarketSettingModel.super.targetCurrencyBidSizes();
         this.baseCurrencyScaleSize = MarketSettingModel.super.baseCurrencyScaleSize();
         this.targetCurrencyScaleSize = MarketSettingModel.super.targetCurrencyScaleSize();
@@ -199,38 +192,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         }
         try {
             targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$473121199.invoke(this, value, (Consumer<List<Num>>) this::setTargetCurrencyBidSizes));
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /** Get the price range of grouped order books. */
-    @Override
-    public final Num[] orderBookGroupRanges() {
-        return this.orderBookGroupRanges;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of orderBookGroupRanges property.
-     */
-    @SuppressWarnings("unused")
-    private final Num[] getOrderBookGroupRanges() {
-        return this.orderBookGroupRanges;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of orderBookGroupRanges property to assign.
-     */
-    private final void setOrderBookGroupRanges(Num[] value) {
-        if (value == null) {
-            throw new IllegalArgumentException("The orderBookGroupRanges property requires non-null value.");
-        }
-        try {
-            orderBookGroupRangesUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -405,7 +366,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         StringBuilder builder = new StringBuilder("MarketSetting [");
         builder.append("baseCurrencyMinimumBidPrice=").append(baseCurrencyMinimumBidPrice).append(", ");
         builder.append("targetCurrencyMinimumBidSize=").append(targetCurrencyMinimumBidSize).append(", ");
-        builder.append("orderBookGroupRanges=").append(orderBookGroupRanges).append(", ");
         builder.append("targetCurrencyBidSizes=").append(targetCurrencyBidSizes).append(", ");
         builder.append("baseCurrencyScaleSize=").append(baseCurrencyScaleSize).append(", ");
         builder.append("targetCurrencyScaleSize=").append(targetCurrencyScaleSize).append(", ");
@@ -421,7 +381,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(baseCurrencyMinimumBidPrice, targetCurrencyMinimumBidSize, orderBookGroupRanges, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger);
+        return Objects.hash(baseCurrencyMinimumBidPrice, targetCurrencyMinimumBidSize, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger);
     }
 
     /**
@@ -438,7 +398,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         MarketSetting other = (MarketSetting) o;
         if (!Objects.equals(baseCurrencyMinimumBidPrice, other.baseCurrencyMinimumBidPrice)) return false;
         if (!Objects.equals(targetCurrencyMinimumBidSize, other.targetCurrencyMinimumBidSize)) return false;
-        if (!Objects.equals(orderBookGroupRanges, other.orderBookGroupRanges)) return false;
         if (!Objects.equals(targetCurrencyBidSizes, other.targetCurrencyBidSizes)) return false;
         if (baseCurrencyScaleSize != other.baseCurrencyScaleSize) return false;
         if (targetCurrencyScaleSize != other.targetCurrencyScaleSize) return false;
@@ -460,7 +419,7 @@ public abstract class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTargetCurrencyMinimumBidSize<ÅssignableOrderBookGroupRanges<Self>> baseCurrencyMinimumBidPrice(Num baseCurrencyMinimumBidPrice) {
+        public ÅssignableTargetCurrencyMinimumBidSize<Self> baseCurrencyMinimumBidPrice(Num baseCurrencyMinimumBidPrice) {
             Åssignable o = new Åssignable();
             o.baseCurrencyMinimumBidPrice(baseCurrencyMinimumBidPrice);
             return o;
@@ -471,7 +430,7 @@ public abstract class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTargetCurrencyMinimumBidSize<ÅssignableOrderBookGroupRanges<Self>> baseCurrencyMinimumBidPrice(String price) {
+        public ÅssignableTargetCurrencyMinimumBidSize<Self> baseCurrencyMinimumBidPrice(String price) {
             Åssignable o = new Åssignable();
             o.baseCurrencyMinimumBidPrice(price);
             return o;
@@ -535,23 +494,6 @@ public abstract class MarketSetting implements MarketSettingModel {
             } catch (Throwable e) {
                 throw quiet(e);
             }
-        }
-    }
-
-    /**
-     * Property assignment API.
-     */
-    public static interface ÅssignableOrderBookGroupRanges<Next> {
-
-        /**
-         * Assign orderBookGroupRanges property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next orderBookGroupRanges(Num... value) {
-            ((MarketSetting) this).setOrderBookGroupRanges(value);
-            return (Next) this;
         }
     }
 
@@ -628,7 +570,7 @@ public abstract class MarketSetting implements MarketSettingModel {
     /**
      * Internal aggregated API.
      */
-    protected static interface ÅssignableAll extends ÅssignableBaseCurrencyMinimumBidPrice, ÅssignableTargetCurrencyMinimumBidSize, ÅssignableOrderBookGroupRanges {
+    protected static interface ÅssignableAll extends ÅssignableBaseCurrencyMinimumBidPrice, ÅssignableTargetCurrencyMinimumBidSize {
     }
 
     /**
@@ -643,7 +585,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     static final class My {
         static final String BaseCurrencyMinimumBidPrice = "baseCurrencyMinimumBidPrice";
         static final String TargetCurrencyMinimumBidSize = "targetCurrencyMinimumBidSize";
-        static final String OrderBookGroupRanges = "orderBookGroupRanges";
         static final String TargetCurrencyBidSizes = "targetCurrencyBidSizes";
         static final String BaseCurrencyScaleSize = "baseCurrencyScaleSize";
         static final String TargetCurrencyScaleSize = "targetCurrencyScaleSize";

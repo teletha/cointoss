@@ -59,12 +59,6 @@ interface MarketSettingModel {
     }
 
     /**
-     * Get the price range of grouped order books.
-     */
-    @Icy.Property
-    Num[] orderBookGroupRanges();
-
-    /**
      * Get the human readable size of base currency.
      */
     @Icy.Property
@@ -78,13 +72,6 @@ interface MarketSettingModel {
     @Icy.Property
     default int targetCurrencyScaleSize() {
         return 0;
-    }
-
-    /**
-     * Get the price range of grouped order books.
-     */
-    default List<Num> orderBookGroupRangesWithBase() {
-        return I.signal(orderBookGroupRanges()).startWith(baseCurrencyMinimumBidPrice()).toList();
     }
 
     /**

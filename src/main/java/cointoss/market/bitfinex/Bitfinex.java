@@ -13,14 +13,12 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
-import cointoss.util.Num;
 import kiss.I;
 
 public final class Bitfinex extends MarketServiceProvider {
 
     private static final MarketSetting BTC = MarketSetting.with.baseCurrencyMinimumBidPrice("0.01")
             .targetCurrencyMinimumBidSize("0.000001")
-            .orderBookGroupRanges(Num.of(1, 5, 10, 25))
             .baseCurrencyScaleSize(1)
             .targetCurrencyScaleSize(5)
             .acquirableExecutionSize(10000);
