@@ -18,47 +18,49 @@ import kiss.I;
 
 public final class FTX extends MarketServiceProvider {
 
+    private static final int AcquirableSize = 10000;
+
     /** Market */
     public static final MarketService ADA_PERP = new FTXService("ADA-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.000005")
             .targetCurrencyMinimumBidSize("1")
             .baseCurrencyScaleSize(6)
             .targetCurrencyScaleSize(0)
-            .acquirableExecutionSize(5000));
+            .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
-    static final MarketService BNB_PERP = new FTXService("BNB-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.0005")
+    public static final MarketService BNB_PERP = new FTXService("BNB-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.0005")
             .targetCurrencyMinimumBidSize("0.00001")
             .baseCurrencyScaleSize(4)
             .targetCurrencyScaleSize(5)
-            .acquirableExecutionSize(5000));
+            .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
     public static final MarketService BTC_PERP = new FTXService("BTC-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.5")
             .targetCurrencyMinimumBidSize("0.0001")
             .baseCurrencyScaleSize(1)
             .targetCurrencyScaleSize(4)
-            .acquirableExecutionSize(5000));
+            .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
     static final MarketService EOS_PERP = new FTXService("EOS-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.00005")
             .targetCurrencyMinimumBidSize("0.00001")
             .baseCurrencyScaleSize(5)
             .targetCurrencyScaleSize(5)
-            .acquirableExecutionSize(5000));
+            .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
     static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.01")
             .targetCurrencyMinimumBidSize("0.001")
             .baseCurrencyScaleSize(2)
             .targetCurrencyScaleSize(3)
-            .acquirableExecutionSize(5000));
+            .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
     public static final MarketService FTT_USDT = new FTXService("FTT/USDT", MarketSetting.with.baseCurrencyMinimumBidPrice("0.001")
             .targetCurrencyMinimumBidSize("1")
             .baseCurrencyScaleSize(3)
             .targetCurrencyScaleSize(0)
-            .acquirableExecutionSize(1000));
+            .acquirableExecutionSize(AcquirableSize));
 
     /**
      * {@inheritDoc}
@@ -69,7 +71,7 @@ public final class FTX extends MarketServiceProvider {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Market market = new Market(FTX.BNB_PERP);
+        Market market = new Market(FTX.EOS_PERP);
         market.readLog(log -> log.fromYestaday());
 
         Thread.sleep(1000 * 30);
