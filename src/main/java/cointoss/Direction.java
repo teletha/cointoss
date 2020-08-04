@@ -119,6 +119,9 @@ public enum Direction implements Directional {
      * @return
      */
     public static Direction parse(String value) {
+        if (value == null || value.length() == 0) {
+            return SELL;
+        }
         char c = value.charAt(0);
         return c == 'S' || c == 's' ? SELL : BUY;
     }

@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Numbering;
 import cointoss.order.Order;
+import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
@@ -213,7 +213,7 @@ public class FTXService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return I.signal();
+        return call("GET", "markets/" + marketName + "/orderbook?depth=100").map(json -> json.get("result")).map(this::convertOrderBook);
     }
 
     /**
@@ -221,7 +221,32 @@ public class FTXService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return I.signal();
+        return clientRealtimely().subscribe(new Topic("orderbook", marketName)).map(json -> convertOrderBook(json.get("data")));
+    }
+
+    /**
+     * Convert JSON to {@link OrderBookPageChanges}.
+     * 
+     * @param array
+     * @return
+     */
+    private OrderBookPageChanges convertOrderBook(JSON pages) {
+        OrderBookPageChanges change = new OrderBookPageChanges();
+
+        for (JSON bid : pages.find("bids", "*")) {
+            Num price = bid.get(Num.class, "0");
+            double size = Double.parseDouble(bid.text("1"));
+
+            change.bids.add(new OrderBookPage(price, size));
+        }
+
+        for (JSON ask : pages.find("asks", "*")) {
+            Num price = ask.get(Num.class, "0");
+            double size = Double.parseDouble(ask.text("1"));
+
+            change.asks.add(new OrderBookPage(price, size));
+        }
+        return change;
     }
 
     /**
@@ -351,25 +376,14 @@ public class FTXService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        // https://ftx.com/api/markets/BTC-PERP/trades?limit=200&start_time=1570944652&end_time=1570944660
-        // GET
-        // https://ftx.com/api/markets/BTC-PERP/trades?limit=200&start_time=1570944652&end_time=1570944654
-        // GET
-        // 2020-07-23 13:55:25.520 INFO REST write on FTX BTC-PERP from
-        // 2019-10-13T05:30:52.304052Z[UTC]. size 2 (1)
-        //
-        // FTX.BTC_USD.executions(1570944654000L, 1570954660000L).to(e -> {
-        // System.out.println(e);
-        // });
+        FTX.BTC_USD.orderBookRealtimely().to(e -> {
+            System.out.println(e);
+        });
 
-        Market market = new Market(FTX.BTC_USD);
-        market.readLog(log -> log.fromYestaday());
+        // Market market = new Market(FTX.BTC_USD);
+        // market.readLog(log -> log.fromYestaday());
 
-        // FTX.BTC_USD.executionsRealtimely().to(e -> {
-        // System.out.println(e);
-        // });
-
-        Thread.sleep(1000 * 60 * 10);
+        Thread.sleep(1000 * 30);
     }
 
 }
