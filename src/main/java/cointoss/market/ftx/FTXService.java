@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -376,12 +377,12 @@ public class FTXService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        FTX.BTC_USD.orderBookRealtimely().to(e -> {
-            System.out.println(e);
-        });
+        // FTX.BTC_PERP.orderBookRealtimely().to(e -> {
+        // System.out.println(e);
+        // });
 
-        // Market market = new Market(FTX.BTC_USD);
-        // market.readLog(log -> log.fromYestaday());
+        Market market = new Market(FTX.BTC_PERP);
+        market.readLog(log -> log.fromYestaday());
 
         Thread.sleep(1000 * 30);
     }

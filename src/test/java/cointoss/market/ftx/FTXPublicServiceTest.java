@@ -25,7 +25,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
      */
     @Override
     protected FTXService constructMarketService() {
-        return construct(FTXService::new, FTX.BTC_USD.marketName, FTX.BTC_USD.setting);
+        return construct(FTXService::new, FTX.BTC_PERP.marketName, FTX.BTC_PERP.setting);
     }
 
     /**
