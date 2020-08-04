@@ -99,7 +99,7 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, double sizeFactor) {
+    public Signal<Execution> executions(long startId, long endId) {
         long startTime = (startId / PaddingForID) + 1;
         long startingPoint = startId % PaddingForID;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
@@ -136,7 +136,7 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatest(long id) {
+    public Signal<Execution> executionLatestAt(long id) {
         return call("GET", "trades/t" + marketName + "/hist?limit=1", LimitForTradeHistory).flatIterable(e -> e.find("*"))
                 .map(e -> convert(e, new AtomicLong(), new Object[2]));
     }

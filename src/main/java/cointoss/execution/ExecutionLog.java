@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -292,7 +292,8 @@ public class ExecutionLog {
 
             while (disposer.isNotDisposed()) {
                 ArrayDeque<Execution> rests = new ArrayDeque(size);
-                service.executions(startId, coefficient.doubleValue()).waitForTerminate().to(rests::add, observer::error);
+                long range = service.estimateAcquirableExecutionIdRange(coefficient.doubleValue());
+                service.executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
 
                 // Since the synchronous REST API did not return an error, it can be determined that
                 // the server is operating normally, so the real-time API is also connected.
@@ -346,7 +347,7 @@ public class ExecutionLog {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
-                        startId += coefficient.multiply(1000).intValue() - 1;
+                        startId += range - 1;
                         coefficient = coefficient.plus("50");
                         continue;
                     }

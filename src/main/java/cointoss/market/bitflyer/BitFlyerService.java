@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.translate;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -363,9 +363,8 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, double sizeFactor) {
+    public Signal<Execution> executions(long startId, long endId) {
         String[] previous = new String[] {"", ""};
-        long endId = startId + Math.round(setting.acquirableExecutionSize * sizeFactor);
 
         return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + setting
                 .acquirableExecutionSize() + "&before=" + endId + "&after=" + startId) //
@@ -389,17 +388,19 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatest(long id) {
+    public Signal<Execution> executionLatestAt(long id) {
         String[] previous = new String[] {"", ""};
 
         return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=1").flatIterable(e -> e.find("*"))
                 .map(e -> convertExecution(e, previous));
     }
 
-    public static void main(String[] args) {
-        BitFlyer.FX_BTC_JPY.executionLatest().to(e -> {
-            System.out.println(e);
-        });
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long estimateAcquirableExecutionIdRange(double factor) {
+        return Math.round(setting.acquirableExecutionSize * factor);
     }
 
     /**

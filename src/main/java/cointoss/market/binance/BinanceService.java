@@ -101,7 +101,7 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, double sizeFactor) {
+    public Signal<Execution> executions(long startId, long endId) {
         return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (startId + 1)).flatIterable(e -> e.find("*"))
                 .map(this::convert);
     }
@@ -126,7 +126,7 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatest(long id) {
+    public Signal<Execution> executionLatestAt(long id) {
         return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("*")).map(this::convert);
     }
 

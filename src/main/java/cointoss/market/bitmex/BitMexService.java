@@ -105,7 +105,7 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, double sizeFactor) {
+    public Signal<Execution> executions(long startId, long endId) {
         startId++;
         long startingPoint = startId % PaddingForID;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
@@ -156,7 +156,7 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatest(long id) {
+    public Signal<Execution> executionLatestAt(long id) {
         return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true&endTime=" + formatEncodedId(id))
                 .flatIterable(e -> e.find("*"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
@@ -338,7 +338,7 @@ public class BitMexService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        BitMex.XBT_USD.executionLatest(Long.MAX_VALUE).to(e -> {
+        BitMex.XBT_USD.executionLatestAt(Long.MAX_VALUE).to(e -> {
             System.out.println(e);
         });
 

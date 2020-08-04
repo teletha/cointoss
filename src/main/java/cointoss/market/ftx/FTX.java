@@ -9,7 +9,6 @@
  */
 package cointoss.market.ftx;
 
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
@@ -38,12 +37,5 @@ public final class FTX extends MarketServiceProvider {
     @Override
     public MarketAccount account() {
         return I.make(FTXAccount.class);
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Market market = new Market(FTX.FTT_USDT);
-        market.readLog(log -> log.fromYestaday());
-
-        Thread.sleep(1000 * 5);
     }
 }

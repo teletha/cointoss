@@ -96,12 +96,12 @@ public class FTXService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, double sizeFactor) {
+    public Signal<Execution> executions(long startId, long endId) {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
         long startTime = Numbering.decode(startId) + 1;
-        long endTime = startTime + Math.round(sizeFactor);
+        long endTime = Numbering.decode(endId);
         return call("GET", "markets/" + marketName + "/trades?limit=" + setting.acquirableExecutionSize + "&start_time=" + startTime + "&end_time=" + endTime)
                 .flatIterable(e -> e.find("result", "*"))
                 .reverse()
@@ -134,10 +134,18 @@ public class FTXService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatest(long id) {
+    public Signal<Execution> executionLatestAt(long id) {
         return call("GET", "markets/" + marketName + "/trades?limit=1&end_time=" + Numbering.decode(id))
                 .flatIterable(e -> e.find("result", "*"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long estimateAcquirableExecutionIdRange(double factor) {
+        return Math.round(factor) * Numbering.padding;
     }
 
     /**

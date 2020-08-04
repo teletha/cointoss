@@ -152,7 +152,7 @@ public abstract class MarketService implements Disposable {
      * @param key An execution sequencial key (i.e. ID, datetime etc).
      * @return This {@link Signal} will be completed immediately.
      */
-    public abstract Signal<Execution> executions(long startId, double sizeFactor);
+    public abstract Signal<Execution> executions(long startId, long endId);
 
     /**
      * Acquire execution log in realtime. This is infinitely.
@@ -185,7 +185,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A latest execution log.
      */
-    public abstract Signal<Execution> executionLatest(long id);
+    public abstract Signal<Execution> executionLatestAt(long id);
 
     /**
      * Checks whether the specified {@link Execution}s are the same.
@@ -196,6 +196,10 @@ public abstract class MarketService implements Disposable {
      */
     public boolean checkEquality(Execution one, Execution other) {
         return one.id == other.id;
+    }
+
+    public long estimateAcquirableExecutionIdRange(double factor) {
+        return setting.acquirableExecutionSize;
     }
 
     /**
@@ -209,7 +213,7 @@ public abstract class MarketService implements Disposable {
         long middle = (start + end) / 2;
 
         while (true) {
-            List<Execution> result = executionLatest(middle).skipError().waitForTerminate().toList();
+            List<Execution> result = executionLatestAt(middle).skipError().waitForTerminate().toList();
 
             if (result.isEmpty()) {
                 start = middle;
