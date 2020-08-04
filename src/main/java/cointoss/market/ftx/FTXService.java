@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
@@ -101,12 +103,37 @@ public class FTXService extends MarketService {
         Object[] previous = new Object[2];
 
         long startTime = Numbering.decode(startId) + 1;
-        long endTime = Numbering.decode(endId);
+        long[] endTime = {Numbering.decode(endId)};
 
-        return call("GET", "markets/" + marketName + "/trades?limit=" + setting.acquirableExecutionSize + "&start_time=" + startTime + "&end_time=" + endTime)
-                .flatIterable(e -> e.find("result", "*"))
-                .reverse()
-                .map(json -> convert(json, increment, previous));
+        return new Signal<JSON>((observer, disposer) -> {
+            int latestSize = 0;
+            List<JSON> executions = new ArrayList(setting.acquirableExecutionSize);
+
+            // Retrieve the execution history between the specified dates and times in small chunks.
+            while (disposer.isNotDisposed()) {
+                call("GET", "markets/" + marketName + "/trades?limit=200&start_time=" + startTime + "&end_time=" + endTime[0])
+                        .flatIterable(e -> e.find("result", "*"))
+                        .waitForTerminate()
+                        .toCollection(executions);
+
+                int size = executions.size();
+                if (latestSize == size) {
+                    break;
+                } else {
+                    latestSize = size;
+                    endTime[0] = Numbering.decode(Numbering.encode(parseTime(executions.get(size - 1).text("time"))));
+                }
+            }
+
+            // Since the first one is the most recent value, it is sent in chronological order,
+            // starting with the last one.
+            for (int i = latestSize - 1; 0 <= i; i--) {
+                observer.accept(executions.get(i));
+            }
+            observer.complete();
+
+            return disposer;
+        }).map(json -> convert(json, increment, previous));
     }
 
     /**

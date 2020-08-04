@@ -9,6 +9,7 @@
  */
 package cointoss.market.ftx;
 
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
@@ -22,14 +23,14 @@ public final class FTX extends MarketServiceProvider {
             .targetCurrencyMinimumBidSize("0.00001")
             .baseCurrencyScaleSize(1)
             .targetCurrencyScaleSize(5)
-            .acquirableExecutionSize(200));
+            .acquirableExecutionSize(5000));
 
     /** Market */
     public static final MarketService FTT_USDT = new FTXService("FTT/USDT", MarketSetting.with.baseCurrencyMinimumBidPrice("1")
             .targetCurrencyMinimumBidSize("0.001")
             .baseCurrencyScaleSize(1)
             .targetCurrencyScaleSize(3)
-            .acquirableExecutionSize(200));
+            .acquirableExecutionSize(1000));
 
     /**
      * {@inheritDoc}
@@ -37,5 +38,13 @@ public final class FTX extends MarketServiceProvider {
     @Override
     public MarketAccount account() {
         return I.make(FTXAccount.class);
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+
+        Market market = new Market(FTX.FTT_USDT);
+        market.readLog(log -> log.fromYestaday());
+
+        Thread.sleep(1000 * 60 * 30);
     }
 }

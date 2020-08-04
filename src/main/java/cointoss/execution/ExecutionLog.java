@@ -289,9 +289,11 @@ public class ExecutionLog {
             int size = service.setting.acquirableExecutionSize();
             long startId = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
             Num coefficient = Num.ONE;
+            ArrayDeque<Execution> rests = new ArrayDeque(size);
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> rests = new ArrayDeque(size);
+                rests.clear();
+
                 long range = service.estimateAcquirableExecutionIdRange(coefficient.doubleValue());
                 service.executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
 
