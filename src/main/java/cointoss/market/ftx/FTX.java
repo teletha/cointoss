@@ -49,7 +49,7 @@ public final class FTX extends MarketServiceProvider {
             .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
-    static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.01")
+    public static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.01")
             .targetCurrencyMinimumBidSize("0.001")
             .baseCurrencyScaleSize(2)
             .targetCurrencyScaleSize(3)
