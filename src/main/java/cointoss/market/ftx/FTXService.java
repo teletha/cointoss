@@ -102,6 +102,7 @@ public class FTXService extends MarketService {
 
         long startTime = Numbering.decode(startId) + 1;
         long endTime = Numbering.decode(endId);
+
         return call("GET", "markets/" + marketName + "/trades?limit=" + setting.acquirableExecutionSize + "&start_time=" + startTime + "&end_time=" + endTime)
                 .flatIterable(e -> e.find("result", "*"))
                 .reverse()
@@ -146,6 +147,14 @@ public class FTXService extends MarketService {
     @Override
     public long estimateAcquirableExecutionIdRange(double factor) {
         return Math.round(factor) * Numbering.padding;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean checkEquality(Execution one, Execution other) {
+        return one.buyer.equals(other.buyer);
     }
 
     /**
@@ -215,22 +224,8 @@ public class FTXService extends MarketService {
         Direction side = e.get(Direction.class, "side");
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");
+        ZonedDateTime date = parseTime(e.text("time"));
         boolean liquidation = e.get(Boolean.class, "liquidation");
-
-        String time = e.text("time");
-        switch (time.length()) {
-        case 32: // 2019-10-04T06:06:21.353533+00:00
-            time = time.substring(0, 26);
-            break;
-
-        case 25: // 2019-10-04T06:07:30+00:00
-            time = time.substring(0, 19).concat(".000000");
-            break;
-
-        default:
-            throw new IllegalArgumentException("Unexpected value: " + time);
-        }
-        ZonedDateTime date = LocalDateTime.parse(time, TimeFormat).atZone(Chrono.UTC);
         long id;
         int consecutive;
 
@@ -258,7 +253,30 @@ public class FTXService extends MarketService {
                 .price(price)
                 .date(date)
                 .consecutive(consecutive)
-                .delay(liquidation ? Execution.DelayHuge : Execution.DelayInestimable);
+                .delay(liquidation ? Execution.DelayHuge : Execution.DelayInestimable)
+                .buyer(e.text("id"));
+    }
+
+    /**
+     * Parse time format.
+     * 
+     * @param time
+     * @return
+     */
+    private ZonedDateTime parseTime(String time) {
+        switch (time.length()) {
+        case 32: // 2019-10-04T06:06:21.353533+00:00
+            time = time.substring(0, 26);
+            break;
+
+        case 25: // 2019-10-04T06:07:30+00:00
+            time = time.substring(0, 19).concat(".000000");
+            break;
+
+        default:
+            throw new IllegalArgumentException("Unexpected value: " + time);
+        }
+        return LocalDateTime.parse(time, TimeFormat).atZone(Chrono.UTC);
     }
 
     /**
@@ -313,7 +331,7 @@ public class FTXService extends MarketService {
         // 2020-07-23 13:55:25.520 INFO REST write on FTX BTC-PERP from
         // 2019-10-13T05:30:52.304052Z[UTC]. size 2 (1)
         //
-        // FTX.BTC_USD.executions(1570944654, 1570944660).to(e -> {
+        // FTX.BTC_USD.executions(1570944654000L, 1570954660000L).to(e -> {
         // System.out.println(e);
         // });
 
@@ -324,7 +342,7 @@ public class FTXService extends MarketService {
         // System.out.println(e);
         // });
 
-        Thread.sleep(1000 * 5);
+        Thread.sleep(1000 * 60 * 10);
     }
 
 }
