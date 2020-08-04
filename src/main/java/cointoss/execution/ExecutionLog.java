@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -629,7 +629,7 @@ public class ExecutionLog {
                                 .effectOnComplete(parser::stopParsing)
                                 .effectOnObserve(stopwatch::start)
                                 .effectOnComplete(() -> {
-                                    log.info("Read fast log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
+                                    log.trace("Read fast log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
                     } else {
                         // read compact
@@ -638,7 +638,7 @@ public class ExecutionLog {
                                 .effectOnComplete(parser::stopParsing)
                                 .effectOnObserve(stopwatch::start)
                                 .effectOnComplete(() -> {
-                                    log.info("Read compact log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
+                                    log.trace("Read compact log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
                     }
                 } else if (normal.isAbsent()) {
@@ -651,7 +651,7 @@ public class ExecutionLog {
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
-                                log.info("Read normal log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
+                                log.trace("Read normal log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                             });
                 }
             } catch (IOException e) {

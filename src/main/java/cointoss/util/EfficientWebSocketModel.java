@@ -199,10 +199,10 @@ public abstract class EfficientWebSocketModel {
      * Connect to the server by websocket.
      */
     private void connect() {
-        logger.info("Starting websocket [{}].", address());
+        logger.trace("Starting websocket [{}].", address());
 
         I.http(address(), ws -> {
-            logger.info("Connected websocket [{}].", address());
+            logger.trace("Connected websocket [{}].", address());
 
             this.ws = ws;
             for (IdentifiableTopic command : queue) {
@@ -210,11 +210,11 @@ public abstract class EfficientWebSocketModel {
             }
             queue.clear();
         }, client()).to(debug ? I.bundle(this::outputTestCode, this::dispatch) : this::dispatch, e -> {
-            logger.error("Disconnected websocket [{}].", address(), cause(e));
+            logger.trace("Disconnected websocket [{}].", address(), cause(e));
             disconnect();
             signals.values().forEach(signal -> signal.error(e));
         }, () -> {
-            logger.info("Finished websocket [{}].", address());
+            logger.trace("Finished websocket [{}].", address());
             disconnect();
             signals.values().forEach(signal -> signal.complete());
         });
@@ -242,13 +242,13 @@ public abstract class EfficientWebSocketModel {
                     subscribings.remove(topic);
                     topic.subscribing.dispose();
                     topic.subscribing = null;
-                    logger.info("Accepted websocket subscription [{}] {}.", address(), topic.id);
+                    logger.trace("Accepted websocket subscription [{}] {}.", address(), topic.id);
 
                     Function<JSON, String> updater = updateId();
                     if (updater != null) {
                         String newId = updater.apply(json);
                         signals.put(newId, signals.get(topic.id));
-                        logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", address(), topic.id, newId);
+                        logger.trace("Update websocket [{}] subscription id from '{}' to '{}'.", address(), topic.id, newId);
                     }
                     return;
                 }

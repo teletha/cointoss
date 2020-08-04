@@ -159,7 +159,7 @@ public class ChartView extends View {
         orderbookHideSize.initialize(IntStream.range(0, 101))
                 .tooltip(en("Display only boards that are larger than the specified size."))
                 .enableWhen(showOrderbook.isSelected());
-        orderbookPriceRange.initialize(Num.ONE)
+        orderbookPriceRange.initializeLazy(market.observe().map(m -> m.service.setting.baseCurrencyMinimumBidPrice))
                 .acceptPositiveNumberInput()
                 .normalizeInput(Form.NFKC)
                 .maximumInput(6)

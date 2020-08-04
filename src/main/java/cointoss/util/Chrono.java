@@ -85,7 +85,7 @@ public class Chrono {
             TimeInfo info = client.getTime(InetAddress.getByName("ntp.nict.jp"));
             info.computeDetails();
             latestDelay = info.getOffset();
-            logger.info("Using NTP server to measure the time deviation : " + latestDelay + "ms");
+            logger.trace("Using NTP server to measure the time deviation : " + latestDelay + "ms");
         } catch (Throwable e) {
             // ignore
             logger.error("A query to NTP server failed. ", e);
