@@ -42,7 +42,7 @@ public final class FTX extends MarketServiceProvider {
             .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
-    static final MarketService EOS_PERP = new FTXService("EOS-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.00005")
+    public static final MarketService EOS_PERP = new FTXService("EOS-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.00005")
             .targetCurrencyMinimumBidSize("0.00001")
             .baseCurrencyScaleSize(5)
             .targetCurrencyScaleSize(5)
@@ -71,7 +71,7 @@ public final class FTX extends MarketServiceProvider {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Market market = new Market(FTX.EOS_PERP);
+        Market market = new Market(FTX.ETH_PERP);
         market.readLog(log -> log.fromYestaday());
 
         Thread.sleep(1000 * 30);
