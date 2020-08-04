@@ -9,6 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
+import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -21,14 +22,16 @@ import kiss.I;
 public final class BitFlyer extends MarketServiceProvider {
 
     /** Reusable market configuration. */
-    private static MarketSetting FiatBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of(1))
+    private static MarketSetting FiatBaseSetting = MarketSetting.with.target(Currency.BTC)
+            .baseCurrencyMinimumBidPrice(Num.of(1))
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
             .targetCurrencyScaleSize(3)
             .acquirableExecutionSize(499)
             .executionLogger(BitFlyerLogger.class);
 
     /** Reusable market configuration. */
-    private static MarketSetting BTCBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of("0.00001"))
+    private static MarketSetting BTCBaseSetting = MarketSetting.with.target(Currency.BTC)
+            .baseCurrencyMinimumBidPrice(Num.of("0.00001"))
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
             .baseCurrencyScaleSize(5)
             .targetCurrencyScaleSize(3)

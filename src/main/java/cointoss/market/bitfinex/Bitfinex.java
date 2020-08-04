@@ -9,6 +9,7 @@
  */
 package cointoss.market.bitfinex;
 
+import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
@@ -17,7 +18,8 @@ import kiss.I;
 
 public final class Bitfinex extends MarketServiceProvider {
 
-    private static final MarketSetting BTC = MarketSetting.with.baseCurrencyMinimumBidPrice("0.01")
+    private static final MarketSetting BTC = MarketSetting.with.target(Currency.BTC)
+            .baseCurrencyMinimumBidPrice("0.01")
             .targetCurrencyMinimumBidSize("0.000001")
             .baseCurrencyScaleSize(1)
             .targetCurrencyScaleSize(5)

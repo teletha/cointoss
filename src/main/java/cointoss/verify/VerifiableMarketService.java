@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
+import cointoss.Currency;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.MarketService;
@@ -88,7 +89,8 @@ public class VerifiableMarketService extends MarketService {
      * 
      */
     public VerifiableMarketService() {
-        super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of("0.01"))
+        super("TestableExchange", "TestableMarket", MarketSetting.with.target(Currency.UNKNOWN)
+                .baseCurrencyMinimumBidPrice(Num.of("0.01"))
                 .targetCurrencyMinimumBidSize(Num.of("0.0001")));
     }
 

@@ -856,7 +856,9 @@ public enum Currency {
 
     OKB("OKB", "OKB"),
 
-    ZRX("ZRX", "0x");
+    ZRX("ZRX", "0x"),
+
+    UNKNOWN("", "Unknown Currency for test.");
 
     /** The commonly used identical currency code. */
     public final String code;

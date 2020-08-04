@@ -21,6 +21,9 @@ import icy.manipulator.Icy;
 @Icy
 interface MarketSettingModel {
 
+    @Icy.Property
+    Currency target();
+
     /**
      * Get the minimum bid price of the base currency.
      */
@@ -81,16 +84,6 @@ interface MarketSettingModel {
     @Icy.Property
     default int acquirableExecutionSize() {
         return 100;
-    }
-
-    /**
-     * Configure max acquirable execution size per one request.
-     * 
-     * @return
-     */
-    @Icy.Property
-    default int executionIdPadding() {
-        return 1;
     }
 
     /**

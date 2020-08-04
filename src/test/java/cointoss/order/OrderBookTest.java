@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.ONE;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -19,13 +19,16 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Iterables;
 
+import cointoss.Currency;
 import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.Num;
 
 class OrderBookTest {
 
-    private MarketSetting setting = MarketSetting.with.baseCurrencyMinimumBidPrice(ONE).targetCurrencyMinimumBidSize(ONE);
+    private MarketSetting setting = MarketSetting.with.target(Currency.UNKNOWN)
+            .baseCurrencyMinimumBidPrice(ONE)
+            .targetCurrencyMinimumBidSize(ONE);
 
     private OrderBookPage at(int index, Collection<OrderBookPage> pages) {
         return Iterables.get(pages, index);
