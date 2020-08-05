@@ -116,7 +116,7 @@ public class FTXService extends MarketService {
                         .flatIterable(e -> e.find("result", "*"))
                         .waitForTerminate()
                         .toCollection(executions);
-                System.out.println(latestSize + "  " + executions.size());
+
                 int size = executions.size();
                 if (latestSize == size) {
                     break;
@@ -341,7 +341,6 @@ public class FTXService extends MarketService {
      */
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://ftx.com/api/" + path));
-        System.out.println(builder.build());
 
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "FTX RESTCall"));
     }
