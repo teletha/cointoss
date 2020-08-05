@@ -11,6 +11,7 @@ package cointoss;
 
 import java.util.Set;
 
+import cointoss.util.Num;
 import kiss.I;
 
 /**
@@ -883,7 +884,17 @@ public enum Currency {
     }
 
     /**
+     * Build {@link CurrencySetting} with minimum size.
      * 
+     * @param minimumSize
+     * @return
+     */
+    public CurrencySetting minimumSize(double minimumSize) {
+        Num min = Num.of(minimumSize);
+        return new CurrencySetting(this, min, min.scale());
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

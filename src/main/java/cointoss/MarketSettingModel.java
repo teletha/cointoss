@@ -10,7 +10,6 @@
 package cointoss;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLog;
@@ -21,36 +20,21 @@ import icy.manipulator.Icy;
 @Icy
 interface MarketSettingModel {
 
-    @Icy.Property
-    Currency target();
-
     /**
-     * Get the minimum bid price of the base currency.
+     * Specify the target currency.
+     * 
+     * @return
      */
     @Icy.Property
-    Num baseCurrencyMinimumBidPrice();
-
-    @Icy.Overload("baseCurrencyMinimumBidPrice")
-    private Num baseCurrencyMinimumBidPrice(String price) {
-        return Num.of(price);
-    }
+    CurrencySetting target();
 
     /**
-     * Get the minimum bid size of the target currency.
+     * Specify the base currency.
+     * 
+     * @return
      */
     @Icy.Property
-    Num targetCurrencyMinimumBidSize();
-
-    @Icy.Overload("targetCurrencyMinimumBidSize")
-    private Num targetCurrencyMinimumBidSize(String price) {
-        return Num.of(price);
-    }
-
-    @Icy.Intercept("targetCurrencyMinimumBidSize")
-    private Num deriveByMinBid(Num minBid, Consumer<List<Num>> targetCurrencyBidSizes) {
-        targetCurrencyBidSizes.accept(List.of(minBid, minBid.multiply(10), minBid.multiply(100), minBid.multiply(1000)));
-        return minBid;
-    }
+    CurrencySetting base();
 
     /**
      * Get the bid size range of target currency.

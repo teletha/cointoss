@@ -19,27 +19,21 @@ import kiss.I;
 public final class BitMex extends MarketServiceProvider {
 
     /** Market */
-    public static final MarketService XBT_USD = new BitMexService(88, "XBTUSD", MarketSetting.with.target(Currency.BTC)
-            .baseCurrencyMinimumBidPrice("0.5")
-            .targetCurrencyMinimumBidSize("0.00001")
-            .baseCurrencyScaleSize(1)
-            .targetCurrencyScaleSize(5)
+    public static final MarketService XBT_USD = new BitMexService(88, "XBTUSD", MarketSetting.with //
+            .target(Currency.BTC.minimumSize(0.00001))
+            .base(Currency.USD.minimumSize(0.5))
             .acquirableExecutionSize(1000));
 
     /** Market */
-    public static final MarketService ETH_USD = new BitMexService(297, "ETHUSD", MarketSetting.with.target(Currency.ETH)
-            .baseCurrencyMinimumBidPrice("0.05")
-            .targetCurrencyMinimumBidSize("0.00001")
-            .baseCurrencyScaleSize(2)
-            .targetCurrencyScaleSize(5)
+    public static final MarketService ETH_USD = new BitMexService(297, "ETHUSD", MarketSetting.with
+            .target(Currency.ETH.minimumSize(0.00001))
+            .base(Currency.USD.minimumSize(0.05))
             .acquirableExecutionSize(1000));
 
     /** Market */
-    public static final MarketService XRP_USD = new BitMexService(377, "XRPUSD", MarketSetting.with.target(Currency.XRP)
-            .baseCurrencyMinimumBidPrice("0.0001")
-            .targetCurrencyMinimumBidSize("0.00001")
-            .baseCurrencyScaleSize(4)
-            .targetCurrencyScaleSize(5)
+    public static final MarketService XRP_USD = new BitMexService(377, "XRPUSD", MarketSetting.with
+            .target(Currency.XRP.minimumSize(0.00001))
+            .base(Currency.USD.minimumSize(0.0001))
             .acquirableExecutionSize(1000));
 
     /**

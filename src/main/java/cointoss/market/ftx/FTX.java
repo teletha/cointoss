@@ -23,6 +23,7 @@ public final class FTX extends MarketServiceProvider {
 
     /** Market */
     public static final MarketService ADA_PERP = new FTXService("ADA-PERP", MarketSetting.with.target(Currency.ADA)
+            .targetMinimumSize(1)
             .baseCurrencyMinimumBidPrice("0.000005")
             .targetCurrencyMinimumBidSize("1")
             .baseCurrencyScaleSize(6)
@@ -31,6 +32,7 @@ public final class FTX extends MarketServiceProvider {
 
     /** Market */
     public static final MarketService BNB_PERP = new FTXService("BNB-PERP", MarketSetting.with.target(Currency.BNB)
+            .targetMinimumSize(0.00001)
             .baseCurrencyMinimumBidPrice("0.0005")
             .targetCurrencyMinimumBidSize("0.00001")
             .baseCurrencyScaleSize(4)
@@ -39,6 +41,7 @@ public final class FTX extends MarketServiceProvider {
 
     /** Market */
     public static final MarketService BTC_PERP = new FTXService("BTC-PERP", MarketSetting.with.target(Currency.BTC)
+            .targetMinimumSize(0.0001)
             .baseCurrencyMinimumBidPrice("0.5")
             .targetCurrencyMinimumBidSize("0.0001")
             .baseCurrencyScaleSize(1)
@@ -46,7 +49,8 @@ public final class FTX extends MarketServiceProvider {
             .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
-    public static final MarketService EOS_PERP = new FTXService("EOS-PERP", MarketSetting.with.target(Currency.EOS)
+    static final MarketService EOS_PERP = new FTXService("EOS-PERP", MarketSetting.with.target(Currency.EOS)
+            .targetMinimumSize(0.00001)
             .baseCurrencyMinimumBidPrice("0.00005")
             .targetCurrencyMinimumBidSize("0.00001")
             .baseCurrencyScaleSize(5)
@@ -54,7 +58,8 @@ public final class FTX extends MarketServiceProvider {
             .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
-    public static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with.target(Currency.ETH)
+    static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with.target(Currency.ETH)
+            .targetMinimumSize(0.001)
             .baseCurrencyMinimumBidPrice("0.01")
             .targetCurrencyMinimumBidSize("0.001")
             .baseCurrencyScaleSize(2)
@@ -63,6 +68,7 @@ public final class FTX extends MarketServiceProvider {
 
     /** Market */
     public static final MarketService FTT_USDT = new FTXService("FTT/USDT", MarketSetting.with.target(Currency.FTT)
+            .targetMinimumSize(1)
             .baseCurrencyMinimumBidPrice("0.001")
             .targetCurrencyMinimumBidSize("1")
             .baseCurrencyScaleSize(3)

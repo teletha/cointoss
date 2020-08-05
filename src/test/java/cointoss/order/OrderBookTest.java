@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static cointoss.util.Num.ONE;
+import static cointoss.util.Num.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +27,7 @@ import cointoss.util.Num;
 class OrderBookTest {
 
     private MarketSetting setting = MarketSetting.with.target(Currency.UNKNOWN)
+            .targetMinimumSize(1)
             .baseCurrencyMinimumBidPrice(ONE)
             .targetCurrencyMinimumBidSize(ONE);
 
