@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -113,10 +112,11 @@ public class FTXService extends MarketService {
             // Retrieve the execution history between the specified dates and times in small chunks.
             while (disposer.isNotDisposed()) {
                 call("GET", "markets/" + marketName + "/trades?limit=200&start_time=" + startTime + "&end_time=" + endTime[0])
+                        .effect(e -> System.out.println(e))
                         .flatIterable(e -> e.find("result", "*"))
                         .waitForTerminate()
                         .toCollection(executions);
-
+                System.out.println(latestSize + "  " + executions.size());
                 int size = executions.size();
                 if (latestSize == size) {
                     break;
@@ -341,6 +341,7 @@ public class FTXService extends MarketService {
      */
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://ftx.com/api/" + path));
+        System.out.println(builder.build());
 
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "FTX RESTCall"));
     }
@@ -375,16 +376,4 @@ public class FTXService extends MarketService {
             return "subscribed".equals(reply.text("type")) && channel.equals(reply.text("channel")) && market.equals(reply.text("market"));
         }
     }
-
-    public static void main(String[] args) throws InterruptedException {
-        // FTX.BTC_PERP.orderBookRealtimely().to(e -> {
-        // System.out.println(e);
-        // });
-
-        Market market = new Market(FTX.BTC_PERP);
-        market.readLog(log -> log.fromYestaday());
-
-        Thread.sleep(1000 * 30);
-    }
-
 }

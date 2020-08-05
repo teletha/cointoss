@@ -11,7 +11,6 @@ package cointoss.market.ftx;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
@@ -19,7 +18,6 @@ import cointoss.execution.Execution;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 
-@Disabled
 class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
 
     /**
@@ -36,38 +34,49 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
     @Override
     @Test
     public void executions() {
-        httpClient.onGet().doReturnJSON("""
+        httpClient.onGet("https://ftx.com/api/markets/BTC-PERP/trades")
+                .withParameter("limit", "200")
+                .withParameter("start_time", "1")
+                .withParameter("end_time", "2")
+                .doReturnJSON("""
+                        {
+                          "result": [
+                            {
+                              "id": 67425873,
+                              "liquidation": false,
+                              "price": 9540.0,
+                              "side": "sell",
+                              "size": 0.001,
+                              "time": "2020-07-23T00:46:17.838284+00:00"
+                            },
+                            {
+                              "id": 67425867,
+                              "liquidation": false,
+                              "price": 9540.5,
+                              "side": "buy",
+                              "size": 0.0004,
+                              "time": "2020-07-23T00:46:16.720449+00:00"
+                            },
+                            {
+                              "id": 67425812,
+                              "liquidation": false,
+                              "price": 9540.5,
+                              "side": "buy",
+                              "size": 0.0004,
+                              "time": "2020-07-23T00:46:01.638901+00:00"
+                            }
+                          ]
+                        }
+                        """);
+        httpClient.onGet().doReturn("""
                 {
                   "result": [
-                    {
-                      "id": 67425873,
-                      "liquidation": false,
-                      "price": 9540.0,
-                      "side": "sell",
-                      "size": 0.001,
-                      "time": "2020-07-23T00:46:17.838284+00:00"
-                    },
-                    {
-                      "id": 67425867,
-                      "liquidation": false,
-                      "price": 9540.5,
-                      "side": "buy",
-                      "size": 0.0004,
-                      "time": "2020-07-23T00:46:16.720449+00:00"
-                    },
-                    {
-                      "id": 67425812,
-                      "liquidation": false,
-                      "price": 9540.5,
-                      "side": "buy",
-                      "size": 0.0004,
-                      "time": "2020-07-23T00:46:01.638901+00:00"
-                    }
-                  ]
+                  ],
+                  "success": true
                 }
                 """);
 
-        List<Execution> list = service.executions(1, 10).toList();
+        List<Execution> list = service.executions(1, 2000).toList();
         Execution e = list.get(0);
         assert e.id == 1828074164;
         assert e.direction == Direction.BUY;
