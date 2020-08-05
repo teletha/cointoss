@@ -67,7 +67,7 @@ public class TradeMate extends View {
             loader.add(tab);
         });
 
-        // ========================================================
+        // ===========================j=============================
         // Clock in Title bar
         // ========================================================
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {

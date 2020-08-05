@@ -40,13 +40,13 @@ public final class FTX extends MarketServiceProvider {
             .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
-    static final MarketService EOS_PERP = new FTXService("EOS-PERP", MarketSetting.with //
+    public static final MarketService EOS_PERP = new FTXService("EOS-PERP", MarketSetting.with //
             .target(Currency.EOS.minimumSize(0.1))
             .base(Currency.USD.minimumSize(0.00005))
             .acquirableExecutionSize(AcquirableSize));
 
     /** Market */
-    static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with //
+    public static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with //
             .target(Currency.ETH.minimumSize(0.001))
             .base(Currency.USD.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
