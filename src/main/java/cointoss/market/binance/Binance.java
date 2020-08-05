@@ -18,19 +18,18 @@ import kiss.I;
 
 public final class Binance extends MarketServiceProvider {
 
-    private static final int AcuirableSize = 1000;
+    /** Limitation */
+    private static final int AcquirableSize = 1000;
 
-    /** Market */
     public static final MarketService BTC_USDT = new BinanceService("BTCUSDT", false, MarketSetting.with
             .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
-            .acquirableExecutionSize(AcuirableSize));
+            .acquirableExecutionSize(AcquirableSize));
 
-    /** Market */
     public static final MarketService FUTURE_BTC_USDT = new BinanceService("BTCUSDT", true, MarketSetting.with
             .target(Currency.BTC.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
-            .acquirableExecutionSize(AcuirableSize));
+            .acquirableExecutionSize(AcquirableSize));
 
     /**
      * {@inheritDoc}

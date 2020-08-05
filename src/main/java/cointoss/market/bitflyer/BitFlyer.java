@@ -21,24 +21,25 @@ import kiss.I;
 
 public final class BitFlyer extends MarketServiceProvider {
 
-    private static final int SIZE = 499;
+    /** Limitation */
+    private static final int AcquirableSize = 1000;
 
     public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", MarketSetting.with
             .target(Currency.BTC.minimumSize(0.01).scale(8))
             .base(Currency.JPY.minimumSize(1))
-            .acquirableExecutionSize(SIZE)
+            .acquirableExecutionSize(AcquirableSize)
             .executionLogger(BitFlyerLogger.class));
 
     public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", MarketSetting.with
             .target(Currency.BTC.minimumSize(0.01).scale(8))
             .base(Currency.JPY.minimumSize(1))
-            .acquirableExecutionSize(SIZE)
+            .acquirableExecutionSize(AcquirableSize)
             .executionLogger(BitFlyerLogger.class));
 
     public static final MarketService ETH_JPY = new BitFlyerService("ETH_JPY", MarketSetting.with
             .target(Currency.ETH.minimumSize(0.01).scale(8))
             .base(Currency.JPY.minimumSize(1))
-            .acquirableExecutionSize(SIZE)
+            .acquirableExecutionSize(AcquirableSize)
             .executionLogger(BitFlyerLogger.class));
 
     /**

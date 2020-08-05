@@ -18,11 +18,13 @@ import kiss.I;
 
 public final class Bitfinex extends MarketServiceProvider {
 
+    /** Limitation */
+    private static final int AcquirableSize = 10000;
+
     /** Market */
-    public static final MarketService BTC_USD = new BitfinexService("BTCUSD", MarketSetting.with //
-            .target(Currency.BTC.minimumSize(0.0001))
+    public static final MarketService BTC_USD = new BitfinexService("BTCUSD", MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(1))
-            .acquirableExecutionSize(10000));
+            .acquirableExecutionSize(AcquirableSize));
 
     /**
      * {@inheritDoc}
