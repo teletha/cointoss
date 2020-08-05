@@ -112,7 +112,6 @@ public class FTXService extends MarketService {
             // Retrieve the execution history between the specified dates and times in small chunks.
             while (disposer.isNotDisposed()) {
                 call("GET", "markets/" + marketName + "/trades?limit=200&start_time=" + startTime + "&end_time=" + endTime[0])
-                        .effect(e -> System.out.println(e))
                         .flatIterable(e -> e.find("result", "*"))
                         .waitForTerminate()
                         .toCollection(executions);
