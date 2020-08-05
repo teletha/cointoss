@@ -89,10 +89,9 @@ public class VerifiableMarketService extends MarketService {
      * 
      */
     public VerifiableMarketService() {
-        super("TestableExchange", "TestableMarket", MarketSetting.with.target(Currency.UNKNOWN)
-                .targetMinimumSize(0.0001)
-                .baseCurrencyMinimumBidPrice(Num.of("0.01"))
-                .targetCurrencyMinimumBidSize(Num.of("0.0001")));
+        super("TestableExchange", "TestableMarket", MarketSetting.with //
+                .target(Currency.UNKNOWN.minimumSize(0.0001))
+                .base(Currency.UNKNOWN.minimumSize(0.01)));
     }
 
     /**
@@ -531,7 +530,7 @@ public class VerifiableMarketService extends MarketService {
         }
         if (order.isBuy()) {
             Num price = order.price;
-            return price.isGreaterThan(e.price) || price.is(setting.baseCurrencyMinimumBidPrice());
+            return price.isGreaterThan(e.price) || price.is(setting.base.minimumSize);
         } else {
             return order.price.isLessThan(e.price);
         }

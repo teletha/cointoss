@@ -9,7 +9,7 @@
  */
 package trademate.chart.builtin;
 
-import static cointoss.ticker.Span.*;
+import static cointoss.ticker.Span.Minute1;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
@@ -54,8 +54,8 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        int scale = market.service.setting.baseCurrencyScaleSize;
-        int targetScale = market.service.setting.targetCurrencyScaleSize;
+        int scale = market.service.setting.base.scale;
+        int targetScale = market.service.setting.target.scale;
 
         Indicator<TraderState> indicator = Indicator.build(market.tickers.on(Minute1), tick -> {
             Num realized = Num.ZERO;

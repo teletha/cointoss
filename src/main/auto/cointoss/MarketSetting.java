@@ -60,12 +60,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     private static final MethodHandle targetCurrencyBidSizesUpdater = updater("targetCurrencyBidSizes");
 
     /** The final property updater. */
-    private static final MethodHandle baseCurrencyScaleSizeUpdater = updater("baseCurrencyScaleSize");
-
-    /** The final property updater. */
-    private static final MethodHandle targetCurrencyScaleSizeUpdater = updater("targetCurrencyScaleSize");
-
-    /** The final property updater. */
     private static final MethodHandle acquirableExecutionSizeUpdater = updater("acquirableExecutionSize");
 
     /** The final property updater. */
@@ -81,12 +75,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     public final List<Num> targetCurrencyBidSizes;
 
     /** The exposed property. */
-    public final int baseCurrencyScaleSize;
-
-    /** The exposed property. */
-    public final int targetCurrencyScaleSize;
-
-    /** The exposed property. */
     public final int acquirableExecutionSize;
 
     /** The exposed property. */
@@ -99,8 +87,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         this.target = null;
         this.base = null;
         this.targetCurrencyBidSizes = MarketSettingModel.super.targetCurrencyBidSizes();
-        this.baseCurrencyScaleSize = MarketSettingModel.super.baseCurrencyScaleSize();
-        this.targetCurrencyScaleSize = MarketSettingModel.super.targetCurrencyScaleSize();
         this.acquirableExecutionSize = MarketSettingModel.super.acquirableExecutionSize();
         this.executionLogger = MarketSettingModel.super.executionLogger();
     }
@@ -209,64 +195,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         }
     }
 
-    /** Get the human readable size of base currency. */
-    @Override
-    public final int baseCurrencyScaleSize() {
-        return this.baseCurrencyScaleSize;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of baseCurrencyScaleSize property.
-     */
-    @SuppressWarnings("unused")
-    private final int getBaseCurrencyScaleSize() {
-        return this.baseCurrencyScaleSize;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of baseCurrencyScaleSize property to assign.
-     */
-    private final void setBaseCurrencyScaleSize(int value) {
-        try {
-            baseCurrencyScaleSizeUpdater.invoke(this, value);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /** Get the human readable size of target currency. */
-    @Override
-    public final int targetCurrencyScaleSize() {
-        return this.targetCurrencyScaleSize;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of targetCurrencyScaleSize property.
-     */
-    @SuppressWarnings("unused")
-    private final int getTargetCurrencyScaleSize() {
-        return this.targetCurrencyScaleSize;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of targetCurrencyScaleSize property to assign.
-     */
-    private final void setTargetCurrencyScaleSize(int value) {
-        try {
-            targetCurrencyScaleSizeUpdater.invoke(this, value);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
     /**
      * Configure max acquirable execution size per one request.
      *  
@@ -347,8 +275,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         builder.append("target=").append(target).append(", ");
         builder.append("base=").append(base).append(", ");
         builder.append("targetCurrencyBidSizes=").append(targetCurrencyBidSizes).append(", ");
-        builder.append("baseCurrencyScaleSize=").append(baseCurrencyScaleSize).append(", ");
-        builder.append("targetCurrencyScaleSize=").append(targetCurrencyScaleSize).append(", ");
         builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
         builder.append("executionLogger=").append(executionLogger).append("]");
         return builder.toString();
@@ -361,7 +287,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(target, base, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger);
+        return Objects.hash(target, base, targetCurrencyBidSizes, acquirableExecutionSize, executionLogger);
     }
 
     /**
@@ -379,8 +305,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         if (!Objects.equals(target, other.target)) return false;
         if (!Objects.equals(base, other.base)) return false;
         if (!Objects.equals(targetCurrencyBidSizes, other.targetCurrencyBidSizes)) return false;
-        if (baseCurrencyScaleSize != other.baseCurrencyScaleSize) return false;
-        if (targetCurrencyScaleSize != other.targetCurrencyScaleSize) return false;
         if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
         return true;
@@ -466,28 +390,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         }
 
         /**
-         * Assign baseCurrencyScaleSize property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next baseCurrencyScaleSize(int value) {
-            ((MarketSetting) this).setBaseCurrencyScaleSize(value);
-            return (Next) this;
-        }
-
-        /**
-         * Assign targetCurrencyScaleSize property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next targetCurrencyScaleSize(int value) {
-            ((MarketSetting) this).setTargetCurrencyScaleSize(value);
-            return (Next) this;
-        }
-
-        /**
          * Assign acquirableExecutionSize property.
          * 
          * @param value A new value to assign.
@@ -529,8 +431,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         static final String Target = "target";
         static final String Base = "base";
         static final String TargetCurrencyBidSizes = "targetCurrencyBidSizes";
-        static final String BaseCurrencyScaleSize = "baseCurrencyScaleSize";
-        static final String TargetCurrencyScaleSize = "targetCurrencyScaleSize";
         static final String AcquirableExecutionSize = "acquirableExecutionSize";
         static final String ExecutionLogger = "executionLogger";
     }

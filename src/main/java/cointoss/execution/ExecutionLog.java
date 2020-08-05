@@ -784,7 +784,7 @@ public class ExecutionLog {
         private void writeFast() {
             if (fast.isAbsent() && compact.isPresent()) {
                 try {
-                    int scale = service.setting.targetCurrencyScaleSize;
+                    int scale = service.setting.target.scale;
                     TickerManager manager = new TickerManager();
                     read().to(manager::update);
                     Ticker ticker = manager.on(Span.Second5);

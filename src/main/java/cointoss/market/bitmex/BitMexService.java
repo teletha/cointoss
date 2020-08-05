@@ -66,7 +66,7 @@ public class BitMexService extends MarketService {
         super("BitMEX", marketName, setting);
 
         this.marketId = id;
-        this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.baseCurrencyMinimumBidPrice;
+        this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.base.minimumSize;
     }
 
     /**

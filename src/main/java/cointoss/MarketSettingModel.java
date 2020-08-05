@@ -45,22 +45,6 @@ interface MarketSettingModel {
     }
 
     /**
-     * Get the human readable size of base currency.
-     */
-    @Icy.Property
-    default int baseCurrencyScaleSize() {
-        return 0;
-    }
-
-    /**
-     * Get the human readable size of target currency.
-     */
-    @Icy.Property
-    default int targetCurrencyScaleSize() {
-        return 0;
-    }
-
-    /**
      * Configure max acquirable execution size per one request.
      * 
      * @return

@@ -18,16 +18,11 @@ import kiss.I;
 
 public final class Bitfinex extends MarketServiceProvider {
 
-    private static final MarketSetting BTC = MarketSetting.with.target(Currency.BTC)
-            .targetMinimumSize(0.000001)
-            .baseCurrencyMinimumBidPrice("0.01")
-            .targetCurrencyMinimumBidSize("0.000001")
-            .baseCurrencyScaleSize(1)
-            .targetCurrencyScaleSize(5)
-            .acquirableExecutionSize(10000);
-
     /** Market */
-    public static final MarketService BTC_USDT = new BitfinexService("BTCUSD", BTC);
+    public static final MarketService BTC_USD = new BitfinexService("BTCUSD", MarketSetting.with //
+            .target(Currency.BTC.minimumSize(0.0001))
+            .base(Currency.USD.minimumSize(1))
+            .acquirableExecutionSize(10000));
 
     /**
      * {@inheritDoc}

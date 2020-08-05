@@ -70,7 +70,7 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        int base = market.service.setting.baseCurrencyScaleSize;
+        int base = market.service.setting.base.scale;
 
         line(ticker, shortDays, base, shortSMA);
         line(market.tickers.on(Minute5), shortDays, base, SMA5M);

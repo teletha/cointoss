@@ -389,7 +389,7 @@ public class Market implements Disposable {
         public Cancellable makeBestPrice() {
             actions.add((market, direction, size, previous, orders) -> {
                 make(market.orderBook.bookFor(direction)
-                        .computeBestPrice(market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
+                        .computeBestPrice(market.service.setting.base.minimumSize), market, direction, size, previous, orders);
             });
             return this;
         }
@@ -401,7 +401,7 @@ public class Market implements Disposable {
         public Cancellable makeBestPrice(Direction directionForBestPrice) {
             actions.add((market, direction, size, previous, orders) -> {
                 make(market.orderBook.bookFor(directionForBestPrice)
-                        .computeBestPrice(market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
+                        .computeBestPrice(market.service.setting.base.minimumSize), market, direction, size, previous, orders);
             });
             return this;
         }

@@ -25,7 +25,7 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
      */
     @Override
     protected BitfinexService constructMarketService() {
-        return construct(BitfinexService::new, Bitfinex.BTC_USDT.marketName, Bitfinex.BTC_USDT.setting);
+        return construct(BitfinexService::new, Bitfinex.BTC_USD.marketName, Bitfinex.BTC_USD.setting);
     }
 
     /**

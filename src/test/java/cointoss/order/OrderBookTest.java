@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.ONE;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -26,10 +26,7 @@ import cointoss.util.Num;
 
 class OrderBookTest {
 
-    private MarketSetting setting = MarketSetting.with.target(Currency.UNKNOWN)
-            .targetMinimumSize(1)
-            .baseCurrencyMinimumBidPrice(ONE)
-            .targetCurrencyMinimumBidSize(ONE);
+    private MarketSetting setting = MarketSetting.with.target(Currency.UNKNOWN.minimumSize(1)).base(Currency.UNKNOWN.minimumSize(1));
 
     private OrderBookPage at(int index, Collection<OrderBookPage> pages) {
         return Iterables.get(pages, index);

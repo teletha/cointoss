@@ -183,7 +183,7 @@ public class OrderBookView extends View {
         Color foreground = FXUtils.color(color);
         Color background = foreground.deriveColor(0, 1, 1, 0.2);
         Font font = Font.font(fontSize);
-        Num minSize = view.market.service.setting.targetCurrencyMinimumBidSize();
+        Num minSize = view.market.service.setting.target.minimumSize;
 
         return (canvas, e) -> {
             canvas.setWidth(width);

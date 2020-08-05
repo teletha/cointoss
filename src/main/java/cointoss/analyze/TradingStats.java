@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.HUNDRED;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -145,8 +145,8 @@ public class TradingStats {
         this.name = trader.name();
         this.startDate = Variable.of(entries.peekFirst()).map(Scenario::holdStartTime).or(market.service::now);
         this.endDate = Variable.of(entries.peekLast()).map(Scenario::holdEndTime).or(market.service::now);
-        this.baseCurrencyScale = market.service.setting.baseCurrencyScaleSize;
-        this.targetCurrencyScale = market.service.setting.targetCurrencyScaleSize;
+        this.baseCurrencyScale = market.service.setting.base.scale;
+        this.targetCurrencyScale = market.service.setting.target.scale;
         this.holdMaxSize = trader.holdMaxSize;
         this.holdCurrentSize = trader.holdSize;
         this.entries = entries;

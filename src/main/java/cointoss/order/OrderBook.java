@@ -60,8 +60,8 @@ public class OrderBook {
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
         this.base = new ConcurrentSkipListMap(side.isBuy() ? Comparator.reverseOrder() : Comparator.naturalOrder());
-        this.scale = setting.targetCurrencyScaleSize;
-        this.group = new GroupedOrderBook(setting.baseCurrencyMinimumBidPrice);
+        this.scale = setting.target.scale;
+        this.group = new GroupedOrderBook(setting.base.minimumSize);
     }
 
     /**

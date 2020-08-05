@@ -58,7 +58,7 @@ class VerifiableMarketTest {
 
     @Test
     void executeBuyMinimumPrice() {
-        Num min = market.service.setting.baseCurrencyMinimumBidPrice();
+        Num min = market.service.setting.base.minimumSize;
 
         market.request(Order.with.buy(1).price(min)).to(order -> {
             assert order.remainingSize.is(1);

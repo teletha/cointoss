@@ -149,7 +149,7 @@ public class ExecutionView extends View {
             losscutVolumeShort.text(Primitives.roundString(realtime.shortLosscutVolume(), 1));
         });
 
-        int scale = view.market.service.setting.targetCurrencyScaleSize;
+        int scale = view.market.service.setting.target.scale;
 
         // configure UI
         takerSize.initialize(IntStream.range(1, 51).boxed());

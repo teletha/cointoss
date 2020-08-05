@@ -11,6 +11,7 @@ package cointoss.market.ftx;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
@@ -18,6 +19,7 @@ import cointoss.execution.Execution;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 
+@Disabled
 class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
 
     /**

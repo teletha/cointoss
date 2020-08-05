@@ -489,7 +489,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double upperPrice = axisY.getValueForPosition(startY);
         double lowerPrice = axisY.getValueForPosition(endY);
 
-        int scale = chart.market.v.service.setting.baseCurrencyScaleSize;
+        int scale = chart.market.v.service.setting.base.scale;
         double textX = endX - 40;
         double lineY = -12;
         gc.setStroke(Color.WHITESMOKE);
@@ -524,7 +524,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             notifyPrice.remove(label);
 
             MarketService service = chart.market.v.service;
-            Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
+            Num p = exe.price.scale(service.setting.target.scale);
             String title = "🔊  " + service.marketReadableName() + " " + p;
             I.make(Notificator.class).priceSignal.notify(title, I.translate("The specified price ({0}) has been reached.", p));
         }));
@@ -788,7 +788,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         gc.clearRect(0, 0, chartInfo.getWidth(), chartInfo.getHeight());
         gc.setFont(InfoFont);
 
-        int base = chart.market.v.service.setting.baseCurrencyScaleSize;
+        int base = chart.market.v.service.setting.base.scale;
         String date = Chrono.systemByMills(tick.startSeconds * 1000).format(Chrono.DateTime);
         String open = CommonText.OpenPrice + " " + tick.openPrice.scale(base);
         String high = CommonText.HighPrice + " " + tick.highPrice().scale(base);

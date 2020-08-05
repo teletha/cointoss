@@ -259,7 +259,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return A ordering method.
      */
     protected final void entry(Directional directional, Num size, Consumer<Orderable> declaration) {
-        if (size == null || size.isLessThan(market.service.setting.targetCurrencyMinimumBidSize)) {
+        if (size == null || size.isLessThan(market.service.setting.target.minimumSize)) {
             throw new Error("Entry size is less than minimum bid size.");
         }
         market.request(this.directional = directional, size, declaration).to(this::processEntryOrder);
@@ -568,7 +568,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
                 .append("\t order ")
                 .append(orders.size())
                 .append("\tprice ")
-                .append(price.scale(market.service.setting.baseCurrencyScaleSize))
+                .append(price.scale(market.service.setting.base.scale))
                 .append("\t size ")
                 .append(executedSize + "/" + size.minus(canceledSize) + "(" + canceledSize + ")\r\n");
 

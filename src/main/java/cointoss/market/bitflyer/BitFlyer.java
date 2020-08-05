@@ -21,32 +21,25 @@ import kiss.I;
 
 public final class BitFlyer extends MarketServiceProvider {
 
-    /** Reusable market configuration. */
-    private static MarketSetting FiatBaseSetting = MarketSetting.with.target(Currency.BTC)
-            .targetMinimumSize(0.01)
-            .baseCurrencyMinimumBidPrice(Num.of(1))
-            .targetCurrencyMinimumBidSize(Num.of("0.01"))
-            .targetCurrencyScaleSize(3)
-            .acquirableExecutionSize(499)
-            .executionLogger(BitFlyerLogger.class);
+    private static final int SIZE = 499;
 
-    /** Reusable market configuration. */
-    private static MarketSetting BTCBaseSetting = MarketSetting.with.target(Currency.BTC)
-            .targetMinimumSize(0.01)
-            .baseCurrencyMinimumBidPrice(Num.of("0.00001"))
-            .targetCurrencyMinimumBidSize(Num.of("0.01"))
-            .baseCurrencyScaleSize(5)
-            .targetCurrencyScaleSize(3)
-            .acquirableExecutionSize(499);
+    public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", MarketSetting.with
+            .target(Currency.BTC.minimumSize(0.01).scale(8))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(SIZE)
+            .executionLogger(BitFlyerLogger.class));
 
-    /** Market */
-    public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", FiatBaseSetting);
+    public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", MarketSetting.with
+            .target(Currency.BTC.minimumSize(0.01).scale(8))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(SIZE)
+            .executionLogger(BitFlyerLogger.class));
 
-    /** Market */
-    public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", FiatBaseSetting);
-
-    /** Market */
-    public static final MarketService ETH_JPY = new BitFlyerService("ETH_JPY", FiatBaseSetting);
+    public static final MarketService ETH_JPY = new BitFlyerService("ETH_JPY", MarketSetting.with
+            .target(Currency.ETH.minimumSize(0.01).scale(8))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(SIZE)
+            .executionLogger(BitFlyerLogger.class));
 
     /**
      * {@inheritDoc}
