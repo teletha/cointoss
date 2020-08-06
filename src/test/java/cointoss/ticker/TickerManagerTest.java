@@ -22,9 +22,6 @@ import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 
-/**
- * @version 2018/07/04 10:46:56
- */
 class TickerManagerTest {
 
     ZonedDateTime Base = Chrono.MIN;

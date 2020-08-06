@@ -21,7 +21,7 @@ class SpanTest {
     @Test
     void duration() {
         assert Span.Minute1.duration.equals(Duration.ofMinutes(1));
-        assert Span.Second5.duration.equals(Duration.ofSeconds(5));
+        assert Span.Minute5.duration.equals(Duration.ofMinutes(5));
         assert Span.Hour1.duration.equals(Duration.ofHours(1));
     }
 

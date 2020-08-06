@@ -22,7 +22,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void valueAt() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator indicator = NumIndicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(2);
@@ -48,7 +48,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void combine() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator open = NumIndicator.build(ticker, tick -> tick.openPrice);
         NumIndicator low = NumIndicator.build(ticker, tick -> tick.lowPrice);
         Indicator<Ⅱ<Num, Num>> indicator = open.combine(low);
@@ -61,7 +61,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void map() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = NumIndicator.build(ticker, tick -> tick.openPrice).map(v -> v.plus(1));
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(3);
@@ -72,7 +72,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void mapWith() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator open = NumIndicator.build(ticker, tick -> tick.openPrice);
         NumIndicator low = NumIndicator.build(ticker, tick -> tick.lowPrice);
         Indicator<Num> indicator = open.map(low, (o, l) -> o.plus(l));
@@ -85,7 +85,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void mapWith2() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator open = NumIndicator.build(ticker, tick -> tick.openPrice);
         NumIndicator low = NumIndicator.build(ticker, tick -> tick.lowPrice);
         NumIndicator high = NumIndicator.build(ticker, tick -> tick.highPrice);
@@ -99,7 +99,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void mapToDouble() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         DoubleIndicator indicator = NumIndicator.build(ticker, tick -> tick.openPrice).dmap(v -> v.doubleValue() + 1);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 2d;
         assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 3d;
@@ -110,7 +110,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void mapToDoubleWith() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator open = NumIndicator.build(ticker, tick -> tick.openPrice);
         NumIndicator low = NumIndicator.build(ticker, tick -> tick.lowPrice);
         DoubleIndicator indicator = open.dmap(low, (o, l) -> o.doubleValue() + l.doubleValue());
@@ -125,7 +125,7 @@ class NumIndicatorTest extends TickerTestSupport {
     void memo() {
         AtomicInteger count = new AtomicInteger();
 
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator indicator = NumIndicator.build(ticker, tick -> {
             count.incrementAndGet();
             return tick.openPrice;
@@ -156,7 +156,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void scale() {
-        Ticker ticker = ticker(Span.Second5, 1.23, 2.34, 3.45, 4.56, 5.67);
+        Ticker ticker = ticker(Span.Minute5, 1.23, 2.34, 3.45, 4.56, 5.67);
         NumIndicator indicator = NumIndicator.build(ticker, tick -> tick.openPrice).scale(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1.2);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(2.3);
@@ -167,7 +167,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void sma() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator indicator = NumIndicator.build(ticker, tick -> tick.openPrice).sma(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.5);
@@ -185,7 +185,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void ema() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator indicator = NumIndicator.build(ticker, tick -> tick.openPrice).ema(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.6666666666666665);
@@ -203,7 +203,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void mma() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator indicator = NumIndicator.build(ticker, tick -> tick.openPrice).mma(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.5);
@@ -221,7 +221,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void wma() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         NumIndicator indicator = NumIndicator.build(ticker, tick -> tick.openPrice).wma(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.6666666666666667);
@@ -239,7 +239,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void dontCacheLatest() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3);
         Tick tick2 = ticker.ticks.getByIndex(2);
 
         NumIndicator indicator = NumIndicator.build(ticker, tick -> tick.closePrice()).memoize();
@@ -261,7 +261,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void trueRange() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 4, 8, 16);
         NumIndicator indicator = NumIndicator.trueRange(ticker);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(0);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1);
@@ -272,7 +272,7 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void averageTrueRange() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 4, 8, 16);
         NumIndicator indicator = NumIndicator.averageTrueRange(ticker, 4);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(0);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(0.25);
