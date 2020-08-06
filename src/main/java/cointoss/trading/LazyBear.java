@@ -27,7 +27,7 @@ import trademate.chart.PlotScript;
 
 public class LazyBear extends Trader {
 
-    public Span tickerSpan = Span.Second30;
+    public Span tickerSpan = Span.Minute1;
 
     public int entryThreshold = 35;
 

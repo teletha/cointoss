@@ -33,17 +33,17 @@ class NumIndicatorTest extends TickerTestSupport {
 
     @Test
     void valueAtLowerTick() {
-        Ticker ticker = ticker(Span.Second30, 1, 2, 3, 4, 5);
-        Ticker lower = manager.on(Span.Second5);
+        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker lower = manager.on(Span.Minute1);
         NumIndicator indicator = NumIndicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(lower.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(lower.ticks.getByIndex(2)).is(1);
         assert indicator.valueAt(lower.ticks.getByIndex(4)).is(1);
+        assert indicator.valueAt(lower.ticks.getByIndex(5)).is(2);
         assert indicator.valueAt(lower.ticks.getByIndex(6)).is(2);
-        assert indicator.valueAt(lower.ticks.getByIndex(8)).is(2);
-        assert indicator.valueAt(lower.ticks.getByIndex(10)).is(2);
-        assert indicator.valueAt(lower.ticks.getByIndex(12)).is(3);
-        assert indicator.valueAt(lower.ticks.getByIndex(24)).is(5);
+        assert indicator.valueAt(lower.ticks.getByIndex(9)).is(2);
+        assert indicator.valueAt(lower.ticks.getByIndex(10)).is(3);
+        assert indicator.valueAt(lower.ticks.getByIndex(20)).is(5);
     }
 
     @Test

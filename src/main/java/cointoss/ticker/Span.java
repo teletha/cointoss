@@ -27,9 +27,6 @@ public enum Span {
     Second5(5, SECOND_OF_MINUTE, 1),
 
     /** SPAN */
-    Second30(30, SECOND_OF_MINUTE, 1),
-
-    /** SPAN */
     Minute1(1, MINUTE_OF_HOUR, 1),
 
     /** SPAN */
