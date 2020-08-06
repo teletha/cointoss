@@ -61,7 +61,7 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
             line(overSoldLevel1, Main);
 
             line(indicator, Main);
-            line(Indicators.waveTrend(market.tickers.on(Span.Minute10), channelLength.v, averageLength.v), M10);
+            line(Indicators.waveTrend(market.tickers.on(Span.Minute15), channelLength.v, averageLength.v), M10);
             line(Indicators.waveTrend(market.tickers.on(Span.Minute30), channelLength.v, averageLength.v), M30);
             line(Indicators.waveTrend(market.tickers.on(Span.Hour1), channelLength.v, averageLength.v), H1);
         });

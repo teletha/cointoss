@@ -299,14 +299,14 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(40).date(Base.plusMinutes(5)));
         assert manager.on(Minute1).ticks.size() == 6;
         assert manager.on(Minute5).ticks.size() == 2;
-        manager.tickers().take(between(Span.Minute10, Day7)).to(ticker -> {
+        manager.tickers().take(between(Span.Minute15, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
 
         manager.update(Execution.with.buy(1).price(50).date(Base.plusMinutes(7)));
         assert manager.on(Minute1).ticks.size() == 8;
         assert manager.on(Minute5).ticks.size() == 2;
-        manager.tickers().take(between(Minute10, Day7)).to(ticker -> {
+        manager.tickers().take(between(Minute15, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
     }
@@ -319,7 +319,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(5)));
         assert manager.on(Minute1).ticks.size() == 6;
         assert manager.on(Minute5).ticks.size() == 2;
-        manager.tickers().take(between(Minute10, Day7)).to(ticker -> {
+        manager.tickers().take(between(Minute15, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
     }

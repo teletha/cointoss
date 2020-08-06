@@ -30,10 +30,7 @@ public enum Span {
     Minute1(1, MINUTE_OF_HOUR, 1),
 
     /** SPAN */
-    Minute5(5, MINUTE_OF_HOUR, 1, 2),
-
-    /** SPAN */
-    Minute10(10, MINUTE_OF_HOUR),
+    Minute5(5, MINUTE_OF_HOUR, 1),
 
     /** SPAN */
     Minute15(15, MINUTE_OF_HOUR, 1),
