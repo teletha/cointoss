@@ -227,12 +227,12 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
     public static NumIndicator trueRange(Ticker ticker) {
         return build(ticker, tick -> {
             Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
+            Tick previous = ticker.ticks.before(tick);
 
-            if (tick.previous() == null) {
+            if (previous == null) {
                 return highLow;
             }
 
-            Tick previous = tick.previous();
             Num highClose = tick.highPrice().minus(previous.closePrice()).abs();
             Num closeLow = previous.closePrice().minus(tick.lowPrice).abs();
 

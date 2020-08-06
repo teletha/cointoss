@@ -754,8 +754,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.setLineWidth(BarWidth);
             gc.strokeLine(x, open, x, close);
 
-            if (tick.previous() != null) {
-                double lastX = axisX.getPositionForValue(tick.previous().startSeconds);
+            Tick previous = chart.ticker.v.ticks.before(tick);
+            if (previous != null) {
+                double lastX = axisX.getPositionForValue(previous.startSeconds);
 
                 for (Plotter plotter : plotters) {
                     if (registry.globalSetting(plotter.origin).visible.is(false)) {

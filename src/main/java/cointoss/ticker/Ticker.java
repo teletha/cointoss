@@ -70,7 +70,7 @@ public final class Ticker implements Disposable {
      * @param realtime The realtime execution statistic.
      */
     final void init(Execution execution, TickerManager realtime) {
-        current = new Tick(ticks.last(), span.calculateStartTime(execution.date)
+        current = new Tick(span.calculateStartTime(execution.date)
                 .toEpochSecond(), span, execution.id, execution.delay, execution.price, realtime);
 
         ticks.store(current);
@@ -92,19 +92,18 @@ public final class Ticker implements Disposable {
             // execution actually belongs to, it is assumed that there was a blank time
             // (i.e. server error, maintenance). So we complement them in advance.
             ZonedDateTime start = span.calculateStartTime(execution.date);
-            Tick prev = ticks.last();
 
             while (current.endSeconds < start.toEpochSecond()) {
                 current.freeze();
                 closing.accept(current);
-                current = new Tick(prev, current.endSeconds, span, execution.id, execution.delay, current.closePrice(), realtime);
+                current = new Tick(current.endSeconds, span, execution.id, execution.delay, current.closePrice(), realtime);
                 ticks.store(current);
             }
 
             // create the latest tick for execution
             current.freeze();
             closing.accept(current);
-            current = new Tick(prev, current.endSeconds, span, execution.id, execution.delay, execution.price, realtime);
+            current = new Tick(current.endSeconds, span, execution.id, execution.delay, execution.price, realtime);
             ticks.store(current);
             opening.accept(current);
             return true;

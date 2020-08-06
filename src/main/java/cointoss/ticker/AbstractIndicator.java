@@ -62,23 +62,6 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     }
 
     /**
-     * Helper method to calculate the length of previous ticks.
-     * 
-     * @param tick A starting {@link Tick}.
-     * @param max A maximum length you want.
-     * @return The actual length of previous ticks.
-     */
-    protected final int calculatePreviousTickLength(Tick tick, int max) {
-        int actualSize = 1;
-
-        while (tick.previous() != null && actualSize < max) {
-            tick = tick.previous();
-            actualSize++;
-        }
-        return actualSize;
-    }
-
-    /**
      * Creates a new {@link AbstractIndicator} of the same type as itself.
      * 
      * @param delegator Actual process with recursive call helper.

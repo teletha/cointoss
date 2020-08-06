@@ -9,12 +9,10 @@
  */
 package cointoss.ticker;
 
-import java.lang.ref.WeakReference;
 import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import kiss.Signal;
 
 public final class Tick {
 
@@ -35,9 +33,6 @@ public final class Tick {
 
     /** Open price of the period */
     public final Num openPrice;
-
-    /** The previous tick. */
-    private WeakReference<Tick> previous;
 
     /** Close price of the period. */
     Num closePrice;
@@ -101,8 +96,7 @@ public final class Tick {
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(Tick previous, long startEpochSeconds, Span span, long id, int delay, Num open, TickerManager realtime) {
-        this.previous = new WeakReference(previous);
+    Tick(long startEpochSeconds, Span span, long id, int delay, Num open, TickerManager realtime) {
         this.startSeconds = startEpochSeconds;
         this.endSeconds = startEpochSeconds + span.seconds;
         this.openId = id;
@@ -120,15 +114,6 @@ public final class Tick {
         this.shortPriceDecrease = realtime.shortPriceDecrease;
         this.shortLosscutCount = realtime.shortLosscutCount;
         this.shortLosscutVolume = realtime.shortLosscutVolume;
-    }
-
-    /**
-     * Get the previous {@link Tick}.
-     * 
-     * @return
-     */
-    public Tick previous() {
-        return previous.get();
     }
 
     /**
