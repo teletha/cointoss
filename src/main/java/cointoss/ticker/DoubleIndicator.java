@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -90,11 +91,12 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
         double multiplier = 2.0 / (size + 1);
 
         return memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous() == null) {
+            Tick before = ticker.ticks.before(tick);
+            if (before == null) {
                 return valueAt(tick);
             }
 
-            double prev = self.apply(tick.previous());
+            double prev = self.apply(before);
             double now = valueAt(tick);
 
             return ((now - prev) * multiplier) + prev;
@@ -109,11 +111,12 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
         double multiplier = 1.0 / size;
 
         return memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous() == null) {
+            Tick before = ticker.ticks.before(tick);
+            if (before == null) {
                 return valueAt(tick);
             }
 
-            double prev = self.apply(tick.previous());
+            double prev = self.apply(before);
             double now = valueAt(tick);
 
             return ((now - prev) * multiplier) + prev;
@@ -130,14 +133,12 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
             @Override
             protected double valueAtRounded(Tick tick) {
                 double value = 0;
-                Tick current = tick;
-                int remaining = size;
-                while (current != null && 0 < remaining) {
-                    value += DoubleIndicator.this.doubleAt(current);
-                    current = current.previous();
-                    remaining--;
+                List<Tick> before = ticker.ticks.beforeWith(tick, size);
+                int actualSize = before.size();
+                for (int i = 0; i < actualSize; i++) {
+                    value += DoubleIndicator.this.doubleAt(before.get(i));
                 }
-                return value / (size - remaining);
+                return value / actualSize;
             }
         }.memoize();
     }
@@ -151,15 +152,11 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
 
             @Override
             protected double valueAtRounded(Tick tick) {
-                if (tick.previous() == null) {
-                    return DoubleIndicator.this.doubleAt(tick);
-                }
-
                 double value = 0;
-                int actualSize = calculatePreviousTickLength(tick, size);
-                for (int i = actualSize; 0 < i; i--) {
-                    value += DoubleIndicator.this.doubleAt(tick) * i;
-                    tick = tick.previous();
+                List<Tick> previous = ticker.ticks.beforeWith(tick, size);
+                int actualSize = previous.size();
+                for (int i = 0; i < actualSize; i++) {
+                    value += DoubleIndicator.this.doubleAt(previous.get(i)) * (actualSize - i);
                 }
                 return value / (actualSize * (actualSize + 1) / 2);
             }

@@ -92,11 +92,12 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
         double multiplier = 2.0 / (size + 1);
 
         return memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous() == null) {
+            Tick before = ticker.ticks.before(tick);
+            if (before == null) {
                 return valueAt(tick);
             }
 
-            double prev = self.apply(tick.previous()).doubleValue();
+            double prev = self.apply(before).doubleValue();
             double now = valueAt(tick).doubleValue();
 
             return Num.of(((now - prev) * multiplier) + prev);
@@ -111,11 +112,12 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
         double multiplier = 1.0 / size;
 
         return memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous() == null) {
+            Tick before = ticker.ticks.before(tick);
+            if (before == null) {
                 return valueAt(tick);
             }
 
-            double prev = self.apply(tick.previous()).doubleValue();
+            double prev = self.apply(before).doubleValue();
             double now = valueAt(tick).doubleValue();
 
             return Num.of(((now - prev) * multiplier) + prev);
@@ -132,14 +134,12 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
             @Override
             protected Num valueAtRounded(Tick tick) {
                 double value = 0;
-                Tick current = tick;
-                int remaining = size;
-                while (current != null && 0 < remaining) {
-                    value += NumIndicator.this.valueAt(current).doubleValue();
-                    current = current.previous();
-                    remaining--;
+                List<Tick> before = ticker.ticks.beforeWith(tick, size);
+                int actualSize = before.size();
+                for (int i = 0; i < actualSize; i++) {
+                    value += NumIndicator.this.valueAt(before.get(i)).doubleValue();
                 }
-                return Num.of(value / (size - remaining));
+                return Num.of(value / actualSize);
             }
         }.memoize();
     }
@@ -153,13 +153,10 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
 
             @Override
             protected Num valueAtRounded(Tick tick) {
-                if (tick.previous() == null) {
-                    return NumIndicator.this.valueAt(tick);
-                }
-
                 double value = 0;
                 List<Tick> previous = ticker.ticks.beforeWith(tick, size);
                 int actualSize = previous.size();
+
                 for (int i = 0; i < actualSize; i++) {
                     value += NumIndicator.this.valueAt(previous.get(i)).doubleValue() * (actualSize - i);
                 }
