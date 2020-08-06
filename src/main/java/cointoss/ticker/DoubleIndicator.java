@@ -23,8 +23,8 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      * 
      * @param ticker A target ticker.
      */
-    protected DoubleIndicator(Function<Tick, Tick> normalizer) {
-        super(normalizer);
+    protected DoubleIndicator(Ticker ticker, Function<Tick, Tick> normalizer) {
+        super(ticker, normalizer);
     }
 
     /**
@@ -59,7 +59,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     protected DoubleIndicator build(BiFunction<Tick, DoubleIndicator, Double> delegator) {
-        return new DoubleIndicator(normalizer) {
+        return new DoubleIndicator(ticker, normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -73,7 +73,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     public final DoubleIndicator scale(int size) {
-        return new DoubleIndicator(normalizer) {
+        return new DoubleIndicator(ticker, normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -125,7 +125,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     public final DoubleIndicator sma(int size) {
-        return new DoubleIndicator(normalizer) {
+        return new DoubleIndicator(ticker, normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -147,7 +147,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     public final DoubleIndicator wma(int size) {
-        return new DoubleIndicator(normalizer) {
+        return new DoubleIndicator(ticker, normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -182,7 +182,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
             return rounded == null ? ticker.ticks.first() : rounded;
         };
 
-        return new DoubleIndicator(normalizer) {
+        return new DoubleIndicator(ticker, normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {

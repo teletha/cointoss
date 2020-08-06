@@ -23,7 +23,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      * @param ticker A target ticker.
      */
     protected NumIndicator(Ticker ticker) {
-        this(tick -> {
+        this(ticker, tick -> {
             Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
             return rounded == null ? ticker.ticks.first() : rounded;
         });
@@ -34,8 +34,8 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      * 
      * @param ticker A target ticker.
      */
-    protected NumIndicator(Function<Tick, Tick> normalizer) {
-        super(normalizer);
+    protected NumIndicator(Ticker ticker, Function<Tick, Tick> normalizer) {
+        super(ticker, normalizer);
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     protected NumIndicator build(BiFunction<Tick, NumIndicator, Num> delegator) {
-        return new NumIndicator(normalizer) {
+        return new NumIndicator(ticker, normalizer) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -74,7 +74,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     public final NumIndicator scale(int size) {
-        return new NumIndicator(normalizer) {
+        return new NumIndicator(ticker, normalizer) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -126,7 +126,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     public final NumIndicator sma(int size) {
-        return new NumIndicator(normalizer) {
+        return new NumIndicator(ticker, normalizer) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -148,7 +148,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     public final NumIndicator wma(int size) {
-        return new NumIndicator(normalizer) {
+        return new NumIndicator(ticker, normalizer) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {

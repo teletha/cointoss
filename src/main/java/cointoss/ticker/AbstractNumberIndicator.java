@@ -19,15 +19,15 @@ public abstract class AbstractNumberIndicator<N extends Number, Self extends Abs
     /**
      * 
      */
-    protected AbstractNumberIndicator() {
-        super();
+    protected AbstractNumberIndicator(Ticker ticker) {
+        super(ticker);
     }
 
     /**
      * @param normalizer
      */
-    protected AbstractNumberIndicator(Function<Tick, Tick> normalizer) {
-        super(normalizer);
+    protected AbstractNumberIndicator(Ticker ticker, Function<Tick, Tick> normalizer) {
+        super(ticker, normalizer);
     }
 
     /**
