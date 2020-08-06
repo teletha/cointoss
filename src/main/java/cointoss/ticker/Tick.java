@@ -330,25 +330,6 @@ public final class Tick {
     }
 
     /**
-     * Retrieve the previous tick sequentially.
-     * 
-     * @param size A number of ticks.
-     */
-    public Signal<Tick> previous(int size) {
-        return new Signal<>((observer, disposer) -> {
-            int count = 0;
-            Tick now = this;
-            while (count < size && now != null && disposer.isNotDisposed()) {
-                observer.accept(now);
-
-                now = now.previous();
-                count++;
-            }
-            return disposer;
-        });
-    }
-
-    /**
      * Check the tick state.
      * 
      * @return

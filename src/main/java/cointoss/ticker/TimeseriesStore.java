@@ -9,6 +9,8 @@
  */
 package cointoss.ticker;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -148,6 +150,10 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public E getByTime(long timestamp) {
+        if (timestamp < 0) {
+            return null;
+        }
+
         long[] index = index(timestamp);
 
         Segment segment = indexed.get(index[0]);
@@ -239,6 +245,108 @@ public final class TimeseriesStore<E> {
             segment.clear();
         }
         indexed.clear();
+    }
+
+    /**
+     * Get the item just before the specified item.
+     * 
+     * @param item An indexable item.
+     * @return
+     */
+    public E before(E item) {
+        return before(timestampExtractor.applyAsLong(item));
+    }
+
+    /**
+     * Get the item just before the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp A time stamp.
+     * @return
+     */
+    public E before(long timestamp) {
+        return getByTime(timestamp - span.seconds);
+    }
+
+    /**
+     * Get the specified number of items before the specified item.
+     * 
+     * @param item An indexable item.
+     * @return
+     */
+    public List<E> before(E item, int maximumSize) {
+        return before(timestampExtractor.applyAsLong(item), maximumSize);
+    }
+
+    /**
+     * Get the specified number of items before the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp A time stamp.
+     * @return
+     */
+    public List<E> before(long timestamp, int maximumSize) {
+        return before(timestamp, maximumSize, false);
+    }
+
+    /**
+     * Get the specified number of items before the specified item.
+     * 
+     * @param item An indexable item.
+     * @return
+     */
+    public List<E> beforeWith(E item, int maximumSize) {
+        return beforeWith(timestampExtractor.applyAsLong(item), maximumSize);
+    }
+
+    /**
+     * Get the specified number of items before the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp A time stamp.
+     * @return
+     */
+    public List<E> beforeWith(long timestamp, int maximumSize) {
+        return before(timestamp, maximumSize, true);
+    }
+
+    /**
+     * Get the specified number of items before the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp A time stamp.
+     * @return
+     */
+    public List<E> before(long timestamp, int maximumSize, boolean with) {
+        List<E> items = new ArrayList();
+
+        long[] index = index(timestamp);
+        long timeIndex = index[0];
+        int segmentIndex = ((int) index[1]);
+        Segment segment = indexed.get(timeIndex);
+
+        if (with) {
+            E item = segment.get(segmentIndex);
+            if (item != null) {
+                items.add(item);
+            }
+        }
+
+        while (items.size() < maximumSize) {
+            if (--segmentIndex == -1) {
+                timeIndex -= 86400; // 60x60x24
+                segment = indexed.get(timeIndex);
+
+                if (segment == null) {
+                    break;
+                } else {
+                    segmentIndex = length - 1;
+                }
+            }
+
+            E item = segment.get(segmentIndex);
+            if (item != null) {
+                items.add(item);
+            }
+        }
+
+        return items;
     }
 
     /**

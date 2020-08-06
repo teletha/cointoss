@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -157,11 +158,12 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
                 }
 
                 double value = 0;
-                int actualSize = calculatePreviousTickLength(tick, size);
-                for (int i = actualSize; 0 < i; i--) {
-                    value += NumIndicator.this.valueAt(tick).doubleValue() * i;
-                    tick = tick.previous();
+                List<Tick> previous = ticker.ticks.beforeWith(tick, size);
+                int actualSize = previous.size();
+                for (int i = 0; i < actualSize; i++) {
+                    value += NumIndicator.this.valueAt(previous.get(i)).doubleValue() * (actualSize - i);
                 }
+
                 return Num.of(value / (actualSize * (actualSize + 1) / 2));
             }
         }.memoize();
