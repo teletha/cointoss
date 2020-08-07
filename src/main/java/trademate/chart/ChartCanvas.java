@@ -36,6 +36,7 @@ import com.google.common.cache.LoadingCache;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.execution.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.order.OrderBookPage;
@@ -563,7 +564,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeLatestPrice() {
         chart.market.observing() //
                 .skipNull()
-                .switchMap(m -> m.tickers.latestPrice.observing())
+                .switchMap(m -> m.tickers.latest.observing().map(Execution::price))
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
                     TickLable latest = latestPrice.createLabel("最新値");

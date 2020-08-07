@@ -174,7 +174,7 @@ public class TradingStats {
 
             // calculate profit and loss
             Num realized = entry.realizedProfit;
-            Num unrealized = entry.unrealizedProfit(market.tickers.latestPrice.v);
+            Num unrealized = entry.unrealizedProfit(market.tickers.latest.v.price);
             Num pol = realized.plus(unrealized);
             Num pips = entry.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(entry.entryExecutedSize);
             Num realizedPips = entry.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(entry.entryExecutedSize);

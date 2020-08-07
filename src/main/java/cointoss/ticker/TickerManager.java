@@ -23,9 +23,6 @@ public final class TickerManager implements Disposable {
     /** The latest execution. */
     public final Variable<Execution> latest = Variable.of(Market.BASE);
 
-    /** The latest price. */
-    public final Variable<Num> latestPrice = Variable.of(Num.ZERO);
-
     /** Total of long count since application startup. */
     int longCount = 0;
 
@@ -113,7 +110,6 @@ public final class TickerManager implements Disposable {
             initialized = true;
             // for the first time only, set LTP before updating tickers
             latest.set(e);
-            latestPrice.set(e.price);
 
             for (Ticker ticker : tickers) {
                 ticker.init(e, this);
@@ -144,7 +140,6 @@ public final class TickerManager implements Disposable {
 
         // update the latest execution at last
         latest.set(e);
-        latestPrice.set(e.price);
 
         // notify update event
         for (Ticker ticker : tickers) {

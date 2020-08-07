@@ -52,7 +52,7 @@ public class LazyBear extends Trader {
         when(oscillator.valueAt(ticker.open).take(v -> v.isLessThan(-entryThreshold)), value -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.BUY, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
+                entry(Direction.BUY, size, s -> s.make(market.tickers.latest.v.price.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
             }
 
             @Override
@@ -73,7 +73,7 @@ public class LazyBear extends Trader {
         when(oscillator.valueAt(ticker.open).take(v -> v.isGreaterThan(entryThreshold)), value -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.SELL, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
+                entry(Direction.SELL, size, s -> s.make(market.tickers.latest.v.price.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
             }
 
             @Override

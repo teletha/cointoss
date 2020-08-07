@@ -340,7 +340,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
         }
 
         // update profit
-        setProfit(snapshot.profit(market.tickers.latestPrice.v));
+        setProfit(snapshot.profit(market.tickers.latest.v.price));
     }
 
     /**

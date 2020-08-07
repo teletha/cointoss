@@ -430,7 +430,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             });
         } else {
             // losscut
-            disposer = market.tickers.latestPrice.observe().take(p -> p.isLessThanOrEqual(directional, price)).first().to(e -> {
+            disposer = market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(directional, price)).first().to(e -> {
                 disposeEntry();
 
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {
@@ -548,7 +548,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     public String toString() {
         StringBuilder builder = new StringBuilder("Scenario ").append(directional)
                 .append(" un/realized")
-                .append(unrealizedProfit(market.tickers.latestPrice.v))
+                .append(unrealizedProfit(market.tickers.latest.v.price))
                 .append("/")
                 .append(realizedProfit)
                 .append("\r\n");
