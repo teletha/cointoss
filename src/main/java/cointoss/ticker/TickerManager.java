@@ -140,11 +140,6 @@ public final class TickerManager implements Disposable {
 
         // update the latest execution at last
         latest.set(e);
-
-        // notify update event
-        for (Ticker ticker : tickers) {
-            ticker.updaters.accept(ticker.current);
-        }
     }
 
     /**

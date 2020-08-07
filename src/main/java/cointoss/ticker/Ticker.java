@@ -37,12 +37,6 @@ public final class Ticker implements Disposable {
     /** The event about opening new tick. */
     public final Signal<Tick> close = closing.expose.skip(tick -> tick.volume() == 0);
 
-    /** The event listeners. */
-    final Signaling<Tick> updaters = new Signaling();
-
-    /** The event about update tick. */
-    public final Signal<Tick> update = updaters.expose;
-
     /** The tick store. */
     public final TimeseriesStore<Tick> ticks;
 

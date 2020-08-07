@@ -321,16 +321,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Shortcut method for {@link Tick} update timing.
-     * 
-     * @param span A target time span.
-     * @return A tick stream.
-     */
-    public final Signal<Tick> update(Span span) {
-        return tickers.on(span).update;
-    }
-
-    /**
      * 
      */
     private class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {

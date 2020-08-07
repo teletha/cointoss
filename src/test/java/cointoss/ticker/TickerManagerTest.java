@@ -12,7 +12,6 @@ package cointoss.ticker;
 import static cointoss.ticker.Span.*;
 
 import java.time.ZonedDateTime;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
@@ -319,22 +318,5 @@ class TickerManagerTest {
         manager.tickers().take(between(Minute15, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
-    }
-
-    @Test
-    void signalUpdate() {
-        AtomicInteger counter = new AtomicInteger();
-        manager.tickers().flatMap(t -> t.update).to(counter::incrementAndGet);
-
-        int size = Span.values().length;
-
-        manager.update(Execution.with.buy(1).price(10));
-        assert counter.get() == size;
-        manager.update(Execution.with.buy(1).price(20));
-        assert counter.get() == size * 2;
-        manager.update(Execution.with.buy(1).price(30).date(Base.plusHours(1)));
-        assert counter.get() == size * 3;
-        manager.update(Execution.with.buy(1).price(40).date(Base.plusHours(6)));
-        assert counter.get() == size * 4;
     }
 }
