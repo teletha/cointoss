@@ -124,14 +124,18 @@ public class Chart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        if (chart.ticker.v.ticks.isNotEmpty()) {
-            long seconds = chart.ticker.v.span.seconds;
-            axisX.logicalMinValue.set(chart.ticker.v.ticks.first().startSeconds);
-            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds);
+        chart.ticker.to(ticker -> {
+            if (ticker.ticks.isEmpty()) {
+                return;
+            }
+
+            long seconds = ticker.span.seconds;
+            axisX.logicalMinValue.set(ticker.ticks.first().startSeconds);
+            axisX.logicalMaxValue.set(ticker.ticks.last().startSeconds);
             axisX.visibleMinRange.set(minimumTickNumber.doubleValue() * seconds);
             axisX.visibleMaxRange.set(maximumTickNumber.doubleValue() * seconds);
             axisX.zoom();
-        }
+        });
     }
 
     /**

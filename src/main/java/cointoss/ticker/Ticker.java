@@ -19,9 +19,6 @@ import kiss.Signaling;
 
 public final class Ticker implements Disposable {
 
-    /** Reusable NULL object. */
-    public static final Ticker EMPTY = new Ticker(Span.Minute1);
-
     /** The span. */
     public final Span span;
 

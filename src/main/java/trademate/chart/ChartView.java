@@ -43,7 +43,7 @@ public class ChartView extends View {
     public final Variable<Market> market = Variable.empty();
 
     /** The list of plottable candle date. */
-    public final Variable<Ticker> ticker = Variable.of(Ticker.EMPTY);
+    public final Variable<Ticker> ticker = Variable.empty();
 
     /** The candle type. */
     public final Variable<CandleType> candleType = Variable.of(CandleType.Price);
