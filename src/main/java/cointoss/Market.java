@@ -74,9 +74,6 @@ public class Market implements Disposable {
     /** The execution time line. */
     public final Signal<Execution> timeline = timelineObservers.expose.skipComplete();
 
-    /** The execution time line with current value. */
-    public final Signal<Execution> timelineNow = timeline.startWith(tickers.latest);
-
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
         Execution previous = switcher.getAndSet(e);

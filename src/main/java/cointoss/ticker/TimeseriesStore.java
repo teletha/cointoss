@@ -313,7 +313,7 @@ public final class TimeseriesStore<E> {
      * @param timestamp A time stamp.
      * @return
      */
-    public List<E> before(long timestamp, int maximumSize, boolean with) {
+    private List<E> before(long timestamp, int maximumSize, boolean with) {
         List<E> items = new ArrayList();
 
         long[] index = index(timestamp);
