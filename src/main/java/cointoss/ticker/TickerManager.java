@@ -20,9 +20,6 @@ import kiss.Variable;
 
 public final class TickerManager implements Disposable {
 
-    /** The initial execution. */
-    public final Variable<Execution> initial = Variable.empty();
-
     /** The latest execution. */
     public final Variable<Execution> latest = Variable.of(Market.BASE);
 
@@ -114,7 +111,6 @@ public final class TickerManager implements Disposable {
         if (initialized == false) {
             // initialize tickers once if needed
             initialized = true;
-            initial.set(e);
             // for the first time only, set LTP before updating tickers
             latest.set(e);
             latestPrice.set(e.price);
