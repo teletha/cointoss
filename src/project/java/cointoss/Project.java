@@ -23,7 +23,6 @@ public class Project extends bee.api.Project {
         require("org.apache.commons", "commons-math3");
         require("commons-net", "commons-net");
         require("org.apache.logging.log4j", "log4j-core");
-        // require("org.decimal4j", "decimal4j");
         require("com.google.guava", "guava");
         unrequire("com.google.code.findbugs", "jsr305");
         unrequire("com.google.errorprone", "error_prone_annotations");
@@ -32,6 +31,9 @@ public class Project extends bee.api.Project {
         unrequire("org.checkerframework", "checker-qual");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
+        require("org.decimal4j", "decimal4j");
+
+        require("com.ibm.icu", "icu4j").atTest();
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }
