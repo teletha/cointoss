@@ -25,6 +25,8 @@ class TickerManagerTest {
 
     ZonedDateTime Base = Chrono.MIN;
 
+    long BaseSec = Base.toEpochSecond();
+
     TickerManager manager = new TickerManager();
 
     @Test
@@ -189,10 +191,10 @@ class TickerManagerTest {
 
         // validate
         Ticker ticker = manager.on(Minute1);
-        assert ticker.ticks.getByIndex(0).longVolume() == 1d;
-        assert ticker.ticks.getByIndex(1).longVolume() == 1d;
-        assert ticker.ticks.getByIndex(2).longVolume() == 1d;
-        assert ticker.ticks.getByIndex(3).longVolume() == 3d;
+        assert ticker.ticks.at(BaseSec + 0 * 60).longVolume() == 1d;
+        assert ticker.ticks.at(BaseSec + 1 * 60).longVolume() == 1d;
+        assert ticker.ticks.at(BaseSec + 2 * 60).longVolume() == 1d;
+        assert ticker.ticks.at(BaseSec + 3 * 60).longVolume() == 3d;
     }
 
     @Test
@@ -233,37 +235,37 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(5)));
 
         Ticker ticker = manager.on(Minute1);
-        Tick tick = ticker.ticks.getByIndex(0);
+        Tick tick = ticker.ticks.at(BaseSec);
         assert tick.openPrice().is(10);
         assert tick.closePrice().is(10);
         assert tick.highPrice().is(10);
         assert tick.lowPrice().is(10);
 
-        tick = ticker.ticks.getByIndex(1);
+        tick = ticker.ticks.at(BaseSec + 60);
         assert tick.openPrice().is(10);
         assert tick.closePrice().is(10);
         assert tick.highPrice().is(10);
         assert tick.lowPrice().is(10);
 
-        tick = ticker.ticks.getByIndex(2);
+        tick = ticker.ticks.at(BaseSec + 2 * 60);
         assert tick.openPrice().is(10);
         assert tick.closePrice().is(10);
         assert tick.highPrice().is(10);
         assert tick.lowPrice().is(10);
 
-        tick = ticker.ticks.getByIndex(3);
+        tick = ticker.ticks.at(BaseSec + 3 * 60);
         assert tick.openPrice().is(10);
         assert tick.closePrice().is(10);
         assert tick.highPrice().is(10);
         assert tick.lowPrice().is(10);
 
-        tick = ticker.ticks.getByIndex(4);
+        tick = ticker.ticks.at(BaseSec + 4 * 60);
         assert tick.openPrice().is(10);
         assert tick.closePrice().is(10);
         assert tick.highPrice().is(10);
         assert tick.lowPrice().is(10);
 
-        tick = ticker.ticks.getByIndex(5);
+        tick = ticker.ticks.at(BaseSec + 5 * 60);
         assert tick.openPrice().is(30);
         assert tick.closePrice().is(30);
         assert tick.highPrice().is(30);

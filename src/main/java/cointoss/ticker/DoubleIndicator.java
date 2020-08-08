@@ -175,7 +175,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
         Objects.requireNonNull(calculator);
 
         Function<Tick, Tick> normalizer = tick -> {
-            Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
+            Tick rounded = ticker.ticks.at(tick.startSeconds);
             return rounded == null ? ticker.ticks.first() : rounded;
         };
 

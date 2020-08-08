@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.ToLongFunction;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public final class TimeseriesStore<E> {
 
     /** The span. */
@@ -111,45 +113,12 @@ public final class TimeseriesStore<E> {
     }
 
     /**
-     * Get an item at the specified index.
-     * 
-     * @param index
-     * @return
-     */
-    public E getByIndex(int index) {
-        for (Segment segment : indexed.values()) {
-            if (index < segment.size()) {
-                return segment.get(index);
-            }
-            index -= segment.size();
-        }
-        return null;
-    }
-
-    /**
-     * Get an item at the specified index from last.
-     * 
-     * @param index
-     * @return
-     */
-    public E getByLastIndex(int index) {
-        for (Segment segment : indexed.descendingMap().values()) {
-            int size = segment.size();
-            if (index < size) {
-                return segment.get(size - index - 1);
-            }
-            index -= size;
-        }
-        return null;
-    }
-
-    /**
      * Get the item for the specified timestamp (epoch seconds).
      * 
      * @param timestamp A time stamp.
      * @return
      */
-    public E getByTime(long timestamp) {
+    public E at(long timestamp) {
         if (timestamp < 0) {
             return null;
         }
@@ -264,7 +233,7 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public E before(long timestamp) {
-        return getByTime(timestamp - span.seconds);
+        return at(timestamp - span.seconds);
     }
 
     /**
@@ -487,6 +456,74 @@ public final class TimeseriesStore<E> {
             for (int i = start; i <= end; i++) {
                 consumer.accept(items[i]);
             }
+        }
+    }
+
+    /**
+     * On disk container.
+     */
+    private class OnDisk extends Segment {
+
+        private Segment heap;
+
+        private int size;
+
+        private void load() {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        int size() {
+            return size;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        E get(int index) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        int set(int index, E item) {
+            return 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        void clear() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        E first() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        E last() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        void each(int start, int end, Consumer<? super E> each) {
         }
     }
 }

@@ -164,8 +164,8 @@ public class Chart extends Region {
 
         if (chart.market.isPresent()) {
             Ticker ticker = chart.market.v.tickers.on(span);
-            Tick startTick = ticker.ticks.getByTime(start);
-            Tick endTick = ticker.ticks.getByTime(end);
+            Tick startTick = ticker.ticks.at(start);
+            Tick endTick = ticker.ticks.at(end);
 
             if (endTick == null) {
                 endTick = ticker.ticks.last();

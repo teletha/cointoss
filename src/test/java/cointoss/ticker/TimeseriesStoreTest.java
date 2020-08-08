@@ -9,7 +9,7 @@
  */
 package cointoss.ticker;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,79 +42,58 @@ class TimeseriesStoreTest {
     void add() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
         store.store(0);
-        assert store.getByTime(0) == 0;
-        assert store.getByTime(5) == null;
-        assert store.getByTime(10) == null;
+        assert store.at(0) == 0;
+        assert store.at(5) == null;
+        assert store.at(10) == null;
 
         // update
         store.store(2);
-        assert store.getByTime(0) == 2;
-        assert store.getByTime(5) == null;
-        assert store.getByTime(10) == null;
+        assert store.at(0) == 2;
+        assert store.at(5) == null;
+        assert store.at(10) == null;
 
         // add next stamp
         store.store(5);
-        assert store.getByTime(0) == 2;
-        assert store.getByTime(5) == 5;
-        assert store.getByTime(10) == null;
+        assert store.at(0) == 2;
+        assert store.at(5) == 5;
+        assert store.at(10) == null;
 
         // add next stamp
         store.store(10);
-        assert store.getByTime(0) == 2;
-        assert store.getByTime(5) == 5;
-        assert store.getByTime(10) == 10;
+        assert store.at(0) == 2;
+        assert store.at(5) == 5;
+        assert store.at(10) == 10;
 
         // update
         store.store(13);
-        assert store.getByTime(0) == 2;
-        assert store.getByTime(5) == 5;
-        assert store.getByTime(10) == 13;
-    }
-
-    @Test
-    void getByIndex() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
-        store.store(0);
-        assert store.getByIndex(0) == 0;
-        assert store.getByIndex(5) == null;
-        assert store.getByIndex(10) == null;
-    }
-
-    @Test
-    void getByIndexOverTime() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
-        store.store(0, days, 2 * days, 3 * days, 4 * days);
-        assert store.getByIndex(0) == 0;
-        assert store.getByIndex(1) == days;
-        assert store.getByIndex(2) == 2 * days;
-        assert store.getByIndex(3) == 3 * days;
-        assert store.getByIndex(4) == 4 * days;
-        assert store.getByIndex(5) == null;
+        assert store.at(0) == 2;
+        assert store.at(5) == 5;
+        assert store.at(10) == 13;
     }
 
     @Test
     void getByTime() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
         store.store(0, 5, 10);
-        assert store.getByTime(0) == 0;
-        assert store.getByTime(3) == 0;
-        assert store.getByTime(5) == 5;
-        assert store.getByTime(7) == 5;
-        assert store.getByTime(10) == 10;
-        assert store.getByTime(14) == 10;
+        assert store.at(0) == 0;
+        assert store.at(3) == 0;
+        assert store.at(5) == 5;
+        assert store.at(7) == 5;
+        assert store.at(10) == 10;
+        assert store.at(14) == 10;
     }
 
     @Test
     void getByTimeOverTime() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
-        assert store.getByTime(0) == 0;
-        assert store.getByTime(days - 1) == 0;
-        assert store.getByTime(days) == days;
-        assert store.getByTime(days + 1) == days;
-        assert store.getByTime(2 * days - 1) == days;
-        assert store.getByTime(2 * days) == 2 * days;
-        assert store.getByTime(2 * days + 1) == 2 * days;
+        assert store.at(0) == 0;
+        assert store.at(days - 1) == 0;
+        assert store.at(days) == days;
+        assert store.at(days + 1) == days;
+        assert store.at(2 * days - 1) == days;
+        assert store.at(2 * days) == 2 * days;
+        assert store.at(2 * days + 1) == 2 * days;
     }
 
     @Test

@@ -359,7 +359,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         // move the start position forward for visual consistency
         long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
 
-        return chart.ticker.v.ticks.getByTime(sec);
+        return chart.ticker.v.ticks.at(sec);
     }
 
     /**
@@ -415,7 +415,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
 
             // update upper info
-            Tick tick = chart.ticker.v.ticks.getByTime(sec);
+            Tick tick = chart.ticker.v.ticks.at(sec);
 
             if (tick != null) {
                 drawChartInfo(tick);
