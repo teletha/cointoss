@@ -23,50 +23,43 @@ import kiss.Variable;
  */
 public enum Span {
 
-    /** SPAN */
-    Second5(5, SECOND_OF_MINUTE, 1),
+    Second5(5, SECOND_OF_MINUTE, 6, HOUR_OF_DAY, 2, 1),
 
-    /** SPAN */
-    Minute1(1, MINUTE_OF_HOUR, 1),
+    Minute1(1, MINUTE_OF_HOUR, 1, EPOCH_DAY, 3, 1),
 
-    /** SPAN */
-    Minute5(5, MINUTE_OF_HOUR, 1),
+    Minute5(5, MINUTE_OF_HOUR, 1, EPOCH_DAY, 5, 1),
 
-    /** SPAN */
-    Minute15(15, MINUTE_OF_HOUR, 1),
+    Minute15(15, MINUTE_OF_HOUR, 1, EPOCH_DAY, 10, 1),
 
-    /** SPAN */
-    Minute30(30, MINUTE_OF_HOUR, 1),
+    Minute30(30, MINUTE_OF_HOUR, 1, EPOCH_DAY, 20, 1),
 
-    /** SPAN */
-    Hour1(1, HOUR_OF_DAY, 1),
+    Hour1(1, HOUR_OF_DAY, 1, EPOCH_DAY, 40, 1),
 
-    /** SPAN */
-    Hour2(2, HOUR_OF_DAY, 1, 2),
+    Hour2(2, HOUR_OF_DAY, 1, EPOCH_DAY, 80, 1, 2),
 
-    /** SPAN */
-    Hour4(4, HOUR_OF_DAY),
+    Hour4(4, HOUR_OF_DAY, 1, EPOCH_DAY, 160),
 
-    /** SPAN */
-    Hour6(6, HOUR_OF_DAY, 1),
+    Hour6(6, HOUR_OF_DAY, 1, EPOCH_DAY, 240, 1),
 
-    /** SPAN */
-    Hour12(12, HOUR_OF_DAY, 1),
+    Hour12(12, HOUR_OF_DAY, 1, EPOCH_DAY, 480, 1),
 
-    /** SPAN */
-    Day1(1, EPOCH_DAY, 1, 2),
+    Day1(1, EPOCH_DAY, 365, EPOCH_DAY, 1, 1, 2),
 
-    /** SPAN */
-    Day3(3, EPOCH_DAY),
+    Day3(3, EPOCH_DAY, 365, EPOCH_DAY, 2),
 
-    /** SPAN */
-    Day7(7, EPOCH_DAY);
+    Day7(7, EPOCH_DAY, 365, EPOCH_DAY, 3);
 
-    /** The duration. */
+    /** The duration of this {@link Span}. */
     public final Duration duration;
 
-    /** The number of seconds. */
+    /** The duration (seconds). */
     public final long seconds;
+
+    /** The duration (seconds) of this {@link Span}'s segment. */
+    public final long segment;
+
+    /** The maximum size of this {@link Span}'s segment. */
+    public final int segmentSize;
 
     /** The indexes of associated upper tickers. */
     final int[] uppers;
@@ -84,11 +77,13 @@ public enum Span {
      * @param amount
      * @param unit
      */
-    private Span(long amount, ChronoField unit, int... uppers) {
+    private Span(long amount, ChronoField unit, int segment, ChronoField segmentUnit, int maximumSegmentSize, int... uppers) {
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());
         this.seconds = duration.getSeconds();
+        this.segment = Duration.of(segment, segmentUnit.getBaseUnit()).toSeconds();
+        this.segmentSize = maximumSegmentSize;
         this.uppers = new int[uppers.length];
         this.unitName = unit();
 

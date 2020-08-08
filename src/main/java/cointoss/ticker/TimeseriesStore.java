@@ -39,15 +39,12 @@ public final class TimeseriesStore<E> {
     /** A number of items. */
     private int size;
 
-    /** The maximum item size on heap. */
-    private int maximumHeapItem;
-
     @SuppressWarnings("serial")
     private final Map<Long, Segment> stats = new LinkedHashMap<>(8, 0.75f, true) {
 
         @Override
         protected boolean removeEldestEntry(Entry<Long, Segment> eldest) {
-            if (maximumHeapItem < size()) {
+            if (span.segmentSize < size()) {
                 persist(eldest.getKey(), eldest.getValue());
                 return true;
             } else {
@@ -61,21 +58,8 @@ public final class TimeseriesStore<E> {
      */
     public TimeseriesStore(Span span, ToLongFunction<E> timestampExtractor) {
         this.span = Objects.requireNonNull(span);
-        this.length = span.ticksPerDay();
+        this.length = (int) (span.segment / span.seconds);
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
-        this.maximumHeapItem = switch (span) {
-            case Second5 -> 2;
-            case Minute1 -> 3;
-            case Minute5 -> 5;
-            case Minute15 -> 10;
-            case Minute30 -> 20;
-            case Hour1 -> 40;
-            case Hour2 -> 80;
-            case Hour4 -> 160;
-            case Hour6 -> 240;
-            case Day1 -> 960;
-            default -> Integer.MAX_VALUE;
-        };
     }
 
     /**
@@ -97,7 +81,7 @@ public final class TimeseriesStore<E> {
      * @return
      */
     long[] index(long timestamp) {
-        long remainder = timestamp % 86400; // 60 * 60 * 24 //
+        long remainder = timestamp % span.segment;
         return new long[] {timestamp - remainder, remainder / span.seconds};
     }
 
@@ -344,7 +328,7 @@ public final class TimeseriesStore<E> {
 
         while (items.size() < maximumSize) {
             if (--segmentIndex == -1) {
-                timeIndex -= 86400; // 60x60x24
+                timeIndex -= span.segment;
                 segment = indexed.get(timeIndex);
 
                 if (segment == null) {
