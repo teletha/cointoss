@@ -10,7 +10,9 @@
 package cointoss.ticker;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -18,7 +20,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.ToLongFunction;
 
-import com.google.common.annotations.VisibleForTesting;
+import cointoss.util.Chrono;
 
 public final class TimeseriesStore<E> {
 
@@ -37,6 +39,23 @@ public final class TimeseriesStore<E> {
     /** A number of items. */
     private int size;
 
+    /** The maximum item size on heap. */
+    private int maximumHeapItem;
+
+    @SuppressWarnings("serial")
+    private final Map<Long, Segment> stats = new LinkedHashMap<>(8, 0.75f, true) {
+
+        @Override
+        protected boolean removeEldestEntry(Entry<Long, Segment> eldest) {
+            if (maximumHeapItem < size()) {
+                persist(eldest.getKey(), eldest.getValue());
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
+
     /**
      * 
      */
@@ -44,6 +63,31 @@ public final class TimeseriesStore<E> {
         this.span = Objects.requireNonNull(span);
         this.length = span.ticksPerDay();
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
+        this.maximumHeapItem = switch (span) {
+            case Second5 -> 2;
+            case Minute1 -> 3;
+            case Minute5 -> 5;
+            case Minute15 -> 10;
+            case Minute30 -> 20;
+            case Hour1 -> 40;
+            case Hour2 -> 80;
+            case Hour4 -> 160;
+            case Hour6 -> 240;
+            case Day1 -> 960;
+            default -> Integer.MAX_VALUE;
+        };
+    }
+
+    /**
+     * Persiste data from heap to disk.
+     * 
+     * @param time
+     * @param segment
+     */
+    private void persist(long time, Segment segment) {
+        System.out.println("Persist data [" + span + "]  " + Chrono.utcBySeconds(time));
+        indexed.remove(time);
+        segment.clear();
     }
 
     /**
@@ -97,6 +141,7 @@ public final class TimeseriesStore<E> {
         if (segment == null) {
             segment = new OnHeap();
             indexed.put(index[0], segment);
+            stats.put(index[0], segment);
         }
         size += segment.set((int) index[1], item);
     }
