@@ -72,7 +72,7 @@ public class Chrono {
     private static long latestDelay;
 
     static {
-        I.schedule(0, 60, TimeUnit.MINUTES, true).to(Chrono::measureTimeDeviation);
+        I.schedule(15, 15 * 60, TimeUnit.SECONDS, true).to(Chrono::measureTimeDeviation);
     }
 
     /**
