@@ -22,7 +22,7 @@ import kiss.I;
 public final class BitFlyer extends MarketServiceProvider {
 
     /** Limitation */
-    private static final int AcquirableSize = 1000;
+    private static final int AcquirableSize = 499;
 
     public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", MarketSetting.with
             .target(Currency.BTC.minimumSize(0.01).scale(8))

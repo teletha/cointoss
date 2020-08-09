@@ -23,11 +23,11 @@ import kiss.Variable;
  */
 public enum Span {
 
-    Second5(5, SECOND_OF_MINUTE, 6, HOUR_OF_DAY, 2, 1),
+    Second5(5, SECOND_OF_MINUTE, 2, HOUR_OF_DAY, 13, 1),
 
-    Minute1(1, MINUTE_OF_HOUR, 1, EPOCH_DAY, 3, 1),
+    Minute1(1, MINUTE_OF_HOUR, 6, HOUR_OF_DAY, 10, 1),
 
-    Minute5(5, MINUTE_OF_HOUR, 1, EPOCH_DAY, 5, 1),
+    Minute5(5, MINUTE_OF_HOUR, 6, HOUR_OF_DAY, 30, 1),
 
     Minute15(15, MINUTE_OF_HOUR, 1, EPOCH_DAY, 10, 1),
 
@@ -127,22 +127,23 @@ public enum Span {
      */
     private Variable<String> unit() {
         switch (unit) {
-        case EPOCH_DAY:
-            return I.translate("days");
+            case EPOCH_DAY:
+                return I.translate("days");
 
-        case HOUR_OF_DAY:
-            return I.translate("hours");
+            case HOUR_OF_DAY:
+                return I.translate("hours");
 
-        case MINUTE_OF_HOUR:
-            return I.translate("mins");
+            case MINUTE_OF_HOUR:
+                return I.translate("mins");
 
-        case SECOND_OF_MINUTE:
-            return I.translate("secs");
+            case SECOND_OF_MINUTE:
+                return I.translate("secs");
 
-        default:
-            // If this exception will be thrown, it is bug of this program. So we must rethrow the
-            // wrapped error in here.
-            throw new Error();
+            default:
+                // If this exception will be thrown, it is bug of this program. So we must rethrow
+                // the
+                // wrapped error in here.
+                throw new Error();
         }
     }
 
