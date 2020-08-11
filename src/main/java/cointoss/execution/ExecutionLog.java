@@ -37,6 +37,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -74,6 +75,9 @@ public class ExecutionLog {
 
     /** The logging system. */
     private static final Logger log = LogManager.getLogger(ExecutionLog.class);
+
+    /** The pseudo id counter for fast log. */
+    private static final AtomicLong FastId = new AtomicLong();
 
     /** NOOP TASK */
     private static final ScheduledFuture NOOP = new ScheduledFuture() {
@@ -793,7 +797,6 @@ public class ExecutionLog {
 
                     CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
                     ticker.ticks.each(tick -> {
-                        long id = tick.openId;
                         Num buy = Num.of(tick.longVolume()).scale(scale).divide(2);
                         Num sell = Num.of(tick.shortVolume()).scale(scale).divide(2);
                         Direction buySide = Direction.BUY;
@@ -817,7 +820,7 @@ public class ExecutionLog {
                         for (int i = 0; i < prices.length; i++) {
                             Execution e = Execution.with.direction(sides[i], sizes[i])
                                     .price(prices[i])
-                                    .id(id + i)
+                                    .id(FastId.getAndIncrement())
                                     .date(tick.openTime().plusSeconds(i))
                                     .consecutive(Execution.ConsecutiveDifference)
                                     .delay(Execution.DelayInestimable);

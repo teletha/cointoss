@@ -403,35 +403,39 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         // track on move
         when(User.MouseMove, User.MouseDrag).to(e -> {
-            double x = axisX.getValueForPosition(e.getX());
-            double y = e.getY();
-            labelX.value.set(x);
-            labelY.value.set(axisY.getValueForPosition(y));
+            chart.ticker.to(ticker -> {
+                double x = axisX.getValueForPosition(e.getX());
+                double y = e.getY();
+                labelX.value.set(x);
+                labelY.value.set(axisY.getValueForPosition(y));
 
-            mouseTrackVertical.layoutLine.requestLayout();
-            mouseTrackHorizontal.layoutLine.requestLayout();
+                mouseTrackVertical.layoutLine.requestLayout();
+                mouseTrackHorizontal.layoutLine.requestLayout();
 
-            // move the start position forward for visual consistency
-            long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+                // move the start position forward for visual consistency
+                long sec = (long) x + ticker.span.duration.toSeconds() / 2;
 
-            // update upper info
-            Tick tick = chart.ticker.v.ticks.at(sec);
+                // update upper info
+                Tick tick = chart.ticker.v.ticks.at(sec);
 
-            if (tick != null) {
-                drawChartInfo(tick);
-            }
-
-            // search the nearest and largest order size
-            chart.market.to(m -> {
-                OrderBookPage largest = m.orderBook.findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
-
-                if (largest != null && orderbookBar != null) {
-                    Num price = largest.rangedPrice();
-                    double position = axisY.getPositionForValue(price.doubleValue());
-                    orderbookDigit.clear()
-                            .strokeColor(price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BuyerColor : SellerColor)
-                            .strokeText((int) largest.size, orderbookDigit.getWidth() - largest.size * orderbookBar.scale - 15, position);
+                if (tick != null) {
+                    drawChartInfo(tick);
                 }
+
+                // search the nearest and largest order size
+                chart.market.to(m -> {
+                    OrderBookPage largest = m.orderBook
+                            .findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
+
+                    if (largest != null && orderbookBar != null) {
+                        Num price = largest.rangedPrice();
+                        double position = axisY.getPositionForValue(price.doubleValue());
+                        orderbookDigit.clear()
+                                .strokeColor(price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BuyerColor : SellerColor)
+                                .strokeText((int) largest.size, orderbookDigit
+                                        .getWidth() - largest.size * orderbookBar.scale - 15, position);
+                    }
+                });
             });
         });
 

@@ -22,9 +22,6 @@ public final class Tick {
     /** Begin time of this tick (epoch second). */
     public final long openTime;
 
-    /** Open id of the period. */
-    public final long openId;
-
     /** Sampled network delay. */
     public final int delay;
 
@@ -67,7 +64,6 @@ public final class Tick {
     private Tick() {
         this.openTime = 0;
         this.delay = 0;
-        this.openId = 0;
         this.openPrice = closePrice = highPrice = lowPrice = Num.ZERO;
     }
 
@@ -81,7 +77,6 @@ public final class Tick {
      */
     Tick(long startEpochSeconds, long id, int delay, Num open, TickerManager realtime) {
         this.openTime = startEpochSeconds;
-        this.openId = id;
         this.delay = delay;
         this.openPrice = this.highPrice = this.lowPrice = open;
 
