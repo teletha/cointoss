@@ -193,7 +193,6 @@ public class OrderBuilder extends View {
         orderPriceInterval.initialize("0")
                 .normalizeInput(Form.NFKC)
                 .acceptPositiveNumberInput()
-                .when(User.Scroll, changeBy(orderPriceAmount))
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount));
 
         optimizeThreshold.initialize(Num.range(0, 200));
@@ -399,14 +398,14 @@ public class OrderBuilder extends View {
 
         ValueStyle<OrderState> State = state -> {
             switch (state) {
-            case REQUESTING:
-                $.descendant(() -> {
-                    font.color($.rgb(80, 80, 80));
-                });
-                break;
+                case REQUESTING:
+                    $.descendant(() -> {
+                        font.color($.rgb(80, 80, 80));
+                    });
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         };
 
