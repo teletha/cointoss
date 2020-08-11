@@ -818,7 +818,7 @@ public class ExecutionLog {
                             Execution e = Execution.with.direction(sides[i], sizes[i])
                                     .price(prices[i])
                                     .id(id + i)
-                                    .date(tick.start().plusSeconds(i))
+                                    .date(tick.openTime().plusSeconds(i))
                                     .consecutive(Execution.ConsecutiveDifference)
                                     .delay(Execution.DelayInestimable);
 

@@ -269,7 +269,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
         assert indicator.valueAt(tick2) == 15d;
 
         // step into next tick
-        manager.update(Execution.with.buy(1).price(20).date(tick2.start().plusSeconds(Span.Minute5.seconds)));
+        manager.update(Execution.with.buy(1).price(20).date(tick2.openTime().plusSeconds(Span.Minute5.seconds)));
         assert indicator.valueAt(tick2) == 15d;
         assert indicator.valueAt(ticker.ticks.at(3 * sec)) == 20d;
     }

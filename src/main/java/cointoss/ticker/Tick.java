@@ -99,7 +99,7 @@ public final class Tick {
      * 
      * @return The start time.
      */
-    public ZonedDateTime start() {
+    public ZonedDateTime openTime() {
         return Chrono.utcByMills(openTime * 1000);
     }
 
@@ -275,7 +275,7 @@ public final class Tick {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("TICK ").append(" ")
-                .append(Chrono.format(start()))
+                .append(Chrono.format(openTime()))
                 .append(" ")
                 .append(openPrice)
                 .append(" ")
