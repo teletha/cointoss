@@ -19,11 +19,8 @@ public final class Tick {
     /** The empty dummy. */
     static final Tick EMPTY = new Tick();
 
-    /** Begin time of the tick (epoch second). */
-    public final long startSeconds;
-
-    /** End time of the tick (epoch second). */
-    public final long endSeconds;
+    /** Begin time of this tick (epoch second). */
+    public final long openTime;
 
     /** Open id of the period. */
     public final long openId;
@@ -68,8 +65,7 @@ public final class Tick {
      * Empty Dummt Tick.
      */
     private Tick() {
-        this.startSeconds = 0;
-        this.endSeconds = 0;
+        this.openTime = 0;
         this.delay = 0;
         this.openId = 0;
         this.openPrice = closePrice = highPrice = lowPrice = Num.ZERO;
@@ -78,15 +74,13 @@ public final class Tick {
     /**
      * New {@link Tick}.
      * 
-     * @param start A start time of period.
-     * @param span A tick span.
+     * @param openTime A start time of period.
      * @param id A open id.
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(long startEpochSeconds, Span span, long id, int delay, Num open, TickerManager realtime) {
-        this.startSeconds = startEpochSeconds;
-        this.endSeconds = startEpochSeconds + span.seconds;
+    Tick(long startEpochSeconds, long id, int delay, Num open, TickerManager realtime) {
+        this.openTime = startEpochSeconds;
         this.openId = id;
         this.delay = delay;
         this.openPrice = this.highPrice = this.lowPrice = open;
@@ -106,16 +100,7 @@ public final class Tick {
      * @return The start time.
      */
     public ZonedDateTime start() {
-        return Chrono.utcByMills(startSeconds * 1000);
-    }
-
-    /**
-     * Retrieve the end time of this {@link Tick}.
-     * 
-     * @return The end time.
-     */
-    public ZonedDateTime end() {
-        return Chrono.utcByMills(endSeconds * 1000);
+        return Chrono.utcByMills(openTime * 1000);
     }
 
     /**
@@ -312,7 +297,7 @@ public final class Tick {
      */
     @Override
     public int hashCode() {
-        return Long.hashCode(startSeconds);
+        return Long.hashCode(openTime);
     }
 
     /**
@@ -325,6 +310,6 @@ public final class Tick {
         }
 
         Tick other = (Tick) obj;
-        return startSeconds == other.startSeconds;
+        return openTime == other.openTime;
     }
 }

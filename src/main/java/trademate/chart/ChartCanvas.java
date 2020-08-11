@@ -624,7 +624,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layout(() -> {
             chart.ticker.to(ticker -> {
                 // estimate visible range
-                chart.ticker.map(v -> v.ticks.last()).map(t -> t.startSeconds - ticker.span.seconds).to(end -> {
+                chart.ticker.map(v -> v.ticks.last()).map(t -> t.openTime - ticker.span.seconds).to(end -> {
                     long start = (long) axisX.computeVisibleMinValue();
 
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
@@ -649,7 +649,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     DoubleArray valueX = new DoubleArray((int) tickSize);
 
                     ticker.ticks.each(start, end, tick -> {
-                        double x = axisX.getPositionForValue(tick.startSeconds);
+                        double x = axisX.getPositionForValue(tick.openTime);
                         double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
                         double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
@@ -746,7 +746,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 Tick tick = ticker.ticks.last();
 
-                double x = axisX.getPositionForValue(tick.startSeconds);
+                double x = axisX.getPositionForValue(tick.openTime);
                 double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
                 double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
                 double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
@@ -760,7 +760,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 Tick previous = ticker.ticks.before(tick);
                 if (previous != null) {
-                    double lastX = axisX.getPositionForValue(previous.startSeconds);
+                    double lastX = axisX.getPositionForValue(previous.openTime);
 
                     for (Plotter plotter : plotters) {
                         if (registry.globalSetting(plotter.origin).visible.is(false)) {
@@ -795,7 +795,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         gc.setFont(InfoFont);
 
         int base = chart.market.v.service.setting.base.scale;
-        String date = Chrono.systemByMills(tick.startSeconds * 1000).format(Chrono.DateTime);
+        String date = Chrono.systemByMills(tick.openTime * 1000).format(Chrono.DateTime);
         String open = CommonText.OpenPrice + " " + tick.openPrice.scale(base);
         String high = CommonText.HighPrice + " " + tick.highPrice().scale(base);
         String low = CommonText.LowPrice + " " + tick.lowPrice().scale(base);

@@ -76,11 +76,11 @@ public final class Indicators {
         private void add(Tick tick) {
             double low = tick.closePrice().doubleValue();
 
-            regression.addData(tick.startSeconds, low);
+            regression.addData(tick.openTime, low);
 
             if (low < minValue) {
                 minValue = low;
-                minTime = tick.startSeconds;
+                minTime = tick.openTime;
             }
         }
 
@@ -89,7 +89,7 @@ public final class Indicators {
          */
         @Override
         protected Num valueAtRounded(Tick tick) {
-            return Num.of(regression.predict(tick.startSeconds));
+            return Num.of(regression.predict(tick.openTime));
         }
     }
 
@@ -124,11 +124,11 @@ public final class Indicators {
         private void add(Tick tick) {
             double high = tick.highPrice.doubleValue();
 
-            regression.addData(tick.startSeconds, high);
+            regression.addData(tick.openTime, high);
 
             if (maxValue < high) {
                 maxValue = high;
-                maxTime = tick.startSeconds;
+                maxTime = tick.openTime;
             }
         }
 
@@ -137,7 +137,7 @@ public final class Indicators {
          */
         @Override
         protected Num valueAtRounded(Tick tick) {
-            return Num.of(regression.predict(tick.startSeconds) + (maxValue - regression.predict(maxTime)));
+            return Num.of(regression.predict(tick.openTime) + (maxValue - regression.predict(maxTime)));
         }
     }
 

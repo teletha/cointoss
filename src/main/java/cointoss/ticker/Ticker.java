@@ -51,7 +51,7 @@ public final class Ticker implements Disposable {
     Ticker(Span span) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
-        this.ticks = new TimeseriesStore<Tick>(span, tick -> tick.startSeconds);
+        this.ticks = new TimeseriesStore<Tick>(span, tick -> tick.openTime);
     }
 
     /**
@@ -62,7 +62,7 @@ public final class Ticker implements Disposable {
      */
     final void init(Execution execution, TickerManager realtime) {
         current = new Tick(span.calculateStartTime(execution.date)
-                .toEpochSecond(), span, execution.id, execution.delay, execution.price, realtime);
+                .toEpochSecond(), execution.id, execution.delay, execution.price, realtime);
 
         ticks.store(current);
         opening.accept(current);
@@ -77,24 +77,24 @@ public final class Ticker implements Disposable {
      */
     final boolean createTick(Execution execution, TickerManager realtime) {
         // Make sure whether the execution does not exceed the end time of current tick.
-        if (!execution.isBeforeSeconds(current.endSeconds)) {
+        if (!execution.isBeforeSeconds(current.openTime + span.seconds)) {
 
             // If the end time of current tick does not reach the start time of tick which
             // execution actually belongs to, it is assumed that there was a blank time
             // (i.e. server error, maintenance). So we complement them in advance.
             ZonedDateTime start = span.calculateStartTime(execution.date);
 
-            while (current.endSeconds < start.toEpochSecond()) {
+            while (current.openTime + span.seconds < start.toEpochSecond()) {
                 current.freeze();
                 closing.accept(current);
-                current = new Tick(current.endSeconds, span, execution.id, execution.delay, current.closePrice(), realtime);
+                current = new Tick(current.openTime + span.seconds, execution.id, execution.delay, current.closePrice(), realtime);
                 ticks.store(current);
             }
 
             // create the latest tick for execution
             current.freeze();
             closing.accept(current);
-            current = new Tick(current.endSeconds, span, execution.id, execution.delay, execution.price, realtime);
+            current = new Tick(current.openTime + span.seconds, execution.id, execution.delay, execution.price, realtime);
             ticks.store(current);
             opening.accept(current);
             return true;

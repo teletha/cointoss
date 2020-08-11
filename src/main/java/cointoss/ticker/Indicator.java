@@ -21,7 +21,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
      */
     protected Indicator(Ticker ticker) {
         this(ticker, tick -> {
-            Tick rounded = ticker.ticks.at(tick.startSeconds);
+            Tick rounded = ticker.ticks.at(tick.openTime);
             return rounded == null ? ticker.ticks.first() : rounded;
         });
     }
@@ -81,7 +81,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
         Objects.requireNonNull(calculator);
 
         Function<Tick, Tick> normalizer = tick -> {
-            Tick rounded = ticker.ticks.at(tick.startSeconds);
+            Tick rounded = ticker.ticks.at(tick.openTime);
             return rounded == null ? ticker.ticks.first() : rounded;
         };
 
