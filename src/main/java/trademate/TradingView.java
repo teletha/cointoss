@@ -155,19 +155,19 @@ public class TradingView extends View {
         if (service == BitFlyer.FX_BTC_JPY) {
             diposer = SFD.now() //
                     .take(chart.showRealtimeUpdate.observing())
+                    .diff()
                     .on(Viewtify.UIThread)
-                    .to(e -> {
-                        tab.textV(title, price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay));
-                    }, error);
+                    .effectOnce(e -> tab.textV(title, price))
+                    .to(e -> price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay), error);
         } else {
             diposer = service.executionsRealtimely()
                     .take(chart.showRealtimeUpdate.observe())
                     .startWith(service.executionLatest())
+                    .diff()
                     .retryWhen(service.retryPolicy(100, "Title"))
                     .on(Viewtify.UIThread)
-                    .to(e -> {
-                        tab.textV(title, price.text(e.price));
-                    }, error);
+                    .effectOnce(e -> tab.textV(title, price))
+                    .to(e -> price.text(e.price), error);
         }
         service.add(diposer);
     }
