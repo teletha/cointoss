@@ -17,6 +17,9 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import antibug.CleanRoom;
+import psychopath.Locator;
+
 class TimeseriesStoreTest {
     int days = 60 * 60 * 24;
 
@@ -358,5 +361,18 @@ class TimeseriesStoreTest {
         assert store.beforeWith(2 * days, 1).equals(List.of(2 * days));
         assert store.beforeWith(2 * days + 1, 5).equals(List.of(2 * days, days, 0));
         assert store.beforeWith(4 * days, 3).equals(List.of(4 * days, 3 * days, 2 * days));
+    }
+
+    CleanRoom room = new CleanRoom();
+
+    @Test
+    void store() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        store.store(0, 5, 10, 15, 20, 25, 30);
+        store.enableDiskStore(Locator.directory(room.root), v -> new String[] {String.valueOf(v)}, v -> Integer.valueOf(v[0]));
+
+        store.store((int) Span.Second5.segment);
+        store.store((int) Span.Second5.segment * 2);
+        store.store((int) Span.Second5.segment * 3);
     }
 }

@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,6 +31,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.util.Chrono;
 import psychopath.Directory;
 import psychopath.File;
+import psychopath.Locator;
 
 public final class TimeseriesStore<E> {
 
@@ -455,7 +457,7 @@ public final class TimeseriesStore<E> {
     /**
      * On heap container.
      */
-    private class OnHeap extends Segment {
+    private class OnHeap extends Segment implements Serializable {
 
         /** The managed items. */
         private E[] items = (E[]) new Object[length];
@@ -688,7 +690,7 @@ public final class TimeseriesStore<E> {
          * @return
          */
         private File name(long time) {
-            return root.file(Chrono.DateTimeWithT.format(Chrono.utcBySeconds(time)) + ".cache");
+            return root.file(Chrono.DateTimeCompact.format(Chrono.utcBySeconds(time)) + ".cache");
         }
     }
 }
