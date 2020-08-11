@@ -71,11 +71,10 @@ public final class Tick {
      * New {@link Tick}.
      * 
      * @param openTime A start time of period.
-     * @param id A open id.
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(long startEpochSeconds, long id, int delay, Num open, TickerManager realtime) {
+    Tick(long startEpochSeconds, int delay, Num open, TickerManager realtime) {
         this.openTime = startEpochSeconds;
         this.delay = delay;
         this.openPrice = this.highPrice = this.lowPrice = open;
