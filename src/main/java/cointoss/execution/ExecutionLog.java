@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -66,7 +66,6 @@ import kiss.Observer;
 import kiss.Signal;
 import psychopath.Directory;
 import psychopath.File;
-import psychopath.Locator;
 
 /**
  * {@link Execution} Log Manager.
@@ -180,7 +179,7 @@ public class ExecutionLog {
      * @param provider
      */
     public ExecutionLog(MarketService service) {
-        this(service, Locator.directory(".log").directory(service.exchangeName).directory(service.marketName));
+        this(service, service.directory());
     }
 
     /**
@@ -610,6 +609,7 @@ public class ExecutionLog {
          * @param types
          * @return
          */
+        @SuppressWarnings("resource")
         private Signal<Execution> read(LogType... types) {
             LogType type = types == null || types.length == 0 ? LogType.Normal : types[0];
             Stopwatch stopwatch = Stopwatch.createUnstarted();

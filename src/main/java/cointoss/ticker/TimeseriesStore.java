@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,9 +19,17 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.ToLongFunction;
 
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
+
 import cointoss.util.Chrono;
+import psychopath.Directory;
+import psychopath.File;
 
 public final class TimeseriesStore<E> {
 
@@ -38,6 +47,9 @@ public final class TimeseriesStore<E> {
 
     /** A number of items. */
     private int size;
+
+    /** The disk store. */
+    private DiskStore store;
 
     @SuppressWarnings("serial")
     private final Map<Long, Segment> stats = new LinkedHashMap<>(8, 0.75f, true) {
@@ -69,9 +81,36 @@ public final class TimeseriesStore<E> {
      * @param segment
      */
     private void persist(long time, Segment segment) {
-        System.out.println("Persist data [" + span + "]  " + Chrono.utcBySeconds(time));
+        if (store != null) {
+            store.store(time, segment);
+        }
         indexed.remove(time);
         segment.clear();
+    }
+
+    /**
+     * Enable the transparent disk persistence.
+     * 
+     * @param store A root directory to store data.
+     * @param encoder A date serializer.
+     * @param decoder A date deserializer.
+     * @return Chainable API.
+     */
+    public synchronized TimeseriesStore<E> enableDiskStore(Directory store, Function<E, String[]> encoder, Function<String[], E> decoder) {
+        if (store != null && this.store == null && encoder != null && decoder != null) {
+            this.store = new DiskStore(store, encoder, decoder);
+        }
+        return this;
+    }
+
+    /**
+     * Disable the transparent disk persistence.
+     * 
+     * @return
+     */
+    public synchronized TimeseriesStore<E> disableDiskStore() {
+        this.store = null;
+        return this;
     }
 
     /**
@@ -398,6 +437,14 @@ public final class TimeseriesStore<E> {
          * Get the time series items stored from the specified start index (inclusive) to end index
          * (exclusive) in ascending order.
          * 
+         * @param each An item processor.
+         */
+        abstract void each(Consumer<? super E> each);
+
+        /**
+         * Get the time series items stored from the specified start index (inclusive) to end index
+         * (exclusive) in ascending order.
+         * 
          * @param start A start index (included).
          * @param end A end index (exclusive).
          * @param each An item processor.
@@ -478,6 +525,14 @@ public final class TimeseriesStore<E> {
          * {@inheritDoc}
          */
         @Override
+        void each(Consumer<? super E> each) {
+            each(min, max, each);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         void each(int start, int end, Consumer<? super E> consumer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
@@ -552,7 +607,88 @@ public final class TimeseriesStore<E> {
          * {@inheritDoc}
          */
         @Override
+        void each(Consumer<? super E> each) {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         void each(int start, int end, Consumer<? super E> each) {
+        }
+    }
+
+    /**
+     * 
+     */
+    private class DiskStore {
+
+        /** The disk store. */
+        private final Directory root;
+
+        /** The data serializer. */
+        private final Function<E, String[]> encoder;
+
+        /** The data deserializer. */
+        private final Function<String[], E> decoder;
+
+        /**
+         * @param root
+         * @param encoder
+         * @param decoder
+         */
+        private DiskStore(Directory root, Function<E, String[]> encoder, Function<String[], E> decoder) {
+            this.root = root;
+            this.encoder = encoder;
+            this.decoder = decoder;
+
+            // read all caches
+            root.walkFile("*.cache").to(file -> {
+
+            });
+        }
+
+        private void store(long time, Segment segment) {
+            File file = name(time);
+
+            if (file.isAbsent()) {
+                CsvWriterSettings setting = new CsvWriterSettings();
+                setting.getFormat().setDelimiter(' ');
+                setting.getFormat().setComment('無');
+
+                CsvWriter writer = new CsvWriter(file.newOutputStream(), StandardCharsets.ISO_8859_1, setting);
+                segment.each(item -> {
+                    writer.writeRow(encoder.apply(item));
+                });
+                writer.close();
+                System.out.println("Persist data [" + span + "]  at " + file);
+            }
+        }
+
+        private void restore(long time) {
+            File file = name(time);
+
+            if (file.isPresent()) {
+                CsvParserSettings setting = new CsvParserSettings();
+                setting.getFormat().setDelimiter(' ');
+                setting.getFormat().setComment('無');
+
+                CsvParser parser = new CsvParser(setting);
+                parser.iterate(file.newInputStream(), StandardCharsets.ISO_8859_1).forEach(values -> {
+                    E item = decoder.apply(values);
+                    System.out.println(item);
+                });
+            }
+        }
+
+        /**
+         * Compute cache file name by epoch second.
+         * 
+         * @param time
+         * @return
+         */
+        private File name(long time) {
+            return root.file(Chrono.DateTimeWithT.format(Chrono.utcBySeconds(time)) + ".cache");
         }
     }
 }

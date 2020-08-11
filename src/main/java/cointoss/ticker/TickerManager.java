@@ -23,12 +23,6 @@ public final class TickerManager implements Disposable {
     /** The latest execution. */
     public final Variable<Execution> latest = Variable.of(Market.BASE);
 
-    /** Total of long count since application startup. */
-    int longCount = 0;
-
-    /** Total of losscut long count since application startup. */
-    int longLosscutCount = 0;
-
     /** Total of long volume since application startup. */
     double longVolume = 0;
 
@@ -37,12 +31,6 @@ public final class TickerManager implements Disposable {
 
     /** Total of long price increase since application startup. */
     double longPriceIncrease = 0;
-
-    /** Total of short count since application startup. */
-    int shortCount = 0;
-
-    /** Total of losscut short count since application startup. */
-    int shortLosscutCount = 0;
 
     /** Total of short volume since application startup. */
     double shortVolume = 0;
@@ -121,19 +109,15 @@ public final class TickerManager implements Disposable {
 
         // update total related values
         if (e.direction == Direction.BUY) {
-            longCount++;
             longVolume += e.size.doubleValue();
             longPriceIncrease += e.price.doubleValue() - latest.v.price.doubleValue();
             if (e.delay == Execution.DelayHuge) {
-                shortLosscutCount++;
                 shortLosscutVolume += e.size.doubleValue();
             }
         } else {
-            shortCount++;
             shortVolume += e.size.doubleValue();
             shortPriceDecrease += latest.v.price.doubleValue() - e.price.doubleValue();
             if (e.delay == Execution.DelayHuge) {
-                longLosscutCount++;
                 longLosscutVolume += e.size.doubleValue();
             }
         }
@@ -158,16 +142,16 @@ public final class TickerManager implements Disposable {
         } else {
             // If a new tick is not added, the maximum value and the minimum value will be updated.
             switch (comparisonResult) {
-            case 1:
-                // If it is higher than the previous price, since it is impossible to update the
-                // minimum price in all upper tickers, only update the maximum price.
-                updateHighPrice(ticker, price);
-                break;
-            case -1:
-                // If it is lower than the previous price, since it is impossible to update the
-                // maximum price in all upper tickers, only update the minimum price.
-                updateLowPrice(ticker, price);
-                break;
+                case 1:
+                    // If it is higher than the previous price, since it is impossible to update the
+                    // minimum price in all upper tickers, only update the maximum price.
+                    updateHighPrice(ticker, price);
+                    break;
+                case -1:
+                    // If it is lower than the previous price, since it is impossible to update the
+                    // maximum price in all upper tickers, only update the minimum price.
+                    updateLowPrice(ticker, price);
+                    break;
             }
         }
     }

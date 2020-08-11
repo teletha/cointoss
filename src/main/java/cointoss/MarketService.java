@@ -36,6 +36,8 @@ import kiss.Disposable;
 import kiss.Encoder;
 import kiss.Signal;
 import kiss.Variable;
+import psychopath.Directory;
+import psychopath.Locator;
 
 public abstract class MarketService implements Disposable {
 
@@ -105,6 +107,15 @@ public abstract class MarketService implements Disposable {
      */
     public final String marketReadableName() {
         return marketIdentity().replaceAll("_", "");
+    }
+
+    /**
+     * Returns the root directory of this service.
+     * 
+     * @return
+     */
+    public final Directory directory() {
+        return Locator.directory(".log").directory(exchangeName).directory(marketName);
     }
 
     /**

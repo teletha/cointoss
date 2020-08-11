@@ -46,12 +46,6 @@ public final class Tick {
     /** The realtime execution statistic. */
     TickerManager realtime;
 
-    /** Snapshot of long count at tick initialization. */
-    int longCount;
-
-    /** Snapshot of losscut long count at tick initialization. */
-    int longLosscutCount;
-
     /** Snapshot of long volume at tick initialization. */
     double longVolume;
 
@@ -60,12 +54,6 @@ public final class Tick {
 
     /** Snapshot of long price increase at tick initialization. */
     double longPriceIncrease;
-
-    /** Snapshot of short count at tick initialization. */
-    int shortCount;
-
-    /** Snapshot of losscut short count at tick initialization. */
-    int shortLosscutCount;
 
     /** Snapshot of short volume at tick initialization. */
     double shortVolume;
@@ -104,15 +92,11 @@ public final class Tick {
         this.openPrice = this.highPrice = this.lowPrice = open;
 
         this.realtime = realtime;
-        this.longCount = realtime.longCount;
         this.longVolume = realtime.longVolume;
         this.longPriceIncrease = realtime.longPriceIncrease;
-        this.longLosscutCount = realtime.longLosscutCount;
         this.longLosscutVolume = realtime.longLosscutVolume;
-        this.shortCount = realtime.shortCount;
         this.shortVolume = realtime.shortVolume;
         this.shortPriceDecrease = realtime.shortPriceDecrease;
-        this.shortLosscutCount = realtime.shortLosscutCount;
         this.shortLosscutVolume = realtime.shortLosscutVolume;
     }
 
@@ -201,13 +185,6 @@ public final class Tick {
 
     /**
      * Retrieve the tick related value.
-     */
-    public int longCount() {
-        return realtime == null ? longCount : realtime.longCount - longCount;
-    }
-
-    /**
-     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
@@ -227,22 +204,8 @@ public final class Tick {
     /**
      * Retrieve the tick related value.
      */
-    public int longLosscutCount() {
-        return realtime == null ? longLosscutCount : realtime.longLosscutCount - longLosscutCount;
-    }
-
-    /**
-     * Retrieve the tick related value.
-     */
     public double longLosscutVolume() {
         return realtime == null ? longLosscutVolume : realtime.longLosscutVolume - longLosscutVolume;
-    }
-
-    /**
-     * Retrieve the tick related value.
-     */
-    public int shortCount() {
-        return realtime == null ? shortCount : realtime.shortCount - shortCount;
     }
 
     /**
@@ -261,13 +224,6 @@ public final class Tick {
      */
     public double shortPriceDecrease() {
         return realtime == null ? shortPriceDecrease : realtime.shortPriceDecrease - shortPriceDecrease;
-    }
-
-    /**
-     * Retrieve the tick related value.
-     */
-    public int shortLosscutCount() {
-        return realtime == null ? shortLosscutCount : realtime.shortLosscutCount - shortLosscutCount;
     }
 
     /**
@@ -301,15 +257,11 @@ public final class Tick {
      */
     void freeze() {
         closePrice = closePrice();
-        longCount = longCount();
         longVolume = longVolume();
         longPriceIncrease = longPriceIncrease();
-        longLosscutCount = longLosscutCount();
         longLosscutVolume = longLosscutVolume();
-        shortCount = shortCount();
         shortVolume = shortVolume();
         shortPriceDecrease = shortPriceDecrease();
-        shortLosscutCount = shortLosscutCount();
         shortLosscutVolume = shortLosscutVolume();
         realtime = null;
     }

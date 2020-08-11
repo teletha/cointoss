@@ -23,6 +23,7 @@ import java.util.function.Function;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
@@ -104,6 +105,14 @@ public class Market implements Disposable {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
         this.orderBook = new OrderBookManager(service);
+
+        if (service == BitFlyer.FX_BTC_JPY) {
+            // tickers.on(Span.Second5).ticks.enableDiskStore(service.directory(), tick -> {
+            // return null;
+            // }, values -> {
+            // return null;
+            // });
+        }
 
         // build tickers for each span
         timeline.to(tickers::update);

@@ -17,17 +17,9 @@ public class RealtimeTicker {
 
     private final RingBuffer<Tick> ticks;
 
-    private int longCount;
-
-    private int longLosscutCount;
-
     private double longVolume;
 
     private double longLosscutVolume;
-
-    private int shortCount;
-
-    private int shortLosscutCount;
 
     private double shortVolume;
 
@@ -43,45 +35,25 @@ public class RealtimeTicker {
             Tick removed = ticks.add(latest);
             if (removed == null) removed = Tick.EMPTY;
 
-            longCount += latest.longCount - removed.longCount;
             longVolume += latest.longVolume - removed.longVolume;
-            longLosscutCount += latest.longLosscutCount - removed.longLosscutCount;
             longLosscutVolume += latest.longLosscutVolume - removed.longLosscutVolume;
-            shortCount += latest.shortCount - removed.shortCount;
             shortVolume += latest.shortVolume - removed.shortVolume;
-            shortLosscutCount += latest.shortLosscutCount - removed.shortLosscutCount;
             shortLosscutVolume += latest.shortLosscutVolume - removed.shortLosscutVolume;
 
             latest = tick;
         });
     }
 
-    public int longCount() {
-        return longCount + latest.longCount();
-    }
-
     public double longVolume() {
         return longVolume + latest.longVolume();
-    }
-
-    public int longLosscutCount() {
-        return longLosscutCount + latest.longLosscutCount();
     }
 
     public double longLosscutVolume() {
         return longLosscutVolume + latest.longLosscutVolume();
     }
 
-    public int shortCount() {
-        return shortCount + latest.shortCount();
-    }
-
     public double shortVolume() {
         return shortVolume + latest.shortVolume();
-    }
-
-    public int shortLosscutCount() {
-        return shortLosscutCount + latest.shortLosscutCount();
     }
 
     public double shortLosscutVolume() {

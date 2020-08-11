@@ -33,21 +33,11 @@ public class ExecutionView extends View {
 
     private UILabel delay;
 
-    private UILabel countLong;
-
-    private UILabel countShort;
-
-    private UILabel countRatio;
-
     private UILabel volumeLong;
 
     private UILabel volumeShort;
 
     private UILabel volumeRatio;
-
-    private UILabel losscutCountLong;
-
-    private UILabel losscutCountShort;
 
     private UILabel losscutVolumeLong;
 
@@ -69,10 +59,8 @@ public class ExecutionView extends View {
         {
             $(vbox, style.root, FormLabelMin, () -> {
                 form(en("Delay"), delay);
-                form(en("Count"), FormInputMin, countLong.style(Long), countShort.style(Short), countRatio);
                 form(en("Volume"), FormInputMin, volumeLong.style(Long), volumeShort.style(Short), volumeRatio);
-                form(en("Losscut"), FormInputMin, losscutCountLong.style(Long), losscutCountShort.style(Short));
-                form(en("Losssize"), FormInputMin, losscutVolumeLong.style(Long), losscutVolumeShort.style(Short));
+                form(en("Losscut"), FormInputMin, losscutVolumeLong.style(Long), losscutVolumeShort.style(Short));
                 form(en("Spread"), FormInputMin, spread);
 
                 $(hbox, () -> {
@@ -129,21 +117,12 @@ public class ExecutionView extends View {
 
         RealtimeTicker realtime = view.market.tickers.realtime(60);
         Chrono.seconds().take(view.chart.showRealtimeUpdate).on(Viewtify.UIThread).to(() -> {
-            int longCount = realtime.longCount();
-            int shortCount = realtime.shortCount();
             double longVolume = realtime.longVolume();
             double shortVolume = realtime.shortVolume();
-
-            countLong.text(longCount);
-            countShort.text(shortCount);
-            countRatio.text(Primitives.percent(longCount, longCount + shortCount));
 
             volumeLong.text(Primitives.roundString(longVolume, 1));
             volumeShort.text(Primitives.roundString(shortVolume, 1));
             volumeRatio.text(Primitives.percent(longVolume, longVolume + shortVolume));
-
-            losscutCountLong.text(realtime.longLosscutCount());
-            losscutCountShort.text(realtime.shortLosscutCount());
 
             losscutVolumeLong.text(Primitives.roundString(realtime.longLosscutVolume(), 1));
             losscutVolumeShort.text(Primitives.roundString(realtime.shortLosscutVolume(), 1));
