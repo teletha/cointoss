@@ -1211,7 +1211,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             GraphicsContext gc = orderbook.getGraphicsContext2D();
             gc.setStroke(color);
 
-            for (OrderBookPage page : pages) {
+            for (int i = 0, size = pages.size(); i < size; i++) {
+                OrderBookPage page = pages.get(i);
                 if (page.size < hideSize) {
                     continue; // hiding
                 }

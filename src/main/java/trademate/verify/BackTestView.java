@@ -407,7 +407,7 @@ public class BackTestView extends View implements Analyzer {
     public void initialize(Market market, List<Trader> traders) {
         verifying.set(true);
 
-        chart.reduceRealtimeUpdate();
+        chart.enableRealtimeUpdate(false);
         chart.market.set(market);
         chart.scripts.clear();
         chart.scripts.addAll(I.signal(traders)

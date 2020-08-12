@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -154,6 +155,14 @@ public class OrderBook {
      */
     public final Iterable<OrderBookPage> ascendingPages() {
         return group.pages.values();
+    }
+
+    public final ConcurrentNavigableMap<Num, OrderBookPage> headMap(Num price) {
+        return group.pages.headMap(price, true);
+    }
+
+    public final ConcurrentNavigableMap<Num, OrderBookPage> tailMap(Num price) {
+        return group.pages.tailMap(price, true);
     }
 
     /**

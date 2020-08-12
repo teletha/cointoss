@@ -79,7 +79,7 @@ public class ChartView extends View {
     public final Variable<Boolean> showPositionSupport = Variable.of(true);
 
     /** The chart configuration. */
-    public final Variable<Boolean> showRealtimeUpdate = Variable.of(true);
+    public final Variable<Boolean> showRealtimeUpdate = Variable.of(false);
 
     /** The chart configuration. */
     public final Variable<Boolean> showIndicator = Variable.of(true);
@@ -173,25 +173,11 @@ public class ChartView extends View {
     }
 
     /**
-     * Restore realtime UI updating.
-     */
-    public void restoreRealtimeUpdate() {
-        realtimeUpdate(true);
-    }
-
-    /**
-     * Reduce realtime UI updating.
-     */
-    public void reduceRealtimeUpdate() {
-        realtimeUpdate(false);
-    }
-
-    /**
      * Change realtime UI updating strategy.
      * 
      * @param state
      */
-    private void realtimeUpdate(boolean state) {
+    public void enableRealtimeUpdate(boolean state) {
         showOrderSupport.set(state);
         showPositionSupport.set(state);
         showRealtimeUpdate.set(state);
