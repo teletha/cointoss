@@ -176,11 +176,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        String bidName = isFutures ? "b" : "bids";
-        String askName = isFutures ? "a" : "asks";
-
-        return clientRealtimely().subscribe(new Topic("depth", marketName))
-                .map(json -> convertOrderBook(json.get("data"), bidName, askName));
+        return clientRealtimely().subscribe(new Topic("depth", marketName)).map(json -> convertOrderBook(json.get("data"), "b", "a"));
     }
 
     /**
