@@ -219,7 +219,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
         Objects.requireNonNull(timing);
         Objects.requireNonNull(builder);
 
-        add(timing.take(disable::isEmpty).to(value -> {
+        add(timing.take(v -> disable.isEmpty()).to(value -> {
             Scenario scenario = builder.apply(value);
 
             if (scenario != null) {
