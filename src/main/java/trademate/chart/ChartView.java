@@ -76,12 +76,6 @@ public class ChartView extends View {
     public final Variable<Boolean> showOrderSupport = Variable.of(true);
 
     /** The chart configuration. */
-    public final Variable<Boolean> showPositionSupport = Variable.of(true);
-
-    /** The chart configuration. */
-    public final Variable<Boolean> showIndicator = Variable.of(true);
-
-    /** The chart configuration. */
     public final Variable<Boolean> showRealtimeUpdate = Variable.of(false);
 
     /** The additional scripts. */
@@ -170,21 +164,6 @@ public class ChartView extends View {
                     v.ⅱ.orderBook.shorts.groupBy(v.ⅰ);
                 });
 
-    }
-
-    /**
-     * Change realtime UI updating strategy.
-     * 
-     * @param enable
-     */
-    public void enableRealtimeUpdate(boolean enable) {
-        showOrderSupport.set(enable);
-        showPositionSupport.set(enable);
-        showIndicator.set(enable);
-        showRealtimeUpdate.set(enable);
-
-        showLatestPrice.value(enable);
-        showOrderbook.value(enable);
     }
 
     /**

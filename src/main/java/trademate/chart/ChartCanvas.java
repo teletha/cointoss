@@ -548,6 +548,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void visualizeOrderPrice() {
         chart.market.observe()
+                .take(chart.showRealtimeUpdate)
                 .switchMap(m -> m.orders.manages())
                 .switchOn(chart.showOrderSupport.observing())
                 .on(Viewtify.UIThread)
@@ -568,6 +569,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeLatestPrice() {
         chart.market.observing() //
                 .skipNull()
+                .take(chart.showRealtimeUpdate)
                 .switchMap(m -> m.tickers.latest.observing().map(Execution::price))
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
@@ -850,6 +852,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             orderbook.clear();
 
             chart.market.to(m -> {
+                System.out.println("Layout orderbook at " + chart.market.v.service.marketIdentity());
                 orderbookBar = new OrderbookBar(m);
                 orderbookBar.draw();
             });

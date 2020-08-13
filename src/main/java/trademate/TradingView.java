@@ -123,10 +123,10 @@ public class TradingView extends View {
         Viewtify.inWorker(() -> {
             whileLoading = true;
             boolean update = chart.showRealtimeUpdate.exact();
-            chart.enableRealtimeUpdate(false);
+            chart.showRealtimeUpdate.set(false);
             chart.market.set(market);
             market.readLog(log -> log.fromLast(9, LogType.Fast));
-            chart.enableRealtimeUpdate(update);
+            chart.showRealtimeUpdate.set(update);
             whileLoading = false;
 
             I.make(TradeMate.class).requestLazyInitialization();
