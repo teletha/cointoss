@@ -126,6 +126,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart UI */
     private final LineMark sfdPrice;
 
+    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
+    final LayoutAssistant layoutCandle = new LayoutAssistant(this);
+
+    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
+    private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
+
+    /** Flag whether orderbook shoud layout on the next rendering phase or not. */
+    private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
+
     /** Chart UI */
     private final EnhancedCanvas candles = new EnhancedCanvas().bindSizeTo(this);
 
@@ -133,12 +142,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final EnhancedCanvas candleLatest = new EnhancedCanvas().bindSizeTo(this);
 
     /** Chart UI */
-    private final EnhancedCanvas orderbook = new EnhancedCanvas().bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
+    private final EnhancedCanvas orderbook = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
+            .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
             .fontSize(8)
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas orderbookDigit = new EnhancedCanvas().bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
+    private final EnhancedCanvas orderbookDigit = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
+            .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
             .fontSize(8)
             .textBaseLine(VPos.CENTER);
 
@@ -150,15 +161,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Chart UI */
     private final EnhancedCanvas supporter = new EnhancedCanvas().bindSizeTo(this);
-
-    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
-    final LayoutAssistant layoutCandle = new LayoutAssistant(this);
-
-    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
-
-    /** Flag whether orderbook shoud layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
 
     /** The script registry. */
     private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
@@ -248,8 +250,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.candleType.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
-                .layoutWhile(chart.showRealtimeUpdate.observing())
-                .invisible(candleLatest);
+                .layoutWhile(chart.showRealtimeUpdate.observing());
         layoutOrderbook.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
@@ -257,8 +258,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.market.observe()
                         .map(m -> m.orderBook)
                         .flatMap(b -> b.longs.update.merge(b.shorts.update).throttle(1, TimeUnit.SECONDS)))
-                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing())
-                .invisible(orderbook, orderbookDigit);
+                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
 
         configIndicator();
         visualizeOrderPrice();
