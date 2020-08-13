@@ -248,7 +248,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.candleType.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
-                .layoutWhile(chart.showRealtimeUpdate.observing());
+                .layoutWhile(chart.showRealtimeUpdate.observing())
+                .invisible(candleLatest);
         layoutOrderbook.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())

@@ -60,7 +60,7 @@ public class TradingView extends View {
 
     private UICheckBox showOrderBuilder;
 
-    private boolean whileLoading = false;
+    public boolean whileLoading = false;
 
     /**
      * @param tab

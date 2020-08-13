@@ -135,7 +135,7 @@ public class ExecutionView extends View {
         executionCumulativeList.render((label, e) -> update(label, e, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
 
         // load big taker log
-        view.service.add(view.market.timelineByTaker.take(view.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
+        view.service.add(view.market.timelineByTaker.skip(v -> view.whileLoading).on(Viewtify.UIThread).to(e -> {
             if (1 <= e.accumulative) {
                 executionCumulativeList.addItemAtFirst(e);
 
