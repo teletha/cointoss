@@ -136,10 +136,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
 
     /** Chart UI */
-    private final EnhancedCanvas candles = new EnhancedCanvas().bindSizeTo(this);
+    private final EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout).bindSizeTo(this);
 
     /** Chart UI */
-    private final EnhancedCanvas candleLatest = new EnhancedCanvas().bindSizeTo(this);
+    private final EnhancedCanvas candleLatest = new EnhancedCanvas().visibleWhen(layoutCandleLatest.canLayout).bindSizeTo(this);
 
     /** Chart UI */
     private final EnhancedCanvas orderbook = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)

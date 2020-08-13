@@ -160,14 +160,14 @@ public class TradingView extends View {
 
         if (service == BitFlyer.FX_BTC_JPY) {
             diposer = SFD.now() //
-                    .skip(v -> isLoading.v)
+                    .switchOff(isLoading())
                     .diff()
                     .on(Viewtify.UIThread)
                     .effectOnce(e -> tab.textV(title, price))
                     .to(e -> price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay), error);
         } else {
             diposer = service.executionsRealtimely()
-                    .skip(v -> isLoading.v)
+                    .switchOff(isLoading())
                     .startWith(service.executionLatest())
                     .diff()
                     .retryWhen(service.retryPolicy(100, "Title"))
