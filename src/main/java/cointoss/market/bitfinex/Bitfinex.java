@@ -22,7 +22,7 @@ public final class Bitfinex extends MarketServiceProvider {
     private static final int AcquirableSize = 10000;
 
     /** Market */
-    public static final MarketService BTC_USD = new BitfinexService("BTCUSD", MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
+    static final MarketService BTC_USD = new BitfinexService("BTCUSD", MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 

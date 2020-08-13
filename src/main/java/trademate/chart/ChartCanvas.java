@@ -256,7 +256,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.market.observe()
                         .map(m -> m.orderBook)
                         .flatMap(b -> b.longs.update.merge(b.shorts.update).throttle(1, TimeUnit.SECONDS)))
-                .layoutWhile(chart.showRealtimeUpdate.observing());
+                .layoutWhile(chart.showOrderbook.observing(), chart.showRealtimeUpdate.observing());
 
         configIndicator();
         visualizeOrderPrice();
@@ -849,12 +849,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             orderbook.clear();
 
-            if (chart.showOrderbook.value()) {
-                chart.market.to(m -> {
-                    orderbookBar = new OrderbookBar(m);
-                    orderbookBar.draw();
-                });
-            }
+            chart.market.to(m -> {
+                orderbookBar = new OrderbookBar(m);
+                orderbookBar.draw();
+            });
         });
     }
 

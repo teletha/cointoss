@@ -19,7 +19,6 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.util.Primitives;
 import kiss.Disposable;
 import kiss.I;
-import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -61,7 +60,7 @@ public class TradingView extends View {
 
     private UICheckBox showOrderBuilder;
 
-    private Variable<Boolean> whileLoading = Variable.of(false);
+    private boolean whileLoading = false;
 
     /**
      * @param tab
@@ -120,15 +119,15 @@ public class TradingView extends View {
     protected void initialize() {
         configContextMenuOnTab();
 
-        Viewtify.observing(tab.selectedProperty()).to(chart::enableRealtimeUpdate);
+        Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
         Viewtify.inWorker(() -> {
-            whileLoading.set(true);
-            boolean originState = chart.showRealtimeUpdate.v;
+            whileLoading = true;
+            boolean update = chart.showRealtimeUpdate.exact();
             chart.enableRealtimeUpdate(false);
             chart.market.set(market);
             market.readLog(log -> log.fromLast(9, LogType.Fast));
-            chart.enableRealtimeUpdate(originState);
-            whileLoading.set(false);
+            chart.enableRealtimeUpdate(update);
+            whileLoading = false;
 
             I.make(TradeMate.class).requestLazyInitialization();
         });
@@ -159,14 +158,14 @@ public class TradingView extends View {
 
         if (service == BitFlyer.FX_BTC_JPY) {
             diposer = SFD.now() //
-                    .skip(v -> whileLoading.v)
+                    .skip(v -> whileLoading)
                     .diff()
                     .on(Viewtify.UIThread)
                     .effectOnce(e -> tab.textV(title, price))
                     .to(e -> price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay), error);
         } else {
             diposer = service.executionsRealtimely()
-                    .skip(v -> whileLoading.v)
+                    .skip(v -> whileLoading)
                     .startWith(service.executionLatest())
                     .diff()
                     .retryWhen(service.retryPolicy(100, "Title"))

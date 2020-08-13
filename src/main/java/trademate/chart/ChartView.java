@@ -79,10 +79,10 @@ public class ChartView extends View {
     public final Variable<Boolean> showPositionSupport = Variable.of(true);
 
     /** The chart configuration. */
-    public final Variable<Boolean> showRealtimeUpdate = Variable.of(false);
+    public final Variable<Boolean> showIndicator = Variable.of(true);
 
     /** The chart configuration. */
-    public final Variable<Boolean> showIndicator = Variable.of(true);
+    public final Variable<Boolean> showRealtimeUpdate = Variable.of(false);
 
     /** The additional scripts. */
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
@@ -175,15 +175,16 @@ public class ChartView extends View {
     /**
      * Change realtime UI updating strategy.
      * 
-     * @param state
+     * @param enable
      */
-    public void enableRealtimeUpdate(boolean state) {
-        showOrderSupport.set(state);
-        showPositionSupport.set(state);
-        showRealtimeUpdate.set(state);
-        showIndicator.set(state);
-        showLatestPrice.value(state);
-        showOrderbook.value(state);
+    public void enableRealtimeUpdate(boolean enable) {
+        showOrderSupport.set(enable);
+        showPositionSupport.set(enable);
+        showIndicator.set(enable);
+        showRealtimeUpdate.set(enable);
+
+        showLatestPrice.value(enable);
+        showOrderbook.value(enable);
     }
 
     /**
