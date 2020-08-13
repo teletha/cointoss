@@ -95,7 +95,8 @@ public class ExecutionView extends View {
     @Override
     protected void initialize() {
         view.market.tickers.latest.observe()
-                .take(view.chart.showRealtimeUpdate)
+                .switchOff(view.isLoading())
+                .switchOn(view.isVisible())
                 .throttle(1000, TimeUnit.MILLISECONDS)
                 .on(Viewtify.UIThread)
                 .to(e -> {
@@ -113,10 +114,14 @@ public class ExecutionView extends View {
                     delay.text(diff + "ms");
                 });
 
-        view.market.orderBook.spread.observe().take(view.chart.showRealtimeUpdate).on(Viewtify.UIThread).to(price -> spread.text(price));
+        view.market.orderBook.spread.observe()
+                .switchOff(view.isLoading())
+                .switchOn(view.isVisible())
+                .on(Viewtify.UIThread)
+                .to(price -> spread.text(price));
 
         RealtimeTicker realtime = view.market.tickers.realtime(60);
-        Chrono.seconds().take(view.chart.showRealtimeUpdate).on(Viewtify.UIThread).to(() -> {
+        Chrono.seconds().switchOff(view.isLoading()).switchOn(view.isVisible()).on(Viewtify.UIThread).to(() -> {
             double longVolume = realtime.longVolume();
             double shortVolume = realtime.shortVolume();
 
@@ -135,7 +140,7 @@ public class ExecutionView extends View {
         executionCumulativeList.render((label, e) -> update(label, e, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
 
         // load big taker log
-        view.service.add(view.market.timelineByTaker.skip(v -> view.whileLoading).on(Viewtify.UIThread).to(e -> {
+        view.service.add(view.market.timelineByTaker.switchOff(view.isLoading()).on(Viewtify.UIThread).to(e -> {
             if (1 <= e.accumulative) {
                 executionCumulativeList.addItemAtFirst(e);
 

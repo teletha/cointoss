@@ -19,6 +19,8 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.util.Primitives;
 import kiss.Disposable;
 import kiss.I;
+import kiss.Signal;
+import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -60,7 +62,7 @@ public class TradingView extends View {
 
     private UICheckBox showOrderBuilder;
 
-    public boolean whileLoading = false;
+    private Variable<Boolean> isLoading = Variable.of(false);
 
     /**
      * @param tab
@@ -121,13 +123,13 @@ public class TradingView extends View {
 
         Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
         Viewtify.inWorker(() -> {
-            whileLoading = true;
+            isLoading.set(true);
             boolean update = chart.showRealtimeUpdate.exact();
             chart.showRealtimeUpdate.set(false);
             chart.market.set(market);
             market.readLog(log -> log.fromLast(9, LogType.Fast));
             chart.showRealtimeUpdate.set(update);
-            whileLoading = false;
+            isLoading.set(false);
 
             I.make(TradeMate.class).requestLazyInitialization();
         });
@@ -158,14 +160,14 @@ public class TradingView extends View {
 
         if (service == BitFlyer.FX_BTC_JPY) {
             diposer = SFD.now() //
-                    .skip(v -> whileLoading)
+                    .skip(v -> isLoading.v)
                     .diff()
                     .on(Viewtify.UIThread)
                     .effectOnce(e -> tab.textV(title, price))
                     .to(e -> price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay), error);
         } else {
             diposer = service.executionsRealtimely()
-                    .skip(v -> whileLoading)
+                    .skip(v -> isLoading.v)
                     .startWith(service.executionLatest())
                     .diff()
                     .retryWhen(service.retryPolicy(100, "Title"))
@@ -182,5 +184,24 @@ public class TradingView extends View {
     @Override
     protected String name() {
         return TradingView.class.getSimpleName() + View.IDSeparator + service.marketIdentity();
+    }
+
+    /**
+     * Get an event stream indicating whether or not this {@link TradingView} is currently visible.
+     * 
+     * @return
+     */
+    public Signal<Boolean> isVisible() {
+        return Viewtify.observing(tab.selectedProperty());
+    }
+
+    /**
+     * Get an event stream indicating whether or not this {@link TradingView} is currently reading
+     * data.
+     * 
+     * @return
+     */
+    public Signal<Boolean> isLoading() {
+        return isLoading.observing();
     }
 }
