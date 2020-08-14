@@ -127,7 +127,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("*")).map(this::convert);
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1&fromId=" + id).flatIterable(e -> e.find("*")).map(this::convert);
     }
 
     /**
@@ -245,11 +245,11 @@ public class BinanceService extends MarketService {
         Builder builder = HttpRequest.newBuilder(URI.create(uri + path));
 
         switch (method) {
-            case "GET":
-                break;
+        case "GET":
+            break;
 
-            default:
-                throw new IllegalArgumentException("Unexpected value: " + method);
+        default:
+            throw new IllegalArgumentException("Unexpected value: " + method);
         }
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
