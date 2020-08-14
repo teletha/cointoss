@@ -36,6 +36,16 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
+    static final MarketService FUTURE_COMP_USDT = new BinanceService("COMPUSDT", true, MarketSetting.with
+            .target(Currency.COMP.minimumSize(0.001))
+            .base(Currency.USDT.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
+
+    static final MarketService FUTURE_MKR_USDT = new BinanceService("MKRUSDT", true, MarketSetting.with
+            .target(Currency.MKR.minimumSize(0.001))
+            .base(Currency.USDT.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
+
     /**
      * {@inheritDoc}
      */

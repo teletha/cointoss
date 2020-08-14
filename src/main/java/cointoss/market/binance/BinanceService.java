@@ -134,14 +134,6 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public long estimateInitialExecutionId() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<Order> orders() {
         throw new Error();
     }
@@ -253,11 +245,11 @@ public class BinanceService extends MarketService {
         Builder builder = HttpRequest.newBuilder(URI.create(uri + path));
 
         switch (method) {
-        case "GET":
-            break;
+            case "GET":
+                break;
 
-        default:
-            throw new IllegalArgumentException("Unexpected value: " + method);
+            default:
+                throw new IllegalArgumentException("Unexpected value: " + method);
         }
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }

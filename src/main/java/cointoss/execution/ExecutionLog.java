@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,7 +56,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.binance.Binance;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -984,10 +984,10 @@ public class ExecutionLog {
     }
 
     public static void main1(String[] args) throws InterruptedException {
-        ExecutionLog log = new ExecutionLog(BitFlyer.BTC_JPY);
-        Cache cache2 = log.cache(Chrono.utc(2020, 2, 9));
-        cache2.writeNormal();
+        ExecutionLog log = new ExecutionLog(Binance.BTC_USDT);
+        Cache cache2 = log.cache(Chrono.utc(2019, 12, 18));
+        cache2.writeCompact();
 
-        Thread.sleep(30000);
+        Thread.sleep(1000 * 10);
     }
 }
