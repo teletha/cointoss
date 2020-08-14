@@ -76,9 +76,6 @@ public class ExecutionLog {
     /** The logging system. */
     private static final Logger log = LogManager.getLogger(ExecutionLog.class);
 
-    /** The pseudo id counter for fast log. */
-    private static final AtomicLong FastId = new AtomicLong();
-
     /** NOOP TASK */
     private static final ScheduledFuture NOOP = new ScheduledFuture() {
 
@@ -789,10 +786,11 @@ public class ExecutionLog {
             if (fast.isAbsent() && compact.isPresent()) {
                 try {
                     int scale = service.setting.target.scale;
+                    AtomicLong fastID = new AtomicLong();
                     TickerManager manager = new TickerManager();
-                    read().to(manager::update);
+                    read().effect(e -> fastID.set(e.id)).to(manager::update);
+                    fastID.updateAndGet(v -> v - 69120 /* 4x12x60x24 */);
                     Ticker ticker = manager.on(Span.Second5);
-
                     Execution[] prev = {Market.BASE};
 
                     CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
@@ -820,7 +818,7 @@ public class ExecutionLog {
                         for (int i = 0; i < prices.length; i++) {
                             Execution e = Execution.with.direction(sides[i], sizes[i])
                                     .price(prices[i])
-                                    .id(FastId.getAndIncrement())
+                                    .id(fastID.getAndIncrement())
                                     .date(tick.openTime().plusSeconds(i))
                                     .consecutive(Execution.ConsecutiveDifference)
                                     .delay(Execution.DelayInestimable);
