@@ -187,15 +187,6 @@ public class TradingView extends View {
     }
 
     /**
-     * Get an event stream indicating whether or not this {@link TradingView} is currently visible.
-     * 
-     * @return
-     */
-    public Signal<Boolean> isVisible() {
-        return Viewtify.observing(tab.selectedProperty());
-    }
-
-    /**
      * Get an event stream indicating whether or not this {@link TradingView} is currently reading
      * data.
      * 

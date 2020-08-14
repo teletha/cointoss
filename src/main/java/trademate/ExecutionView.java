@@ -96,7 +96,7 @@ public class ExecutionView extends View {
     protected void initialize() {
         view.market.tickers.latest.observe()
                 .switchOff(view.isLoading())
-                .switchOn(view.isVisible())
+                .switchOn(view.tab.isSelecting())
                 .throttle(1000, TimeUnit.MILLISECONDS)
                 .on(Viewtify.UIThread)
                 .to(e -> {
@@ -116,12 +116,12 @@ public class ExecutionView extends View {
 
         view.market.orderBook.spread.observe()
                 .switchOff(view.isLoading())
-                .switchOn(view.isVisible())
+                .switchOn(view.tab.isSelecting())
                 .on(Viewtify.UIThread)
                 .to(price -> spread.text(price));
 
         RealtimeTicker realtime = view.market.tickers.realtime(60);
-        Chrono.seconds().switchOff(view.isLoading()).switchOn(view.isVisible()).on(Viewtify.UIThread).to(() -> {
+        Chrono.seconds().switchOff(view.isLoading()).switchOn(view.tab.isSelecting()).on(Viewtify.UIThread).to(() -> {
             double longVolume = realtime.longVolume();
             double shortVolume = realtime.shortVolume();
 
