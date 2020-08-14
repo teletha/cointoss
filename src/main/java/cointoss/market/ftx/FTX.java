@@ -10,7 +10,6 @@
 package cointoss.market.ftx;
 
 import cointoss.Currency;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
@@ -46,18 +45,29 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService DEFI_PERP = new FTXService("DEFI-PERP", MarketSetting.with
+            .target(Currency.FTX_DEFI.minimumSize(0.001))
+            .base(Currency.USD.minimumSize(0.1))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService ALT_PERP = new FTXService("ALT-PERP", MarketSetting.with.target(Currency.FTX_ALT.minimumSize(0.001))
+            .base(Currency.USD.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService MID_PERP = new FTXService("MID-PERP", MarketSetting.with.target(Currency.FTX_MID.minimumSize(0.001))
+            .base(Currency.USD.minimumSize(0.1))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService SHIT_PERP = new FTXService("SHIT-PERP", MarketSetting.with
+            .target(Currency.FTX_SHIT.minimumSize(0.001))
+            .base(Currency.USD.minimumSize(0.1))
+            .acquirableExecutionSize(AcquirableSize));
+
     /**
      * {@inheritDoc}
      */
     @Override
     public MarketAccount account() {
         return I.make(FTXAccount.class);
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Market market = new Market(FTX.ETH_PERP);
-        market.readLog(log -> log.fromYestaday());
-
-        Thread.sleep(1000 * 30);
     }
 }

@@ -13,6 +13,7 @@ import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
+import cointoss.market.MarketDevTool;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
 
@@ -21,9 +22,12 @@ public final class Bitfinex extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 10000;
 
-    /** Market */
     public static final MarketService BTC_USD = new BitfinexService("BTCUSD", MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
+
+    static final MarketService ETH_USD = new BitfinexService("ETHUSD", MarketSetting.with.target(Currency.ETH.minimumSize(0.0001))
+            .base(Currency.USD.minimumSize(0.01).scale(8))
             .acquirableExecutionSize(AcquirableSize));
 
     /**
@@ -32,5 +36,9 @@ public final class Bitfinex extends MarketServiceProvider {
     @Override
     public MarketAccount account() {
         return I.make(BitfinexAccount.class);
+    }
+
+    public static void main(String[] args) {
+        MarketDevTool.collectLog(Bitfinex.ETH_USD);
     }
 }

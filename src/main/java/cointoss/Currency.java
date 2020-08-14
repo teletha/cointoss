@@ -859,7 +859,21 @@ public enum Currency {
 
     ZRX("ZRX", "0x"),
 
-    UNKNOWN("", "Unknown Currency for test.");
+    // ===================================================================
+    // Derivatives on FTX
+    // ===================================================================
+    FTX_DEFI("DEFI", "Buscket for Defi project tokens on FTX"),
+
+    FTX_ALT("ALT", "Buscket for major alt coins on FTX"),
+
+    FTX_MID("MID", "Buscket for middle alt coins on FTX"),
+
+    FTX_SHIT("SHIT", "Buscket for minor alt coins on FTX"),
+
+    // ===================================================================
+    // For Test
+    // ===================================================================
+    UNKNOWN("", "Unknown Currency for test");
 
     /** The commonly used identical currency code. */
     public final String code;

@@ -31,7 +31,6 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.util.Chrono;
 import psychopath.Directory;
 import psychopath.File;
-import psychopath.Locator;
 
 public final class TimeseriesStore<E> {
 
