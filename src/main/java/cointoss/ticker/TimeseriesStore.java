@@ -537,9 +537,10 @@ public final class TimeseriesStore<E> {
         void each(int start, int end, Consumer<? super E> consumer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
+            E[] avoidNPE = items; // copy reference to avoid NPE by #clear
 
             for (int i = start; i <= end; i++) {
-                consumer.accept(items[i]);
+                consumer.accept(avoidNPE[i]);
             }
         }
     }
