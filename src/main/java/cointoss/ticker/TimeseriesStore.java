@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +34,9 @@ import psychopath.Directory;
 import psychopath.File;
 
 public final class TimeseriesStore<E> {
+
+    /** Reusable format. yyyyMMdd'T'HHmmss */
+    private static final DateTimeFormatter FileName = DateTimeFormatter.ofPattern("yyyyMMddHH");
 
     /** The span. */
     private final Span span;
@@ -690,7 +694,7 @@ public final class TimeseriesStore<E> {
          * @return
          */
         private File name(long time) {
-            return root.file(Chrono.DateTimeCompact.format(Chrono.utcBySeconds(time)) + ".cache");
+            return root.file(FileName.format(Chrono.utcBySeconds(time)) + ".cache");
         }
     }
 }

@@ -59,9 +59,6 @@ public class Chrono {
     /** Reusable format. yyyy-MM-dd'T'HH:mm:ss */
     public static final DateTimeFormatter DateTimeWithT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    /** Reusable format. yyyyMMdd'T'HHmmss */
-    public static final DateTimeFormatter DateTimeCompact = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
-
     /** Reusable format. HH:mm:ss */
     public static final DateTimeFormatter Time = DateTimeFormatter.ofPattern("HH:mm:ss");
 

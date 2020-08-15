@@ -368,11 +368,10 @@ class TimeseriesStoreTest {
     @Test
     void store() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
-        store.store(0, 5, 10, 15, 20, 25, 30);
         store.enableDiskStore(Locator.directory(room.root), v -> new String[] {String.valueOf(v)}, v -> Integer.valueOf(v[0]));
 
-        store.store((int) Span.Second5.segment);
-        store.store((int) Span.Second5.segment * 2);
-        store.store((int) Span.Second5.segment * 3);
+        for (int i = 1; i <= 20; i++) {
+            store.store((int) Span.Second5.segment * i);
+        }
     }
 }
