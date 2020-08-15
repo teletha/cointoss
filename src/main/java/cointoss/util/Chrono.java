@@ -177,6 +177,18 @@ public class Chrono {
     /**
      * UTC {@link ZonedDateTime} at the specified date.
      * 
+     * @param year A year.
+     * @param month A month.
+     * @param day A day of month.
+     * @return
+     */
+    public static ZonedDateTime utc(int year, int month, int day, int hour, int minute, int second, int milli, int micro) {
+        return ZonedDateTime.of(year, month, day, hour, minute, second, milli * 1000000 + micro * 1000, UTC);
+    }
+
+    /**
+     * UTC {@link ZonedDateTime} at the specified date.
+     * 
      * @param date A target {@link LocalDateTime}.
      * @return
      */
