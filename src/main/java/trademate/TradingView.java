@@ -112,6 +112,9 @@ public class TradingView extends View {
         Style fill = () -> {
             display.height.fill();
         };
+
+        Style tab = () -> {
+        };
     }
 
     /**
@@ -154,6 +157,8 @@ public class TradingView extends View {
     }
 
     private void additionalInfo() {
+        tab.style(style.tab);
+
         Disposable diposer;
         Consumer<Throwable> error = e -> {
         };
@@ -172,8 +177,7 @@ public class TradingView extends View {
                     .diff()
                     .retryWhen(service.retryPolicy(100, "Title"))
                     .on(Viewtify.UIThread)
-                    .effectOnce(e -> tab.textV(title, price))
-                    .to(e -> price.text(e.price), error);
+                    .to(e -> tab.text(service.marketReadableName() + "\n" + e.price), error);
         }
         service.add(diposer);
     }
