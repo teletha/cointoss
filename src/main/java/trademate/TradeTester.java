@@ -59,7 +59,7 @@ public class TradeTester extends View {
         for (MarketService service : services) {
             UITab tab = DockSystem.register(service.marketIdentity())
                     .closable(false)
-                    .text(service.marketReadableName())
+                    .text(service.marketReadableName)
                     .contents(ui -> new TradingView(ui, service));
         }
     }

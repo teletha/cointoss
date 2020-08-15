@@ -61,7 +61,7 @@ public class TradeMate extends View {
         MarketServiceProvider.availableMarketServices().to(service -> {
             UITab tab = DockSystem.register(service.marketIdentity())
                     .closable(false)
-                    .text(service.marketReadableName())
+                    .text(service.marketReadableName)
                     .contents(ui -> new TradingView(ui, service));
 
             loader.add(tab);

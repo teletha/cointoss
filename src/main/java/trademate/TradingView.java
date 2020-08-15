@@ -28,7 +28,6 @@ import trademate.order.OrderBuilder;
 import viewtify.Viewtify;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIHBox;
-import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -43,12 +42,6 @@ public class TradingView extends View {
 
     /** The associated market. */
     public final Market market;
-
-    /** The market title. */
-    private UILabel title;
-
-    /** The market latest price. */
-    private UILabel price;
 
     private UIHBox box;
 
@@ -137,9 +130,6 @@ public class TradingView extends View {
             I.make(TradeMate.class).requestLazyInitialization();
         });
 
-        title.text(service.marketReadableName()).style(style.tabTitle);
-        price.style(style.tabPrice);
-
         additionalInfo();
     }
 
@@ -157,27 +147,28 @@ public class TradingView extends View {
     }
 
     private void additionalInfo() {
-        tab.style(style.tab);
-
         Disposable diposer;
         Consumer<Throwable> error = e -> {
         };
+
+        tab.style("multiline");
 
         if (service == BitFlyer.FX_BTC_JPY) {
             diposer = SFD.now() //
                     .switchOff(isLoading())
                     .diff()
                     .on(Viewtify.UIThread)
-                    .effectOnce(e -> tab.textV(title, price))
-                    .to(e -> price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay), error);
+                    .to(e -> tab
+                            .text(service.marketReadableName + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "), error);
         } else {
+
             diposer = service.executionsRealtimely()
                     .switchOff(isLoading())
                     .startWith(service.executionLatest())
                     .diff()
                     .retryWhen(service.retryPolicy(100, "Title"))
                     .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.marketReadableName() + "\n" + e.price), error);
+                    .to(e -> tab.text(service.marketReadableName + "\n" + e.price), error);
         }
         service.add(diposer);
     }

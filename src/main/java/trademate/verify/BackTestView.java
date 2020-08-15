@@ -249,8 +249,8 @@ public class BackTestView extends View implements Analyzer {
     @Override
     protected void initialize() {
         marketSelection.initialize(MarketServiceProvider.availableMarketServices())
-                .render(MarketService::marketReadableName)
-                .renderSelected(MarketService::marketReadableName);
+                .render(service -> service.marketReadableName)
+                .renderSelected(service -> service.marketReadableName);
 
         fastLog.initialize(false)
                 .text(en("Use Fast Log"))

@@ -50,6 +50,9 @@ public abstract class MarketService implements Disposable {
     /** The market name. */
     public final String marketName;
 
+    /** The human-readable market name. */
+    public final String marketReadableName;
+
     /** The execution log. */
     public final ExecutionLog log;
 
@@ -78,6 +81,7 @@ public abstract class MarketService implements Disposable {
     protected MarketService(String exchangeName, String marketName, MarketSetting setting) {
         this.exchangeName = Objects.requireNonNull(exchangeName);
         this.marketName = Objects.requireNonNull(marketName);
+        this.marketReadableName = marketIdentity().replaceAll("_", "");
         this.setting = setting;
         this.scheduler = new ScheduledThreadPoolExecutor(2, task -> {
             Thread thread = new Thread(task);
@@ -98,15 +102,6 @@ public abstract class MarketService implements Disposable {
      */
     public final String marketIdentity() {
         return exchangeName + " " + marketName;
-    }
-
-    /**
-     * Returns the human-readable name of market.
-     * 
-     * @return A human-readable name.
-     */
-    public final String marketReadableName() {
-        return marketIdentity().replaceAll("_", "");
     }
 
     /**

@@ -232,7 +232,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
 
-        chart.market.observe().to(m -> marketName.clear().fillText(m.service.marketReadableName(), 4, 28));
+        chart.market.observe().to(m -> marketName.clear().fillText(m.service.marketReadableName, 4, 28));
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
@@ -532,7 +532,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             MarketService service = chart.market.v.service;
             Num p = exe.price.scale(service.setting.target.scale);
-            String title = "🔊  " + service.marketReadableName() + " " + p;
+            String title = "🔊  " + service.marketReadableName + " " + p;
             I.make(Notificator.class).priceSignal.notify(title, I.translate("The specified price ({0}) has been reached.", p));
         }));
     }
