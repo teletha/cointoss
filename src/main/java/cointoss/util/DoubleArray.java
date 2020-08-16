@@ -36,19 +36,24 @@ public class DoubleArray {
      * @return
      */
     public DoubleArray add(double value) {
-        if (size == array.length) {
-            synchronized (this) {
-                int length = array.length;
-                if (size == length) {
-                    double[] large = new double[length + Math.min(length, 1024)];
-                    System.arraycopy(array, 0, large, 0, length);
-                    array = large;
-                }
-            }
+        if (array.length <= size) {
+            widen(size + 1);
         }
 
         array[size++] = value;
         return this;
+    }
+
+    /**
+     * Widen the base array's capacity.
+     */
+    private synchronized void widen(int require) {
+        int length = array.length;
+        if (length <= require) {
+            double[] large = new double[Math.max(require, length + Math.min(length, 1024))];
+            System.arraycopy(array, 0, large, 0, length);
+            array = large;
+        }
     }
 
     /**
@@ -81,8 +86,20 @@ public class DoubleArray {
     }
 
     public DoubleArray set(int index, double value) {
-        array[index] = value;
+        if (size <= index) {
+            if (array.length <= index) {
+                widen(index);
+            }
+            size = index + 1;
+            array[index] = value;
+        } else if (0 <= index) {
+            array[index] = value;
+        }
         return this;
+    }
+
+    public void modify(int index, double value) {
+        array[index] = array[index] + value;
     }
 
     /**
