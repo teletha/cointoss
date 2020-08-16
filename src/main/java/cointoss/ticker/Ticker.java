@@ -61,7 +61,7 @@ public final class Ticker implements Disposable {
      * @param realtime The realtime execution statistic.
      */
     final void init(Execution execution, TickerManager realtime) {
-        current = new Tick(span.calculateStartTime(execution.date).toEpochSecond(), execution.delay, execution.price, realtime);
+        current = new Tick(span.calculateStartTime(execution.date).toEpochSecond(), execution.price, realtime);
 
         ticks.store(current);
         opening.accept(current);
@@ -86,14 +86,14 @@ public final class Ticker implements Disposable {
             while (current.openTime + span.seconds < start.toEpochSecond()) {
                 current.freeze();
                 closing.accept(current);
-                current = new Tick(current.openTime + span.seconds, execution.delay, current.closePrice(), realtime);
+                current = new Tick(current.openTime + span.seconds, current.closePrice(), realtime);
                 ticks.store(current);
             }
 
             // create the latest tick for execution
             current.freeze();
             closing.accept(current);
-            current = new Tick(current.openTime + span.seconds, execution.delay, execution.price, realtime);
+            current = new Tick(current.openTime + span.seconds, execution.price, realtime);
             ticks.store(current);
             opening.accept(current);
             return true;
