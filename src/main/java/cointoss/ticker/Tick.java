@@ -43,17 +43,11 @@ public final class Tick {
     /** Snapshot of long losscut volume at tick initialization. */
     double longLosscutVolume;
 
-    /** Snapshot of long price increase at tick initialization. */
-    double longPriceIncrease;
-
     /** Snapshot of short volume at tick initialization. */
     double shortVolume;
 
     /** Snapshot of short losscut volume at tick initialization. */
     double shortLosscutVolume;
-
-    /** Snapshot of short price decrease at tick initialization. */
-    double shortPriceDecrease;
 
     /**
      * Empty Dummt Tick.
@@ -76,10 +70,8 @@ public final class Tick {
 
         this.realtime = realtime;
         this.longVolume = realtime.longVolume;
-        this.longPriceIncrease = realtime.longPriceIncrease;
         this.longLosscutVolume = realtime.longLosscutVolume;
         this.shortVolume = realtime.shortVolume;
-        this.shortPriceDecrease = realtime.shortPriceDecrease;
         this.shortLosscutVolume = realtime.shortLosscutVolume;
     }
 
@@ -168,15 +160,6 @@ public final class Tick {
 
     /**
      * Retrieve the tick related value.
-     * 
-     * @return The tick related value.
-     */
-    public double longPriceIncrease() {
-        return realtime == null ? longPriceIncrease : realtime.longPriceIncrease - longPriceIncrease;
-    }
-
-    /**
-     * Retrieve the tick related value.
      */
     public double longLosscutVolume() {
         return realtime == null ? longLosscutVolume : realtime.longLosscutVolume - longLosscutVolume;
@@ -193,35 +176,9 @@ public final class Tick {
 
     /**
      * Retrieve the tick related value.
-     * 
-     * @return The tick related value.
-     */
-    public double shortPriceDecrease() {
-        return realtime == null ? shortPriceDecrease : realtime.shortPriceDecrease - shortPriceDecrease;
-    }
-
-    /**
-     * Retrieve the tick related value.
      */
     public double shortLosscutVolume() {
         return realtime == null ? shortLosscutVolume : realtime.shortLosscutVolume - shortLosscutVolume;
-    }
-
-    /**
-     * @return
-     */
-    public double priceVolatility() {
-        double upPotencial = longVolume() == 0d ? 0 : longPriceIncrease() / longVolume();
-        double downPotencial = shortVolume() == 0d ? 0 : shortPriceDecrease() / shortVolume();
-        return upPotencial / downPotencial;
-    }
-
-    public double upRatio() {
-        return longVolume() == 0d ? 0 : longPriceIncrease() * longVolume();
-    }
-
-    public double downRatio() {
-        return shortVolume() == 0d ? 0 : shortPriceDecrease() * shortVolume();
     }
 
     /**
@@ -232,10 +189,8 @@ public final class Tick {
     void freeze() {
         closePrice = closePrice();
         longVolume = longVolume();
-        longPriceIncrease = longPriceIncrease();
         longLosscutVolume = longLosscutVolume();
         shortVolume = shortVolume();
-        shortPriceDecrease = shortPriceDecrease();
         shortLosscutVolume = shortLosscutVolume();
         realtime = null;
     }
