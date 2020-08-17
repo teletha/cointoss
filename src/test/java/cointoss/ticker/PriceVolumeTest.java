@@ -17,8 +17,25 @@ class PriceVolumeTest {
 
     @Test
     void volumeAt() {
-        PriceVolume volume = new PriceVolume(Num.of(200), Num.of(10));
-        volume.update(Num.of(200), 1);
-        assert volume.volumeAt(200) == 1;
+        PriceVolume volume = new PriceVolume(Num.of(2000), Num.of(10), 0);
+        for (int i = 0; i < 4000; i++) {
+            volume.update(Num.of(i), 1);
+        }
+
+        for (int i = 0; i < 4000; i++) {
+            assert volume.volumeAt(i) == 10;
+        }
+    }
+
+    @Test
+    void volumeAtWithDecimal() {
+        PriceVolume volume = new PriceVolume(Num.of(0.2), Num.of(0.001), 5);
+        for (int i = 0; i < 4000; i++) {
+            volume.update(Num.of(i * 0.0001), 1);
+        }
+
+        for (int i = 0; i < 4000; i++) {
+            assert volume.volumeAt(i * 0.0001) == 10;
+        }
     }
 }
