@@ -37,7 +37,7 @@ public class DoubleArray {
      */
     public DoubleArray add(double value) {
         if (array.length <= size) {
-            widen(size + 1);
+            widenBaseArary(size + 1);
         }
 
         array[size++] = value;
@@ -47,7 +47,7 @@ public class DoubleArray {
     /**
      * Widen the base array's capacity.
      */
-    private synchronized void widen(int require) {
+    private synchronized void widenBaseArary(int require) {
         int length = array.length;
         if (length <= require) {
             double[] large = new double[Math.max(require, length + Math.min(length, 1024))];
@@ -78,28 +78,66 @@ public class DoubleArray {
      * Get the value at the specified index. If out of bounded index is specified, 0 will be
      * returned.
      * 
-     * @param index
-     * @return
+     * @param index An index to get.
+     * @return The indexed value.
      */
     public double get(int index) {
         return 0 <= index && index < size ? array[index] : 0;
     }
 
+    /**
+     * Set the value at the specified index.
+     * 
+     * @param index An index to set.
+     * @param value A value to set.
+     * @return Chainable API.
+     */
     public DoubleArray set(int index, double value) {
-        if (size <= index) {
-            if (array.length <= index) {
-                widen(index);
-            }
-            size = index + 1;
-            array[index] = value;
-        } else if (0 <= index) {
-            array[index] = value;
-        }
+        ensureSize(index);
+        array[index] = value;
         return this;
     }
 
-    public void modify(int index, double value) {
-        array[index] = array[index] + value;
+    /**
+     * Increment the value at the specified index.
+     * 
+     * @param index An index to set.
+     * @param increment A value to increment.
+     * @return Chainable API.
+     */
+    public DoubleArray increment(int index, double increment) {
+        ensureSize(index);
+        array[index] += increment;
+        return this;
+    }
+
+    /**
+     * Decrement the value at the specified index.
+     * 
+     * @param index An index to set.
+     * @param decrement A value to decrement.
+     * @return Chainable API.
+     */
+    public DoubleArray decrement(int index, double decrement) {
+        ensureSize(index);
+        array[index] -= decrement;
+        return this;
+    }
+
+    /**
+     * Ensure size and base array' size.
+     * 
+     * @param index
+     */
+    private void ensureSize(int index) {
+        if (size <= index) {
+            size = index + 1;
+            if (array.length <= index) {
+                widenBaseArary(size);
+            }
+        } else if (index < 0) {
+            throw new IndexOutOfBoundsException(index);
+        }
     }
 
     /**

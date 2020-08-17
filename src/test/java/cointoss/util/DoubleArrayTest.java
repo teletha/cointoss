@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class DoubleArrayTest {
@@ -61,14 +62,77 @@ class DoubleArrayTest {
     }
 
     @Test
+    void setNegativeIndex() {
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleArray().set(-1, 10));
+    }
+
+    @Test
     void setLargeStep() {
         DoubleArray array = new DoubleArray();
-        for (int i = 0; i < sizeForTest; i += sizeForTest / 2) {
-            array.set(i, i);
+        for (int i = 0; i < 5; i++) {
+            array.set(i * 2000, i);
         }
 
-        for (int i = 0; i < sizeForTest; i += sizeForTest / 2) {
+        for (int i = 0; i < 5; i++) {
+            assert array.get(i * 2000) == i;
+        }
+    }
+
+    @Test
+    void increment() {
+        DoubleArray array = new DoubleArray();
+        for (int i = 0; i < sizeForTest; i++) {
+            array.increment(i, i);
+        }
+
+        for (int i = 0; i < sizeForTest; i++) {
             assert array.get(i) == i;
         }
+    }
+
+    @Test
+    void incrementLargeStep() {
+        DoubleArray array = new DoubleArray();
+        for (int i = 0; i < 5; i++) {
+            array.increment(i * 2000, i);
+        }
+
+        for (int i = 0; i < 5; i++) {
+            assert array.get(i * 2000) == i;
+        }
+    }
+
+    @Test
+    void incrementNegativeIndex() {
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleArray().increment(-1, 10));
+    }
+
+    @Test
+    void decrement() {
+        DoubleArray array = new DoubleArray();
+        for (int i = 0; i < sizeForTest; i++) {
+            array.decrement(i, i);
+        }
+
+        for (int i = 0; i < sizeForTest; i++) {
+            assert array.get(i) == -i;
+        }
+    }
+
+    @Test
+    void decrementLargeStep() {
+        DoubleArray array = new DoubleArray();
+        for (int i = 0; i < 5; i++) {
+            array.decrement(i * 2000, i);
+        }
+
+        for (int i = 0; i < 5; i++) {
+            assert array.get(i * 2000) == -i;
+        }
+    }
+
+    @Test
+    void decrementNegativeIndex() {
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleArray().decrement(-1, 10));
     }
 }
