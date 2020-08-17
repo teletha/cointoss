@@ -23,7 +23,6 @@ import java.util.function.Function;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
@@ -33,6 +32,7 @@ import cointoss.order.OrderStrategy.Cancellable;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
+import cointoss.ticker.PriceRangedVolumeManager;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickerManager;
@@ -68,6 +68,9 @@ public class Market implements Disposable {
 
     /** The order books. */
     public final OrderBookManager orderBook;
+
+    /** The price volume manager. */
+    public final PriceRangedVolumeManager priceVolume;
 
     /** The ticker manager. */
     public final TickerManager tickers = new TickerManager();
@@ -105,17 +108,15 @@ public class Market implements Disposable {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
         this.orderBook = new OrderBookManager(service);
-
-        if (service == BitFlyer.FX_BTC_JPY) {
-            // tickers.on(Span.Second5).ticks.enableDiskStore(service.directory(), tick -> {
-            // return null;
-            // }, values -> {
-            // return null;
-            // });
-        }
+        this.priceVolume = new PriceRangedVolumeManager(service.setting.base.minimumSize.multiply(10), service.setting.base.scale);
 
         // build tickers for each span
-        timeline.to(tickers::update);
+        timeline.to(e -> {
+            tickers.update(e);
+            priceVolume.update(e);
+        });
+
+        tickers.on(Span.Day3).open.to(priceVolume::update);
 
         readOrderBook();
     }

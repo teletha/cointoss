@@ -12,9 +12,10 @@ package cointoss.ticker;
 import java.util.Arrays;
 
 import cointoss.util.DoubleArray;
+import cointoss.util.DoubleBiConsumer;
 import cointoss.util.Num;
 
-public class PriceVolume {
+public class PriceRangedVolume {
 
     private final int priceBase;
 
@@ -28,21 +29,14 @@ public class PriceVolume {
 
     private final DoubleArray lower = new DoubleArray();
 
-    /**
-     * @param priceBase
-     */
-    public PriceVolume(Num priceBase, Num priceRange, int scale) {
+    PriceRangedVolume(Num priceBase, Num priceRange, int scale) {
         this.scale = scale;
         this.tens = (int) Math.pow(10, scale);
         this.priceBase = (int) Math.round(priceBase.doubleValue() * tens);
         this.priceRange = (int) Math.round(priceRange.doubleValue() * tens);
     }
 
-    /**
-     * @param price
-     * @param size
-     */
-    public void update(Num price, double size) {
+    void update(Num price, double size) {
         int diff = price.decuple(scale).intValue() - priceBase;
 
         if (0 <= diff) {
@@ -78,14 +72,24 @@ public class PriceVolume {
         }
     }
 
+    public void each(DoubleBiConsumer consumer) {
+        for (int i = 0, size = lower.size(); i < size; i++) {
+            consumer.accept((priceBase - i * priceRange) / tens, lower.get(i));
+        }
+        for (int i = 0, size = upper.size(); i < size; i++) {
+            consumer.accept((priceBase + i * priceRange) / tens, upper.get(i));
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
+        b.append(upper.size() + lower.size()).append(" ");
         b.append(Arrays.toString(upper.asArray()));
-        b.append("\r\n");
+        b.append(" ");
         b.append(Arrays.toString(lower.asArray()));
         return b.toString();
     }

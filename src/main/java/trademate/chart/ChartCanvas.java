@@ -126,14 +126,17 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart UI */
     private final LineMark sfdPrice;
 
-    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
+    /** Flag whether candle chart should layout on the next rendering phase or not. */
     final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
-    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
+    /** Flag whether candle chart should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
-    /** Flag whether orderbook shoud layout on the next rendering phase or not. */
+    /** Flag whether orderbook should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
+
+    /** Flag whether price-ranged volume should layout on the next rendering phase or not. */
+    private final LayoutAssistant layoutPriceRangedVolume = new LayoutAssistant(this);
 
     /** Chart UI */
     private final EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout).bindSizeTo(this);
@@ -150,6 +153,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart UI */
     private final EnhancedCanvas orderbookDigit = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
             .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
+            .fontSize(8)
+            .textBaseLine(VPos.CENTER);
+
+    /** Chart UI */
+    private final EnhancedCanvas priceRangedVolume = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
+            .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
+            .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
             .fontSize(8)
             .textBaseLine(VPos.CENTER);
 
@@ -211,6 +221,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The latest orderbook layer. */
     private OrderbookBar orderbookBar;
 
+    /** The latest priced volume layer. */
+    private PriceRangedVolumeBar priceVolumeBar;
+
     /**
      * Chart canvas.
      * 
@@ -259,6 +272,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         .map(m -> m.orderBook)
                         .flatMap(b -> b.longs.update.merge(b.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
+        layoutPriceRangedVolume.layoutBy(widthProperty(), heightProperty())
+                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
+                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+                .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(10, TimeUnit.SECONDS)))
+                .layoutWhile(chart.showRealtimeUpdate.observing());
 
         configIndicator();
         visualizeOrderPrice();
@@ -268,7 +286,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizePriceSupporter();
 
         getChildren()
-                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -623,6 +641,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         drawCandle();
         drawOrderbook();
+        drawPriceVolume();
     }
 
     /**
@@ -856,6 +875,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             chart.market.to(m -> {
                 orderbookBar = new OrderbookBar(m);
                 orderbookBar.draw();
+            });
+        });
+    }
+
+    /**
+     * Draw priced volumes on chart.
+     */
+    private void drawPriceVolume() {
+        layoutPriceRangedVolume.layout(() -> {
+            priceRangedVolume.clear();
+
+            chart.market.to(m -> {
+                priceVolumeBar = new PriceRangedVolumeBar(m);
+                priceVolumeBar.draw();
             });
         });
     }
@@ -1226,6 +1259,56 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     gc.strokeText(String.valueOf((int) page.size), width - 15, position, OrderbookBarWidth);
                     lastPosition = position;
                 }
+            }
+        }
+    }
+
+    /**
+     * 
+     */
+    private class PriceRangedVolumeBar {
+
+        /** The current diminishing scale. */
+        private final double scale;
+
+        /** The maximum size on buyers. */
+        private double maxSize = OrderbookBarWidth;
+
+        private DoubleArray prices = new DoubleArray();
+
+        private DoubleArray sizes = new DoubleArray();
+
+        /**
+         * Calculate info.
+         * 
+         * @param market
+         */
+        private PriceRangedVolumeBar(Market market) {
+            final double visibleMax = axisY.computeVisibleMaxValue();
+            final double visibleMin = axisY.computeVisibleMinValue();
+
+            market.priceVolume.latest().each((price, size) -> {
+                maxSize = Math.max(maxSize, size);
+                prices.add(price);
+                sizes.add(size);
+            });
+            scale = OrderbookBarWidth / maxSize;
+        }
+
+        /**
+         * Draw orderbooks on chart' side.
+         * 
+         * @param pages The page info.
+         * @param threshold A range to draw.
+         * @param color Visible color.
+         */
+        private void draw() {
+            GraphicsContext gc = priceRangedVolume.getGraphicsContext2D();
+
+            for (int i = 0, size = prices.size(); i < size; i++) {
+                double position = axisY.getPositionForValue(prices.get(i));
+                double width = sizes.get(i) * scale;
+                gc.strokeLine(0, position, width, position);
             }
         }
     }
