@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
@@ -42,7 +43,7 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.order.OrderBookPage;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
-import cointoss.ticker.PriceRangedVolume;
+import cointoss.ticker.PriceRangedVolume.GroupedVolumes;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
@@ -139,6 +140,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Flag whether price-ranged volume should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutPriceRangedVolume = new LayoutAssistant(this);
 
+    /** Flag whether price-ranged volume should layout on the next rendering phase or not. */
+    private final LayoutAssistant layoutPriceRangedVolumeLatest = new LayoutAssistant(this);
+
     /** Chart UI */
     private final EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout).bindSizeTo(this);
 
@@ -158,7 +162,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas priceRangedVolume = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
+    private final EnhancedCanvas priceRangedVolume = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolume.canLayout)
+            .bindSizeTo(this)
+            .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
+            .fontSize(8)
+            .textBaseLine(VPos.CENTER);
+
+    /** Chart UI */
+    private final EnhancedCanvas priceRangedVolumeLatest = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolumeLatest.canLayout)
             .bindSizeTo(this)
             .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
             .fontSize(8)
@@ -252,32 +263,27 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
         });
 
-        layoutCandle.layoutBy(widthProperty(), heightProperty())
-                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+        layoutCandle.layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe())
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.open.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)));
-        layoutCandleLatest.layoutBy(widthProperty(), heightProperty())
-                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+        layoutCandleLatest.layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
-        layoutOrderbook.layoutBy(widthProperty(), heightProperty())
-                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+        layoutOrderbook.layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe()
-                        .map(m -> m.orderBook)
-                        .flatMap(b -> b.longs.update.merge(b.shorts.update).throttle(1, TimeUnit.SECONDS)))
+                        .flatMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
-        layoutPriceRangedVolume.layoutBy(widthProperty(), heightProperty())
-                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+        layoutPriceRangedVolume.layoutBy(userInterfaceModification())
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe())
+                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
+        layoutPriceRangedVolumeLatest.layoutBy(userInterfaceModification())
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe())
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(10, TimeUnit.SECONDS)))
-                .layoutWhile(chart.showRealtimeUpdate.observing());
+                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
         configIndicator();
         visualizeOrderPrice();
@@ -287,7 +293,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizePriceSupporter();
 
         getChildren()
-                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+    }
+
+    private Observable[] userInterfaceModification() {
+        return new Observable[] {widthProperty(), heightProperty(), axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty(),
+                axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty()};
     }
 
     /**
@@ -888,10 +899,19 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolume.clear();
 
             chart.market.to(m -> {
-                m.priceVolume.all().forEach(volumes -> {
-                    priceVolumeBar = new PriceRangedVolumeBar(volumes);
+                m.priceVolume.previous().to(volumes -> {
+                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes.grouped(50));
                     priceVolumeBar.draw();
                 });
+            });
+        });
+
+        layoutPriceRangedVolumeLatest.layout(() -> {
+            priceRangedVolumeLatest.clear();
+
+            chart.market.map(m -> m.priceVolume.latest()).to(volumes -> {
+                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes.grouped(50));
+                priceVolumeBar.draw();
             });
         });
     }
@@ -1271,19 +1291,22 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class PriceRangedVolumeBar {
 
+        private final EnhancedCanvas canvas;
+
         /** The current diminishing scale. */
         private final double scale;
 
-        private PriceRangedVolume volumes;
+        private GroupedVolumes volumes;
 
         /**
          * Calculate info.
          * 
          * @param market
          */
-        private PriceRangedVolumeBar(PriceRangedVolume volumes) {
+        private PriceRangedVolumeBar(EnhancedCanvas canvas, GroupedVolumes volumes) {
+            this.canvas = canvas;
             this.volumes = volumes;
-            scale = 160 / (volumes.max * 50);
+            this.scale = 40 / volumes.maxVolume;
         }
 
         /**
@@ -1294,14 +1317,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param color Visible color.
          */
         private void draw() {
-            GraphicsContext gc = priceRangedVolume.getGraphicsContext2D();
+            GraphicsContext gc = canvas.getGraphicsContext2D();
             double start = axisX.getPositionForValue(volumes.startTime);
 
-            volumes.each(50, (price, size) -> {
-                double position = axisY.getPositionForValue(price);
-                double width = size * scale;
+            for (int i = 0, size = volumes.prices.size(); i < size; i++) {
+                double position = axisY.getPositionForValue(volumes.prices.get(i));
+                double width = volumes.volumes.get(i) * scale;
                 gc.strokeLine(start, position, start + width, position);
-            });
+            }
         }
     }
 }

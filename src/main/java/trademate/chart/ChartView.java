@@ -69,6 +69,12 @@ public class ChartView extends View {
     /** Configuration UI */
     public UISpinner<Integer> orderbookHideSize;
 
+    /** Configuration UI */
+    public UICheckBox showPricedVolume;
+
+    /** Configuration UI */
+    public UITextValue<Num> pricedVolumeRange;
+
     /** Chart UI */
     public Chart chart;
 
@@ -143,12 +149,14 @@ public class ChartView extends View {
                     form("Candle Type", candle);
                     form("Latest Price", showLatestPrice);
                     form("Orderbook", FormStyles.FormInputMin, showOrderbook, orderbookPriceRange, orderbookHideSize);
+                    form("Priced Volume", FormStyles.FormInputMin, showPricedVolume, pricedVolumeRange);
                 });
             }
         });
         candle.initialize(CandleType.values()).observing(candleType::set);
         showLatestPrice.initialize(true);
         showOrderbook.initialize(true);
+        showPricedVolume.initialize(true);
 
         orderbookHideSize.initialize(IntStream.range(0, 101))
                 .tooltip(en("Display only boards that are larger than the specified size."))
@@ -163,6 +171,13 @@ public class ChartView extends View {
                     v.ⅱ.orderBook.longs.groupBy(v.ⅰ);
                     v.ⅱ.orderBook.shorts.groupBy(v.ⅰ);
                 });
+
+        pricedVolumeRange.initializeLazy(market.observe().map(m -> m.service.setting.base.minimumSize.multiply(100)))
+                .acceptPositiveNumberInput()
+                .normalizeInput(Form.NFKC)
+                .maximumInput(6)
+                .tooltip(en("Display a price-ranged volume with a specified price range."))
+                .enableWhen(showPricedVolume.isSelected());
 
     }
 

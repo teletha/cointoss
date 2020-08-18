@@ -9,12 +9,13 @@
  */
 package cointoss.ticker;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import kiss.I;
+import kiss.Signal;
 
 public class PriceRangedVolumeManager {
 
@@ -47,7 +48,7 @@ public class PriceRangedVolumeManager {
         return volume;
     }
 
-    public Collection<PriceRangedVolume> all() {
-        return volumes.values();
+    public Signal<PriceRangedVolume> previous() {
+        return I.signal(volumes.values()).skip(1);
     }
 }

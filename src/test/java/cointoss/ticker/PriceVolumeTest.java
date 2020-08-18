@@ -17,7 +17,7 @@ class PriceVolumeTest {
 
     @Test
     void volumeAt() {
-        PriceRangedVolume volume = new PriceRangedVolume(Num.of(2000), Num.of(10), 0);
+        PriceRangedVolume volume = new PriceRangedVolume(0, Num.of(2000), Num.of(10), 0);
         for (int i = 0; i < 4000; i++) {
             volume.update(Num.of(i), 1);
         }
@@ -29,7 +29,7 @@ class PriceVolumeTest {
 
     @Test
     void volumeAtWithDecimal() {
-        PriceRangedVolume volume = new PriceRangedVolume(Num.of(0.2), Num.of(0.001), 5);
+        PriceRangedVolume volume = new PriceRangedVolume(0, Num.of(0.2), Num.of(0.001), 5);
         for (int i = 0; i < 4000; i++) {
             volume.update(Num.of(i * 0.0001), 1);
         }

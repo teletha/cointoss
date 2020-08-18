@@ -9,15 +9,12 @@
  */
 package cointoss.ticker;
 
-import java.util.Arrays;
-
 import cointoss.util.DoubleArray;
-import cointoss.util.DoubleBiConsumer;
 import cointoss.util.Num;
 
 public class PriceRangedVolume {
 
-    /** The starting time of period. (epoch seconds) */
+    /** The starting time of period. (epoch second) */
     public final long startTime;
 
     private final int priceBase;
@@ -32,8 +29,6 @@ public class PriceRangedVolume {
 
     private final DoubleArray lower = new DoubleArray();
 
-    public double max = 0;
-
     PriceRangedVolume(long startTime, Num priceBase, Num priceRange, int scale) {
         this.startTime = startTime;
         this.scale = scale;
@@ -43,11 +38,10 @@ public class PriceRangedVolume {
     }
 
     void update(Num price, double size) {
-        double updated;
         int diff = price.decuple(scale).intValue() - priceBase;
 
         if (0 <= diff) {
-            updated = upper.increment(diff / priceRange, size);
+            upper.increment(diff / priceRange, size);
         } else {
             // Convert a and b to a double, and you can use the division and Math.ceil as you wanted
             // it to work. However I strongly discourage the use of this approach, because double
@@ -57,11 +51,7 @@ public class PriceRangedVolume {
             // This is very short, but maybe for some less intuitive. I think this less
             // intuitive approach would be faster than the double division.
             // Please note that this doesn't work for b < 0.
-            updated = lower.increment((-diff + priceRange - 1) / priceRange - 1, size);
-        }
-
-        if (max < updated) {
-            max = updated;
+            lower.increment((-diff + priceRange - 1) / priceRange - 1, size);
         }
     }
 
@@ -83,56 +73,68 @@ public class PriceRangedVolume {
         }
     }
 
-    public void each(DoubleBiConsumer consumer) {
-        for (int i = 0, size = lower.size(); i < size; i++) {
-            consumer.accept((priceBase - i * priceRange) / tens, lower.get(i));
-        }
-        for (int i = 0, size = upper.size(); i < size; i++) {
-            consumer.accept((priceBase + i * priceRange) / tens, upper.get(i));
-        }
-    }
+    /**
+     * Compute the grouped price-ranged-volume data.
+     * 
+     * @param groupSize
+     * @return
+     */
+    public GroupedVolumes grouped(int groupSize) {
+        int size = (upper.size() + lower.size()) / groupSize + 1;
+        DoubleArray prices = new DoubleArray(size);
+        DoubleArray volumes = new DoubleArray(size);
+        double max = 0;
 
-    public void each(int group, DoubleBiConsumer consumer) {
         int now = 0;
-        double totalSize = 0;
-        for (int i = 0, size = lower.size(); i < size; i++) {
-            totalSize += lower.get(i);
+        double volume = 0;
+        for (int i = 0, end = lower.size(); i < end; i++) {
+            volume += lower.get(i);
 
-            if (++now == group) {
-                consumer.accept((priceBase - (i + 1) * priceRange) / tens, totalSize);
-                totalSize = 0;
+            if (++now == groupSize) {
+                prices.add((priceBase - (i + 1) * priceRange) / tens);
+                volumes.add(volume);
+                max = Math.max(max, volume);
+                volume = 0;
                 now = 0;
             }
         }
-        for (int i = 0, size = upper.size(); i < size; i++) {
-            totalSize += upper.get(i);
+        for (int i = 0, end = upper.size(); i < end; i++) {
+            volume += upper.get(i);
 
-            if (++now == group) {
-                consumer.accept((priceBase + i * priceRange) / tens, totalSize);
-                totalSize = 0;
+            if (++now == groupSize) {
+                prices.add((priceBase + i * priceRange) / tens);
+                volumes.add(volume);
+                max = Math.max(max, volume);
+                volume = 0;
                 now = 0;
             }
         }
+
+        return new GroupedVolumes(startTime, max, prices, volumes);
     }
 
     /**
-     * {@inheritDoc}
+     * 
      */
-    @Override
-    public String toString() {
-        StringBuilder b = new StringBuilder();
-        b.append(upper.size() + lower.size()).append(" ");
-        b.append(Arrays.toString(upper.asArray()));
-        b.append(" ");
-        b.append(Arrays.toString(lower.asArray()));
-        return b.toString();
-    }
+    public static class GroupedVolumes {
 
-    private static class Freezed extends PriceRangedVolume {
+        /** The starting time of period. (epoch second) */
+        public final long startTime;
 
-    }
+        /** The max volume in this period. */
+        public final double maxVolume;
 
-    private static class Realtime extends PriceRangedVolume {
+        /** The price list. */
+        public final DoubleArray prices;
 
+        /** The volume list. */
+        public final DoubleArray volumes;
+
+        private GroupedVolumes(long startTime, double maxVolume, DoubleArray prices, DoubleArray volumes) {
+            this.startTime = startTime;
+            this.maxVolume = maxVolume;
+            this.prices = prices;
+            this.volumes = volumes;
+        }
     }
 }
