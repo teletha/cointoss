@@ -28,6 +28,7 @@ public final class BitFlyer extends MarketServiceProvider {
             .target(Currency.BTC.minimumSize(0.01).scale(8))
             .base(Currency.JPY.minimumSize(1))
             .targetCurrencyBidSizes(Num.of(0.01), Num.of(0.1), Num.of(1))
+            .priceRangeModifier(200)
             .acquirableExecutionSize(AcquirableSize)
             .executionLogger(BitFlyerLogger.class));
 

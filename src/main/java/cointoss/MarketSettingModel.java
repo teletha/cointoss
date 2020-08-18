@@ -45,6 +45,21 @@ interface MarketSettingModel {
     }
 
     /**
+     * Get the price range modifier of base currency.
+     */
+    @Icy.Property
+    default int priceRangeModifier() {
+        return 10;
+    }
+
+    /**
+     * Get the recommended price range of base currency.
+     */
+    default Num recommendedPriceRange() {
+        return base().minimumSize.multiply(priceRangeModifier());
+    }
+
+    /**
      * Configure max acquirable execution size per one request.
      * 
      * @return

@@ -515,7 +515,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         E first() {
-            return items[min];
+            return items == null ? null : items[min];
         }
 
         /**
@@ -523,7 +523,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         E last() {
-            return items[max];
+            return items == null ? null : items[max];
         }
 
         /**

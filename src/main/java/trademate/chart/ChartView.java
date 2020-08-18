@@ -172,13 +172,12 @@ public class ChartView extends View {
                     v.ⅱ.orderBook.shorts.groupBy(v.ⅰ);
                 });
 
-        pricedVolumeRange.initializeLazy(market.observe().map(m -> m.service.setting.base.minimumSize.multiply(100)))
+        pricedVolumeRange.initializeLazy(market.observe().map(m -> m.service.setting.recommendedPriceRange()))
                 .acceptPositiveNumberInput()
                 .normalizeInput(Form.NFKC)
                 .maximumInput(6)
                 .tooltip(en("Display a price-ranged volume with a specified price range."))
                 .enableWhen(showPricedVolume.isSelected());
-
     }
 
     /**

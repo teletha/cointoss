@@ -264,11 +264,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         });
 
         layoutCandle.layoutBy(userInterfaceModification())
-                .layoutBy(chart.candleType.observe())
+                .layoutBy(chart.candleType.observe(), chart.ticker.observe())
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.open.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)));
         layoutCandleLatest.layoutBy(userInterfaceModification())
-                .layoutBy(chart.candleType.observe())
+                .layoutBy(chart.candleType.observe(), chart.ticker.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
@@ -278,10 +278,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         .flatMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
         layoutPriceRangedVolume.layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe())
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeRange
+                        .observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
         layoutPriceRangedVolumeLatest.layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe())
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeRange
+                        .observe())
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(10, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
@@ -900,7 +902,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             chart.market.to(m -> {
                 m.priceVolume.previous().to(volumes -> {
-                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes.grouped(50));
+                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes.groupedByPrice(chart.pricedVolumeRange.value()));
                     priceVolumeBar.draw();
                 });
             });
@@ -910,7 +912,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolumeLatest.clear();
 
             chart.market.map(m -> m.priceVolume.latest()).to(volumes -> {
-                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes.grouped(50));
+                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes.groupedByPrice(chart.pricedVolumeRange.value()));
                 priceVolumeBar.draw();
             });
         });

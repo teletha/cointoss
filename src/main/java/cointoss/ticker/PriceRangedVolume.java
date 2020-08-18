@@ -114,6 +114,16 @@ public class PriceRangedVolume {
     }
 
     /**
+     * Compute the grouped price-ranged-volume data.
+     * 
+     * @param groupSize
+     * @return
+     */
+    public GroupedVolumes groupedByPrice(Num range) {
+        return grouped(Math.max(1, range.multiply(tens).intValue() / priceRange));
+    }
+
+    /**
      * 
      */
     public static class GroupedVolumes {
