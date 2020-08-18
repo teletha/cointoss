@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import java.net.ConnectException;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.ArrayDeque;
@@ -106,6 +107,17 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
+     * Reconnect socket when some message match the specified criteria.
+     * 
+     * @param condition
+     * @return Chainable API.
+     */
+    @Icy.Property
+    public Predicate<JSON> recconnectIf() {
+        return null;
+    }
+
+    /**
      * Outputs a detailed log.
      */
     public EfficientWebSocket enableDebug() {
@@ -170,7 +182,7 @@ public abstract class EfficientWebSocketModel {
     private void sendSubscription(IdentifiableTopic topic) {
         if (ws != null) {
             subscribings.add(topic);
-            topic.subscribing = I.schedule(0, 3, TimeUnit.SECONDS, true, scheduler()).to(count -> {
+            topic.subscribing = I.schedule(0, 10, TimeUnit.SECONDS, true, scheduler()).to(count -> {
                 ws.sendText(I.write(topic), true);
                 logger.info("Sent websocket command {} to {}. @{}", topic, address(), count);
             });
@@ -210,14 +222,21 @@ public abstract class EfficientWebSocketModel {
             }
             queue.clear();
         }, client()).to(debug ? I.bundle(this::outputTestCode, this::dispatch) : this::dispatch, e -> {
-            logger.trace("Disconnected websocket [{}].", address(), cause(e));
-            disconnect();
-            signals.values().forEach(signal -> signal.error(e));
+            error(e);
         }, () -> {
             logger.trace("Finished websocket [{}].", address());
             disconnect();
             signals.values().forEach(signal -> signal.complete());
         });
+    }
+
+    /**
+     * Disconnect websocket connection and send error message to all channels.
+     */
+    private void error(Throwable e) {
+        logger.trace("Disconnected websocket [{}].", address(), cause(e));
+        disconnect();
+        signals.values().forEach(signal -> signal.error(e));
     }
 
     /**
@@ -253,6 +272,14 @@ public abstract class EfficientWebSocketModel {
                     return;
                 }
             }
+
+            Predicate<JSON> recconnect = recconnectIf();
+            if (recconnect != null && recconnect.test(json)) {
+                error(new ConnectException("Server was terminated by some error, Try to reconnect."));
+                return;
+            }
+
+            // we can't handle message
             logger.warn("Unknown message was recieved. [{}] {}", address(), text);
         }
     }
