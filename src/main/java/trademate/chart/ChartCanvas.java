@@ -42,6 +42,7 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.order.OrderBookPage;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
+import cointoss.ticker.PriceRangedVolume;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
@@ -158,7 +159,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Chart UI */
     private final EnhancedCanvas priceRangedVolume = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
-            .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
+            .bindSizeTo(this)
             .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
             .fontSize(8)
             .textBaseLine(VPos.CENTER);
@@ -887,8 +888,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolume.clear();
 
             chart.market.to(m -> {
-                priceVolumeBar = new PriceRangedVolumeBar(m);
-                priceVolumeBar.draw();
+                m.priceVolume.all().forEach(volumes -> {
+                    priceVolumeBar = new PriceRangedVolumeBar(volumes);
+                    priceVolumeBar.draw();
+                });
             });
         });
     }
@@ -1274,25 +1277,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The maximum size on buyers. */
         private double maxSize = OrderbookBarWidth;
 
-        private DoubleArray prices = new DoubleArray();
-
-        private DoubleArray sizes = new DoubleArray();
+        private PriceRangedVolume volumes;
 
         /**
          * Calculate info.
          * 
          * @param market
          */
-        private PriceRangedVolumeBar(Market market) {
-            final double visibleMax = axisY.computeVisibleMaxValue();
-            final double visibleMin = axisY.computeVisibleMinValue();
-
-            market.priceVolume.latest().each((price, size) -> {
-                maxSize = Math.max(maxSize, size);
-                prices.add(price);
-                sizes.add(size);
-            });
-            scale = OrderbookBarWidth / maxSize;
+        private PriceRangedVolumeBar(PriceRangedVolume volumes) {
+            this.volumes = volumes;
+            scale = 8 / maxSize;
         }
 
         /**
@@ -1304,12 +1298,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void draw() {
             GraphicsContext gc = priceRangedVolume.getGraphicsContext2D();
+            double start = axisX.getPositionForValue(volumes.startTime);
 
-            for (int i = 0, size = prices.size(); i < size; i++) {
-                double position = axisY.getPositionForValue(prices.get(i));
-                double width = sizes.get(i) * scale;
-                gc.strokeLine(0, position, width, position);
-            }
+            volumes.each((price, size) -> {
+                double position = axisY.getPositionForValue(price);
+                double width = size * scale;
+                gc.strokeLine(start, position, start + width, position);
+            });
         }
     }
 }

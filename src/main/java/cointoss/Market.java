@@ -23,6 +23,7 @@ import java.util.function.Function;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
@@ -113,10 +114,14 @@ public class Market implements Disposable {
         // build tickers for each span
         timeline.to(e -> {
             tickers.update(e);
-            priceVolume.update(e);
         });
 
-        tickers.on(Span.Day3).open.to(priceVolume::update);
+        if (service == BitFlyer.FX_BTC_JPY) {
+            tickers.on(Span.Day1).open.to(priceVolume::update);
+            timeline.to(e -> {
+                priceVolume.update(e);
+            });
+        }
 
         readOrderBook();
     }

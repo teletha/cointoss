@@ -17,6 +17,9 @@ import cointoss.util.Num;
 
 public class PriceRangedVolume {
 
+    /** The starting time of period. (epoch seconds) */
+    public final long startTime;
+
     private final int priceBase;
 
     private final int priceRange;
@@ -29,7 +32,10 @@ public class PriceRangedVolume {
 
     private final DoubleArray lower = new DoubleArray();
 
-    PriceRangedVolume(Num priceBase, Num priceRange, int scale) {
+    private double max = 0;
+
+    PriceRangedVolume(long startTime, Num priceBase, Num priceRange, int scale) {
+        this.startTime = startTime;
         this.scale = scale;
         this.tens = (int) Math.pow(10, scale);
         this.priceBase = (int) Math.round(priceBase.doubleValue() * tens);
@@ -37,10 +43,11 @@ public class PriceRangedVolume {
     }
 
     void update(Num price, double size) {
+        double updated;
         int diff = price.decuple(scale).intValue() - priceBase;
 
         if (0 <= diff) {
-            upper.increment(diff / priceRange, size);
+            updated = upper.increment(diff / priceRange, size);
         } else {
             // Convert a and b to a double, and you can use the division and Math.ceil as you wanted
             // it to work. However I strongly discourage the use of this approach, because double
@@ -50,7 +57,11 @@ public class PriceRangedVolume {
             // This is very short, but maybe for some less intuitive. I think this less
             // intuitive approach would be faster than the double division.
             // Please note that this doesn't work for b < 0.
-            lower.increment((-diff + priceRange - 1) / priceRange - 1, size);
+            updated = lower.increment((-diff + priceRange - 1) / priceRange - 1, size);
+        }
+
+        if (max < updated) {
+            max = updated;
         }
     }
 
@@ -92,5 +103,13 @@ public class PriceRangedVolume {
         b.append(" ");
         b.append(Arrays.toString(lower.asArray()));
         return b.toString();
+    }
+
+    private static class Freezed extends PriceRangedVolume {
+
+    }
+
+    private static class Realtime extends PriceRangedVolume {
+
     }
 }

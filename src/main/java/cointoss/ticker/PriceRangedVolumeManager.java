@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -34,7 +35,7 @@ public class PriceRangedVolumeManager {
     }
 
     public void update(Tick tick) {
-        volume = new PriceRangedVolume(tick.openPrice, priceRange, scale);
+        volume = new PriceRangedVolume(tick.openTime, tick.openPrice, priceRange, scale);
         volumes.put(tick.openTime, volume);
     }
 
@@ -44,5 +45,9 @@ public class PriceRangedVolumeManager {
 
     public PriceRangedVolume latest() {
         return volume;
+    }
+
+    public Collection<PriceRangedVolume> all() {
+        return volumes.values();
     }
 }

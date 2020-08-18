@@ -103,12 +103,11 @@ public class DoubleArray {
      * 
      * @param index An index to set.
      * @param increment A value to increment.
-     * @return Chainable API.
+     * @return An updated value.
      */
-    public DoubleArray increment(int index, double increment) {
+    public double increment(int index, double increment) {
         ensureSize(index);
-        array[index] += increment;
-        return this;
+        return array[index] += increment;
     }
 
     /**
@@ -116,12 +115,11 @@ public class DoubleArray {
      * 
      * @param index An index to set.
      * @param decrement A value to decrement.
-     * @return Chainable API.
+     * @return An updated value.
      */
-    public DoubleArray decrement(int index, double decrement) {
+    public double decrement(int index, double decrement) {
         ensureSize(index);
-        array[index] -= decrement;
-        return this;
+        return array[index] -= decrement;
     }
 
     /**
