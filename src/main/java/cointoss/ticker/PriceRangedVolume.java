@@ -32,7 +32,7 @@ public class PriceRangedVolume {
 
     private final DoubleArray lower = new DoubleArray();
 
-    private double max = 0;
+    public double max = 0;
 
     PriceRangedVolume(long startTime, Num priceBase, Num priceRange, int scale) {
         this.startTime = startTime;
@@ -89,6 +89,29 @@ public class PriceRangedVolume {
         }
         for (int i = 0, size = upper.size(); i < size; i++) {
             consumer.accept((priceBase + i * priceRange) / tens, upper.get(i));
+        }
+    }
+
+    public void each(int group, DoubleBiConsumer consumer) {
+        int now = 0;
+        double totalSize = 0;
+        for (int i = 0, size = lower.size(); i < size; i++) {
+            totalSize += lower.get(i);
+
+            if (++now == group) {
+                consumer.accept((priceBase - (i + 1) * priceRange) / tens, totalSize);
+                totalSize = 0;
+                now = 0;
+            }
+        }
+        for (int i = 0, size = upper.size(); i < size; i++) {
+            totalSize += upper.get(i);
+
+            if (++now == group) {
+                consumer.accept((priceBase + i * priceRange) / tens, totalSize);
+                totalSize = 0;
+                now = 0;
+            }
         }
     }
 

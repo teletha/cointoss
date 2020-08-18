@@ -1274,9 +1274,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The current diminishing scale. */
         private final double scale;
 
-        /** The maximum size on buyers. */
-        private double maxSize = OrderbookBarWidth;
-
         private PriceRangedVolume volumes;
 
         /**
@@ -1286,7 +1283,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private PriceRangedVolumeBar(PriceRangedVolume volumes) {
             this.volumes = volumes;
-            scale = 8 / maxSize;
+            scale = 160 / (volumes.max * 50);
         }
 
         /**
@@ -1300,7 +1297,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             GraphicsContext gc = priceRangedVolume.getGraphicsContext2D();
             double start = axisX.getPositionForValue(volumes.startTime);
 
-            volumes.each((price, size) -> {
+            volumes.each(50, (price, size) -> {
                 double position = axisY.getPositionForValue(price);
                 double width = size * scale;
                 gc.strokeLine(start, position, start + width, position);
