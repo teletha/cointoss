@@ -694,7 +694,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
                         double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
-                        gc.setStroke(chart.candleType.v.coordinator.apply(tick));
+                        gc.setStroke(chart.candleType.value().coordinator.apply(tick));
                         gc.setLineWidth(1);
                         gc.strokeLine(x, high, x, low);
                         if (needDrawingOpenAndClose) {
@@ -793,7 +793,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
                 double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
-                gc.setStroke(chart.candleType.v.coordinator.apply(tick));
+                gc.setStroke(chart.candleType.value().coordinator.apply(tick));
                 gc.setLineWidth(1);
                 gc.strokeLine(x, high, x, low);
                 gc.setLineWidth(BarWidth);
@@ -902,7 +902,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             chart.market.to(m -> {
                 m.priceVolume.previous().to(volumes -> {
-                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes.groupedByPrice(chart.orderbookPriceRange.value()));
+                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes[0].groupedByPrice(chart.orderbookPriceRange
+                            .value()), volumes[1].groupedByPrice(chart.orderbookPriceRange.value()));
                     priceVolumeBar.draw();
                 });
             });
@@ -912,8 +913,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolumeLatest.clear();
 
             chart.market.map(m -> m.priceVolume.latest()).to(volumes -> {
-                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes
-                        .groupedByPrice(chart.orderbookPriceRange.value()));
+                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes[0]
+                        .groupedByPrice(chart.orderbookPriceRange.value()), volumes[1].groupedByPrice(chart.orderbookPriceRange.value()));
                 priceVolumeBar.draw();
             });
         });
@@ -1299,17 +1300,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The current diminishing scale. */
         private final double scale;
 
-        private GroupedVolumes volumes;
+        private GroupedVolumes longs;
+
+        private GroupedVolumes shorts;
 
         /**
          * Calculate info.
          * 
          * @param market
          */
-        private PriceRangedVolumeBar(EnhancedCanvas canvas, GroupedVolumes volumes) {
+        private PriceRangedVolumeBar(EnhancedCanvas canvas, GroupedVolumes longs, GroupedVolumes shorts) {
             this.canvas = canvas;
-            this.volumes = volumes;
-            this.scale = 40 / volumes.maxVolume;
+            this.longs = longs;
+            this.shorts = shorts;
+            this.scale = 40 * 2 / Math.max(longs.maxVolume, shorts.maxVolume);
         }
 
         /**
@@ -1321,12 +1325,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void draw() {
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            double start = axisX.getPositionForValue(volumes.startTime);
+            double start = axisX.getPositionForValue(longs.startTime);
 
-            for (int i = 0, size = volumes.prices.size(); i < size; i++) {
-                double position = axisY.getPositionForValue(volumes.prices.get(i));
-                double width = volumes.volumes.get(i) * scale;
-                gc.strokeLine(start, position, start + width, position);
+            for (int i = 0, size = longs.prices.size(); i < size; i++) {
+                double position = axisY.getPositionForValue(longs.prices.get(i));
+                double l = longs.volumes.get(i);
+                double s = shorts.volumes.get(i);
+                double w = (l - s) * scale;
+                gc.strokeLine(start, position, start + w, position);
             }
         }
     }

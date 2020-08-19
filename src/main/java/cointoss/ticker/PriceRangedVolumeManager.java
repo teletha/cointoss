@@ -12,6 +12,7 @@ package cointoss.ticker;
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.I;
@@ -19,9 +20,11 @@ import kiss.Signal;
 
 public class PriceRangedVolumeManager {
 
-    private final ConcurrentSkipListMap<Long, PriceRangedVolume> volumes = new ConcurrentSkipListMap(Comparator.reverseOrder());
+    private final ConcurrentSkipListMap<Long, PriceRangedVolume[]> volumes = new ConcurrentSkipListMap(Comparator.reverseOrder());
 
-    private PriceRangedVolume volume;
+    private PriceRangedVolume longs;
+
+    private PriceRangedVolume shorts;
 
     private final Num priceRange;
 
@@ -36,19 +39,24 @@ public class PriceRangedVolumeManager {
     }
 
     public void update(Tick tick) {
-        volume = new PriceRangedVolume(tick.openTime, tick.openPrice, priceRange, scale);
-        volumes.put(tick.openTime, volume);
+        longs = new PriceRangedVolume(tick.openTime, tick.openPrice, priceRange, scale);
+        shorts = new PriceRangedVolume(tick.openTime, tick.openPrice, priceRange, scale);
+        volumes.put(tick.openTime, new PriceRangedVolume[] {longs, shorts});
     }
 
     public void update(Execution e) {
-        volume.update(e.price, e.size.doubleValue());
+        if (e.direction == Direction.BUY) {
+            longs.update(e.price, e.size.doubleValue());
+        } else {
+            shorts.update(e.price, e.size.doubleValue());
+        }
     }
 
-    public PriceRangedVolume latest() {
-        return volume;
+    public PriceRangedVolume[] latest() {
+        return new PriceRangedVolume[] {longs, shorts};
     }
 
-    public Signal<PriceRangedVolume> previous() {
+    public Signal<PriceRangedVolume[]> previous() {
         return I.signal(volumes.values()).skip(1);
     }
 }

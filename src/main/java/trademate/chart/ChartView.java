@@ -45,9 +45,6 @@ public class ChartView extends View {
     /** The list of plottable candle date. */
     public final Variable<Ticker> ticker = Variable.empty();
 
-    /** The candle type. */
-    public final Variable<CandleType> candleType = Variable.of(CandleType.Price);
-
     /** Configuration UI */
     private UIButton config;
 
@@ -55,7 +52,7 @@ public class ChartView extends View {
     private UIComboBox<Span> span;
 
     /** Configuration UI */
-    private UIComboBox<CandleType> candle;
+    public UIComboBox<CandleType> candleType;
 
     /** Configuration UI */
     public UICheckBox showLatestPrice;
@@ -71,6 +68,9 @@ public class ChartView extends View {
 
     /** Configuration UI */
     public UICheckBox showPricedVolume;
+
+    /** Configuration UI */
+    public UIComboBox<PricedVolumeType> pricedVolumeType;
 
     /** Chart UI */
     public Chart chart;
@@ -143,14 +143,14 @@ public class ChartView extends View {
         config.text(FontAwesome.Glyph.GEAR).popup(new ViewDSL() {
             {
                 $(vbox, () -> {
-                    form("Candle Type", candle);
+                    form("Candle Type", candleType);
                     form("Latest Price", showLatestPrice);
                     form("Orderbook", FormStyles.FormInputMin, showOrderbook, orderbookPriceRange, orderbookHideSize);
-                    form("Priced Volume", showPricedVolume);
+                    form("Priced Volume", FormStyles.FormInputMin, showPricedVolume, pricedVolumeType);
                 });
             }
         });
-        candle.initialize(CandleType.values()).observing(candleType::set);
+        candleType.initialize(CandleType.values());
         showLatestPrice.initialize(true);
         showOrderbook.initialize(true);
         showPricedVolume.initialize(true);
@@ -168,6 +168,8 @@ public class ChartView extends View {
                     v.ⅱ.orderBook.longs.groupBy(v.ⅰ);
                     v.ⅱ.orderBook.shorts.groupBy(v.ⅰ);
                 });
+
+        pricedVolumeType.initialize(PricedVolumeType.values()).enableWhen(showPricedVolume.isSelected());
     }
 
     /**
