@@ -9,6 +9,8 @@
  */
 package cointoss.util;
 
+import java.util.Arrays;
+
 public class DoubleArray {
 
     private volatile int size = 0;
@@ -182,5 +184,13 @@ public class DoubleArray {
      */
     public double[] asArray() {
         return array;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "DoubleArray[Size: " + size + " Items: " + Arrays.toString(array) + "]";
     }
 }

@@ -84,6 +84,7 @@ public class PriceRangedVolume {
         DoubleArray prices = new DoubleArray(size);
         DoubleArray volumes = new DoubleArray(size);
         double max = 0;
+        double half = priceRange / tens / 2;
 
         int now = 0;
         double volume = 0;
@@ -91,7 +92,7 @@ public class PriceRangedVolume {
             volume += lower.get(i);
 
             if (++now == groupSize) {
-                prices.add((priceBase - (i + 1) * priceRange) / tens);
+                prices.add((priceBase - i * priceRange) / (double) tens - half);
                 volumes.add(volume);
                 max = Math.max(max, volume);
                 volume = 0;
@@ -102,14 +103,13 @@ public class PriceRangedVolume {
             volume += upper.get(i);
 
             if (++now == groupSize) {
-                prices.add((priceBase + i * priceRange) / tens);
+                prices.add((priceBase + i * priceRange) / (double) tens + half);
                 volumes.add(volume);
                 max = Math.max(max, volume);
                 volume = 0;
                 now = 0;
             }
         }
-
         return new GroupedVolumes(startTime, max, prices, volumes);
     }
 
