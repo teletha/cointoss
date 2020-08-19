@@ -112,8 +112,13 @@ public class Market implements Disposable {
 
         // build tickers for each span
         timeline.to(e -> {
-            tickers.update(e);
-            priceVolume.update(e);
+            try {
+                tickers.update(e);
+                priceVolume.update(e);
+            } catch (Throwable e1) {
+                System.out.println(service.marketIdentity());
+                throw I.quiet(e1);
+            }
         });
         tickers.on(Span.Day1).open.to(priceVolume::update);
 

@@ -72,9 +72,6 @@ public class ChartView extends View {
     /** Configuration UI */
     public UICheckBox showPricedVolume;
 
-    /** Configuration UI */
-    public UITextValue<Num> pricedVolumeRange;
-
     /** Chart UI */
     public Chart chart;
 
@@ -149,7 +146,7 @@ public class ChartView extends View {
                     form("Candle Type", candle);
                     form("Latest Price", showLatestPrice);
                     form("Orderbook", FormStyles.FormInputMin, showOrderbook, orderbookPriceRange, orderbookHideSize);
-                    form("Priced Volume", FormStyles.FormInputMin, showPricedVolume, pricedVolumeRange);
+                    form("Priced Volume", showPricedVolume);
                 });
             }
         });
@@ -171,13 +168,6 @@ public class ChartView extends View {
                     v.ⅱ.orderBook.longs.groupBy(v.ⅰ);
                     v.ⅱ.orderBook.shorts.groupBy(v.ⅰ);
                 });
-
-        pricedVolumeRange.initializeLazy(market.observe().map(m -> m.service.setting.recommendedPriceRange()))
-                .acceptPositiveNumberInput()
-                .normalizeInput(Form.NFKC)
-                .maximumInput(6)
-                .tooltip(en("Display a price-ranged volume with a specified price range."))
-                .enableWhen(showPricedVolume.isSelected());
     }
 
     /**

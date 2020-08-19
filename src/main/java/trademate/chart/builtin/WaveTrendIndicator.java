@@ -22,7 +22,7 @@ import trademate.TradeMateStyle;
 import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
 
-public class WaveTrendIndicator extends PlotScript implements StyleDSL {
+public class WaveTrendIndicator extends PlotScript {
 
     public final Variable<Integer> channelLength = Variable.of(10);
 
@@ -31,22 +31,6 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
     public final Variable<Integer> overBoughtLevel1 = Variable.of(60);
 
     public final Variable<Integer> overSoldLevel1 = Variable.of(-60);
-
-    public Style Main = () -> {
-        stroke.color(TradeMateStyle.BUY).width(0.3, px);
-    };
-
-    public Style M10 = () -> {
-        stroke.color(Color.rgb(17, 132, 66, 0.5));
-    };
-
-    public Style M30 = () -> {
-        stroke.color(Color.rgb(57, 130, 195, 0.5));
-    };
-
-    public Style H1 = () -> {
-        stroke.color(Color.rgb(157, 130, 195, 0.5));
-    };
 
     /**
      * {@inheritDoc}
@@ -57,13 +41,31 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
 
         in(PlotArea.Low, () -> {
             line(0);
-            line(overBoughtLevel1, Main);
-            line(overSoldLevel1, Main);
+            line(overBoughtLevel1, style.Main);
+            line(overSoldLevel1, style.Main);
 
-            line(indicator, Main);
-            line(Indicators.waveTrend(market.tickers.on(Span.Minute15), channelLength.v, averageLength.v), M10);
-            line(Indicators.waveTrend(market.tickers.on(Span.Minute30), channelLength.v, averageLength.v), M30);
-            line(Indicators.waveTrend(market.tickers.on(Span.Hour1), channelLength.v, averageLength.v), H1);
+            line(indicator, style.Main);
+            line(Indicators.waveTrend(market.tickers.on(Span.Minute15), channelLength.v, averageLength.v), style.M10);
+            line(Indicators.waveTrend(market.tickers.on(Span.Minute30), channelLength.v, averageLength.v), style.M30);
+            line(Indicators.waveTrend(market.tickers.on(Span.Hour1), channelLength.v, averageLength.v), style.H1);
         });
+    }
+
+    interface style extends StyleDSL {
+        Style Main = () -> {
+            stroke.color(TradeMateStyle.BUY).width(0.3, px);
+        };
+
+        Style M10 = () -> {
+            stroke.color(Color.rgb(17, 132, 66, 0.5));
+        };
+
+        Style M30 = () -> {
+            stroke.color(Color.rgb(57, 130, 195, 0.5));
+        };
+
+        Style H1 = () -> {
+            stroke.color(Color.rgb(157, 130, 195, 0.5));
+        };
     }
 }

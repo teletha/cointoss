@@ -278,11 +278,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         .flatMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
         layoutPriceRangedVolume.layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeRange
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.orderbookPriceRange
                         .observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
         layoutPriceRangedVolumeLatest.layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeRange
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.orderbookPriceRange
                         .observe())
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(10, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
@@ -902,7 +902,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             chart.market.to(m -> {
                 m.priceVolume.previous().to(volumes -> {
-                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes.groupedByPrice(chart.pricedVolumeRange.value()));
+                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes.groupedByPrice(chart.orderbookPriceRange.value()));
                     priceVolumeBar.draw();
                 });
             });
@@ -912,7 +912,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolumeLatest.clear();
 
             chart.market.map(m -> m.priceVolume.latest()).to(volumes -> {
-                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes.groupedByPrice(chart.pricedVolumeRange.value()));
+                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes
+                        .groupedByPrice(chart.orderbookPriceRange.value()));
                 priceVolumeBar.draw();
             });
         });

@@ -9,7 +9,7 @@
  */
 package trademate.chart.builtin;
 
-import static cointoss.ticker.Span.Minute1;
+import static cointoss.ticker.Span.*;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
@@ -23,31 +23,7 @@ import stylist.value.Color;
 import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
 
-public class TraderVisualizer extends PlotScript implements StyleDSL {
-
-    public Style profit = () -> {
-        stroke.color(Color.rgb(158, 208, 221));
-    };
-
-    public Style realized = () -> {
-        stroke.color(Color.rgb(201, 216, 150));
-    };
-
-    public Style unrealized = () -> {
-        stroke.color(Color.rgb(201, 216, 150)).dashArray(1, 6);
-    };
-
-    public Style size = () -> {
-        stroke.color(Color.rgb(220, 220, 200)).width(0.3, px);
-    };
-
-    public Style longSize = () -> {
-        stroke.color(Color.rgb(180, 220, 200)).width(0.3, px);
-    };
-
-    public Style shortSize = () -> {
-        stroke.color(Color.rgb(180, 220, 200)).width(0.3, px);
-    };
+public class TraderVisualizer extends PlotScript {
 
     /**
      * {@inheritDoc}
@@ -75,12 +51,12 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
         }).memoize();
 
         in(PlotArea.Low, () -> {
-            line(indicator.map(s -> s.unrealized).name("含み"), unrealized);
-            line(indicator.map(s -> s.profit).name("損益"), profit);
+            line(indicator.map(s -> s.unrealized).name("含み"), style.unrealized);
+            line(indicator.map(s -> s.profit).name("損益"), style.profit);
         });
 
         in(PlotArea.LowNarrow, () -> {
-            line(indicator.map(s -> s.size).name("枚数"), size, indicator.map(s -> s.sizeInfo()));
+            line(indicator.map(s -> s.size).name("枚数"), style.size, indicator.map(s -> s.sizeInfo()));
         });
     }
 
@@ -127,5 +103,31 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
         private String sizeInfo() {
             return size + "(" + longs + " " + shorts + ")";
         }
+    }
+
+    interface style extends StyleDSL {
+        Style profit = () -> {
+            stroke.color(Color.rgb(158, 208, 221));
+        };
+
+        Style realized = () -> {
+            stroke.color(Color.rgb(201, 216, 150));
+        };
+
+        Style unrealized = () -> {
+            stroke.color(Color.rgb(201, 216, 150)).dashArray(1, 6);
+        };
+
+        Style size = () -> {
+            stroke.color(Color.rgb(220, 220, 200)).width(0.3, px);
+        };
+
+        Style longSize = () -> {
+            stroke.color(Color.rgb(180, 220, 200)).width(0.3, px);
+        };
+
+        Style shortSize = () -> {
+            stroke.color(Color.rgb(180, 220, 200)).width(0.3, px);
+        };
     }
 }

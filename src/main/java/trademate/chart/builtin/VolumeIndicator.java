@@ -20,15 +20,7 @@ import trademate.chart.ChartStyles;
 import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
 
-public class VolumeIndicator extends PlotScript implements StyleDSL {
-
-    public Style Long = () -> {
-        stroke.color(ChartStyles.buy);
-    };
-
-    public Style Short = () -> {
-        stroke.color(ChartStyles.sell.opacify(-0.49));
-    };
+public class VolumeIndicator extends PlotScript {
 
     /**
      * {@inheritDoc}
@@ -42,8 +34,21 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::shortVolume);
 
         in(PlotArea.Bottom, () -> {
-            line(buyVolume.scale(volumeScale).name(CommonText.Buy), Long);
-            line(sellVolume.scale(volumeScale).name(CommonText.Sell), Short);
+            line(buyVolume.scale(volumeScale).name(CommonText.Buy), style.Long);
+            line(sellVolume.scale(volumeScale).name(CommonText.Sell), style.Short);
         });
+    }
+
+    /**
+     * 
+     */
+    interface style extends StyleDSL {
+        Style Long = () -> {
+            stroke.color(ChartStyles.buy);
+        };
+
+        Style Short = () -> {
+            stroke.color(ChartStyles.sell.opacify(-0.49));
+        };
     }
 }

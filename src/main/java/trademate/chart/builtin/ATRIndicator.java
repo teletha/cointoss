@@ -19,15 +19,7 @@ import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.chart.PlotScript;
 
-public class ATRIndicator extends PlotScript implements StyleDSL {
-
-    public Style Main = () -> {
-        stroke.color(TradeMateStyle.BUY).width(0.3, px);
-    };
-
-    public Style Per = () -> {
-        stroke.color(TradeMateStyle.SELL).width(0.3, px);
-    };
+public class ATRIndicator extends PlotScript {
 
     /**
      * {@inheritDoc}
@@ -38,9 +30,22 @@ public class ATRIndicator extends PlotScript implements StyleDSL {
         line(atr);
 
         Indicator<Num> tr = NumIndicator.trueRange(ticker).map(n -> n.scale(market.service.setting.base.scale));
-        line(tr, Main);
+        line(tr, style.Main);
 
         Indicator<Num> percentage = atr.map(tr, (avg, now) -> now.divide(avg).scale(3));
-        line(percentage, Per);
+        line(percentage, style.Per);
+    }
+
+    /**
+     * 
+     */
+    interface style extends StyleDSL {
+        Style Main = () -> {
+            stroke.color(TradeMateStyle.BUY).width(0.3, px);
+        };
+
+        Style Per = () -> {
+            stroke.color(TradeMateStyle.SELL).width(0.3, px);
+        };
     }
 }

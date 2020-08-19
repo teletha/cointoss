@@ -17,18 +17,20 @@ import stylist.StyleDSL;
 import stylist.value.Color;
 import trademate.chart.PlotScript;
 
-public class TrendLineIndicator extends PlotScript implements StyleDSL {
+public class TrendLineIndicator extends PlotScript {
 
     public final Variable<Integer> tickLength = Variable.of(21);
-
-    public Style SupportLine = () -> {
-        stroke.color(Color.rgb(253, 253, 223, 0.8));
-    };
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
+    }
+
+    interface style extends StyleDSL {
+        Style SupportLine = () -> {
+            stroke.color(Color.rgb(253, 253, 223, 0.8));
+        };
     }
 }

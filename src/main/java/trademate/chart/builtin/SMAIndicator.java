@@ -21,49 +21,11 @@ import stylist.StyleDSL;
 import stylist.value.Color;
 import trademate.chart.PlotScript;
 
-public class SMAIndicator extends PlotScript implements StyleDSL {
+public class SMAIndicator extends PlotScript {
 
     public final Variable<Integer> shortDays = Variable.of(21);
 
     public final Variable<Integer> longDays = Variable.of(75);
-
-    private double alpha = 0.7;
-
-    public Style shortSMA = () -> {
-        stroke.color(Color.rgb(181, 212, 53, alpha));
-    };
-
-    public Style longSMA = () -> {
-        stroke.color(Color.rgb(54, 78, 161, alpha));
-    };
-
-    public Style SMA5M = () -> {
-        stroke.color(Color.rgb(207, 89, 71, alpha));
-    };
-
-    public Style SMA15M = () -> {
-        stroke.color(Color.rgb(101, 89, 71, alpha));
-    };
-
-    public Style SMA30M = () -> {
-        stroke.color(Color.rgb(107, 191, 71, alpha));
-    };
-
-    public Style SMA1H = () -> {
-        stroke.color(Color.rgb(17, 132, 66, alpha));
-    };
-
-    public Style SMA2H = () -> {
-        stroke.color(Color.rgb(17, 132, 206, alpha));
-    };
-
-    public Style SMA4H = () -> {
-        stroke.color(Color.rgb(57, 80, 195, alpha));
-    };
-
-    public Style SMA6H = () -> {
-        stroke.color(Color.rgb(57, 80, 105, alpha));
-    };
 
     /**
      * {@inheritDoc}
@@ -72,15 +34,15 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
     protected void declare(Market market, Ticker ticker) {
         int base = market.service.setting.base.scale;
 
-        line(ticker, shortDays, base, shortSMA);
-        line(market.tickers.on(Minute5), shortDays, base, SMA5M);
-        line(market.tickers.on(Minute15), shortDays, base, SMA15M);
-        line(market.tickers.on(Minute30), shortDays, base, SMA30M);
-        line(market.tickers.on(Hour1), shortDays, base, SMA1H);
-        line(market.tickers.on(Hour2), shortDays, base, SMA2H);
-        line(market.tickers.on(Hour4), shortDays, base, SMA4H);
-        line(market.tickers.on(Hour6), shortDays, base, SMA6H);
-        line(ticker, longDays, base, longSMA);
+        line(ticker, shortDays, base, style.shortSMA);
+        line(market.tickers.on(Minute5), shortDays, base, style.SMA5M);
+        line(market.tickers.on(Minute15), shortDays, base, style.SMA15M);
+        line(market.tickers.on(Minute30), shortDays, base, style.SMA30M);
+        line(market.tickers.on(Hour1), shortDays, base, style.SMA1H);
+        line(market.tickers.on(Hour2), shortDays, base, style.SMA2H);
+        line(market.tickers.on(Hour4), shortDays, base, style.SMA4H);
+        line(market.tickers.on(Hour6), shortDays, base, style.SMA6H);
+        line(ticker, longDays, base, style.longSMA);
     }
 
     private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {
@@ -93,5 +55,48 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
     @Override
     protected String name() {
         return "SMA(" + shortDays + " " + longDays + ")";
+    }
+
+    /**
+     * 
+     */
+    interface style extends StyleDSL {
+        double alpha = 0.7;
+
+        Style shortSMA = () -> {
+            stroke.color(Color.rgb(181, 212, 53, alpha));
+        };
+
+        Style longSMA = () -> {
+            stroke.color(Color.rgb(54, 78, 161, alpha));
+        };
+
+        Style SMA5M = () -> {
+            stroke.color(Color.rgb(207, 89, 71, alpha));
+        };
+
+        Style SMA15M = () -> {
+            stroke.color(Color.rgb(101, 89, 71, alpha));
+        };
+
+        Style SMA30M = () -> {
+            stroke.color(Color.rgb(107, 191, 71, alpha));
+        };
+
+        Style SMA1H = () -> {
+            stroke.color(Color.rgb(17, 132, 66, alpha));
+        };
+
+        Style SMA2H = () -> {
+            stroke.color(Color.rgb(17, 132, 206, alpha));
+        };
+
+        Style SMA4H = () -> {
+            stroke.color(Color.rgb(57, 80, 195, alpha));
+        };
+
+        Style SMA6H = () -> {
+            stroke.color(Color.rgb(57, 80, 105, alpha));
+        };
     }
 }

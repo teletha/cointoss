@@ -21,6 +21,7 @@ import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import stylist.Style;
+import stylist.StyleDSL;
 import trademate.chart.ChartStyles;
 import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
@@ -93,14 +94,6 @@ public class LazyBear extends Trader {
 
         option(new PlotScript() {
 
-            public Style Long = () -> {
-                stroke.color(ChartStyles.buy);
-            };
-
-            public Style Short = () -> {
-                stroke.color(ChartStyles.sell);
-            };
-
             /**
              * {@inheritDoc}
              */
@@ -115,5 +108,15 @@ public class LazyBear extends Trader {
                 });
             }
         });
+    }
+
+    interface style extends StyleDSL {
+        Style Long = () -> {
+            stroke.color(ChartStyles.buy);
+        };
+
+        Style Short = () -> {
+            stroke.color(ChartStyles.sell);
+        };
     }
 }

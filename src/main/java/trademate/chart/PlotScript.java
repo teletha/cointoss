@@ -21,12 +21,11 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
-import stylist.StyleDSL;
 import trademate.chart.ChartCanvas.CandleMark;
 import trademate.chart.ChartCanvas.Horizon;
 import trademate.chart.ChartCanvas.LineChart;
 
-public abstract class PlotScript implements StyleDSL {
+public abstract class PlotScript {
 
     /** The declared plotters. */
     final Map<PlotArea, Plotter> plotters = new HashMap();
