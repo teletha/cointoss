@@ -17,9 +17,9 @@ public class PriceRangedVolume {
     /** The starting time of period. (epoch second) */
     public final long startTime;
 
-    private final int priceBase;
+    private final long priceBase;
 
-    private final int priceRange;
+    private final long priceRange;
 
     private final int scale;
 
@@ -38,10 +38,10 @@ public class PriceRangedVolume {
     }
 
     void update(Num price, double size) {
-        int diff = price.decuple(scale).intValue() - priceBase;
+        long diff = price.decuple(scale).longValue() - priceBase;
 
         if (0 <= diff) {
-            upper.increment(diff / priceRange, size);
+            upper.increment((int) (diff / priceRange), size);
         } else {
             // Convert a and b to a double, and you can use the division and Math.ceil as you wanted
             // it to work. However I strongly discourage the use of this approach, because double
@@ -51,15 +51,15 @@ public class PriceRangedVolume {
             // This is very short, but maybe for some less intuitive. I think this less
             // intuitive approach would be faster than the double division.
             // Please note that this doesn't work for b < 0.
-            lower.increment((-diff + priceRange - 1) / priceRange - 1, size);
+            lower.increment((int) ((-diff + priceRange - 1) / priceRange) - 1, size);
         }
     }
 
     public double volumeAt(double price) {
-        int diff = (int) (price * tens) - priceBase;
+        long diff = (long) (price * tens) - priceBase;
 
         if (0 <= diff) {
-            return upper.get(diff / priceRange);
+            return upper.get((int) (diff / priceRange));
         } else {
             // Convert a and b to a double, and you can use the division and Math.ceil as you wanted
             // it to work. However I strongly discourage the use of this approach, because double
@@ -69,7 +69,7 @@ public class PriceRangedVolume {
             // This is very short, but maybe for some less intuitive. I think this less
             // intuitive approach would be faster than the double division.
             // Please note that this doesn't work for b < 0.
-            return lower.get((-diff + priceRange - 1) / priceRange - 1);
+            return lower.get((int) ((-diff + priceRange - 1) / priceRange) - 1);
         }
     }
 
@@ -120,7 +120,7 @@ public class PriceRangedVolume {
      * @return
      */
     public GroupedVolumes groupedByPrice(Num range) {
-        return grouped(Math.max(1, range.multiply(tens).intValue() / priceRange));
+        return grouped(Math.max(1, (int) (range.multiply(tens).intValue() / priceRange)));
     }
 
     /**
