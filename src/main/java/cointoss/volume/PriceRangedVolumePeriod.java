@@ -12,14 +12,16 @@ package cointoss.volume;
 import cointoss.util.DoubleArray;
 import cointoss.util.Num;
 
-public class PriceRangedVolume {
+public class PriceRangedVolumePeriod {
 
-    /** The starting time of period. (epoch second) */
+    /** The starting time of this period. (epoch second) */
     public final long startTime;
 
-    private final long priceBase;
+    /** The integral starting price of this period. */
+    private final int startPrice;
 
-    private final long priceRange;
+    /** The integral price range. */
+    private final int priceRange;
 
     private final int scale;
 
@@ -29,19 +31,25 @@ public class PriceRangedVolume {
 
     private final DoubleArray lower = new DoubleArray();
 
-    PriceRangedVolume(long startTime, Num priceBase, Num priceRange, int scale) {
+    PriceRangedVolumePeriod(long startTime, Num startPrice, Num priceRange) {
         this.startTime = startTime;
-        this.scale = scale;
+        this.scale = Math.max(0, priceRange.scale());
         this.tens = (int) Math.pow(10, scale);
-        this.priceBase = (int) Math.round(priceBase.doubleValue() * tens);
+        this.startPrice = (int) Math.round(startPrice.doubleValue() * tens);
         this.priceRange = (int) Math.round(priceRange.doubleValue() * tens);
     }
 
-    void update(Num price, double size) {
-        long diff = price.decuple(scale).longValue() - priceBase;
+    /**
+     * Update volume by price.
+     * 
+     * @param price A target price.
+     * @param volume A target volume.
+     */
+    final void update(Num price, double volume) {
+        int diff = price.decuple(scale).intValue() - startPrice;
 
         if (0 <= diff) {
-            upper.increment((int) (diff / priceRange), size);
+            upper.increment(diff / priceRange, volume);
         } else {
             // Convert a and b to a double, and you can use the division and Math.ceil as you wanted
             // it to work. However I strongly discourage the use of this approach, because double
@@ -51,15 +59,22 @@ public class PriceRangedVolume {
             // This is very short, but maybe for some less intuitive. I think this less
             // intuitive approach would be faster than the double division.
             // Please note that this doesn't work for b < 0.
-            lower.increment((int) ((-diff + priceRange - 1) / priceRange) - 1, size);
+            lower.increment((-diff + priceRange - 1) / priceRange - 1, volume);
         }
     }
 
+    /**
+     * Get price ranged volume by price.
+     * 
+     * @param price A target price (NOT price range). It is round to the suitable price range
+     *            automatically.
+     * @return A price ranged valume.
+     */
     public double volumeAt(double price) {
-        long diff = (long) (price * tens) - priceBase;
+        int diff = (int) (price * tens) - startPrice;
 
         if (0 <= diff) {
-            return upper.get((int) (diff / priceRange));
+            return upper.get(diff / priceRange);
         } else {
             // Convert a and b to a double, and you can use the division and Math.ceil as you wanted
             // it to work. However I strongly discourage the use of this approach, because double
@@ -69,8 +84,16 @@ public class PriceRangedVolume {
             // This is very short, but maybe for some less intuitive. I think this less
             // intuitive approach would be faster than the double division.
             // Please note that this doesn't work for b < 0.
-            return lower.get((int) ((-diff + priceRange - 1) / priceRange) - 1);
+            return lower.get((-diff + priceRange - 1) / priceRange - 1);
         }
+    }
+
+    public void aggregateBySize(int size) {
+
+    }
+
+    public void aggregateByPriceRange(Num range) {
+
     }
 
     /**
@@ -92,7 +115,7 @@ public class PriceRangedVolume {
             volume += lower.get(i);
 
             if (++now == groupSize) {
-                prices.add((priceBase - i * priceRange) / (double) tens - half);
+                prices.add((startPrice - i * priceRange) / (double) tens - half);
                 volumes.add(volume);
                 max = Math.max(max, volume);
                 volume = 0;
@@ -103,7 +126,7 @@ public class PriceRangedVolume {
             volume += upper.get(i);
 
             if (++now == groupSize) {
-                prices.add((priceBase + i * priceRange) / (double) tens + half);
+                prices.add((startPrice + i * priceRange) / (double) tens + half);
                 volumes.add(volume);
                 max = Math.max(max, volume);
                 volume = 0;
@@ -120,7 +143,7 @@ public class PriceRangedVolume {
      * @return
      */
     public GroupedVolumes groupedByPrice(Num range) {
-        return grouped(Math.max(1, (int) (range.multiply(tens).intValue() / priceRange)));
+        return grouped(Math.max(1, range.multiply(tens).intValue() / priceRange));
     }
 
     /**

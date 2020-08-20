@@ -21,43 +21,59 @@ import kiss.Signal;
 
 public class PriceRangedVolumeManager {
 
-    private final ConcurrentSkipListMap<Long, PriceRangedVolume[]> volumes = new ConcurrentSkipListMap(Comparator.reverseOrder());
+    /** The time-based cache. */
+    private final ConcurrentSkipListMap<Long, PriceRangedVolumePeriod[]> volumes = new ConcurrentSkipListMap(Comparator.reverseOrder());
 
-    private PriceRangedVolume longs;
+    /** The volume for buyers. */
+    private PriceRangedVolumePeriod buyer;
 
-    private PriceRangedVolume shorts;
+    /** The volume for sellers. */
+    private PriceRangedVolumePeriod seller;
 
+    /** The minimum price range. */
     private final Num priceRange;
-
-    private final int scale;
 
     /**
      * @param service
      */
-    public PriceRangedVolumeManager(Num priceRange, int scale) {
+    public PriceRangedVolumeManager(Num priceRange) {
         this.priceRange = priceRange;
-        this.scale = scale;
     }
 
-    public void update(Tick tick) {
-        longs = new PriceRangedVolume(tick.openTime, tick.openPrice, priceRange, scale);
-        shorts = new PriceRangedVolume(tick.openTime, tick.openPrice, priceRange, scale);
-        volumes.put(tick.openTime, new PriceRangedVolume[] {longs, shorts});
+    /**
+     * End the current record and start a new one.
+     * 
+     * @param tick A starting point.
+     */
+    public void start(Tick tick) {
+        start(tick.openTime, tick.openPrice);
+    }
+
+    /**
+     * End the current record and start a new one.
+     * 
+     * @param startTime A starting time.
+     * @param startPrice A starting price.
+     */
+    public void start(long startTime, Num startPrice) {
+        buyer = new PriceRangedVolumePeriod(startTime, startPrice, priceRange);
+        seller = new PriceRangedVolumePeriod(startTime, startPrice, priceRange);
+        volumes.put(startTime, new PriceRangedVolumePeriod[] {buyer, seller});
     }
 
     public void update(Execution e) {
         if (e.direction == Direction.BUY) {
-            longs.update(e.price, e.size.doubleValue());
+            buyer.update(e.price, e.size.doubleValue());
         } else {
-            shorts.update(e.price, e.size.doubleValue());
+            seller.update(e.price, e.size.doubleValue());
         }
     }
 
-    public PriceRangedVolume[] latest() {
-        return new PriceRangedVolume[] {longs, shorts};
+    public PriceRangedVolumePeriod[] latest() {
+        return new PriceRangedVolumePeriod[] {buyer, seller};
     }
 
-    public Signal<PriceRangedVolume[]> previous() {
+    public Signal<PriceRangedVolumePeriod[]> previous() {
         return I.signal(volumes.values()).skip(1);
     }
 }

@@ -49,7 +49,7 @@ import cointoss.util.Chrono;
 import cointoss.util.DoubleArray;
 import cointoss.util.Num;
 import cointoss.util.Primitives;
-import cointoss.volume.PriceRangedVolume.GroupedVolumes;
+import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;

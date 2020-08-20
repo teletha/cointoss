@@ -108,19 +108,14 @@ public class Market implements Disposable {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
         this.orderBook = new OrderBookManager(service);
-        this.priceVolume = new PriceRangedVolumeManager(service.setting.base.minimumSize.multiply(10), service.setting.base.scale);
+        this.priceVolume = new PriceRangedVolumeManager(service.setting.base.minimumSize.multiply(10));
 
         // build tickers for each span
         timeline.to(e -> {
-            try {
-                tickers.update(e);
-                priceVolume.update(e);
-            } catch (Throwable e1) {
-                System.out.println(service.marketIdentity());
-                throw I.quiet(e1);
-            }
+            tickers.update(e);
+            priceVolume.update(e);
         });
-        tickers.on(Span.Day1).open.to(priceVolume::update);
+        tickers.on(Span.Day1).open.to(priceVolume::start);
 
         readOrderBook();
     }
