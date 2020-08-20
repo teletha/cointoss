@@ -7,11 +7,12 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.ticker;
+package cointoss.volume;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Num;
+import cointoss.volume.PriceRangedVolume;
 
 class PriceVolumeTest {
 

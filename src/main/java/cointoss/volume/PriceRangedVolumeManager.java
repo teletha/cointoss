@@ -7,13 +7,14 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.ticker;
+package cointoss.volume;
 
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.ticker.Tick;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;

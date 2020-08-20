@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.ticker;
+package cointoss.volume;
 
 import cointoss.util.DoubleArray;
 import cointoss.util.Num;
