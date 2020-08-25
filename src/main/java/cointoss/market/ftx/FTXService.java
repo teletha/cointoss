@@ -53,7 +53,8 @@ public class FTXService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ftx.com/ws/")
             .extractId(json -> json.has("type", "update") ? json.text("channel") + "@" + json.text("market") : null)
-            .recconnectIf(json -> json.has("code", 20001));
+            .recconnectIf(json -> json.has("code", 20001))
+            .stopRecconnectIf(json -> json.has("code", "400"));
 
     /**
      * @param marketName

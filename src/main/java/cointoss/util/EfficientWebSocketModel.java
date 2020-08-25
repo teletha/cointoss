@@ -118,6 +118,17 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
+     * Stop reconnecting socket when some message match the specified criteria.
+     * 
+     * @param condition
+     * @return Chainable API.
+     */
+    @Icy.Property
+    public Predicate<JSON> stopRecconnectIf() {
+        return null;
+    }
+
+    /**
      * Outputs a detailed log.
      */
     public EfficientWebSocket enableDebug() {
@@ -275,6 +286,12 @@ public abstract class EfficientWebSocketModel {
 
             Predicate<JSON> recconnect = recconnectIf();
             if (recconnect != null && recconnect.test(json)) {
+                error(new ConnectException("Server was terminated by some error, Try to reconnect."));
+                return;
+            }
+
+            Predicate<JSON> stopping = stopRecconnectIf();
+            if (stopping != null && stopping.test(json)) {
                 error(new ConnectException("Server was terminated by some error, Try to reconnect."));
                 return;
             }
