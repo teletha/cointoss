@@ -25,6 +25,10 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.000005))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService AMPL_PERP = new FTXService("AMPL-PERP", MarketSetting.with.target(Currency.AMPL.minimumSize(1))
+            .base(Currency.USD.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService BNB_PERP = new FTXService("BNB-PERP", MarketSetting.with.target(Currency.BNB.minimumSize(0.1))
             .base(Currency.USD.minimumSize(0.0005))
             .acquirableExecutionSize(AcquirableSize));
