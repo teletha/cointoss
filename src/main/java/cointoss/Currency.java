@@ -761,6 +761,8 @@ public enum Currency {
 
     FTT("FTT", "FTX Token"),
 
+    YFI("YFI", "Yearn.Finance Token"),
+
     CVT("CVT", "CyberVein"),
 
     WTC("WTC", "Waltonchain"),
