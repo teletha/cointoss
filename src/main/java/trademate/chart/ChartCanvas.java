@@ -280,6 +280,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutPriceRangedVolume.layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.orderbookPriceRange
                         .observe())
+                .layoutBy(chart.ticker.observe().switchMap(t -> t.open))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
         layoutPriceRangedVolumeLatest.layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.orderbookPriceRange
