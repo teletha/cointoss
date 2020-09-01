@@ -20,11 +20,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.market.Consecutive;
-import cointoss.market.Numbering;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -41,9 +40,6 @@ import kiss.Signal;
 
 public class BybitService extends MarketService {
 
-    /** The idetifier management. */
-    static final Numbering Numbering = new Numbering(false, 1000);
-
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]X");
 
@@ -59,7 +55,7 @@ public class BybitService extends MarketService {
      * @param setting
      */
     protected BybitService(String marketName, MarketSetting setting) {
-        super("FTX", marketName, setting);
+        super("Bybit", marketName, setting);
     }
 
     /**
@@ -99,40 +95,44 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        long startTime = Numbering.decode(startId) + 1;
-        long[] endTime = {Numbering.decode(endId)};
+        return call("GET", "trading-records?symbol=" + marketName + "&from=" + startId + "&limit=" + (endId - startId))
+                .flatIterable(e -> e.find("result", "*"))
+                .map(e -> convert(e, previous));
+    }
 
-        return new Signal<JSON>((observer, disposer) -> {
-            int latestSize = 0;
-            List<JSON> executions = new ArrayList(setting.acquirableExecutionSize);
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param e
+     * @param previous
+     * @return
+     */
+    private Execution convert(JSON e, Object[] previous) {
+        Direction side = e.get(Direction.class, "side");
+        Num price = e.get(Num.class, "price");
+        Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
+        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
+        long id = Long.parseLong(e.text("id"));
+        int consecutive;
 
-            // Retrieve the execution history between the specified dates and times in small chunks.
-            while (!disposer.isDisposed()) {
-                call("GET", "markets/" + marketName + "/trades?limit=200&start_time=" + startTime + "&end_time=" + endTime[0])
-                        .flatIterable(e -> e.find("result", "*"))
-                        .waitForTerminate()
-                        .toCollection(executions);
-
-                int size = executions.size();
-                if (latestSize == size) {
-                    break;
-                } else {
-                    latestSize = size;
-                }
+        if (date.equals(previous[1])) {
+            if (side != previous[0]) {
+                consecutive = Execution.ConsecutiveDifference;
+            } else if (side == Direction.BUY) {
+                consecutive = Execution.ConsecutiveSameBuyer;
+            } else {
+                consecutive = Execution.ConsecutiveSameSeller;
             }
+        } else {
+            consecutive = Execution.ConsecutiveDifference;
+        }
 
-            // Since the first one is the most recent value, it is sent in chronological order,
-            // starting with the last one.
-            for (int i = latestSize - 1; 0 <= i; i--) {
-                observer.accept(executions.get(i));
-            }
-            observer.complete();
+        previous[0] = side;
+        previous[1] = date;
 
-            return disposer;
-        }).map(json -> convertByREST(json, increment, previous));
+        return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
     }
 
     /**
@@ -141,26 +141,41 @@ public class BybitService extends MarketService {
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
         AtomicLong counter = new AtomicLong(-1);
-        Consecutive consecutive = new Consecutive();
+        Object[] previous = new Object[2];
 
         return clientRealtimely().subscribe(new Topic("trade", marketName)).flatIterable(json -> json.find("data", "*")).map(e -> {
-            long id = counter.updateAndGet(now -> now == -1 ? calculateId(e) : now + 1);
+            long id = counter.updateAndGet(now -> now == -1 ? requestId(e) : now + 1);
             Direction side = e.get(Direction.class, "side");
             Num price = e.get(Num.class, "price");
             Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
             ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("trade_time_ms")));
 
-            return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive.compute(side, date));
+            int consecutive;
+            if (date.equals(previous[1])) {
+                if (side != previous[0]) {
+                    consecutive = Execution.ConsecutiveDifference;
+                } else if (side == Direction.BUY) {
+                    consecutive = Execution.ConsecutiveSameBuyer;
+                } else {
+                    consecutive = Execution.ConsecutiveSameSeller;
+                }
+            } else {
+                consecutive = Execution.ConsecutiveDifference;
+            }
+            previous[0] = side;
+            previous[1] = date;
+
+            return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
         });
     }
 
     /**
-     * Calculate the actual id.
+     * Request the actual execution id.
      * 
      * @param exe The target execution data.
      * @return An actual id.
      */
-    private synchronized long calculateId(JSON exe) {
+    private synchronized long requestId(JSON exe) {
         String side = exe.text("side");
         String size = exe.text("size");
         String price = exe.text("price");
@@ -197,7 +212,7 @@ public class BybitService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trading-records?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("result", "*"))
-                .map(json -> convertByREST(json, new AtomicLong(), new Object[2]));
+                .map(json -> convert(json, new Object[2]));
     }
 
     /**
@@ -205,24 +220,20 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "trading-records?symbol=" + marketName).flatIterable(e -> e.find("result", "*"))
-                .map(json -> convertByREST(json, new AtomicLong(), new Object[2]));
+        return call("GET", "trading-records?symbol=" + marketName + "&from=" + id).flatIterable(e -> e.find("result", "*"))
+                .map(json -> convert(json, new Object[2]));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public long estimateAcquirableExecutionIdRange(double factor) {
-        return Math.round(factor) * Numbering.padding;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean checkEquality(Execution one, Execution other) {
-        return one.buyer.equals(other.buyer);
+    public long estimateInitialExecutionId() {
+        return call("GET", "trading-records?symbol=" + marketName + "&from=1&limit=1").flatIterable(e -> e.find("result", "*"))
+                .first()
+                .waitForTerminate()
+                .map(json -> Long.parseLong(json.text("id")))
+                .to().v;
     }
 
     /**
@@ -254,7 +265,7 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "markets/" + marketName + "/orderbook?depth=100").map(json -> json.get("result")).map(this::convertOrderBook);
+        return I.signal();
     }
 
     /**
@@ -262,7 +273,7 @@ public class BybitService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderbook", marketName)).map(json -> convertOrderBook(json.get("data")));
+        return I.signal();
     }
 
     /**
@@ -304,41 +315,6 @@ public class BybitService extends MarketService {
     @Override
     public Signal<Num> targetCurrency() {
         return null;
-    }
-
-    /**
-     * Convert to {@link Execution}.
-     * 
-     * @param json
-     * @param previous
-     * @return
-     */
-    private Execution convertByREST(JSON e, AtomicLong increment, Object[] previous) {
-        System.out.println(e);
-        Direction side = e.get(Direction.class, "side");
-        Num price = e.get(Num.class, "price");
-        Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
-        long id = Long.parseLong(e.text("id"));
-        int consecutive;
-
-        if (date.equals(previous[1])) {
-            if (side != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (side == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = side;
-        previous[1] = date;
-
-        return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
     }
 
     /**
@@ -391,10 +367,7 @@ public class BybitService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Bybit.BTC_USD.executionsRealtimely().to(e -> {
-            System.out.println(e);
-        });
-
-        Thread.sleep(30 * 1000);
+        Market m = new Market(Bybit.BTC_USD);
+        m.readLog(log -> log.fromYestaday());
     }
 }
