@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.market.bybit;
+package cointoss.market.bitbank;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -38,7 +37,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
-public class BybitService extends MarketService {
+public class BitbankService extends MarketService {
 
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]X");
@@ -47,14 +46,14 @@ public class BybitService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bybit.com/realtime")
-            .extractId(json -> json.text("topic"));
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bitbank.cc")
+            .extractId(json -> json.text("room_name"));
 
     /**
      * @param marketName
      * @param setting
      */
-    protected BybitService(String marketName, MarketSetting setting) {
+    protected BitbankService(String marketName, MarketSetting setting) {
         super("Bybit", marketName, setting);
     }
 
@@ -110,11 +109,12 @@ public class BybitService extends MarketService {
      * @return
      */
     private Execution convert(JSON e, Object[] previous) {
+        System.out.println(e);
         Direction side = e.get(Direction.class, "side");
         Num price = e.get(Num.class, "price");
-        Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
-        long id = Long.parseLong(e.text("id"));
+        Num size = e.get(Num.class, "amount");
+        ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("executed_at")));
+        long id = Long.parseLong(e.text("transaction_id"));
         int consecutive;
 
         if (date.equals(previous[1])) {
@@ -211,7 +211,8 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "trading-records?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("result", "*"))
+        return call("GET", marketName + "/transactions").flatIterable(e -> e.find("data", "transactions", "*"))
+                .first()
                 .map(json -> convert(json, new Object[2]));
     }
 
@@ -220,7 +221,7 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "trading-records?symbol=" + marketName + "&from=" + id).flatIterable(e -> e.find("result", "*"))
+        return call("GET", marketName + "/transactions").flatIterable(e -> e.find("data", "transactions", "*"))
                 .map(json -> convert(json, new Object[2]));
     }
 
@@ -332,7 +333,7 @@ public class BybitService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Builder builder = HttpRequest.newBuilder(URI.create("https://api.bybit.com/v2/public/" + path));
+        Builder builder = HttpRequest.newBuilder(URI.create("https://public.bitbank.cc/" + path));
 
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Bybit RESTCall"));
     }
@@ -371,5 +372,13 @@ public class BybitService extends MarketService {
             }
             return false;
         }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Bitbank.BTC_JPY.executionsRealtimely().to(e -> {
+            System.out.println(e);
+        });
+
+        Thread.sleep(1000 * 10);
     }
 }
