@@ -265,7 +265,11 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return I.signal();
+        return call("GET", "orderBook/L2?symbol=" + marketName).map(pages -> {
+            OrderBookPageChanges change = new OrderBookPageChanges();
+            pages.find("result", "*").forEach(e -> convertOrderBook(change, e));
+            return change;
+        });
     }
 
     /**
@@ -273,32 +277,35 @@ public class BybitService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return I.signal();
+        return clientRealtimely().subscribe(new Topic("orderBook_200.100ms", marketName)).map(pages -> {
+            OrderBookPageChanges change = new OrderBookPageChanges();
+
+            String type = pages.text("type");
+            if (type.equals("snapshot")) {
+                pages.find("data", "*").forEach(e -> convertOrderBook(change, e));
+            } else {
+                pages.find("data", "delete", "*").forEach(e -> convertOrderBook(change, e));
+                pages.find("data", "update", "*").forEach(e -> convertOrderBook(change, e));
+                pages.find("data", "insert", "*").forEach(e -> convertOrderBook(change, e));
+            }
+
+            return change;
+        });
     }
 
     /**
-     * Convert JSON to {@link OrderBookPageChanges}.
+     * Convert to {@link OrderBookPage}.
      * 
-     * @param array
-     * @return
+     * @param changes
+     * @param e
      */
-    private OrderBookPageChanges convertOrderBook(JSON pages) {
-        OrderBookPageChanges change = new OrderBookPageChanges();
+    private void convertOrderBook(OrderBookPageChanges changes, JSON e) {
+        Num price = e.get(Num.class, "price");
+        String sizeValue = e.text("size");
+        double size = sizeValue == null ? 0 : Double.parseDouble(sizeValue) / price.doubleValue();
 
-        for (JSON bid : pages.find("bids", "*")) {
-            Num price = bid.get(Num.class, "0");
-            double size = Double.parseDouble(bid.text("1"));
-
-            change.bids.add(new OrderBookPage(price, size));
-        }
-
-        for (JSON ask : pages.find("asks", "*")) {
-            Num price = ask.get(Num.class, "0");
-            double size = Double.parseDouble(ask.text("1"));
-
-            change.asks.add(new OrderBookPage(price, size));
-        }
-        return change;
+        List<OrderBookPage> books = e.text("side").charAt(0) == 'B' ? changes.bids : changes.asks;
+        books.add(new OrderBookPage(price, size));
     }
 
     /**
@@ -327,7 +334,7 @@ public class BybitService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.bybit.com/v2/public/" + path));
 
-        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "FTX RESTCall"));
+        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Bybit RESTCall"));
     }
 
     /**
@@ -367,7 +374,7 @@ public class BybitService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Market m = new Market(Bybit.BTC_USD);
-        m.readLog(log -> log.fromYestaday());
+        Market m = new Market(Bybit.EOS_USD);
+        m.readLog(am -> am.fromYestaday());
     }
 }
