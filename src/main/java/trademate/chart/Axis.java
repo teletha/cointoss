@@ -261,6 +261,16 @@ public class Axis extends Region {
     }
 
     /**
+     * Compute the visual length for the specified value distance.
+     * 
+     * @param value A value to compute length.
+     * @return A visual length.
+     */
+    public final double getLengthForValue(double value) {
+        return getPositionForValue(value) - getPositionForValue(0);
+    }
+
+    /**
      * Compute visible max value.
      * 
      * @return

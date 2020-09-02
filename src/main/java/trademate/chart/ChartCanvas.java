@@ -276,13 +276,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         .flatMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
         layoutPriceRangedVolume.layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.orderbookPriceRange
-                        .observe())
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
+                        .observe(), chart.orderbookPriceRange.observe())
                 .layoutBy(chart.ticker.observe().switchMap(t -> t.open))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
         layoutPriceRangedVolumeLatest.layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.orderbookPriceRange
-                        .observe())
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
+                        .observe(), chart.orderbookPriceRange.observe())
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(10, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
@@ -1292,9 +1292,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class PriceRangedVolumeBar {
 
-        /** The current diminishing scale. */
-        private final double scale;
-
         private GroupedVolumes longs;
 
         private GroupedVolumes shorts;
@@ -1309,7 +1306,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             this.longs = period[0].aggregateByPrice(range);
             this.shorts = period[1].aggregateByPrice(range);
-            this.scale = 40 * 2 / Math.max(longs.maxVolume, shorts.maxVolume);
         }
 
         /**
@@ -1318,6 +1314,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param canvas A target canvas to draw chart.
          */
         private void drawOn(EnhancedCanvas canvas) {
+            PriceRangedVolumeType type = chart.pricedVolumeType.value();
+
+            double widthFor1Day = axisX.getLengthForValue(60 * 60 * 24);
+            double maxValue = type.max(longs.maxVolume, shorts.maxVolume);
+            double scale = widthFor1Day / maxValue * type.scale();
+
             GraphicsContext gc = canvas.getGraphicsContext2D();
             double start = axisX.getPositionForValue(longs.startTime);
 
@@ -1325,8 +1327,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 double position = axisY.getPositionForValue(longs.prices.get(i));
                 double l = longs.volumes.get(i);
                 double s = shorts.volumes.get(i);
-                double w = (l - s) * scale;
-                gc.strokeLine(start, position, start + w, position);
+
+                if (type == PriceRangedVolumeType.Separate) {
+                    gc.strokeLine(start, position, start + l * scale, position);
+                    gc.strokeLine(start, position, start - s * scale, position);
+                } else {
+                    gc.strokeLine(start, position, start + type.width(l, s) * scale, position);
+                }
             }
         }
     }

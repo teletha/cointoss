@@ -70,7 +70,7 @@ public class ChartView extends View {
     public UICheckBox showPricedVolume;
 
     /** Configuration UI */
-    public UIComboBox<PricedVolumeType> pricedVolumeType;
+    public UIComboBox<PriceRangedVolumeType> pricedVolumeType;
 
     /** Chart UI */
     public Chart chart;
@@ -169,7 +169,7 @@ public class ChartView extends View {
                     v.ⅱ.orderBook.shorts.groupBy(v.ⅰ);
                 });
 
-        pricedVolumeType.initialize(PricedVolumeType.values()).enableWhen(showPricedVolume.isSelected());
+        pricedVolumeType.initialize(PriceRangedVolumeType.values()).enableWhen(showPricedVolume.isSelected());
     }
 
     /**
