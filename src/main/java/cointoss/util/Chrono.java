@@ -109,6 +109,15 @@ public class Chrono {
     }
 
     /**
+     * Gets a stream that returns the current time every minute.
+     * 
+     * @return
+     */
+    public static Signal<ZonedDateTime> minutes() {
+        return seconds().takeAt(i -> i % 60 == 0);
+    }
+
+    /**
      * Obtains the exact current time, corrected for the difference between the NTP server and local
      * PC time.
      * 

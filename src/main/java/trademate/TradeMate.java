@@ -10,7 +10,9 @@
 package trademate;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -19,7 +21,9 @@ import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import kiss.I;
 import kiss.Managed;
+import kiss.Signal;
 import kiss.Singleton;
+import psychopath.Locator;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
@@ -70,8 +74,8 @@ public class TradeMate extends View {
         // ===========================j=============================
         // Clock in Title bar
         // ========================================================
-        Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
-            stage().v.setTitle(time);
+        Chrono.seconds().map(Chrono.DateDayTime::format).combineLatest(Wisdom.random()).on(Viewtify.UIThread).to(v -> {
+            stage().v.setTitle(v.ⅰ + "  " + v.ⅱ);
         });
     }
 
@@ -114,6 +118,20 @@ public class TradeMate extends View {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Moral manager.
+     */
+    private static class Wisdom {
+
+        private static final List<String> words = Locator.file("wisdom.txt").lines().toList();
+
+        private static final Random random = new Random();
+
+        private static Signal<String> random() {
+            return Chrono.minutes().map(v -> words.get(random.nextInt(words.size())));
         }
     }
 

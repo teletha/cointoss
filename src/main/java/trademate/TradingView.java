@@ -158,10 +158,9 @@ public class TradingView extends View {
                     .switchOff(isLoading())
                     .diff()
                     .on(Viewtify.UIThread)
-                    .to(e -> tab
-                            .text(service.marketReadableName + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "), error);
+                    .to(e -> tab.text(service.marketReadableName + "\n" + e.ⅰ.price + " (" + e.ⅲ
+                            .format(Primitives.DecimalScale2) + "%) "), error);
         } else {
-
             diposer = service.executionsRealtimely()
                     .switchOff(isLoading())
                     .startWith(service.executionLatest())
