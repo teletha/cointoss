@@ -24,6 +24,7 @@ import kiss.Managed;
 import kiss.Signal;
 import kiss.Singleton;
 import psychopath.Locator;
+import trademate.locust.LocustView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
@@ -58,6 +59,7 @@ public class TradeMate extends View {
     protected void initialize() {
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
+        DockSystem.register("FlyingLocust").contents(LocustView.class).closable(false);
 
         // ========================================================
         // Create Tab for each Markets
@@ -71,7 +73,7 @@ public class TradeMate extends View {
             loader.add(tab);
         });
 
-        // ===========================j=============================
+        // ========================================================
         // Clock in Title bar
         // ========================================================
         Chrono.seconds().map(Chrono.DateDayTime::format).combineLatest(Wisdom.random()).on(Viewtify.UIThread).to(v -> {
@@ -122,7 +124,7 @@ public class TradeMate extends View {
     }
 
     /**
-     * Moral manager.
+     * Managing words of widsom.
      */
     private static class Wisdom {
 
