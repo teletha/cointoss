@@ -1316,7 +1316,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private void drawOn(EnhancedCanvas canvas) {
             PriceRangedVolumeType type = chart.pricedVolumeType.value();
 
-            double widthFor1Day = axisX.getLengthForValue(60 * 60 * 24);
+            double widthFor1Day = Math.min(50, axisX.getLengthForValue(60 * 60 * 24));
             double maxValue = type.max(longs.maxVolume, shorts.maxVolume);
             double scale = widthFor1Day / maxValue * type.scale();
 

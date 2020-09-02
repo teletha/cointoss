@@ -105,5 +105,8 @@ public enum PriceRangedVolumeType {
      */
     abstract double width(double longVolumes, double shortVolumes);
 
+    /**
+     * Compute the base scale.
+     */
     abstract double scale();
 }
