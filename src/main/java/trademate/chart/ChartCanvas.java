@@ -234,9 +234,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The latest orderbook layer. */
     private OrderbookBar orderbookBar;
 
-    /** The latest priced volume layer. */
-    private PriceRangedVolumeBar priceVolumeBar;
-
     /**
      * Chart canvas.
      * 
@@ -904,10 +901,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             chart.market.to(m -> {
                 m.priceVolume.past().to(volumes -> {
-                    Num range = chart.orderbookPriceRange.value();
-
-                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes, range);
-                    priceVolumeBar.draw();
+                    PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
+                    bar.drawOn(priceRangedVolume);
                 });
             });
         });
@@ -916,10 +911,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolumeLatest.clear();
 
             chart.market.map(m -> m.priceVolume.latest()).to(volumes -> {
-                Num range = chart.orderbookPriceRange.value();
-
-                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes, range);
-                priceVolumeBar.draw();
+                PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
+                bar.drawOn(priceRangedVolumeLatest);
             });
         });
     }
@@ -1299,8 +1292,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class PriceRangedVolumeBar {
 
-        private final EnhancedCanvas canvas;
-
         /** The current diminishing scale. */
         private final double scale;
 
@@ -1313,21 +1304,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * 
          * @param market
          */
-        private PriceRangedVolumeBar(EnhancedCanvas canvas, PriceRangedVolumePeriod[] period, Num range) {
-            this.canvas = canvas;
+        private PriceRangedVolumeBar(PriceRangedVolumePeriod[] period) {
+            Num range = chart.orderbookPriceRange.value();
+
             this.longs = period[0].aggregateByPrice(range);
             this.shorts = period[1].aggregateByPrice(range);
             this.scale = 40 * 2 / Math.max(longs.maxVolume, shorts.maxVolume);
         }
 
         /**
-         * Draw orderbooks on chart' side.
+         * Draw price-ranged volumes on chart.
          * 
-         * @param pages The page info.
-         * @param threshold A range to draw.
-         * @param color Visible color.
+         * @param canvas A target canvas to draw chart.
          */
-        private void draw() {
+        private void drawOn(EnhancedCanvas canvas) {
             GraphicsContext gc = canvas.getGraphicsContext2D();
             double start = axisX.getPositionForValue(longs.startTime);
 
