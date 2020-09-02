@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -327,7 +327,15 @@ public class ExecutionLog {
                                 return disposer;
                             }
                         }
-                        startId = rests.peekLast().id;
+
+                        long latestId = rests.peekLast().id;
+                        if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId) {
+                            // REST API has caught up with the real-time API,
+                            // we must switch to realtime API.
+                            buffer.switchToRealtime(latestId, observer);
+                            return disposer;
+                        }
+                        startId = latestId;
 
                         // The number of acquired data is too small,
                         // expand the data range slightly from next time.

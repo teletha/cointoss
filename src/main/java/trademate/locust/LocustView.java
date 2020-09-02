@@ -10,11 +10,21 @@
 package trademate.locust;
 
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
+import viewtify.ui.canvas.EnhancedCanvas;
 
 /**
  * 
  */
 public class LocustView extends View {
+
+    private EnhancedCanvas canvas = new EnhancedCanvas();
+
+    class view extends ViewDSL {
+        {
+            $(() -> canvas);
+        }
+    }
 
     /**
      * {@inheritDoc}
