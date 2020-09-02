@@ -88,21 +88,13 @@ public class PriceRangedVolumePeriod {
         }
     }
 
-    public void aggregateBySize(int size) {
-
-    }
-
-    public void aggregateByPriceRange(Num range) {
-
-    }
-
     /**
      * Compute the grouped price-ranged-volume data.
      * 
      * @param groupSize
      * @return
      */
-    public GroupedVolumes grouped(int groupSize) {
+    public GroupedVolumes aggregateBySize(int groupSize) {
         int size = (upper.size() + lower.size()) / groupSize + 1;
         DoubleArray prices = new DoubleArray(size);
         DoubleArray volumes = new DoubleArray(size);
@@ -139,11 +131,11 @@ public class PriceRangedVolumePeriod {
     /**
      * Compute the grouped price-ranged-volume data.
      * 
-     * @param groupSize
+     * @param range
      * @return
      */
-    public GroupedVolumes groupedByPrice(Num range) {
-        return grouped(Math.max(1, range.multiply(tens).intValue() / priceRange));
+    public GroupedVolumes aggregateByPrice(Num range) {
+        return aggregateBySize(Math.max(1, range.multiply(tens).intValue() / priceRange));
     }
 
     /**

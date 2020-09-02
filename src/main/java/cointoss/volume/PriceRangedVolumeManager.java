@@ -61,6 +61,11 @@ public class PriceRangedVolumeManager {
         volumes.put(startTime, new PriceRangedVolumePeriod[] {buyer, seller});
     }
 
+    /**
+     * Update the current record.
+     * 
+     * @param e
+     */
     public void update(Execution e) {
         if (e.direction == Direction.BUY) {
             buyer.update(e.price, e.size.doubleValue());
@@ -69,11 +74,21 @@ public class PriceRangedVolumeManager {
         }
     }
 
+    /**
+     * Retrieve the latest record.
+     * 
+     * @return
+     */
     public PriceRangedVolumePeriod[] latest() {
         return new PriceRangedVolumePeriod[] {buyer, seller};
     }
 
-    public Signal<PriceRangedVolumePeriod[]> previous() {
+    /**
+     * Retrieve all past records (without the latest).
+     * 
+     * @return
+     */
+    public Signal<PriceRangedVolumePeriod[]> past() {
         return I.signal(volumes.values()).skip(1);
     }
 }

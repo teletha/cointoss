@@ -49,6 +49,7 @@ import cointoss.util.Chrono;
 import cointoss.util.DoubleArray;
 import cointoss.util.Num;
 import cointoss.util.Primitives;
+import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
 import kiss.Disposable;
 import kiss.I;
@@ -902,9 +903,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolume.clear();
 
             chart.market.to(m -> {
-                m.priceVolume.previous().to(volumes -> {
-                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes[0].groupedByPrice(chart.orderbookPriceRange
-                            .value()), volumes[1].groupedByPrice(chart.orderbookPriceRange.value()));
+                m.priceVolume.past().to(volumes -> {
+                    Num range = chart.orderbookPriceRange.value();
+
+                    priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolume, volumes, range);
                     priceVolumeBar.draw();
                 });
             });
@@ -914,8 +916,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolumeLatest.clear();
 
             chart.market.map(m -> m.priceVolume.latest()).to(volumes -> {
-                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes[0]
-                        .groupedByPrice(chart.orderbookPriceRange.value()), volumes[1].groupedByPrice(chart.orderbookPriceRange.value()));
+                Num range = chart.orderbookPriceRange.value();
+
+                priceVolumeBar = new PriceRangedVolumeBar(priceRangedVolumeLatest, volumes, range);
                 priceVolumeBar.draw();
             });
         });
@@ -1310,10 +1313,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * 
          * @param market
          */
-        private PriceRangedVolumeBar(EnhancedCanvas canvas, GroupedVolumes longs, GroupedVolumes shorts) {
+        private PriceRangedVolumeBar(EnhancedCanvas canvas, PriceRangedVolumePeriod[] period, Num range) {
             this.canvas = canvas;
-            this.longs = longs;
-            this.shorts = shorts;
+            this.longs = period[0].aggregateByPrice(range);
+            this.shorts = period[1].aggregateByPrice(range);
             this.scale = 40 * 2 / Math.max(longs.maxVolume, shorts.maxVolume);
         }
 
