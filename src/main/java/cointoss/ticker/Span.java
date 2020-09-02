@@ -23,9 +23,9 @@ import kiss.Variable;
  */
 public enum Span {
 
-    Second5(5, SECOND_OF_MINUTE, 1, HOUR_OF_DAY, 25, 1),
+    Second5(5, SECOND_OF_MINUTE, 1, HOUR_OF_DAY, 4, 1),
 
-    Minute1(1, MINUTE_OF_HOUR, 6, HOUR_OF_DAY, 5, 1),
+    Minute1(1, MINUTE_OF_HOUR, 4, HOUR_OF_DAY, 7, 1),
 
     Minute5(5, MINUTE_OF_HOUR, 6, HOUR_OF_DAY, 20, 1),
 

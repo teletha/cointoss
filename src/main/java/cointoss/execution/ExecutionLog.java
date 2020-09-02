@@ -796,6 +796,7 @@ public class ExecutionLog {
                     int scale = service.setting.target.scale;
                     AtomicLong fastID = new AtomicLong();
                     TickerManager manager = new TickerManager();
+                    manager.tickers().to(ticker -> ticker.ticks.disableMemoryShrink());
                     read().effect(e -> fastID.set(e.id)).to(manager::update);
                     fastID.updateAndGet(v -> v - 69120 /* 4x12x60x24 */);
                     Ticker ticker = manager.on(Span.Second5);

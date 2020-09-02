@@ -53,6 +53,9 @@ public final class TimeseriesStore<E> {
     /** A number of items. */
     private int size;
 
+    /** The usage of memory shrinking. */
+    private boolean shrink = true;
+
     /** The disk store. */
     private DiskStore store;
 
@@ -61,7 +64,7 @@ public final class TimeseriesStore<E> {
 
         @Override
         protected boolean removeEldestEntry(Entry<Long, Segment> eldest) {
-            if (span.segmentSize < size()) {
+            if (shrink && span.segmentSize < size()) {
                 persist(eldest.getKey(), eldest.getValue());
                 return true;
             } else {
@@ -115,6 +118,16 @@ public final class TimeseriesStore<E> {
      */
     public synchronized TimeseriesStore<E> disableDiskStore() {
         this.store = null;
+        return this;
+    }
+
+    /**
+     * Disable the memory shrinking.
+     * 
+     * @return
+     */
+    public synchronized TimeseriesStore<E> disableMemoryShrink() {
+        this.shrink = false;
         return this;
     }
 
