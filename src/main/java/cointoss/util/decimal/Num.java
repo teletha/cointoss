@@ -11,47 +11,47 @@ package cointoss.util.decimal;
 
 import java.math.BigDecimal;
 
-public class DecimalNum extends Decimal<DecimalNum> {
+public class Num extends Decimal<Num> {
 
     /** reuse */
-    public static final DecimalNum ZERO = new DecimalNum(0, 0);
+    public static final Num ZERO = new Num(0, 0);
 
     /** reuse */
-    public static final DecimalNum ONE = ZERO.create(1);
+    public static final Num ONE = ZERO.create(1);
 
     /** reuse */
-    public static final DecimalNum TWO = ZERO.create(2);
+    public static final Num TWO = ZERO.create(2);
 
     /** reuse */
-    public static final DecimalNum THREE = ZERO.create(3);
+    public static final Num THREE = ZERO.create(3);
 
     /** reuse */
-    public static final DecimalNum TEN = ZERO.create(10);
+    public static final Num TEN = ZERO.create(10);
 
     /** reuse */
-    public static final DecimalNum HUNDRED = ZERO.create(100);
+    public static final Num HUNDRED = ZERO.create(100);
 
     /** reuse */
-    public static final DecimalNum THOUSAND = ZERO.create(1000);
+    public static final Num THOUSAND = ZERO.create(1000);
 
     /** reuse */
-    public static final DecimalNum MAX = ZERO.create(Long.MAX_VALUE);
+    public static final Num MAX = ZERO.create(Long.MAX_VALUE);
 
     /** reuse */
-    public static final DecimalNum MIN = ZERO.create(Long.MIN_VALUE);
+    public static final Num MIN = ZERO.create(Long.MIN_VALUE);
 
     /**
      * @param value
      * @param scale
      */
-    private DecimalNum(long value, int scale) {
+    private Num(long value, int scale) {
         super(value, scale);
     }
 
     /**
      * @param value
      */
-    public DecimalNum(BigDecimal value) {
+    public Num(BigDecimal value) {
         super(value);
     }
 
@@ -59,15 +59,15 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * {@inheritDoc}
      */
     @Override
-    protected DecimalNum create(long value, int scale) {
-        return new DecimalNum(value, scale);
+    protected Num create(long value, int scale) {
+        return new Num(value, scale);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DecimalNum zero() {
+    protected Num zero() {
         return ZERO;
     }
 
@@ -77,7 +77,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static DecimalNum of(int value) {
+    public static Num of(int value) {
         return ZERO.create(value);
     }
 
@@ -87,7 +87,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static DecimalNum of(long value) {
+    public static Num of(long value) {
         return ZERO.create(value);
     }
 
@@ -97,7 +97,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static DecimalNum of(float value) {
+    public static Num of(float value) {
         return ZERO.create(value);
     }
 
@@ -107,7 +107,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static DecimalNum of(double value) {
+    public static Num of(double value) {
         return ZERO.create(value);
     }
 
@@ -117,7 +117,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static DecimalNum of(String value) {
+    public static Num of(String value) {
         return ZERO.create(value);
     }
 }

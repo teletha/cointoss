@@ -9,7 +9,7 @@
  */
 package cointoss.util.decimal;
 
-import static cointoss.util.decimal.DecimalNum.*;
+import static cointoss.util.decimal.Num.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,89 +33,89 @@ class DecimalTest {
 
     @Test
     void plus() {
-        assert DecimalNum.of(10).plus(DecimalNum.of(20)).doubleValue() == 30;
-        assert DecimalNum.of(10).plus(DecimalNum.of(20000)).doubleValue() == 20010;
-        assert DecimalNum.of(10).plus(DecimalNum.of(0.1)).doubleValue() == 10.1;
-        assert DecimalNum.of(10).plus(DecimalNum.of(0.123456)).doubleValue() == 10.123456;
+        assert Num.of(10).plus(Num.of(20)).doubleValue() == 30;
+        assert Num.of(10).plus(Num.of(20000)).doubleValue() == 20010;
+        assert Num.of(10).plus(Num.of(0.1)).doubleValue() == 10.1;
+        assert Num.of(10).plus(Num.of(0.123456)).doubleValue() == 10.123456;
     }
 
     @Test
     void minus() {
-        assert DecimalNum.of(10).minus(DecimalNum.of(20)).doubleValue() == -10;
-        assert DecimalNum.of(10).minus(DecimalNum.of(20000)).doubleValue() == -19990;
-        assert DecimalNum.of(10).minus(DecimalNum.of(0.1)).doubleValue() == 9.9;
-        assert DecimalNum.of(10).minus(DecimalNum.of(0.123456)).doubleValue() == 9.876544;
+        assert Num.of(10).minus(Num.of(20)).doubleValue() == -10;
+        assert Num.of(10).minus(Num.of(20000)).doubleValue() == -19990;
+        assert Num.of(10).minus(Num.of(0.1)).doubleValue() == 9.9;
+        assert Num.of(10).minus(Num.of(0.123456)).doubleValue() == 9.876544;
     }
 
     @Test
     void multiply() {
-        assert DecimalNum.of(10).multiply(DecimalNum.of(20)).doubleValue() == 200;
-        assert DecimalNum.of(10).multiply(DecimalNum.of(12345678)).doubleValue() == 123456780;
-        assert DecimalNum.of(10).multiply(DecimalNum.of(0.1)).doubleValue() == 1;
-        assert DecimalNum.of(10).multiply(DecimalNum.of(0.00002)).doubleValue() == 0.0002;
-        assert DecimalNum.of(10).multiply(DecimalNum.of(0.1234567)).doubleValue() == 1.234567;
+        assert Num.of(10).multiply(Num.of(20)).doubleValue() == 200;
+        assert Num.of(10).multiply(Num.of(12345678)).doubleValue() == 123456780;
+        assert Num.of(10).multiply(Num.of(0.1)).doubleValue() == 1;
+        assert Num.of(10).multiply(Num.of(0.00002)).doubleValue() == 0.0002;
+        assert Num.of(10).multiply(Num.of(0.1234567)).doubleValue() == 1.234567;
     }
 
     @Test
     void divide() {
-        assert DecimalNum.of(10).divide(DecimalNum.of(20)).doubleValue() == 0.5;
-        assert DecimalNum.of(10).divide(DecimalNum.of(12345678)).doubleValue() == 8.100000664200054E-7;
-        assert DecimalNum.of(10).divide(DecimalNum.of(0.1)).doubleValue() == 100;
-        assert DecimalNum.of(10).divide(DecimalNum.of(0.00002)).intValue() == 500000;
-        assert DecimalNum.of(10).divide(DecimalNum.of(0.1234567)).doubleValue() == 81.00005913004316;
+        assert Num.of(10).divide(Num.of(20)).doubleValue() == 0.5;
+        assert Num.of(10).divide(Num.of(12345678)).doubleValue() == 8.100000664200054E-7;
+        assert Num.of(10).divide(Num.of(0.1)).doubleValue() == 100;
+        assert Num.of(10).divide(Num.of(0.00002)).intValue() == 500000;
+        assert Num.of(10).divide(Num.of(0.1234567)).doubleValue() == 81.00005913004316;
     }
 
     @Test
     void remainder() {
-        assert DecimalNum.of(10).remainder(DecimalNum.of(3)).doubleValue() == 1;
-        assert DecimalNum.of(10).remainder(DecimalNum.of(345)).doubleValue() == 10;
-        assert DecimalNum.of(10).remainder(DecimalNum.of(0.1)).doubleValue() == 0;
-        assert DecimalNum.of(10).remainder(DecimalNum.of(0.00002)).intValue() == 0;
+        assert Num.of(10).remainder(Num.of(3)).doubleValue() == 1;
+        assert Num.of(10).remainder(Num.of(345)).doubleValue() == 10;
+        assert Num.of(10).remainder(Num.of(0.1)).doubleValue() == 0;
+        assert Num.of(10).remainder(Num.of(0.00002)).intValue() == 0;
     }
 
     @Test
     void pow() {
-        assert DecimalNum.of(10).pow(2).doubleValue() == 100;
-        assert DecimalNum.of(10).pow(-2).doubleValue() == 0.01;
-        assert DecimalNum.of(10).pow(2.5).doubleValue() == 316.22776601683796;
-        assert DecimalNum.of(10).pow(-2.5).doubleValue() == 0.003162277660168379;
+        assert Num.of(10).pow(2).doubleValue() == 100;
+        assert Num.of(10).pow(-2).doubleValue() == 0.01;
+        assert Num.of(10).pow(2.5).doubleValue() == 316.22776601683796;
+        assert Num.of(10).pow(-2.5).doubleValue() == 0.003162277660168379;
     }
 
     @Test
     void decuple() {
-        assert DecimalNum.of(10).decuple(2).doubleValue() == 1000;
-        assert DecimalNum.of(10).decuple(-2).doubleValue() == 0.1;
+        assert Num.of(10).decuple(2).doubleValue() == 1000;
+        assert Num.of(10).decuple(-2).doubleValue() == 0.1;
     }
 
     @Test
     void sqrt() {
-        assert DecimalNum.of(100).sqrt().doubleValue() == 10;
-        assert DecimalNum.of(3).sqrt().doubleValue() == 1.73205080756887729352;
+        assert Num.of(100).sqrt().doubleValue() == 10;
+        assert Num.of(3).sqrt().doubleValue() == 1.73205080756887729352;
     }
 
     @Test
     void abs() {
-        assert DecimalNum.of(100).abs().doubleValue() == 100;
-        assert DecimalNum.of(-100).abs().doubleValue() == 100;
+        assert Num.of(100).abs().doubleValue() == 100;
+        assert Num.of(-100).abs().doubleValue() == 100;
     }
 
     @Test
     void negate() {
-        assert DecimalNum.of(100).negate().doubleValue() == -100;
-        assert DecimalNum.of(-100).negate().doubleValue() == 100;
+        assert Num.of(100).negate().doubleValue() == -100;
+        assert Num.of(-100).negate().doubleValue() == 100;
     }
 
     @Test
     void scale() {
-        assert DecimalNum.of("10.1").scale(1).doubleValue() == 10.1;
-        assert DecimalNum.of(1).scale(2).doubleValue() == 1;
+        assert Num.of("10.1").scale(1).doubleValue() == 10.1;
+        assert Num.of(1).scale(2).doubleValue() == 1;
 
-        assert DecimalNum.of("1.234").scale(1).doubleValue() == 1.2;
-        assert DecimalNum.of("1.234").scale(2).doubleValue() == 1.23;
-        assert DecimalNum.of("0.05").scale(1).doubleValue() == 0.1;
+        assert Num.of("1.234").scale(1).doubleValue() == 1.2;
+        assert Num.of("1.234").scale(2).doubleValue() == 1.23;
+        assert Num.of("0.05").scale(1).doubleValue() == 0.1;
 
-        assert DecimalNum.of(21.234).scale(-1).doubleValue() == 20;
-        assert DecimalNum.of(321.234).scale(-2).doubleValue() == 300;
+        assert Num.of(21.234).scale(-1).doubleValue() == 20;
+        assert Num.of(321.234).scale(-2).doubleValue() == 300;
     }
 
     @Test
@@ -164,41 +164,41 @@ class DecimalTest {
 
     @Test
     void isZero() {
-        assert DecimalNum.of(1).isZero() == false;
-        assert DecimalNum.of(0).isZero();
+        assert Num.of(1).isZero() == false;
+        assert Num.of(0).isZero();
     }
 
     @Test
     void isNotZero() {
-        assert DecimalNum.of(1).isNotZero();
-        assert DecimalNum.of(0).isNotZero() == false;
+        assert Num.of(1).isNotZero();
+        assert Num.of(0).isNotZero() == false;
     }
 
     @Test
     void isPositive() {
-        assert DecimalNum.of(1).isPositive() == true;
-        assert DecimalNum.of(0).isPositive() == false;
-        assert DecimalNum.of(-1).isPositive() == false;
+        assert Num.of(1).isPositive() == true;
+        assert Num.of(0).isPositive() == false;
+        assert Num.of(-1).isPositive() == false;
     }
 
     @Test
     void isPositiveOrZero() {
-        assert DecimalNum.of(1).isPositiveOrZero() == true;
-        assert DecimalNum.of(0).isPositiveOrZero() == true;
-        assert DecimalNum.of(-1).isPositiveOrZero() == false;
+        assert Num.of(1).isPositiveOrZero() == true;
+        assert Num.of(0).isPositiveOrZero() == true;
+        assert Num.of(-1).isPositiveOrZero() == false;
     }
 
     @Test
     void isNegative() {
-        assert DecimalNum.of(1).isNegative() == false;
-        assert DecimalNum.of(0).isNegative() == false;
-        assert DecimalNum.of(-1).isNegative() == true;
+        assert Num.of(1).isNegative() == false;
+        assert Num.of(0).isNegative() == false;
+        assert Num.of(-1).isNegative() == true;
     }
 
     @Test
     void isNegativeOrZero() {
-        assert DecimalNum.of(1).isNegativeOrZero() == false;
-        assert DecimalNum.of(0).isNegativeOrZero() == true;
-        assert DecimalNum.of(-1).isNegativeOrZero() == true;
+        assert Num.of(1).isNegativeOrZero() == false;
+        assert Num.of(0).isNegativeOrZero() == true;
+        assert Num.of(-1).isNegativeOrZero() == true;
     }
 }
