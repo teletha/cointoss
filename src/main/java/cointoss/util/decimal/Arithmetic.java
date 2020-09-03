@@ -21,10 +21,10 @@ import kiss.Variable;
 /**
  * 
  */
-public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
+public abstract class Arithmetic<Self extends Arithmetic> extends Number implements Comparable<Self> {
 
     /** The base context. */
-    MathContext CONTEXT = new MathContext(15, RoundingMode.HALF_UP);
+    protected static final MathContext CONTEXT = new MathContext(15, RoundingMode.HALF_UP);
 
     /**
      * Build by the specified value.
@@ -32,7 +32,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param value
      * @return
      */
-    Self create(int value);
+    protected abstract Self create(int value);
 
     /**
      * Build by the specified value.
@@ -40,7 +40,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param value
      * @return
      */
-    Self create(long value);
+    protected abstract Self create(long value);
 
     /**
      * Build by the specified value.
@@ -48,7 +48,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param value
      * @return
      */
-    Self create(double value);
+    protected abstract Self create(double value);
 
     /**
      * Build by the specified value.
@@ -56,9 +56,9 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param value
      * @return
      */
-    Self create(String value);
+    protected abstract Self create(String value);
 
-    Self zero();
+    protected abstract Self zero();
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
@@ -68,7 +68,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self plus(int augend) {
+    public final Self plus(int augend) {
         return plus(create(augend));
     }
 
@@ -80,7 +80,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self plus(long augend) {
+    public final Self plus(long augend) {
         return plus(create(augend));
     }
 
@@ -92,7 +92,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self plus(double augend) {
+    public final Self plus(double augend) {
         return plus(create(augend));
     }
 
@@ -104,7 +104,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self plus(String augend) {
+    public final Self plus(String augend) {
         return plus(create(augend));
     }
 
@@ -116,7 +116,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self plus(Variable<Self> augend) {
+    public final Self plus(Variable<Self> augend) {
         return plus(augend.get());
     }
 
@@ -126,7 +126,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param direction A current side.
      * @param size A increase size.
      */
-    default Self plus(Directional direction, int size) {
+    public final Self plus(Directional direction, int size) {
         return plus(direction, create(size));
     }
 
@@ -136,7 +136,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param direction A current side.
      * @param size A increase size.
      */
-    default Self plus(Directional direction, Self size) {
+    public final Self plus(Directional direction, Self size) {
         return direction.isBuy() ? plus(size) : minus(size);
     }
 
@@ -146,7 +146,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param direction A current side.
      * @param size A increase size.
      */
-    default Self plus(Directional direction, Variable<Self> size) {
+    public final Self plus(Directional direction, Variable<Self> size) {
         return direction.isBuy() ? plus(size) : minus(size);
     }
 
@@ -158,7 +158,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
-    Self plus(Self augend);
+    public abstract Self plus(Self augend);
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
@@ -168,7 +168,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self minus(int subtrahend) {
+    public final Self minus(int subtrahend) {
         return minus(create(subtrahend));
     }
 
@@ -180,7 +180,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self minus(long subtrahend) {
+    public final Self minus(long subtrahend) {
         return minus(create(subtrahend));
     }
 
@@ -192,7 +192,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self minus(double subtrahend) {
+    public final Self minus(double subtrahend) {
         return minus(create(subtrahend));
     }
 
@@ -204,7 +204,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self minus(String subtrahend) {
+    public final Self minus(String subtrahend) {
         return minus(create(subtrahend));
     }
 
@@ -216,7 +216,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self minus(Variable<Self> subtrahend) {
+    public final Self minus(Variable<Self> subtrahend) {
         return minus(subtrahend.get());
     }
 
@@ -226,7 +226,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param direction A current side.
      * @param size A decrease size.
      */
-    default Self minus(Directional direction, int size) {
+    public final Self minus(Directional direction, int size) {
         return minus(direction, create(size));
     }
 
@@ -236,7 +236,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param direction A current side.
      * @param size A decrease size.
      */
-    default Self minus(Directional direction, Self size) {
+    public final Self minus(Directional direction, Self size) {
         return direction.isSell() ? plus(size) : minus(size);
     }
 
@@ -246,7 +246,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param direction A current side.
      * @param size A decrease size.
      */
-    default Self minus(Directional direction, Variable<Self> size) {
+    public final Self minus(Directional direction, Variable<Self> size) {
         return direction.isSell() ? plus(size) : minus(size);
     }
 
@@ -258,7 +258,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
-    Self minus(Self subtrahend);
+    public abstract Self minus(Self subtrahend);
 
     /**
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
@@ -268,7 +268,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self multiply(int multiplicand) {
+    public final Self multiply(int multiplicand) {
         return multiply(create(multiplicand));
     }
 
@@ -280,7 +280,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self multiply(long multiplicand) {
+    public final Self multiply(long multiplicand) {
         return multiply(create(multiplicand));
     }
 
@@ -292,7 +292,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self multiply(double multiplicand) {
+    public final Self multiply(double multiplicand) {
         return multiply(create(multiplicand));
     }
 
@@ -304,7 +304,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self multiply(String multiplicand) {
+    public final Self multiply(String multiplicand) {
         return multiply(create(multiplicand));
     }
 
@@ -316,7 +316,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self multiply(Variable<Self> multiplicand) {
+    public final Self multiply(Variable<Self> multiplicand) {
         return multiply(multiplicand.get());
     }
 
@@ -328,7 +328,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
-    Self multiply(Self multiplicand);
+    public abstract Self multiply(Self multiplicand);
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
@@ -338,7 +338,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self divide(int divisor) {
+    public final Self divide(int divisor) {
         return divide(create(divisor));
     }
 
@@ -350,7 +350,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self divide(long divisor) {
+    public final Self divide(long divisor) {
         return divide(create(divisor));
     }
 
@@ -362,7 +362,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self divide(double divisor) {
+    public final Self divide(double divisor) {
         return divide(create(divisor));
     }
 
@@ -374,7 +374,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self divide(String divisor) {
+    public final Self divide(String divisor) {
         return divide(create(divisor));
     }
 
@@ -386,7 +386,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self divide(Variable<Self> divisor) {
+    public final Self divide(Variable<Self> divisor) {
         return divide(divisor.get());
     }
 
@@ -398,7 +398,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
-    Self divide(Self divisor);
+    public abstract Self divide(Self divisor);
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
@@ -408,7 +408,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self remainder(int divisor) {
+    public final Self remainder(int divisor) {
         return remainder(create(divisor));
     }
 
@@ -420,7 +420,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self remainder(long divisor) {
+    public final Self remainder(long divisor) {
         return remainder(create(divisor));
     }
 
@@ -432,7 +432,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self remainder(double divisor) {
+    public final Self remainder(double divisor) {
         return remainder(create(divisor));
     }
 
@@ -444,7 +444,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self remainder(String divisor) {
+    public final Self remainder(String divisor) {
         return remainder(create(divisor));
     }
 
@@ -456,7 +456,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
-    default Self remainder(Variable<Self> divisor) {
+    public final Self remainder(Variable<Self> divisor) {
         return remainder(divisor.get());
     }
 
@@ -468,7 +468,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
-    Self remainder(Self divisor);
+    public abstract Self remainder(Self divisor);
 
     /**
      * Checks if this value is greater than another.
@@ -476,7 +476,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isGreaterThan(int other) {
+    public final boolean isGreaterThan(int other) {
         return isGreaterThan(create(other));
     }
 
@@ -486,7 +486,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isGreaterThan(long other) {
+    public final boolean isGreaterThan(long other) {
         return isGreaterThan(create(other));
     }
 
@@ -496,7 +496,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isGreaterThan(double other) {
+    public final boolean isGreaterThan(double other) {
         return isGreaterThan(create(other));
     }
 
@@ -506,7 +506,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isGreaterThan(String other) {
+    public final boolean isGreaterThan(String other) {
         return isGreaterThan(create(other));
     }
 
@@ -516,7 +516,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isGreaterThan(Variable<Self> other) {
+    public final boolean isGreaterThan(Variable<Self> other) {
         return isGreaterThan(other.get());
     }
 
@@ -526,7 +526,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isGreaterThan(Self other) {
+    public final boolean isGreaterThan(Self other) {
         return compareTo(other) > 0;
     }
 
@@ -537,7 +537,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isGreaterThan(Directional direction, Self price) {
+    public final boolean isGreaterThan(Directional direction, Self price) {
         return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
     }
 
@@ -548,7 +548,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isGreaterThan(Directional direction, Variable<Self> price) {
+    public final boolean isGreaterThan(Directional direction, Variable<Self> price) {
         return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
     }
 
@@ -558,7 +558,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
-    default boolean isGreaterThanOrEqual(int other) {
+    public final boolean isGreaterThanOrEqual(int other) {
         return isGreaterThanOrEqual(create(other));
     }
 
@@ -568,7 +568,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
-    default boolean isGreaterThanOrEqual(long other) {
+    public final boolean isGreaterThanOrEqual(long other) {
         return isGreaterThanOrEqual(create(other));
     }
 
@@ -578,7 +578,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
-    default boolean isGreaterThanOrEqual(double other) {
+    public final boolean isGreaterThanOrEqual(double other) {
         return isGreaterThanOrEqual(create(other));
     }
 
@@ -588,7 +588,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
-    default boolean isGreaterThanOrEqual(String other) {
+    public final boolean isGreaterThanOrEqual(String other) {
         return isGreaterThanOrEqual(create(other));
     }
 
@@ -598,7 +598,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
-    default boolean isGreaterThanOrEqual(Variable<Self> other) {
+    public final boolean isGreaterThanOrEqual(Variable<Self> other) {
         return isGreaterThanOrEqual(other.get());
     }
 
@@ -608,7 +608,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
-    default boolean isGreaterThanOrEqual(Self other) {
+    public final boolean isGreaterThanOrEqual(Self other) {
         return compareTo(other) > -1;
     }
 
@@ -619,7 +619,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isGreaterThanOrEqual(Directional direction, Self other) {
+    public final boolean isGreaterThanOrEqual(Directional direction, Self other) {
         return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
     }
 
@@ -630,7 +630,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isGreaterThanOrEqual(Directional direction, Variable<Self> other) {
+    public final boolean isGreaterThanOrEqual(Directional direction, Variable<Self> other) {
         return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
     }
 
@@ -640,7 +640,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
-    default boolean isLessThan(int other) {
+    public final boolean isLessThan(int other) {
         return isLessThan(create(other));
     }
 
@@ -650,7 +650,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
-    default boolean isLessThan(long other) {
+    public final boolean isLessThan(long other) {
         return isLessThan(create(other));
     }
 
@@ -660,7 +660,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
-    default boolean isLessThan(double other) {
+    public final boolean isLessThan(double other) {
         return isLessThan(create(other));
     }
 
@@ -670,7 +670,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
-    default boolean isLessThan(String other) {
+    public final boolean isLessThan(String other) {
         return isLessThan(create(other));
     }
 
@@ -680,7 +680,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
-    default boolean isLessThan(Variable<Self> other) {
+    public final boolean isLessThan(Variable<Self> other) {
         return isLessThan(other.get());
     }
 
@@ -690,7 +690,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
-    default boolean isLessThan(Self other) {
+    public final boolean isLessThan(Self other) {
         return compareTo(other) < 0;
     }
 
@@ -701,7 +701,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isLessThan(Directional direction, int other) {
+    public final boolean isLessThan(Directional direction, int other) {
         return isLessThan(direction, create(other));
     }
 
@@ -712,7 +712,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isLessThan(Directional direction, Self other) {
+    public final boolean isLessThan(Directional direction, Self other) {
         return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
     }
 
@@ -723,7 +723,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isLessThan(Directional direction, Variable<Self> other) {
+    public final boolean isLessThan(Directional direction, Variable<Self> other) {
         return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
     }
 
@@ -733,7 +733,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
-    default boolean isLessThanOrEqual(int other) {
+    public final boolean isLessThanOrEqual(int other) {
         return isLessThanOrEqual(create(other));
     }
 
@@ -743,7 +743,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
-    default boolean isLessThanOrEqual(long other) {
+    public final boolean isLessThanOrEqual(long other) {
         return isLessThanOrEqual(create(other));
     }
 
@@ -753,7 +753,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
-    default boolean isLessThanOrEqual(double other) {
+    public final boolean isLessThanOrEqual(double other) {
         return isLessThanOrEqual(create(other));
     }
 
@@ -763,7 +763,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
-    default boolean isLessThanOrEqual(String other) {
+    public final boolean isLessThanOrEqual(String other) {
         return isLessThanOrEqual(create(other));
     }
 
@@ -773,7 +773,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
-    default boolean isLessThanOrEqual(Variable<Self> other) {
+    public final boolean isLessThanOrEqual(Variable<Self> other) {
         return isLessThanOrEqual(other.get());
     }
 
@@ -783,7 +783,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
-    default boolean isLessThanOrEqual(Self other) {
+    public final boolean isLessThanOrEqual(Self other) {
         return compareTo(other) < 1;
     }
 
@@ -794,7 +794,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isLessThanOrEqual(Directional direction, Self other) {
+    public final boolean isLessThanOrEqual(Directional direction, Self other) {
         return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
     }
 
@@ -805,7 +805,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return
      */
-    default boolean isLessThanOrEqual(Directional direction, Variable<Self> other) {
+    public final boolean isLessThanOrEqual(Directional direction, Variable<Self> other) {
         return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
     }
 
@@ -815,7 +815,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param direction A current side.
      * @param size A decrease size.
      */
-    default Self diff(Directional direction, int size) {
+    public final Self diff(Directional direction, int size) {
         return diff(direction, create(size));
     }
 
@@ -825,7 +825,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param direction A current side.
      * @param size A decrease size.
      */
-    default Self diff(Directional direction, Self size) {
+    public final Self diff(Directional direction, Self size) {
         return direction.isSell() ? (Self) size.minus(this) : minus(size);
     }
 
@@ -835,7 +835,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return A result.
      */
-    default boolean is(int other) {
+    public final boolean is(int other) {
         return is(create(other));
     }
 
@@ -845,7 +845,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return A result.
      */
-    default boolean is(long other) {
+    public final boolean is(long other) {
         return is(create(other));
     }
 
@@ -855,7 +855,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return A result.
      */
-    default boolean is(double other) {
+    public final boolean is(double other) {
         return is(create(other));
     }
 
@@ -865,7 +865,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return A result.
      */
-    default boolean is(String other) {
+    public final boolean is(String other) {
         return is(create(other));
     }
 
@@ -875,7 +875,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other
      * @return A result.
      */
-    default boolean is(Variable<Self> other) {
+    public final boolean is(Variable<Self> other) {
         return is(other.get());
     }
 
@@ -885,7 +885,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean is(Self other) {
+    public final boolean is(Self other) {
         return compareTo(other) == 0;
     }
 
@@ -895,7 +895,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isNot(int other) {
+    public final boolean isNot(int other) {
         return !is(other);
     }
 
@@ -905,7 +905,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isNot(long other) {
+    public final boolean isNot(long other) {
         return !is(other);
     }
 
@@ -915,7 +915,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isNot(double other) {
+    public final boolean isNot(double other) {
         return !is(other);
     }
 
@@ -925,7 +925,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isNot(String other) {
+    public final boolean isNot(String other) {
         return !is(other);
     }
 
@@ -935,7 +935,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isNot(Variable<Self> other) {
+    public final boolean isNot(Variable<Self> other) {
         return !is(other);
     }
 
@@ -945,7 +945,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
-    default boolean isNot(Self other) {
+    public final boolean isNot(Self other) {
         return !is(other);
     }
 
@@ -954,7 +954,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * 
      * @return true if the value is zero, false otherwise
      */
-    default boolean isZero() {
+    public final boolean isZero() {
         return compareTo(zero()) == 0;
     }
 
@@ -963,7 +963,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * 
      * @return true if the value is NOT zero, false otherwise
      */
-    default boolean isNotZero() {
+    public final boolean isNotZero() {
         return isZero() == false;
     }
 
@@ -972,7 +972,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * 
      * @return true if the value is greater than zero, false otherwise
      */
-    default boolean isPositive() {
+    public final boolean isPositive() {
         return compareTo(zero()) > 0;
     }
 
@@ -981,7 +981,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * 
      * @return true if the value is zero or greater, false otherwise
      */
-    default boolean isPositiveOrZero() {
+    public final boolean isPositiveOrZero() {
         return compareTo(zero()) >= 0;
     }
 
@@ -990,7 +990,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * 
      * @return true if the value is less than zero, false otherwise
      */
-    default boolean isNegative() {
+    public final boolean isNegative() {
         return compareTo(zero()) < 0;
     }
 
@@ -999,7 +999,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * 
      * @return true if the value is zero or less, false otherwise
      */
-    default boolean isNegativeOrZero() {
+    public final boolean isNegativeOrZero() {
         return compareTo(zero()) <= 0;
     }
 
@@ -1011,7 +1011,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return a {@link Num} whose numerical value is equal to ({@code this} * 10<sup>n</sup>)
      * @throws ArithmeticException if the scale would be outside the range of a 32-bit integer.
      */
-    Num decuple(int n);
+    public abstract Num decuple(int n);
 
     /**
      * Returns a {@code Num} whose value is <code>(this<sup>n</sup>)</code>. The current
@@ -1027,7 +1027,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @throws ArithmeticException if the result is inexact but the rounding mode is
      *             {@code UNNECESSARY}, or {@code n} is out of range.
      */
-    Num pow(int n);
+    public abstract Num pow(int n);
 
     /**
      * Returns a {@code Num} whose value is <code>(this<sup>n</sup>)</code>. The current
@@ -1043,7 +1043,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @throws ArithmeticException if the result is inexact but the rounding mode is
      *             {@code UNNECESSARY}, or {@code n} is out of range.
      */
-    Num pow(double n);
+    public abstract Num pow(double n);
 
     /**
      * Returns the correctly rounded natural logarithm (base e) of the <code>double</code> value of
@@ -1053,7 +1053,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @return the natural logarithm (base e) of {@code this}
      * @see StrictMath#log(double)
      */
-    Num log();
+    public abstract Num log();
 
     /**
      * Returns an approximation to the square root of {@code this} with rounding according to the
@@ -1072,7 +1072,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @throws ArithmeticException if {@code (mc.getRoundingMode()==RoundingMode.UNNECESSARY}) and
      *             the exact result cannot fit in {@code mc.getPrecision()} digits.
      */
-    Num sqrt();
+    public abstract Num sqrt();
 
     /**
      * Returns a {@code Num} whose value is the absolute value of this {@code Num}, and whose scale
@@ -1080,7 +1080,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      *
      * @return {@code abs(this)}
      */
-    Num abs();
+    public abstract Num abs();
 
     /**
      * Returns a {@code Num} whose value is {@code (-this)}, and whose scale is
@@ -1088,12 +1088,12 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      *
      * @return {@code -this}.
      */
-    Num negate();
+    public abstract Num negate();
 
     /**
      * Compute scale.
      */
-    int scale();
+    public abstract int scale();
 
     /**
      * Returns a {@code Num} whose scale is the specified value, and whose unscaled value is
@@ -1109,7 +1109,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @throws ArithmeticException if {@code roundingMode==UNNECESSARY} and the specified scaling
      *             operation would require rounding.
      */
-    default Self scale(int size) {
+    public final Self scale(int size) {
         return scale(size, CONTEXT.getRoundingMode());
     }
 
@@ -1128,7 +1128,7 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @throws ArithmeticException if {@code roundingMode==UNNECESSARY} and the specified scaling
      *             operation would require rounding.
      */
-    Self scale(int size, RoundingMode mode);
+    public abstract Self scale(int size, RoundingMode mode);
 
     /**
      * Format this number.
@@ -1136,5 +1136,5 @@ public interface Arithmetic<Self extends Arithmetic> extends Comparable<Self> {
      * @param format Your number format.
      * @return A formatted value.
      */
-    String format(NumberFormat format);
+    public abstract String format(NumberFormat format);
 }

@@ -31,7 +31,7 @@ import kiss.Singleton;
 import kiss.Variable;
 
 @SuppressWarnings("serial")
-public class Num extends Number implements Arithmetic<Num>, Comparable<Num> {
+public class Num extends Arithmetic<Num> {
 
     // initialize
     static {
@@ -91,7 +91,7 @@ public class Num extends Number implements Arithmetic<Num>, Comparable<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num create(int value) {
+    protected Num create(int value) {
         return of(value);
     }
 
@@ -99,7 +99,7 @@ public class Num extends Number implements Arithmetic<Num>, Comparable<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num create(long value) {
+    protected Num create(long value) {
         return of(value);
     }
 
@@ -107,7 +107,7 @@ public class Num extends Number implements Arithmetic<Num>, Comparable<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num create(double value) {
+    protected Num create(double value) {
         return of(value);
     }
 
@@ -115,7 +115,7 @@ public class Num extends Number implements Arithmetic<Num>, Comparable<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num create(String value) {
+    protected Num create(String value) {
         return of(value);
     }
 
@@ -123,7 +123,7 @@ public class Num extends Number implements Arithmetic<Num>, Comparable<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num zero() {
+    protected Num zero() {
         return ZERO;
     }
 
