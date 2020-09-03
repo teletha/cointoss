@@ -21,7 +21,7 @@ import org.apache.commons.lang3.RandomUtils;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.util.decimal.Arithmetic;
+import cointoss.util.decimal.JDK;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
@@ -31,7 +31,7 @@ import kiss.Singleton;
 import kiss.Variable;
 
 @SuppressWarnings("serial")
-public class Num extends Arithmetic<Num> {
+public class Num extends JDK<Num> {
 
     // initialize
     static {
@@ -91,31 +91,7 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    protected Num create(int value) {
-        return of(value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Num create(long value) {
-        return of(value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Num create(double value) {
-        return of(value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Num create(String value) {
+    protected Num create(BigDecimal value) {
         return of(value);
     }
 

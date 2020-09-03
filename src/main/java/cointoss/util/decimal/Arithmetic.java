@@ -57,6 +57,14 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      */
     protected abstract Self create(String value);
 
+    /**
+     * Build by the specified value.
+     * 
+     * @param value
+     * @return
+     */
+    protected abstract Self create(BigDecimal value);
+
     protected abstract Self zero();
 
     /**

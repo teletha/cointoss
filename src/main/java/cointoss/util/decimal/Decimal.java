@@ -117,6 +117,14 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
+    protected Decimal create(BigDecimal value) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Decimal zero() {
         return ZERO;
     }
