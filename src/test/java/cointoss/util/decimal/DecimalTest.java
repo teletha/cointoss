@@ -29,6 +29,18 @@ class DecimalTest {
         assert Decimal.computeScale(0.100) == 1;
         assert Decimal.computeScale(0.02) == 2;
         assert Decimal.computeScale(0.02040) == 4;
+
+        for (int i = 1; i < 10000; i++) {
+            if (i % 1000 == 0) {
+                assert Decimal.computeScale(i * 0.0001) == 1;
+            } else if (i % 100 == 0) {
+                assert Decimal.computeScale(i * 0.0001) == 2;
+            } else if (i % 10 == 0) {
+                assert Decimal.computeScale(i * 0.0001) == 3;
+            } else {
+                assert Decimal.computeScale(i * 0.0001) == 4;
+            }
+        }
     }
 
     @Test
@@ -59,10 +71,10 @@ class DecimalTest {
     @Test
     void divide() {
         assert Num.of(10).divide(Num.of(20)).doubleValue() == 0.5;
-        assert Num.of(10).divide(Num.of(12345678)).doubleValue() == 8.100000664200054E-7;
+        assert Num.of(10).divide(Num.of(12345678)).doubleValue() == 0.00000081;
         assert Num.of(10).divide(Num.of(0.1)).doubleValue() == 100;
         assert Num.of(10).divide(Num.of(0.00002)).intValue() == 500000;
-        assert Num.of(10).divide(Num.of(0.1234567)).doubleValue() == 81.00005913004316;
+        assert Num.of(10).divide(Num.of(0.1234567)).doubleValue() == 81.00005;
     }
 
     @Test
@@ -77,8 +89,8 @@ class DecimalTest {
     void pow() {
         assert Num.of(10).pow(2).doubleValue() == 100;
         assert Num.of(10).pow(-2).doubleValue() == 0.01;
-        assert Num.of(10).pow(2.5).doubleValue() == 316.22776601683796;
-        assert Num.of(10).pow(-2.5).doubleValue() == 0.003162277660168379;
+        assert Num.of(10).pow(2.5).doubleValue() == 316.227766016837;
+        assert Num.of(10).pow(-2.5).doubleValue() == 0.00316227766;
     }
 
     @Test
@@ -90,7 +102,7 @@ class DecimalTest {
     @Test
     void sqrt() {
         assert Num.of(100).sqrt().doubleValue() == 10;
-        assert Num.of(3).sqrt().doubleValue() == 1.73205080756887729352;
+        assert Num.of(3).sqrt().doubleValue() == 1.732050807568;
     }
 
     @Test

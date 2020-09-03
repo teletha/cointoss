@@ -12,7 +12,6 @@ package cointoss.util;
 import org.decimal4j.immutable.Decimal8f;
 
 import antibug.profiler.Benchmark;
-import cointoss.util.decimal.Decimal;
 
 public class BigNumBenchmark {
 
@@ -52,7 +51,11 @@ public class BigNumBenchmark {
         });
 
         benchmark.measure("Decimal", () -> {
-            return Decimal.of(1000).divide(Decimal.of(4)).plus(Decimal.of(0.123)).multiply(Decimal.of(-24.5)).pow(2);
+            return cointoss.util.decimal.Num.of(1000)
+                    .divide(cointoss.util.decimal.Num.of(4))
+                    .plus(cointoss.util.decimal.Num.of(0.123))
+                    .multiply(cointoss.util.decimal.Num.of(-24.5))
+                    .pow(2);
         });
 
         benchmark.perform();

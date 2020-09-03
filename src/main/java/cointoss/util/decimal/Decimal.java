@@ -12,6 +12,7 @@ package cointoss.util.decimal;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.util.Objects;
 
 import com.google.common.math.DoubleMath;
 
@@ -295,14 +296,46 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         return Primitives.roundDecimal(v * pow10(-scale), scale);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return Primitives.roundString(v * pow10(-scale), scale);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(v, scale);
+    }
+
+    /**
+     * {@inheritDoc} Warning: This method returns true if `this` and `obj` are both NaN.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Decimal)) {
+            return false;
+        }
+
+        Decimal other = (Decimal) obj;
+        return this.scale == other.scale && this.v == other.v;
+    }
+
     protected static int computeScale(double value) {
         for (int i = 0; i < 30; i++) {
             double fixer = pow10(i);
             double fixed = ((long) (value * fixer)) / fixer;
-            if (value == fixed) {
+            if (DoubleMath.fuzzyEquals(value, fixed, 0.000000000001)) {
                 return i;
             }
         }
-        throw new Error();
+        throw new Error("Overflow Value : " + value);
     }
 }
