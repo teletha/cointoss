@@ -68,7 +68,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static Decimal of(int value) {
+    public static DecimalNum of(int value) {
         return ZERO.create(value);
     }
 
@@ -78,7 +78,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static Decimal of(long value) {
+    public static DecimalNum of(long value) {
         return ZERO.create(value);
     }
 
@@ -88,7 +88,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static Decimal of(float value) {
+    public static DecimalNum of(float value) {
         return ZERO.create(value);
     }
 
@@ -98,7 +98,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static Decimal of(double value) {
+    public static DecimalNum of(double value) {
         return ZERO.create(value);
     }
 
@@ -108,7 +108,7 @@ public class DecimalNum extends Decimal<DecimalNum> {
      * @param value Your value.
      * @return Immutable {@link Decimal}.
      */
-    public static Decimal of(String value) {
+    public static DecimalNum of(String value) {
         return ZERO.create(value);
     }
 }
