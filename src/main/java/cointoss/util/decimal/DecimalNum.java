@@ -11,25 +11,32 @@ package cointoss.util.decimal;
 
 public class DecimalNum extends Decimal<DecimalNum> {
 
+    /** reuse */
     public static final DecimalNum ZERO = new DecimalNum(0, 0);
 
     /** reuse */
-    public static final Decimal ONE = of(1);
+    public static final DecimalNum ONE = ZERO.create(1);
 
     /** reuse */
-    public static final Decimal TWO = of(2);
+    public static final DecimalNum TWO = ZERO.create(2);
 
     /** reuse */
-    public static final Decimal THREE = of(3);
+    public static final DecimalNum THREE = ZERO.create(3);
 
     /** reuse */
-    public static final Decimal TEN = of(10);
+    public static final DecimalNum TEN = ZERO.create(10);
 
     /** reuse */
-    public static final Decimal HUNDRED = of(100);
+    public static final DecimalNum HUNDRED = ZERO.create(100);
 
     /** reuse */
-    public static final Decimal THOUSAND = of(1000);
+    public static final DecimalNum THOUSAND = ZERO.create(1000);
+
+    /** reuse */
+    public static final DecimalNum MAX = ZERO.create(Long.MAX_VALUE);
+
+    /** reuse */
+    public static final DecimalNum MIN = ZERO.create(Long.MIN_VALUE);
 
     /**
      * @param value

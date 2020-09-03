@@ -30,13 +30,8 @@ import kiss.Variable;
 @SuppressWarnings("serial")
 public class Num extends JDK<Num> {
 
-    // initialize
-    static {
-        I.load(Market.class);
-    }
-
     /** reuse */
-    public static final Num ZERO = new Num();
+    public static final Num ZERO = new Num(BigDecimal.ZERO);
 
     /** reuse */
     public static final Num ONE = ZERO.create(1);
@@ -61,15 +56,6 @@ public class Num extends JDK<Num> {
 
     /** reuse */
     public static final Num MIN = ZERO.create(Long.MIN_VALUE);
-
-    /** reuse */
-    public static final Num NaN = new NaN();
-
-    /**
-     * Constructor. Only used for NaN instance.
-     */
-    private Num() {
-    }
 
     /**
      * Constructor.
@@ -178,9 +164,6 @@ public class Num extends JDK<Num> {
      * @return
      */
     public static Num of(double value) {
-        if (Double.isNaN(value)) {
-            return NaN;
-        }
         return ZERO.create(value);
     }
 
@@ -372,6 +355,10 @@ public class Num extends JDK<Num> {
         return sum;
     }
 
+    static {
+        I.load(Market.class);
+    }
+
     /**
      * 
      */
@@ -392,27 +379,6 @@ public class Num extends JDK<Num> {
         @Override
         public String encode(Num value) {
             return value.toString();
-        }
-    }
-
-    /**
-     */
-    private static class NaN extends Num {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public double doubleValue() {
-            return Double.NaN;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "NaN";
         }
     }
 }
