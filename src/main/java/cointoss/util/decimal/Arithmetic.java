@@ -15,7 +15,6 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 
 import cointoss.Directional;
-import cointoss.util.Num;
 import kiss.Variable;
 
 /**
@@ -1004,56 +1003,46 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Returns a {@link Num} whose numerical value is equal to ({@code this} * 10<sup>n</sup>). The
-     * scale of the result is {@code (this.scale() - n)}.
+     * Returns a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>).
+     * The scale of the result is {@code (this.scale() - n)}.
      *
      * @param n the exponent power of ten to scale by
-     * @return a {@link Num} whose numerical value is equal to ({@code this} * 10<sup>n</sup>)
+     * @return a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>)
      * @throws ArithmeticException if the scale would be outside the range of a 32-bit integer.
      */
-    public abstract Num decuple(int n);
+    public abstract Self decuple(int n);
 
     /**
-     * Returns a {@code Num} whose value is <code>(this<sup>n</sup>)</code>. The current
+     * Returns a {@code Self} whose value is <code>(this<sup>n</sup>)</code>. The current
      * implementation uses the core algorithm defined in ANSI standard X3.274-1996 with rounding
-     * according to the context settings. In general, the returned numerical value is within two
-     * ulps of the exact numerical value for the chosen precision. Note that future releases may use
-     * a different algorithm with a decreased allowable error bound and increased allowable exponent
-     * range.
+     * according to the context settings. In general, the returned Selferical value is within two
+     * ulps of the exact Selferical value for the chosen precision. Note that future releases may
+     * use a different algorithm with a decreased allowable error bound and increased allowable
+     * exponent range.
      *
-     * @param n power to raise this {@code Num} to.
+     * @param n power to raise this {@code Self} to.
      * @param mc the context to use.
      * @return <code>this<sup>n</sup></code> using the ANSI standard X3.274-1996 algorithm
      * @throws ArithmeticException if the result is inexact but the rounding mode is
      *             {@code UNNECESSARY}, or {@code n} is out of range.
      */
-    public abstract Num pow(int n);
+    public abstract Self pow(int n);
 
     /**
-     * Returns a {@code Num} whose value is <code>(this<sup>n</sup>)</code>. The current
+     * Returns a {@code Self} whose value is <code>(this<sup>n</sup>)</code>. The current
      * implementation uses the core algorithm defined in ANSI standard X3.274-1996 with rounding
-     * according to the context settings. In general, the returned numerical value is within two
-     * ulps of the exact numerical value for the chosen precision. Note that future releases may use
-     * a different algorithm with a decreased allowable error bound and increased allowable exponent
-     * range.
+     * according to the context settings. In general, the returned Selferical value is within two
+     * ulps of the exact Selferical value for the chosen precision. Note that future releases may
+     * use a different algorithm with a decreased allowable error bound and increased allowable
+     * exponent range.
      *
-     * @param n power to raise this {@code Num} to.
+     * @param n power to raise this {@code Self} to.
      * @param mc the context to use.
      * @return <code>this<sup>n</sup></code> using the ANSI standard X3.274-1996 algorithm
      * @throws ArithmeticException if the result is inexact but the rounding mode is
      *             {@code UNNECESSARY}, or {@code n} is out of range.
      */
-    public abstract Num pow(double n);
-
-    /**
-     * Returns the correctly rounded natural logarithm (base e) of the <code>double</code> value of
-     * this {@code Decimal}. /!\ Warning! Uses the {@code StrictMath#log(double)} method under the
-     * hood.
-     * 
-     * @return the natural logarithm (base e) of {@code this}
-     * @see StrictMath#log(double)
-     */
-    public abstract Num log();
+    public abstract Self pow(double n);
 
     /**
      * Returns an approximation to the square root of {@code this} with rounding according to the
@@ -1072,23 +1061,23 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @throws ArithmeticException if {@code (mc.getRoundingMode()==RoundingMode.UNNECESSARY}) and
      *             the exact result cannot fit in {@code mc.getPrecision()} digits.
      */
-    public abstract Num sqrt();
+    public abstract Self sqrt();
 
     /**
-     * Returns a {@code Num} whose value is the absolute value of this {@code Num}, and whose scale
-     * is {@code this.scale()}.
+     * Returns a {@code Self} whose value is the absolute value of this {@code Self}, and whose
+     * scale is {@code this.scale()}.
      *
      * @return {@code abs(this)}
      */
-    public abstract Num abs();
+    public abstract Self abs();
 
     /**
-     * Returns a {@code Num} whose value is {@code (-this)}, and whose scale is
+     * Returns a {@code Self} whose value is {@code (-this)}, and whose scale is
      * {@code this.scale()}.
      *
      * @return {@code -this}.
      */
-    public abstract Num negate();
+    public abstract Self negate();
 
     /**
      * Compute scale.
@@ -1096,15 +1085,15 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract int scale();
 
     /**
-     * Returns a {@code Num} whose scale is the specified value, and whose unscaled value is
-     * determined by multiplying or dividing this {@code Num}'s unscaled value by the appropriate
+     * Returns a {@code Self} whose scale is the specified value, and whose unscaled value is
+     * determined by multiplying or dividing this {@code Self}'s unscaled value by the appropriate
      * power of ten to maintain its overall value. If the scale is reduced by the operation, the
      * unscaled value must be divided (rather than multiplied), and the value may be changed; in
      * this case, the specified rounding mode is applied to the division.
      *
-     * @param size scale of the {@code Num} value to be returned.
-     * @return a {@code Num} whose scale is the specified value, and whose unscaled value is
-     *         determined by multiplying or dividing this {@code Num}'s unscaled value by the
+     * @param size scale of the {@code Self} value to be returned.
+     * @return a {@code Self} whose scale is the specified value, and whose unscaled value is
+     *         determined by multiplying or dividing this {@code Self}'s unscaled value by the
      *         appropriate power of ten to maintain its overall value.
      * @throws ArithmeticException if {@code roundingMode==UNNECESSARY} and the specified scaling
      *             operation would require rounding.
@@ -1114,16 +1103,16 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Returns a {@code Num} whose scale is the specified value, and whose unscaled value is
-     * determined by multiplying or dividing this {@code Num}'s unscaled value by the appropriate
+     * Returns a {@code Self} whose scale is the specified value, and whose unscaled value is
+     * determined by multiplying or dividing this {@code Self}'s unscaled value by the appropriate
      * power of ten to maintain its overall value. If the scale is reduced by the operation, the
      * unscaled value must be divided (rather than multiplied), and the value may be changed; in
      * this case, the specified rounding mode is applied to the division.
      *
-     * @param size scale of the {@code Num} value to be returned.
+     * @param size scale of the {@code Self} value to be returned.
      * @param mode The rounding mode to apply.
-     * @return a {@code Num} whose scale is the specified value, and whose unscaled value is
-     *         determined by multiplying or dividing this {@code Num}'s unscaled value by the
+     * @return a {@code Self} whose scale is the specified value, and whose unscaled value is
+     *         determined by multiplying or dividing this {@code Self}'s unscaled value by the
      *         appropriate power of ten to maintain its overall value.
      * @throws ArithmeticException if {@code roundingMode==UNNECESSARY} and the specified scaling
      *             operation would require rounding.
@@ -1131,9 +1120,9 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self scale(int size, RoundingMode mode);
 
     /**
-     * Format this number.
+     * Format this Selfber.
      * 
-     * @param format Your number format.
+     * @param format Your Selfber format.
      * @return A formatted value.
      */
     public abstract String format(NumberFormat format);

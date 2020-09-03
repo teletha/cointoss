@@ -211,14 +211,6 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num log() {
-        return of(StrictMath.log(delegate.doubleValue()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Num sqrt() {
         return of(delegate.sqrt(CONTEXT));
     }
