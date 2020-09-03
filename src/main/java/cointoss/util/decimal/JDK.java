@@ -20,10 +20,10 @@ public abstract class JDK<Self extends JDK> extends Arithmetic<Self> {
     protected final BigDecimal delegate;
 
     /**
-     * Constructor. Only used for NaN instance.
+     * Constructor for ZERO.
      */
     protected JDK() {
-        this.delegate = null;
+        this(BigDecimal.ZERO);
     }
 
     /**

@@ -36,31 +36,31 @@ public class Num extends JDK<Num> {
     }
 
     /** reuse */
-    public static final Num ZERO = of(0);
+    public static final Num ZERO = new Num();
 
     /** reuse */
-    public static final Num ONE = of(1);
+    public static final Num ONE = ZERO.create(1);
 
     /** reuse */
-    public static final Num TWO = of(2);
+    public static final Num TWO = ZERO.create(2);
 
     /** reuse */
-    public static final Num THREE = of(3);
+    public static final Num THREE = ZERO.create(3);
 
     /** reuse */
-    public static final Num TEN = of(10);
+    public static final Num TEN = ZERO.create(10);
 
     /** reuse */
-    public static final Num HUNDRED = of(100);
+    public static final Num HUNDRED = ZERO.create(100);
 
     /** reuse */
-    public static final Num THOUSAND = of(1000);
+    public static final Num THOUSAND = ZERO.create(1000);
 
     /** reuse */
-    public static final Num MAX = of(Long.MAX_VALUE);
+    public static final Num MAX = ZERO.create(Long.MAX_VALUE);
 
     /** reuse */
-    public static final Num MIN = of(Long.MIN_VALUE);
+    public static final Num MIN = ZERO.create(Long.MIN_VALUE);
 
     /** reuse */
     public static final Num NaN = new NaN();
@@ -85,7 +85,7 @@ public class Num extends JDK<Num> {
      */
     @Override
     protected Num create(BigDecimal value) {
-        return of(value);
+        return new Num(value);
     }
 
     /**
@@ -103,7 +103,7 @@ public class Num extends JDK<Num> {
      * @return
      */
     public static Num of(int value) {
-        return new Num(new BigDecimal(value, CONTEXT));
+        return ZERO.create(value);
     }
 
     /**
@@ -128,7 +128,7 @@ public class Num extends JDK<Num> {
      * @return
      */
     public static Num of(long value) {
-        return new Num(new BigDecimal(value, CONTEXT));
+        return ZERO.create(value);
     }
 
     /**
@@ -153,7 +153,7 @@ public class Num extends JDK<Num> {
      * @return
      */
     public static Num of(float value) {
-        return new Num(new BigDecimal(value, CONTEXT));
+        return ZERO.create(value);
     }
 
     /**
@@ -181,7 +181,7 @@ public class Num extends JDK<Num> {
         if (Double.isNaN(value)) {
             return NaN;
         }
-        return new Num(new BigDecimal(value, CONTEXT));
+        return ZERO.create(value);
     }
 
     /**
@@ -206,7 +206,7 @@ public class Num extends JDK<Num> {
      * @return
      */
     public static Num of(String value) {
-        return new Num(new BigDecimal(value, CONTEXT));
+        return ZERO.create(value);
     }
 
     /**
@@ -225,7 +225,7 @@ public class Num extends JDK<Num> {
     }
 
     public static Num of(BigDecimal value) {
-        return new Num(value);
+        return ZERO.create(value);
     }
 
     /**
