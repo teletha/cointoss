@@ -10,10 +10,7 @@
 package cointoss.util;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -68,14 +65,10 @@ public class Num extends JDK<Num> {
     /** reuse */
     public static final Num NaN = new NaN();
 
-    /** The actual value. */
-    private final BigDecimal delegate;
-
     /**
      * Constructor. Only used for NaN instance.
      */
     private Num() {
-        this.delegate = null;
     }
 
     /**
@@ -84,7 +77,7 @@ public class Num extends JDK<Num> {
      * @param value primitive value
      */
     protected Num(BigDecimal value) {
-        this.delegate = value;
+        super(value);
     }
 
     /**
@@ -101,193 +94,6 @@ public class Num extends JDK<Num> {
     @Override
     protected Num zero() {
         return ZERO;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num plus(Num augend) {
-        return new Num(delegate.add(augend.delegate, CONTEXT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num minus(Num subtrahend) {
-        return new Num(delegate.subtract(subtrahend.delegate, CONTEXT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num multiply(Num multiplicand) {
-        return new Num(delegate.multiply(multiplicand.delegate, CONTEXT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num divide(Num divisor) {
-        return new Num(delegate.divide(divisor.delegate, CONTEXT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num remainder(Num divisor) {
-        return new Num(delegate.remainder(divisor.delegate, CONTEXT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int scale() {
-        return delegate.stripTrailingZeros().scale();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num scale(int size, RoundingMode mode) {
-        return new Num(delegate.setScale(size, mode));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num decuple(int n) {
-        return new Num(delegate.scaleByPowerOfTen(n));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num pow(int n) {
-        return new Num(delegate.pow(n, CONTEXT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num pow(double n) {
-        return of(Math.pow(doubleValue(), n));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num sqrt() {
-        return of(delegate.sqrt(CONTEXT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num abs() {
-        return new Num(delegate.abs());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num negate() {
-        return new Num(delegate.negate());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(Num other) {
-        return delegate.compareTo(other.delegate);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int intValue() {
-        return delegate.intValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long longValue() {
-        return delegate.longValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public float floatValue() {
-        return delegate.floatValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double doubleValue() {
-        return delegate.doubleValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String format(NumberFormat format) {
-        return format.format(delegate);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return delegate.stripTrailingZeros().toPlainString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(delegate);
-    }
-
-    /**
-     * {@inheritDoc} Warning: This method returns true if `this` and `obj` are both NaN.
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Num)) {
-            return false;
-        }
-
-        Num other = (Num) obj;
-        if (this.delegate != other.delegate && (this.delegate == null || (this.delegate.compareTo(other.delegate) != 0))) {
-            return false;
-        }
-        return true;
     }
 
     /**
