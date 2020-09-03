@@ -68,9 +68,9 @@ class DecimalTest {
     @Test
     void remainder() {
         assert Decimal.of(10).remainder(Decimal.of(3)).doubleValue() == 1;
-        assert Decimal.of(10).remainder(Decimal.of(345)).doubleValue() == 0;
-        assert Decimal.of(10).remainder(Decimal.of(0.1)).doubleValue() == 0.1;
-        assert Decimal.of(10).remainder(Decimal.of(0.00002)).intValue() == 2.0e-5;
+        assert Decimal.of(10).remainder(Decimal.of(345)).doubleValue() == 10;
+        assert Decimal.of(10).remainder(Decimal.of(0.1)).doubleValue() == 0;
+        assert Decimal.of(10).remainder(Decimal.of(0.00002)).intValue() == 0;
     }
 
     @Test

@@ -162,8 +162,14 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public Decimal remainder(Decimal divisor) {
-        return null;
+    public Decimal remainder(Decimal value) {
+        if (scale == value.scale) {
+            return new Decimal(v % value.v, scale);
+        } else if (scale < value.scale) {
+            return new Decimal((long) (v * pow10(value.scale - scale)) % value.v, value.scale);
+        } else {
+            return new Decimal(v % (long) (value.v * pow10(scale - value.scale)), scale);
+        }
     }
 
     /**
