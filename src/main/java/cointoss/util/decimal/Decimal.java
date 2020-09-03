@@ -12,21 +12,12 @@ package cointoss.util.decimal;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.RandomUtils;
 
 import com.google.common.math.DoubleMath;
 
-import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.util.Primitives;
-import kiss.I;
-import kiss.Signal;
-import kiss.Variable;
 
-public class Decimal extends Arithmetic<Decimal> {
+public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Self> {
 
     private static final double[] positives = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000d,
             100000000000d, 1000000000000d, 10000000000000d, 100000000000000d, 1000000000000000d, 10000000000000000d, 100000000000000000d,
@@ -48,35 +39,15 @@ public class Decimal extends Arithmetic<Decimal> {
         }
     }
 
-    private static final Decimal ZERO = of(0);
+    long v;
 
-    /** reuse */
-    public static final Decimal ONE = of(1);
-
-    /** reuse */
-    public static final Decimal TWO = of(2);
-
-    /** reuse */
-    public static final Decimal THREE = of(3);
-
-    /** reuse */
-    public static final Decimal TEN = of(10);
-
-    /** reuse */
-    public static final Decimal HUNDRED = of(100);
-
-    /** reuse */
-    public static final Decimal THOUSAND = of(1000);
-
-    private long v;
-
-    private int scale;
+    int scale;
 
     /**
      * @param value
      * @param scale
      */
-    private Decimal(long value, int scale) {
+    protected Decimal(long value, int scale) {
         this.v = value;
         this.scale = scale;
     }
@@ -85,58 +56,55 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    protected Decimal create(int value) {
-        return of(value);
+    protected Self create(int value) {
+        return create(value, 0);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Decimal create(long value) {
-        return of(value);
+    protected Self create(long value) {
+        return create(value, 0);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Decimal create(double value) {
-        return of(value);
+    protected Self create(double value) {
+        int scale = computeScale(value);
+        return create((long) (value * pow10(scale)), scale);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Decimal create(String value) {
-        return of(value);
+    protected Self create(String value) {
+        BigDecimal big = new BigDecimal(value);
+        int scale = Math.max(0, big.scale());
+        return create(big.scaleByPowerOfTen(scale).longValue(), scale);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Decimal create(BigDecimal value) {
+    protected Self create(BigDecimal value) {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Decimal zero() {
-        return ZERO;
-    }
+    protected abstract Self create(long value, int scale);
 
     @Override
-    public Decimal plus(Decimal value) {
+    public Self plus(Self value) {
         if (scale == value.scale) {
-            return new Decimal(v + value.v, scale);
+            return create(v + value.v, scale);
         } else if (scale < value.scale) {
-            return new Decimal((long) (v * pow10(value.scale - scale) + value.v), value.scale);
+            return create((long) (v * pow10(value.scale - scale) + value.v), value.scale);
         } else {
-            return new Decimal(v + (long) (value.v * pow10(scale - value.scale)), scale);
+            return create(v + (long) (value.v * pow10(scale - value.scale)), scale);
         }
     }
 
@@ -144,24 +112,30 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public Decimal minus(Decimal value) {
+    public Self minus(Self value) {
         if (scale == value.scale) {
-            return new Decimal(v - value.v, scale);
+            return create(v - value.v, scale);
         } else if (scale < value.scale) {
-            return new Decimal((long) (v * pow10(value.scale - scale) - value.v), value.scale);
+            return create((long) (v * pow10(value.scale - scale) - value.v), value.scale);
         } else {
-            return new Decimal(v - (long) (value.v * pow10(scale - value.scale)), scale);
+            return create(v - (long) (value.v * pow10(scale - value.scale)), scale);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Decimal multiply(Decimal value) {
-        return new Decimal(v * value.v, scale + value.scale);
+    public Self multiply(Self value) {
+        return create(v * value.v, scale + value.scale);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Decimal divide(Decimal value) {
-        Decimal result = Decimal.of((double) v / value.v);
+    public Self divide(Self value) {
+        Self result = create((double) v / value.v);
         result.scale = scale - value.scale + result.scale;
         return result;
     }
@@ -170,13 +144,13 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public Decimal remainder(Decimal value) {
+    public Self remainder(Self value) {
         if (scale == value.scale) {
-            return new Decimal(v % value.v, scale);
+            return create(v % value.v, scale);
         } else if (scale < value.scale) {
-            return new Decimal((long) (v * pow10(value.scale - scale)) % value.v, value.scale);
+            return create((long) (v * pow10(value.scale - scale)) % value.v, value.scale);
         } else {
-            return new Decimal(v % (long) (value.v * pow10(scale - value.scale)), scale);
+            return create(v % (long) (value.v * pow10(scale - value.scale)), scale);
         }
     }
 
@@ -184,7 +158,7 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public int compareTo(Decimal o) {
+    public int compareTo(Self o) {
         if (scale == o.scale) {
             return Long.compare(v, o.v);
         } else if (scale < o.scale) {
@@ -198,16 +172,16 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public Decimal decuple(int n) {
-        return new Decimal(v, scale - n);
+    public Self decuple(int n) {
+        return create(v, scale - n);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Decimal pow(int n) {
-        Decimal result = of(Math.pow(v, n));
+    public Self pow(int n) {
+        Self result = create(Math.pow(v, n));
         result.scale += scale * n;
         return result;
     }
@@ -216,8 +190,8 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public Decimal pow(double n) {
-        Decimal result = of(Math.pow(v, n));
+    public Self pow(double n) {
+        Self result = create(Math.pow(v, n));
         result.scale += scale * n;
         return result;
     }
@@ -226,8 +200,8 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public Decimal sqrt() {
-        Decimal result = of(Math.sqrt(v));
+    public Self sqrt() {
+        Self result = create(Math.sqrt(v));
         result.scale += scale / 2;
         return result;
     }
@@ -236,16 +210,16 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public Decimal abs() {
-        return new Decimal(Math.abs(v), scale);
+    public Self abs() {
+        return create(Math.abs(v), scale);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Decimal negate() {
-        return new Decimal(-v, scale);
+    public Self negate() {
+        return create(-v, scale);
     }
 
     /**
@@ -260,13 +234,13 @@ public class Decimal extends Arithmetic<Decimal> {
      * {@inheritDoc}
      */
     @Override
-    public Decimal scale(int size, RoundingMode mode) {
+    public Self scale(int size, RoundingMode mode) {
         if (scale == size) {
-            return this;
+            return (Self) this;
         } else if (scale < size) {
-            return new Decimal((long) (v * pow10(size - scale)), size);
+            return create((long) (v * pow10(size - scale)), size);
         } else {
-            return new Decimal(DoubleMath.roundToLong(v * pow10(size - scale), mode), size);
+            return create(DoubleMath.roundToLong(v * pow10(size - scale), mode), size);
         }
     }
 
@@ -310,60 +284,6 @@ public class Decimal extends Arithmetic<Decimal> {
         return Primitives.roundDecimal(v * pow10(-scale), scale);
     }
 
-    /**
-     * Construct {@link Decimal} by the specified value.
-     * 
-     * @param value Your value.
-     * @return Immutable {@link Decimal}.
-     */
-    public static Decimal of(int value) {
-        return new Decimal(value, 0);
-    }
-
-    /**
-     * Construct {@link Decimal} by the specified value.
-     * 
-     * @param value Your value.
-     * @return Immutable {@link Decimal}.
-     */
-    public static Decimal of(long value) {
-        return new Decimal(value, 0);
-    }
-
-    /**
-     * Construct {@link Decimal} by the specified value.
-     * 
-     * @param value Your value.
-     * @return Immutable {@link Decimal}.
-     */
-    public static Decimal of(float value) {
-        int scale = computeScale(value);
-        return new Decimal((long) (value * pow10(scale)), scale);
-    }
-
-    /**
-     * Construct {@link Decimal} by the specified value.
-     * 
-     * @param value Your value.
-     * @return Immutable {@link Decimal}.
-     */
-    public static Decimal of(double value) {
-        int scale = computeScale(value);
-        return new Decimal((long) (value * pow10(scale)), scale);
-    }
-
-    /**
-     * Construct {@link Decimal} by the specified value.
-     * 
-     * @param value Your value.
-     * @return Immutable {@link Decimal}.
-     */
-    public static Decimal of(String value) {
-        BigDecimal big = new BigDecimal(value);
-        int scale = Math.max(0, big.scale());
-        return new Decimal(big.scaleByPowerOfTen(scale).longValue(), scale);
-    }
-
     static int computeScale(double value) {
         for (int i = 0; i < 30; i++) {
             double fixer = pow10(i);
@@ -373,224 +293,5 @@ public class Decimal extends Arithmetic<Decimal> {
             }
         }
         throw new Error();
-    }
-
-    /**
-     * Convert to {@link Decimal}.
-     * 
-     * @param values
-     * @return
-     */
-    public static Decimal[] of(int... values) {
-        Decimal[] decimals = new Decimal[values.length];
-
-        for (int i = 0; i < decimals.length; i++) {
-            decimals[i] = of(values[i]);
-        }
-        return decimals;
-    }
-
-    /**
-     * Convert to {@link Decimal}.
-     * 
-     * @param values
-     * @return
-     */
-    public static Decimal[] of(long... values) {
-        Decimal[] decimals = new Decimal[values.length];
-
-        for (int i = 0; i < decimals.length; i++) {
-            decimals[i] = of(values[i]);
-        }
-        return decimals;
-    }
-
-    /**
-     * Convert to {@link Decimal}.
-     * 
-     * @param values
-     * @return
-     */
-    public static Decimal[] of(float... values) {
-        Decimal[] decimals = new Decimal[values.length];
-
-        for (int i = 0; i < decimals.length; i++) {
-            decimals[i] = of(values[i]);
-        }
-        return decimals;
-    }
-
-    /**
-     * Convert to {@link Decimal}.
-     * 
-     * @param values
-     * @return
-     */
-    public static Decimal[] of(double... values) {
-        Decimal[] decimals = new Decimal[values.length];
-
-        for (int i = 0; i < decimals.length; i++) {
-            decimals[i] = of(values[i]);
-        }
-        return decimals;
-    }
-
-    /**
-     * Convert to {@link Decimal}.
-     * 
-     * @param values
-     * @return
-     */
-    public static Decimal[] of(String... values) {
-        Decimal[] decimals = new Decimal[values.length];
-
-        for (int i = 0; i < decimals.length; i++) {
-            decimals[i] = of(values[i]);
-        }
-        return decimals;
-    }
-
-    /**
-     * Detect max value.
-     * 
-     * @param decimals
-     * @return
-     */
-    public static Decimal max(Decimal... decimals) {
-        return max(Direction.BUY, decimals);
-    }
-
-    /**
-     * Detect max value.
-     * 
-     * @param decimals
-     * @return
-     */
-    public static Decimal max(Directional direction, Decimal... decimals) {
-        Decimal max = decimals[0];
-
-        for (int i = 1; i < decimals.length; i++) {
-            if (decimals[i] != null) {
-                if (max == null || max.isLessThan(direction, decimals[i])) {
-                    max = decimals[i];
-                }
-            }
-        }
-        return max;
-    }
-
-    /**
-     * Detect min value.
-     * 
-     * @param one
-     * @param other
-     * @return
-     */
-    public static Decimal min(Variable<Decimal> one, Decimal other) {
-        return min(one.v, other);
-    }
-
-    /**
-     * Detect min value.
-     * 
-     * @param decimals
-     * @return
-     */
-    public static Decimal min(Decimal... decimals) {
-        return min(Direction.BUY, decimals);
-    }
-
-    /**
-     * Detect min value.
-     * 
-     * @param decimals
-     * @return
-     */
-    public static Decimal min(Directional direction, Decimal... decimals) {
-        Decimal min = decimals[0];
-
-        for (int i = 1; i < decimals.length; i++) {
-            if (decimals[i] != null) {
-                if (min == null || min.isGreaterThan(direction, decimals[i])) {
-                    min = decimals[i];
-                }
-            }
-        }
-        return min;
-    }
-
-    /**
-     * Check the value range.
-     * 
-     * @param min A minimum value.
-     * @param value A target value to check.
-     * @param max A maximum value.
-     * @return A target value in range.
-     */
-    public static boolean within(Decimal min, Decimal value, Decimal max) {
-        if (min.isGreaterThan(value)) {
-            return false;
-        }
-
-        if (value.isGreaterThan(max)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check the value range.
-     * 
-     * @param min A minimum value.
-     * @param value A target value to check.
-     * @param max A maximum value.
-     * @return A target value in range.
-     */
-    public static Decimal between(Decimal min, Decimal value, Decimal max) {
-        return min(max, max(min, value));
-    }
-
-    /**
-     * @param start
-     * @param end
-     * @return
-     */
-    public static Signal<Decimal> range(int start, int end) {
-        return I.signal(IntStream.rangeClosed(start, end).mapToObj(Decimal::of)::iterator);
-    }
-
-    /**
-     * Create {@link Decimal} with random Decimalber between min and max.
-     * 
-     * @param minInclusive A minimum Decimalber (inclusive).
-     * @param maxExclusive A maximum Decimalber (exclusive).
-     * @return A random Decimalber.
-     */
-    public static Decimal random(double minInclusive, double maxExclusive) {
-        return of(RandomUtils.nextDouble(minInclusive, maxExclusive));
-    }
-
-    /**
-     * Calculate the sum of all Decimalbers.
-     * 
-     * @param Decimals
-     * @return
-     */
-    public static Decimal sum(Decimal... Decimals) {
-        return sum(List.of(Decimals));
-    }
-
-    /**
-     * Calculate the sum of all Decimalbers.
-     * 
-     * @param Decimals
-     * @return
-     */
-    public static Decimal sum(Iterable<Decimal> Decimals) {
-        Decimal sum = Decimal.ZERO;
-        for (Decimal Decimal : Decimals) {
-            sum = sum.plus(Decimal);
-        }
-        return sum;
     }
 }
