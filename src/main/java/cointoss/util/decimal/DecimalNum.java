@@ -9,6 +9,8 @@
  */
 package cointoss.util.decimal;
 
+import java.math.BigDecimal;
+
 public class DecimalNum extends Decimal<DecimalNum> {
 
     /** reuse */
@@ -44,6 +46,13 @@ public class DecimalNum extends Decimal<DecimalNum> {
      */
     private DecimalNum(long value, int scale) {
         super(value, scale);
+    }
+
+    /**
+     * @param value
+     */
+    public DecimalNum(BigDecimal value) {
+        super(value);
     }
 
     /**

@@ -53,6 +53,16 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
     }
 
     /**
+     * @param value
+     * @param scale
+     */
+    protected Decimal(BigDecimal value) {
+        int scale = Math.max(0, value.scale());
+        this.v = value.scaleByPowerOfTen(scale).longValue();
+        this.scale = scale;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -92,7 +102,8 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
      */
     @Override
     protected Self create(BigDecimal value) {
-        return null;
+        int scale = Math.max(0, value.scale());
+        return create(value.scaleByPowerOfTen(scale).longValue(), scale);
     }
 
     protected abstract Self create(long value, int scale);
@@ -284,7 +295,7 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         return Primitives.roundDecimal(v * pow10(-scale), scale);
     }
 
-    static int computeScale(double value) {
+    protected static int computeScale(double value) {
         for (int i = 0; i < 30; i++) {
             double fixer = pow10(i);
             double fixed = ((long) (value * fixer)) / fixer;

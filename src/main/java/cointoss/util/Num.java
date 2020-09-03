@@ -355,6 +355,7 @@ public class Num extends JDK<Num> {
         return sum;
     }
 
+    // initialize
     static {
         I.load(Market.class);
     }
