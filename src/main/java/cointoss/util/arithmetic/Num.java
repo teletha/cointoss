@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -490,7 +489,7 @@ public class Num extends Arithmetic<Num> {
         if (big != null) {
             return big.hashCode();
         } else {
-            return Objects.hash(v, scale);
+            return (int) (v ^ ((scale + 1) >>> 32));
         }
     }
 
