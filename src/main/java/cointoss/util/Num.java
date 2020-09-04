@@ -18,7 +18,7 @@ import org.apache.commons.lang3.RandomUtils;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.util.decimal.JDK;
+import cointoss.util.decimal.Decimal;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
@@ -28,10 +28,10 @@ import kiss.Singleton;
 import kiss.Variable;
 
 @SuppressWarnings("serial")
-public class Num extends JDK<Num> {
+public class Num extends Decimal<Num> {
 
     /** reuse */
-    public static final Num ZERO = new Num(BigDecimal.ZERO);
+    public static final Num ZERO = new Num(0, 0);
 
     /** reuse */
     public static final Num ONE = ZERO.create(1);
@@ -58,12 +58,26 @@ public class Num extends JDK<Num> {
     public static final Num MIN = ZERO.create(Long.MIN_VALUE);
 
     /**
-     * Constructor.
-     * 
-     * @param value primitive value
+     * @param value
+     * @param scale
+     */
+    protected Num(long value, int scale) {
+        super(value, scale);
+    }
+
+    /**
+     * @param value
      */
     protected Num(BigDecimal value) {
         super(value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Num create(long value, int scale) {
+        return new Num(value, scale);
     }
 
     /**

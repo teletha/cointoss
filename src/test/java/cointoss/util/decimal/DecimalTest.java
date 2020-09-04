@@ -256,4 +256,12 @@ class DecimalTest {
     void promotePow10() {
         assert Num.of(Long.MAX_VALUE).decuple(5).toString().equals("9.223372036854774E23");
     }
+
+    @Test
+    void equals() {
+        assert Num.of(12345).equals(Num.of(12345));
+        assert Num.of("12345").equals(Num.of("12345"));
+        assert Num.of(12345).equals(Num.of("12345"));
+        assert Num.of("12345").equals(Num.of(12345));
+    }
 }

@@ -11,6 +11,8 @@ package cointoss.analyze;
 
 import org.junit.jupiter.api.Test;
 
+import com.google.common.math.DoubleMath;
+
 import cointoss.util.Num;
 
 class NumStatsTest {
@@ -103,7 +105,7 @@ class NumStatsTest {
         assert statistics.standardDeviation().is(5);
 
         statistics.add(Num.of(30));
-        assert statistics.standardDeviation().is(8.16496580927726);
+        assert DoubleMath.fuzzyEquals(statistics.standardDeviation().doubleValue(), 8.16496580927, 0.0000000001);
     }
 
     @Test
@@ -116,7 +118,7 @@ class NumStatsTest {
         assert statistics.skewness().is(0);
 
         statistics.add(Num.of(10));
-        assert statistics.skewness().is(0.707106781186553);
+        assert DoubleMath.fuzzyEquals(statistics.skewness().doubleValue(), 0.70710678, 0.0000001);
     }
 
     @Test

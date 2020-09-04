@@ -88,9 +88,9 @@ class TakerTest extends TraderTestSupport {
 
         Scenario s = latest();
         if (side.isBuy()) {
-            assert s.entryPrice.is(12);
+            assert s.entryPrice.scale(0).is(12);
         } else {
-            assert s.entryPrice.is(7);
+            assert s.entryPrice.scale(0).is(7);
         }
     }
 

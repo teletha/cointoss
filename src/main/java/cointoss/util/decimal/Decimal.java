@@ -347,7 +347,7 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
             if (scale == size) {
                 return (Self) this;
             } else if (scale < size) {
-                return create((long) (v * pow10(size - scale)), size);
+                return (Self) this;
             } else {
                 return create(DoubleMath.roundToLong(v * pow10(size - scale), mode), size);
             }
@@ -439,29 +439,43 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
     }
 
     /**
-     * {@inheritDoc} Warning: This method returns true if `this` and `obj` are both NaN.
+     * {@inheritDoc}
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-
-        if (big != null) {
-            return big.equals(obj);
-        }
-
-        if (!(obj instanceof Decimal)) {
+        if (obj instanceof Decimal == false) {
             return false;
         }
 
         Decimal other = (Decimal) obj;
-
         if (big != null) {
-            return big.compareTo(other.big) == 0;
+            if (other.big != null) {
+                return big.compareTo(other.big) == 0;
+            } else {
+                return checkEqualityBetweenPrimitiveAndBig(other, this);
+            }
+        } else {
+            if (other.big != null) {
+                return checkEqualityBetweenPrimitiveAndBig(this, other);
+            } else {
+                return this.scale == other.scale && this.v == other.v;
+            }
         }
+    }
 
-        return this.scale == other.scale && this.v == other.v;
+    /**
+     * Test equality between the primive type and wrapped type.
+     * 
+     * @param primitive
+     * @param big
+     * @return
+     */
+    private boolean checkEqualityBetweenPrimitiveAndBig(Decimal<Self> primitive, Decimal<Self> big) {
+        if (primitive.scale == 0) {
+            return primitive.v == big.big.longValue();
+        } else {
+            return big.big.compareTo(primitive.big()) == 0;
+        }
     }
 
     protected static int computeScale(double value) {
