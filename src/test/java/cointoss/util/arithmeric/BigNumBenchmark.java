@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util;
+package cointoss.util.arithmeric;
 
 import org.decimal4j.immutable.Decimal8f;
 

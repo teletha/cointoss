@@ -16,8 +16,6 @@ import java.util.Objects;
 
 import com.google.common.math.DoubleMath;
 
-import cointoss.util.Primitives;
-
 /**
  * A signed real number with arbitrary precision that cannot be changed.
  */

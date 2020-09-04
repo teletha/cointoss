@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.util.arithmeric;
 
 import java.util.Set;
 import java.util.function.BiConsumer;

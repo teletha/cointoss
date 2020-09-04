@@ -16,7 +16,7 @@ import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
-import cointoss.util.Primitives;
+import cointoss.util.arithmeric.Primitives;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;

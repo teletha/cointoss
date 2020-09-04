@@ -17,7 +17,7 @@ import com.google.common.base.Strings;
 import cointoss.execution.Execution;
 import cointoss.ticker.RealtimeTicker;
 import cointoss.util.Chrono;
-import cointoss.util.Primitives;
+import cointoss.util.arithmeric.Primitives;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
