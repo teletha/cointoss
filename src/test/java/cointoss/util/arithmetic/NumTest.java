@@ -13,10 +13,10 @@ import static cointoss.util.arithmetic.Num.*;
 
 import java.math.RoundingMode;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.util.arithmetic.Num;
 
 class NumTest {
 
@@ -82,6 +82,11 @@ class NumTest {
         assert ONE.plus(TWO).is(3);
         assert ONE.plus(-1).is(0);
         assert ONE.plus("5.5").is(6.5);
+
+        assert Num.of(10).plus(Num.of(20)).doubleValue() == 30;
+        assert Num.of(10).plus(Num.of(20000)).doubleValue() == 20010;
+        assert Num.of(10).plus(Num.of(0.1)).doubleValue() == 10.1;
+        assert Num.of(10).plus(Num.of(0.123456)).doubleValue() == 10.123456;
     }
 
     @Test
@@ -89,6 +94,11 @@ class NumTest {
         assert ONE.minus(TWO).is(-1);
         assert ONE.minus(-1).is(2);
         assert ONE.minus("5.5").is(-4.5);
+
+        assert Num.of(10).minus(Num.of(20)).doubleValue() == -10;
+        assert Num.of(10).minus(Num.of(20000)).doubleValue() == -19990;
+        assert Num.of(10).minus(Num.of(0.1)).doubleValue() == 9.9;
+        assert Num.of(10).minus(Num.of(0.123456)).doubleValue() == 9.876544;
     }
 
     @Test
@@ -102,6 +112,12 @@ class NumTest {
         assert ONE.multiply(TWO).is(2);
         assert ONE.multiply(-1).is(-1);
         assert ONE.multiply("5.5").is(5.5);
+
+        assert Num.of(10).multiply(Num.of(20)).doubleValue() == 200;
+        assert Num.of(10).multiply(Num.of(12345678)).doubleValue() == 123456780;
+        assert Num.of(10).multiply(Num.of(0.1)).doubleValue() == 1;
+        assert Num.of(10).multiply(Num.of(0.00002)).doubleValue() == 0.0002;
+        assert Num.of(10).multiply(Num.of(0.1234567)).doubleValue() == 1.234567;
     }
 
     @Test
@@ -110,6 +126,12 @@ class NumTest {
         assert ONE.divide(-1).is(-1);
         assert ONE.divide("0.5").is(2);
         assert ZERO.divide(ONE).is(0);
+
+        assert Num.of(10).divide(Num.of(20)).doubleValue() == 0.5;
+        assert Num.of(10).divide(Num.of(12345678)).doubleValue() == 0.00000081;
+        assert Num.of(10).divide(Num.of(0.1)).doubleValue() == 100;
+        assert Num.of(10).divide(Num.of(0.00002)).intValue() == 500000;
+        assert Num.of(10).divide(Num.of(0.1234567)).doubleValue() == 81.00005;
     }
 
     @Test
@@ -117,6 +139,11 @@ class NumTest {
         assert TEN.remainder(TWO).is(0);
         assert TEN.remainder(-3).is(1);
         assert TEN.remainder("2.4").is(0.4);
+
+        assert Num.of(10).remainder(Num.of(3)).doubleValue() == 1;
+        assert Num.of(10).remainder(Num.of(345)).doubleValue() == 10;
+        assert Num.of(10).remainder(Num.of(0.1)).doubleValue() == 0;
+        assert Num.of(10).remainder(Num.of(0.00002)).intValue() == 0;
     }
 
     @Test
@@ -124,6 +151,8 @@ class NumTest {
         assert ONE.abs().is(1);
         assert Num.of(-1).abs().is(1);
         assert Num.of(-0.5).abs().is(0.5);
+        assert Num.of(100).abs().doubleValue() == 100;
+        assert Num.of(-100).abs().doubleValue() == 100;
     }
 
     @Test
@@ -171,6 +200,11 @@ class NumTest {
         assert Num.of(-2.5).pow(0).is(1);
         assert Num.of(-2.5).pow(1).is(-2.5);
         assert Num.of(-2.5).pow(2).is(6.25);
+
+        assert Num.of(10).pow(2).doubleValue() == 100;
+        assert Num.of(10).pow(-2).doubleValue() == 0.01;
+        assert Num.of(10).pow(2.5).doubleValue() == 316.227766016837;
+        assert Num.of(10).pow(-2.5).doubleValue() == 0.00316227766;
     }
 
     @Test
@@ -178,6 +212,9 @@ class NumTest {
         assert Num.of(0).sqrt().is(0);
         assert Num.of(1).sqrt().is(1);
         assert Num.of(4).sqrt().is(2);
+
+        assert Num.of(100).sqrt().doubleValue() == 10;
+        assert Num.of(3).sqrt().doubleValue() == 1.732050807568;
     }
 
     @Test
@@ -186,6 +223,7 @@ class NumTest {
         assert ONE.isLessThan(1) == false;
         assert ONE.isLessThan("3");
         assert ONE.isLessThan(TEN);
+        assert ONE.isLessThan(5.3);
     }
 
     @Test
@@ -194,6 +232,7 @@ class NumTest {
         assert ONE.isLessThanOrEqual(1);
         assert ONE.isLessThanOrEqual("3");
         assert ONE.isLessThanOrEqual(TEN);
+        assert ONE.isLessThanOrEqual(5.345);
     }
 
     @Test
@@ -210,6 +249,7 @@ class NumTest {
         assert ONE.isGreaterThan(1) == false;
         assert ONE.isGreaterThan("0");
         assert ONE.isGreaterThan(TEN) == false;
+        assert ONE.isGreaterThan(0.052);
     }
 
     @Test
@@ -218,6 +258,7 @@ class NumTest {
         assert ONE.isGreaterThanOrEqual(1);
         assert ONE.isGreaterThanOrEqual("0");
         assert ONE.isGreaterThanOrEqual(TEN) == false;
+        assert ONE.isGreaterThanOrEqual(1.355) == false;
     }
 
     @Test
@@ -258,5 +299,90 @@ class NumTest {
         assert Num.of(1).isNegativeOrZero() == false;
         assert Num.of(0).isNegativeOrZero() == true;
         assert Num.of(-1).isNegativeOrZero() == true;
+    }
+
+    @Test
+    void computeScale() {
+        assert Decimal.computeScale(0.1) == 1;
+        assert Decimal.computeScale(0.12) == 2;
+        assert Decimal.computeScale(0.123) == 3;
+        assert Decimal.computeScale(0.1234) == 4;
+        assert Decimal.computeScale(0.100) == 1;
+        assert Decimal.computeScale(0.02) == 2;
+        assert Decimal.computeScale(0.02040) == 4;
+
+        for (int i = 1; i < 10000; i++) {
+            if (i % 1000 == 0) {
+                assert Decimal.computeScale(i * 0.0001) == 1;
+            } else if (i % 100 == 0) {
+                assert Decimal.computeScale(i * 0.0001) == 2;
+            } else if (i % 10 == 0) {
+                assert Decimal.computeScale(i * 0.0001) == 3;
+            } else {
+                assert Decimal.computeScale(i * 0.0001) == 4;
+            }
+        }
+
+        assert Decimal.computeScale(1e19) == 18;
+        assert Decimal.computeScale(1e100) == 18;
+        assert Decimal.computeScale(1e300) == 18;
+        assert Decimal.computeScale(Double.MIN_VALUE) == 0;
+        assert Decimal.computeScale(Double.MAX_VALUE) == 18;
+    }
+
+    @Test
+    void decuple() {
+        assert Num.of(10).decuple(2).doubleValue() == 1000;
+        assert Num.of(10).decuple(-2).doubleValue() == 0.1;
+    }
+
+    @Test
+    void negate() {
+        assert Num.of(100).negate().doubleValue() == -100;
+        assert Num.of(-100).negate().doubleValue() == 100;
+    }
+
+    @Test
+    void promote() {
+        assert Num.of("12345678901234567890").toString().equals("12345678901234600000");
+    }
+
+    @Test
+    void promotePlus() {
+        assert Num.of(Long.MAX_VALUE).plus(Long.MAX_VALUE).toString().equals("18446744073709551614");
+    }
+
+    @Test
+    void promoteMinus() {
+        assert Num.of(Long.MIN_VALUE).minus(Long.MAX_VALUE).toString().equals("-18446744073709551615");
+    }
+
+    @Test
+    void promoteMultiply() {
+        assert Num.of(1234567898765L).multiply(1234567898765L).toString().equals("1524157896661027288525225");
+    }
+
+    @Test
+    @Disabled
+    void promoteDivide() {
+        assert Num.of(Long.MAX_VALUE).divide(Double.MIN_VALUE).toString().equals("-18446744073709551615");
+    }
+
+    @Test
+    void promotePow() {
+        assert Num.of(Long.MAX_VALUE).pow(2).toString().equals("85070591730234615847396907784232501249");
+    }
+
+    @Test
+    void promotePow10() {
+        assert Num.of(Long.MAX_VALUE).decuple(5).toString().equals("9.223372036854774E23");
+    }
+
+    @Test
+    void equals() {
+        assert Num.of(12345).equals(Num.of(12345));
+        assert Num.of("12345").equals(Num.of("12345"));
+        assert Num.of(12345).equals(Num.of("12345"));
+        assert Num.of("12345").equals(Num.of(12345));
     }
 }
