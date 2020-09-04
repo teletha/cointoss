@@ -13,7 +13,7 @@ import org.decimal4j.immutable.Decimal8f;
 
 import antibug.profiler.Benchmark;
 
-public class BigNumBenchmark {
+public class BigDecimalBenchmark {
 
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
