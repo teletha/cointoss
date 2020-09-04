@@ -11,6 +11,7 @@ package cointoss.util.decimal;
 
 import static cointoss.util.decimal.Num.*;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
@@ -221,7 +222,38 @@ class DecimalTest {
     }
 
     @Test
-    void big() {
+    void promote() {
         assert Num.of("12345678901234567890").toString().equals("12345678901234600000");
+    }
+
+    @Test
+    void promotePlus() {
+        assert Num.of(Long.MAX_VALUE).plus(Long.MAX_VALUE).toString().equals("18446744073709551614");
+    }
+
+    @Test
+    void promoteMinus() {
+        assert Num.of(Long.MIN_VALUE).minus(Long.MAX_VALUE).toString().equals("-18446744073709551615");
+    }
+
+    @Test
+    void promoteMultiply() {
+        assert Num.of(1234567898765L).multiply(1234567898765L).toString().equals("1524157896661027288525225");
+    }
+
+    @Test
+    @Disabled
+    void promoteDivide() {
+        assert Num.of(Long.MAX_VALUE).divide(Double.MIN_VALUE).toString().equals("-18446744073709551615");
+    }
+
+    @Test
+    void promotePow() {
+        assert Num.of(Long.MAX_VALUE).pow(2).toString().equals("85070591730234615847396907784232501249");
+    }
+
+    @Test
+    void promotePow10() {
+        assert Num.of(Long.MAX_VALUE).decuple(5).toString().equals("9.223372036854774E23");
     }
 }

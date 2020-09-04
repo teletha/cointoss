@@ -118,12 +118,16 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         } else if (value.big != null) {
             return create(big().add(value.big, CONTEXT));
         } else {
-            if (scale == value.scale) {
-                return create(v + value.v, scale);
-            } else if (scale < value.scale) {
-                return create((long) (v * pow10(value.scale - scale) + value.v), value.scale);
-            } else {
-                return create(v + (long) (value.v * pow10(scale - value.scale)), scale);
+            try {
+                if (scale == value.scale) {
+                    return create(Math.addExact(v, value.v), scale);
+                } else if (scale < value.scale) {
+                    return create(Math.addExact((long) (v * pow10(value.scale - scale)), value.v), value.scale);
+                } else {
+                    return create(Math.addExact(v, (long) (value.v * pow10(scale - value.scale))), scale);
+                }
+            } catch (ArithmeticException e) {
+                return create(big().add(value.big()));
             }
         }
     }
@@ -138,12 +142,16 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         } else if (value.big != null) {
             return create(big().subtract(value.big, CONTEXT));
         } else {
-            if (scale == value.scale) {
-                return create(v - value.v, scale);
-            } else if (scale < value.scale) {
-                return create((long) (v * pow10(value.scale - scale) - value.v), value.scale);
-            } else {
-                return create(v - (long) (value.v * pow10(scale - value.scale)), scale);
+            try {
+                if (scale == value.scale) {
+                    return create(Math.subtractExact(v, value.v), scale);
+                } else if (scale < value.scale) {
+                    return create(Math.subtractExact((long) (v * pow10(value.scale - scale)), value.v), value.scale);
+                } else {
+                    return create(Math.subtractExact(v, (long) (value.v * pow10(scale - value.scale))), scale);
+                }
+            } catch (ArithmeticException e) {
+                return create(big().subtract(value.big()));
             }
         }
     }
@@ -158,7 +166,11 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         } else if (value.big != null) {
             return create(big().multiply(value.big, CONTEXT));
         } else {
-            return create(v * value.v, scale + value.scale);
+            try {
+                return create(Math.multiplyExact(v, value.v), scale + value.scale);
+            } catch (ArithmeticException e) {
+                return create(big().multiply(value.big()));
+            }
         }
     }
 
@@ -227,7 +239,6 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
             return create(big.scaleByPowerOfTen(n));
         } else {
             return create(v, scale - n);
-
         }
     }
 
@@ -239,9 +250,15 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         if (big != null) {
             return create(big.pow(n));
         } else {
-            Self result = create(Math.pow(v, n));
-            result.scale += scale * n;
-            return result;
+            try {
+                double result = Math.pow(v, n);
+                DoubleMath.roundToLong(result, RoundingMode.HALF_DOWN);
+                Self self = create(result);
+                self.scale += scale * n;
+                return self;
+            } catch (ArithmeticException e) {
+                return create(big().pow(n));
+            }
         }
     }
 
@@ -253,9 +270,15 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         if (big != null) {
             return create(BigDecimal.valueOf(Math.pow(big.doubleValue(), n)));
         } else {
-            Self result = create(Math.pow(v, n));
-            result.scale += scale * n;
-            return result;
+            try {
+                double result = Math.pow(v, n);
+                DoubleMath.roundToLong(result, RoundingMode.HALF_DOWN);
+                Self self = create(result);
+                self.scale += scale * n;
+                return self;
+            } catch (ArithmeticException e) {
+                return create(big()).pow(n);
+            }
         }
     }
 
@@ -293,7 +316,11 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         if (big != null) {
             return create(big.negate());
         } else {
-            return create(-v, scale);
+            try {
+                return create(Math.negateExact(v), scale);
+            } catch (ArithmeticException e) {
+                return create(big().negate());
+            }
         }
     }
 
@@ -332,7 +359,11 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
      */
     @Override
     public String format(NumberFormat format) {
-        return null;
+        if (big != null) {
+            return format.format(big);
+        } else {
+            return format.format(doubleValue());
+        }
     }
 
     /**
