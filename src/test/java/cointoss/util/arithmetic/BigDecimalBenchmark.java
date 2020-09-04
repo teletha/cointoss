@@ -18,29 +18,13 @@ public class BigDecimalBenchmark {
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
 
-        benchmark.measure("JavaBigDecimal", () -> {
-            return java.math.BigDecimal.valueOf(1000)
-                    .divide(java.math.BigDecimal.valueOf(4))
-                    .add(java.math.BigDecimal.valueOf(0.123))
-                    .multiply(java.math.BigDecimal.valueOf(-24.5))
+        benchmark.measure("Decimal", () -> {
+            return cointoss.util.arithmetic.Num.of(1000)
+                    .divide(cointoss.util.arithmetic.Num.of(4))
+                    .plus(cointoss.util.arithmetic.Num.of(0.123))
+                    .multiply(cointoss.util.arithmetic.Num.of(-24.5))
                     .pow(2);
         });
-
-        // benchmark.measure("GWTBigDecimal", () -> {
-        // return cointoss.util.math.BigDecimal.valueOf(1000)
-        // .divide(cointoss.util.math.BigDecimal.valueOf(4))
-        // .add(cointoss.util.math.BigDecimal.valueOf(0.123))
-        // .multiply(cointoss.util.math.BigDecimal.valueOf(-24.5))
-        // .pow(2);
-        // });
-        //
-        // benchmark.measure("ICU4JBigDecimal", () -> {
-        // return com.ibm.icu.math.BigDecimal.valueOf(1000)
-        // .divide(com.ibm.icu.math.BigDecimal.valueOf(4))
-        // .add(com.ibm.icu.math.BigDecimal.valueOf(0.123))
-        // .multiply(com.ibm.icu.math.BigDecimal.valueOf(-24.5))
-        // .pow(BigDecimal.valueOf(2));
-        // });
 
         benchmark.measure("Decimal4J", () -> {
             return Decimal8f.valueOf(1000)
@@ -50,11 +34,11 @@ public class BigDecimalBenchmark {
                     .pow(2);
         });
 
-        benchmark.measure("Decimal", () -> {
-            return cointoss.util.arithmetic.Num.of(1000)
-                    .divide(cointoss.util.arithmetic.Num.of(4))
-                    .plus(cointoss.util.arithmetic.Num.of(0.123))
-                    .multiply(cointoss.util.arithmetic.Num.of(-24.5))
+        benchmark.measure("JavaBigDecimal", () -> {
+            return java.math.BigDecimal.valueOf(1000)
+                    .divide(java.math.BigDecimal.valueOf(4))
+                    .add(java.math.BigDecimal.valueOf(0.123))
+                    .multiply(java.math.BigDecimal.valueOf(-24.5))
                     .pow(2);
         });
 

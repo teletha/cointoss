@@ -17,9 +17,7 @@ import java.text.NumberFormat;
 import cointoss.Directional;
 import kiss.Variable;
 
-/**
- * 
- */
+@SuppressWarnings("serial")
 public abstract class Arithmetic<Self extends Arithmetic> extends Number implements Comparable<Self> {
 
     /** The base context. */
