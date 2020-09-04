@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 public final class OrderBookPage implements Comparable<OrderBookPage> {
 

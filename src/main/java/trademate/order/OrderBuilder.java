@@ -29,7 +29,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.trading.LazyBear;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;

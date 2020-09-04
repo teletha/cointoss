@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.arithmeric;
+package cointoss.util.arithmetic;
 
 import org.decimal4j.immutable.Decimal8f;
 
@@ -51,10 +51,10 @@ public class BigNumBenchmark {
         });
 
         benchmark.measure("Decimal", () -> {
-            return cointoss.util.arithmeric.Num.of(1000)
-                    .divide(cointoss.util.arithmeric.Num.of(4))
-                    .plus(cointoss.util.arithmeric.Num.of(0.123))
-                    .multiply(cointoss.util.arithmeric.Num.of(-24.5))
+            return cointoss.util.arithmetic.Num.of(1000)
+                    .divide(cointoss.util.arithmetic.Num.of(4))
+                    .plus(cointoss.util.arithmetic.Num.of(0.123))
+                    .multiply(cointoss.util.arithmetic.Num.of(-24.5))
                     .pow(2);
         });
 

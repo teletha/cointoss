@@ -24,7 +24,7 @@ import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.MarketServiceProvider;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import cointoss.verify.BackTest;
 import kiss.Disposable;
 import kiss.I;

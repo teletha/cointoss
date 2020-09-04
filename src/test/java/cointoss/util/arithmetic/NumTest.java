@@ -7,15 +7,16 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util.arithmeric;
+package cointoss.util.arithmetic;
 
-import static cointoss.util.arithmeric.Num.*;
+import static cointoss.util.arithmetic.Num.*;
 
 import java.math.RoundingMode;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.util.arithmetic.Num;
 
 class NumTest {
 

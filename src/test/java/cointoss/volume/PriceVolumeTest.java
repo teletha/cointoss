@@ -11,7 +11,7 @@ package cointoss.volume;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 class PriceVolumeTest {
 

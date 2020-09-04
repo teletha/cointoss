@@ -18,7 +18,7 @@ import cointoss.Market;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.Variable;
 import stylist.Style;
 import trademate.chart.ChartCanvas.CandleMark;

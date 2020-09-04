@@ -7,15 +7,16 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.arithmeric;
+package cointoss.util.arithmetic;
 
-import static cointoss.util.arithmeric.Num.*;
+import static cointoss.util.arithmetic.Num.*;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.util.arithmeric.Decimal;
+import cointoss.util.arithmetic.Decimal;
+import cointoss.util.arithmetic.Num;
 
 /**
  * 

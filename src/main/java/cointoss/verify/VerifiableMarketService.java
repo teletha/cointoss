@@ -41,7 +41,7 @@ import cointoss.order.QuantityCondition;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.RetryPolicy;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;

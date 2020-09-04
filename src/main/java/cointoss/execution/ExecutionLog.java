@@ -61,7 +61,7 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;

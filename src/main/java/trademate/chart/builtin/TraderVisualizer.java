@@ -16,7 +16,7 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import cointoss.trade.Trader;
 import cointoss.trade.Trader.Snapshot;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.value.Color;

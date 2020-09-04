@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.arithmeric;
+package cointoss.util.arithmetic;
 
 import java.math.BigDecimal;
 

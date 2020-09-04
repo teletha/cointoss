@@ -12,7 +12,7 @@ package cointoss.ticker;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.execution.Execution;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;

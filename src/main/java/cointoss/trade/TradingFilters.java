@@ -11,7 +11,7 @@ package cointoss.trade;
 
 import java.util.function.Function;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.Signal;
 
 /**

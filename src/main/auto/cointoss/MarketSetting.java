@@ -4,7 +4,7 @@ import cointoss.CurrencySetting;
 import cointoss.MarketSetting;
 import cointoss.MarketSettingModel;
 import cointoss.execution.ExecutionLogger;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 import java.lang.Class;
 import java.lang.Override;

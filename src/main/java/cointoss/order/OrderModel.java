@@ -20,7 +20,7 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Chrono;
 import cointoss.util.ObservableProperty;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;

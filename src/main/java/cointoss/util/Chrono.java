@@ -27,7 +27,7 @@ import org.apache.commons.net.ntp.TimeInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.Signal;
 

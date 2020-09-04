@@ -14,7 +14,7 @@ import java.util.function.Function;
 import cointoss.Market;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 import kiss.Signal;
 

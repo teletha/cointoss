@@ -48,7 +48,7 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import cointoss.util.Network;
 import kiss.Disposable;
 import kiss.I;

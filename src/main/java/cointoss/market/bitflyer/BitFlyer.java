@@ -16,7 +16,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 
 public final class BitFlyer extends MarketServiceProvider {

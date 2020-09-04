@@ -30,7 +30,7 @@ import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.RetryPolicy;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.Decoder;
 import kiss.Disposable;
 import kiss.Encoder;

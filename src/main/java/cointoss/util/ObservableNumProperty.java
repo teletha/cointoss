@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.Signal;
 
 public abstract class ObservableNumProperty extends ObservableProperty<Num> {

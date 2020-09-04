@@ -2,7 +2,7 @@ package cointoss.trade;
 
 import cointoss.trade.FundManager;
 import cointoss.trade.FundManagerModel;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 import java.lang.Override;
 import java.lang.StringBuilder;

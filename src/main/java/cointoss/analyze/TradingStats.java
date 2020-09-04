@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.arithmeric.Num.HUNDRED;
+import static cointoss.util.arithmetic.Num.HUNDRED;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -27,7 +27,7 @@ import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.Variable;
 import kiss.WiseConsumer;

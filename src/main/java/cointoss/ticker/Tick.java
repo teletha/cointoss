@@ -12,7 +12,7 @@ package cointoss.ticker;
 import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 public final class Tick {
 

@@ -11,7 +11,7 @@ package cointoss;
 
 import java.util.Set;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 
 /**

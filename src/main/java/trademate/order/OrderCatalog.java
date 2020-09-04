@@ -20,7 +20,7 @@ import javafx.scene.control.TableRow;
 import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;

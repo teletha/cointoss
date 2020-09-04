@@ -15,7 +15,7 @@ import org.apache.logging.log4j.util.PerformanceSensitive;
 
 import cointoss.Direction;
 import cointoss.Directional;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 
 @Icy

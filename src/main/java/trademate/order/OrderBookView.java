@@ -19,8 +19,8 @@ import javafx.scene.text.FontSmoothingType;
 
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderBookPage;
-import cointoss.util.arithmeric.Num;
-import cointoss.util.arithmeric.Primitives;
+import cointoss.util.arithmetic.Num;
+import cointoss.util.arithmetic.Primitives;
 import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;

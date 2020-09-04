@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.math.DoubleMath;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 class NumStatsTest {
 

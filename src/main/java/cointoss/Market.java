@@ -38,7 +38,7 @@ import cointoss.ticker.TickerManager;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.RetryPolicy;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import cointoss.volume.PriceRangedVolumeManager;
 import kiss.Disposable;
 import kiss.I;

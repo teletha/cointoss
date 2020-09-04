@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 public class CurrencySetting {
 

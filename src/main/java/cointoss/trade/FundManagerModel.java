@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 
 @Icy

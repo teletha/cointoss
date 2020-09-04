@@ -32,7 +32,7 @@ import cointoss.trade.extension.StrategyPart;
 import cointoss.trade.extension.TradePart;
 import cointoss.util.Chrono;
 import cointoss.util.TimebaseSupport;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;

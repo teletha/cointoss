@@ -4,7 +4,7 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionModel;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 import java.lang.Override;
 import java.lang.String;

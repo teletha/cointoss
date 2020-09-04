@@ -10,7 +10,7 @@
 package cointoss.volume;
 
 import cointoss.util.DoubleArray;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 public class PriceRangedVolumePeriod {
 

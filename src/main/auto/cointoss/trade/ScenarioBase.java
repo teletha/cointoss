@@ -3,7 +3,7 @@ package cointoss.trade;
 import cointoss.trade.ScenarioBase;
 import cointoss.trade.ScenarioBaseModel;
 import cointoss.util.ObservableNumProperty;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 import java.lang.Override;
 import java.lang.StringBuilder;

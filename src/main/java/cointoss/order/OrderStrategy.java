@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.ticker.Span;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 import kiss.Signal;
 import kiss.Variable;
 

@@ -11,7 +11,7 @@ package cointoss.trade;
 
 import org.apache.logging.log4j.util.PerformanceSensitive;
 
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 public interface Profitable {
     /**

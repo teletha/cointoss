@@ -7,7 +7,7 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
 import cointoss.util.ObservableProperty;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 import java.lang.String;
 import java.lang.Throwable;

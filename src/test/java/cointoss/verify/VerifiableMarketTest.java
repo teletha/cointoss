@@ -20,7 +20,7 @@ import com.google.common.util.concurrent.AtomicDouble;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.QuantityCondition;
-import cointoss.util.arithmeric.Num;
+import cointoss.util.arithmetic.Num;
 
 class VerifiableMarketTest {
 
