@@ -41,6 +41,12 @@ class DecimalTest {
                 assert Decimal.computeScale(i * 0.0001) == 4;
             }
         }
+
+        assert Decimal.computeScale(1e19) == 18;
+        assert Decimal.computeScale(1e100) == 18;
+        assert Decimal.computeScale(1e300) == 18;
+        assert Decimal.computeScale(Double.MIN_VALUE) == 0;
+        assert Decimal.computeScale(Double.MAX_VALUE) == 18;
     }
 
     @Test
