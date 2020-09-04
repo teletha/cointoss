@@ -51,7 +51,7 @@ public class Num extends Decimal<Num> {
     /**
      * @param value
      */
-    public Num(BigDecimal value) {
+    private Num(BigDecimal value) {
         super(value);
     }
 
@@ -61,6 +61,14 @@ public class Num extends Decimal<Num> {
     @Override
     protected Num create(long value, int scale) {
         return new Num(value, scale);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Num create(BigDecimal value) {
+        return new Num(value);
     }
 
     /**

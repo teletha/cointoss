@@ -95,16 +95,7 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
      */
     @Override
     protected Self create(String value) {
-        return create(new BigDecimal(value));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Self create(BigDecimal value) {
-        int scale = Math.min(18, Math.max(0, value.scale()));
-        return create(value.scaleByPowerOfTen(scale).longValue(), scale);
+        return create(new BigDecimal(value, CONTEXT));
     }
 
     protected abstract Self create(long value, int scale);
@@ -397,7 +388,11 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
      */
     @Override
     public String toString() {
-        return Primitives.roundString(v * pow10(-scale), scale);
+        if (big != null) {
+            return big.stripTrailingZeros().toPlainString();
+        } else {
+            return Primitives.roundString(v * pow10(-scale), scale);
+        }
     }
 
     /**
@@ -405,7 +400,11 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
      */
     @Override
     public int hashCode() {
-        return Objects.hash(v, scale);
+        if (big != null) {
+            return big.hashCode();
+        } else {
+            return Objects.hash(v, scale);
+        }
     }
 
     /**
@@ -416,11 +415,21 @@ public abstract class Decimal<Self extends Decimal<Self>> extends Arithmetic<Sel
         if (obj == null) {
             return false;
         }
+
+        if (big != null) {
+            return big.equals(obj);
+        }
+
         if (!(obj instanceof Decimal)) {
             return false;
         }
 
         Decimal other = (Decimal) obj;
+
+        if (big != null) {
+            return big.compareTo(other.big) == 0;
+        }
+
         return this.scale == other.scale && this.v == other.v;
     }
 

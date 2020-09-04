@@ -219,4 +219,9 @@ class DecimalTest {
         assert Num.of(0).isNegativeOrZero() == true;
         assert Num.of(-1).isNegativeOrZero() == true;
     }
+
+    @Test
+    void big() {
+        assert Num.of("12345678901234567890").toString().equals("12345678901234600000");
+    }
 }
