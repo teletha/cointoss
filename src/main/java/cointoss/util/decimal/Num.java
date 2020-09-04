@@ -44,14 +44,14 @@ public class Num extends Decimal<Num> {
      * @param value
      * @param scale
      */
-    private Num(long value, int scale) {
+    protected Num(long value, int scale) {
         super(value, scale);
     }
 
     /**
      * @param value
      */
-    private Num(BigDecimal value) {
+    protected Num(BigDecimal value) {
         super(value);
     }
 
