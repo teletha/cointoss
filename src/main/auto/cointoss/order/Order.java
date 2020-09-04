@@ -8,7 +8,6 @@ import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
 import cointoss.util.ObservableProperty;
 import cointoss.util.arithmetic.Num;
-
 import java.lang.String;
 import java.lang.Throwable;
 import java.lang.invoke.MethodHandle;
@@ -65,7 +64,7 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle size$912239839= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateSize$1683249437= invoker("validateSize", Num.class, Consumer.class);
+    private static final MethodHandle validateSize$705502851= invoker("validateSize", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$1093866057= invoker("price", long.class);
@@ -74,7 +73,7 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle price$912239839= invoker("price", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1654949385= invoker("price", Num.class, Consumer.class);
+    private static final MethodHandle price$701841881= invoker("price", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle validateState$41283920= invoker("validateState", OrderState.class);
@@ -267,7 +266,7 @@ public abstract class Order extends OrderModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, validateSize$1683249437.invoke(this, value, (Consumer<Num>) this::setRemainingSize));
+            sizeUpdater.invoke(this, validateSize$705502851.invoke(this, value, (Consumer<Num>) this::setRemainingSize));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -303,7 +302,7 @@ public abstract class Order extends OrderModel {
             value = super.price();
         }
         try {
-            priceUpdater.invoke(this, price$1654949385.invoke(this, value, (Consumer<OrderType>) this::setType));
+            priceUpdater.invoke(this, price$701841881.invoke(this, value, (Consumer<OrderType>) this::setType));
         } catch (Throwable e) {
             throw quiet(e);
         }

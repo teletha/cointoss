@@ -303,31 +303,31 @@ class NumTest {
 
     @Test
     void computeScale() {
-        assert Decimal.computeScale(0.1) == 1;
-        assert Decimal.computeScale(0.12) == 2;
-        assert Decimal.computeScale(0.123) == 3;
-        assert Decimal.computeScale(0.1234) == 4;
-        assert Decimal.computeScale(0.100) == 1;
-        assert Decimal.computeScale(0.02) == 2;
-        assert Decimal.computeScale(0.02040) == 4;
+        assert Num.computeScale(0.1) == 1;
+        assert Num.computeScale(0.12) == 2;
+        assert Num.computeScale(0.123) == 3;
+        assert Num.computeScale(0.1234) == 4;
+        assert Num.computeScale(0.100) == 1;
+        assert Num.computeScale(0.02) == 2;
+        assert Num.computeScale(0.02040) == 4;
 
         for (int i = 1; i < 10000; i++) {
             if (i % 1000 == 0) {
-                assert Decimal.computeScale(i * 0.0001) == 1;
+                assert Num.computeScale(i * 0.0001) == 1;
             } else if (i % 100 == 0) {
-                assert Decimal.computeScale(i * 0.0001) == 2;
+                assert Num.computeScale(i * 0.0001) == 2;
             } else if (i % 10 == 0) {
-                assert Decimal.computeScale(i * 0.0001) == 3;
+                assert Num.computeScale(i * 0.0001) == 3;
             } else {
-                assert Decimal.computeScale(i * 0.0001) == 4;
+                assert Num.computeScale(i * 0.0001) == 4;
             }
         }
 
-        assert Decimal.computeScale(1e19) == 18;
-        assert Decimal.computeScale(1e100) == 18;
-        assert Decimal.computeScale(1e300) == 18;
-        assert Decimal.computeScale(Double.MIN_VALUE) == 0;
-        assert Decimal.computeScale(Double.MAX_VALUE) == 18;
+        assert Num.computeScale(1e19) == 18;
+        assert Num.computeScale(1e100) == 18;
+        assert Num.computeScale(1e300) == 18;
+        assert Num.computeScale(Double.MIN_VALUE) == 0;
+        assert Num.computeScale(Double.MAX_VALUE) == 18;
     }
 
     @Test

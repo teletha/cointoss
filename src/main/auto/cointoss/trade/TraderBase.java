@@ -4,7 +4,6 @@ import cointoss.trade.TraderBase;
 import cointoss.trade.TraderBaseModel;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
@@ -149,20 +148,10 @@ public abstract class TraderBase extends TraderBaseModel {
         return holdSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldSize() {
         return holdSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldSizeNow() {
         return holdSizeCustomizer.observe$Now();
     }
@@ -213,20 +202,10 @@ public abstract class TraderBase extends TraderBaseModel {
         return holdMaxSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldMaxSize() {
         return holdMaxSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldMaxSizeNow() {
         return holdMaxSizeCustomizer.observe$Now();
     }
@@ -277,20 +256,10 @@ public abstract class TraderBase extends TraderBaseModel {
         return profitCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeProfit() {
         return profitCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeProfitNow() {
         return profitCustomizer.observe$Now();
     }

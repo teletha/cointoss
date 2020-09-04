@@ -5,7 +5,6 @@ import cointoss.ticker.Span;
 import cointoss.trade.Trailing;
 import cointoss.trade.TrailingModel;
 import cointoss.util.arithmetic.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
@@ -60,7 +59,7 @@ public abstract class Trailing extends TrailingModel {
     private static final MethodHandle losscut$1093866057= invoker("losscut", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle losscut$1377900837= invoker("losscut", Num.class);
+    private static final MethodHandle losscut$2101382901= invoker("losscut", Num.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle profit$912239839= invoker("profit", double.class);
@@ -144,7 +143,7 @@ public abstract class Trailing extends TrailingModel {
             throw new IllegalArgumentException("The losscut property requires non-null value.");
         }
         try {
-            losscutUpdater.invoke(this, losscut$1377900837.invoke(this, value));
+            losscutUpdater.invoke(this, losscut$2101382901.invoke(this, value));
         } catch (Throwable e) {
             throw quiet(e);
         }

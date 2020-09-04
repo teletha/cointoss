@@ -4,7 +4,6 @@ import cointoss.trade.ScenarioBase;
 import cointoss.trade.ScenarioBaseModel;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;

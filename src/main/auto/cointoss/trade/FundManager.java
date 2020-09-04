@@ -3,7 +3,6 @@ package cointoss.trade;
 import cointoss.trade.FundManager;
 import cointoss.trade.FundManagerModel;
 import cointoss.util.arithmetic.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
@@ -61,7 +60,7 @@ public abstract class FundManager implements FundManagerModel {
     private static final MethodHandle validateAcceptableRiskAssetsRatio$912239839= invoker("validateAcceptableRiskAssetsRatio", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateLosscutRange$1377900837= invoker("validateLosscutRange", Num.class);
+    private static final MethodHandle validateLosscutRange$2101382901= invoker("validateLosscutRange", Num.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle validateRiskRewardRatio$912239839= invoker("validateRiskRewardRatio", double.class);
@@ -229,7 +228,7 @@ public abstract class FundManager implements FundManagerModel {
             value = FundManagerModel.super.losscutRange();
         }
         try {
-            losscutRangeUpdater.invoke(this, validateLosscutRange$1377900837.invoke(this, value));
+            losscutRangeUpdater.invoke(this, validateLosscutRange$2101382901.invoke(this, value));
         } catch (Throwable e) {
             throw quiet(e);
         }

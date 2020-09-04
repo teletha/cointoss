@@ -4,7 +4,6 @@ import cointoss.Direction;
 import cointoss.order.Position;
 import cointoss.order.PositionModel;
 import cointoss.util.arithmetic.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
