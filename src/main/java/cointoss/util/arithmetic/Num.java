@@ -126,7 +126,11 @@ public class Num extends Arithmetic<Num> {
      */
     @Override
     protected Num create(String value) {
-        return create(new BigDecimal(value, CONTEXT));
+        if (value.indexOf('.') == -1 && value.length() < 18) {
+            return create(Long.parseLong(value));
+        } else {
+            return create(new BigDecimal(value, CONTEXT));
+        }
     }
 
     /**
@@ -471,6 +475,8 @@ public class Num extends Arithmetic<Num> {
     public String toString() {
         if (big != null) {
             return big.stripTrailingZeros().toPlainString();
+        } else if (scale == 0) {
+            return Long.toString(v);
         } else {
             return Primitives.roundString(v * pow10(-scale), scale);
         }

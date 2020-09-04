@@ -385,4 +385,9 @@ class NumTest {
         assert Num.of(12345).equals(Num.of("12345"));
         assert Num.of("12345").equals(Num.of(12345));
     }
+
+    @Test
+    void stringlize() {
+        assert Num.of(12345).toString().equals("12345");
+    }
 }
