@@ -3,7 +3,8 @@ package cointoss.order;
 import cointoss.Direction;
 import cointoss.order.Position;
 import cointoss.order.PositionModel;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
+
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;

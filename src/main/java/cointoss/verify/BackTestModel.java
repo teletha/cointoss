@@ -24,7 +24,7 @@ import cointoss.execution.ExecutionLog.LogType;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Loggings;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import icy.manipulator.Icy;
 
 @Icy

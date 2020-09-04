@@ -20,7 +20,7 @@ import javafx.scene.layout.Region;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 

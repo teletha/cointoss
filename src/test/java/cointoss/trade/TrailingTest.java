@@ -13,7 +13,7 @@ import cointoss.execution.Execution;
 import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.TradeTest;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 
 public class TrailingTest extends TraderTestSupport {
 

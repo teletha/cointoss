@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.MarketService;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;

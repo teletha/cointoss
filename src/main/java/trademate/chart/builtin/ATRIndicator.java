@@ -13,7 +13,7 @@ import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Ticker;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradeMateStyle;

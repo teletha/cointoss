@@ -14,7 +14,7 @@ import java.util.function.Function;
 import javafx.scene.paint.Color;
 
 import cointoss.ticker.Tick;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import viewtify.util.FXUtils;
 
 public enum CandleType {

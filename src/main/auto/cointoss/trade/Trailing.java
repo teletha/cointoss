@@ -4,7 +4,8 @@ import cointoss.Market;
 import cointoss.ticker.Span;
 import cointoss.trade.Trailing;
 import cointoss.trade.TrailingModel;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
+
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;

@@ -3,7 +3,7 @@ package cointoss.verify;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.LogType;
 import cointoss.trade.Trader;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import cointoss.verify.BackTest;
 import cointoss.verify.BackTestModel;
 import java.lang.Override;

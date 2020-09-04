@@ -7,9 +7,9 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.util.arithmeric;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.arithmeric.Num.*;
 
 import java.math.RoundingMode;
 

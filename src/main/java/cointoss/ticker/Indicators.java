@@ -11,7 +11,7 @@ package cointoss.ticker;
 
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 
 /**
  * Built-in {@link Indicator} collection.

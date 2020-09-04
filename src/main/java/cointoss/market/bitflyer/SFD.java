@@ -12,7 +12,7 @@ package cointoss.market.bitflyer;
 import java.math.RoundingMode;
 
 import cointoss.execution.Execution;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Ⅲ;

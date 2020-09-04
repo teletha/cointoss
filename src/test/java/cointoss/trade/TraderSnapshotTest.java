@@ -19,7 +19,7 @@ import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.SizePart;
 import cointoss.trade.extension.TradeTest;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 
 class TraderSnapshotTest extends TraderTestSupport {
 

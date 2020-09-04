@@ -23,7 +23,7 @@ import cointoss.Market;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;

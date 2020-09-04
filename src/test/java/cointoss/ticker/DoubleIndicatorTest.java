@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import kiss.I;
 import kiss.Ⅱ;
 

@@ -18,7 +18,7 @@ import java.util.function.LongConsumer;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Chrono;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import icy.manipulator.Icy;
 import kiss.Decoder;
 import kiss.Encoder;

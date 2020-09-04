@@ -30,7 +30,7 @@ import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.Span;
 import cointoss.util.Chrono;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;

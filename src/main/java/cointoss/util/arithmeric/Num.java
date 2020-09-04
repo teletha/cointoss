@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.util.arithmeric;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,7 +18,6 @@ import org.apache.commons.lang3.RandomUtils;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.util.decimal.Decimal;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;

@@ -9,8 +9,8 @@
  */
 package cointoss.trade;
 
-import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
+import cointoss.util.arithmeric.Num;
 import icy.manipulator.Icy;
 
 @Icy

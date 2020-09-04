@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 
 /**
  * @version 2018/07/08 11:44:58

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cointoss.Direction;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 
 public class Executions {
 

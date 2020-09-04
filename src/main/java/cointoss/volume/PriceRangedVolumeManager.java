@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.ticker.Tick;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import kiss.I;
 import kiss.Signal;
 

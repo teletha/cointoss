@@ -11,7 +11,7 @@ package trademate.info;
 
 import cointoss.order.OrderBook;
 import cointoss.order.Position;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;

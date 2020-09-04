@@ -12,7 +12,7 @@ package cointoss.order;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.MarketService;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import kiss.Variable;
 
 /**

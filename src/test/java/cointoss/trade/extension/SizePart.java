@@ -11,7 +11,7 @@ package cointoss.trade.extension;
 
 import java.math.BigDecimal;
 
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 
 @SuppressWarnings("serial")
 public class SizePart extends Num implements TradePart {

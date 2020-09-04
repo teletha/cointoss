@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static cointoss.util.Num.ONE;
+import static cointoss.util.arithmeric.Num.ONE;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,7 +22,7 @@ import com.google.common.collect.Iterables;
 import cointoss.Currency;
 import cointoss.Direction;
 import cointoss.MarketSetting;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 
 class OrderBookTest {
 

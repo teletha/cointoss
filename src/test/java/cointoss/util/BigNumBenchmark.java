@@ -51,10 +51,10 @@ public class BigNumBenchmark {
         });
 
         benchmark.measure("Decimal", () -> {
-            return cointoss.util.decimal.Num.of(1000)
-                    .divide(cointoss.util.decimal.Num.of(4))
-                    .plus(cointoss.util.decimal.Num.of(0.123))
-                    .multiply(cointoss.util.decimal.Num.of(-24.5))
+            return cointoss.util.arithmeric.Num.of(1000)
+                    .divide(cointoss.util.arithmeric.Num.of(4))
+                    .plus(cointoss.util.arithmeric.Num.of(0.123))
+                    .multiply(cointoss.util.arithmeric.Num.of(-24.5))
                     .pow(2);
         });
 

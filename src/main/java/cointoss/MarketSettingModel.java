@@ -14,7 +14,7 @@ import java.util.List;
 import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogger;
-import cointoss.util.Num;
+import cointoss.util.arithmeric.Num;
 import icy.manipulator.Icy;
 
 @Icy
