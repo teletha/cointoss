@@ -276,7 +276,7 @@ public class OrderBook {
      * @return
      */
     static Num calculateGroupedPrice(Num price, Num range) {
-        return price.minus(price.remainder(range));
+        return price.primitive().minus(price.modulo(range));
     }
 
     /**

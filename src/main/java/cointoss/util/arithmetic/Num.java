@@ -157,7 +157,29 @@ public class Num extends Arithmetic<Num> {
         if (big != null) {
             return big;
         } else {
-            return BigDecimal.valueOf(v).scaleByPowerOfTen(-scale);
+            return BigDecimal.valueOf(v / pow10(scale));
+        }
+    }
+
+    /**
+     * Convert to {@link BigDecimal}.
+     * 
+     * @return
+     */
+    Num small() {
+        if (big != null) {
+            scale = Math.max(0, big.scale());
+            v = (long) (big.doubleValue() * pow10(scale));
+        }
+        return this;
+    }
+
+    public Num primitive() {
+        if (big == null) {
+            return this;
+        } else {
+            int scale = Math.max(0, big.scale());
+            return new Num((long) (big.doubleValue() * pow10(scale)), scale);
         }
     }
 
@@ -259,6 +281,34 @@ public class Num extends Arithmetic<Num> {
                 return new Num((long) (v * pow10(value.scale - scale)) % value.v, value.scale);
             } else {
                 return new Num(v % (long) (value.v * pow10(scale - value.scale)), scale);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Num modulo(Num value) {
+        if (big != null) {
+            small();
+        }
+
+        if (value.big != null) {
+            value.small();
+        }
+
+        if (scale == value.scale) {
+            return new Num(v % value.v, scale);
+        } else if (scale < value.scale) {
+            return new Num((long) (v * pow10(value.scale - scale)) % value.v, value.scale);
+        } else {
+            try {
+                return new Num(v % (long) (value.v * pow10(scale - value.scale)), scale);
+            } catch (Throwable e) {
+                System.out
+                        .println(value.v + "  " + value.scale + "   " + value.big + "   " + v + "   " + scale + "  " + pow10(scale - value.scale));
+                throw I.quiet(e);
             }
         }
     }

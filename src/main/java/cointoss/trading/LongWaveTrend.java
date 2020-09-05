@@ -15,8 +15,8 @@ import org.apache.logging.log4j.Logger;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Indicators;
-import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.trade.FundManager;
@@ -53,9 +53,9 @@ public class LongWaveTrend extends Trader {
     protected void declare(Market market, FundManager fund) {
 
         Ticker ticker = market.tickers.on(span);
-        NumIndicator indicator = Indicators.waveTrend(ticker);
+        DoubleIndicator indicator = Indicators.waveTrend(ticker);
 
-        when(indicator.valueAt(ticker.open).plug(breakdown(entryThreshold)), v -> new Scenario() {
+        when(indicator.valueAt(ticker.open).plug(breakdownDouble(entryThreshold)), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, size);
@@ -65,12 +65,12 @@ public class LongWaveTrend extends Trader {
             protected void exit() {
                 exitAt(Trailing.with.losscut(trailLosscut).profit(trailProfitcut));
                 exitAt(entryPrice.minus(profitcut));
-                exitWhen(indicator.valueAt(ticker.open).plug(breakup(entryThreshold + stop)));
-                exitWhen(indicator.valueAt(ticker.open).plug(breakdown(exitThreshold)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakupDouble(entryThreshold + stop)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakdownDouble(exitThreshold)));
             }
         });
 
-        when(indicator.valueAt(ticker.open).plug(breakup(-entryThreshold)), v -> new Scenario() {
+        when(indicator.valueAt(ticker.open).plug(breakupDouble(-entryThreshold)), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, size);
@@ -80,8 +80,8 @@ public class LongWaveTrend extends Trader {
             protected void exit() {
                 exitAt(Trailing.with.losscut(trailLosscut).profit(trailProfitcut));
                 exitAt(entryPrice.plus(profitcut));
-                exitWhen(indicator.valueAt(ticker.open).plug(breakdown(-entryThreshold - stop)));
-                exitWhen(indicator.valueAt(ticker.open).plug(breakup(-exitThreshold)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakdownDouble(-entryThreshold - stop)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakupDouble(-exitThreshold)));
             }
         });
     }

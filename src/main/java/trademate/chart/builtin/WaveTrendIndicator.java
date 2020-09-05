@@ -10,8 +10,8 @@
 package trademate.chart.builtin;
 
 import cointoss.Market;
+import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Indicators;
-import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
@@ -37,7 +37,7 @@ public class WaveTrendIndicator extends PlotScript {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        NumIndicator indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
+        DoubleIndicator indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
 
         in(PlotArea.Low, () -> {
             line(0);

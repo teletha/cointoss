@@ -26,21 +26,21 @@ public final class Indicators {
         return new LowTrendLine(ticker, length);
     }
 
-    public static NumIndicator waveTrend(Ticker ticker) {
+    public static DoubleIndicator waveTrend(Ticker ticker) {
         return waveTrend(ticker, 10, 21);
     }
 
-    public static NumIndicator waveTrend(Ticker ticker, int channelLength, int averageLength) {
-        NumIndicator price = NumIndicator.build(ticker, Tick::typicalPrice);
-        NumIndicator priceEMA = price.ema(channelLength);
-        NumIndicator emaOnDiffPriceAndPriceEMA = priceEMA.nmap(price, (pEMA, p) -> pEMA.minus(p).abs()).ema(channelLength);
-        NumIndicator ci = price.nmap(priceEMA, emaOnDiffPriceAndPriceEMA, (a, b, c) -> {
-            if (c.isZero()) {
-                return a.minus(b);
+    public static DoubleIndicator waveTrend(Ticker ticker, int channelLength, int averageLength) {
+        DoubleIndicator price = DoubleIndicator.build(ticker, Tick::typicalDoublePrice);
+        DoubleIndicator priceEMA = price.ema(channelLength);
+        DoubleIndicator emaOnDiffPriceAndPriceEMA = priceEMA.dmap(price, (pEMA, p) -> Math.abs(pEMA - p)).ema(channelLength);
+        DoubleIndicator ci = price.dmap(priceEMA, emaOnDiffPriceAndPriceEMA, (a, b, c) -> {
+            if (c == 0) {
+                return a - b;
             }
-            return a.minus(b).divide(Num.of(0.015).multiply(c));
+            return (a - b) / (0.015 * c);
         });
-        NumIndicator indi = ci.ema(averageLength).scale(2);
+        DoubleIndicator indi = ci.ema(averageLength).scale(2);
         indi.name.set(ticker.span.toString());
         return indi;
     }

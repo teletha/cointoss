@@ -131,6 +131,16 @@ public final class Tick {
     }
 
     /**
+     * Typical price (sometimes called the pivot point) refers to the arithmetic average of the
+     * high, low, and closing prices for this {@link Tick}.
+     * 
+     * @return The tick related value.
+     */
+    public double typicalDoublePrice() {
+        return (highPrice.doubleValue() + lowPrice.doubleValue() + closePrice().doubleValue()) / 3;
+    }
+
+    /**
      * Median price (sometimes called the high-low price) refers to the arithmetic average of the
      * high and low prices for this {@link Tick}.
      * 

@@ -147,6 +147,18 @@ class NumTest {
     }
 
     @Test
+    void modulo() {
+        assert TEN.modulo(TWO).is(0);
+        assert TEN.modulo(-3).is(1);
+        assert TEN.modulo("2.4").is(0.4);
+
+        assert Num.of(10).modulo(Num.of(3)).doubleValue() == 1;
+        assert Num.of(10).modulo(Num.of(345)).doubleValue() == 10;
+        assert Num.of(10).modulo(Num.of(0.1)).doubleValue() == 0;
+        assert Num.of(10).modulo(Num.of(0.00002)).intValue() == 0;
+    }
+
+    @Test
     void abs() {
         assert ONE.abs().is(1);
         assert Num.of(-1).abs().is(1);
