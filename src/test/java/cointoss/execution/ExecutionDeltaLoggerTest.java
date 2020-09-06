@@ -183,7 +183,7 @@ class ExecutionDeltaLoggerTest {
         Num decoded = ExecutionDeltaLogger.decodeDiff(encoded, Num.ZERO);
         assert decoded.is(current);
 
-        current = Num.of("200000000000000000000000000000000000000000000000000000000000000000000000000");
+        current = Num.of("1234567890987654321234567890987654321234567890987654321234567890987654321");
         encoded = ExecutionDeltaLogger.encodeDiff(current, Num.ZERO);
         decoded = ExecutionDeltaLogger.decodeDiff(encoded, Num.ZERO);
         assert decoded.is(current);

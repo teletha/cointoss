@@ -22,7 +22,7 @@ class NumTest {
 
     @Test
     void parseString() {
-        for (int i = 1; i <= Arithmetic.CONTEXT.getPrecision(); i++) {
+        for (int i = 1; i <= Num.CONTEXT.getPrecision(); i++) {
             String value = "1".repeat(i);
             assert Num.of(value).toString().equals(value);
         }

@@ -10,6 +10,7 @@
 package cointoss.util.arithmetic;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
@@ -35,6 +36,9 @@ import kiss.Variable;
  */
 @SuppressWarnings("serial")
 public class Num extends Arithmetic<Num> {
+
+    /** The base context. */
+    public static final MathContext CONTEXT = new MathContext(16, RoundingMode.HALF_UP);
 
     /** reuse */
     public static final Num ZERO = new Num(0, 0);
@@ -156,8 +160,10 @@ public class Num extends Arithmetic<Num> {
     private BigDecimal big() {
         if (big != null) {
             return big;
+        } else if (scale == 0) {
+            return new BigDecimal(v, CONTEXT);
         } else {
-            return BigDecimal.valueOf(v / pow10(scale));
+            return new BigDecimal(v, CONTEXT).scaleByPowerOfTen(-scale);
         }
     }
 

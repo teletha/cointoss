@@ -10,7 +10,6 @@
 package cointoss.util.arithmetic;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 
@@ -19,9 +18,6 @@ import kiss.Variable;
 
 @SuppressWarnings("serial")
 public abstract class Arithmetic<Self extends Arithmetic> extends Number implements Comparable<Self> {
-
-    /** The base context. */
-    public static final MathContext CONTEXT = new MathContext(25, RoundingMode.HALF_UP);
 
     /**
      * Build by the specified value.
@@ -1175,7 +1171,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      *             operation would require rounding.
      */
     public final Self scale(int size) {
-        return scale(size, CONTEXT.getRoundingMode());
+        return scale(size, Num.CONTEXT.getRoundingMode());
     }
 
     /**
