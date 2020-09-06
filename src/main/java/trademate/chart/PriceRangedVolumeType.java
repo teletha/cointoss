@@ -61,7 +61,7 @@ public enum PriceRangedVolumeType {
             return 1;
         }
     },
-    Separate {
+    Both {
         /**
          * {@inheritDoc}
          */

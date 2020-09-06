@@ -1328,7 +1328,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 double l = longs.volumes.get(i);
                 double s = shorts.volumes.get(i);
 
-                if (type == PriceRangedVolumeType.Separate) {
+                if (type == PriceRangedVolumeType.Both) {
                     gc.strokeLine(start, position, start + l * scale, position);
                     gc.strokeLine(start, position, start - s * scale, position);
                 } else {
