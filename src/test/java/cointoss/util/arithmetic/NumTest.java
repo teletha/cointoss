@@ -21,8 +21,23 @@ import cointoss.Direction;
 class NumTest {
 
     @Test
-    void big() {
-        assert Num.of("12345678901234567890").toString().equals("12345678901234600000");
+    void parseString() {
+        for (int i = 1; i <= Arithmetic.CONTEXT.getPrecision(); i++) {
+            String value = "1".repeat(i);
+            assert Num.of(value).toString().equals(value);
+        }
+    }
+
+    @Test
+    void parseLong() {
+        for (int i = 0; i <= 18; i++) {
+            long value = (long) Math.pow(10, i);
+            assert Num.of(value).longValue() == value;
+        }
+
+        assert Num.of(0L).longValue() == 0L;
+        assert Num.of(Long.MAX_VALUE).longValue() == Long.MAX_VALUE;
+        assert Num.of(Long.MIN_VALUE).longValue() == Long.MIN_VALUE;
     }
 
     @Test
@@ -355,18 +370,13 @@ class NumTest {
     }
 
     @Test
-    void promote() {
-        assert Num.of("12345678901234567890").toString().equals("12345678901234600000");
-    }
-
-    @Test
     void promotePlus() {
-        assert Num.of(Long.MAX_VALUE).plus(Long.MAX_VALUE).toString().equals("18446744073709551614");
+        assert Num.of(Long.MAX_VALUE).plus(Long.MAX_VALUE).toString().equals("18446744073709552000");
     }
 
     @Test
     void promoteMinus() {
-        assert Num.of(Long.MIN_VALUE).minus(Long.MAX_VALUE).toString().equals("-18446744073709551615");
+        assert Num.of(Long.MIN_VALUE).minus(Long.MAX_VALUE).toString().equals("-18446744073709552000");
     }
 
     @Test
@@ -382,7 +392,7 @@ class NumTest {
 
     @Test
     void promotePow() {
-        assert Num.of(Long.MAX_VALUE).pow(2).toString().equals("85070591730234615847396907784232501249");
+        assert Num.of(Long.MAX_VALUE).pow(2).toString().equals("85070591730234619407618514010176000000");
     }
 
     @Test

@@ -21,7 +21,7 @@ import kiss.Variable;
 public abstract class Arithmetic<Self extends Arithmetic> extends Number implements Comparable<Self> {
 
     /** The base context. */
-    protected static final MathContext CONTEXT = new MathContext(15, RoundingMode.HALF_UP);
+    public static final MathContext CONTEXT = new MathContext(25, RoundingMode.HALF_UP);
 
     /**
      * Build by the specified value.
