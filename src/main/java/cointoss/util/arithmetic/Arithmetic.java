@@ -25,14 +25,6 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param value
      * @return
      */
-    protected abstract Self create(int value);
-
-    /**
-     * Build by the specified value.
-     * 
-     * @param value
-     * @return
-     */
     protected abstract Self create(long value);
 
     /**

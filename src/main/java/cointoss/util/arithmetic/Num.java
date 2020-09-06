@@ -103,14 +103,6 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    protected Num create(int value) {
-        return new Num(value, 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected Num create(long value) {
         return new Num(value, 0);
     }
