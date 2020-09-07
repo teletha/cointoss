@@ -9,7 +9,95 @@
  */
 package cointoss.util.arithmetic;
 
+import java.math.BigDecimal;
+
+import com.google.common.math.DoubleMath;
+
+import kiss.Variable;
+
 public class ArithmeticTestSupport {
 
     protected static final double Fuzzy = Math.pow(0.1, Num.CONTEXT.getPrecision());
+
+    /**
+     * Convert to {@link BigDecimal}.
+     * 
+     * @param value A target value to convert.
+     * @return A converted value.
+     */
+    protected static BigDecimal big(int value) {
+        return new BigDecimal(value);
+    }
+
+    /**
+     * Convert to {@link BigDecimal}.
+     * 
+     * @param value A target value to convert.
+     * @return A converted value.
+     */
+    protected static BigDecimal big(long value) {
+        return new BigDecimal(value);
+    }
+
+    /**
+     * Convert to {@link BigDecimal}.
+     * 
+     * @param value A target value to convert.
+     * @return A converted value.
+     */
+    protected static BigDecimal big(double value) {
+        return new BigDecimal(value);
+    }
+
+    /**
+     * Convert to {@link BigDecimal}.
+     * 
+     * @param value A target value to convert.
+     * @return A converted value.
+     */
+    protected static BigDecimal big(String value) {
+        return new BigDecimal(value);
+    }
+
+    /**
+     * Convert to {@link BigDecimal}.
+     * 
+     * @param value A target value to convert.
+     * @return A converted value.
+     */
+    protected static BigDecimal big(Num value) {
+        return new BigDecimal(value.toString());
+    }
+
+    /**
+     * Convert to {@link BigDecimal}.
+     * 
+     * @param value A target value to convert.
+     * @return A converted value.
+     */
+    protected static BigDecimal big(Variable<Num> value) {
+        return new BigDecimal(value.v.toString());
+    }
+
+    /**
+     * Check equality of the specified values.
+     * 
+     * @param one A targe value.
+     * @param other A target value.
+     * @return A result.
+     */
+    protected static boolean equality(Num one, BigDecimal other) {
+        return one.toString().equals(other.toPlainString());
+    }
+
+    /**
+     * Check equality of the specified values vaguely.
+     * 
+     * @param one A targe value.
+     * @param other A target value.
+     * @return A result.
+     */
+    protected static boolean equalityVaguely(Num one, BigDecimal other) {
+        return DoubleMath.fuzzyEquals(one.doubleValue(), other.doubleValue(), Fuzzy * 100);
+    }
 }
