@@ -143,10 +143,10 @@ class NumTest {
         assert ZERO.divide(ONE).is(0);
 
         assert Num.of(10).divide(Num.of(20)).doubleValue() == 0.5;
-        assert Num.of(10).divide(Num.of(12345678)).doubleValue() == 0.00000081;
+        assert Num.of(10).divide(Num.of(12345679)).doubleValue() == 0.00000081;
         assert Num.of(10).divide(Num.of(0.1)).doubleValue() == 100;
         assert Num.of(10).divide(Num.of(0.00002)).intValue() == 500000;
-        assert Num.of(10).divide(Num.of(0.1234567)).doubleValue() == 81.00005;
+        assert Num.of(10).divide(Num.of(0.1234567)).doubleValue() == 81.0000591;
     }
 
     @Test
@@ -230,8 +230,8 @@ class NumTest {
 
         assert Num.of(10).pow(2).doubleValue() == 100;
         assert Num.of(10).pow(-2).doubleValue() == 0.01;
-        assert Num.of(10).pow(2.5).doubleValue() == 316.227766016837;
-        assert Num.of(10).pow(-2.5).doubleValue() == 0.00316227766;
+        assert Num.of(10).pow(2.5).doubleValue() == 316.22776601683796;
+        assert Num.of(10).pow(-2.5).doubleValue() == 0.00316227766016;
     }
 
     @Test
@@ -241,7 +241,7 @@ class NumTest {
         assert Num.of(4).sqrt().is(2);
 
         assert Num.of(100).sqrt().doubleValue() == 10;
-        assert Num.of(3).sqrt().doubleValue() == 1.732050807568;
+        assert Num.of(3).sqrt().doubleValue() == 1.73205080756887;
     }
 
     @Test

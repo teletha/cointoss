@@ -13,9 +13,8 @@ import org.junit.jupiter.api.Disabled;
 
 import kiss.Variable;
 
-@Disabled
 class ArithmeticDivideTest extends ArithmeticTestSupport {
-
+    @Disabled
     @ArithmeticTest
     void primitiveInt(int one, int other) {
         if (other == 0) {
@@ -24,31 +23,37 @@ class ArithmeticDivideTest extends ArithmeticTestSupport {
         assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other), Num.CONTEXT));
     }
 
+    @Disabled
     @ArithmeticTest
     void primitiveLong(long one, long other) {
         assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other)));
     }
 
+    @Disabled
     @ArithmeticTest
     void primitiveDouble(double one, double other) {
         assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other)));
     }
 
+    @Disabled
     @ArithmeticTest
     void numeralString(String one, String other) {
         assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other)));
     }
 
+    @Disabled
     @ArithmeticTest
     void number(Num value) {
         assert Num.ONE.divide(value).equals(value);
     }
 
+    @Disabled
     @ArithmeticTest
     void number(Num one, Num other) {
         assert equalityVaguely(one.divide(other), big(one).divide(big(other)));
     }
 
+    @Disabled
     @ArithmeticTest
     void numberVariable(Variable<Num> one, Variable<Num> other) {
         assert equalityVaguely(one.v.divide(other), big(one).divide(big(other)));

@@ -590,7 +590,7 @@ public class Num extends Arithmetic<Num> {
         for (int i = 0; i < 18; i++) {
             double fixer = pow10(i);
             double fixed = ((long) (value * fixer)) / fixer;
-            if (DoubleMath.fuzzyEquals(value, fixed, 1e-12)) {
+            if (DoubleMath.fuzzyEquals(value, fixed, 1e-14)) {
                 return i;
             }
         }
