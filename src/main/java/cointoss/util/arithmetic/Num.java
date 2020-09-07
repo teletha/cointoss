@@ -38,7 +38,7 @@ import kiss.Variable;
 public class Num extends Arithmetic<Num> {
 
     /** The base context. */
-    public static final MathContext CONTEXT = new MathContext(16, RoundingMode.HALF_UP);
+    public static final MathContext CONTEXT = new MathContext(17, RoundingMode.HALF_UP);
 
     /** reuse */
     public static final Num ZERO = new Num(0, 0);
@@ -113,7 +113,12 @@ public class Num extends Arithmetic<Num> {
     @Override
     protected Num create(double value) {
         int scale = computeScale(value);
-        return new Num((long) (value * pow10(scale)), scale);
+        double longed = value * pow10(scale);
+        if (Long.MIN_VALUE < longed && longed < Long.MAX_VALUE) {
+            return new Num((long) longed, scale);
+        } else {
+            return create(new BigDecimal(value, CONTEXT));
+        }
     }
 
     /**

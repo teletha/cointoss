@@ -20,7 +20,7 @@ import kiss.Variable;
 public abstract class Arithmetic<Self extends Arithmetic> extends Number implements Comparable<Self> {
 
     /**
-     * Build by the specified value.
+     * Create by the specified value.
      * 
      * @param value
      * @return
@@ -28,7 +28,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     protected abstract Self create(long value);
 
     /**
-     * Build by the specified value.
+     * Create by the specified value.
      * 
      * @param value
      * @return
@@ -36,7 +36,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     protected abstract Self create(double value);
 
     /**
-     * Build by the specified value.
+     * Create by the specified value.
      * 
      * @param value
      * @return
@@ -44,13 +44,18 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     protected abstract Self create(String value);
 
     /**
-     * Build by the specified value.
+     * Create by the specified value.
      * 
      * @param value
      * @return
      */
     protected abstract Self create(BigDecimal value);
 
+    /**
+     * Create by 0.
+     * 
+     * @return
+     */
     protected abstract Self zero();
 
     /**
@@ -109,9 +114,31 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
+    public final Self plus(BigDecimal augend) {
+        return plus(create(augend));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
+     * 
+     * @param augend value to be added to this {@code Decimal}.
+     * @return {@code this + augend}, rounded as necessary
+     * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
+     */
     public final Self plus(Variable<Self> augend) {
         return plus(augend.get());
     }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
+     * 
+     * @param augend value to be added to this {@code Decimal}.
+     * @return {@code this + augend}, rounded as necessary
+     * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
+     */
+    public abstract Self plus(Self augend);
 
     /**
      * Increase amount by the specified {@link Directional}.
@@ -129,8 +156,38 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param direction A current side.
      * @param size A increase size.
      */
-    public final Self plus(Directional direction, Self size) {
-        return direction.isBuy() ? plus(size) : minus(size);
+    public final Self plus(Directional direction, long size) {
+        return plus(direction, create(size));
+    }
+
+    /**
+     * Increase amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A increase size.
+     */
+    public final Self plus(Directional direction, double size) {
+        return plus(direction, create(size));
+    }
+
+    /**
+     * Increase amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A increase size.
+     */
+    public final Self plus(Directional direction, String size) {
+        return plus(direction, create(size));
+    }
+
+    /**
+     * Increase amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A increase size.
+     */
+    public final Self plus(Directional direction, BigDecimal size) {
+        return plus(direction, create(size));
     }
 
     /**
@@ -144,14 +201,14 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
-     * the context settings.
+     * Increase amount by the specified {@link Directional}.
      * 
-     * @param augend value to be added to this {@code Decimal}.
-     * @return {@code this + augend}, rounded as necessary
-     * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
+     * @param direction A current side.
+     * @param size A increase size.
      */
-    public abstract Self plus(Self augend);
+    public final Self plus(Directional direction, Self size) {
+        return direction.isBuy() ? plus(size) : minus(size);
+    }
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
