@@ -371,12 +371,12 @@ class NumTest {
 
     @Test
     void promotePlus() {
-        assert Num.of(Long.MAX_VALUE).plus(Long.MAX_VALUE).toString().equals("18446744073709551600");
+        assert Num.of(Long.MAX_VALUE).plus(Long.MAX_VALUE).toString().equals("18446744073709551614");
     }
 
     @Test
     void promoteMinus() {
-        assert Num.of(Long.MIN_VALUE).minus(Long.MAX_VALUE).toString().equals("-18446744073709551600");
+        assert Num.of(Long.MIN_VALUE).minus(Long.MAX_VALUE).toString().equals("-18446744073709551615");
     }
 
     @Test
@@ -392,7 +392,7 @@ class NumTest {
 
     @Test
     void promotePow() {
-        assert Num.of(Long.MAX_VALUE).pow(2).toString().equals("85070591730234615718269699268265640000");
+        assert Num.of(Long.MAX_VALUE).pow(2).toString().equals("85070591730234615847396907784232501249");
     }
 
     @Test

@@ -114,18 +114,6 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
-    public final Self plus(BigDecimal augend) {
-        return plus(create(augend));
-    }
-
-    /**
-     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
-     * the context settings.
-     * 
-     * @param augend value to be added to this {@code Decimal}.
-     * @return {@code this + augend}, rounded as necessary
-     * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
-     */
     public final Self plus(Variable<Self> augend) {
         return plus(augend.get());
     }
@@ -177,16 +165,6 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param size A increase size.
      */
     public final Self plus(Directional direction, String size) {
-        return plus(direction, create(size));
-    }
-
-    /**
-     * Increase amount by the specified {@link Directional}.
-     * 
-     * @param direction A current side.
-     * @param size A increase size.
-     */
-    public final Self plus(Directional direction, BigDecimal size) {
         return plus(direction, create(size));
     }
 

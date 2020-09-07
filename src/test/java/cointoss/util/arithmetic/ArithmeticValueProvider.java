@@ -24,6 +24,9 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 
 import com.google.common.collect.Sets;
 
+import cointoss.Direction;
+import kiss.Variable;
+
 class ArithmeticValueProvider implements ArgumentsProvider {
 
     /**
@@ -41,6 +44,14 @@ class ArithmeticValueProvider implements ArgumentsProvider {
                 parameters.add(LongStream.of(annotation.longs()).mapToObj(Long::valueOf).collect(Collectors.toSet()));
             } else if (parameterType == double.class) {
                 parameters.add(DoubleStream.of(annotation.doubles()).mapToObj(Double::valueOf).collect(Collectors.toSet()));
+            } else if (parameterType == String.class) {
+                parameters.add(Stream.of(annotation.strings()).collect(Collectors.toSet()));
+            } else if (parameterType == Num.class) {
+                parameters.add(Stream.of(annotation.strings()).map(Num::of).collect(Collectors.toSet()));
+            } else if (parameterType == Variable.class) {
+                parameters.add(Stream.of(annotation.strings()).map(Num::of).map(Variable::of).collect(Collectors.toSet()));
+            } else if (parameterType == Direction.class) {
+                parameters.add(Stream.of(Direction.values()).collect(Collectors.toSet()));
             }
         }
         return Sets.cartesianProduct(parameters).stream().map(List::toArray).map(Arguments::arguments);

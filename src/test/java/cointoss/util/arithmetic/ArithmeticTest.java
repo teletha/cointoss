@@ -43,4 +43,12 @@ public @interface ArithmeticTest {
      * @return
      */
     double[] doubles() default {0, 0.1, -0.1, Long.MAX_VALUE, Long.MIN_VALUE, Double.MIN_VALUE, -Double.MIN_VALUE};
+
+    /**
+     * Provide values.
+     * 
+     * @return
+     */
+    String[] strings() default {"0", "0.1", "-0.1", "9223372036854775807", "-9223372036854775808", "123456789012345678901234567890",
+            "-123456789012345678901234567890", "0.123456789012345678901234567890123456789", "-0.123456789012345678901234567890123456789"};
 }

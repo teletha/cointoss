@@ -38,7 +38,7 @@ import kiss.Variable;
 public class Num extends Arithmetic<Num> {
 
     /** The base context. */
-    public static final MathContext CONTEXT = new MathContext(17, RoundingMode.HALF_UP);
+    public static final MathContext CONTEXT = new MathContext(19, RoundingMode.HALF_UP);
 
     /** reuse */
     public static final Num ZERO = new Num(0, 0);
