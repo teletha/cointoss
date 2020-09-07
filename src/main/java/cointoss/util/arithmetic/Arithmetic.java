@@ -249,6 +249,16 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
+     * 
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
+     * @return {@code this - subtrahend}, rounded as necessary
+     * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
+     */
+    public abstract Self minus(Self subtrahend);
+
+    /**
      * Decrease amount by the specified {@link Directional}.
      * 
      * @param direction A current side.
@@ -264,8 +274,28 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param direction A current side.
      * @param size A decrease size.
      */
-    public final Self minus(Directional direction, Self size) {
-        return direction.isSell() ? plus(size) : minus(size);
+    public final Self minus(Directional direction, long size) {
+        return minus(direction, create(size));
+    }
+
+    /**
+     * Decrease amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A decrease size.
+     */
+    public final Self minus(Directional direction, double size) {
+        return minus(direction, create(size));
+    }
+
+    /**
+     * Decrease amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A decrease size.
+     */
+    public final Self minus(Directional direction, String size) {
+        return minus(direction, create(size));
     }
 
     /**
@@ -279,14 +309,14 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
-     * the context settings.
+     * Decrease amount by the specified {@link Directional}.
      * 
-     * @param subtrahend value to be subtracted from this {@code Decimal}.
-     * @return {@code this - subtrahend}, rounded as necessary
-     * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
+     * @param direction A current side.
+     * @param size A decrease size.
      */
-    public abstract Self minus(Self subtrahend);
+    public final Self minus(Directional direction, Self size) {
+        return direction.isSell() ? plus(size) : minus(size);
+    }
 
     /**
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
