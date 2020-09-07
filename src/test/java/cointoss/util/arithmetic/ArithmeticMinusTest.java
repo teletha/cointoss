@@ -9,10 +9,6 @@
  */
 package cointoss.util.arithmetic;
 
-import java.math.BigDecimal;
-
-import com.google.common.math.DoubleMath;
-
 import cointoss.Direction;
 import kiss.Variable;
 
@@ -20,85 +16,85 @@ class ArithmeticMinusTest extends ArithmeticTestSupport {
 
     @ArithmeticTest
     void primitiveInt(int value) {
-        assert Num.ZERO.minus(value).equals(Num.of(value * -1L));
+        assert equality(Num.ZERO.minus(value), big(value).negate());
     }
 
     @ArithmeticTest
     void primitiveIntDirection(int value, Direction side) {
         if (side.isBuy()) {
-            assert Num.ZERO.minus(side, value).equals(Num.of(value * -1L));
+            assert equality(Num.ZERO.minus(side, value), big(value).negate());
         } else {
-            assert Num.ZERO.minus(side, value).equals(Num.of(value));
+            assert equality(Num.ZERO.minus(side, value), big(value));
         }
     }
 
     @ArithmeticTest
     void primitiveLong(long value) {
-        assert Num.ZERO.minus(value).equals(Num.of(value * -1L));
+        assert equality(Num.ZERO.minus(value), big(value).negate());
     }
 
     @ArithmeticTest
     void primitiveLongDirection(long value, Direction side) {
         if (side.isBuy()) {
-            assert Num.ZERO.minus(side, value).equals(Num.of(value * -1L));
+            assert equality(Num.ZERO.minus(side, value), big(value).negate());
         } else {
-            assert Num.ZERO.minus(side, value).equals(Num.of(value));
+            assert equality(Num.ZERO.minus(side, value), big(value));
         }
     }
 
     @ArithmeticTest
     void primitiveDouble(double value) {
-        assert DoubleMath.fuzzyEquals(Num.ZERO.minus(value).doubleValue(), value * -1.0D, Fuzzy);
+        assert equalityVaguely(Num.ZERO.minus(value), big(value).negate());
     }
 
     @ArithmeticTest
     void primitiveDoubleDirection(double value, Direction side) {
         if (side.isBuy()) {
-            assert DoubleMath.fuzzyEquals(Num.ZERO.minus(side, value).doubleValue(), value * -1.0D, Fuzzy);
+            assert equalityVaguely(Num.ZERO.minus(side, value), big(value).negate());
         } else {
-            assert DoubleMath.fuzzyEquals(Num.ZERO.minus(side, value).doubleValue(), value, Fuzzy);
+            assert equalityVaguely(Num.ZERO.minus(side, value), big(value));
         }
     }
 
     @ArithmeticTest
     void numeralString(String value) {
-        assert Num.ZERO.minus(value).toString().equals(new BigDecimal(value, Num.CONTEXT).negate().toPlainString());
+        assert equality(Num.ZERO.minus(value), big(value).negate());
     }
 
     @ArithmeticTest
     void numeralStringDirection(String value, Direction side) {
         if (side.isBuy()) {
-            assert Num.ZERO.minus(side, value).toString().equals(new BigDecimal(value, Num.CONTEXT).negate().toPlainString());
+            assert equality(Num.ZERO.minus(side, value), big(value).negate());
         } else {
-            assert Num.ZERO.minus(side, value).toString().equals(new BigDecimal(value, Num.CONTEXT).toPlainString());
+            assert equality(Num.ZERO.minus(side, value), big(value));
         }
     }
 
     @ArithmeticTest
     void number(Num value) {
-        assert Num.ZERO.minus(value).equals(value.negate());
+        assert equality(Num.ZERO.minus(value), big(value).negate());
     }
 
     @ArithmeticTest
     void numberDirection(Num value, Direction side) {
         if (side.isBuy()) {
-            assert Num.ZERO.minus(side, value).equals(value.negate());
+            assert equality(Num.ZERO.minus(side, value), big(value).negate());
         } else {
-            assert Num.ZERO.minus(side, value).equals(value);
+            assert equality(Num.ZERO.minus(side, value), big(value));
         }
     }
 
     @ArithmeticTest
     void numberVariable(Variable<Num> value) {
-        assert Num.ZERO.minus(value).longValue() == -value.v.longValue();
+        assert equality(Num.ZERO.minus(value), big(value).negate());
     }
 
     @ArithmeticTest
     void numberVariableWithDirection(Variable<Num> value, Direction side) {
         if (side.isBuy()) {
-            assert Num.ZERO.minus(side, value).longValue() == -value.v.longValue();
+            assert equality(Num.ZERO.minus(side, value), big(value).negate());
         } else {
-            assert Num.ZERO.minus(side, value).longValue() == value.v.longValue();
+            assert equality(Num.ZERO.minus(side, value), big(value));
         }
     }
 }
