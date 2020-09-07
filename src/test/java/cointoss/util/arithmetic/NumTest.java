@@ -143,10 +143,10 @@ class NumTest {
         assert ZERO.divide(ONE).is(0);
 
         assert Num.of(10).divide(Num.of(20)).doubleValue() == 0.5;
-        assert Num.of(10).divide(Num.of(12345678)).doubleValue() == 0.00000081000006642;
+        assert Num.of(10).divide(Num.of(12345678)).doubleValue() == 0.00000081;
         assert Num.of(10).divide(Num.of(0.1)).doubleValue() == 100;
         assert Num.of(10).divide(Num.of(0.00002)).intValue() == 500000;
-        assert Num.of(10).divide(Num.of(0.1234567)).doubleValue() == 81.00005913004;
+        assert Num.of(10).divide(Num.of(0.1234567)).doubleValue() == 81.00005;
     }
 
     @Test
@@ -230,13 +230,8 @@ class NumTest {
 
         assert Num.of(10).pow(2).doubleValue() == 100;
         assert Num.of(10).pow(-2).doubleValue() == 0.01;
-        assert Num.of(10).pow(2.5).doubleValue() == 316.22776601683796;
-        assert Num.of(10).pow(-2.5).doubleValue() == 0.00316227766016838;
-    }
-
-    @Test
-    void testName() {
-        assert Num.of("9331.91000000").is(9331.91);
+        assert Num.of(10).pow(2.5).doubleValue() == 316.227766016837;
+        assert Num.of(10).pow(-2.5).doubleValue() == 0.00316227766;
     }
 
     @Test
@@ -246,7 +241,7 @@ class NumTest {
         assert Num.of(4).sqrt().is(2);
 
         assert Num.of(100).sqrt().doubleValue() == 10;
-        assert Num.of(3).sqrt().doubleValue() == 1.7320508075688772;
+        assert Num.of(3).sqrt().doubleValue() == 1.732050807568;
     }
 
     @Test
@@ -339,40 +334,27 @@ class NumTest {
         assert Num.computeScale(0.12) == 2;
         assert Num.computeScale(0.123) == 3;
         assert Num.computeScale(0.1234) == 4;
-        assert Num.computeScale(0.12345) == 5;
-        assert Num.computeScale(0.123456) == 6;
-        assert Num.computeScale(0.1234567) == 7;
-        assert Num.computeScale(0.12345678) == 8;
-        assert Num.computeScale(0.123456789) == 9;
-        assert Num.computeScale(0.1234567891) == 10;
-        assert Num.computeScale(0.12345678901) == 11;
-        assert Num.computeScale(0.123456789012) == 12;
-        assert Num.computeScale(0.1234567890123) == 13;
-        assert Num.computeScale(0.12345678901234) == 14;
-        assert Num.computeScale(0.123456789012345) == 15;
-        assert Num.computeScale(0.1234567890123456) == 16;
-        assert Num.computeScale(0.12345678901234567) == 17;
         assert Num.computeScale(0.100) == 1;
         assert Num.computeScale(0.02) == 2;
         assert Num.computeScale(0.02040) == 4;
+
+        for (int i = 1; i < 10000; i++) {
+            if (i % 1000 == 0) {
+                assert Num.computeScale(i * 0.0001) == 1;
+            } else if (i % 100 == 0) {
+                assert Num.computeScale(i * 0.0001) == 2;
+            } else if (i % 10 == 0) {
+                assert Num.computeScale(i * 0.0001) == 3;
+            } else {
+                assert Num.computeScale(i * 0.0001) == 4;
+            }
+        }
 
         assert Num.computeScale(1e19) == 18;
         assert Num.computeScale(1e100) == 18;
         assert Num.computeScale(1e300) == 18;
         assert Num.computeScale(Double.MIN_VALUE) == 0;
         assert Num.computeScale(Double.MAX_VALUE) == 18;
-
-        for (int i = 1; i < 10000; i++) {
-            if (i % 1000 == 0) {
-                assert Num.computeScale(Primitives.roundDecimal(i * 0.0001, 4)) == 1;
-            } else if (i % 100 == 0) {
-                assert Num.computeScale(Primitives.roundDecimal(i * 0.0001, 4)) == 2;
-            } else if (i % 10 == 0) {
-                assert Num.computeScale(Primitives.roundDecimal(i * 0.0001, 4)) == 3;
-            } else {
-                assert Num.computeScale(Primitives.roundDecimal(i * 0.0001, 4)) == 4;
-            }
-        }
     }
 
     @Test

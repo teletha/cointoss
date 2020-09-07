@@ -113,10 +113,9 @@ public class Num extends Arithmetic<Num> {
     @Override
     protected Num create(double value) {
         int scale = computeScale(value);
-        long longed = Math.round(value * pow10(scale));
-
+        double longed = value * pow10(scale);
         if (Long.MIN_VALUE < longed && longed < Long.MAX_VALUE) {
-            return new Num(longed, scale);
+            return new Num((long) longed, scale);
         } else {
             return create(new BigDecimal(value, CONTEXT));
         }
@@ -557,7 +556,6 @@ public class Num extends Arithmetic<Num> {
         }
 
         Num other = (Num) obj;
-        System.out.println(this.v + "  " + this.scale + "  " + this.big + "    " + other.v + "   " + other.scale + "   " + other.big);
         if (big != null) {
             if (other.big != null) {
                 return big.compareTo(other.big) == 0;
@@ -591,8 +589,8 @@ public class Num extends Arithmetic<Num> {
     protected static int computeScale(double value) {
         for (int i = 0; i < 18; i++) {
             double fixer = pow10(i);
-            double fixed = Math.round(value * fixer) / fixer;
-            if (Math.abs(value - fixed) < 1e-18) {
+            double fixed = ((long) (value * fixer)) / fixer;
+            if (DoubleMath.fuzzyEquals(value, fixed, 1e-12)) {
                 return i;
             }
         }

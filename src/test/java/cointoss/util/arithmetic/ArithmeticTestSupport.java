@@ -26,7 +26,7 @@ public class ArithmeticTestSupport {
      * @return A converted value.
      */
     protected static BigDecimal big(int value) {
-        return new BigDecimal(value, Num.CONTEXT);
+        return new BigDecimal(value);
     }
 
     /**
@@ -36,7 +36,7 @@ public class ArithmeticTestSupport {
      * @return A converted value.
      */
     protected static BigDecimal big(long value) {
-        return new BigDecimal(value, Num.CONTEXT);
+        return new BigDecimal(value);
     }
 
     /**
@@ -46,7 +46,7 @@ public class ArithmeticTestSupport {
      * @return A converted value.
      */
     protected static BigDecimal big(double value) {
-        return new BigDecimal(value, Num.CONTEXT);
+        return new BigDecimal(value);
     }
 
     /**
@@ -56,7 +56,7 @@ public class ArithmeticTestSupport {
      * @return A converted value.
      */
     protected static BigDecimal big(String value) {
-        return new BigDecimal(value, Num.CONTEXT);
+        return new BigDecimal(value);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ArithmeticTestSupport {
      * @return A converted value.
      */
     protected static BigDecimal big(Num value) {
-        return big(value.toString());
+        return new BigDecimal(value.toString());
     }
 
     /**
@@ -76,7 +76,7 @@ public class ArithmeticTestSupport {
      * @return A converted value.
      */
     protected static BigDecimal big(Variable<Num> value) {
-        return big(value.v);
+        return new BigDecimal(value.v.toString());
     }
 
     /**

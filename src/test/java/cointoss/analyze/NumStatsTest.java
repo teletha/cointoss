@@ -92,7 +92,7 @@ class NumStatsTest {
         assert statistics.variance().is(25);
 
         statistics.add(Num.of(30));
-        assert statistics.variance().is(66.66666666666667);
+        assert statistics.variance().is(66.6666666666667);
     }
 
     @Test
