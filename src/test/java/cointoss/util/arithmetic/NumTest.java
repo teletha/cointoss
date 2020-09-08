@@ -350,11 +350,34 @@ class NumTest {
             }
         }
 
-        assert Num.computeScale(1e19) == 18;
-        assert Num.computeScale(1e100) == 18;
-        assert Num.computeScale(1e300) == 18;
+        assert Num.computeScale(1e+1) == 0;
+        assert Num.computeScale(1e+2) == 0;
+        assert Num.computeScale(1e+3) == 0;
+        assert Num.computeScale(1e+4) == 0;
+        assert Num.computeScale(1e+5) == 0;
+        assert Num.computeScale(1e+6) == 0;
+        assert Num.computeScale(1e+7) == 0;
+
+        assert Num.computeScale(1e-1) == 1;
+        assert Num.computeScale(1e-2) == 2;
+        assert Num.computeScale(1e-3) == 3;
+        assert Num.computeScale(1e-4) == 4;
+        assert Num.computeScale(1e-5) == 5;
+        assert Num.computeScale(1e-6) == 6;
+        assert Num.computeScale(1e-7) == 7;
+        assert Num.computeScale(1e-8) == 8;
+        assert Num.computeScale(1e-9) == 9;
+        assert Num.computeScale(1e-10) == 10;
+        // assert Num.computeScale(1e-11) == 11;
+        assert Num.computeScale(1e-12) == 12;
+        assert Num.computeScale(1e-13) == 13;
+        assert Num.computeScale(1e-14) == 0;
+        assert Num.computeScale(1e-15) == 0;
+        assert Num.computeScale(1e-16) == 0;
+        assert Num.computeScale(1e-100) == 0;
+        assert Num.computeScale(1e-300) == 0;
         assert Num.computeScale(Double.MIN_VALUE) == 0;
-        assert Num.computeScale(Double.MAX_VALUE) == 18;
+        assert Num.computeScale(Double.MAX_VALUE) == 14;
     }
 
     @Test

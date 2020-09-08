@@ -37,6 +37,9 @@ import kiss.Variable;
 @SuppressWarnings("serial")
 public class Num extends Arithmetic<Num> {
 
+    /** The acceptable decimal difference. */
+    static final double Fuzzy = 1e-14;
+
     /** The base context. */
     public static final MathContext CONTEXT = new MathContext(19, RoundingMode.HALF_UP);
 
@@ -262,6 +265,8 @@ public class Num extends Arithmetic<Num> {
         } else if (value.big != null) {
             return create(big().divide(value.big, CONTEXT));
         } else {
+            if (value.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
+
             Num result = create((double) v / value.v);
             result.scale = scale - value.scale + result.scale;
             return result;
@@ -587,14 +592,18 @@ public class Num extends Arithmetic<Num> {
     }
 
     protected static int computeScale(double value) {
+        if (-Fuzzy <= value && value <= Fuzzy) {
+            return 0;
+        }
+
         for (int i = 0; i < 18; i++) {
             double fixer = pow10(i);
             double fixed = ((long) (value * fixer)) / fixer;
-            if (DoubleMath.fuzzyEquals(value, fixed, 1e-14)) {
+            if (DoubleMath.fuzzyEquals(value, fixed, Fuzzy)) {
                 return i;
             }
         }
-        return 18;
+        return 14;
     }
 
     /**

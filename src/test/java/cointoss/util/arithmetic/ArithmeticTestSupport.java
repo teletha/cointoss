@@ -17,8 +17,6 @@ import kiss.Variable;
 
 public class ArithmeticTestSupport {
 
-    protected static final double Fuzzy = Math.pow(0.1, Num.CONTEXT.getPrecision());
-
     /**
      * Convert to {@link BigDecimal}.
      * 
@@ -98,6 +96,6 @@ public class ArithmeticTestSupport {
      * @return A result.
      */
     protected static boolean equalityVaguely(Num one, BigDecimal other) {
-        return DoubleMath.fuzzyEquals(one.doubleValue(), other.doubleValue(), Fuzzy * 100);
+        return DoubleMath.fuzzyEquals(one.doubleValue(), other.doubleValue(), Num.Fuzzy);
     }
 }

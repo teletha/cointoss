@@ -9,18 +9,20 @@
  */
 package cointoss.util.arithmetic;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 
 import kiss.Variable;
 
 class ArithmeticDivideTest extends ArithmeticTestSupport {
-    @Disabled
+
     @ArithmeticTest
     void primitiveInt(int one, int other) {
-        if (other == 0) {
-            return;
+        if (other != 0) {
+            assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other), Num.CONTEXT));
+        } else {
+            Assertions.assertThrows(ArithmeticException.class, () -> Num.of(one).divide(other));
         }
-        assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other), Num.CONTEXT));
     }
 
     @Disabled
