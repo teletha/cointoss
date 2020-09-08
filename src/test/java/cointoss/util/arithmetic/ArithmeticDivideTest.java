@@ -12,6 +12,8 @@ package cointoss.util.arithmetic;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 
+import com.google.common.math.DoubleMath;
+
 import kiss.Variable;
 
 class ArithmeticDivideTest extends ArithmeticTestSupport {
@@ -25,16 +27,22 @@ class ArithmeticDivideTest extends ArithmeticTestSupport {
         }
     }
 
-    @Disabled
     @ArithmeticTest
     void primitiveLong(long one, long other) {
-        assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other)));
+        if (other != 0) {
+            assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other), Num.CONTEXT));
+        } else {
+            Assertions.assertThrows(ArithmeticException.class, () -> Num.of(one).divide(other));
+        }
     }
 
-    @Disabled
     @ArithmeticTest
     void primitiveDouble(double one, double other) {
-        assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other)));
+        if (DoubleMath.fuzzyEquals(other, 0, 0.0001)) {
+            assert equalityVaguely(Num.of(one).divide(other), big(one).divide(big(other), Num.CONTEXT));
+        } else {
+            Assertions.assertThrows(ArithmeticException.class, () -> Num.of(one).divide(other));
+        }
     }
 
     @Disabled
