@@ -98,4 +98,64 @@ public class ArithmeticTestSupport {
     protected static boolean equalityVaguely(Num one, BigDecimal other) {
         return DoubleMath.fuzzyEquals(one.doubleValue(), other.doubleValue(), Num.Fuzzy);
     }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean zeroIsEqualTo(int value) {
+        return value == 0;
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean zeroIsEqualTo(long value) {
+        return value == 0;
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean zeroIsEqualTo(double value) {
+        return DoubleMath.fuzzyEquals(value, 0, Num.Fuzzy);
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean zeroIsEqualTo(String value) {
+        return value.equals("0");
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean zeroIsEqualTo(Num value) {
+        return value.is(0);
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean zeroIsEqualTo(Variable<Num> value) {
+        return zeroIsEqualTo(value.v);
+    }
 }
