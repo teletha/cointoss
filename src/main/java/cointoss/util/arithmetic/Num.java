@@ -279,9 +279,9 @@ public class Num extends Arithmetic<Num> {
     @Override
     public Num remainder(Num value) {
         if (big != null) {
-            return create(big.remainder(value.big(), CONTEXT));
+            return create(big.remainder(value.big()));
         } else if (value.big != null) {
-            return create(big().remainder(value.big, CONTEXT));
+            return create(big().remainder(value.big));
         } else {
             if (scale == value.scale) {
                 return new Num(v % value.v, scale);
