@@ -18,85 +18,85 @@ class ArithmeticIsLessThanTest extends ArithmeticTestSupport {
 
     @ArithmeticTest
     void primitiveInt(int one) {
-        assert Num.ONE.isLessThan(one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+        assert Num.ZERO.isLessThan(one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
     }
 
     @ArithmeticTest
     void primitiveInt(int one, Direction side) {
         if (side.isBuy()) {
-            assert Num.ONE.isLessThan(side, one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+            assert Num.ZERO.isLessThan(side, one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
         } else {
-            assert Num.ONE.isLessThan(side, one) == 0 < BigDecimal.ONE.compareTo(big(one));
+            assert Num.ZERO.isLessThan(side, one) == 0 < BigDecimal.ZERO.compareTo(big(one));
         }
     }
 
     @ArithmeticTest
     void primitiveLong(long one) {
-        assert Num.ONE.isLessThan(one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+        assert Num.ZERO.isLessThan(one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
     }
 
     @ArithmeticTest
     void primitiveLong(long one, Direction side) {
         if (side.isBuy()) {
-            assert Num.ONE.isLessThan(side, one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+            assert Num.ZERO.isLessThan(side, one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
         } else {
-            assert Num.ONE.isLessThan(side, one) == 0 < BigDecimal.ONE.compareTo(big(one));
+            assert Num.ZERO.isLessThan(side, one) == 0 < BigDecimal.ZERO.compareTo(big(one));
         }
     }
 
     @ArithmeticTest
     void primitiveDouble(double one) {
-        assert Num.ONE.isLessThan(one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+        assert Num.ZERO.isLessThan(one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
     }
 
     @ArithmeticTest
     void primitiveDouble(double one, Direction side) {
         if (side.isBuy()) {
-            assert Num.ONE.isLessThan(side, one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+            assert Num.ZERO.isLessThan(side, one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
         } else {
-            assert Num.ONE.isLessThan(side, one) == 0 < BigDecimal.ONE.compareTo(big(one));
+            assert Num.ZERO.isLessThan(side, one) == 0 < BigDecimal.ZERO.compareTo(big(one));
         }
     }
 
     @ArithmeticTest
     void numeralString(String one) {
-        assert Num.ONE.isLessThan(one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+        assert Num.ZERO.isLessThan(one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
     }
 
     @ArithmeticTest
     void numeralString(String one, Direction side) {
         if (side.isBuy()) {
-            assert Num.ONE.isLessThan(side, one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+            assert Num.ZERO.isLessThan(side, one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
         } else {
-            assert Num.ONE.isLessThan(side, one) == 0 < BigDecimal.ONE.compareTo(big(one));
+            assert Num.ZERO.isLessThan(side, one) == 0 < BigDecimal.ZERO.compareTo(big(one));
         }
     }
 
     @ArithmeticTest
     void number(Num one) {
-        assert Num.ONE.isLessThan(one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+        assert Num.ZERO.isLessThan(one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
     }
 
     @ArithmeticTest
     void number(Num one, Direction side) {
         if (side.isBuy()) {
-            assert Num.ONE.isLessThan(side, one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+            assert Num.ZERO.isLessThan(side, one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
         } else {
-            assert Num.ONE.isLessThan(side, one) == 0 < BigDecimal.ONE.compareTo(big(one));
+            assert Num.ZERO.isLessThan(side, one) == 0 < BigDecimal.ZERO.compareTo(big(one));
         }
     }
 
     @ArithmeticTest
     void numberVariable(Variable<Num> one) {
-        assert Num.ONE.isLessThan(one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+        assert Num.ZERO.isLessThan(one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
     }
 
     @ArithmeticTest
     void numberVariable(Variable<Num> one, Direction side) {
         if (side.isBuy()) {
-            assert Num.ONE.isLessThan(side, one) == BigDecimal.ONE.compareTo(big(one)) < 0;
+            assert Num.ZERO.isLessThan(side, one) == BigDecimal.ZERO.compareTo(big(one)) < 0;
         } else {
-            assert Num.ONE.isLessThan(side, one) == 0 < BigDecimal.ONE.compareTo(big(one));
+            assert Num.ZERO.isLessThan(side, one) == 0 < BigDecimal.ZERO.compareTo(big(one));
         }
     }
 }
