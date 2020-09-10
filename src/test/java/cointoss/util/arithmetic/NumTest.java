@@ -371,12 +371,6 @@ class NumTest {
         // assert Num.computeScale(1e-11) == 11;
         assert Num.computeScale(1e-12) == 12;
         assert Num.computeScale(1e-13) == 13;
-        assert Num.computeScale(1e-14) == 0;
-        assert Num.computeScale(1e-15) == 0;
-        assert Num.computeScale(1e-16) == 0;
-        assert Num.computeScale(1e-100) == 0;
-        assert Num.computeScale(1e-300) == 0;
-        assert Num.computeScale(Double.MIN_VALUE) == 0;
         assert Num.computeScale(Double.MAX_VALUE) == 14;
     }
 

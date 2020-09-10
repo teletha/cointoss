@@ -126,7 +126,7 @@ public class ArithmeticTestSupport {
      * @return A result.
      */
     protected static boolean zeroIsEqualTo(double value) {
-        return DoubleMath.fuzzyEquals(value, 0, Num.Fuzzy);
+        return value == 0;
     }
 
     /**

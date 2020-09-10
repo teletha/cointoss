@@ -115,11 +115,16 @@ public class Num extends Arithmetic<Num> {
      */
     @Override
     protected Num create(double value) {
-        int scale = computeScale(value);
-        double longed = value * pow10(scale);
-        if (Long.MIN_VALUE < longed && longed < Long.MAX_VALUE) {
-            return new Num((long) longed, scale);
-        } else {
+        try {
+            int scale = computeScale(value);
+            double longed = value * pow10(scale);
+            if (Long.MIN_VALUE < longed && longed < Long.MAX_VALUE) {
+                return new Num((long) longed, scale);
+            } else {
+                // don't use BigDecimal constructor
+                return create(BigDecimal.valueOf(value));
+            }
+        } catch (ArithmeticException e) {
             // don't use BigDecimal constructor
             return create(BigDecimal.valueOf(value));
         }
@@ -316,13 +321,7 @@ public class Num extends Arithmetic<Num> {
         } else if (scale < value.scale) {
             return new Num((long) (v * pow10(value.scale - scale)) % value.v, value.scale);
         } else {
-            try {
-                return new Num(v % (long) (value.v * pow10(scale - value.scale)), scale);
-            } catch (Throwable e) {
-                System.out
-                        .println(value.v + "  " + value.scale + "   " + value.big + "   " + v + "   " + scale + "  " + pow10(scale - value.scale));
-                throw I.quiet(e);
-            }
+            return new Num(v % (long) (value.v * pow10(scale - value.scale)), scale);
         }
     }
 
@@ -597,8 +596,8 @@ public class Num extends Arithmetic<Num> {
     }
 
     protected static int computeScale(double value) {
-        if (-Fuzzy <= value && value <= Fuzzy) {
-            return 0;
+        if (value != 0 && -Fuzzy <= value && value <= Fuzzy) {
+            throw new ArithmeticException("Too small.");
         }
 
         for (int i = 0; i < 18; i++) {
