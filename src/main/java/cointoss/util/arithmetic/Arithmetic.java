@@ -599,7 +599,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self modulo(Self divisor);
 
     /**
-     * Checks if this value is greater than another.
+     * Checks if this value is greater than other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -609,7 +609,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than another.
+     * Checks if this value is greater than other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -619,7 +619,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than another.
+     * Checks if this value is greater than other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -629,7 +629,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than another.
+     * Checks if this value is greater than other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -639,7 +639,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than another.
+     * Checks if this value is greater than other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -649,7 +649,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than another.
+     * Checks if this value is greater than other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -659,29 +659,67 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Checks if this value is greater than other value.
      * 
-     * @param direction
-     * @param other
-     * @return
+     * @param other the other value
+     * @return true is this is greater than the specified value, false otherwise
      */
-    public final boolean isGreaterThan(Directional direction, Self price) {
-        return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
+    public final boolean isGreaterThan(Directional direction, int other) {
+        return direction.isBuy() ? isGreaterThan(other) : isLessThan(other);
     }
 
     /**
-     * Compare {@link Self}.
+     * Checks if this value is greater than other value.
      * 
-     * @param direction
-     * @param other
-     * @return
+     * @param other the other value
+     * @return true is this is greater than the specified value, false otherwise
+     */
+    public final boolean isGreaterThan(Directional direction, long other) {
+        return direction.isBuy() ? isGreaterThan(other) : isLessThan(other);
+    }
+
+    /**
+     * Checks if this value is greater than other value.
+     * 
+     * @param other the other value
+     * @return true is this is greater than the specified value, false otherwise
+     */
+    public final boolean isGreaterThan(Directional direction, double other) {
+        return direction.isBuy() ? isGreaterThan(other) : isLessThan(other);
+    }
+
+    /**
+     * Checks if this value is greater than other value.
+     * 
+     * @param other the other value
+     * @return true is this is greater than the specified value, false otherwise
+     */
+    public final boolean isGreaterThan(Directional direction, String other) {
+        return direction.isBuy() ? isGreaterThan(other) : isLessThan(other);
+    }
+
+    /**
+     * Checks if this value is greater than other value.
+     * 
+     * @param other the other value
+     * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isGreaterThan(Directional direction, Variable<Self> price) {
         return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
     }
 
     /**
-     * Checks if this value is greater than or equal to another.
+     * Checks if this value is greater than other value.
+     * 
+     * @param other the other value
+     * @return true is this is greater than the specified value, false otherwise
+     */
+    public final boolean isGreaterThan(Directional direction, Self price) {
+        return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
+    }
+
+    /**
+     * Checks if this value is greater than or equal to other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
@@ -691,7 +729,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than or equal to another.
+     * Checks if this value is greater than or equal to other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
@@ -701,7 +739,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than or equal to another.
+     * Checks if this value is greater than or equal to other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
@@ -711,7 +749,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than or equal to another.
+     * Checks if this value is greater than or equal to other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
@@ -721,7 +759,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than or equal to another.
+     * Checks if this value is greater than or equal to other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
@@ -731,7 +769,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Checks if this value is greater than or equal to another.
+     * Checks if this value is greater than or equal to other value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
@@ -741,24 +779,62 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Checks if this value is greater than or equal to other value.
      * 
-     * @param direction
-     * @param other
-     * @return
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
      */
-    public final boolean isGreaterThanOrEqual(Directional direction, Self other) {
+    public final boolean isGreaterThanOrEqual(Directional direction, int other) {
         return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
     }
 
     /**
-     * Compare {@link Self}.
+     * Checks if this value is greater than or equal to other value.
      * 
-     * @param direction
-     * @param other
-     * @return
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
+     */
+    public final boolean isGreaterThanOrEqual(Directional direction, long other) {
+        return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
+    }
+
+    /**
+     * Checks if this value is greater than or equal to other value.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
+     */
+    public final boolean isGreaterThanOrEqual(Directional direction, double other) {
+        return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
+    }
+
+    /**
+     * Checks if this value is greater than or equal to other value.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
+     */
+    public final boolean isGreaterThanOrEqual(Directional direction, String other) {
+        return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
+    }
+
+    /**
+     * Checks if this value is greater than or equal to other value.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
      */
     public final boolean isGreaterThanOrEqual(Directional direction, Variable<Self> other) {
+        return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
+    }
+
+    /**
+     * Checks if this value is greater than or equal to other value.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
+     */
+    public final boolean isGreaterThanOrEqual(Directional direction, Self other) {
         return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
     }
 
@@ -823,24 +899,42 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Checks if this value is less than another.
      * 
-     * @param direction
-     * @param other
-     * @return
+     * @param other the other value, not null
+     * @return true is this is less than the specified value, false otherwise
      */
     public final boolean isLessThan(Directional direction, int other) {
-        return isLessThan(direction, create(other));
+        return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
     }
 
     /**
-     * Compare {@link Self}.
+     * Checks if this value is less than another.
      * 
-     * @param direction
-     * @param other
-     * @return
+     * @param other the other value, not null
+     * @return true is this is less than the specified value, false otherwise
      */
-    public final boolean isLessThan(Directional direction, Self other) {
+    public final boolean isLessThan(Directional direction, long other) {
+        return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
+    }
+
+    /**
+     * Checks if this value is less than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than the specified value, false otherwise
+     */
+    public final boolean isLessThan(Directional direction, double other) {
+        return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
+    }
+
+    /**
+     * Checks if this value is less than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than the specified value, false otherwise
+     */
+    public final boolean isLessThan(Directional direction, String other) {
         return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
     }
 
@@ -852,6 +946,16 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return
      */
     public final boolean isLessThan(Directional direction, Variable<Self> other) {
+        return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
+    }
+
+    /**
+     * Checks if this value is less than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than the specified value, false otherwise
+     */
+    public final boolean isLessThan(Directional direction, Self other) {
         return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
     }
 
@@ -916,24 +1020,62 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Checks if this value is less than or equal to another.
      * 
-     * @param direction
-     * @param other
-     * @return
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
      */
-    public final boolean isLessThanOrEqual(Directional direction, Self other) {
+    public final boolean isLessThanOrEqual(Directional direction, int other) {
         return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
     }
 
     /**
-     * Compare {@link Self}.
+     * Checks if this value is less than or equal to another.
      * 
-     * @param direction
-     * @param other
-     * @return
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
+     */
+    public final boolean isLessThanOrEqual(Directional direction, long other) {
+        return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
+    }
+
+    /**
+     * Checks if this value is less than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
+     */
+    public final boolean isLessThanOrEqual(Directional direction, double other) {
+        return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
+    }
+
+    /**
+     * Checks if this value is less than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
+     */
+    public final boolean isLessThanOrEqual(Directional direction, String other) {
+        return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
+    }
+
+    /**
+     * Checks if this value is less than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
      */
     public final boolean isLessThanOrEqual(Directional direction, Variable<Self> other) {
+        return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
+    }
+
+    /**
+     * Checks if this value is less than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
+     */
+    public final boolean isLessThanOrEqual(Directional direction, Self other) {
         return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
     }
 
