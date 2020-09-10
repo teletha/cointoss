@@ -418,6 +418,8 @@ public class Num extends Arithmetic<Num> {
     public Num abs() {
         if (big != null) {
             return create(big.abs());
+        } else if (v == Long.MIN_VALUE) {
+            return create(big().abs());
         } else {
             return new Num(Math.abs(v), scale);
         }
