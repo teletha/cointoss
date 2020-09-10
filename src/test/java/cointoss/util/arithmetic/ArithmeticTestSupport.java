@@ -100,6 +100,17 @@ public class ArithmeticTestSupport {
     }
 
     /**
+     * Check equality of the specified values vaguely.
+     * 
+     * @param one A targe value.
+     * @param other A target value.
+     * @return A result.
+     */
+    protected static boolean equalityVaguely(Num one, double other) {
+        return DoubleMath.fuzzyEquals(one.doubleValue(), other, Num.Fuzzy);
+    }
+
+    /**
      * Check equality between the specified value and zero.
      * 
      * @param value Target value.

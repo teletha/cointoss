@@ -364,7 +364,9 @@ public class Num extends Arithmetic<Num> {
     public Num pow(int n) {
         if (big != null) {
             return create(big.pow(n));
-        } else {
+        } else if (v == 0) {
+            return Num.ZERO;
+        } else if (0 <= n && n <= 999999999) {
             try {
                 double result = Math.pow(v, n);
                 DoubleMath.roundToLong(result, RoundingMode.HALF_DOWN);
@@ -374,6 +376,10 @@ public class Num extends Arithmetic<Num> {
             } catch (ArithmeticException e) {
                 return create(big().pow(n));
             }
+        } else if (n < 0) {
+            return Num.ONE.divide(pow(-n));
+        } else {
+            throw new ArithmeticException("Cannot calculate " + this + " ^ " + n + ".");
         }
     }
 
@@ -384,6 +390,10 @@ public class Num extends Arithmetic<Num> {
     public Num pow(double n) {
         if (big != null) {
             return create(BigDecimal.valueOf(Math.pow(big.doubleValue(), n)));
+        } else if (n == 1) {
+            return this;
+        } else if (v == 0) {
+            return Num.ZERO;
         } else {
             try {
                 double result = Math.pow(v, n);
@@ -392,7 +402,7 @@ public class Num extends Arithmetic<Num> {
                 self.scale += scale * n;
                 return self;
             } catch (ArithmeticException e) {
-                return create(big()).pow(n);
+                throw new ArithmeticException("Cannot calculate " + this + " ^ " + n + ".");
             }
         }
     }

@@ -211,7 +211,7 @@ public class NumStats {
     public Num skewness() {
         Num divide = m3.multiply(decayedSize.sqrt());
 
-        return divide.isZero() ? Num.ZERO : divide.divide(m2.pow(1.5));
+        return divide.isZero() ? Num.ZERO : divide.divide(m2.sqrt().pow(3));
     }
 
     /**
