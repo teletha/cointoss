@@ -44,7 +44,7 @@ public class ArithmeticTestSupport {
      * @return A converted value.
      */
     protected static BigDecimal big(double value) {
-        return new BigDecimal(value, Num.CONTEXT);
+        return BigDecimal.valueOf(value);
     }
 
     /**

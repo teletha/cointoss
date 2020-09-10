@@ -120,7 +120,8 @@ public class Num extends Arithmetic<Num> {
         if (Long.MIN_VALUE < longed && longed < Long.MAX_VALUE) {
             return new Num((long) longed, scale);
         } else {
-            return create(new BigDecimal(value, CONTEXT));
+            // don't use BigDecimal constructor
+            return create(BigDecimal.valueOf(value));
         }
     }
 
@@ -283,12 +284,16 @@ public class Num extends Arithmetic<Num> {
         } else if (value.big != null) {
             return create(big().remainder(value.big));
         } else {
-            if (scale == value.scale) {
-                return new Num(v % value.v, scale);
-            } else if (scale < value.scale) {
-                return new Num((long) (v * pow10(value.scale - scale)) % value.v, value.scale);
-            } else {
-                return new Num(v % (long) (value.v * pow10(scale - value.scale)), scale);
+            try {
+                if (scale == value.scale) {
+                    return new Num(v % value.v, scale);
+                } else if (scale < value.scale) {
+                    return new Num((Math.multiplyExact(v, positivLongs[value.scale - scale])) % value.v, value.scale);
+                } else {
+                    return new Num(v % (long) (value.v * negativeDoubles[scale - value.scale]), scale);
+                }
+            } catch (ArithmeticException e) {
+                return create(big().remainder(value.big()));
             }
         }
     }
@@ -884,16 +889,20 @@ public class Num extends Arithmetic<Num> {
     }
 
     /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
-    private static final double[] positives = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000d,
+    private static final long[] positivLongs = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000L,
+            100000000000L, 1000000000000L, 10000000000000L, 100000000000000L, 1000000000000000L, 10000000000000000L, 100000000000000000L,
+            1000000000000000000L};
+
+    /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
+    private static final double[] positivDoubles = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000d,
             100000000000d, 1000000000000d, 10000000000000d, 100000000000000d, 1000000000000000d, 10000000000000000d, 100000000000000000d,
             1000000000000000000d, 10000000000000000000d, 100000000000000000000d, 1000000000000000000000d, 10000000000000000000000d,
             100000000000000000000000d, 1000000000000000000000000d};
 
     /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
-    private static final double[] negatives = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001,
+    private static final double[] negativeDoubles = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001,
             0.0000000001, 0.00000000001, 0.000000000001, 0.0000000000001, 0.00000000000001, 0.000000000000001, 0.0000000000000001,
-            0.00000000000000001, 0.000000000000000001, 0.0000000000000000001, 0.00000000000000000001, 0.000000000000000000001,
-            0.0000000000000000000001, 0.00000000000000000000001, 0.000000000000000000000001};
+            0.00000000000000001};
 
     /**
      * Fast cached power of ten.
@@ -903,9 +912,9 @@ public class Num extends Arithmetic<Num> {
      */
     protected static double pow10(int scale) {
         if (0 <= scale) {
-            return positives[scale];
+            return positivDoubles[scale];
         } else {
-            return negatives[-scale];
+            return negativeDoubles[-scale];
         }
     }
 
