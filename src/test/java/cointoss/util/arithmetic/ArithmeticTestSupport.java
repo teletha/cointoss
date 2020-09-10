@@ -84,8 +84,30 @@ public class ArithmeticTestSupport {
      * @param other A target value.
      * @return A result.
      */
+    protected static boolean equality(Num one, int other) {
+        return one.intValue() == other;
+    }
+
+    /**
+     * Check equality of the specified values.
+     * 
+     * @param one A targe value.
+     * @param other A target value.
+     * @return A result.
+     */
+    protected static boolean equality(Num one, String other) {
+        return one.toString().equals(other);
+    }
+
+    /**
+     * Check equality of the specified values.
+     * 
+     * @param one A targe value.
+     * @param other A target value.
+     * @return A result.
+     */
     protected static boolean equality(Num one, BigDecimal other) {
-        return one.toString().equals(other.toPlainString());
+        return one.toString().equals(other.stripTrailingZeros().toPlainString());
     }
 
     /**
