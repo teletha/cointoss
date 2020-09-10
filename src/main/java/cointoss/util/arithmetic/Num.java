@@ -404,10 +404,14 @@ public class Num extends Arithmetic<Num> {
     public Num sqrt() {
         if (big != null) {
             return create(big.sqrt(CONTEXT));
-        } else {
+        } else if (v < 0) {
+            throw new ArithmeticException("Cannot calculate the square root of a negative number.");
+        } else if (scale % 2 == 0) {
             Num result = create(Math.sqrt(v));
             result.scale += scale / 2;
             return result;
+        } else {
+            return create(big().sqrt(CONTEXT));
         }
     }
 

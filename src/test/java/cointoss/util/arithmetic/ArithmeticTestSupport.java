@@ -158,4 +158,64 @@ public class ArithmeticTestSupport {
     protected static boolean zeroIsEqualTo(Variable<Num> value) {
         return zeroIsEqualTo(value.v);
     }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean isPositive(int value) {
+        return 0 <= value;
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean isPositive(long value) {
+        return 0 <= value;
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean isPositive(double value) {
+        return 0 <= value;
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean isPositive(String value) {
+        return value.charAt(0) != '-';
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean isPositive(Num value) {
+        return value.isPositiveOrZero();
+    }
+
+    /**
+     * Check equality between the specified value and zero.
+     * 
+     * @param value Target value.
+     * @return A result.
+     */
+    protected static boolean isPositive(Variable<Num> value) {
+        return isPositive(value.v);
+    }
 }

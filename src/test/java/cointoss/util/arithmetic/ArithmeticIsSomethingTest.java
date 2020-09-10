@@ -24,7 +24,7 @@ class ArithmeticIsSomethingTest extends ArithmeticTestSupport {
     }
 
     @ArithmeticTest
-    void isPositive(int one) {
+    void isPositiveZ(int one) {
         assert Num.of(one).isPositive() == (0 < big(one).compareTo(BigDecimal.ZERO));
     }
 
