@@ -20,6 +20,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 import com.google.common.math.DoubleMath;
 
+import ch.obermuhlner.math.big.BigDecimalMath;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
@@ -390,10 +391,12 @@ public class Num extends Arithmetic<Num> {
     public Num pow(double n) {
         if (big != null) {
             return create(BigDecimal.valueOf(Math.pow(big.doubleValue(), n)));
+        } else if (n == 0) {
+            return Num.ONE; // by definition
         } else if (n == 1) {
-            return this;
+            return this; // shortcut
         } else if (v == 0) {
-            return Num.ZERO;
+            return Num.ZERO; // cache
         } else {
             try {
                 double result = Math.pow(v, n);
@@ -402,7 +405,7 @@ public class Num extends Arithmetic<Num> {
                 self.scale += scale * n;
                 return self;
             } catch (ArithmeticException e) {
-                throw new ArithmeticException("Cannot calculate " + this + " ^ " + n + ".");
+                return create(BigDecimalMath.pow(big(), BigDecimal.valueOf(n), MathContext.DECIMAL128));
             }
         }
     }
