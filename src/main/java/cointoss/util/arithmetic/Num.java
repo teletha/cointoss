@@ -364,9 +364,13 @@ public class Num extends Arithmetic<Num> {
     public Num pow(int n) {
         if (big != null) {
             return create(big.pow(n));
+        } else if (n == 0) {
+            return Num.ONE; // by definition
+        } else if (n == 1) {
+            return this; // shortcut
         } else if (v == 0) {
-            return Num.ZERO;
-        } else if (0 <= n && n <= 999999999) {
+            return Num.ZERO; // cache
+        } else {
             try {
                 double result = Math.pow(v, n);
                 DoubleMath.roundToLong(result, RoundingMode.HALF_DOWN);
@@ -376,10 +380,6 @@ public class Num extends Arithmetic<Num> {
             } catch (ArithmeticException e) {
                 return create(big().pow(n));
             }
-        } else if (n < 0) {
-            return Num.ONE.divide(pow(-n));
-        } else {
-            throw new ArithmeticException("Cannot calculate " + this + " ^ " + n + ".");
         }
     }
 
