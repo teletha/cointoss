@@ -42,7 +42,7 @@ public class Num extends Arithmetic<Num> {
     static final double Fuzzy = 1e-14;
 
     /** The base context. */
-    public static final MathContext CONTEXT = new MathContext(19, RoundingMode.HALF_UP);
+    static final MathContext CONTEXT = new MathContext(19, RoundingMode.HALF_UP);
 
     /** reuse */
     public static final Num ZERO = new Num(0, 0);
@@ -61,9 +61,6 @@ public class Num extends Arithmetic<Num> {
 
     /** reuse */
     public static final Num HUNDRED = ZERO.create(100);
-
-    /** reuse */
-    public static final Num THOUSAND = ZERO.create(1000);
 
     /** reuse */
     public static final Num MAX = ZERO.create(Long.MAX_VALUE);
@@ -294,9 +291,9 @@ public class Num extends Arithmetic<Num> {
                 if (scale == value.scale) {
                     return new Num(v % value.v, scale);
                 } else if (scale < value.scale) {
-                    return new Num((Math.multiplyExact(v, positivLongs[value.scale - scale])) % value.v, value.scale);
+                    return new Num((Math.multiplyExact(v, (long) pow10(value.scale - scale))) % value.v, value.scale);
                 } else {
-                    return new Num(v % (long) (value.v * negativeDoubles[scale - value.scale]), scale);
+                    return new Num(v % (long) (value.v * pow10(scale - value.scale)), scale);
                 }
             } catch (ArithmeticException e) {
                 return create(big().remainder(value.big()));
@@ -614,21 +611,6 @@ public class Num extends Arithmetic<Num> {
         }
     }
 
-    protected static int computeScale(double value) {
-        if (value != 0 && -Fuzzy <= value && value <= Fuzzy) {
-            throw new ArithmeticException("Too small.");
-        }
-
-        for (int i = 0; i < 18; i++) {
-            double fixer = pow10(i);
-            double fixed = ((long) (value * fixer)) / fixer;
-            if (DoubleMath.fuzzyEquals(value, fixed, Fuzzy)) {
-                return i;
-            }
-        }
-        return 14;
-    }
-
     /**
      * Convert to {@link Num}.
      * 
@@ -907,20 +889,15 @@ public class Num extends Arithmetic<Num> {
     }
 
     /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
-    private static final long[] positivLongs = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000L,
-            100000000000L, 1000000000000L, 10000000000000L, 100000000000000L, 1000000000000000L, 10000000000000000L, 100000000000000000L,
-            1000000000000000000L};
-
-    /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
-    private static final double[] positivDoubles = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000d,
+    private static final double[] positives = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000d,
             100000000000d, 1000000000000d, 10000000000000d, 100000000000000d, 1000000000000000d, 10000000000000000d, 100000000000000000d,
             1000000000000000000d, 10000000000000000000d, 100000000000000000000d, 1000000000000000000000d, 10000000000000000000000d,
-            100000000000000000000000d, 1000000000000000000000000d};
+            100000000000000000000000d, 1000000000000000000000000d, 10000000000000000000000000d, 100000000000000000000000000d};
 
     /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
-    private static final double[] negativeDoubles = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001,
+    private static final double[] negatives = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001,
             0.0000000001, 0.00000000001, 0.000000000001, 0.0000000000001, 0.00000000000001, 0.000000000000001, 0.0000000000000001,
-            0.00000000000000001};
+            0.00000000000000001, 0.000000000000000001, 0.0000000000000000001, 0.00000000000000000001, 0.000000000000000000001};
 
     /**
      * Fast cached power of ten.
@@ -928,12 +905,33 @@ public class Num extends Arithmetic<Num> {
      * @param scale
      * @return
      */
-    protected static double pow10(int scale) {
+    private static double pow10(int scale) {
         if (0 <= scale) {
-            return positivDoubles[scale];
+            return positives[scale];
         } else {
-            return negativeDoubles[-scale];
+            return negatives[-scale];
         }
+    }
+
+    /**
+     * Estimate scale of the target double value.
+     * 
+     * @param value
+     * @return
+     */
+    static int computeScale(double value) {
+        if (value != 0 && -Fuzzy <= value && value <= Fuzzy) {
+            throw new ArithmeticException("Too small.");
+        }
+
+        for (int i = 0; i < 18; i++) {
+            double fixer = pow10(i);
+            double fixed = ((long) (value * fixer)) / fixer;
+            if (DoubleMath.fuzzyEquals(value, fixed, Fuzzy)) {
+                return i;
+            }
+        }
+        return 14;
     }
 
     /**
