@@ -599,6 +599,76 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self modulo(Self divisor);
 
     /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(int divisor) {
+        return quotient(create(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(long divisor) {
+        return quotient(create(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(double divisor) {
+        return quotient(create(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(String divisor) {
+        return quotient(create(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(Variable<Self> divisor) {
+        return quotient(divisor.v);
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public abstract Self quotient(Self divisor);
+
+    /**
      * Checks if this value is greater than other value.
      * 
      * @param other the other value, not null

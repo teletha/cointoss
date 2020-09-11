@@ -327,6 +327,20 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
+    public Num quotient(Num value) {
+        if (big != null) {
+            return create(big.divideToIntegralValue(value.big()));
+        } else if (value.big != null) {
+            return create(big().divideToIntegralValue(value.big));
+        } else {
+            return this.minus(this.remainder(value)).divide(value);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int compareTo(Num o) {
         if (big != null) {
             return big.compareTo(o.big());

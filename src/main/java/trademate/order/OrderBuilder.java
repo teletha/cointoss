@@ -179,7 +179,7 @@ public class OrderBuilder extends View {
                 .when(User.MiddleClick, () -> {
                     orderPrice.value(view.market.tickers.latest.v.price.toString());
                 });
-        orderPriceAmount.initialize(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
+        orderPriceAmount.initialize(Num.ONE, Num.HUNDRED, Num.of(1000), Num.of(10000));
 
         orderDivideIntervalAmount.initialize(IntStream.rangeClosed(0, 6));
         orderDivideSize.initialize(IntStream.rangeClosed(1, 12)).observing(v -> {
@@ -189,7 +189,7 @@ public class OrderBuilder extends View {
             orderPriceIntervalAmount.disable(disable);
         });
 
-        orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.THOUSAND);
+        orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.of(1000));
         orderPriceInterval.initialize("0")
                 .normalizeInput(Form.NFKC)
                 .acceptPositiveNumberInput()
@@ -398,14 +398,14 @@ public class OrderBuilder extends View {
 
         ValueStyle<OrderState> State = state -> {
             switch (state) {
-                case REQUESTING:
-                    $.descendant(() -> {
-                        font.color($.rgb(80, 80, 80));
-                    });
-                    break;
+            case REQUESTING:
+                $.descendant(() -> {
+                    font.color($.rgb(80, 80, 80));
+                });
+                break;
 
-                default:
-                    break;
+            default:
+                break;
             }
         };
 
