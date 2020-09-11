@@ -536,6 +536,16 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
+    public abstract Self remainderOff(Self divisor);
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     */
     public final Self modulo(int divisor) {
         return remainder(create(divisor));
     }

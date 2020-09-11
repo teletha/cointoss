@@ -305,6 +305,14 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
+    public Num remainderOff(Num divisor) {
+        return this.minus(this.remainder(divisor));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Num modulo(Num value) {
         if (big != null) {
             small();
