@@ -354,8 +354,19 @@ public class Num extends Arithmetic<Num> {
     public Num decuple(int n) {
         if (big != null) {
             return create(big.scaleByPowerOfTen(n));
+        } else if (n == 0) {
+            return this;
         } else {
-            return new Num(v, scale - n);
+            int s = scale - n;
+            if (0 < s) {
+                return new Num(v, s);
+            } else {
+                try {
+                    return new Num(Math.multiplyExact(v, positives[-s]), 0);
+                } catch (ArithmeticException | ArrayIndexOutOfBoundsException e) {
+                    return create(big().scaleByPowerOfTen(n));
+                }
+            }
         }
     }
 
