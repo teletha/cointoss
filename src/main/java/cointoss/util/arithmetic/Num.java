@@ -50,25 +50,39 @@ public class Num extends Arithmetic<Num> {
     public static final Num ZERO = new Num(0, 0);
 
     /** reuse */
-    public static final Num ONE = ZERO.create(1);
+    public static final Num ONE = new Num(1, 0);
 
     /** reuse */
-    public static final Num TWO = ZERO.create(2);
+    public static final Num TWO = new Num(2, 0);
 
     /** reuse */
-    public static final Num THREE = ZERO.create(3);
+    public static final Num THREE = new Num(3, 0);
 
     /** reuse */
-    public static final Num TEN = ZERO.create(10);
+    public static final Num TEN = new Num(10, 0);
 
     /** reuse */
-    public static final Num HUNDRED = ZERO.create(100);
+    public static final Num HUNDRED = new Num(100, 0);
 
     /** reuse */
-    public static final Num MAX = ZERO.create(Long.MAX_VALUE);
+    public static final Num MAX = new Num(Long.MAX_VALUE, 0);
 
     /** reuse */
-    public static final Num MIN = ZERO.create(Long.MIN_VALUE);
+    public static final Num MIN = new Num(Long.MIN_VALUE, 0);
+
+    private static final Num[] cache = new Num[104];
+
+    static {
+        cache[0] = new Num(-3, 0);
+        cache[1] = new Num(-2, 0);
+        cache[2] = new Num(-1, 0);
+        cache[3] = ZERO;
+        cache[4] = ONE;
+        cache[5] = TWO;
+        cache[6] = THREE;
+        cache[13] = TEN;
+        cache[103] = HUNDRED;
+    }
 
     /** Express a real number as the product of an integer N and a power of 10. */
     private long v;
@@ -82,9 +96,21 @@ public class Num extends Arithmetic<Num> {
      * @param value
      * @param scale
      */
-    protected Num(long value, int scale) {
+    private Num(long value, int scale) {
         this.v = value;
         this.scale = scale;
+    }
+
+    private synchronized static Num create(long value, int scale) {
+        if (scale == 0 && -3 <= value && value <= 100) {
+            int index = (int) value + 3;
+            Num cached = cache[index];
+            if (cached == null) {
+                cached = cache[index] = new Num(value, 0);
+            }
+            // return cached;
+        }
+        return new Num(value, scale);
     }
 
     /**
@@ -107,7 +133,7 @@ public class Num extends Arithmetic<Num> {
      */
     @Override
     protected Num create(long value) {
-        return new Num(value, 0);
+        return create(value, 0);
     }
 
     /**
@@ -119,7 +145,7 @@ public class Num extends Arithmetic<Num> {
             int scale = computeScale(value);
             double longed = value * pow10(scale);
             if (Long.MIN_VALUE < longed && longed < Long.MAX_VALUE) {
-                return new Num((long) longed, scale);
+                return create((long) longed, scale);
             } else {
                 // don't use BigDecimal constructor
                 return create(BigDecimal.valueOf(value));
@@ -198,11 +224,11 @@ public class Num extends Arithmetic<Num> {
         } else {
             try {
                 if (scale == value.scale) {
-                    return new Num(Math.addExact(v, value.v), scale);
+                    return create(Math.addExact(v, value.v), scale);
                 } else if (scale < value.scale) {
-                    return new Num(Math.addExact((long) (v * pow10(value.scale - scale)), value.v), value.scale);
+                    return create(Math.addExact((long) (v * pow10(value.scale - scale)), value.v), value.scale);
                 } else {
-                    return new Num(Math.addExact(v, (long) (value.v * pow10(scale - value.scale))), scale);
+                    return create(Math.addExact(v, (long) (value.v * pow10(scale - value.scale))), scale);
                 }
             } catch (ArithmeticException e) {
                 return create(big().add(value.big()));
@@ -222,11 +248,11 @@ public class Num extends Arithmetic<Num> {
         } else {
             try {
                 if (scale == value.scale) {
-                    return new Num(Math.subtractExact(v, value.v), scale);
+                    return create(Math.subtractExact(v, value.v), scale);
                 } else if (scale < value.scale) {
-                    return new Num(Math.subtractExact((long) (v * pow10(value.scale - scale)), value.v), value.scale);
+                    return create(Math.subtractExact((long) (v * pow10(value.scale - scale)), value.v), value.scale);
                 } else {
-                    return new Num(Math.subtractExact(v, (long) (value.v * pow10(scale - value.scale))), scale);
+                    return create(Math.subtractExact(v, (long) (value.v * pow10(scale - value.scale))), scale);
                 }
             } catch (ArithmeticException e) {
                 return create(big().subtract(value.big()));
@@ -245,7 +271,7 @@ public class Num extends Arithmetic<Num> {
             return create(big().multiply(value.big, CONTEXT));
         } else {
             try {
-                return new Num(Math.multiplyExact(v, value.v), scale + value.scale);
+                return create(Math.multiplyExact(v, value.v), scale + value.scale);
             } catch (ArithmeticException e) {
                 return create(big().multiply(value.big()));
             }
@@ -296,11 +322,11 @@ public class Num extends Arithmetic<Num> {
         } else {
             try {
                 if (scale == value.scale) {
-                    return new Num(v % value.v, scale);
+                    return create(v % value.v, scale);
                 } else if (scale < value.scale) {
-                    return new Num((Math.multiplyExact(v, (long) pow10(value.scale - scale))) % value.v, value.scale);
+                    return create((Math.multiplyExact(v, (long) pow10(value.scale - scale))) % value.v, value.scale);
                 } else {
-                    return new Num(v % (long) (value.v * pow10(scale - value.scale)), scale);
+                    return create(v % (long) (value.v * pow10(scale - value.scale)), scale);
                 }
             } catch (ArithmeticException e) {
                 return create(big().remainder(value.big()));
@@ -324,7 +350,7 @@ public class Num extends Arithmetic<Num> {
         for (int i = 0; i < values.length; i++) {
             values[i] = params.get(i).v * positives[max - params.get(i).scale];
         }
-        return new Num(calculation.apply(values), max);
+        return create(calculation.apply(values), max);
     }
 
     /**
@@ -359,10 +385,10 @@ public class Num extends Arithmetic<Num> {
         } else {
             int s = scale - n;
             if (0 < s) {
-                return new Num(v, s);
+                return create(v, s);
             } else {
                 try {
-                    return new Num(Math.multiplyExact(v, positives[-s]), 0);
+                    return create(Math.multiplyExact(v, positives[-s]), 0);
                 } catch (ArithmeticException | ArrayIndexOutOfBoundsException e) {
                     return create(big().scaleByPowerOfTen(n));
                 }
@@ -450,7 +476,7 @@ public class Num extends Arithmetic<Num> {
         } else if (v == Long.MIN_VALUE) {
             return create(big().abs());
         } else {
-            return new Num(Math.abs(v), scale);
+            return create(Math.abs(v), scale);
         }
     }
 
@@ -463,7 +489,7 @@ public class Num extends Arithmetic<Num> {
             return create(big.negate());
         } else {
             try {
-                return new Num(Math.negateExact(v), scale);
+                return create(Math.negateExact(v), scale);
             } catch (ArithmeticException e) {
                 return create(big().negate());
             }
@@ -495,7 +521,7 @@ public class Num extends Arithmetic<Num> {
             } else if (scale < size) {
                 return this;
             } else {
-                return new Num(DoubleMath.roundToLong(v * pow10(size - scale), mode), size);
+                return create(DoubleMath.roundToLong(v * pow10(size - scale), mode), size);
             }
         }
     }
