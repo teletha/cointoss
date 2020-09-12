@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util.arithmetic;
+package cointoss.util.primitive;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -129,6 +129,38 @@ public class Primitives {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Compute the maximum value.
+     * 
+     * @param values
+     * @return
+     */
+    public static int max(int... values) {
+        int max = Integer.MIN_VALUE;
+        for (int value : values) {
+            if (max < value) {
+                max = value;
+            }
+        }
+        return max;
+    }
+
+    /**
+     * Compute the minimum value.
+     * 
+     * @param values
+     * @return
+     */
+    public static int min(int... values) {
+        int min = Integer.MAX_VALUE;
+        for (int value : values) {
+            if (value < min) {
+                min = value;
+            }
+        }
+        return min;
     }
 
     /**

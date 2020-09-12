@@ -7,13 +7,27 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util.arithmetic;
+package cointoss.util.primitive;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.arithmetic.Primitives;
-
 class PrimitivesTest {
+
+    @Test
+    void max() {
+        assert Primitives.max(0, 1, 2) == 2;
+        assert Primitives.max(0) == 0;
+        assert Primitives.max(1, 1, 1) == 1;
+        assert Primitives.max(-1, -2, -3) == -1;
+    }
+
+    @Test
+    void min() {
+        assert Primitives.min(0, 1, 2) == 0;
+        assert Primitives.min(0) == 0;
+        assert Primitives.min(1, 1, 1) == 1;
+        assert Primitives.min(-1, -2, -3) == -3;
+    }
 
     @Test
     void ratio() {

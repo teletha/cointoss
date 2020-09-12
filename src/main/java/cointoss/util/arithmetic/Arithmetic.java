@@ -12,8 +12,12 @@ package cointoss.util.arithmetic;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.LongBinaryOperator;
 
 import cointoss.Directional;
+import cointoss.util.primitive.LongTriFunction;
 import kiss.Variable;
 
 @SuppressWarnings("serial")
@@ -459,6 +463,76 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self divide(Self divisor);
 
     /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(int divisor) {
+        return quotient(create(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(long divisor) {
+        return quotient(create(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(double divisor) {
+        return quotient(create(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(String divisor) {
+        return quotient(create(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public final Self quotient(Variable<Self> divisor) {
+        return quotient(divisor.v);
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
+     * according to the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     */
+    public abstract Self quotient(Self divisor);
+
+    /**
      * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
      * the context settings.
      * 
@@ -529,154 +603,178 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self remainder(Self divisor);
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
-     * the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     * @param other
+     * @return A result.
      */
-    public abstract Self remainderOff(Self divisor);
-
-    /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
-     * the context settings.
-     * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
-     */
-    public final Self modulo(int divisor) {
-        return remainder(create(divisor));
+    public final boolean is(int other) {
+        return is(create(other));
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
-     * the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     * @param other
+     * @return A result.
      */
-    public final Self modulo(long divisor) {
-        return remainder(create(divisor));
+    public final boolean is(long other) {
+        return is(create(other));
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
-     * the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     * @param other
+     * @return A result.
      */
-    public final Self modulo(double divisor) {
-        return remainder(create(divisor));
+    public final boolean is(double other) {
+        return is(create(other));
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
-     * the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     * @param other
+     * @return A result.
      */
-    public final Self modulo(String divisor) {
-        return remainder(create(divisor));
+    public final boolean is(String other) {
+        return is(create(other));
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
-     * the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     * @param other
+     * @return A result.
      */
-    public final Self modulo(Variable<Self> divisor) {
-        return remainder(divisor.get());
+    public final boolean is(Variable<Self> other) {
+        return is(other.get());
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
-     * the context settings.
+     * Checks if this value is equal to another.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
      */
-    public abstract Self modulo(Self divisor);
-
-    /**
-     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
-     * according to the context settings.
-     * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#divideToIntegralValue(BigDecimal)
-     */
-    public final Self quotient(int divisor) {
-        return quotient(create(divisor));
+    public final boolean is(Self other) {
+        return compareTo(other) == 0;
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
-     * according to the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
      */
-    public final Self quotient(long divisor) {
-        return quotient(create(divisor));
+    public final boolean isNot(int other) {
+        return !is(other);
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
-     * according to the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
      */
-    public final Self quotient(double divisor) {
-        return quotient(create(divisor));
+    public final boolean isNot(long other) {
+        return !is(other);
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
-     * according to the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
      */
-    public final Self quotient(String divisor) {
-        return quotient(create(divisor));
+    public final boolean isNot(double other) {
+        return !is(other);
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
-     * according to the context settings.
+     * Compare {@link Self}.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
      */
-    public final Self quotient(Variable<Self> divisor) {
-        return quotient(divisor.v);
+    public final boolean isNot(String other) {
+        return !is(other);
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - this % divisor)}, with rounding
-     * according to the context settings.
+     * Checks if this value is equal to another.
      * 
-     * @param divisor value by which this {@code Decimal} is to be divided.
-     * @return {@code this % divisor}, rounded as necessary.
-     * @see BigDecimal#divideToIntegralValue(BigDecimal)
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
      */
-    public abstract Self quotient(Self divisor);
+    public final boolean isNot(Variable<Self> other) {
+        return !is(other);
+    }
+
+    /**
+     * Checks if this value is equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
+     */
+    public final boolean isNot(Self other) {
+        return !is(other);
+    }
+
+    /**
+     * Checks if the value is zero.
+     * 
+     * @return true if the value is zero, false otherwise
+     */
+    public final boolean isZero() {
+        return compareTo(zero()) == 0;
+    }
+
+    /**
+     * Checks if the value is NOT zero.
+     * 
+     * @return true if the value is NOT zero, false otherwise
+     */
+    public final boolean isNotZero() {
+        return isZero() == false;
+    }
+
+    /**
+     * Checks if the value is greater than zero.
+     * 
+     * @return true if the value is greater than zero, false otherwise
+     */
+    public final boolean isPositive() {
+        return compareTo(zero()) > 0;
+    }
+
+    /**
+     * Checks if the value is zero or greater.
+     * 
+     * @return true if the value is zero or greater, false otherwise
+     */
+    public final boolean isPositiveOrZero() {
+        return compareTo(zero()) >= 0;
+    }
+
+    /**
+     * Checks if the value is less than zero.
+     * 
+     * @return true if the value is less than zero, false otherwise
+     */
+    public final boolean isNegative() {
+        return compareTo(zero()) < 0;
+    }
+
+    /**
+     * Checks if the value is zero or less.
+     * 
+     * @return true if the value is zero or less, false otherwise
+     */
+    public final boolean isNegativeOrZero() {
+        return compareTo(zero()) <= 0;
+    }
 
     /**
      * Checks if this value is greater than other value.
@@ -1180,178 +1278,36 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Support direct calculation by unsigned long.
      * 
-     * @param other
-     * @return A result.
+     * @param param An addition parameter.
+     * @param calculation An actual calculation.
+     * @return Calculation result.
      */
-    public final boolean is(int other) {
-        return is(create(other));
+    public final Self calculate(Self param, LongBinaryOperator calculation) {
+        return calculate(List.of((Self) this, param), p -> calculation.applyAsLong(p[0], p[1]));
     }
 
     /**
-     * Compare {@link Self}.
+     * Support direct calculation by unsigned long.
      * 
-     * @param other
-     * @return A result.
+     * @param param1 An addition parameter.
+     * @param param2 An addition parameter.
+     * @param calculation An actual calculation.
+     * @return Calculation result.
      */
-    public final boolean is(long other) {
-        return is(create(other));
+    public final Self calculate(Self param1, Self param2, LongTriFunction calculation) {
+        return calculate(List.of((Self) this, param1, param2), p -> calculation.applyAsLong(p[0], p[1], p[2]));
     }
 
     /**
-     * Compare {@link Self}.
+     * Support direct calculation by unsigned long.
      * 
-     * @param other
-     * @return A result.
+     * @param params A list of addition parameters.
+     * @param calculation An actual calculation.
+     * @return Calculation result.
      */
-    public final boolean is(double other) {
-        return is(create(other));
-    }
-
-    /**
-     * Compare {@link Self}.
-     * 
-     * @param other
-     * @return A result.
-     */
-    public final boolean is(String other) {
-        return is(create(other));
-    }
-
-    /**
-     * Compare {@link Self}.
-     * 
-     * @param other
-     * @return A result.
-     */
-    public final boolean is(Variable<Self> other) {
-        return is(other.get());
-    }
-
-    /**
-     * Checks if this value is equal to another.
-     * 
-     * @param other the other value, not null
-     * @return true is this is greater than the specified value, false otherwise
-     */
-    public final boolean is(Self other) {
-        return compareTo(other) == 0;
-    }
-
-    /**
-     * Compare {@link Self}.
-     * 
-     * @param other the other value, not null
-     * @return true is this is greater than the specified value, false otherwise
-     */
-    public final boolean isNot(int other) {
-        return !is(other);
-    }
-
-    /**
-     * Compare {@link Self}.
-     * 
-     * @param other the other value, not null
-     * @return true is this is greater than the specified value, false otherwise
-     */
-    public final boolean isNot(long other) {
-        return !is(other);
-    }
-
-    /**
-     * Compare {@link Self}.
-     * 
-     * @param other the other value, not null
-     * @return true is this is greater than the specified value, false otherwise
-     */
-    public final boolean isNot(double other) {
-        return !is(other);
-    }
-
-    /**
-     * Compare {@link Self}.
-     * 
-     * @param other the other value, not null
-     * @return true is this is greater than the specified value, false otherwise
-     */
-    public final boolean isNot(String other) {
-        return !is(other);
-    }
-
-    /**
-     * Checks if this value is equal to another.
-     * 
-     * @param other the other value, not null
-     * @return true is this is greater than the specified value, false otherwise
-     */
-    public final boolean isNot(Variable<Self> other) {
-        return !is(other);
-    }
-
-    /**
-     * Checks if this value is equal to another.
-     * 
-     * @param other the other value, not null
-     * @return true is this is greater than the specified value, false otherwise
-     */
-    public final boolean isNot(Self other) {
-        return !is(other);
-    }
-
-    /**
-     * Checks if the value is zero.
-     * 
-     * @return true if the value is zero, false otherwise
-     */
-    public final boolean isZero() {
-        return compareTo(zero()) == 0;
-    }
-
-    /**
-     * Checks if the value is NOT zero.
-     * 
-     * @return true if the value is NOT zero, false otherwise
-     */
-    public final boolean isNotZero() {
-        return isZero() == false;
-    }
-
-    /**
-     * Checks if the value is greater than zero.
-     * 
-     * @return true if the value is greater than zero, false otherwise
-     */
-    public final boolean isPositive() {
-        return compareTo(zero()) > 0;
-    }
-
-    /**
-     * Checks if the value is zero or greater.
-     * 
-     * @return true if the value is zero or greater, false otherwise
-     */
-    public final boolean isPositiveOrZero() {
-        return compareTo(zero()) >= 0;
-    }
-
-    /**
-     * Checks if the value is less than zero.
-     * 
-     * @return true if the value is less than zero, false otherwise
-     */
-    public final boolean isNegative() {
-        return compareTo(zero()) < 0;
-    }
-
-    /**
-     * Checks if the value is zero or less.
-     * 
-     * @return true if the value is zero or less, false otherwise
-     */
-    public final boolean isNegativeOrZero() {
-        return compareTo(zero()) <= 0;
-    }
+    public abstract Self calculate(List<Self> params, Function<long[], Long> calculation);
 
     /**
      * Returns a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>).

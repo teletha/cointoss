@@ -151,6 +151,16 @@ public final class Tick {
     }
 
     /**
+     * Median price (sometimes called the high-low price) refers to the arithmetic average of the
+     * high and low prices for this {@link Tick}.
+     * 
+     * @return The tick related value.
+     */
+    public double medianDoublePrice() {
+        return (highPrice.doubleValue() + lowPrice.doubleValue()) / 2;
+    }
+
+    /**
      * Retrieve the tick related value.
      * 
      * @return The tick related value.

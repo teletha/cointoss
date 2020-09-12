@@ -14,6 +14,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -24,6 +25,7 @@ import ch.obermuhlner.math.big.BigDecimalMath;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
+import cointoss.util.primitive.Primitives;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
@@ -172,25 +174,16 @@ public class Num extends Arithmetic<Num> {
     }
 
     /**
-     * Convert to {@link BigDecimal}.
+     * Convert to unsigned long.
      * 
      * @return
      */
-    Num small() {
+    private Num small() {
         if (big != null) {
             scale = Math.max(0, big.scale());
             v = (long) (big.doubleValue() * pow10(scale));
         }
         return this;
-    }
-
-    public Num primitive() {
-        if (big == null) {
-            return this;
-        } else {
-            int scale = Math.max(0, big.scale());
-            return new Num((long) (big.doubleValue() * pow10(scale)), scale);
-        }
     }
 
     /**
@@ -281,6 +274,20 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
+    public Num quotient(Num value) {
+        if (big != null) {
+            return create(big.divideToIntegralValue(value.big()));
+        } else if (value.big != null) {
+            return create(big().divideToIntegralValue(value.big));
+        } else {
+            return this.minus(this.remainder(value)).divide(value);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Num remainder(Num value) {
         if (big != null) {
             return create(big.remainder(value.big()));
@@ -305,44 +312,19 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num remainderOff(Num divisor) {
-        return this.minus(this.remainder(divisor));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num modulo(Num value) {
-        if (big != null) {
-            small();
+    public Num calculate(List<Num> params, Function<long[], Long> calculation) {
+        int max = 0;
+        long[] values = new long[params.size()];
+        for (int i = 0; i < values.length; i++) {
+            Num num = params.get(i).small();
+            if (max < num.scale) {
+                max = num.scale;
+            }
         }
-
-        if (value.big != null) {
-            value.small();
+        for (int i = 0; i < values.length; i++) {
+            values[i] = params.get(i).v * positives[max - params.get(i).scale];
         }
-
-        if (scale == value.scale) {
-            return new Num(v % value.v, scale);
-        } else if (scale < value.scale) {
-            return new Num((long) (v * pow10(value.scale - scale)) % value.v, value.scale);
-        } else {
-            return new Num(v % (long) (value.v * pow10(scale - value.scale)), scale);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num quotient(Num value) {
-        if (big != null) {
-            return create(big.divideToIntegralValue(value.big()));
-        } else if (value.big != null) {
-            return create(big().divideToIntegralValue(value.big));
-        } else {
-            return this.minus(this.remainder(value)).divide(value);
-        }
+        return new Num(calculation.apply(values), max);
     }
 
     /**
@@ -758,6 +740,12 @@ public class Num extends Arithmetic<Num> {
         return decimals;
     }
 
+    /**
+     * Convert to {@link Num}.
+     * 
+     * @param values
+     * @return
+     */
     public static Num of(BigDecimal value) {
         return ZERO.create(value);
     }
@@ -911,10 +899,9 @@ public class Num extends Arithmetic<Num> {
     }
 
     /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
-    private static final double[] positives = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000d,
-            100000000000d, 1000000000000d, 10000000000000d, 100000000000000d, 1000000000000000d, 10000000000000000d, 100000000000000000d,
-            1000000000000000000d, 10000000000000000000d, 100000000000000000000d, 1000000000000000000000d, 10000000000000000000000d,
-            100000000000000000000000d, 1000000000000000000000000d, 10000000000000000000000000d, 100000000000000000000000000d};
+    private static final long[] positives = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000L,
+            100000000000L, 1000000000000L, 10000000000000L, 100000000000000L, 1000000000000000L, 10000000000000000L, 100000000000000000L,
+            1000000000000000000L};
 
     /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
     private static final double[] negatives = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001,

@@ -23,7 +23,7 @@ import java.util.function.UnaryOperator;
 import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.arithmetic.Num;
-import cointoss.util.arithmetic.Primitives;
+import cointoss.util.primitive.Primitives;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
@@ -276,7 +276,7 @@ public class OrderBook {
      * @return
      */
     static Num calculateGroupedPrice(Num price, Num range) {
-        return price.primitive().remainderOff(range);
+        return price.calculate(range, (orderPrice, priceRange) -> orderPrice - orderPrice % priceRange);
     }
 
     /**

@@ -20,7 +20,7 @@ import javafx.scene.text.FontSmoothingType;
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderBookPage;
 import cointoss.util.arithmetic.Num;
-import cointoss.util.arithmetic.Primitives;
+import cointoss.util.primitive.Primitives;
 import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;

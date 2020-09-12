@@ -11,7 +11,7 @@ package cointoss.analyze;
 
 import java.util.function.DoubleFunction;
 
-import cointoss.util.arithmetic.Primitives;
+import cointoss.util.primitive.Primitives;
 
 /**
  * This class provides a means of updating summary statistics as each new data point is added. The
