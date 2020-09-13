@@ -100,11 +100,13 @@ public class Primitives {
     }
 
     /**
-     * @param min
-     * @param value
-     * @param max
+     * Rounds the specified value to the range of valid values.
+     * 
+     * @param min A minimum value.
+     * @param value A target value.
+     * @param max A maximum value.
      */
-    public static double between(double min, double value, double max) {
+    public static int round(int min, int value, int max) {
         if (value < min) {
             value = min;
         }
@@ -116,9 +118,83 @@ public class Primitives {
     }
 
     /**
-     * @param min
-     * @param value
-     * @param max
+     * Rounds the specified value to the range of valid values.
+     * 
+     * @param min A minimum value.
+     * @param value A target value.
+     * @param max A maximum value.
+     */
+    public static long round(long min, long value, long max) {
+        if (value < min) {
+            value = min;
+        }
+
+        if (max < value) {
+            value = max;
+        }
+        return value;
+    }
+
+    /**
+     * Rounds the specified value to the range of valid values.
+     * 
+     * @param min A minimum value.
+     * @param value A target value.
+     * @param max A maximum value.
+     */
+    public static double round(double min, double value, double max) {
+        if (value < min) {
+            value = min;
+        }
+
+        if (max < value) {
+            value = max;
+        }
+        return value;
+    }
+
+    /**
+     * Checks if the specified value is in the range of valid values.
+     * 
+     * @param min A minimum value.
+     * @param value A target value.
+     * @param max A maximum value.
+     */
+    public static boolean within(int min, int value, int max) {
+        if (value < min) {
+            return false;
+        }
+
+        if (max < value) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the specified value is in the range of valid values.
+     * 
+     * @param min A minimum value.
+     * @param value A target value.
+     * @param max A maximum value.
+     */
+    public static boolean within(long min, long value, long max) {
+        if (value < min) {
+            return false;
+        }
+
+        if (max < value) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the specified value is in the range of valid values.
+     * 
+     * @param min A minimum value.
+     * @param value A target value.
+     * @param max A maximum value.
      */
     public static boolean within(double min, double value, double max) {
         if (value < min) {

@@ -54,4 +54,46 @@ class PrimitivesTest {
         assert Primitives.percent(100, 100).equals("100%");
         assert Primitives.percent(100, 0).equals("0%");
     }
+
+    @Test
+    void round() {
+        assert Primitives.round(0, 10, 20) == 10;
+        assert Primitives.round(0, -10, 20) == 0;
+        assert Primitives.round(0, 30, 20) == 20;
+    }
+
+    @Test
+    void roundLong() {
+        assert Primitives.round(0L, 10, 20) == 10;
+        assert Primitives.round(0L, -10, 20) == 0;
+        assert Primitives.round(0L, 30, 20) == 20;
+    }
+
+    @Test
+    void roundDouble() {
+        assert Primitives.round(0d, 10, 20) == 10;
+        assert Primitives.round(0d, -10, 20) == 0;
+        assert Primitives.round(0d, 30, 20) == 20;
+    }
+
+    @Test
+    void within() {
+        assert Primitives.within(0, 10, 20) == true;
+        assert Primitives.within(0, -10, 20) == false;
+        assert Primitives.within(0, 30, 20) == false;
+    }
+
+    @Test
+    void withinLong() {
+        assert Primitives.within(0L, 10, 20) == true;
+        assert Primitives.within(0L, -10, 20) == false;
+        assert Primitives.within(0L, 30, 20) == false;
+    }
+
+    @Test
+    void withinDouble() {
+        assert Primitives.within(0d, 10, 20) == true;
+        assert Primitives.within(0d, -10, 20) == false;
+        assert Primitives.within(0d, 30, 20) == false;
+    }
 }
