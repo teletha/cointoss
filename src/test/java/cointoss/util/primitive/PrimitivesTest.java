@@ -22,11 +22,27 @@ class PrimitivesTest {
     }
 
     @Test
+    void maxLong() {
+        assert Primitives.max(0L, 1, 2) == 2;
+        assert Primitives.max(0L) == 0;
+        assert Primitives.max(1L, 1, 1) == 1;
+        assert Primitives.max(-1L, -2, -3) == -1;
+    }
+
+    @Test
     void min() {
         assert Primitives.min(0, 1, 2) == 0;
         assert Primitives.min(0) == 0;
         assert Primitives.min(1, 1, 1) == 1;
         assert Primitives.min(-1, -2, -3) == -3;
+    }
+
+    @Test
+    void minLong() {
+        assert Primitives.min(0L, 1, 2) == 0;
+        assert Primitives.min(0L) == 0;
+        assert Primitives.min(1L, 1, 1) == 1;
+        assert Primitives.min(-1L, -2, -3) == -3;
     }
 
     @Test

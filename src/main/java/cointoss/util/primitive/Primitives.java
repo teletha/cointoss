@@ -224,6 +224,22 @@ public class Primitives {
     }
 
     /**
+     * Compute the maximum value.
+     * 
+     * @param values
+     * @return
+     */
+    public static long max(long... values) {
+        long max = Long.MIN_VALUE;
+        for (long value : values) {
+            if (max < value) {
+                max = value;
+            }
+        }
+        return max;
+    }
+
+    /**
      * Compute the minimum value.
      * 
      * @param values
@@ -232,6 +248,22 @@ public class Primitives {
     public static int min(int... values) {
         int min = Integer.MAX_VALUE;
         for (int value : values) {
+            if (value < min) {
+                min = value;
+            }
+        }
+        return min;
+    }
+
+    /**
+     * Compute the minimum value.
+     * 
+     * @param values
+     * @return
+     */
+    public static long min(long... values) {
+        long min = Long.MAX_VALUE;
+        for (long value : values) {
             if (value < min) {
                 min = value;
             }
