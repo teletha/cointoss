@@ -54,25 +54,25 @@ public class Num extends Arithmetic<Num> {
     public static final Num ZERO = new Num(0, 0);
 
     /** reuse */
-    public static final Num ONE = ZERO.create(1);
+    public static final Num ONE = new Num(1, 0);
 
     /** reuse */
-    public static final Num TWO = ZERO.create(2);
+    public static final Num TWO = new Num(2, 0);
 
     /** reuse */
-    public static final Num THREE = ZERO.create(3);
+    public static final Num THREE = new Num(3, 0);
 
     /** reuse */
-    public static final Num TEN = ZERO.create(10);
+    public static final Num TEN = new Num(10, 0);
 
     /** reuse */
-    public static final Num HUNDRED = ZERO.create(100);
+    public static final Num HUNDRED = new Num(100, 0);
 
     /** reuse */
-    public static final Num MAX = ZERO.create(Long.MAX_VALUE);
+    public static final Num MAX = new Num(Long.MAX_VALUE, 0);
 
     /** reuse */
-    public static final Num MIN = ZERO.create(Long.MIN_VALUE);
+    public static final Num MIN = new Num(Long.MIN_VALUE, 0);
 
     /** Express a real number as the product of an integer N and a power of 10. */
     private final long v;
