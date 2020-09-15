@@ -15,6 +15,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -39,6 +40,9 @@ import kiss.Variable;
  */
 @SuppressWarnings("serial")
 public class Num extends Arithmetic<Num> {
+
+    /** The reusable cache. */
+    private static final IntSupplier NoOP = () -> 0;
 
     /** The acceptable decimal difference. */
     static final double Fuzzy = 1e-14;
@@ -88,7 +92,7 @@ public class Num extends Arithmetic<Num> {
     private long v;
 
     /** Express a real number as the product of an integer N and a power of 10. */
-    private int scale;
+    private final int scale;
 
     /**
      * Construct the number as a binary format with dynamic fixed precision.
@@ -108,7 +112,7 @@ public class Num extends Arithmetic<Num> {
             if (cached == null) {
                 cached = cache[index] = new Num(value, 0);
             }
-            // return cached;
+            return cached;
         }
         return new Num(value, scale);
     }
@@ -125,6 +129,7 @@ public class Num extends Arithmetic<Num> {
      * @param value
      */
     protected Num(BigDecimal value) {
+        this.scale = 0;
         this.big = value;
     }
 
@@ -141,11 +146,22 @@ public class Num extends Arithmetic<Num> {
      */
     @Override
     protected Num create(double value) {
+        return create(value, NoOP);
+    }
+
+    /**
+     * Create {@link Num} from primitive double value with the specified scale calculator.
+     * 
+     * @param value
+     * @param scaler
+     * @return
+     */
+    private Num create(double value, IntSupplier scaler) {
         try {
             int scale = computeScale(value);
             double longed = value * pow10(scale);
             if (Long.MIN_VALUE < longed && longed < Long.MAX_VALUE) {
-                return create((long) longed, scale);
+                return create((long) longed, scale + scaler.getAsInt());
             } else {
                 // don't use BigDecimal constructor
                 return create(BigDecimal.valueOf(value));
@@ -206,8 +222,9 @@ public class Num extends Arithmetic<Num> {
      */
     private Num small() {
         if (big != null) {
-            scale = Math.max(0, big.scale());
-            v = (long) (big.doubleValue() * pow10(scale));
+            int scale = Math.max(0, big.scale());
+            long v = (long) (big.doubleValue() * pow10(scale));
+            return new Num(v, scale);
         }
         return this;
     }
@@ -290,9 +307,7 @@ public class Num extends Arithmetic<Num> {
         } else {
             if (value.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
 
-            Num result = create((double) v / value.v);
-            result.scale = scale - value.scale + result.scale;
-            return result;
+            return create((double) v / value.v, () -> scale - value.scale);
         }
     }
 
@@ -413,9 +428,7 @@ public class Num extends Arithmetic<Num> {
             try {
                 double result = Math.pow(v, n);
                 DoubleMath.roundToLong(result, RoundingMode.HALF_DOWN);
-                Num self = create(result);
-                self.scale += scale * n;
-                return self;
+                return create(result, () -> scale * n);
             } catch (ArithmeticException e) {
                 return create(big().pow(n));
             }
@@ -439,9 +452,7 @@ public class Num extends Arithmetic<Num> {
             try {
                 double result = Math.pow(v, n);
                 DoubleMath.roundToLong(result, RoundingMode.HALF_DOWN);
-                Num self = create(result);
-                self.scale += scale * n;
-                return self;
+                return create(result, () -> (int) (scale * n));
             } catch (ArithmeticException e) {
                 return create(BigDecimalMath.pow(big(), BigDecimal.valueOf(n), MathContext.DECIMAL128));
             }
@@ -458,9 +469,7 @@ public class Num extends Arithmetic<Num> {
         } else if (v < 0) {
             throw new ArithmeticException("Cannot calculate the square root of a negative number.");
         } else if (scale % 2 == 0) {
-            Num result = create(Math.sqrt(v));
-            result.scale += scale / 2;
-            return result;
+            return create(Math.sqrt(v), () -> scale / 2);
         } else {
             return create(big().sqrt(CONTEXT));
         }
