@@ -199,29 +199,6 @@ public class Num extends Arithmetic<Num> {
     }
 
     /**
-     * Convert to {@link BigDecimal}.
-     * 
-     * @return
-     */
-    Num small() {
-        if (big != null) {
-            int scale = Math.max(0, big.scale());
-            long v = (long) (big.doubleValue() * pow10(scale));
-            return new Num(v, scale);
-        }
-        return this;
-    }
-
-    public Num primitive() {
-        if (big == null) {
-            return this;
-        } else {
-            int scale = Math.max(0, big.scale());
-            return new Num((long) (big.doubleValue() * pow10(scale)), scale);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
