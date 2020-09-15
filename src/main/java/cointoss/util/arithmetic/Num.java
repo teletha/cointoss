@@ -14,8 +14,8 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.IntSupplier;
-import java.util.function.LongBinaryOperator;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -26,8 +26,9 @@ import ch.obermuhlner.math.big.BigDecimalMath;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.util.primitive.LongTetraFunction;
-import cointoss.util.primitive.LongTriFunction;
+import cointoss.util.primitive.DoublePentaFunction;
+import cointoss.util.primitive.DoubleTetraFunction;
+import cointoss.util.primitive.DoubleTriFunction;
 import cointoss.util.primitive.Primitives;
 import kiss.Decoder;
 import kiss.Encoder;
@@ -340,51 +341,72 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num calculate(Num param, LongBinaryOperator calculation) {
+    public Num calculate(int maxScale, Num param1, DoubleBinaryOperator calculation) {
         // inlined code for performance
         int max = scale;
-        if (max < param.scale) max = param.scale;
+        if (max < param1.scale) max = param1.scale;
 
-        long v0 = this.v * (long) positives[max - this.scale];
-        long v1 = param.v * (long) positives[max - param.scale];
+        double v0 = this.v * negatives[scale];
+        double v1 = param1.v * negatives[param1.scale];
 
-        return new Num(calculation.applyAsLong(v0, v1), max);
+        return new Num((long) (calculation.applyAsDouble(v0, v1) * positives[max]), max);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Num calculate(Num param1, Num param2, LongTriFunction calculation) {
+    public Num calculate(int maxScale, Num param1, Num param2, DoubleTriFunction calculation) {
         // inlined code for performance
         int max = scale;
         if (max < param1.scale) max = param1.scale;
         if (max < param2.scale) max = param2.scale;
 
-        long v0 = this.v * (long) positives[max - this.scale];
-        long v1 = param1.v * (long) positives[max - param1.scale];
-        long v2 = param2.v * (long) positives[max - param2.scale];
+        double v0 = this.v * negatives[scale];
+        double v1 = param1.v * negatives[param1.scale];
+        double v2 = param2.v * negatives[param2.scale];
 
-        return new Num(calculation.applyAsLong(v0, v1, v2), max);
+        return new Num((long) (calculation.applyAsDouble(v0, v1, v2) * positives[max]), max);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Num calculate(Num param1, Num param2, Num param3, LongTetraFunction calculation) {
+    public Num calculate(int maxScale, Num param1, Num param2, Num param3, DoubleTetraFunction calculation) {
         // inlined code for performance
         int max = scale;
         if (max < param1.scale) max = param1.scale;
         if (max < param2.scale) max = param2.scale;
         if (max < param3.scale) max = param3.scale;
 
-        long v0 = this.v * (long) positives[max - this.scale];
-        long v1 = param1.v * (long) positives[max - param1.scale];
-        long v2 = param2.v * (long) positives[max - param2.scale];
-        long v3 = param3.v * (long) positives[max - param3.scale];
+        double v0 = this.v * negatives[scale];
+        double v1 = param1.v * negatives[param1.scale];
+        double v2 = param2.v * negatives[param2.scale];
+        double v3 = param3.v * negatives[param3.scale];
 
-        return new Num(calculation.applyAsLong(v0, v1, v2, v3), max);
+        return new Num((long) (calculation.applyAsDouble(v0, v1, v2, v3) * positives[max]), max);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Num calculate(int maxScale, Num param1, Num param2, Num param3, Num param4, DoublePentaFunction calculation) {
+        // inlined code for performance
+        int max = maxScale;
+        if (max < param1.scale) max = param1.scale;
+        if (max < param2.scale) max = param2.scale;
+        if (max < param3.scale) max = param3.scale;
+        if (max < param4.scale) max = param4.scale;
+
+        double v0 = this.v * negatives[scale];
+        double v1 = param1.v * negatives[param1.scale];
+        double v2 = param2.v * negatives[param2.scale];
+        double v3 = param3.v * negatives[param3.scale];
+        double v4 = param4.v * negatives[param4.scale];
+
+        return new Num((long) (calculation.applyAsDouble(v0, v1, v2, v3, v4) * positives[max]), max);
     }
 
     /**

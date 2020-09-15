@@ -12,11 +12,12 @@ package cointoss.util.arithmetic;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.function.LongBinaryOperator;
+import java.util.function.DoubleBinaryOperator;
 
 import cointoss.Directional;
-import cointoss.util.primitive.LongTetraFunction;
-import cointoss.util.primitive.LongTriFunction;
+import cointoss.util.primitive.DoublePentaFunction;
+import cointoss.util.primitive.DoubleTetraFunction;
+import cointoss.util.primitive.DoubleTriFunction;
 import kiss.Variable;
 
 @SuppressWarnings("serial")
@@ -1283,7 +1284,18 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param calculation An actual calculation.
      * @return Calculation result.
      */
-    public abstract Self calculate(Self param, LongBinaryOperator calculation);
+    public final Self calculate(Self param, DoubleBinaryOperator calculation) {
+        return calculate(0, param, calculation);
+    }
+
+    /**
+     * Support direct calculation by unsigned long.
+     * 
+     * @param param An addition parameter.
+     * @param calculation An actual calculation.
+     * @return Calculation result.
+     */
+    public abstract Self calculate(int maxScale, Self param, DoubleBinaryOperator calculation);
 
     /**
      * Support direct calculation by unsigned long.
@@ -1293,7 +1305,9 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param calculation An actual calculation.
      * @return Calculation result.
      */
-    public abstract Self calculate(Self param1, Self param2, LongTriFunction calculation);
+    public final Self calculate(Self param1, Self param2, DoubleTriFunction calculation) {
+        return calculate(0, param1, param2, calculation);
+    }
 
     /**
      * Support direct calculation by unsigned long.
@@ -1303,7 +1317,55 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param calculation An actual calculation.
      * @return Calculation result.
      */
-    public abstract Self calculate(Self param1, Self param2, Self param3, LongTetraFunction calculation);
+    public abstract Self calculate(int maxScale, Self param1, Self param2, DoubleTriFunction calculation);
+
+    /**
+     * Support direct calculation by unsigned long.
+     * 
+     * @param param1 An addition parameter.
+     * @param param2 An addition parameter.
+     * @param param3 An addition parameter.
+     * @param calculation An actual calculation.
+     * @return Calculation result.
+     */
+    public final Self calculate(Self param1, Self param2, Self param3, DoubleTetraFunction calculation) {
+        return calculate(0, param1, param2, param3, calculation);
+    }
+
+    /**
+     * Support direct calculation by unsigned long.
+     * 
+     * @param param1 An addition parameter.
+     * @param param2 An addition parameter.
+     * @param param3 An addition parameter.
+     * @param calculation An actual calculation.
+     * @return Calculation result.
+     */
+    public abstract Self calculate(int maxScale, Self param1, Self param2, Self param3, DoubleTetraFunction calculation);
+
+    /**
+     * Support direct calculation by unsigned long.
+     * 
+     * @param param1 An addition parameter.
+     * @param param2 An addition parameter.
+     * @param param3 An addition parameter. * @param param4 An addition parameter.
+     * @param calculation An actual calculation.
+     * @return Calculation result.
+     */
+    public final Self calculate(Self param1, Self param2, Self param3, Self param4, DoublePentaFunction calculation) {
+        return calculate(0, param1, param2, param3, param4, calculation);
+    }
+
+    /**
+     * Support direct calculation by unsigned long.
+     * 
+     * @param param1 An addition parameter.
+     * @param param2 An addition parameter.
+     * @param param3 An addition parameter. * @param param4 An addition parameter.
+     * @param calculation An actual calculation.
+     * @return Calculation result.
+     */
+    public abstract Self calculate(int maxScale, Self param1, Self param2, Self param3, Self param4, DoublePentaFunction calculation);
 
     /**
      * Returns a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>).
