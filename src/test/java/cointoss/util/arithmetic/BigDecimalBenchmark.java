@@ -18,7 +18,7 @@ public class BigDecimalBenchmark {
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
 
-        benchmark.measure("Decimal", () -> {
+        benchmark.measure("Num", () -> {
             return cointoss.util.arithmetic.Num.of(1000)
                     .divide(cointoss.util.arithmetic.Num.of(4))
                     .plus(cointoss.util.arithmetic.Num.of(0.123))
@@ -26,7 +26,7 @@ public class BigDecimalBenchmark {
                     .pow(2);
         });
 
-        benchmark.measure("Decimal Calculation", () -> {
+        benchmark.measure("Num#calculate", () -> {
             return cointoss.util.arithmetic.Num.of(1000).calculate(Num.of(4), Num.of(0.123), Num.of(-24.5), (p0, p1, p2, p3) -> {
                 long v = ((p0 / p1) + p2) * p3;
                 return v * v;
