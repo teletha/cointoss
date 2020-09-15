@@ -74,6 +74,20 @@ public class Num extends Arithmetic<Num> {
     /** reuse */
     public static final Num MIN = new Num(Long.MIN_VALUE, 0);
 
+    private static final Num[] cache = new Num[1004];
+
+    static {
+        cache[0] = new Num(-3, 0);
+        cache[1] = new Num(-2, 0);
+        cache[2] = new Num(-1, 0);
+        cache[3] = ZERO;
+        cache[4] = ONE;
+        cache[5] = TWO;
+        cache[6] = THREE;
+        cache[13] = TEN;
+        cache[103] = HUNDRED;
+    }
+
     /** Express a real number as the product of an integer N and a power of 10. */
     private final long v;
 
@@ -93,15 +107,16 @@ public class Num extends Arithmetic<Num> {
     }
 
     private static Num create(long value, int scale) {
-        // if (scale == 0 && -3 <= value && value <= 100) {
-        // int index = (int) value + 3;
-        // Num cached = cache[index];
-        // if (cached == null) {
-        // cached = cache[index] = new Num(value, 0);
-        // }
-        // return cached;
-        // }
-        return new Num(value, scale);
+        if (scale != 0 || value < -3 || 1000 < value) {
+            return new Num(value, scale);
+        }
+
+        int index = (int) value + 3;
+        Num cached = cache[index];
+        if (cached == null) {
+            cached = cache[index] = new Num(value, 0);
+        }
+        return cached;
     }
 
     /**
@@ -353,14 +368,15 @@ public class Num extends Arithmetic<Num> {
     public Num calculate(List<Num> params, Function<long[], Long> calculation) {
         int max = 0;
         long[] values = new long[params.size()];
+        Num[] smalls = new Num[params.size()];
         for (int i = 0; i < values.length; i++) {
-            Num num = params.get(i).small();
-            if (max < num.scale) {
-                max = num.scale;
+            smalls[i] = params.get(i).small();
+            if (max < smalls[i].scale) {
+                max = smalls[i].scale;
             }
         }
         for (int i = 0; i < values.length; i++) {
-            values[i] = params.get(i).v * (long) positives[max - params.get(i).scale];
+            values[i] = smalls[i].v * (long) positives[max - smalls[i].scale];
         }
         return create(calculation.apply(values), max);
     }
