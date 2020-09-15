@@ -14,8 +14,8 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.LongBinaryOperator;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -26,6 +26,8 @@ import ch.obermuhlner.math.big.BigDecimalMath;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
+import cointoss.util.primitive.LongTetraFunction;
+import cointoss.util.primitive.LongTriFunction;
 import cointoss.util.primitive.Primitives;
 import kiss.Decoder;
 import kiss.Encoder;
@@ -365,20 +367,51 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num calculate(List<Num> params, Function<long[], Long> calculation) {
-        int max = 0;
-        long[] values = new long[params.size()];
-        Num[] smalls = new Num[params.size()];
-        for (int i = 0; i < values.length; i++) {
-            smalls[i] = params.get(i).small();
-            if (max < smalls[i].scale) {
-                max = smalls[i].scale;
-            }
-        }
-        for (int i = 0; i < values.length; i++) {
-            values[i] = smalls[i].v * (long) positives[max - smalls[i].scale];
-        }
-        return create(calculation.apply(values), max);
+    public Num calculate(Num param, LongBinaryOperator calculation) {
+        // inlined code for performance
+        int max = scale;
+        if (max < param.scale) max = param.scale;
+
+        long v0 = this.v * (long) positives[max - this.scale];
+        long v1 = param.v * (long) positives[max - param.scale];
+
+        return create(calculation.applyAsLong(v0, v1), max);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Num calculate(Num param1, Num param2, LongTriFunction calculation) {
+        // inlined code for performance
+        int max = scale;
+        if (max < param1.scale) max = param1.scale;
+        if (max < param2.scale) max = param2.scale;
+
+        long v0 = this.v * (long) positives[max - this.scale];
+        long v1 = param1.v * (long) positives[max - param1.scale];
+        long v2 = param2.v * (long) positives[max - param2.scale];
+
+        return create(calculation.applyAsLong(v0, v1, v2), max);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Num calculate(Num param1, Num param2, Num param3, LongTetraFunction calculation) {
+        // inlined code for performance
+        int max = scale;
+        if (max < param1.scale) max = param1.scale;
+        if (max < param2.scale) max = param2.scale;
+        if (max < param3.scale) max = param3.scale;
+
+        long v0 = this.v * (long) positives[max - this.scale];
+        long v1 = param1.v * (long) positives[max - param1.scale];
+        long v2 = param2.v * (long) positives[max - param2.scale];
+        long v3 = param3.v * (long) positives[max - param3.scale];
+
+        return create(calculation.applyAsLong(v0, v1, v2, v3), max);
     }
 
     /**

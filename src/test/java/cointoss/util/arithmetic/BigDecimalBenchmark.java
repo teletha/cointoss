@@ -26,6 +26,13 @@ public class BigDecimalBenchmark {
                     .pow(2);
         });
 
+        benchmark.measure("Decimal Calculation", () -> {
+            return cointoss.util.arithmetic.Num.of(1000).calculate(Num.of(4), Num.of(0.123), Num.of(-24.5), (p0, p1, p2, p3) -> {
+                long v = ((p0 / p1) + p2) * p3;
+                return v * v;
+            });
+        });
+
         benchmark.measure("Decimal4J", () -> {
             return Decimal8f.valueOf(1000)
                     .divide(Decimal8f.valueOf(4))

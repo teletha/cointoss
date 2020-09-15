@@ -12,11 +12,10 @@ package cointoss.util.arithmetic;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.List;
-import java.util.function.Function;
 import java.util.function.LongBinaryOperator;
 
 import cointoss.Directional;
+import cointoss.util.primitive.LongTetraFunction;
 import cointoss.util.primitive.LongTriFunction;
 import kiss.Variable;
 
@@ -1284,9 +1283,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param calculation An actual calculation.
      * @return Calculation result.
      */
-    public final Self calculate(Self param, LongBinaryOperator calculation) {
-        return calculate(List.of((Self) this, param), p -> calculation.applyAsLong(p[0], p[1]));
-    }
+    public abstract Self calculate(Self param, LongBinaryOperator calculation);
 
     /**
      * Support direct calculation by unsigned long.
@@ -1296,18 +1293,17 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param calculation An actual calculation.
      * @return Calculation result.
      */
-    public final Self calculate(Self param1, Self param2, LongTriFunction calculation) {
-        return calculate(List.of((Self) this, param1, param2), p -> calculation.applyAsLong(p[0], p[1], p[2]));
-    }
+    public abstract Self calculate(Self param1, Self param2, LongTriFunction calculation);
 
     /**
      * Support direct calculation by unsigned long.
      * 
-     * @param params A list of addition parameters.
+     * @param param1 An addition parameter.
+     * @param param2 An addition parameter.
      * @param calculation An actual calculation.
      * @return Calculation result.
      */
-    public abstract Self calculate(List<Self> params, Function<long[], Long> calculation);
+    public abstract Self calculate(Self param1, Self param2, Self param3, LongTetraFunction calculation);
 
     /**
      * Returns a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>).
