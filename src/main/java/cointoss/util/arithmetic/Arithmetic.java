@@ -56,11 +56,11 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     protected abstract Self create(BigDecimal value);
 
     /**
-     * Create by 0.
+     * Returns the signum function of this value.
      * 
-     * @return
+     * @return -1, 0, or 1 as the value of this value is negative, zero, or positive.
      */
-    protected abstract Self zero();
+    protected abstract int signum();
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
@@ -728,7 +728,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return true if the value is zero, false otherwise
      */
     public final boolean isZero() {
-        return compareTo(zero()) == 0;
+        return signum() == 0;
     }
 
     /**
@@ -737,7 +737,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return true if the value is NOT zero, false otherwise
      */
     public final boolean isNotZero() {
-        return isZero() == false;
+        return signum() != 0;
     }
 
     /**
@@ -746,7 +746,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return true if the value is greater than zero, false otherwise
      */
     public final boolean isPositive() {
-        return compareTo(zero()) > 0;
+        return signum() > 0;
     }
 
     /**
@@ -755,7 +755,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return true if the value is zero or greater, false otherwise
      */
     public final boolean isPositiveOrZero() {
-        return compareTo(zero()) >= 0;
+        return signum() >= 0;
     }
 
     /**
@@ -764,7 +764,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return true if the value is less than zero, false otherwise
      */
     public final boolean isNegative() {
-        return compareTo(zero()) < 0;
+        return signum() < 0;
     }
 
     /**
@@ -773,7 +773,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @return true if the value is zero or less, false otherwise
      */
     public final boolean isNegativeOrZero() {
-        return compareTo(zero()) <= 0;
+        return signum() <= 0;
     }
 
     /**

@@ -175,8 +175,12 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    protected Num zero() {
-        return ZERO;
+    protected int signum() {
+        if (big != null) {
+            return big.signum();
+        } else {
+            return v == 0 ? 0 : v < 0 ? -1 : 1;
+        }
     }
 
     /**
