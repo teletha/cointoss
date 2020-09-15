@@ -89,7 +89,7 @@ public class Num extends Arithmetic<Num> {
     }
 
     /** Express a real number as the product of an integer N and a power of 10. */
-    private long v;
+    private final long v;
 
     /** Express a real number as the product of an integer N and a power of 10. */
     private final int scale;
@@ -103,6 +103,7 @@ public class Num extends Arithmetic<Num> {
     private Num(long value, int scale) {
         this.v = value;
         this.scale = scale;
+        this.big = null;
     }
 
     private synchronized static Num create(long value, int scale) {
@@ -121,7 +122,7 @@ public class Num extends Arithmetic<Num> {
      * Use an arbitrary double-precision decimal point for real numbers that do not fit in the range
      * of Long.
      */
-    private BigDecimal big;
+    private final BigDecimal big;
 
     /**
      * Constructs the number as a signed decimal number with arbitrary precision.
@@ -129,6 +130,7 @@ public class Num extends Arithmetic<Num> {
      * @param value
      */
     protected Num(BigDecimal value) {
+        this.v = 0;
         this.scale = 0;
         this.big = value;
     }
