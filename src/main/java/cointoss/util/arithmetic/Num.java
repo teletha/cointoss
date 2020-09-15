@@ -365,7 +365,7 @@ public class Num extends Arithmetic<Num> {
             }
         }
         for (int i = 0; i < values.length; i++) {
-            values[i] = params.get(i).v * positives[max - params.get(i).scale];
+            values[i] = params.get(i).v * (long) positives[max - params.get(i).scale];
         }
         return create(calculation.apply(values), max);
     }
@@ -405,7 +405,7 @@ public class Num extends Arithmetic<Num> {
                 return create(v, s);
             } else {
                 try {
-                    return create(Math.multiplyExact(v, positives[-s]), 0);
+                    return create(Math.multiplyExact(v, (long) positives[-s]), 0);
                 } catch (ArithmeticException | ArrayIndexOutOfBoundsException e) {
                     return create(big().scaleByPowerOfTen(n));
                 }
@@ -947,9 +947,10 @@ public class Num extends Arithmetic<Num> {
     }
 
     /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
-    private static final long[] positives = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000L,
-            100000000000L, 1000000000000L, 10000000000000L, 100000000000000L, 1000000000000000L, 10000000000000000L, 100000000000000000L,
-            1000000000000000000L};
+    private static final double[] positives = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000d,
+            100000000000d, 1000000000000d, 10000000000000d, 100000000000000d, 1000000000000000d, 10000000000000000d, 100000000000000000d,
+            1000000000000000000d, 10000000000000000000d, 100000000000000000000d, 1000000000000000000000d, 10000000000000000000000d,
+            100000000000000000000000d, 1000000000000000000000000d, 10000000000000000000000000d, 100000000000000000000000000d};
 
     /** The value of the power of 10 is calculated and cached in advance. (For 18 digits.) */
     private static final double[] negatives = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001, 0.000000001,
