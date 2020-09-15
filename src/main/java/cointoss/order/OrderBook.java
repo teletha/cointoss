@@ -123,8 +123,8 @@ public class OrderBook {
                 return max;
             }
 
-            Num lowerRounded = calculateGroupedPrice(Num.max(base.lastKey(), lowerPrice), group.range);
-            Num upperRounded = calculateGroupedPrice(Num.min(base.firstKey(), upperPrice), group.range);
+            Num lowerRounded = Num.max(base.lastKey(), lowerPrice).floor(group.range);
+            Num upperRounded = Num.min(base.firstKey(), upperPrice).floor(group.range);
 
             for (OrderBookPage page : group.pages.subMap(upperRounded, true, lowerRounded, true).values()) {
                 if (max.size < page.size) {
@@ -136,8 +136,8 @@ public class OrderBook {
                 return max;
             }
 
-            Num lowerRounded = calculateGroupedPrice(Num.max(base.firstKey(), lowerPrice), group.range);
-            Num upperRounded = calculateGroupedPrice(Num.min(base.lastKey(), upperPrice), group.range);
+            Num lowerRounded = Num.max(base.firstKey(), lowerPrice).floor(group.range);
+            Num upperRounded = Num.min(base.lastKey(), upperPrice).floor(group.range);
 
             for (OrderBookPage page : group.pages.subMap(lowerRounded, true, upperRounded, true).values()) {
                 if (max.size < page.size) {
@@ -269,17 +269,6 @@ public class OrderBook {
     }
 
     /**
-     * Calculate the grouped price.
-     * 
-     * @param price
-     * @param range
-     * @return
-     */
-    static Num calculateGroupedPrice(Num price, Num range) {
-        return price.calculate(range, (orderPrice, priceRange) -> orderPrice - orderPrice % priceRange);
-    }
-
-    /**
      * 
      */
     private class GroupedOrderBook {
@@ -311,7 +300,7 @@ public class OrderBook {
          * @param size
          */
         private void update(Num price, double size) {
-            price = calculateGroupedPrice(price, range);
+            price = price.floor(range);
 
             OrderBookPage page = pages.computeIfAbsent(price, key -> new OrderBookPage(key, 0, side.isBuy() ? Num.ZERO : range));
             page.size += size;
@@ -328,7 +317,7 @@ public class OrderBook {
          */
         private void fix(Num hint) {
             if (!pages.isEmpty()) {
-                hint = calculateGroupedPrice(hint, range);
+                hint = hint.floor(range);
 
                 Entry<Num, OrderBookPage> entry = pages.firstEntry();
                 while (entry != null && entry.getKey().isGreaterThan(side, hint)) {

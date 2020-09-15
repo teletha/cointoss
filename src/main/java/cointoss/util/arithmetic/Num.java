@@ -433,6 +433,78 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
+    public Num ceiling(Num base) {
+        if (big != null) {
+            return create(ceiling(big, base.big()));
+        } else if (base.big != null) {
+            return create(ceiling(big(), base.big));
+        } else {
+            if (base.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
+
+            try {
+                if (scale == base.scale) {
+                    long rem = v % base.v;
+                    return rem == 0 ? this : new Num(v - rem + base.v, scale);
+                } else if (scale < base.scale) {
+                    long value = (Math.multiplyExact(v, (long) pow10(base.scale - scale)));
+                    long rem = value % base.v;
+                    return rem == 0 ? this : new Num(value - rem + base.v, base.scale);
+                } else {
+                    long value = Math.multiplyExact(base.v, (long) pow10(scale - base.scale));
+                    long rem = v % value;
+                    return rem == 0 ? this : new Num(v - rem + value, scale);
+                }
+            } catch (ArithmeticException e) {
+                return create(ceiling(big(), base.big()));
+            }
+        }
+    }
+
+    /**
+     * Helper method to calculate round-up value on {@link BigDecimal} context.
+     * 
+     * @param value A target value.
+     * @param base A base value.
+     * @return A round-up value.
+     */
+    static BigDecimal ceiling(BigDecimal value, BigDecimal base) {
+        BigDecimal rem = value.remainder(base);
+        return rem.signum() == 0 ? value : value.subtract(rem).add(base);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Num floor(Num base) {
+        if (big != null) {
+            return create(big.subtract(big.remainder(base.big())));
+        } else if (base.big != null) {
+            BigDecimal b = big();
+            return create(b.subtract(b.remainder(base.big)));
+        } else {
+            if (base.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
+
+            try {
+                if (scale == base.scale) {
+                    return new Num(v - v % base.v, scale);
+                } else if (scale < base.scale) {
+                    long value = (Math.multiplyExact(v, (long) pow10(base.scale - scale)));
+                    return new Num(value - value % base.v, base.scale);
+                } else {
+                    return new Num(v - v % Math.multiplyExact(base.v, (long) pow10(scale - base.scale)), scale);
+                }
+            } catch (ArithmeticException e) {
+                BigDecimal b = big();
+                return create(b.subtract(b.remainder(base.big())));
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Num decuple(int n) {
         if (big != null) {
             return create(big.scaleByPowerOfTen(n));

@@ -1368,6 +1368,22 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self calculate(int maxScale, Self param1, Self param2, Self param3, Self param4, DoublePentaFunction calculation);
 
     /**
+     * Truncates the current number so that it is a multiple of the specified base value.
+     * 
+     * @param base
+     * @return A rounded-up value
+     */
+    public abstract Self ceiling(Num base);
+
+    /**
+     * Truncates the current number so that it is a multiple of the specified base value.
+     * 
+     * @param base
+     * @return A rounded-down value
+     */
+    public abstract Self floor(Num base);
+
+    /**
      * Returns a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>).
      * The scale of the result is {@code (this.scale() - n)}.
      *

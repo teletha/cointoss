@@ -376,14 +376,4 @@ class OrderBookTest {
     private List<OrderBookPage> unit(int price, int size) {
         return Collections.singletonList(new OrderBookPage(Num.of(price), size));
     }
-
-    @Test
-    void calculateGroupedPrice() {
-        assert OrderBook.calculateGroupedPrice(Num.of(100), Num.of(500)).is(Num.of(0));
-        assert OrderBook.calculateGroupedPrice(Num.of(300), Num.of(500)).is(Num.of(0));
-        assert OrderBook.calculateGroupedPrice(Num.of(500), Num.of(500)).is(Num.of(500));
-        assert OrderBook.calculateGroupedPrice(Num.of(700), Num.of(500)).is(Num.of(500));
-        assert OrderBook.calculateGroupedPrice(Num.of(900), Num.of(500)).is(Num.of(500));
-        assert OrderBook.calculateGroupedPrice(Num.of(1100), Num.of(500)).is(Num.of(1000));
-    }
 }
