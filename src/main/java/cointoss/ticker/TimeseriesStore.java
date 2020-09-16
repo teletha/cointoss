@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentNavigableMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToLongFunction;
@@ -30,6 +29,7 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.util.Chrono;
+import cointoss.util.primitive.ConcurrentSkipListLongMap;
 import psychopath.Directory;
 import psychopath.File;
 
@@ -48,7 +48,7 @@ public final class TimeseriesStore<E> {
     private final ToLongFunction<E> timestampExtractor;
 
     /** The completed data manager. */
-    private final ConcurrentSkipListMap<Long, Segment> indexed = new ConcurrentSkipListMap();
+    private final ConcurrentSkipListLongMap<Segment> indexed = new ConcurrentSkipListLongMap();
 
     /** A number of items. */
     private int size;
@@ -225,13 +225,13 @@ public final class TimeseriesStore<E> {
      * @return The first stored time series item.
      */
     public E first() {
-        Entry<Long, Segment> entry = indexed.firstEntry();
+        Segment entry = indexed.firstValue();
 
         if (entry == null) {
             return null;
         }
 
-        return entry.getValue().first();
+        return entry.first();
     }
 
     /**
@@ -240,13 +240,13 @@ public final class TimeseriesStore<E> {
      * @return The last stored time series item.
      */
     public E last() {
-        Entry<Long, Segment> entry = indexed.lastEntry();
+        Segment entry = indexed.lastValue();
 
         if (entry == null) {
             return null;
         }
 
-        return entry.getValue().last();
+        return entry.last();
     }
 
     /**
