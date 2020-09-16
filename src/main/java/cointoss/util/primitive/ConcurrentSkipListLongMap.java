@@ -203,6 +203,8 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * k, key Values: v, value Comparisons: c
      */
 
+    private static final long EMPTY = Long.MIN_VALUE;
+
     /**
      * The comparator used to maintain order in this map, or null if using natural ordering.
      * (Non-private to simplify access in nested classes.)
@@ -234,13 +236,13 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * nulled out upon deletion.
      */
     static final class Node<V> {
-        final Long key; // currently, never detached
+        final long key; // currently, never detached
 
         V val;
 
         Node<V> next;
 
-        Node(Long key, V value, Node<V> next) {
+        Node(long key, V value, Node<V> next) {
             this.key = key;
             this.val = value;
             this.next = next;
@@ -270,7 +272,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * Compares using comparator or natural ordering if null. Called only by methods that have
      * performed required type checks.
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     static int cpr(Comparator c, Object x, Object y) {
         return (c != null) ? c.compare(x, y) : ((Comparable) x).compareTo(y);
     }
@@ -296,10 +297,10 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         if (b != null && n != null) {
             Node<V> f, p;
             for (;;) {
-                if ((f = n.next) != null && f.key == null) {
+                if ((f = n.next) != null && f.key == EMPTY) {
                     p = f.next; // already marked
                     break;
-                } else if (NEXT.compareAndSet(n, f, new Node<V>(null, null, f))) {
+                } else if (NEXT.compareAndSet(n, f, new Node<V>(EMPTY, null, f))) {
                     p = f; // add marker
                     break;
                 }
@@ -481,7 +482,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             VarHandle.acquireFence();
             int levels = 0; // number of levels descended
             if ((h = head) == null) { // try to initialize
-                Node<V> base = new Node<V>(null, null, null);
+                Node<V> base = new Node<V>(EMPTY, null, null);
                 h = new Index<V>(base, null, null);
                 b = (HEAD.compareAndSet(this, null, h)) ? base : null;
             } else {
@@ -513,7 +514,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
                     V v;
                     int c;
                     if ((n = b.next) == null) {
-                        if (b.key == null) // if empty, type check key now
+                        if (b.key == EMPTY) // if empty, type check key now
                             cpr(cmp, key, key);
                         c = -1;
                     } else if ((k = n.key) == null)
@@ -773,11 +774,11 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
                 for (;;) {
                     Node<V> n;
                     if ((n = b.next) == null) {
-                        if (b.key == null) // empty
+                        if (b.key == EMPTY) // empty
                             break outer;
                         else
                             return b;
-                    } else if (n.key == null)
+                    } else if (n.key == EMPTY)
                         break;
                     else if (n.val == null)
                         unlinkNode(b, n);
@@ -838,7 +839,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
                     Long k;
                     V v;
                     if ((n = b.next) == null) {
-                        if (b.key == null) // empty
+                        if (b.key == EMPTY) // empty
                             break outer;
                         else
                             break; // retry
@@ -891,7 +892,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
                 Long k;
                 int c;
                 if ((n = b.next) == null) {
-                    result = ((rel & LT) != 0 && b.key != null) ? b : null;
+                    result = ((rel & LT) != 0 && b.key != EMPTY) ? b : null;
                     break outer;
                 } else if ((k = n.key) == null)
                     break;
@@ -901,7 +902,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
                     result = n;
                     break outer;
                 } else if (c <= 0 && (rel & LT) != 0) {
-                    result = (b.key != null) ? b : null;
+                    result = (b.key != EMPTY) ? b : null;
                     break outer;
                 } else
                     b = n;
@@ -983,7 +984,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     @Override
     public ConcurrentSkipListLongMap<V> clone() {
         try {
-            @SuppressWarnings("unchecked")
             ConcurrentSkipListLongMap<V> clone = (ConcurrentSkipListLongMap<V>) super.clone();
             clone.keySet = null;
             clone.entrySet = null;
@@ -1010,9 +1010,8 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
          * The maximum possible resulting level is less than the number of bits in a long (64). The
          * preds array tracks the current rightmost node at each level.
          */
-        @SuppressWarnings("unchecked")
         Index<V>[] preds = (Index<V>[]) new Index<?>[64];
-        Node<V> bp = new Node<V>(null, null, null);
+        Node<V> bp = new Node<V>(EMPTY, null, null);
         Index<V> h = preds[0] = new Index<V>(bp, null, null);
         long count = 0;
 
@@ -1082,15 +1081,13 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * @throws ClassNotFoundException if the class of a serialized object could not be found
      * @throws java.io.IOException if an I/O error occurs
      */
-    @SuppressWarnings("unchecked")
     private void readObject(final java.io.ObjectInputStream s) throws java.io.IOException, ClassNotFoundException {
         // Read in the Comparator and any hidden stuff
         s.defaultReadObject();
 
         // Same idea as buildFromSorted
-        @SuppressWarnings("unchecked")
         Index<V>[] preds = (Index<V>[]) new Index<?>[64];
-        Node<V> bp = new Node<V>(null, null, null);
+        Node<V> bp = new Node<V>(EMPTY, null, null);
         Index<V> h = preds[0] = new Index<V>(bp, null, null);
         Comparator<? super Long> cmp = comparator;
         Long prevKey = null;
