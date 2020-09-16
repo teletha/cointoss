@@ -157,7 +157,7 @@ public class Num extends Arithmetic<Num> {
     @Override
     protected Num create(String value) {
         int length = value.length();
-        if (length < 18) {
+        if (length <= 18) {
             int index = value.indexOf('.');
             if (index == -1) {
                 return create(Long.parseLong(value));
@@ -250,7 +250,6 @@ public class Num extends Arithmetic<Num> {
         // BigDecimalMath.toBigDecimal(String) is a drop-in replacement with the same
         // functionality (converting a string representation into a BigDecimal) but it is using
         // a faster recursive implementation.
-        System.out.println(count++ + "   " + value);
         return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
     }
 
