@@ -162,7 +162,7 @@ public class Num extends Arithmetic<Num> {
             if (index == -1) {
                 return create(Long.parseLong(value));
             } else {
-                int lastDigitIndex = findLastNonZeroDigit(value);
+                int lastDigitIndex = findLastNonZeroDigit(value, length);
 
                 // parse as long directly and insanely fast
                 long result = 0;
@@ -224,7 +224,17 @@ public class Num extends Arithmetic<Num> {
                     default:
                         char c = value.charAt(i);
                         if (c == 'E' || c == 'e') {
-                            return create(value.substring(0, i)).decuple(Integer.parseInt(value.substring(i + 1)));
+                            // reculculate the last digit index
+                            lastDigitIndex = findLastNonZeroDigit(value, i);
+
+                            // revert the extra calculation
+                            result /= positives[i - 1 - lastDigitIndex];
+
+                            // Estimate Scale
+                            // scale
+                            // = (textLength - pointIndex) - (textLength - lastDigitIndex) - exp
+                            // = lastDigitIndex - pointIndex - exp
+                            return new Num(negative ? result : -result, lastDigitIndex - index - parseInt(value, i + 1, length));
                         } else {
                             return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
                         }
@@ -253,10 +263,14 @@ public class Num extends Arithmetic<Num> {
         return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
     }
 
-    private static int count;
-
-    private int findLastNonZeroDigit(String value) {
-        for (int i = value.length() - 1; 0 <= i; i--) {
+    /**
+     * Find index of the last non-zero digit.
+     * 
+     * @param value
+     * @return
+     */
+    private static int findLastNonZeroDigit(String value, int last) {
+        for (int i = last - 1; 0 <= i; i--) {
             char c = value.charAt(i);
             if (c != '0') {
                 return i;
@@ -266,6 +280,70 @@ public class Num extends Arithmetic<Num> {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error("Fix Bug!");
+    }
+
+    /**
+     * Parse the text as primitive int insanely fast.
+     * 
+     * @param value A digit exporession.
+     * @param start A start position to parse.
+     * @param end A end position to parse.
+     * @return A pased value.
+     */
+    private static int parseInt(String value, int start, int end) {
+        int result = 0;
+        boolean negative = false;
+        for (int i = start; i < end; i++) {
+            switch (value.charAt(i)) {
+            case '0':
+                result = result * 10;
+                break;
+            case '1':
+                result = result * 10 - 1;
+                break;
+            case '2':
+                result = result * 10 - 2;
+                break;
+            case '3':
+                result = result * 10 - 3;
+                break;
+            case '4':
+                result = result * 10 - 4;
+                break;
+            case '5':
+                result = result * 10 - 5;
+                break;
+            case '6':
+                result = result * 10 - 6;
+                break;
+            case '7':
+                result = result * 10 - 7;
+                break;
+            case '8':
+                result = result * 10 - 8;
+                break;
+            case '9':
+                result = result * 10 - 9;
+                break;
+
+            case '-':
+                if (i != start) {
+                    throw new NumberFormatException("Invalid Format [" + value + "]");
+                }
+                negative = true;
+                break;
+
+            case '+':
+                if (i != start) {
+                    throw new NumberFormatException("Invalid Format [" + value + "]");
+                }
+                break; // ignore
+
+            default:
+                throw new NumberFormatException("Invalid Format [" + value + "]");
+            }
+        }
+        return negative ? result : -result;
     }
 
     /**

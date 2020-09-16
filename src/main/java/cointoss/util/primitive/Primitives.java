@@ -298,6 +298,5 @@ public class Primitives {
         } else {
             return String.valueOf(ratio).concat("%");
         }
-
     }
 }
