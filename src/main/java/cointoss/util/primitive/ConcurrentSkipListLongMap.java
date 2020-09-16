@@ -84,6 +84,7 @@ import java.util.function.Predicate;
  * @param <V> the type of mapped values
  * @since 1.6
  */
+@SuppressWarnings("serial")
 public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableMap<Long, V>, Cloneable, Serializable {
     /*
      * This class implements a tree-like two-dimensionally linked skip list in which the index
@@ -202,15 +203,10 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * k, key Values: v, value Comparisons: c
      */
 
-    private static final long serialVersionUID = -8627078645895051609L;
-
     /**
      * The comparator used to maintain order in this map, or null if using natural ordering.
      * (Non-private to simplify access in nested classes.)
-     * 
-     * @serial
      */
-    @SuppressWarnings("serial") // Conditionally serializable
     final Comparator<? super Long> comparator;
 
     /** Lazily initialized topmost index of the skiplist. */
@@ -296,7 +292,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * @param b if nonnull, predecessor
      * @param n if nonnull, node known to be deleted
      */
-    static <Long, V> void unlinkNode(Node<V> b, Node<V> n) {
+    static <V> void unlinkNode(Node<V> b, Node<V> n) {
         if (b != null && n != null) {
             Node<V> f, p;
             for (;;) {
@@ -2307,11 +2303,9 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         final ConcurrentSkipListLongMap<V> m;
 
         /** lower bound key, or null if from start */
-        @SuppressWarnings("serial") // Conditionally serializable
         private final Long lo;
 
         /** upper bound key, or null if to end */
-        @SuppressWarnings("serial") // Conditionally serializable
         private final Long hi;
 
         /** inclusion flag for lo */
@@ -3049,7 +3043,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * splits relies on some statistical estimation: The expected remaining number of elements of a
      * skip list when advancing either across or down decreases by about 25%.
      */
-    abstract static class CSLMSpliterator<Long, V> {
+    abstract static class CSLMSpliterator<V> {
         final Comparator<? super Long> comparator;
 
         final Long fence; // exclusive upper bound for keys, or null if to end
@@ -3073,7 +3067,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         }
     }
 
-    static final class KeySpliterator<V> extends CSLMSpliterator<Long, V> implements Spliterator<Long> {
+    static final class KeySpliterator<V> extends CSLMSpliterator<V> implements Spliterator<Long> {
         KeySpliterator(Comparator<? super Long> comparator, Index<V> row, Node<V> origin, Long fence, long est) {
             super(comparator, row, origin, fence, est);
         }
@@ -3164,7 +3158,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         return new KeySpliterator<V>(comparator, h, n, null, est);
     }
 
-    static final class ValueSpliterator<V> extends CSLMSpliterator<Long, V> implements Spliterator<V> {
+    static final class ValueSpliterator<V> extends CSLMSpliterator<V> implements Spliterator<V> {
         ValueSpliterator(Comparator<? super Long> comparator, Index<V> row, Node<V> origin, Long fence, long est) {
             super(comparator, row, origin, fence, est);
         }
@@ -3252,7 +3246,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         return new ValueSpliterator<V>(comparator, h, n, null, est);
     }
 
-    static final class EntrySpliterator<V> extends CSLMSpliterator<Long, V> implements Spliterator<Map.Entry<Long, V>> {
+    static final class EntrySpliterator<V> extends CSLMSpliterator<V> implements Spliterator<Map.Entry<Long, V>> {
         EntrySpliterator(Comparator<? super Long> comparator, Index<V> row, Node<V> origin, Long fence, long est) {
             super(comparator, row, origin, fence, est);
         }
