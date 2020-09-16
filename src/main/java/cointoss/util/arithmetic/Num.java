@@ -159,7 +159,18 @@ public class Num extends Arithmetic<Num> {
         if (value.indexOf('.') == -1 && value.length() < 18) {
             return create(Long.parseLong(value));
         } else {
-            return create(new BigDecimal(value, CONTEXT));
+            // https://github.com/eobermuhlner/big-math#why-is-there-bigdecimalmathtobigdecimalstring-if-java-already-has-a-bigdecimalstring-constructor
+            //
+            // The BigDecimal(String) constructor as provided by Java gets increasingly slower if
+            // you pass longer strings to it. The implementation in Java 11 and before is O(n^2).
+            //
+            // If you want to convert very long strings (10000 characters or longer) then this slow
+            // constructor may become an issue.
+            //
+            // BigDecimalMath.toBigDecimal(String) is a drop-in replacement with the same
+            // functionality (converting a string representation into a BigDecimal) but it is using
+            // a faster recursive implementation.
+            return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
         }
     }
 
@@ -394,6 +405,20 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
+    public Num abs() {
+        if (big != null) {
+            return create(big.abs());
+        } else if (v == Long.MIN_VALUE) {
+            return create(big().abs());
+        } else {
+            return new Num(Math.abs(v), scale);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int compareTo(Num o) {
         if (big != null) {
             return big.compareTo(o.big());
@@ -509,6 +534,22 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
+    public Num negate() {
+        if (big != null) {
+            return create(big.negate());
+        } else {
+            try {
+                return new Num(Math.negateExact(v), scale);
+            } catch (ArithmeticException e) {
+                return create(big().negate());
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Num pow(int n) {
         if (big != null) {
             return create(big.pow(n));
@@ -557,52 +598,6 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    public Num sqrt() {
-        if (big != null) {
-            return create(big.sqrt(CONTEXT));
-        } else if (v < 0) {
-            throw new ArithmeticException("Cannot calculate the square root of a negative number.");
-        } else if (scale % 2 == 0) {
-            return create(Math.sqrt(v), () -> scale / 2);
-        } else {
-            return create(big().sqrt(CONTEXT));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num abs() {
-        if (big != null) {
-            return create(big.abs());
-        } else if (v == Long.MIN_VALUE) {
-            return create(big().abs());
-        } else {
-            return new Num(Math.abs(v), scale);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num negate() {
-        if (big != null) {
-            return create(big.negate());
-        } else {
-            try {
-                return new Num(Math.negateExact(v), scale);
-            } catch (ArithmeticException e) {
-                return create(big().negate());
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int scale() {
         if (big != null) {
             return big.stripTrailingZeros().scale();
@@ -633,11 +628,15 @@ public class Num extends Arithmetic<Num> {
      * {@inheritDoc}
      */
     @Override
-    public String format(NumberFormat format) {
+    public Num sqrt() {
         if (big != null) {
-            return format.format(big);
+            return create(big.sqrt(CONTEXT));
+        } else if (v < 0) {
+            throw new ArithmeticException("Cannot calculate the square root of a negative number.");
+        } else if (scale % 2 == 0) {
+            return create(Math.sqrt(v), () -> scale / 2);
         } else {
-            return format.format(doubleValue());
+            return create(big().sqrt(CONTEXT));
         }
     }
 
@@ -686,6 +685,18 @@ public class Num extends Arithmetic<Num> {
             return big.doubleValue();
         } else {
             return Primitives.roundDecimal(v * pow10(-scale), scale);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String format(NumberFormat format) {
+        if (big != null) {
+            return format.format(big);
+        } else {
+            return format.format(doubleValue());
         }
     }
 

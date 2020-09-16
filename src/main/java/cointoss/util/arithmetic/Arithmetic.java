@@ -1368,6 +1368,14 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self calculate(int maxScale, Self param1, Self param2, Self param3, Self param4, DoublePentaFunction calculation);
 
     /**
+     * Returns a {@code Self} whose value is the absolute value of this {@code Self}, and whose
+     * scale is {@code this.scale()}.
+     *
+     * @return {@code abs(this)}
+     */
+    public abstract Self abs();
+
+    /**
      * Truncates the current number so that it is a multiple of the specified base value.
      * 
      * @param base
@@ -1392,6 +1400,14 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @throws ArithmeticException if the scale would be outside the range of a 32-bit integer.
      */
     public abstract Self decuple(int n);
+
+    /**
+     * Returns a {@code Self} whose value is {@code (-this)}, and whose scale is
+     * {@code this.scale()}.
+     *
+     * @return {@code -this}.
+     */
+    public abstract Self negate();
 
     /**
      * Returns a {@code Self} whose value is <code>(this<sup>n</sup>)</code>. The current
@@ -1424,41 +1440,6 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      *             {@code UNNECESSARY}, or {@code n} is out of range.
      */
     public abstract Self pow(double n);
-
-    /**
-     * Returns an approximation to the square root of {@code this} with rounding according to the
-     * context settings.
-     * <p>
-     * The preferred scale of the returned result is equal to {@code this.scale()/2}. The value of
-     * the returned result is always within one ulp of the exact decimal value for the precision in
-     * question. If the rounding mode is {@link RoundingMode#HALF_UP HALF_UP},
-     * {@link RoundingMode#HALF_DOWN HALF_DOWN}, or {@link RoundingMode#HALF_EVEN HALF_EVEN}, the
-     * result is within one half an ulp of the exact decimal value.
-     *
-     * @return the square root of {@code this}.
-     * @throws ArithmeticException if {@code this} is less than zero.
-     * @throws ArithmeticException if an exact result is requested ({@code mc.getPrecision()==0})
-     *             and there is no finite decimal expansion of the exact result
-     * @throws ArithmeticException if {@code (mc.getRoundingMode()==RoundingMode.UNNECESSARY}) and
-     *             the exact result cannot fit in {@code mc.getPrecision()} digits.
-     */
-    public abstract Self sqrt();
-
-    /**
-     * Returns a {@code Self} whose value is the absolute value of this {@code Self}, and whose
-     * scale is {@code this.scale()}.
-     *
-     * @return {@code abs(this)}
-     */
-    public abstract Self abs();
-
-    /**
-     * Returns a {@code Self} whose value is {@code (-this)}, and whose scale is
-     * {@code this.scale()}.
-     *
-     * @return {@code -this}.
-     */
-    public abstract Self negate();
 
     /**
      * Compute scale.
@@ -1499,6 +1480,25 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      *             operation would require rounding.
      */
     public abstract Self scale(int size, RoundingMode mode);
+
+    /**
+     * Returns an approximation to the square root of {@code this} with rounding according to the
+     * context settings.
+     * <p>
+     * The preferred scale of the returned result is equal to {@code this.scale()/2}. The value of
+     * the returned result is always within one ulp of the exact decimal value for the precision in
+     * question. If the rounding mode is {@link RoundingMode#HALF_UP HALF_UP},
+     * {@link RoundingMode#HALF_DOWN HALF_DOWN}, or {@link RoundingMode#HALF_EVEN HALF_EVEN}, the
+     * result is within one half an ulp of the exact decimal value.
+     *
+     * @return the square root of {@code this}.
+     * @throws ArithmeticException if {@code this} is less than zero.
+     * @throws ArithmeticException if an exact result is requested ({@code mc.getPrecision()==0})
+     *             and there is no finite decimal expansion of the exact result
+     * @throws ArithmeticException if {@code (mc.getRoundingMode()==RoundingMode.UNNECESSARY}) and
+     *             the exact result cannot fit in {@code mc.getPrecision()} digits.
+     */
+    public abstract Self sqrt();
 
     /**
      * Format this Selfber.
