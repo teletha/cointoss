@@ -41,7 +41,12 @@ public class BigDecimalBenchmark {
                     .pow(2);
         });
 
-        benchmark.measure("JavaBigDecimal", () -> {
+        benchmark.measure("Java Primitive", () -> {
+            double v = (1000 / 4 + 0.123) * -24.5;
+            return v * v;
+        });
+
+        benchmark.measure("Java BigDecimal", () -> {
             return java.math.BigDecimal.valueOf(1000)
                     .divide(java.math.BigDecimal.valueOf(4))
                     .add(java.math.BigDecimal.valueOf(0.123))
