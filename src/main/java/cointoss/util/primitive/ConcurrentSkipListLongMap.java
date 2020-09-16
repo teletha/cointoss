@@ -285,8 +285,12 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * Compares using comparator or natural ordering if null. Called only by methods that have
      * performed required type checks.
      */
-    static int cpr(Comparator c, long x, long y) {
-        return (c != null) ? c.compare(x, y) : ((Comparable) x).compareTo(y);
+    static int cpr(LongComparator c, long x, long y) {
+        if (c == null) {
+            return Long.compare(x, y);
+        } else {
+            return c.compare(x, y);
+        }
     }
 
     /**
