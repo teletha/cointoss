@@ -34,6 +34,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
 /**
@@ -284,7 +285,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * Compares using comparator or natural ordering if null. Called only by methods that have
      * performed required type checks.
      */
-    static int cpr(Comparator c, Object x, Object y) {
+    static int cpr(Comparator c, long x, long y) {
         return (c != null) ? c.compare(x, y) : ((Comparable) x).compareTo(y);
     }
 
@@ -354,10 +355,10 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * @param key if nonnull the key
      * @return a predecessor node of key, or null if uninitialized or null key
      */
-    private Node<V> findPredecessor(Object key, LongComparator cmp) {
+    private Node<V> findPredecessor(long key, LongComparator cmp) {
         Index<V> q;
         VarHandle.acquireFence();
-        if ((q = head) == null || key == null)
+        if ((q = head) == null || key == EMPTY)
             return null;
         else {
             for (Index<V> r, d;;) {
@@ -393,8 +394,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * @param key the key
      * @return node holding key, or null if no such
      */
-    private Node<V> findNode(Object key) {
-        if (key == null) throw new NullPointerException(); // don't postpone errors
+    private Node<V> findNode(long key) {
         LongComparator cmp = comparator;
         Node<V> b;
         outer: while ((b = findPredecessor(key, cmp)) != null) {
@@ -427,10 +427,9 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * @param key the key
      * @return the value, or null if absent
      */
-    private V doGet(Object key) {
+    private V doGet(long key) {
         Index<V> q;
         VarHandle.acquireFence();
-        if (key == null) throw new NullPointerException();
         LongComparator cmp = comparator;
         V result = null;
         if ((q = head) != null) {
@@ -485,8 +484,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * @param onlyIfAbsent if should not insert if already present
      * @return the old value, or null if newly inserted
      */
-    private V doPut(Long key, V value, boolean onlyIfAbsent) {
-        if (key == null) throw new NullPointerException();
+    private V doPut(long key, V value, boolean onlyIfAbsent) {
         LongComparator cmp = comparator;
         for (;;) {
             Index<V> h;
@@ -634,8 +632,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * @param value if non-null, the value that must be associated with key
      * @return the node, or null if not found
      */
-    final V doRemove(Object key, Object value) {
-        if (key == null) throw new NullPointerException();
+    final V doRemove(long key, Object value) {
         LongComparator cmp = comparator;
         V result = null;
         Node<V> b;
@@ -930,7 +927,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * @param rel the relation -- OR'ed combination of EQ, LT, GT
      * @return Entry fitting relation, or null if no such
      */
-    final AbstractMap.SimpleImmutableEntry<Long, V> findNearEntry(Long key, int rel, LongComparator cmp) {
+    final AbstractMap.SimpleImmutableEntry<Long, V> findNearEntry(long key, int rel, LongComparator cmp) {
         for (;;) {
             Node<V> n;
             V v;
@@ -1134,6 +1131,19 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      */
     @Override
     public boolean containsKey(Object key) {
+        return doGet((Long) key) != null;
+    }
+
+    /**
+     * Returns {@code true} if this map contains a mapping for the specified key.
+     *
+     * @param key key whose presence in this map is to be tested
+     * @return {@code true} if this map contains a mapping for the specified key
+     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
+     *             the map
+     * @throws NullPointerException if the specified key is null
+     */
+    public boolean containsKey(long key) {
         return doGet(key) != null;
     }
 
@@ -1153,6 +1163,24 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      */
     @Override
     public V get(Object key) {
+        return doGet((Long) key);
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped, or {@code null} if this map contains
+     * no mapping for the key.
+     *
+     * <p>
+     * More formally, if this map contains a mapping from a key {@code k} to a value {@code v} such
+     * that {@code key} compares equal to {@code k} according to the map's ordering, then this
+     * method returns {@code v}; otherwise it returns {@code null}. (There can be at most one such
+     * mapping.)
+     *
+     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
+     *             the map
+     * @throws NullPointerException if the specified key is null
+     */
+    public V get(long key) {
         return doGet(key);
     }
 
@@ -1168,6 +1196,21 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      */
     @Override
     public V getOrDefault(Object key, V defaultValue) {
+        V v;
+        return (v = doGet((Long) key)) == null ? defaultValue : v;
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped, or the given defaultValue if this map
+     * contains no mapping for the key.
+     *
+     * @param key the key
+     * @param defaultValue the value to return if this map contains no mapping for the given key
+     * @return the mapping for the key, if present; else the defaultValue
+     * @throws NullPointerException if the specified key is null
+     * @since 1.8
+     */
+    public V getOrDefault(long key, V defaultValue) {
         V v;
         return (v = doGet(key)) == null ? defaultValue : v;
     }
@@ -1191,6 +1234,23 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     }
 
     /**
+     * Associates the specified value with the specified key in this map. If the map previously
+     * contained a mapping for the key, the old value is replaced.
+     *
+     * @param key key with which the specified value is to be associated
+     * @param value value to be associated with the specified key
+     * @return the previous value associated with the specified key, or {@code null} if there was no
+     *         mapping for the key
+     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
+     *             the map
+     * @throws NullPointerException if the specified key or value is null
+     */
+    public V put(long key, V value) {
+        if (value == null) throw new NullPointerException();
+        return doPut(key, value, false);
+    }
+
+    /**
      * Removes the mapping for the specified key from this map if present.
      *
      * @param key key for which mapping should be removed
@@ -1202,6 +1262,20 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      */
     @Override
     public V remove(Object key) {
+        return doRemove((Long) key, null);
+    }
+
+    /**
+     * Removes the mapping for the specified key from this map if present.
+     *
+     * @param key key for which mapping should be removed
+     * @return the previous value associated with the specified key, or {@code null} if there was no
+     *         mapping for the key
+     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
+     *             the map
+     * @throws NullPointerException if the specified key is null
+     */
+    public V remove(long key) {
         return doRemove(key, null);
     }
 
@@ -1297,6 +1371,26 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     @Override
     public V computeIfAbsent(Long key, Function<? super Long, ? extends V> mappingFunction) {
         if (key == null || mappingFunction == null) throw new NullPointerException();
+        V v, p, r;
+        if ((v = doGet(key)) == null && (r = mappingFunction.apply(key)) != null) v = (p = doPut(key, r, true)) == null ? r : p;
+        return v;
+    }
+
+    /**
+     * If the specified key is not already associated with a value, attempts to compute its value
+     * using the given mapping function and enters it into this map unless {@code null}. The
+     * function is <em>NOT</em> guaranteed to be applied once atomically only if the value is not
+     * present.
+     *
+     * @param key key with which the specified value is to be associated
+     * @param mappingFunction the function to compute a value
+     * @return the current (existing or computed) value associated with the specified key, or null
+     *         if the computed value is null
+     * @throws NullPointerException if the specified key is null or the mappingFunction is null
+     * @since 1.8
+     */
+    public V computeIfAbsent(long key, LongFunction<? extends V> mappingFunction) {
+        if (key == EMPTY || mappingFunction == null) throw new NullPointerException();
         V v, p, r;
         if ((v = doGet(key)) == null && (r = mappingFunction.apply(key)) != null) v = (p = doPut(key, r, true)) == null ? r : p;
         return v;
@@ -1537,14 +1631,14 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
                 Node<V> b, n;
                 if ((b = baseHead()) != null) {
                     while ((n = b.next) != null) {
-                        Long k;
+                        long k;
                         V v;
-                        if ((v = n.val) != null && (k = n.key) != null) {
+                        if ((v = n.val) != null && (k = n.key) != EMPTY) {
                             if (!it.hasNext()) return false;
                             Map.Entry<?, ?> e = it.next();
-                            Object mk = e.getKey();
+                            long mk = (Long) e.getKey();
                             Object mv = e.getValue();
-                            if (mk == null || mv == null) return false;
+                            if (mk == EMPTY || mv == null) return false;
                             try {
                                 if (cpr(cmp, k, mk) != 0) return false;
                             } catch (ClassCastException cce) {
@@ -1608,6 +1702,17 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     @Override
     public boolean remove(Object key, Object value) {
         if (key == null) throw new NullPointerException();
+        return value != null && doRemove((Long) key, value) != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
+     *             the map
+     * @throws NullPointerException if the specified key is null
+     */
+    public boolean remove(long key, Object value) {
         return value != null && doRemove(key, value) != null;
     }
 
@@ -1621,6 +1726,26 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     @Override
     public boolean replace(Long key, V oldValue, V newValue) {
         if (key == null || oldValue == null || newValue == null) throw new NullPointerException();
+        for (;;) {
+            Node<V> n;
+            V v;
+            if ((n = findNode(key)) == null) return false;
+            if ((v = n.val) != null) {
+                if (!oldValue.equals(v)) return false;
+                if (VAL.compareAndSet(n, v, newValue)) return true;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
+     *             the map
+     * @throws NullPointerException if any of the arguments are null
+     */
+    public boolean replace(long key, V oldValue, V newValue) {
+        if (key == EMPTY || oldValue == null || newValue == null) throw new NullPointerException();
         for (;;) {
             Node<V> n;
             V v;
@@ -1652,6 +1777,25 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the previous value associated with the specified key, or {@code null} if there was no
+     *         mapping for the key
+     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
+     *             the map
+     * @throws NullPointerException if the specified key or value is null
+     */
+    public V replace(long key, V value) {
+        if (key == EMPTY || value == null) throw new NullPointerException();
+        for (;;) {
+            Node<V> n;
+            V v;
+            if ((n = findNode(key)) == null) return null;
+            if ((v = n.val) != null && VAL.compareAndSet(n, v, value)) return v;
+        }
+    }
+
     /* ------ SortedMap API methods ------ */
 
     @Override
@@ -1672,8 +1816,26 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     /**
      * @throws NoSuchElementException {@inheritDoc}
      */
+    public long firstKeyAsLong() {
+        Node<V> n = findFirst();
+        if (n == null) throw new NoSuchElementException();
+        return n.key;
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
     @Override
     public Long lastKey() {
+        Node<V> n = findLast();
+        if (n == null) throw new NoSuchElementException();
+        return n.key;
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public long lastKeyAsLong() {
         Node<V> n = findLast();
         if (n == null) throw new NoSuchElementException();
         return n.key;
@@ -1754,6 +1916,18 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      */
     @Override
     public Map.Entry<Long, V> lowerEntry(Long key) {
+        return findNearEntry(key, LT, comparator);
+    }
+
+    /**
+     * Returns a key-value mapping associated with the greatest key strictly less than the given
+     * key, or {@code null} if there is no such key. The returned entry does <em>not</em> support
+     * the {@code Entry.setValue} method.
+     *
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public Map.Entry<Long, V> lowerEntry(long key) {
         return findNearEntry(key, LT, comparator);
     }
 
@@ -2335,22 +2509,21 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
 
         /* ---------------- Utilities -------------- */
 
-        boolean tooLow(Object key, LongComparator cmp) {
+        boolean tooLow(long key, LongComparator cmp) {
             int c;
             return (lo != null && ((c = cpr(cmp, key, lo)) < 0 || (c == 0 && !loInclusive)));
         }
 
-        boolean tooHigh(Object key, LongComparator cmp) {
+        boolean tooHigh(long key, LongComparator cmp) {
             int c;
             return (hi != null && ((c = cpr(cmp, key, hi)) > 0 || (c == 0 && !hiInclusive)));
         }
 
-        boolean inBounds(Object key, LongComparator cmp) {
+        boolean inBounds(long key, LongComparator cmp) {
             return !tooLow(key, cmp) && !tooHigh(key, cmp);
         }
 
-        void checkKeyBounds(Long key, LongComparator cmp) {
-            if (key == null) throw new NullPointerException();
+        void checkKeyBounds(long key, LongComparator cmp) {
             if (!inBounds(key, cmp)) throw new IllegalArgumentException("key out of range");
         }
 
@@ -2522,16 +2695,23 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         }
 
         /* ---------------- Map API methods -------------- */
-
         @Override
         public boolean containsKey(Object key) {
             if (key == null) throw new NullPointerException();
+            return inBounds((Long) key, m.comparator) && m.containsKey(key);
+        }
+
+        public boolean containsKey(long key) {
             return inBounds(key, m.comparator) && m.containsKey(key);
         }
 
         @Override
         public V get(Object key) {
             if (key == null) throw new NullPointerException();
+            return (!inBounds((Long) key, m.comparator)) ? null : m.get(key);
+        }
+
+        public V get(long key) {
             return (!inBounds(key, m.comparator)) ? null : m.get(key);
         }
 
@@ -2543,6 +2723,10 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
 
         @Override
         public V remove(Object key) {
+            return (!inBounds((Long) key, m.comparator)) ? null : m.remove(key);
+        }
+
+        public V remove(long key) {
             return (!inBounds(key, m.comparator)) ? null : m.remove(key);
         }
 
@@ -2589,8 +2773,17 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             return m.putIfAbsent(key, value);
         }
 
+        public V putIfAbsent(long key, V value) {
+            checkKeyBounds(key, m.comparator);
+            return m.putIfAbsent(key, value);
+        }
+
         @Override
         public boolean remove(Object key, Object value) {
+            return inBounds((Long) key, m.comparator) && m.remove(key, value);
+        }
+
+        public boolean remove(long key, Object value) {
             return inBounds(key, m.comparator) && m.remove(key, value);
         }
 
@@ -2600,8 +2793,18 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             return m.replace(key, oldValue, newValue);
         }
 
+        public boolean replace(long key, V oldValue, V newValue) {
+            checkKeyBounds(key, m.comparator);
+            return m.replace(key, oldValue, newValue);
+        }
+
         @Override
         public V replace(Long key, V value) {
+            checkKeyBounds(key, m.comparator);
+            return m.replace(key, value);
+        }
+
+        public V replace(long key, V value) {
             checkKeyBounds(key, m.comparator);
             return m.replace(key, value);
         }
