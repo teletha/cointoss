@@ -1376,20 +1376,100 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self abs();
 
     /**
-     * Truncates the current number so that it is a multiple of the specified base value.
+     * Round up to the nearest multiple of the specified base value.
      * 
-     * @param base
-     * @return A rounded-up value
+     * @param base A base value.
+     * @return A round-up value
      */
-    public abstract Self ceiling(Num base);
+    public final Self ceiling(int base) {
+        return ceiling(create(base));
+    }
 
     /**
-     * Truncates the current number so that it is a multiple of the specified base value.
+     * Round up to the nearest multiple of the specified base value.
      * 
-     * @param base
-     * @return A rounded-down value
+     * @param base A base value.
+     * @return A round-up value
      */
-    public abstract Self floor(Num base);
+    public final Self ceiling(long base) {
+        return ceiling(create(base));
+    }
+
+    /**
+     * Round up to the nearest multiple of the specified base value.
+     * 
+     * @param base A base value.
+     * @return A round-up value
+     */
+    public final Self ceiling(double base) {
+        return ceiling(create(base));
+    }
+
+    /**
+     * Round up to the nearest multiple of the specified base value.
+     * 
+     * @param base A base value.
+     * @return A round-up value
+     */
+    public final Self ceiling(String base) {
+        return ceiling(create(base));
+    }
+
+    /**
+     * Round up to the nearest multiple of the specified base value.
+     * 
+     * @param base A base value.
+     * @return A round-up value
+     */
+    public abstract Self ceiling(Self base);
+
+    /**
+     * Round down to the nearest multiple of the specified base value.
+     * 
+     * @param base A base value.
+     * @return A round-down value
+     */
+    public final Self floor(int base) {
+        return floor(create(base));
+    }
+
+    /**
+     * Round down to the nearest multiple of the specified base value.
+     * 
+     * @param base A base value.
+     * @return A round-down value
+     */
+    public final Self floor(long base) {
+        return floor(create(base));
+    }
+
+    /**
+     * Round down to the nearest multiple of the specified base value.
+     * 
+     * @param base A base value.
+     * @return A round-down value
+     */
+    public final Self floor(double base) {
+        return floor(create(base));
+    }
+
+    /**
+     * Round down to the nearest multiple of the specified base value.
+     * 
+     * @param base A base value.
+     * @return A round-down value
+     */
+    public final Self floor(String base) {
+        return floor(create(base));
+    }
+
+    /**
+     * Round down to the nearest multiple of the specified base value.
+     * 
+     * @param base A base value.
+     * @return A round-down value
+     */
+    public abstract Self floor(Self base);
 
     /**
      * Returns a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>).
