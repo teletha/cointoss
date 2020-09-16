@@ -236,6 +236,7 @@ public class Num extends Arithmetic<Num> {
                             // = lastDigitIndex - pointIndex - exp
                             return new Num(negative ? result : -result, lastDigitIndex - index - parseInt(value, i + 1, length));
                         } else {
+                            // fallback
                             return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
                         }
                     }
@@ -266,8 +267,8 @@ public class Num extends Arithmetic<Num> {
     /**
      * Find index of the last non-zero digit.
      * 
-     * @param value
-     * @return
+     * @param value A targe digit expression.
+     * @return A result.
      */
     private static int findLastNonZeroDigit(String value, int last) {
         for (int i = last - 1; 0 <= i; i--) {
@@ -285,7 +286,7 @@ public class Num extends Arithmetic<Num> {
     /**
      * Parse the text as primitive int insanely fast.
      * 
-     * @param value A digit exporession.
+     * @param value A digit expression.
      * @param start A start position to parse.
      * @param end A end position to parse.
      * @return A pased value.
