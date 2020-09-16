@@ -28,6 +28,28 @@ class NumTest {
     }
 
     @Test
+    void parseStringDecimal() {
+        assert Num.of("0.1234").is(0.1234);
+        assert Num.of("0.00123").is(0.00123);
+        assert Num.of("1.234").is(1.234);
+        assert Num.of("12.34").is(12.34);
+        assert Num.of("100.004").is(100.004);
+        assert Num.of("1.000").is(1);
+        assert Num.of("100.000").is(100);
+        assert Num.of("-0.00100").is(-0.001);
+        assert Num.of("-12.0120").is(-12.012);
+    }
+
+    @Test
+    void parseStringExponential() {
+        assert Num.of("1.7E-7").is(0.00000017);
+        assert Num.of("1.0E-4").is(0.0001);
+        assert Num.of("0.12E-2").is(0.0012);
+        assert Num.of("12.34e-5").is(0.0001234);
+        assert Num.of("-12.34e-5").is(-0.0001234);
+    }
+
+    @Test
     void parseLong() {
         for (int i = 0; i <= 18; i++) {
             long value = (long) Math.pow(10, i);

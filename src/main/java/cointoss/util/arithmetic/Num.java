@@ -156,22 +156,117 @@ public class Num extends Arithmetic<Num> {
      */
     @Override
     protected Num create(String value) {
-        if (value.indexOf('.') == -1 && value.length() < 18) {
-            return create(Long.parseLong(value));
-        } else {
-            // https://github.com/eobermuhlner/big-math#why-is-there-bigdecimalmathtobigdecimalstring-if-java-already-has-a-bigdecimalstring-constructor
-            //
-            // The BigDecimal(String) constructor as provided by Java gets increasingly slower if
-            // you pass longer strings to it. The implementation in Java 11 and before is O(n^2).
-            //
-            // If you want to convert very long strings (10000 characters or longer) then this slow
-            // constructor may become an issue.
-            //
-            // BigDecimalMath.toBigDecimal(String) is a drop-in replacement with the same
-            // functionality (converting a string representation into a BigDecimal) but it is using
-            // a faster recursive implementation.
-            return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
+        int length = value.length();
+        if (length < 18) {
+            int index = value.indexOf('.');
+            if (index == -1) {
+                return create(Long.parseLong(value));
+            } else {
+                int lastDigitIndex = findLastNonZeroDigit(value);
+
+                // parse as long directly and insanely fast
+                long result = 0;
+                boolean negative = false;
+                length = 1 + lastDigitIndex;
+                for (int i = 0; i < length; i++) {
+                    switch (value.charAt(i)) {
+                    case '0':
+                        result = result * 10;
+                        break;
+                    case '1':
+                        result = result * 10 - 1;
+                        break;
+                    case '2':
+                        result = result * 10 - 2;
+                        break;
+                    case '3':
+                        result = result * 10 - 3;
+                        break;
+                    case '4':
+                        result = result * 10 - 4;
+                        break;
+                    case '5':
+                        result = result * 10 - 5;
+                        break;
+                    case '6':
+                        result = result * 10 - 6;
+                        break;
+                    case '7':
+                        result = result * 10 - 7;
+                        break;
+                    case '8':
+                        result = result * 10 - 8;
+                        break;
+                    case '9':
+                        result = result * 10 - 9;
+                        break;
+
+                    case '-':
+                        if (i != 0) {
+                            throw new NumberFormatException("Invalid Format [" + value + "]");
+                        }
+                        negative = true;
+                        break;
+
+                    case '+':
+                        if (i != 0) {
+                            throw new NumberFormatException("Invalid Format [" + value + "]");
+                        }
+                        break; // ignore
+
+                    case '.':
+                        break; // ignore
+
+                    // Don't apply exponential case, it occurs using lookuptable instruction
+                    // instead of tableswitch instruction.
+                    // case 'e':
+                    // case 'E':
+                    default:
+                        char c = value.charAt(i);
+                        if (c == 'E' || c == 'e') {
+                            return create(value.substring(0, i)).decuple(Integer.parseInt(value.substring(i + 1)));
+                        } else {
+                            return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
+                        }
+                    }
+                }
+
+                // Estimate Scale
+                // scale
+                // = (textLength - pointIndex) - (textLength - lastDigitIndex)
+                // = lastDigitIndex - pointIndex
+                return new Num(negative ? result : -result, lastDigitIndex - index);
+            }
         }
+
+        // https://github.com/eobermuhlner/big-math#why-is-there-bigdecimalmathtobigdecimalstring-if-java-already-has-a-bigdecimalstring-constructor
+        //
+        // The BigDecimal(String) constructor as provided by Java gets increasingly slower if
+        // you pass longer strings to it. The implementation in Java 11 and before is O(n^2).
+        //
+        // If you want to convert very long strings (10000 characters or longer) then this slow
+        // constructor may become an issue.
+        //
+        // BigDecimalMath.toBigDecimal(String) is a drop-in replacement with the same
+        // functionality (converting a string representation into a BigDecimal) but it is using
+        // a faster recursive implementation.
+        System.out.println(count++ + "   " + value);
+        return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
+    }
+
+    private static int count;
+
+    private int findLastNonZeroDigit(String value) {
+        for (int i = value.length() - 1; 0 <= i; i--) {
+            char c = value.charAt(i);
+            if (c != '0') {
+                return i;
+            }
+        }
+
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error("Fix Bug!");
     }
 
     /**
