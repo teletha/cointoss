@@ -25,7 +25,7 @@ class ArithmeticCeilingTest extends ArithmeticTestSupport {
     @ArithmeticTest
     void ceiling(int value) {
         if (!zeroIsEqualTo(value)) {
-            assert equality(Num.of(100).ceiling(Num.of(value)), Num.ceiling(big(100), big(value)));
+            assert equality(Num.of(100).ceiling(Num.of(value)), BigDecimals.ceiling(big(100), big(value)));
         } else {
             Assertions.assertThrows(ArithmeticException.class, () -> Num.of(100).ceiling(Num.of(value)));
         }
@@ -34,7 +34,7 @@ class ArithmeticCeilingTest extends ArithmeticTestSupport {
     @ArithmeticTest
     void ceiling(double value) {
         if (!zeroIsEqualTo(value)) {
-            assert equalityVaguely(Num.of(100).ceiling(Num.of(value)), Num.ceiling(big(100), big(value)));
+            assert equalityVaguely(Num.of(100).ceiling(Num.of(value)), BigDecimals.ceiling(big(100), big(value)));
         } else {
             Assertions.assertThrows(ArithmeticException.class, () -> Num.of(100).ceiling(Num.of(value)));
         }

@@ -441,9 +441,9 @@ public class Num extends Arithmetic<Num> {
     @Override
     public Num ceiling(Num base) {
         if (big != null) {
-            return create(ceiling(big, base.big()));
+            return create(BigDecimals.ceiling(big, base.big()));
         } else if (base.big != null) {
-            return create(ceiling(big(), base.big));
+            return create(BigDecimals.ceiling(big(), base.big));
         } else {
             if (base.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
 
@@ -461,21 +461,9 @@ public class Num extends Arithmetic<Num> {
                     return rem == 0 ? this : new Num(v - rem + value, scale);
                 }
             } catch (ArithmeticException e) {
-                return create(ceiling(big(), base.big()));
+                return create(BigDecimals.ceiling(big(), base.big()));
             }
         }
-    }
-
-    /**
-     * Helper method to calculate round-up value on {@link BigDecimal} context.
-     * 
-     * @param value A target value.
-     * @param base A base value.
-     * @return A round-up value.
-     */
-    static BigDecimal ceiling(BigDecimal value, BigDecimal base) {
-        BigDecimal rem = value.remainder(base);
-        return rem.signum() == 0 ? value : value.subtract(rem).add(base);
     }
 
     /**
@@ -484,10 +472,9 @@ public class Num extends Arithmetic<Num> {
     @Override
     public Num floor(Num base) {
         if (big != null) {
-            return create(big.subtract(big.remainder(base.big())));
+            return create(BigDecimals.floor(big, base.big()));
         } else if (base.big != null) {
-            BigDecimal b = big();
-            return create(b.subtract(b.remainder(base.big)));
+            return create(BigDecimals.floor(big(), base.big));
         } else {
             if (base.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
 
@@ -501,8 +488,7 @@ public class Num extends Arithmetic<Num> {
                     return new Num(v - v % Math.multiplyExact(base.v, (long) pow10(scale - base.scale)), scale);
                 }
             } catch (ArithmeticException e) {
-                BigDecimal b = big();
-                return create(b.subtract(b.remainder(base.big())));
+                return create(BigDecimals.floor(big(), base.big()));
             }
         }
     }
