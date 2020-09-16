@@ -323,6 +323,61 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
+     * Calculates the difference from a given value based on the direction.
+     * 
+     * @param direction A direction.
+     * @param target A target value.
+     * @return A difference value.
+     */
+    public final Self diff(Directional direction, int target) {
+        return diff(direction, create(target));
+    }
+
+    /**
+     * Calculates the difference from a given value based on the direction.
+     * 
+     * @param direction A direction.
+     * @param target A target value.
+     * @return A difference value.
+     */
+    public final Self diff(Directional direction, long target) {
+        return diff(direction, create(target));
+    }
+
+    /**
+     * Calculates the difference from a given value based on the direction.
+     * 
+     * @param direction A direction.
+     * @param target A target value.
+     * @return A difference value.
+     */
+    public final Self diff(Directional direction, double target) {
+        return diff(direction, create(target));
+    }
+
+    /**
+     * Calculates the difference from a given value based on the direction.
+     * 
+     * @param direction A direction.
+     * @param target A target value.
+     * @return A difference value.
+     */
+    public final Self diff(Directional direction, String target) {
+        return diff(direction, create(target));
+    }
+
+    /**
+     * Calculates the difference from a given value based on the direction.
+     * 
+     * @param direction A direction.
+     * @param target A target value.
+     * @return A difference value.
+     */
+    public final Self diff(Directional direction, Self target) {
+        return direction.isSell() ? (Self) target.minus(this) : minus(target);
+    }
+
+    /**
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
      * to the context settings.
      * 
@@ -1255,26 +1310,6 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      */
     public final boolean isLessThanOrEqual(Directional direction, Self other) {
         return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
-    }
-
-    /**
-     * Decrease amount by the specified {@link Directional}.
-     * 
-     * @param direction A current side.
-     * @param size A decrease size.
-     */
-    public final Self diff(Directional direction, int size) {
-        return diff(direction, create(size));
-    }
-
-    /**
-     * Decrease amount by the specified {@link Directional}.
-     * 
-     * @param direction A current side.
-     * @param size A decrease size.
-     */
-    public final Self diff(Directional direction, Self size) {
-        return direction.isSell() ? (Self) size.minus(this) : minus(size);
     }
 
     /**
