@@ -83,7 +83,6 @@ import java.util.function.Predicate;
  * @author Doug Lea
  * @param <Long> the type of keys maintained by this map
  * @param <V> the type of mapped values
- * @since 1.6
  */
 @SuppressWarnings("serial")
 public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V>, Cloneable, Serializable {
@@ -102,123 +101,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
 
     private static final AtomicReferenceFieldUpdater<Index, Index> RIGHT = AtomicReferenceFieldUpdater
             .newUpdater(Index.class, Index.class, "right");
-
-    /*
-     * This class implements a tree-like two-dimensionally linked skip list in which the index
-     * levels are represented in separate nodes from the base nodes holding data. There are two
-     * reasons for taking this approach instead of the usual array-based structure: 1) Array based
-     * implementations seem to encounter more complexity and overhead 2) We can use cheaper
-     * algorithms for the heavily-traversed index lists than can be used for the base lists. Here's
-     * a picture of some of the basics for a possible list with 2 levels of index: Head nodes Index
-     * nodes +-+ right +-+ +-+ |2|---------------->| |--------------------->| |->null +-+ +-+ +-+ |
-     * down | | v v v +-+ +-+ +-+ +-+ +-+ +-+ |1|----------->| |->| |------>| |----------->|
-     * |------>| |->null +-+ +-+ +-+ +-+ +-+ +-+ v | | | | | Nodes next v v v v v +-+ +-+ +-+ +-+
-     * +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ |
-     * |->|A|->|B|->|C|->|D|->|E|->|F|->|G|->|H|->|I|->|J|->|K|->null +-+ +-+ +-+ +-+ +-+ +-+ +-+
-     * +-+ +-+ +-+ +-+ +-+ The base lists use a variant of the HM linked ordered set algorithm. See
-     * Tim Harris, "A pragmatic implementation of non-blocking linked lists"
-     * http://www.cl.cam.ac.uk/~tlh20/publications.html and Maged Michael "High Performance Dynamic
-     * Lock-Free Hash Tables and List-Based Sets"
-     * http://www.research.ibm.com/people/m/michael/pubs.htm. The basic idea in these lists is to
-     * mark the "next" pointers of deleted nodes when deleting to avoid conflicts with concurrent
-     * insertions, and when traversing to keep track of triples (predecessor, node, successor) in
-     * order to detect when and how to unlink these deleted nodes. Rather than using mark-bits to
-     * mark list deletions (which can be slow and space-intensive using AtomicMarkedReference),
-     * nodes use direct CAS'able next pointers. On deletion, instead of marking a pointer, they
-     * splice in another node that can be thought of as standing for a marked pointer (see method
-     * unlinkNode). Using plain nodes acts roughly like "boxed" implementations of marked pointers,
-     * but uses new nodes only when nodes are deleted, not for every link. This requires less space
-     * and supports faster traversal. Even if marked references were better supported by JVMs,
-     * traversal using this technique might still be faster because any search need only read ahead
-     * one more node than otherwise required (to check for trailing marker) rather than unmasking
-     * mark bits or whatever on each read. This approach maintains the essential property needed in
-     * the HM algorithm of changing the next-pointer of a deleted node so that any other CAS of it
-     * will fail, but implements the idea by changing the pointer to point to a different node (with
-     * otherwise illegal null fields), not by marking it. While it would be possible to further
-     * squeeze space by defining marker nodes not to have key/value fields, it isn't worth the extra
-     * type-testing overhead. The deletion markers are rarely encountered during traversal, are
-     * easily detected via null checks that are needed anyway, and are normally quickly garbage
-     * collected. (Note that this technique would not work well in systems without garbage
-     * collection.) In addition to using deletion markers, the lists also use nullness of value
-     * fields to indicate deletion, in a style similar to typical lazy-deletion schemes. If a node's
-     * value is null, then it is considered logically deleted and ignored even though it is still
-     * reachable. Here's the sequence of events for a deletion of node n with predecessor b and
-     * successor f, initially: +------+ +------+ +------+ ... | b |------>| n |----->| f | ...
-     * +------+ +------+ +------+ 1. CAS n's value field from non-null to null. Traversals
-     * encountering a node with null value ignore it. However, ongoing insertions and deletions
-     * might still modify n's next pointer. 2. CAS n's next pointer to point to a new marker node.
-     * From this point on, no other nodes can be appended to n. which avoids deletion errors in
-     * CAS-based linked lists. +------+ +------+ +------+ +------+ ... | b |------>| n
-     * |----->|marker|------>| f | ... +------+ +------+ +------+ +------+ 3. CAS b's next pointer
-     * over both n and its marker. From this point on, no new traversals will encounter n, and it
-     * can eventually be GCed. +------+ +------+ ... | b |----------------------------------->| f |
-     * ... +------+ +------+ A failure at step 1 leads to simple retry due to a lost race with
-     * another operation. Steps 2-3 can fail because some other thread noticed during a traversal a
-     * node with null value and helped out by marking and/or unlinking. This helping-out ensures
-     * that no thread can become stuck waiting for progress of the deleting thread. Skip lists add
-     * indexing to this scheme, so that the base-level traversals start close to the locations being
-     * found, inserted or deleted -- usually base level traversals only traverse a few nodes. This
-     * doesn't change the basic algorithm except for the need to make sure base traversals start at
-     * predecessors (here, b) that are not (structurally) deleted, otherwise retrying after
-     * processing the deletion. Index levels are maintained using CAS to link and unlink successors
-     * ("right" fields). Races are allowed in index-list operations that can (rarely) fail to link
-     * in a new index node. (We can't do this of course for data nodes.) However, even when this
-     * happens, the index lists correctly guide search. This can impact performance, but since skip
-     * lists are probabilistic anyway, the net result is that under contention, the effective "p"
-     * value may be lower than its nominal value. Index insertion and deletion sometimes require a
-     * separate traversal pass occurring after the base-level action, to add or remove index nodes.
-     * This adds to single-threaded overhead, but improves contended multithreaded performance by
-     * narrowing interference windows, and allows deletion to ensure that all index nodes will be
-     * made unreachable upon return from a public remove operation, thus avoiding unwanted garbage
-     * retention. Indexing uses skip list parameters that maintain good search performance while
-     * using sparser-than-usual indices: The hardwired parameters k=1, p=0.5 (see method doPut) mean
-     * that about one-quarter of the nodes have indices. Of those that do, half have one level, a
-     * quarter have two, and so on (see Pugh's Skip List Cookbook, sec 3.4), up to a maximum of 62
-     * levels (appropriate for up to 2^63 elements). The expected total space requirement for a map
-     * is slightly less than for the current implementation of java.util.TreeMap. Changing the level
-     * of the index (i.e, the height of the tree-like structure) also uses CAS. Creation of an index
-     * with height greater than the current level adds a level to the head index by CAS'ing on a new
-     * top-most head. To maintain good performance after a lot of removals, deletion methods
-     * heuristically try to reduce the height if the topmost levels appear to be empty. This may
-     * encounter races in which it is possible (but rare) to reduce and "lose" a level just as it is
-     * about to contain an index (that will then never be encountered). This does no structural
-     * harm, and in practice appears to be a better option than allowing unrestrained growth of
-     * levels. This class provides concurrent-reader-style memory consistency, ensuring that
-     * read-only methods report status and/or values no staler than those holding at method entry.
-     * This is done by performing all publication and structural updates using (volatile) CAS,
-     * placing an acquireFence in a few access methods, and ensuring that linked objects are
-     * transitively acquired via dependent reads (normally once) unless performing a volatile-mode
-     * CAS operation (that also acts as an acquire and release). This form of fence-hoisting is
-     * similar to RCU and related techniques (see McKenney's online book
-     * https://www.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html) It minimizes
-     * overhead that may otherwise occur when using so many volatile-mode reads. Using explicit
-     * acquireFences is logistically easier than targeting particular fields to be read in acquire
-     * mode: fences are just hoisted up as far as possible, to the entry points or loop headers of a
-     * few methods. A potential disadvantage is that these few remaining fences are not easily
-     * optimized away by compilers under exclusively single-thread use. It requires some care to
-     * avoid volatile mode reads of other fields. (Note that the memory semantics of a reference
-     * dependently read in plain mode exactly once are equivalent to those for atomic opaque mode.)
-     * Iterators and other traversals encounter each node and value exactly once. Other operations
-     * locate an element (or position to insert an element) via a sequence of dereferences. This
-     * search is broken into two parts. Method findPredecessor (and its specialized embeddings)
-     * searches index nodes only, returning a base-level predecessor of the key. Callers carry out
-     * the base-level search, restarting if encountering a marker preventing link modification. In
-     * some cases, it is possible to encounter a node multiple times while descending levels. For
-     * mutative operations, the reported value is validated using CAS (else retrying), preserving
-     * linearizability with respect to each other. Others may return any (non-null) value holding in
-     * the course of the method call. (Search-based methods also include some useless-looking
-     * explicit null checks designed to allow more fields to be nulled out upon removal, to reduce
-     * floating garbage, but which is not currently done, pending discovery of a way to do this with
-     * less impact on other operations.) To produce random values without interference across
-     * threads, we use within-JDK thread local random support (via the "secondary seed", to avoid
-     * interference with user-level ThreadLocalRandom.) For explanation of algorithms sharing at
-     * least a couple of features with this one, see Mikhail Fomitchev's thesis
-     * (http://www.cs.yorku.ca/~mikhail/), Keir Fraser's thesis
-     * (http://www.cl.cam.ac.uk/users/kaf24/), and Hakan Sundell's thesis
-     * (http://www.cs.chalmers.se/~phs/). Notation guide for local variables Node: b, n, f, p for
-     * predecessor, node, successor, aux Index: q, r, d for index node, right, down. Head: h Keys:
-     * k, key Values: v, value Comparisons: c
-     */
 
     /** Lazily initialized topmost index of the skiplist. */
     private transient volatile Index<V> head;
@@ -1061,14 +943,12 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         }
     }
 
-    /* ---------------- Constructors -------------- */
-
     /**
      * Constructs a new, empty map, sorted according to the {@linkplain Comparable natural ordering}
      * of the keys.
      */
     public ConcurrentSkipListLongMap() {
-        this.comparator = null;
+        this(null);
     }
 
     /**
@@ -1082,296 +962,29 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     }
 
     /**
-     * Constructs a new map containing the same mappings as the given map, sorted according to the
-     * {@linkplain Comparable natural ordering} of the keys.
-     *
-     * @param m the map whose mappings are to be placed in this map
-     * @throws ClassCastException if the keys in {@code m} are not {@link Comparable}, or are not
-     *             mutually comparable
-     * @throws NullPointerException if the specified map or any of its keys or values are null
-     */
-    public ConcurrentSkipListLongMap(Map<? extends Long, ? extends V> m) {
-        this.comparator = null;
-        putAll(m);
-    }
-
-    /**
-     * Returns a shallow copy of this {@code ConcurrentSkipListLongMap} instance. (The keys and
-     * values themselves are not cloned.)
-     *
-     * @return a shallow copy of this map
+     * {@inheritDoc}
      */
     @Override
-    public ConcurrentSkipListLongMap<V> clone() {
-        try {
-            ConcurrentSkipListLongMap<V> clone = (ConcurrentSkipListLongMap<V>) super.clone();
-            clone.keySet = null;
-            clone.entrySet = null;
-            clone.values = null;
-            clone.descendingMap = null;
-            clone.adder = null;
-            clone.buildFromSorted(this);
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError();
-        }
-    }
-
-    /**
-     * Streamlined bulk insertion to initialize from elements of given sorted map. Call only from
-     * constructor or clone method.
-     */
-    private void buildFromSorted(SortedMap<Long, ? extends V> map) {
-        if (map == null) throw new NullPointerException();
-        Iterator<? extends Map.Entry<? extends Long, ? extends V>> it = map.entrySet().iterator();
-
-        /*
-         * Add equally spaced indices at log intervals, using the bits of count during insertion.
-         * The maximum possible resulting level is less than the number of bits in a long (64). The
-         * preds array tracks the current rightmost node at each level.
-         */
-        Index<V>[] preds = (Index<V>[]) new Index<?>[64];
-        Node<V> bp = new Node<V>(EMPTY, null, null);
-        Index<V> h = preds[0] = new Index<V>(bp, null, null);
-        long count = 0;
-
-        while (it.hasNext()) {
-            Map.Entry<? extends Long, ? extends V> e = it.next();
-            Long k = e.getKey();
-            V v = e.getValue();
-            if (k == null || v == null) throw new NullPointerException();
-            Node<V> z = new Node<V>(k, v, null);
-            bp = bp.next = z;
-            if ((++count & 3L) == 0L) {
-                long m = count >>> 2;
-                int i = 0;
-                Index<V> idx = null, q;
-                do {
-                    idx = new Index<V>(z, idx, null);
-                    if ((q = preds[i]) == null)
-                        preds[i] = h = new Index<V>(h.node, h, idx);
-                    else
-                        preds[i] = q.right = idx;
-                } while (++i < preds.length && ((m >>>= 1) & 1L) != 0L);
-            }
-        }
-        if (count != 0L) {
-            VarHandle.releaseFence(); // emulate volatile stores
-            addCount(count);
-            head = h;
-            VarHandle.fullFence();
-        }
-    }
-
-    /* ---------------- Serialization -------------- */
-
-    /**
-     * Saves this map to a stream (that is, serializes it).
-     *
-     * @param s the stream
-     * @throws java.io.IOException if an I/O error occurs
-     * @serialData The key (Object) and value (Object) for each key-value mapping represented by the
-     *             map, followed by {@code null}. The key-value mappings are emitted in key-order
-     *             (as determined by the Comparator, or by the keys' natural ordering if no
-     *             Comparator).
-     */
-    private void writeObject(java.io.ObjectOutputStream s) throws java.io.IOException {
-        // Write out the Comparator and any hidden stuff
-        s.defaultWriteObject();
-
-        // Write out keys and values (alternating)
-        Node<V> b, n;
-        V v;
-        if ((b = baseHead()) != null) {
-            while ((n = b.next) != null) {
-                if ((v = n.val) != null) {
-                    s.writeObject(n.key);
-                    s.writeObject(v);
-                }
-                b = n;
-            }
-        }
-        s.writeObject(null);
-    }
-
-    /**
-     * Reconstitutes this map from a stream (that is, deserializes it).
-     * 
-     * @param s the stream
-     * @throws ClassNotFoundException if the class of a serialized object could not be found
-     * @throws java.io.IOException if an I/O error occurs
-     */
-    private void readObject(final java.io.ObjectInputStream s) throws java.io.IOException, ClassNotFoundException {
-        // Read in the Comparator and any hidden stuff
-        s.defaultReadObject();
-
-        // Same idea as buildFromSorted
-        Index<V>[] preds = (Index<V>[]) new Index<?>[64];
-        Node<V> bp = new Node<V>(EMPTY, null, null);
-        Index<V> h = preds[0] = new Index<V>(bp, null, null);
-        LongComparator cmp = comparator;
-        Long prevKey = null;
-        long count = 0;
-
-        for (;;) {
-            Long k = (Long) s.readObject();
-            if (k == null) break;
-            V v = (V) s.readObject();
-            if (v == null) throw new NullPointerException();
-            if (prevKey != null && cpr(cmp, prevKey, k) > 0) throw new IllegalStateException("out of order");
-            prevKey = k;
-            Node<V> z = new Node<V>(k, v, null);
-            bp = bp.next = z;
-            if ((++count & 3L) == 0L) {
-                long m = count >>> 2;
-                int i = 0;
-                Index<V> idx = null, q;
-                do {
-                    idx = new Index<V>(z, idx, null);
-                    if ((q = preds[i]) == null)
-                        preds[i] = h = new Index<V>(h.node, h, idx);
-                    else
-                        preds[i] = q.right = idx;
-                } while (++i < preds.length && ((m >>>= 1) & 1L) != 0L);
-            }
-        }
-        if (count != 0L) {
-            VarHandle.releaseFence();
-            addCount(count);
-            head = h;
-            VarHandle.fullFence();
-        }
-    }
-
-    /* ------ Map API methods ------ */
-
-    /**
-     * Returns {@code true} if this map contains a mapping for the specified key.
-     *
-     * @param key key whose presence in this map is to be tested
-     * @return {@code true} if this map contains a mapping for the specified key
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key is null
-     */
-    @Override
-    public boolean containsKey(Object key) {
-        return doGet((Long) key) != null;
-    }
-
-    /**
-     * Returns {@code true} if this map contains a mapping for the specified key.
-     *
-     * @param key key whose presence in this map is to be tested
-     * @return {@code true} if this map contains a mapping for the specified key
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key is null
-     */
     public boolean containsKey(long key) {
         return doGet(key) != null;
     }
 
     /**
-     * Returns the value to which the specified key is mapped, or {@code null} if this map contains
-     * no mapping for the key.
-     *
-     * <p>
-     * More formally, if this map contains a mapping from a key {@code k} to a value {@code v} such
-     * that {@code key} compares equal to {@code k} according to the map's ordering, then this
-     * method returns {@code v}; otherwise it returns {@code null}. (There can be at most one such
-     * mapping.)
-     *
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key is null
+     * {@inheritDoc}
      */
     @Override
-    public V get(Object key) {
-        return doGet((Long) key);
-    }
-
-    /**
-     * Returns the value to which the specified key is mapped, or {@code null} if this map contains
-     * no mapping for the key.
-     *
-     * <p>
-     * More formally, if this map contains a mapping from a key {@code k} to a value {@code v} such
-     * that {@code key} compares equal to {@code k} according to the map's ordering, then this
-     * method returns {@code v}; otherwise it returns {@code null}. (There can be at most one such
-     * mapping.)
-     *
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key is null
-     */
     public V get(long key) {
         return doGet(key);
     }
 
     /**
-     * Returns the value to which the specified key is mapped, or the given defaultValue if this map
-     * contains no mapping for the key.
-     *
-     * @param key the key
-     * @param defaultValue the value to return if this map contains no mapping for the given key
-     * @return the mapping for the key, if present; else the defaultValue
-     * @throws NullPointerException if the specified key is null
-     * @since 1.8
+     * {@inheritDoc}
      */
     @Override
-    public V getOrDefault(Object key, V defaultValue) {
-        V v;
-        return (v = doGet((Long) key)) == null ? defaultValue : v;
-    }
-
-    /**
-     * Returns the value to which the specified key is mapped, or the given defaultValue if this map
-     * contains no mapping for the key.
-     *
-     * @param key the key
-     * @param defaultValue the value to return if this map contains no mapping for the given key
-     * @return the mapping for the key, if present; else the defaultValue
-     * @throws NullPointerException if the specified key is null
-     * @since 1.8
-     */
-    public V getOrDefault(long key, V defaultValue) {
-        V v;
-        return (v = doGet(key)) == null ? defaultValue : v;
-    }
-
-    /**
-     * Associates the specified value with the specified key in this map. If the map previously
-     * contained a mapping for the key, the old value is replaced.
-     *
-     * @param key key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     * @return the previous value associated with the specified key, or {@code null} if there was no
-     *         mapping for the key
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key or value is null
-     */
-    @Override
-    public V put(Long key, V value) {
-        if (value == null) throw new NullPointerException();
-        return doPut(key, value, false);
-    }
-
-    /**
-     * Associates the specified value with the specified key in this map. If the map previously
-     * contained a mapping for the key, the old value is replaced.
-     *
-     * @param key key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     * @return the previous value associated with the specified key, or {@code null} if there was no
-     *         mapping for the key
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key or value is null
-     */
     public V put(long key, V value) {
-        if (value == null) throw new NullPointerException();
+        if (value == null) {
+            throw new NullPointerException();
+        }
         return doPut(key, value, false);
     }
 
@@ -1400,6 +1013,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      *             the map
      * @throws NullPointerException if the specified key is null
      */
+    @Override
     public V remove(long key) {
         return doRemove(key, null);
     }
@@ -1800,75 +1414,26 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         }
     }
 
-    /* ------ ConcurrentMap API methods ------ */
-
     /**
      * {@inheritDoc}
-     *
-     * @return the previous value associated with the specified key, or {@code null} if there was no
-     *         mapping for the key
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key or value is null
      */
     @Override
-    public V putIfAbsent(Long key, V value) {
-        if (value == null) throw new NullPointerException();
+    public V putIfAbsent(long key, V value) {
         return doPut(key, value, true);
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key is null
      */
     @Override
-    public boolean remove(Object key, Object value) {
-        if (key == null) throw new NullPointerException();
-        return value != null && doRemove((Long) key, value) != null;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key is null
-     */
     public boolean remove(long key, Object value) {
         return value != null && doRemove(key, value) != null;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if any of the arguments are null
      */
     @Override
-    public boolean replace(Long key, V oldValue, V newValue) {
-        if (key == null || oldValue == null || newValue == null) throw new NullPointerException();
-        for (;;) {
-            Node<V> n;
-            V v;
-            if ((n = findNode(key)) == null) return false;
-            if ((v = n.val) != null) {
-                if (!oldValue.equals(v)) return false;
-                if (VAL.compareAndSet(n, v, newValue)) return true;
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if any of the arguments are null
-     */
     public boolean replace(long key, V oldValue, V newValue) {
         if (key == EMPTY || oldValue == null || newValue == null) throw new NullPointerException();
         for (;;) {
@@ -1884,33 +1449,8 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
 
     /**
      * {@inheritDoc}
-     *
-     * @return the previous value associated with the specified key, or {@code null} if there was no
-     *         mapping for the key
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key or value is null
      */
     @Override
-    public V replace(Long key, V value) {
-        if (key == null || value == null) throw new NullPointerException();
-        for (;;) {
-            Node<V> n;
-            V v;
-            if ((n = findNode(key)) == null) return null;
-            if ((v = n.val) != null && VAL.compareAndSet(n, v, value)) return v;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return the previous value associated with the specified key, or {@code null} if there was no
-     *         mapping for the key
-     * @throws ClassCastException if the specified key cannot be compared with the keys currently in
-     *             the map
-     * @throws NullPointerException if the specified key or value is null
-     */
     public V replace(long key, V value) {
         if (key == EMPTY || value == null) throw new NullPointerException();
         for (;;) {
@@ -2822,42 +2362,42 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             }
         }
 
-        /* ---------------- Map API methods -------------- */
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public boolean containsKey(Object key) {
-            if (key == null) throw new NullPointerException();
-            return inBounds((Long) key, m.comparator) && m.containsKey(key);
-        }
-
         public boolean containsKey(long key) {
             return inBounds(key, m.comparator) && m.containsKey(key);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public V get(Object key) {
-            if (key == null) throw new NullPointerException();
-            return (!inBounds((Long) key, m.comparator)) ? null : m.get(key);
-        }
-
         public V get(long key) {
             return (!inBounds(key, m.comparator)) ? null : m.get(key);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public V put(Long key, V value) {
+        public V put(long key, V value) {
             checkKeyBounds(key, m.comparator);
             return m.put(key, value);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public V remove(Object key) {
-            return (!inBounds((Long) key, m.comparator)) ? null : m.remove(key);
-        }
-
         public V remove(long key) {
             return (!inBounds(key, m.comparator)) ? null : m.remove(key);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int size() {
             LongComparator cmp = m.comparator;
@@ -2868,12 +2408,18 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             return count >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) count;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isEmpty() {
             LongComparator cmp = m.comparator;
             return !isBeforeEnd(loNode(cmp), cmp);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean containsValue(Object value) {
             if (value == null) throw new NullPointerException();
@@ -2885,6 +2431,9 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void clear() {
             LongComparator cmp = m.comparator;
@@ -2893,51 +2442,40 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             }
         }
 
-        /* ---------------- ConcurrentMap API methods -------------- */
-
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public V putIfAbsent(Long key, V value) {
-            checkKeyBounds(key, m.comparator);
-            return m.putIfAbsent(key, value);
-        }
-
         public V putIfAbsent(long key, V value) {
             checkKeyBounds(key, m.comparator);
             return m.putIfAbsent(key, value);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public boolean remove(Object key, Object value) {
-            return inBounds((Long) key, m.comparator) && m.remove(key, value);
-        }
-
         public boolean remove(long key, Object value) {
             return inBounds(key, m.comparator) && m.remove(key, value);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public boolean replace(Long key, V oldValue, V newValue) {
-            checkKeyBounds(key, m.comparator);
-            return m.replace(key, oldValue, newValue);
-        }
-
         public boolean replace(long key, V oldValue, V newValue) {
             checkKeyBounds(key, m.comparator);
             return m.replace(key, oldValue, newValue);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public V replace(Long key, V value) {
-            checkKeyBounds(key, m.comparator);
-            return m.replace(key, value);
-        }
-
         public V replace(long key, V value) {
             checkKeyBounds(key, m.comparator);
             return m.replace(key, value);
         }
-
-        /* ---------------- SortedMap API methods -------------- */
 
         @Override
         public Comparator<Long> comparator() {
