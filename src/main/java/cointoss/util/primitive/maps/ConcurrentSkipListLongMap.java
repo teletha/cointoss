@@ -291,20 +291,20 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             for (;;) {
                 Node<V> n;
                 long k;
-                V v;
                 int c;
-                if ((n = b.next) == null)
+                if ((n = b.next) == null) {
                     break outer; // empty
-                else if ((k = n.key) == EMPTY)
+                } else if ((k = n.key) == EMPTY) {
                     break; // b is deleted
-                else if ((v = n.val) == null)
+                } else if (n.val == null) {
                     unlinkNode(b, n); // n is deleted
-                else if ((c = cpr(cmp, key, k)) > 0)
+                } else if ((c = cpr(cmp, key, k)) > 0) {
                     b = n;
-                else if (c == 0)
+                } else if (c == 0) {
                     return n;
-                else
+                } else {
                     break outer;
+                }
             }
         }
         return null;
