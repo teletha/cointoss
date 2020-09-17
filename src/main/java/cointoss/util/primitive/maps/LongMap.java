@@ -251,7 +251,7 @@ public interface LongMap<V> extends Map<Long, V> {
      * @return A new created map.
      */
     public static <V> ConcurrentNavigableLongMap<V> createSortedMap() {
-        return new ConcurrentSkipListLongMap(null);
+        return new SkipListLongMap(null);
     }
 
     /**
@@ -261,6 +261,6 @@ public interface LongMap<V> extends Map<Long, V> {
      * @return A new created map.
      */
     public static <V> ConcurrentNavigableLongMap<V> createSortedMap(LongComparator comparator) {
-        return new ConcurrentSkipListLongMap(comparator);
+        return new SkipListLongMap(comparator);
     }
 }

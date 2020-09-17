@@ -314,7 +314,7 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      * @return a navigable set view of the keys in this map
      */
     @Override
-    NavigableSet<Long> navigableKeySet();
+    NavigableLongSet navigableKeySet();
 
     /**
      * Returns a reverse order {@link NavigableSet} view of the keys contained in this map. The
@@ -329,7 +329,7 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      * @return a reverse order navigable set view of the keys in this map
      */
     @Override
-    NavigableSet<Long> descendingKeySet();
+    NavigableLongSet descendingKeySet();
 
     /**
      * {@inheritDoc}
