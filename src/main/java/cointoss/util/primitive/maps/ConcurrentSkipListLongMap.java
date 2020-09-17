@@ -14,12 +14,10 @@ import java.lang.invoke.VarHandle;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
@@ -36,6 +34,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
+
+import kiss.I;
 
 /**
  * A scalable concurrent {@link ConcurrentNavigableMap} implementation. The map is sorted according
@@ -85,7 +85,7 @@ import java.util.function.Predicate;
  * @param <V> the type of mapped values
  */
 @SuppressWarnings("serial")
-public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V>, Cloneable, Serializable {
+class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
 
     /** The field updater. */
     private static final AtomicReferenceFieldUpdater<ConcurrentSkipListLongMap, Index> HEAD = AtomicReferenceFieldUpdater
@@ -106,6 +106,141 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     /** The field updater. */
     private static final AtomicReferenceFieldUpdater<Index, Index> RIGHT = AtomicReferenceFieldUpdater
             .newUpdater(Index.class, Index.class, "right");
+
+    /* ---------------- Deletion -------------- */
+
+    /* ---------------- Finding and removing first element -------------- */
+
+    /* ---------------- Finding and removing last element -------------- */
+
+    /* ---------------- Relational operations -------------- */
+
+    // Control values OR'ed as arguments to findNear
+
+    private static final int EQ = 1;
+
+    private static final int LT = 2;
+
+    private static final int GT = 0; // Actually checked as !LT
+
+    /*
+     * This class implements a tree-like two-dimensionally linked skip list in which the index
+     * levels are represented in separate nodes from the base nodes holding data. There are two
+     * reasons for taking this approach instead of the usual array-based structure: 1) Array based
+     * implementations seem to encounter more complexity and overhead 2) We can use cheaper
+     * algorithms for the heavily-traversed index lists than can be used for the base lists. Here's
+     * a picture of some of the basics for a possible list with 2 levels of index: Head nodes Index
+     * nodes +-+ right +-+ +-+ |2|---------------->| |--------------------->| |->null +-+ +-+ +-+ |
+     * down | | v v v +-+ +-+ +-+ +-+ +-+ +-+ |1|----------->| |->| |------>| |----------->|
+     * |------>| |->null +-+ +-+ +-+ +-+ +-+ +-+ v | | | | | Nodes next v v v v v +-+ +-+ +-+ +-+
+     * +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ |
+     * |->|A|->|B|->|C|->|D|->|E|->|F|->|G|->|H|->|I|->|J|->|K|->null +-+ +-+ +-+ +-+ +-+ +-+ +-+
+     * +-+ +-+ +-+ +-+ +-+ The base lists use a variant of the HM linked ordered set algorithm. See
+     * Tim Harris, "A pragmatic implementation of non-blocking linked lists"
+     * http://www.cl.cam.ac.uk/~tlh20/publications.html and Maged Michael "High Performance Dynamic
+     * Lock-Free Hash Tables and List-Based Sets"
+     * http://www.research.ibm.com/people/m/michael/pubs.htm. The basic idea in these lists is to
+     * mark the "next" pointers of deleted nodes when deleting to avoid conflicts with concurrent
+     * insertions, and when traversing to keep track of triples (predecessor, node, successor) in
+     * order to detect when and how to unlink these deleted nodes. Rather than using mark-bits to
+     * mark list deletions (which can be slow and space-intensive using AtomicMarkedReference),
+     * nodes use direct CAS'able next pointers. On deletion, instead of marking a pointer, they
+     * splice in another node that can be thought of as standing for a marked pointer (see method
+     * unlinkNode). Using plain nodes acts roughly like "boxed" implementations of marked pointers,
+     * but uses new nodes only when nodes are deleted, not for every link. This requires less space
+     * and supports faster traversal. Even if marked references were better supported by JVMs,
+     * traversal using this technique might still be faster because any search need only read ahead
+     * one more node than otherwise required (to check for trailing marker) rather than unmasking
+     * mark bits or whatever on each read. This approach maintains the essential property needed in
+     * the HM algorithm of changing the next-pointer of a deleted node so that any other CAS of it
+     * will fail, but implements the idea by changing the pointer to point to a different node (with
+     * otherwise illegal null fields), not by marking it. While it would be possible to further
+     * squeeze space by defining marker nodes not to have key/value fields, it isn't worth the extra
+     * type-testing overhead. The deletion markers are rarely encountered during traversal, are
+     * easily detected via null checks that are needed anyway, and are normally quickly garbage
+     * collected. (Note that this technique would not work well in systems without garbage
+     * collection.) In addition to using deletion markers, the lists also use nullness of value
+     * fields to indicate deletion, in a style similar to typical lazy-deletion schemes. If a node's
+     * value is null, then it is considered logically deleted and ignored even though it is still
+     * reachable. Here's the sequence of events for a deletion of node n with predecessor b and
+     * successor f, initially: +------+ +------+ +------+ ... | b |------>| n |----->| f | ...
+     * +------+ +------+ +------+ 1. CAS n's value field from non-null to null. Traversals
+     * encountering a node with null value ignore it. However, ongoing insertions and deletions
+     * might still modify n's next pointer. 2. CAS n's next pointer to point to a new marker node.
+     * From this point on, no other nodes can be appended to n. which avoids deletion errors in
+     * CAS-based linked lists. +------+ +------+ +------+ +------+ ... | b |------>| n
+     * |----->|marker|------>| f | ... +------+ +------+ +------+ +------+ 3. CAS b's next pointer
+     * over both n and its marker. From this point on, no new traversals will encounter n, and it
+     * can eventually be GCed. +------+ +------+ ... | b |----------------------------------->| f |
+     * ... +------+ +------+ A failure at step 1 leads to simple retry due to a lost race with
+     * another operation. Steps 2-3 can fail because some other thread noticed during a traversal a
+     * node with null value and helped out by marking and/or unlinking. This helping-out ensures
+     * that no thread can become stuck waiting for progress of the deleting thread. Skip lists add
+     * indexing to this scheme, so that the base-level traversals start close to the locations being
+     * found, inserted or deleted -- usually base level traversals only traverse a few nodes. This
+     * doesn't change the basic algorithm except for the need to make sure base traversals start at
+     * predecessors (here, b) that are not (structurally) deleted, otherwise retrying after
+     * processing the deletion. Index levels are maintained using CAS to link and unlink successors
+     * ("right" fields). Races are allowed in index-list operations that can (rarely) fail to link
+     * in a new index node. (We can't do this of course for data nodes.) However, even when this
+     * happens, the index lists correctly guide search. This can impact performance, but since skip
+     * lists are probabilistic anyway, the net result is that under contention, the effective "p"
+     * value may be lower than its nominal value. Index insertion and deletion sometimes require a
+     * separate traversal pass occurring after the base-level action, to add or remove index nodes.
+     * This adds to single-threaded overhead, but improves contended multithreaded performance by
+     * narrowing interference windows, and allows deletion to ensure that all index nodes will be
+     * made unreachable upon return from a public remove operation, thus avoiding unwanted garbage
+     * retention. Indexing uses skip list parameters that maintain good search performance while
+     * using sparser-than-usual indices: The hardwired parameters k=1, p=0.5 (see method doPut) mean
+     * that about one-quarter of the nodes have indices. Of those that do, half have one level, a
+     * quarter have two, and so on (see Pugh's Skip List Cookbook, sec 3.4), up to a maximum of 62
+     * levels (appropriate for up to 2^63 elements). The expected total space requirement for a map
+     * is slightly less than for the current implementation of java.util.TreeMap. Changing the level
+     * of the index (i.e, the height of the tree-like structure) also uses CAS. Creation of an index
+     * with height greater than the current level adds a level to the head index by CAS'ing on a new
+     * top-most head. To maintain good performance after a lot of removals, deletion methods
+     * heuristically try to reduce the height if the topmost levels appear to be empty. This may
+     * encounter races in which it is possible (but rare) to reduce and "lose" a level just as it is
+     * about to contain an index (that will then never be encountered). This does no structural
+     * harm, and in practice appears to be a better option than allowing unrestrained growth of
+     * levels. This class provides concurrent-reader-style memory consistency, ensuring that
+     * read-only methods report status and/or values no staler than those holding at method entry.
+     * This is done by performing all publication and structural updates using (volatile) CAS,
+     * placing an acquireFence in a few access methods, and ensuring that linked objects are
+     * transitively acquired via dependent reads (normally once) unless performing a volatile-mode
+     * CAS operation (that also acts as an acquire and release). This form of fence-hoisting is
+     * similar to RCU and related techniques (see McKenney's online book
+     * https://www.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html) It minimizes
+     * overhead that may otherwise occur when using so many volatile-mode reads. Using explicit
+     * acquireFences is logistically easier than targeting particular fields to be read in acquire
+     * mode: fences are just hoisted up as far as possible, to the entry points or loop headers of a
+     * few methods. A potential disadvantage is that these few remaining fences are not easily
+     * optimized away by compilers under exclusively single-thread use. It requires some care to
+     * avoid volatile mode reads of other fields. (Note that the memory semantics of a reference
+     * dependently read in plain mode exactly once are equivalent to those for atomic opaque mode.)
+     * Iterators and other traversals encounter each node and value exactly once. Other operations
+     * locate an element (or position to insert an element) via a sequence of dereferences. This
+     * search is broken into two parts. Method findPredecessor (and its specialized embeddings)
+     * searches index nodes only, returning a base-level predecessor of the key. Callers carry out
+     * the base-level search, restarting if encountering a marker preventing link modification. In
+     * some cases, it is possible to encounter a node multiple times while descending levels. For
+     * mutative operations, the reported value is validated using CAS (else retrying), preserving
+     * linearizability with respect to each other. Others may return any (non-null) value holding in
+     * the course of the method call. (Search-based methods also include some useless-looking
+     * explicit null checks designed to allow more fields to be nulled out upon removal, to reduce
+     * floating garbage, but which is not currently done, pending discovery of a way to do this with
+     * less impact on other operations.) To produce random values without interference across
+     * threads, we use within-JDK thread local random support (via the "secondary seed", to avoid
+     * interference with user-level ThreadLocalRandom.) For explanation of algorithms sharing at
+     * least a couple of features with this one, see Mikhail Fomitchev's thesis
+     * (http://www.cs.yorku.ca/~mikhail/), Keir Fraser's thesis
+     * (http://www.cl.cam.ac.uk/users/kaf24/), and Hakan Sundell's thesis
+     * (http://www.cs.chalmers.se/~phs/). Notation guide for local variables Node: b, n, f, p for
+     * predecessor, node, successor, aux Index: q, r, d for index node, right, down. Head: h Keys:
+     * k, key Values: v, value Comparisons: c
+     */
+
+    private static final long EMPTY = Long.MIN_VALUE;
 
     /** Lazily initialized topmost index of the skiplist. */
     private transient volatile Index<V> head;
@@ -262,157 +397,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         return null;
     }
 
-    /**
-     * Gets value for key. Same idea as findNode, except skips over deletions and markers, and
-     * returns first encountered value to avoid possibly inconsistent rereads.
-     *
-     * @param key the key
-     * @return the value, or null if absent
-     */
-    private V doGet(long key) {
-        Index<V> q;
-        VarHandle.acquireFence();
-        LongComparator cmp = comparator;
-        V result = null;
-        if ((q = head) != null) {
-            outer: for (Index<V> r, d;;) {
-                while ((r = q.right) != null) {
-                    Node<V> p;
-                    long k;
-                    V v;
-                    int c;
-                    if ((p = r.node) == null || (k = p.key) == EMPTY || (v = p.value) == null)
-                        RIGHT.compareAndSet(q, r, r.right);
-                    else if ((c = cmp.compare(key, k)) > 0)
-                        q = r;
-                    else if (c == 0) {
-                        result = v;
-                        break outer;
-                    } else
-                        break;
-                }
-                if ((d = q.down) != null)
-                    q = d;
-                else {
-                    Node<V> b, n;
-                    if ((b = q.node) != null) {
-                        while ((n = b.next) != null) {
-                            V v;
-                            int c;
-                            long k = n.key;
-                            if ((v = n.value) == null || k == EMPTY || (c = cmp.compare(key, k)) > 0)
-                                b = n;
-                            else {
-                                if (c == 0) result = v;
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
     /* ---------------- Insertion -------------- */
-
-    /**
-     * Main insertion method. Adds element if not present, or replaces value if present and
-     * onlyIfAbsent is false.
-     *
-     * @param key the key
-     * @param value the value that must be associated with key
-     * @param onlyIfAbsent if should not insert if already present
-     * @return the old value, or null if newly inserted
-     */
-    private V doPut(long key, V value, boolean onlyIfAbsent) {
-        LongComparator cmp = comparator;
-        for (;;) {
-            Index<V> h;
-            Node<V> b;
-            VarHandle.acquireFence();
-            int levels = 0; // number of levels descended
-            if ((h = head) == null) { // try to initialize
-                Node<V> base = new Node<V>(EMPTY, null, null);
-                h = new Index<V>(base, null, null);
-                b = (HEAD.compareAndSet(this, null, h)) ? base : null;
-            } else {
-                for (Index<V> q = h, r, d;;) { // count while descending
-                    while ((r = q.right) != null) {
-                        Node<V> p;
-                        long k;
-                        if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null)
-                            RIGHT.compareAndSet(q, r, r.right);
-                        else if (cmp.compare(key, k) > 0)
-                            q = r;
-                        else
-                            break;
-                    }
-                    if ((d = q.down) != null) {
-                        ++levels;
-                        q = d;
-                    } else {
-                        b = q.node;
-                        break;
-                    }
-                }
-            }
-            if (b != null) {
-                Node<V> z = null; // new node, if inserted
-                for (;;) { // find insertion point
-                    Node<V> n, p;
-                    long k;
-                    V v;
-                    int c;
-                    if ((n = b.next) == null) {
-                        if (b.key == EMPTY) // if empty, type check key now
-                            cmp.compare(key, key);
-                        c = -1;
-                    } else if ((k = n.key) == EMPTY)
-                        break; // can't append; restart
-                    else if ((v = n.value) == null) {
-                        unlinkNode(b, n);
-                        c = 1;
-                    } else if ((c = cmp.compare(key, k)) > 0)
-                        b = n;
-                    else if (c == 0 && (onlyIfAbsent || VALUE.compareAndSet(n, v, value))) return v;
-
-                    if (c < 0 && NEXT.compareAndSet(b, n, p = new Node<V>(key, value, n))) {
-                        z = p;
-                        break;
-                    }
-                }
-
-                if (z != null) {
-                    int lr = ThreadLocalRandom.current().nextInt();
-                    if ((lr & 0x3) == 0) { // add indices with 1/4 prob
-                        int hr = ThreadLocalRandom.current().nextInt();
-                        long rnd = ((long) hr << 32) | (lr & 0xffffffffL);
-                        int skips = levels; // levels to descend before add
-                        Index<V> x = null;
-                        for (;;) { // create at most 62 indices
-                            x = new Index<V>(z, x, null);
-                            if (rnd >= 0L || --skips < 0)
-                                break;
-                            else
-                                rnd <<= 1;
-                        }
-                        if (addIndices(h, skips, x, cmp) && skips < 0 && head == h) { // try to add
-                                                                                      // new level
-                            Index<V> hx = new Index<V>(z, x, null);
-                            Index<V> nh = new Index<V>(h.node, h, hx);
-                            HEAD.compareAndSet(this, h, nh);
-                        }
-                        if (z.value == null) // deleted while adding indices
-                            findPredecessor(key, cmp); // clean
-                    }
-                    addCount(1L);
-                    return null;
-                }
-            }
-        }
-    }
 
     /**
      * Add indices after an insertion. Descends iteratively to the highest level of insertion, then
@@ -466,262 +451,13 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
 
     /* ---------------- Deletion -------------- */
 
-    /**
-     * Main deletion method. Locates node, nulls value, appends a deletion marker, unlinks
-     * predecessor, removes associated index nodes, and possibly reduces head index level.
-     *
-     * @param key the key
-     * @param value if non-null, the value that must be associated with key
-     * @return the node, or null if not found
-     */
-    final V doRemove(long key, Object value) {
-        LongComparator cmp = comparator;
-        V result = null;
-        Node<V> b;
-        outer: while ((b = findPredecessor(key, cmp)) != null && result == null) {
-            for (;;) {
-                Node<V> n;
-                long k;
-                V v;
-                int c;
-                if ((n = b.next) == null)
-                    break outer;
-                else if ((k = n.key) == EMPTY)
-                    break;
-                else if ((v = n.value) == null)
-                    unlinkNode(b, n);
-                else if ((c = cmp.compare(key, k)) > 0)
-                    b = n;
-                else if (c < 0)
-                    break outer;
-                else if (value != null && !value.equals(v))
-                    break outer;
-                else if (VALUE.compareAndSet(n, v, null)) {
-                    result = v;
-                    unlinkNode(b, n);
-                    break; // loop to clean up
-                }
-            }
-        }
-        if (result != null) {
-            tryReduceLevel();
-            addCount(-1L);
-        }
-        return result;
-    }
-
-    /**
-     * Possibly reduce head level if it has no nodes. This method can (rarely) make mistakes, in
-     * which case levels can disappear even though they are about to contain index nodes. This
-     * impacts performance, not correctness. To minimize mistakes as well as to reduce hysteresis,
-     * the level is reduced by one only if the topmost three levels look empty. Also, if the removed
-     * level looks non-empty after CAS, we try to change it back quick before anyone notices our
-     * mistake! (This trick works pretty well because this method will practically never make
-     * mistakes unless current thread stalls immediately before first CAS, in which case it is very
-     * unlikely to stall again immediately afterwards, so will recover.)
-     *
-     * We put up with all this rather than just let levels grow because otherwise, even a small map
-     * that has undergone a large number of insertions and removals will have a lot of levels,
-     * slowing down access more than would an occasional unwanted reduction.
-     */
-    private void tryReduceLevel() {
-        Index<V> h, d, e;
-        if ((h = head) != null && h.right == null && (d = h.down) != null && d.right == null && (e = d.down) != null && e.right == null && HEAD
-                .compareAndSet(this, h, d) && h.right != null) // recheck
-            HEAD.compareAndSet(this, d, h); // try to backout
-    }
-
     /* ---------------- Finding and removing first element -------------- */
 
-    /**
-     * Gets first valid node, unlinking deleted nodes if encountered.
-     * 
-     * @return first node or null if empty
-     */
-    final Node<V> findFirst() {
-        Node<V> b, n;
-        if ((b = baseHead()) != null) {
-            while ((n = b.next) != null) {
-                if (n.value == null)
-                    unlinkNode(b, n);
-                else
-                    return n;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Entry snapshot version of findFirst
-     */
-    final LongEntry<V> findFirstEntry() {
-        Node<V> b, n;
-        V v;
-        if ((b = baseHead()) != null) {
-            while ((n = b.next) != null) {
-                if ((v = n.value) == null)
-                    unlinkNode(b, n);
-                else
-                    return LongEntry.immutable(n.key, v);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Removes first entry; returns its snapshot.
-     * 
-     * @return null if empty, else snapshot of first entry
-     */
-    private LongEntry<V> doRemoveFirstEntry() {
-        Node<V> b, n;
-        V v;
-        if ((b = baseHead()) != null) {
-            while ((n = b.next) != null) {
-                if ((v = n.value) == null || VALUE.compareAndSet(n, v, null)) {
-                    long k = n.key;
-                    unlinkNode(b, n);
-                    if (v != null) {
-                        tryReduceLevel();
-                        findPredecessor(k, comparator); // clean index
-                        addCount(-1L);
-                        return LongEntry.immutable(k, v);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     /* ---------------- Finding and removing last element -------------- */
-
-    /**
-     * Specialized version of find to get last valid node.
-     * 
-     * @return last node or null if empty
-     */
-    final Node<V> findLast() {
-        outer: for (;;) {
-            Index<V> q;
-            Node<V> b;
-            VarHandle.acquireFence();
-            if ((q = head) == null) break;
-            for (Index<V> r, d;;) {
-                while ((r = q.right) != null) {
-                    Node<V> p;
-                    if ((p = r.node) == null || p.value == null)
-                        RIGHT.compareAndSet(q, r, r.right);
-                    else
-                        q = r;
-                }
-                if ((d = q.down) != null)
-                    q = d;
-                else {
-                    b = q.node;
-                    break;
-                }
-            }
-            if (b != null) {
-                for (;;) {
-                    Node<V> n;
-                    if ((n = b.next) == null) {
-                        if (b.key == EMPTY) // empty
-                            break outer;
-                        else
-                            return b;
-                    } else if (n.key == EMPTY)
-                        break;
-                    else if (n.value == null)
-                        unlinkNode(b, n);
-                    else
-                        b = n;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Entry version of findLast
-     * 
-     * @return Entry for last node or null if empty
-     */
-    final LongEntry<V> findLastEntry() {
-        for (;;) {
-            Node<V> n;
-            V v;
-            if ((n = findLast()) == null) return null;
-            if ((v = n.value) != null) return LongEntry.immutable(n.key, v);
-        }
-    }
-
-    /**
-     * Removes last entry; returns its snapshot. Specialized variant of doRemove.
-     * 
-     * @return null if empty, else snapshot of last entry
-     */
-    private LongEntry<V> doRemoveLastEntry() {
-        outer: for (;;) {
-            Index<V> q;
-            Node<V> b;
-            VarHandle.acquireFence();
-            if ((q = head) == null) break;
-            for (;;) {
-                Index<V> d, r;
-                Node<V> p;
-                while ((r = q.right) != null) {
-                    if ((p = r.node) == null || p.value == null)
-                        RIGHT.compareAndSet(q, r, r.right);
-                    else if (p.next != null)
-                        q = r; // continue only if a successor
-                    else
-                        break;
-                }
-                if ((d = q.down) != null)
-                    q = d;
-                else {
-                    b = q.node;
-                    break;
-                }
-            }
-            if (b != null) {
-                for (;;) {
-                    Node<V> n;
-                    long k;
-                    V v;
-                    if ((n = b.next) == null) {
-                        if (b.key == EMPTY) // empty
-                            break outer;
-                        else
-                            break; // retry
-                    } else if ((k = n.key) == EMPTY)
-                        break;
-                    else if ((v = n.value) == null)
-                        unlinkNode(b, n);
-                    else if (n.next != null)
-                        b = n;
-                    else if (VALUE.compareAndSet(n, v, null)) {
-                        unlinkNode(b, n);
-                        tryReduceLevel();
-                        findPredecessor(k, comparator); // clean index
-                        addCount(-1L);
-                        return LongEntry.immutable(k, v);
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     /* ---------------- Relational operations -------------- */
 
     // Control values OR'ed as arguments to findNear
-
-    private static final int EQ = 1;
-
-    private static final int LT = 2;
-
-    private static final int GT = 0; // Actually checked as !LT
 
     /*
      * This class implements a tree-like two-dimensionally linked skip list in which the index
@@ -840,7 +576,271 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * k, key Values: v, value Comparisons: c
      */
 
-    private static final long EMPTY = Long.MIN_VALUE;
+    /**
+     * Constructs a new, empty map, sorted according to the specified comparator.
+     *
+     * @param comparator the comparator that will be used to order this map. If {@code null}, the
+     *            {@linkplain Comparable natural ordering} of the keys will be used.
+     */
+    ConcurrentSkipListLongMap(LongComparator comparator) {
+        this.comparator = comparator == null ? Long::compare : comparator;
+    }
+
+    /**
+     * Main deletion method. Locates node, nulls value, appends a deletion marker, unlinks
+     * predecessor, removes associated index nodes, and possibly reduces head index level.
+     *
+     * @param key the key
+     * @param value if non-null, the value that must be associated with key
+     * @return the node, or null if not found
+     */
+    final V doRemove(long key, Object value) {
+        LongComparator cmp = comparator;
+        V result = null;
+        Node<V> b;
+        outer: while ((b = findPredecessor(key, cmp)) != null && result == null) {
+            for (;;) {
+                Node<V> n;
+                long k;
+                V v;
+                int c;
+                if ((n = b.next) == null)
+                    break outer;
+                else if ((k = n.key) == EMPTY)
+                    break;
+                else if ((v = n.value) == null)
+                    unlinkNode(b, n);
+                else if ((c = cmp.compare(key, k)) > 0)
+                    b = n;
+                else if (c < 0)
+                    break outer;
+                else if (value != null && !value.equals(v))
+                    break outer;
+                else if (VALUE.compareAndSet(n, v, null)) {
+                    result = v;
+                    unlinkNode(b, n);
+                    break; // loop to clean up
+                }
+            }
+        }
+        if (result != null) {
+            tryReduceLevel();
+            addCount(-1L);
+        }
+        return result;
+    }
+
+    /**
+     * Possibly reduce head level if it has no nodes. This method can (rarely) make mistakes, in
+     * which case levels can disappear even though they are about to contain index nodes. This
+     * impacts performance, not correctness. To minimize mistakes as well as to reduce hysteresis,
+     * the level is reduced by one only if the topmost three levels look empty. Also, if the removed
+     * level looks non-empty after CAS, we try to change it back quick before anyone notices our
+     * mistake! (This trick works pretty well because this method will practically never make
+     * mistakes unless current thread stalls immediately before first CAS, in which case it is very
+     * unlikely to stall again immediately afterwards, so will recover.)
+     *
+     * We put up with all this rather than just let levels grow because otherwise, even a small map
+     * that has undergone a large number of insertions and removals will have a lot of levels,
+     * slowing down access more than would an occasional unwanted reduction.
+     */
+    private void tryReduceLevel() {
+        Index<V> h, d, e;
+        if ((h = head) != null && h.right == null && (d = h.down) != null && d.right == null && (e = d.down) != null && e.right == null && HEAD
+                .compareAndSet(this, h, d) && h.right != null) // recheck
+            HEAD.compareAndSet(this, d, h); // try to backout
+    }
+
+    /**
+     * Gets first valid node, unlinking deleted nodes if encountered.
+     * 
+     * @return first node or null if empty
+     */
+    private Node<V> findFirst() {
+        Node<V> b, n;
+        if ((b = baseHead()) != null) {
+            while ((n = b.next) != null) {
+                if (n.value == null)
+                    unlinkNode(b, n);
+                else
+                    return n;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Specialized version of find to get last valid node.
+     * 
+     * @return last node or null if empty
+     */
+    private Node<V> findLast() {
+        outer: for (;;) {
+            Index<V> q;
+            Node<V> b;
+            VarHandle.acquireFence();
+            if ((q = head) == null) break;
+            for (Index<V> r, d;;) {
+                while ((r = q.right) != null) {
+                    Node<V> p;
+                    if ((p = r.node) == null || p.value == null)
+                        RIGHT.compareAndSet(q, r, r.right);
+                    else
+                        q = r;
+                }
+                if ((d = q.down) != null)
+                    q = d;
+                else {
+                    b = q.node;
+                    break;
+                }
+            }
+            if (b != null) {
+                for (;;) {
+                    Node<V> n;
+                    if ((n = b.next) == null) {
+                        if (b.key == EMPTY) // empty
+                            break outer;
+                        else
+                            return b;
+                    } else if (n.key == EMPTY)
+                        break;
+                    else if (n.value == null)
+                        unlinkNode(b, n);
+                    else
+                        b = n;
+                }
+            }
+        }
+        return null;
+    }
+
+    /* ---------------- Deletion -------------- */
+
+    /* ---------------- Finding and removing first element -------------- */
+
+    /* ---------------- Finding and removing last element -------------- */
+
+    /* ---------------- Relational operations -------------- */
+
+    // Control values OR'ed as arguments to findNear
+
+    /*
+     * This class implements a tree-like two-dimensionally linked skip list in which the index
+     * levels are represented in separate nodes from the base nodes holding data. There are two
+     * reasons for taking this approach instead of the usual array-based structure: 1) Array based
+     * implementations seem to encounter more complexity and overhead 2) We can use cheaper
+     * algorithms for the heavily-traversed index lists than can be used for the base lists. Here's
+     * a picture of some of the basics for a possible list with 2 levels of index: Head nodes Index
+     * nodes +-+ right +-+ +-+ |2|---------------->| |--------------------->| |->null +-+ +-+ +-+ |
+     * down | | v v v +-+ +-+ +-+ +-+ +-+ +-+ |1|----------->| |->| |------>| |----------->|
+     * |------>| |->null +-+ +-+ +-+ +-+ +-+ +-+ v | | | | | Nodes next v v v v v +-+ +-+ +-+ +-+
+     * +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ |
+     * |->|A|->|B|->|C|->|D|->|E|->|F|->|G|->|H|->|I|->|J|->|K|->null +-+ +-+ +-+ +-+ +-+ +-+ +-+
+     * +-+ +-+ +-+ +-+ +-+ The base lists use a variant of the HM linked ordered set algorithm. See
+     * Tim Harris, "A pragmatic implementation of non-blocking linked lists"
+     * http://www.cl.cam.ac.uk/~tlh20/publications.html and Maged Michael "High Performance Dynamic
+     * Lock-Free Hash Tables and List-Based Sets"
+     * http://www.research.ibm.com/people/m/michael/pubs.htm. The basic idea in these lists is to
+     * mark the "next" pointers of deleted nodes when deleting to avoid conflicts with concurrent
+     * insertions, and when traversing to keep track of triples (predecessor, node, successor) in
+     * order to detect when and how to unlink these deleted nodes. Rather than using mark-bits to
+     * mark list deletions (which can be slow and space-intensive using AtomicMarkedReference),
+     * nodes use direct CAS'able next pointers. On deletion, instead of marking a pointer, they
+     * splice in another node that can be thought of as standing for a marked pointer (see method
+     * unlinkNode). Using plain nodes acts roughly like "boxed" implementations of marked pointers,
+     * but uses new nodes only when nodes are deleted, not for every link. This requires less space
+     * and supports faster traversal. Even if marked references were better supported by JVMs,
+     * traversal using this technique might still be faster because any search need only read ahead
+     * one more node than otherwise required (to check for trailing marker) rather than unmasking
+     * mark bits or whatever on each read. This approach maintains the essential property needed in
+     * the HM algorithm of changing the next-pointer of a deleted node so that any other CAS of it
+     * will fail, but implements the idea by changing the pointer to point to a different node (with
+     * otherwise illegal null fields), not by marking it. While it would be possible to further
+     * squeeze space by defining marker nodes not to have key/value fields, it isn't worth the extra
+     * type-testing overhead. The deletion markers are rarely encountered during traversal, are
+     * easily detected via null checks that are needed anyway, and are normally quickly garbage
+     * collected. (Note that this technique would not work well in systems without garbage
+     * collection.) In addition to using deletion markers, the lists also use nullness of value
+     * fields to indicate deletion, in a style similar to typical lazy-deletion schemes. If a node's
+     * value is null, then it is considered logically deleted and ignored even though it is still
+     * reachable. Here's the sequence of events for a deletion of node n with predecessor b and
+     * successor f, initially: +------+ +------+ +------+ ... | b |------>| n |----->| f | ...
+     * +------+ +------+ +------+ 1. CAS n's value field from non-null to null. Traversals
+     * encountering a node with null value ignore it. However, ongoing insertions and deletions
+     * might still modify n's next pointer. 2. CAS n's next pointer to point to a new marker node.
+     * From this point on, no other nodes can be appended to n. which avoids deletion errors in
+     * CAS-based linked lists. +------+ +------+ +------+ +------+ ... | b |------>| n
+     * |----->|marker|------>| f | ... +------+ +------+ +------+ +------+ 3. CAS b's next pointer
+     * over both n and its marker. From this point on, no new traversals will encounter n, and it
+     * can eventually be GCed. +------+ +------+ ... | b |----------------------------------->| f |
+     * ... +------+ +------+ A failure at step 1 leads to simple retry due to a lost race with
+     * another operation. Steps 2-3 can fail because some other thread noticed during a traversal a
+     * node with null value and helped out by marking and/or unlinking. This helping-out ensures
+     * that no thread can become stuck waiting for progress of the deleting thread. Skip lists add
+     * indexing to this scheme, so that the base-level traversals start close to the locations being
+     * found, inserted or deleted -- usually base level traversals only traverse a few nodes. This
+     * doesn't change the basic algorithm except for the need to make sure base traversals start at
+     * predecessors (here, b) that are not (structurally) deleted, otherwise retrying after
+     * processing the deletion. Index levels are maintained using CAS to link and unlink successors
+     * ("right" fields). Races are allowed in index-list operations that can (rarely) fail to link
+     * in a new index node. (We can't do this of course for data nodes.) However, even when this
+     * happens, the index lists correctly guide search. This can impact performance, but since skip
+     * lists are probabilistic anyway, the net result is that under contention, the effective "p"
+     * value may be lower than its nominal value. Index insertion and deletion sometimes require a
+     * separate traversal pass occurring after the base-level action, to add or remove index nodes.
+     * This adds to single-threaded overhead, but improves contended multithreaded performance by
+     * narrowing interference windows, and allows deletion to ensure that all index nodes will be
+     * made unreachable upon return from a public remove operation, thus avoiding unwanted garbage
+     * retention. Indexing uses skip list parameters that maintain good search performance while
+     * using sparser-than-usual indices: The hardwired parameters k=1, p=0.5 (see method doPut) mean
+     * that about one-quarter of the nodes have indices. Of those that do, half have one level, a
+     * quarter have two, and so on (see Pugh's Skip List Cookbook, sec 3.4), up to a maximum of 62
+     * levels (appropriate for up to 2^63 elements). The expected total space requirement for a map
+     * is slightly less than for the current implementation of java.util.TreeMap. Changing the level
+     * of the index (i.e, the height of the tree-like structure) also uses CAS. Creation of an index
+     * with height greater than the current level adds a level to the head index by CAS'ing on a new
+     * top-most head. To maintain good performance after a lot of removals, deletion methods
+     * heuristically try to reduce the height if the topmost levels appear to be empty. This may
+     * encounter races in which it is possible (but rare) to reduce and "lose" a level just as it is
+     * about to contain an index (that will then never be encountered). This does no structural
+     * harm, and in practice appears to be a better option than allowing unrestrained growth of
+     * levels. This class provides concurrent-reader-style memory consistency, ensuring that
+     * read-only methods report status and/or values no staler than those holding at method entry.
+     * This is done by performing all publication and structural updates using (volatile) CAS,
+     * placing an acquireFence in a few access methods, and ensuring that linked objects are
+     * transitively acquired via dependent reads (normally once) unless performing a volatile-mode
+     * CAS operation (that also acts as an acquire and release). This form of fence-hoisting is
+     * similar to RCU and related techniques (see McKenney's online book
+     * https://www.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html) It minimizes
+     * overhead that may otherwise occur when using so many volatile-mode reads. Using explicit
+     * acquireFences is logistically easier than targeting particular fields to be read in acquire
+     * mode: fences are just hoisted up as far as possible, to the entry points or loop headers of a
+     * few methods. A potential disadvantage is that these few remaining fences are not easily
+     * optimized away by compilers under exclusively single-thread use. It requires some care to
+     * avoid volatile mode reads of other fields. (Note that the memory semantics of a reference
+     * dependently read in plain mode exactly once are equivalent to those for atomic opaque mode.)
+     * Iterators and other traversals encounter each node and value exactly once. Other operations
+     * locate an element (or position to insert an element) via a sequence of dereferences. This
+     * search is broken into two parts. Method findPredecessor (and its specialized embeddings)
+     * searches index nodes only, returning a base-level predecessor of the key. Callers carry out
+     * the base-level search, restarting if encountering a marker preventing link modification. In
+     * some cases, it is possible to encounter a node multiple times while descending levels. For
+     * mutative operations, the reported value is validated using CAS (else retrying), preserving
+     * linearizability with respect to each other. Others may return any (non-null) value holding in
+     * the course of the method call. (Search-based methods also include some useless-looking
+     * explicit null checks designed to allow more fields to be nulled out upon removal, to reduce
+     * floating garbage, but which is not currently done, pending discovery of a way to do this with
+     * less impact on other operations.) To produce random values without interference across
+     * threads, we use within-JDK thread local random support (via the "secondary seed", to avoid
+     * interference with user-level ThreadLocalRandom.) For explanation of algorithms sharing at
+     * least a couple of features with this one, see Mikhail Fomitchev's thesis
+     * (http://www.cs.yorku.ca/~mikhail/), Keir Fraser's thesis
+     * (http://www.cl.cam.ac.uk/users/kaf24/), and Hakan Sundell's thesis
+     * (http://www.cs.chalmers.se/~phs/). Notation guide for local variables Node: b, n, f, p for
+     * predecessor, node, successor, aux Index: q, r, d for index node, right, down. Head: h Keys:
+     * k, key Values: v, value Comparisons: c
+     */
 
     /**
      * Utility for ceiling, floor, lower, higher methods.
@@ -897,16 +897,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     }
 
     /**
-     * Constructs a new, empty map, sorted according to the specified comparator.
-     *
-     * @param comparator the comparator that will be used to order this map. If {@code null}, the
-     *            {@linkplain Comparable natural ordering} of the keys will be used.
-     */
-    ConcurrentSkipListLongMap(LongComparator comparator) {
-        this.comparator = comparator == null ? Long::compare : comparator;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -923,6 +913,59 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     }
 
     /**
+     * Gets value for key. Same idea as findNode, except skips over deletions and markers, and
+     * returns first encountered value to avoid possibly inconsistent rereads.
+     *
+     * @param key the key
+     * @return the value, or null if absent
+     */
+    private V doGet(long key) {
+        Index<V> q;
+        VarHandle.acquireFence();
+        LongComparator cmp = comparator;
+        V result = null;
+        if ((q = head) != null) {
+            outer: for (Index<V> r, d;;) {
+                while ((r = q.right) != null) {
+                    Node<V> p;
+                    long k;
+                    V v;
+                    int c;
+                    if ((p = r.node) == null || (k = p.key) == EMPTY || (v = p.value) == null)
+                        RIGHT.compareAndSet(q, r, r.right);
+                    else if ((c = cmp.compare(key, k)) > 0)
+                        q = r;
+                    else if (c == 0) {
+                        result = v;
+                        break outer;
+                    } else
+                        break;
+                }
+                if ((d = q.down) != null)
+                    q = d;
+                else {
+                    Node<V> b, n;
+                    if ((b = q.node) != null) {
+                        while ((n = b.next) != null) {
+                            V v;
+                            int c;
+                            long k = n.key;
+                            if ((v = n.value) == null || k == EMPTY || (c = cmp.compare(key, k)) > 0)
+                                b = n;
+                            else {
+                                if (c == 0) result = v;
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -931,6 +974,105 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             throw new NullPointerException();
         }
         return doPut(key, value, false);
+    }
+
+    /* ---------------- Insertion -------------- */
+
+    /**
+     * Main insertion method. Adds element if not present, or replaces value if present and
+     * onlyIfAbsent is false.
+     *
+     * @param key the key
+     * @param value the value that must be associated with key
+     * @param onlyIfAbsent if should not insert if already present
+     * @return the old value, or null if newly inserted
+     */
+    private V doPut(long key, V value, boolean onlyIfAbsent) {
+        LongComparator cmp = comparator;
+        for (;;) {
+            Index<V> h;
+            Node<V> b;
+            VarHandle.acquireFence();
+            int levels = 0; // number of levels descended
+            if ((h = head) == null) { // try to initialize
+                Node<V> base = new Node<V>(EMPTY, null, null);
+                h = new Index<V>(base, null, null);
+                b = (HEAD.compareAndSet(this, null, h)) ? base : null;
+            } else {
+                for (Index<V> q = h, r, d;;) { // count while descending
+                    while ((r = q.right) != null) {
+                        Node<V> p;
+                        long k;
+                        if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null)
+                            RIGHT.compareAndSet(q, r, r.right);
+                        else if (cmp.compare(key, k) > 0)
+                            q = r;
+                        else
+                            break;
+                    }
+                    if ((d = q.down) != null) {
+                        ++levels;
+                        q = d;
+                    } else {
+                        b = q.node;
+                        break;
+                    }
+                }
+            }
+            if (b != null) {
+                Node<V> z = null; // new node, if inserted
+                for (;;) { // find insertion point
+                    Node<V> n, p;
+                    long k;
+                    V v;
+                    int c;
+                    if ((n = b.next) == null) {
+                        if (b.key == EMPTY) // if empty, type check key now
+                            cmp.compare(key, key);
+                        c = -1;
+                    } else if ((k = n.key) == EMPTY)
+                        break; // can't append; restart
+                    else if ((v = n.value) == null) {
+                        unlinkNode(b, n);
+                        c = 1;
+                    } else if ((c = cmp.compare(key, k)) > 0)
+                        b = n;
+                    else if (c == 0 && (onlyIfAbsent || VALUE.compareAndSet(n, v, value))) return v;
+
+                    if (c < 0 && NEXT.compareAndSet(b, n, p = new Node<V>(key, value, n))) {
+                        z = p;
+                        break;
+                    }
+                }
+
+                if (z != null) {
+                    int lr = ThreadLocalRandom.current().nextInt();
+                    if ((lr & 0x3) == 0) { // add indices with 1/4 prob
+                        int hr = ThreadLocalRandom.current().nextInt();
+                        long rnd = ((long) hr << 32) | (lr & 0xffffffffL);
+                        int skips = levels; // levels to descend before add
+                        Index<V> x = null;
+                        for (;;) { // create at most 62 indices
+                            x = new Index<V>(z, x, null);
+                            if (rnd >= 0L || --skips < 0)
+                                break;
+                            else
+                                rnd <<= 1;
+                        }
+                        if (addIndices(h, skips, x, cmp) && skips < 0 && head == h) { // try to add
+                                                                                      // new level
+                            Index<V> hx = new Index<V>(z, x, null);
+                            Index<V> nh = new Index<V>(h.node, h, hx);
+                            HEAD.compareAndSet(this, h, nh);
+                        }
+                        if (z.value == null) // deleted while adding indices
+                            findPredecessor(key, cmp); // clean
+                    }
+                    addCount(1L);
+                    return null;
+                }
+            }
+        }
     }
 
     /**
@@ -1307,6 +1449,8 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         return n.key;
     }
 
+    /* ---------------- Finding and removing first element -------------- */
+
     /**
      * {@inheritDoc}
      */
@@ -1448,50 +1592,102 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     }
 
     /**
-     * Returns a key-value mapping associated with the least key in this map, or {@code null} if the
-     * map is empty. The returned entry does <em>not</em> support the {@code Entry.setValue} method.
+     * {@inheritDoc}
      */
     @Override
     public LongEntry firstEntry() {
-        return findFirstEntry();
+        Node<V> node = findFirst();
+        return node == null || node.value == null ? null : LongEntry.immutable(node.key, node.value);
     }
 
     /**
-     * Returns a key-value mapping associated with the greatest key in this map, or {@code null} if
-     * the map is empty. The returned entry does <em>not</em> support the {@code Entry.setValue}
-     * method.
+     * {@inheritDoc}
      */
     @Override
     public LongEntry<V> lastEntry() {
-        return findLastEntry();
+        Node<V> node = findLast();
+        return node == null || node.value == null ? null : LongEntry.immutable(node.key, node.value);
     }
 
     /**
-     * Removes and returns a key-value mapping associated with the least key in this map, or
-     * {@code null} if the map is empty. The returned entry does <em>not</em> support the
-     * {@code Entry.setValue} method.
+     * {@inheritDoc}
      */
     @Override
     public LongEntry<V> pollFirstEntry() {
-        return doRemoveFirstEntry();
+        Node<V> b, n;
+        V v;
+        if ((b = baseHead()) != null) {
+            while ((n = b.next) != null) {
+                if ((v = n.value) == null || VALUE.compareAndSet(n, v, null)) {
+                    long k = n.key;
+                    unlinkNode(b, n);
+                    if (v != null) {
+                        tryReduceLevel();
+                        findPredecessor(k, comparator); // clean index
+                        addCount(-1L);
+                        return LongEntry.immutable(k, v);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
-     * Removes and returns a key-value mapping associated with the greatest key in this map, or
-     * {@code null} if the map is empty. The returned entry does <em>not</em> support the
-     * {@code Entry.setValue} method.
+     * {@inheritDoc}
      */
     @Override
     public LongEntry<V> pollLastEntry() {
-        return doRemoveLastEntry();
-    }
-
-    static final <E> List<E> toList(Collection<E> c) {
-        // Using size() here would be a pessimization.
-        ArrayList<E> list = new ArrayList<E>();
-        for (E e : c)
-            list.add(e);
-        return list;
+        outer: for (;;) {
+            Index<V> q;
+            Node<V> b;
+            VarHandle.acquireFence();
+            if ((q = head) == null) break;
+            for (;;) {
+                Index<V> d, r;
+                Node<V> p;
+                while ((r = q.right) != null) {
+                    if ((p = r.node) == null || p.value == null)
+                        RIGHT.compareAndSet(q, r, r.right);
+                    else if (p.next != null)
+                        q = r; // continue only if a successor
+                    else
+                        break;
+                }
+                if ((d = q.down) != null)
+                    q = d;
+                else {
+                    b = q.node;
+                    break;
+                }
+            }
+            if (b != null) {
+                for (;;) {
+                    Node<V> n;
+                    long k;
+                    V v;
+                    if ((n = b.next) == null) {
+                        if (b.key == EMPTY) // empty
+                            break outer;
+                        else
+                            break; // retry
+                    } else if ((k = n.key) == EMPTY)
+                        break;
+                    else if ((v = n.value) == null)
+                        unlinkNode(b, n);
+                    else if (n.next != null)
+                        b = n;
+                    else if (VALUE.compareAndSet(n, v, null)) {
+                        unlinkNode(b, n);
+                        tryReduceLevel();
+                        findPredecessor(k, comparator); // clean index
+                        addCount(-1L);
+                        return LongEntry.immutable(k, v);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -1654,7 +1850,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
          */
         @Override
         public Object[] toArray() {
-            return toList(this).toArray();
+            return I.signal(this).toList().toArray();
         }
 
         /**
@@ -1662,7 +1858,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
          */
         @Override
         public <T> T[] toArray(T[] a) {
-            return toList(this).toArray(a);
+            return I.signal(this).toList().toArray(a);
         }
 
         /**
@@ -1739,10 +1935,20 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         }
     }
 
-    static final class Values<V> extends AbstractCollection<V> {
-        final ConcurrentNavigableMap<Long, V> m;
+    /**
+     * 
+     */
+    private static class Values<V> extends AbstractCollection<V> {
 
-        Values(ConcurrentNavigableMap<Long, V> map) {
+        /** The original view. */
+        private final ConcurrentNavigableLongMap<V> m;
+
+        /**
+         * Build view.
+         * 
+         * @param map
+         */
+        private Values(ConcurrentNavigableLongMap<V> map) {
             m = map;
         }
 
@@ -1772,14 +1978,20 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             m.clear();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object[] toArray() {
-            return toList(this).toArray();
+            return I.signal(this).toList().toArray();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public <T> T[] toArray(T[] a) {
-            return toList(this).toArray(a);
+            return I.signal(this).toList().toArray(a);
         }
 
         @Override
@@ -1804,10 +2016,20 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         }
     }
 
-    static final class EntrySet<V> extends AbstractSet<LongEntry<V>> {
-        final ConcurrentNavigableMap<Long, V> m;
+    /**
+     * 
+     */
+    private static class EntrySet<V> extends AbstractSet<LongEntry<V>> {
 
-        EntrySet(ConcurrentNavigableMap<Long, V> map) {
+        /** The original view. */
+        private final ConcurrentNavigableLongMap<V> m;
+
+        /**
+         * Build view.
+         * 
+         * @param map
+         */
+        private EntrySet(ConcurrentNavigableLongMap<V> map) {
             m = map;
         }
 
@@ -1859,14 +2081,20 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object[] toArray() {
-            return toList(this).toArray();
+            return I.signal(this).toList().toArray();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public <T> T[] toArray(T[] a) {
-            return toList(this).toArray(a);
+            return I.signal(this).toList().toArray(a);
         }
 
         @Override

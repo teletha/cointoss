@@ -11,9 +11,10 @@ package cointoss.util.primitive.maps;
 
 import static cointoss.util.primitive.Primitives.ensureLong;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.NavigableMap;
-import java.util.NavigableSet;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 
@@ -210,57 +211,253 @@ public interface ConcurrentNavigableLongMap<V> extends ConcurrentNavigableMap<Lo
     ConcurrentNavigableLongMap<V> descendingMap();
 
     /**
-     * Returns a {@link NavigableSet} view of the keys contained in this map. The set's iterator
-     * returns the keys in ascending order. The set is backed by the map, so changes to the map are
-     * reflected in the set, and vice-versa. The set supports element removal, which removes the
-     * corresponding mapping from the map, via the {@code Iterator.remove}, {@code Set.remove},
-     * {@code removeAll}, {@code retainAll}, and {@code clear} operations. It does not support the
-     * {@code add} or {@code addAll} operations.
-     *
-     * <p>
-     * The view's iterators and spliterators are <a href="package-summary.html#Weakly"><i>weakly
-     * consistent</i></a>.
-     *
-     * @return a navigable set view of the keys in this map
+     * Create the key-set view.
+     * 
+     * @param <V>
+     * @param map
+     * @return
      */
-    @Override
-    NavigableSet<Long> navigableKeySet();
+    static NavigableLongSet viewKeys(ConcurrentNavigableLongMap<?> map) {
+        return new NavigableLongSet() {
 
-    /**
-     * Returns a {@link NavigableSet} view of the keys contained in this map. The set's iterator
-     * returns the keys in ascending order. The set is backed by the map, so changes to the map are
-     * reflected in the set, and vice-versa. The set supports element removal, which removes the
-     * corresponding mapping from the map, via the {@code Iterator.remove}, {@code Set.remove},
-     * {@code removeAll}, {@code retainAll}, and {@code clear} operations. It does not support the
-     * {@code add} or {@code addAll} operations.
-     *
-     * <p>
-     * The view's iterators and spliterators are <a href="package-summary.html#Weakly"><i>weakly
-     * consistent</i></a>.
-     *
-     * <p>
-     * This method is equivalent to method {@code navigableKeySet}.
-     *
-     * @return a navigable set view of the keys in this map
-     */
-    @Override
-    NavigableSet<Long> keySet();
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Iterator<Long> iterator() {
+                return null;
+            }
 
-    /**
-     * Returns a reverse order {@link NavigableSet} view of the keys contained in this map. The
-     * set's iterator returns the keys in descending order. The set is backed by the map, so changes
-     * to the map are reflected in the set, and vice-versa. The set supports element removal, which
-     * removes the corresponding mapping from the map, via the {@code Iterator.remove},
-     * {@code Set.remove}, {@code removeAll}, {@code retainAll}, and {@code clear} operations. It
-     * does not support the {@code add} or {@code addAll} operations.
-     *
-     * <p>
-     * The view's iterators and spliterators are <a href="package-summary.html#Weakly"><i>weakly
-     * consistent</i></a>.
-     *
-     * @return a reverse order navigable set view of the keys in this map
-     */
-    @Override
-    NavigableSet<Long> descendingKeySet();
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Iterator<Long> descendingIterator() {
+                return null;
+            }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Comparator<? super Long> comparator() {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Long first() {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Long last() {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public int size() {
+                return 0;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean contains(Object o) {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Object[] toArray() {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public <T> T[] toArray(T[] a) {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean add(Long e) {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean remove(Object o) {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean containsAll(Collection<?> c) {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean addAll(Collection<? extends Long> c) {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean retainAll(Collection<?> c) {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean removeAll(Collection<?> c) {
+                return false;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void clear() {
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public long lower(long e) {
+                return 0;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public long floor(long e) {
+                return 0;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public long ceiling(long e) {
+                return 0;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public long higher(long e) {
+                return 0;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public long pollFirstLong() {
+                return 0;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public long pollLastLong() {
+                return 0;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public NavigableLongSet descendingSet() {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public NavigableLongSet subSet(long fromElement, boolean fromInclusive, long toElement, boolean toInclusive) {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public NavigableLongSet headSet(long toElement, boolean inclusive) {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public NavigableLongSet tailSet(long fromElement, boolean inclusive) {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public NavigableLongSet subSet(long fromElement, long toElement) {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public NavigableLongSet headSet(long toElement) {
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public NavigableLongSet tailSet(long fromElement) {
+                return null;
+            }
+        };
+    }
 }
