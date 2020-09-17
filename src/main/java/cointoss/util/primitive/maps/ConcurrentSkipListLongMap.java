@@ -417,7 +417,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
                         if (b.key == EMPTY) // if empty, type check key now
                             cpr(cmp, key, key);
                         c = -1;
-                    } else if ((k = n.key) == null)
+                    } else if ((k = n.key) == EMPTY)
                         break; // can't append; restart
                     else if ((v = n.val) == null) {
                         unlinkNode(b, n);
@@ -1396,13 +1396,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * {@inheritDoc}
      */
     @Override
-    public Long firstKey() {
-        return firstLongKey();
-    }
-
-    /**
-     * @see #firstKey()
-     */
     public long firstLongKey() {
         Node<V> n = findFirst();
         if (n == null) {
@@ -1415,13 +1408,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
      * {@inheritDoc}
      */
     @Override
-    public Long lastKey() {
-        return lastLongKey();
-    }
-
-    /**
-     * @see #lastKey()
-     */
     public long lastLongKey() {
         Node<V> n = findLast();
         if (n == null) {
@@ -2096,8 +2082,8 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         boolean isBeforeEnd(ConcurrentSkipListLongMap.Node<V> n, LongComparator cmp) {
             if (n == null) return false;
             if (hi == null) return true;
-            Long k = n.key;
-            if (k == null) // pass by markers and headers
+            long k = n.key;
+            if (k == EMPTY) // pass by markers and headers
                 return true;
             int c = cpr(cmp, k, hi);
             return c < 0 || (c == 0 && hiInclusive);
@@ -2132,7 +2118,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         /**
          * Returns lowest absolute key (ignoring directionality).
          */
-        Long lowestKey() {
+        long lowestKey() {
             LongComparator cmp = m.comparator;
             ConcurrentSkipListLongMap.Node<V> n = loNode(cmp);
             if (isBeforeEnd(n, cmp))
@@ -2144,11 +2130,11 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         /**
          * Returns highest absolute key (ignoring directionality).
          */
-        Long highestKey() {
+        long highestKey() {
             LongComparator cmp = m.comparator;
             ConcurrentSkipListLongMap.Node<V> n = hiNode(cmp);
             if (n != null) {
-                Long last = n.key;
+                long last = n.key;
                 if (inBounds(last, cmp)) return last;
             }
             throw new NoSuchElementException();
@@ -2207,7 +2193,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         /**
          * Submap version of ConcurrentSkipListLongMap.findNearEntry.
          */
-        LongEntry<V> getNearEntry(Long key, int rel) {
+        LongEntry<V> getNearEntry(long key, int rel) {
             LongComparator cmp = m.comparator;
             if (isDescending) { // adjust relation for direction
                 if ((rel & LT) == 0)
@@ -2244,7 +2230,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
                 if ((rel & LT) != 0) {
                     ConcurrentSkipListLongMap.Node<V> n = hiNode(cmp);
                     if (n != null) {
-                        Long last = n.key;
+                        long last = n.key;
                         if (inBounds(last, cmp)) return last;
                     }
                 }
@@ -2388,7 +2374,7 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
         SubMap<V> newSubMap(long fromKey, boolean fromInclusive, long toKey, boolean toInclusive) {
             LongComparator cmp = m.comparator;
             if (isDescending) { // flip senses
-                Long tk = fromKey;
+                long tk = fromKey;
                 fromKey = toKey;
                 toKey = tk;
                 boolean ti = fromInclusive;
@@ -2469,8 +2455,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             return new SubMap<V>(m, lo, loInclusive, hi, hiInclusive, !isDescending);
         }
 
-        /* ---------------- Relational methods -------------- */
-
         /**
          * {@inheritDoc}
          */
@@ -2535,37 +2519,53 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             return getNearKey(key, GT);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public Long firstKey() {
+        public long firstLongKey() {
             return isDescending ? highestKey() : lowestKey();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public Long lastKey() {
+        public long lastLongKey() {
             return isDescending ? lowestKey() : highestKey();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public LongEntry<V> firstEntry() {
             return isDescending ? highestEntry() : lowestEntry();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public LongEntry<V> lastEntry() {
             return isDescending ? lowestEntry() : highestEntry();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public LongEntry<V> pollFirstEntry() {
             return isDescending ? removeHighest() : removeLowest();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public LongEntry<V> pollLastEntry() {
             return isDescending ? removeLowest() : removeHighest();
         }
-
-        /* ---------------- Submap Views -------------- */
 
         @Override
         public NavigableSet<Long> keySet() {

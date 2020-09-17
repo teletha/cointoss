@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
+import java.util.NoSuchElementException;
 import java.util.SortedMap;
 
 import cointoss.util.primitive.maps.LongMap.LongEntry;
@@ -194,6 +195,38 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      *             keys
      */
     long higherKey(long key);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default Long firstKey() {
+        return firstLongKey();
+    }
+
+    /**
+     * Returns the first (lowest) key currently in this map.
+     *
+     * @return the first (lowest) key currently in this map
+     * @throws NoSuchElementException if this map is empty
+     */
+    long firstLongKey();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default Long lastKey() {
+        return lastLongKey();
+    }
+
+    /**
+     * Returns the last (highest) key currently in this map.
+     *
+     * @return the last (highest) key currently in this map
+     * @throws NoSuchElementException if this map is empty
+     */
+    long lastLongKey();
 
     /**
      * Returns a key-value mapping associated with the least key in this map, or {@code null} if the
