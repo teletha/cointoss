@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToLongFunction;
@@ -29,7 +28,9 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.util.Chrono;
-import cointoss.util.primitive.ConcurrentSkipListLongMap;
+import cointoss.util.primitive.maps.ConcurrentNavigableLongMap;
+import cointoss.util.primitive.maps.ConcurrentSkipListLongMap;
+import cointoss.util.primitive.maps.LongMap.LongEntry;
 import psychopath.Directory;
 import psychopath.File;
 
@@ -275,10 +276,10 @@ public final class TimeseriesStore<E> {
 
         long[] startIndex = index(start);
         long[] endIndex = index(end);
-        ConcurrentNavigableMap<Long, Segment> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
+        ConcurrentNavigableLongMap<Segment> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
 
-        for (Entry<Long, Segment> entry : sub.entrySet()) {
-            long time = entry.getKey();
+        for (LongEntry<Segment> entry : sub.longEntrySet()) {
+            long time = entry.getLongKey();
             int startItemIndex = 0;
             int endItemIndex = length;
 

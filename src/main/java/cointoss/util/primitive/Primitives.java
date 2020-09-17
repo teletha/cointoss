@@ -299,4 +299,30 @@ public class Primitives {
             return String.valueOf(ratio).concat("%");
         }
     }
+
+    /**
+     * Ensure that the specified value is long like value.
+     * 
+     * @param value
+     * @return
+     */
+    public static long ensureLong(Object value) {
+        if (value instanceof Long == false) {
+            throw new IllegalArgumentException("Value type must be Long.");
+        }
+        return ((Long) value).longValue();
+    }
+
+    /**
+     * Ensure that the specified value is long like value.
+     * 
+     * @param value
+     * @return
+     */
+    public static long ensureLong(Long value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Value must be Long, this is null.");
+        }
+        return value.longValue();
+    }
 }
