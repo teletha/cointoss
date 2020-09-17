@@ -16,7 +16,6 @@ import java.util.Comparator;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
-import java.util.SortedMap;
 
 import cointoss.util.primitive.maps.LongMap.LongEntry;
 
@@ -280,7 +279,7 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      * @return a reverse order view of this map
      */
     @Override
-    NavigableMap<Long, V> descendingMap();
+    NavigableLongMap<V> descendingMap();
 
     /**
      * Returns a {@link NavigableSet} view of the keys contained in this map. The set's iterator
@@ -313,6 +312,14 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
     NavigableSet<Long> descendingKeySet();
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    default NavigableMap<Long, V> subMap(Long fromKey, boolean fromInclusive, Long toKey, boolean toInclusive) {
+        return subMap(ensureLong(fromKey), fromInclusive, ensureLong(toKey), toInclusive);
+    }
+
+    /**
      * Returns a view of the portion of this map whose keys range from {@code fromKey} to
      * {@code toKey}. If {@code fromKey} and {@code toKey} are equal, the returned map is empty
      * unless {@code fromInclusive} and {@code toInclusive} are both true. The returned map is
@@ -341,8 +348,15 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      *             map itself has a restricted range, and {@code fromKey} or {@code toKey} lies
      *             outside the bounds of the range
      */
+    NavigableLongMap<V> subMap(long fromKey, boolean fromInclusive, long toKey, boolean toInclusive);
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    NavigableMap<Long, V> subMap(Long fromKey, boolean fromInclusive, Long toKey, boolean toInclusive);
+    default NavigableLongMap<V> headMap(Long toKey, boolean inclusive) {
+        return headMap(ensureLong(toKey), inclusive);
+    }
 
     /**
      * Returns a view of the portion of this map whose keys are less than (or equal to, if
@@ -366,8 +380,15 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      * @throws IllegalArgumentException if this map itself has a restricted range, and {@code toKey}
      *             lies outside the bounds of the range
      */
+    NavigableLongMap<V> headMap(long toKey, boolean inclusive);
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    NavigableMap<Long, V> headMap(Long toKey, boolean inclusive);
+    default NavigableLongMap<V> tailMap(Long fromKey, boolean inclusive) {
+        return tailMap(ensureLong(fromKey), inclusive);
+    }
 
     /**
      * Returns a view of the portion of this map whose keys are greater than (or equal to, if
@@ -392,8 +413,15 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      * @throws IllegalArgumentException if this map itself has a restricted range, and
      *             {@code fromKey} lies outside the bounds of the range
      */
+    NavigableLongMap<V> tailMap(long fromKey, boolean inclusive);
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    NavigableMap<Long, V> tailMap(Long fromKey, boolean inclusive);
+    default NavigableLongMap<V> subMap(Long fromKey, Long toKey) {
+        return subMap(ensureLong(fromKey), ensureLong(toKey));
+    }
 
     /**
      * {@inheritDoc}
@@ -405,8 +433,15 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    NavigableLongMap<V> subMap(long fromKey, long toKey);
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    SortedMap<Long, V> subMap(Long fromKey, Long toKey);
+    default NavigableLongMap<V> headMap(Long toKey) {
+        return headMap(ensureLong(toKey));
+    }
 
     /**
      * {@inheritDoc}
@@ -418,8 +453,15 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    NavigableLongMap<V> headMap(long toKey);
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    SortedMap<Long, V> headMap(Long toKey);
+    default NavigableLongMap<V> tailMap(Long fromKey) {
+        return tailMap(ensureLong(fromKey));
+    }
 
     /**
      * {@inheritDoc}
@@ -431,6 +473,5 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
-    @Override
-    SortedMap<Long, V> tailMap(Long fromKey);
+    NavigableLongMap<V> tailMap(long fromKey);
 }
