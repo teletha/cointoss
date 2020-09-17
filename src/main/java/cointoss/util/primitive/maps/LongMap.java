@@ -14,6 +14,9 @@ import static cointoss.util.primitive.Primitives.ensureLong;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Specialized {@link Map} interface for primitive long.
+ */
 public interface LongMap<V> extends Map<Long, V> {
 
     /**

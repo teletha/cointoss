@@ -9,41 +9,14 @@
  */
 package cointoss.util.primitive.maps;
 
+import static cointoss.util.primitive.Primitives.ensureLong;
+
 import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.LongFunction;
 
-import cointoss.util.primitive.LongBiConsumer;
-import cointoss.util.primitive.LongBiFunction;
-
 public interface ConcurrentLongMap<V> extends ConcurrentMap<Long, V>, LongMap<V> {
-
-    /**
-     * Ensure key type as {@link Long}.
-     * 
-     * @param key
-     * @return
-     */
-    private long ensureLong(Object key) {
-        if (key instanceof Long == false) {
-            throw new IllegalArgumentException("Key type must be Long.");
-        }
-        return ((Long) key).longValue();
-    }
-
-    /**
-     * Ensure key type as {@link Long}.
-     * 
-     * @param key
-     * @return
-     */
-    private long ensureLong(Long key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Key must be Long, this is null.");
-        }
-        return key.longValue();
-    }
 
     /**
      * {@inheritDoc}
@@ -74,36 +47,6 @@ public interface ConcurrentLongMap<V> extends ConcurrentMap<Long, V>, LongMap<V>
     default V getOrDefault(long key, V defaultValue) {
         V value = get(key);
         return value != null ? value : defaultValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @implSpec The default implementation is equivalent to, for this {@code map}: <pre> {@code
-     * for (Map.Entry<K,V> entry : map.entrySet()) {
-     *   action.accept(entry.getKey(), entry.getValue());
-     * }}</pre>
-     *
-     * @implNote The default implementation assumes that {@code IllegalStateException} thrown by
-     *           {@code getKey()} or {@code getValue()} indicates that the entry has been removed
-     *           and cannot be processed. Operation continues for subsequent entries.
-     *
-     * @throws NullPointerException {@inheritDoc}
-     */
-    default void forEachP(LongBiConsumer<? super V> action) {
-        Objects.requireNonNull(action);
-        for (LongEntry<V> entry : longEntrySet()) {
-            long k;
-            V v;
-            try {
-                k = entry.getLongKey();
-                v = entry.getValue();
-            } catch (IllegalStateException ise) {
-                // this usually means the entry is no longer in the map.
-                continue;
-            }
-            action.accept(k, v);
-        }
     }
 
     /**
@@ -260,48 +203,6 @@ public interface ConcurrentLongMap<V> extends ConcurrentMap<Long, V>, LongMap<V>
     /**
      * {@inheritDoc}
      *
-     * @implSpec
-     *           <p>
-     *           The default implementation is equivalent to, for this {@code map}: <pre> {@code
-     * for (Map.Entry<K,V> entry : map.entrySet()) {
-     *   K k;
-     *   V v;
-     *   do {
-     *     k = entry.getKey();
-     *     v = entry.getValue();
-     *   } while (!map.replace(k, v, function.apply(k, v)));
-     * }}</pre>
-     *
-     *           The default implementation may retry these steps when multiple threads attempt
-     *           updates including potentially calling the function repeatedly for a given key.
-     *
-     *           <p>
-     *           This implementation assumes that the ConcurrentMap cannot contain null values and
-     *           {@code get()} returning null unambiguously means the key is absent. Implementations
-     *           which support null values <strong>must</strong> override this default
-     *           implementation.
-     *
-     * @throws UnsupportedOperationException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws ClassCastException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
-     */
-    default void replaceAll(LongBiFunction<? super V, ? extends V> function) {
-        Objects.requireNonNull(function);
-        forEachP((k, v) -> {
-            while (!replace(k, v, function.apply(k, v))) {
-                // v changed or k is gone
-                if ((v = get(k)) == null) {
-                    // k is no longer in the map.
-                    break;
-                }
-            }
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @implSpec The default implementation is equivalent to the following steps for this
      *           {@code map}:
      *
@@ -329,96 +230,6 @@ public interface ConcurrentLongMap<V> extends ConcurrentMap<Long, V>, LongMap<V>
         V oldValue, newValue;
         return ((oldValue = get(key)) == null && (newValue = mappingFunction
                 .apply(key)) != null && (oldValue = putIfAbsent(key, newValue)) == null) ? newValue : oldValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @implSpec The default implementation is equivalent to performing the following steps for this
-     *           {@code map}:
-     *
-     *           <pre> {@code
-     * for (V oldValue; (oldValue = map.get(key)) != null; ) {
-     *   V newValue = remappingFunction.apply(key, oldValue);
-     *   if ((newValue == null)
-     *       ? map.remove(key, oldValue)
-     *       : map.replace(key, oldValue, newValue))
-     *     return newValue;
-     * }
-     * return null;}</pre> When multiple threads attempt updates, map operations and the remapping
-     *           function may be called multiple times.
-     *
-     *           <p>
-     *           This implementation assumes that the ConcurrentMap cannot contain null values and
-     *           {@code get()} returning null unambiguously means the key is absent. Implementations
-     *           which support null values <strong>must</strong> override this default
-     *           implementation.
-     *
-     * @throws UnsupportedOperationException {@inheritDoc}
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
-     */
-    default V computeIfPresent(long key, LongBiFunction<? super V, ? extends V> remappingFunction) {
-        Objects.requireNonNull(remappingFunction);
-        for (V oldValue; (oldValue = get(key)) != null;) {
-            V newValue = remappingFunction.apply(key, oldValue);
-            if ((newValue == null) ? remove(key, oldValue) : replace(key, oldValue, newValue)) return newValue;
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @implSpec The default implementation is equivalent to performing the following steps for this
-     *           {@code map}:
-     *
-     *           <pre> {@code
-     * for (;;) {
-     *   V oldValue = map.get(key);
-     *   V newValue = remappingFunction.apply(key, oldValue);
-     *   if (newValue != null) {
-     *     if ((oldValue != null)
-     *       ? map.replace(key, oldValue, newValue)
-     *       : map.putIfAbsent(key, newValue) == null)
-     *       return newValue;
-     *   } else if (oldValue == null || map.remove(key, oldValue)) {
-     *     return null;
-     *   }
-     * }}</pre> When multiple threads attempt updates, map operations and the remapping function
-     *           may be called multiple times.
-     *
-     *           <p>
-     *           This implementation assumes that the ConcurrentMap cannot contain null values and
-     *           {@code get()} returning null unambiguously means the key is absent. Implementations
-     *           which support null values <strong>must</strong> override this default
-     *           implementation.
-     *
-     * @throws UnsupportedOperationException {@inheritDoc}
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
-     */
-    default V compute(long key, LongBiFunction<? super V, ? extends V> remappingFunction) {
-        retry: for (;;) {
-            V oldValue = get(key);
-            // if putIfAbsent fails, opportunistically use its return value
-            haveOldValue: for (;;) {
-                V newValue = remappingFunction.apply(key, oldValue);
-                if (newValue != null) {
-                    if (oldValue != null) {
-                        if (replace(key, oldValue, newValue)) return newValue;
-                    } else if ((oldValue = putIfAbsent(key, newValue)) == null)
-                        return newValue;
-                    else
-                        continue haveOldValue;
-                } else if (oldValue == null || remove(key, oldValue)) {
-                    return null;
-                }
-                continue retry;
-            }
-        }
     }
 
     /**

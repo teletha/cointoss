@@ -63,6 +63,7 @@ public interface ConcurrentNavigableLongMap<V> extends ConcurrentNavigableMap<Lo
      *             map itself has a restricted range, and {@code fromKey} or {@code toKey} lies
      *             outside the bounds of the range
      */
+    @Override
     ConcurrentNavigableLongMap<V> subMap(long fromKey, boolean fromInclusive, long toKey, boolean toInclusive);
 
     /**
@@ -95,6 +96,7 @@ public interface ConcurrentNavigableLongMap<V> extends ConcurrentNavigableMap<Lo
      * @throws IllegalArgumentException if this map itself has a restricted range, and {@code toKey}
      *             lies outside the bounds of the range
      */
+    @Override
     ConcurrentNavigableLongMap<V> headMap(long toKey, boolean inclusive);
 
     /**
@@ -128,6 +130,7 @@ public interface ConcurrentNavigableLongMap<V> extends ConcurrentNavigableMap<Lo
      * @throws IllegalArgumentException if this map itself has a restricted range, and
      *             {@code fromKey} lies outside the bounds of the range
      */
+    @Override
     ConcurrentNavigableLongMap<V> tailMap(long fromKey, boolean inclusive);
 
     /**
@@ -148,6 +151,7 @@ public interface ConcurrentNavigableLongMap<V> extends ConcurrentNavigableMap<Lo
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    @Override
     ConcurrentNavigableLongMap<V> subMap(long fromKey, long toKey);
 
     /**
@@ -168,6 +172,7 @@ public interface ConcurrentNavigableLongMap<V> extends ConcurrentNavigableMap<Lo
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    @Override
     ConcurrentNavigableLongMap<V> headMap(long toKey);
 
     /**
@@ -188,6 +193,7 @@ public interface ConcurrentNavigableLongMap<V> extends ConcurrentNavigableMap<Lo
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    @Override
     ConcurrentNavigableLongMap<V> tailMap(long fromKey);
 
     /**
