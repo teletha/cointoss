@@ -11,6 +11,7 @@ package cointoss.util.primitive.maps;
 
 import static cointoss.util.primitive.Primitives.ensureLong;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
@@ -161,9 +162,9 @@ public interface LongMap<V> extends Map<Long, V> {
     Set<LongEntry<V>> longEntrySet();
 
     /**
-     * 
+     * Specialized {@link Entry} for primitive long.
      */
-    public static interface LongEntry<V> extends Map.Entry<Long, V> {
+    interface LongEntry<V> extends Map.Entry<Long, V> {
 
         /**
          * {@inheritDoc}
@@ -218,5 +219,48 @@ public interface LongMap<V> extends Map<Long, V> {
                 }
             };
         }
+    }
+
+    /**
+     * Specialized {@link Comparator} for primitive long.
+     */
+    interface LongComparator extends Comparator<Long> {
+
+        /**
+         * Compare values.
+         * 
+         * @param one
+         * @param other
+         * @return
+         */
+        int compare(long one, long other);
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        default int compare(Long o1, Long o2) {
+            return compare(o1.longValue(), o2.longValue());
+        }
+    }
+
+    /**
+     * Create the concurrent-safe sorted map for primitive long with natual order.
+     * 
+     * @param <V> A value type.
+     * @return A new created map.
+     */
+    public static <V> ConcurrentNavigableLongMap<V> createSortedMap() {
+        return new ConcurrentSkipListLongMap(null);
+    }
+
+    /**
+     * Create the concurrent-safe sorted map for primitive long with your order.
+     * 
+     * @param <V> A value type.
+     * @return A new created map.
+     */
+    public static <V> ConcurrentNavigableLongMap<V> createSortedMap(LongComparator comparator) {
+        return new ConcurrentSkipListLongMap(comparator);
     }
 }

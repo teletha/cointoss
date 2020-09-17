@@ -897,20 +897,12 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     }
 
     /**
-     * Constructs a new, empty map, sorted according to the {@linkplain Comparable natural ordering}
-     * of the keys.
-     */
-    public ConcurrentSkipListLongMap() {
-        this(null);
-    }
-
-    /**
      * Constructs a new, empty map, sorted according to the specified comparator.
      *
      * @param comparator the comparator that will be used to order this map. If {@code null}, the
      *            {@linkplain Comparable natural ordering} of the keys will be used.
      */
-    public ConcurrentSkipListLongMap(LongComparator comparator) {
+    ConcurrentSkipListLongMap(LongComparator comparator) {
         this.comparator = comparator == null ? Long::compare : comparator;
     }
 
@@ -1465,15 +1457,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     }
 
     /**
-     * Returns a value mapping associated with the least key in this map, or {@code null} if the map
-     * is empty.
-     */
-    public V firstValue() {
-        Node<V> node = findFirst();
-        return node == null ? null : node.value;
-    }
-
-    /**
      * Returns a key-value mapping associated with the greatest key in this map, or {@code null} if
      * the map is empty. The returned entry does <em>not</em> support the {@code Entry.setValue}
      * method.
@@ -1481,15 +1464,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
     @Override
     public LongEntry<V> lastEntry() {
         return findLastEntry();
-    }
-
-    /**
-     * Returns a value mapping associated with the greatest key in this map, or {@code null} if the
-     * map is empty.
-     */
-    public V lastValue() {
-        Node<V> node = findLast();
-        return node == null ? null : node.value;
     }
 
     /**
@@ -2435,6 +2409,70 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
          * {@inheritDoc}
          */
         @Override
+        public Entry<Long, V> lowerEntry(Long key) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Long lowerKey(Long key) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Entry<Long, V> floorEntry(Long key) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Long floorKey(Long key) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Entry<Long, V> ceilingEntry(Long key) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Long ceilingKey(Long key) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Entry<Long, V> higherEntry(Long key) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Long higherKey(Long key) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public long firstLongKey() {
             return isDescending ? highestKey() : lowestKey();
         }
@@ -2443,16 +2481,16 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
          * {@inheritDoc}
          */
         @Override
-        public long lastLongKey() {
-            return isDescending ? lowestKey() : highestKey();
+        public LongEntry<V> firstEntry() {
+            return isDescending ? highestEntry() : lowestEntry();
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> firstEntry() {
-            return isDescending ? highestEntry() : lowestEntry();
+        public long lastLongKey() {
+            return isDescending ? lowestKey() : highestKey();
         }
 
         /**
@@ -3063,29 +3101,6 @@ public class ConcurrentSkipListLongMap<V> extends AbstractMap<Long, V> implement
             est = getAdderCount();
         }
         return new EntrySpliterator<V>(comparator, h, n, EMPTY, est);
-    }
-
-    /**
-     * {@link Comparator} for primitive longs.
-     */
-    private interface LongComparator extends Comparator<Long> {
-
-        /**
-         * Compare values.
-         * 
-         * @param one
-         * @param other
-         * @return
-         */
-        int compare(long one, long other);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        default int compare(Long o1, Long o2) {
-            return compare(o1.longValue(), o2.longValue());
-        }
     }
 
     /**

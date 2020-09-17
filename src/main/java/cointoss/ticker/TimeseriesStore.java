@@ -29,7 +29,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.util.Chrono;
 import cointoss.util.primitive.maps.ConcurrentNavigableLongMap;
-import cointoss.util.primitive.maps.ConcurrentSkipListLongMap;
+import cointoss.util.primitive.maps.LongMap;
 import cointoss.util.primitive.maps.LongMap.LongEntry;
 import psychopath.Directory;
 import psychopath.File;
@@ -49,7 +49,7 @@ public final class TimeseriesStore<E> {
     private final ToLongFunction<E> timestampExtractor;
 
     /** The completed data manager. */
-    private final ConcurrentSkipListLongMap<Segment> indexed = new ConcurrentSkipListLongMap();
+    private final ConcurrentNavigableLongMap<Segment> indexed = LongMap.createSortedMap();
 
     /** A number of items. */
     private int size;

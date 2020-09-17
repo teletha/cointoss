@@ -212,6 +212,25 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
     long firstLongKey();
 
     /**
+     * Returns a value mapping associated with the least key in this map, or {@code null} if the map
+     * is empty.
+     *
+     * @return A value with the least key, or {@code null} if this map is empty
+     */
+    default V firstValue() {
+        return isEmpty() ? null : firstEntry().getValue();
+    }
+
+    /**
+     * Returns a key-value mapping associated with the least key in this map, or {@code null} if the
+     * map is empty.
+     *
+     * @return an entry with the least key, or {@code null} if this map is empty
+     */
+    @Override
+    LongEntry<V> firstEntry();
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -228,13 +247,14 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
     long lastLongKey();
 
     /**
-     * Returns a key-value mapping associated with the least key in this map, or {@code null} if the
+     * Returns a value mapping associated with the greatest key in this map, or {@code null} if the
      * map is empty.
      *
-     * @return an entry with the least key, or {@code null} if this map is empty
+     * @return A value with the greatest key, or {@code null} if this map is empty
      */
-    @Override
-    LongEntry<V> firstEntry();
+    default V lastValue() {
+        return isEmpty() ? null : lastEntry().getValue();
+    }
 
     /**
      * Returns a key-value mapping associated with the greatest key in this map, or {@code null} if

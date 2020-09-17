@@ -12,9 +12,14 @@ package cointoss.util.primitive.maps;
 import static cointoss.util.primitive.Primitives.ensureLong;
 
 import java.util.Comparator;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 
+/**
+ * Sepcialized {@link ConcurrentMap} and {@link NavigableMap} interface for primitive long.
+ */
 public interface ConcurrentNavigableLongMap<V> extends ConcurrentNavigableMap<Long, V>, ConcurrentLongMap<V>, NavigableLongMap<V> {
 
     /**
