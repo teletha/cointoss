@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -257,12 +258,12 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * The comparator used to maintain order in this map. (Non-private to simplify access in nested
      * classes.)
      */
-    final LongComparator comparator;
+    private final LongComparator comparator;
 
     /**
      * Returns the header for base node list, or null if uninitialized
      */
-    final Node<V> baseHead() {
+    private final Node<V> baseHead() {
         Index<V> h;
         VarHandle.acquireFence();
         return ((h = head) == null) ? null : h.node;
@@ -276,7 +277,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * @param b if nonnull, predecessor
      * @param n if nonnull, node known to be deleted
      */
-    static <V> void unlinkNode(Node<V> b, Node<V> n) {
+    private static <V> void unlinkNode(Node<V> b, Node<V> n) {
         if (b != null && n != null) {
             Node<V> f, p;
             for (;;) {
@@ -307,7 +308,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     /**
      * Returns element count, initializing adder if necessary.
      */
-    final long getAdderCount() {
+    private final long getAdderCount() {
         LongAdder a;
         long c;
         do {
@@ -1664,439 +1665,74 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         return null;
     }
 
-    /**
-     * 
-     */
-    private static final class KeySet<V> extends AbstractSet<Long> implements NavigableLongSet {
+    // default Map method overrides
 
-        /** The original map. */
-        private final ConcurrentNavigableLongMap<V> m;
-
-        /**
-         * Build key-set view.
-         * 
-         * @param map
-         */
-        private KeySet(ConcurrentNavigableLongMap<V> map) {
-            m = map;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int size() {
-            return m.size();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isEmpty() {
-            return m.isEmpty();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean contains(Object o) {
-            return m.containsKey(o);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean remove(Object o) {
-            return m.remove(o) != null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void clear() {
-            m.clear();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long lower(long e) {
-            return m.lowerKey(e);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long floor(long e) {
-            return m.floorKey(e);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long ceiling(long e) {
-            return m.ceilingKey(e);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long higher(long e) {
-            return m.higherKey(e);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Comparator<? super Long> comparator() {
-            return m.comparator();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Long first() {
-            return m.firstKey();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Long last() {
-            return m.lastKey();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long pollFirstLong() {
-            LongEntry<V> entry = m.pollFirstEntry();
-            if (entry == null) {
-                throw new NoSuchElementException();
-            }
-            return entry.getLongKey();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long pollLastLong() {
-            LongEntry<V> entry = m.pollLastEntry();
-            if (entry == null) {
-                throw new NoSuchElementException();
-            }
-            return entry.getLongKey();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Iterator<Long> iterator() {
-            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).new KeyIterator() : ((SubMap<V>) m).new SubMapKeyIterator();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) return true;
-            if (!(o instanceof Set)) return false;
-            Collection<?> c = (Collection<?>) o;
-            try {
-                return containsAll(c) && c.containsAll(this);
-            } catch (ClassCastException | NullPointerException unused) {
-                return false;
+    @Override
+    public void forEach(BiConsumer<? super Long, ? super V> action) {
+        if (action == null) throw new NullPointerException();
+        Node<V> b, n;
+        V v;
+        if ((b = baseHead()) != null) {
+            while ((n = b.next) != null) {
+                if ((v = n.value) != null) action.accept(n.key, v);
+                b = n;
             }
         }
+    }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object[] toArray() {
-            return I.signal(this).toList().toArray();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public <T> T[] toArray(T[] a) {
-            return I.signal(this).toList().toArray(a);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Iterator<Long> descendingIterator() {
-            return descendingSet().iterator();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public NavigableLongSet subSet(long fromElement, boolean fromInclusive, long toElement, boolean toInclusive) {
-            return new KeySet(m.subMap(fromElement, fromInclusive, toElement, toInclusive));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public NavigableLongSet headSet(long toElement, boolean inclusive) {
-            return new KeySet<>(m.headMap(toElement, inclusive));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public NavigableLongSet tailSet(long fromElement, boolean inclusive) {
-            return new KeySet<>(m.tailMap(fromElement, inclusive));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public NavigableLongSet subSet(long fromElement, long toElement) {
-            return subSet(fromElement, true, toElement, false);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public NavigableLongSet headSet(long toElement) {
-            return headSet(toElement, false);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public NavigableLongSet tailSet(long fromElement) {
-            return tailSet(fromElement, true);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public NavigableLongSet descendingSet() {
-            return new KeySet<>(m.descendingMap());
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Spliterator<Long> spliterator() {
-            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).keySpliterator() : ((SubMap<V>) m).new SubMapKeyIterator();
+    @Override
+    public void replaceAll(BiFunction<? super Long, ? super V, ? extends V> function) {
+        if (function == null) throw new NullPointerException();
+        Node<V> b, n;
+        V v;
+        if ((b = baseHead()) != null) {
+            while ((n = b.next) != null) {
+                while ((v = n.value) != null) {
+                    V r = function.apply(n.key, v);
+                    if (r == null) throw new NullPointerException();
+                    if (VALUE.compareAndSet(n, v, r)) break;
+                }
+                b = n;
+            }
         }
     }
 
     /**
-     * 
+     * Helper method for EntrySet.removeIf.
      */
-    private static class Values<V> extends AbstractCollection<V> {
-
-        /** The original view. */
-        private final ConcurrentNavigableLongMap<V> m;
-
-        /**
-         * Build view.
-         * 
-         * @param map
-         */
-        private Values(ConcurrentNavigableLongMap<V> map) {
-            m = map;
-        }
-
-        @Override
-        public Iterator<V> iterator() {
-            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).new ValueIterator()
-                    : ((SubMap<V>) m).new SubMapValueIterator();
-        }
-
-        @Override
-        public int size() {
-            return m.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return m.isEmpty();
-        }
-
-        @Override
-        public boolean contains(Object o) {
-            return m.containsValue(o);
-        }
-
-        @Override
-        public void clear() {
-            m.clear();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object[] toArray() {
-            return I.signal(this).toList().toArray();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public <T> T[] toArray(T[] a) {
-            return I.signal(this).toList().toArray(a);
-        }
-
-        @Override
-        public Spliterator<V> spliterator() {
-            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).valueSpliterator() : ((SubMap<V>) m).new SubMapValueIterator();
-        }
-
-        @Override
-        public boolean removeIf(Predicate<? super V> filter) {
-            if (filter == null) throw new NullPointerException();
-            if (m instanceof SkipListLongMap) return ((SkipListLongMap<V>) m).removeValueIf(filter);
-            // else use iterator
-            Iterator<LongEntry<V>> it = ((SubMap<V>) m).new SubMapEntryIterator();
-            boolean removed = false;
-            while (it.hasNext()) {
-                LongEntry<V> e = it.next();
-                V v = e.getValue();
-                if (filter.test(v) && m.remove(e.getLongKey(), v)) removed = true;
+    private boolean removeEntryIf(Predicate<? super LongEntry<V>> function) {
+        if (function == null) throw new NullPointerException();
+        boolean removed = false;
+        Node<V> b, n;
+        V v;
+        if ((b = baseHead()) != null) {
+            while ((n = b.next) != null) {
+                if ((v = n.value) != null) {
+                    long k = n.key;
+                    LongEntry<V> e = LongEntry.immutable(k, v);
+                    if (function.test(e) && remove(k, v)) removed = true;
+                }
+                b = n;
             }
-            return removed;
         }
+        return removed;
     }
 
     /**
-     * 
+     * Helper method for Values.removeIf.
      */
-    private static class EntrySet<V> extends AbstractSet<LongEntry<V>> {
-
-        /** The original view. */
-        private final ConcurrentNavigableLongMap<V> m;
-
-        /**
-         * Build view.
-         * 
-         * @param map
-         */
-        private EntrySet(ConcurrentNavigableLongMap<V> map) {
-            m = map;
-        }
-
-        @Override
-        public Iterator<LongEntry<V>> iterator() {
-            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).new EntryIterator()
-                    : ((SubMap<V>) m).new SubMapEntryIterator();
-        }
-
-        @Override
-        public boolean contains(Object o) {
-            if (!(o instanceof Map.Entry)) return false;
-            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-            V v = m.get(e.getKey());
-            return v != null && v.equals(e.getValue());
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            if (!(o instanceof Map.Entry)) return false;
-            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-            return m.remove(e.getKey(), e.getValue());
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return m.isEmpty();
-        }
-
-        @Override
-        public int size() {
-            return m.size();
-        }
-
-        @Override
-        public void clear() {
-            m.clear();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) return true;
-            if (!(o instanceof Set)) return false;
-            Collection<?> c = (Collection<?>) o;
-            try {
-                return containsAll(c) && c.containsAll(this);
-            } catch (ClassCastException | NullPointerException unused) {
-                return false;
+    private boolean removeValueIf(Predicate<? super V> function) {
+        if (function == null) throw new NullPointerException();
+        boolean removed = false;
+        Node<V> b, n;
+        V v;
+        if ((b = baseHead()) != null) {
+            while ((n = b.next) != null) {
+                if ((v = n.value) != null && function.test(v) && remove(n.key, v)) removed = true;
+                b = n;
             }
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object[] toArray() {
-            return I.signal(this).toList().toArray();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public <T> T[] toArray(T[] a) {
-            return I.signal(this).toList().toArray(a);
-        }
-
-        @Override
-        public Spliterator<LongEntry<V>> spliterator() {
-            if (m instanceof SkipListLongMap) {
-                return ((SkipListLongMap) m).entrySpliterator();
-            } else {
-
-            }
-            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).entrySpliterator() : ((SubMap<V>) m).new SubMapEntryIterator();
-        }
-
-        @Override
-        public boolean removeIf(Predicate<? super LongEntry<V>> filter) {
-            if (filter == null) throw new NullPointerException();
-            if (m instanceof SkipListLongMap) return ((SkipListLongMap<V>) m).removeEntryIf(filter);
-            // else use iterator
-            Iterator<LongEntry<V>> it = ((SubMap<V>) m).new SubMapEntryIterator();
-            boolean removed = false;
-            while (it.hasNext()) {
-                LongEntry<V> e = it.next();
-                if (filter.test(e) && m.remove(e.getLongKey(), e.getValue())) removed = true;
-            }
-            return removed;
-        }
+        return removed;
     }
 
     /**
@@ -2106,13 +1742,11 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * add mappings outside their ranges result in {@link IllegalArgumentException}. Instances of
      * this class are constructed only using the {@code subMap}, {@code headMap}, and
      * {@code tailMap} methods of their underlying maps.
-     *
-     * @serial include
      */
-    static final class SubMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V>, Serializable {
+    private static class SubMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V>, Serializable {
 
         /** Underlying map */
-        final SkipListLongMap<V> m;
+        private final SkipListLongMap<V> m;
 
         /** lower bound key, or null if from start */
         private final long lo;
@@ -2127,7 +1761,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         private final boolean hiInclusive;
 
         /** direction */
-        final boolean isDescending;
+        private final boolean isDescending;
 
         // Lazily initialized view holders
         private transient KeySet<V> keySetView;
@@ -2940,381 +2574,450 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         }
     }
 
+    /**
+     * 
+     */
+    private static final class KeySet<V> extends AbstractSet<Long> implements NavigableLongSet {
+
+        /** The original map. */
+        private final ConcurrentNavigableLongMap<V> m;
+
+        /**
+         * Build key-set view.
+         * 
+         * @param map
+         */
+        private KeySet(ConcurrentNavigableLongMap<V> map) {
+            m = map;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int size() {
+            return m.size();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isEmpty() {
+            return m.isEmpty();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean contains(Object o) {
+            return m.containsKey(o);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean remove(Object o) {
+            return m.remove(o) != null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void clear() {
+            m.clear();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long lower(long e) {
+            return m.lowerKey(e);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long floor(long e) {
+            return m.floorKey(e);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long ceiling(long e) {
+            return m.ceilingKey(e);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long higher(long e) {
+            return m.higherKey(e);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Comparator<? super Long> comparator() {
+            return m.comparator();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Long first() {
+            return m.firstKey();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Long last() {
+            return m.lastKey();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long pollFirstLong() {
+            LongEntry<V> entry = m.pollFirstEntry();
+            if (entry == null) {
+                throw new NoSuchElementException();
+            }
+            return entry.getLongKey();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long pollLastLong() {
+            LongEntry<V> entry = m.pollLastEntry();
+            if (entry == null) {
+                throw new NoSuchElementException();
+            }
+            return entry.getLongKey();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Iterator<Long> iterator() {
+            if (m instanceof SkipListLongMap) {
+                return ((SkipListLongMap) m).createIteratorFor(Type.Key);
+            } else {
+                return ((SubMap) m).new SubMapKeyIterator();
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof Set)) return false;
+            Collection<?> c = (Collection<?>) o;
+            try {
+                return containsAll(c) && c.containsAll(this);
+            } catch (ClassCastException | NullPointerException unused) {
+                return false;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object[] toArray() {
+            return I.signal(this).toList().toArray();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return I.signal(this).toList().toArray(a);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Iterator<Long> descendingIterator() {
+            return descendingSet().iterator();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public NavigableLongSet subSet(long fromElement, boolean fromInclusive, long toElement, boolean toInclusive) {
+            return new KeySet(m.subMap(fromElement, fromInclusive, toElement, toInclusive));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public NavigableLongSet headSet(long toElement, boolean inclusive) {
+            return new KeySet<>(m.headMap(toElement, inclusive));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public NavigableLongSet tailSet(long fromElement, boolean inclusive) {
+            return new KeySet<>(m.tailMap(fromElement, inclusive));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public NavigableLongSet subSet(long fromElement, long toElement) {
+            return subSet(fromElement, true, toElement, false);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public NavigableLongSet headSet(long toElement) {
+            return headSet(toElement, false);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public NavigableLongSet tailSet(long fromElement) {
+            return tailSet(fromElement, true);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public NavigableLongSet descendingSet() {
+            return new KeySet<>(m.descendingMap());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Spliterator<Long> spliterator() {
+            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).createSpliteratorFor(Type.Key)
+                    : ((SubMap<V>) m).new SubMapKeyIterator();
+        }
+    }
+
+    /**
+     * 
+     */
+    private static class Values<V> extends AbstractCollection<V> {
+
+        /** The original view. */
+        private final ConcurrentNavigableLongMap<V> m;
+
+        /**
+         * Build view.
+         * 
+         * @param map
+         */
+        private Values(ConcurrentNavigableLongMap<V> map) {
+            m = map;
+        }
+
+        @Override
+        public Iterator<V> iterator() {
+            if (m instanceof SkipListLongMap) {
+                return ((SkipListLongMap) m).createIteratorFor(Type.Value);
+            } else {
+                return ((SubMap) m).new SubMapValueIterator();
+            }
+        }
+
+        @Override
+        public int size() {
+            return m.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return m.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return m.containsValue(o);
+        }
+
+        @Override
+        public void clear() {
+            m.clear();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object[] toArray() {
+            return I.signal(this).toList().toArray();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return I.signal(this).toList().toArray(a);
+        }
+
+        @Override
+        public Spliterator<V> spliterator() {
+            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).createSpliteratorFor(Type.Value)
+                    : ((SubMap<V>) m).new SubMapValueIterator();
+        }
+
+        @Override
+        public boolean removeIf(Predicate<? super V> filter) {
+            if (filter == null) throw new NullPointerException();
+            if (m instanceof SkipListLongMap) return ((SkipListLongMap<V>) m).removeValueIf(filter);
+            // else use iterator
+            Iterator<LongEntry<V>> it = ((SubMap<V>) m).new SubMapEntryIterator();
+            boolean removed = false;
+            while (it.hasNext()) {
+                LongEntry<V> e = it.next();
+                V v = e.getValue();
+                if (filter.test(v) && m.remove(e.getLongKey(), v)) removed = true;
+            }
+            return removed;
+        }
+    }
+
+    /**
+     * 
+     */
+    private static class EntrySet<V> extends AbstractSet<LongEntry<V>> {
+
+        /** The original view. */
+        private final ConcurrentNavigableLongMap<V> m;
+
+        /**
+         * Build view.
+         * 
+         * @param map
+         */
+        private EntrySet(ConcurrentNavigableLongMap<V> map) {
+            m = map;
+        }
+
+        @Override
+        public Iterator<LongEntry<V>> iterator() {
+            if (m instanceof SkipListLongMap) {
+                return ((SkipListLongMap) m).createIteratorFor(Type.Entry);
+            } else {
+                return ((SubMap) m).new SubMapEntryIterator();
+            }
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            if (!(o instanceof Map.Entry)) return false;
+            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+            V v = m.get(e.getKey());
+            return v != null && v.equals(e.getValue());
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            if (!(o instanceof Map.Entry)) return false;
+            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+            return m.remove(e.getKey(), e.getValue());
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return m.isEmpty();
+        }
+
+        @Override
+        public int size() {
+            return m.size();
+        }
+
+        @Override
+        public void clear() {
+            m.clear();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof Set)) return false;
+            Collection<?> c = (Collection<?>) o;
+            try {
+                return containsAll(c) && c.containsAll(this);
+            } catch (ClassCastException | NullPointerException unused) {
+                return false;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object[] toArray() {
+            return I.signal(this).toList().toArray();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return I.signal(this).toList().toArray(a);
+        }
+
+        @Override
+        public Spliterator<LongEntry<V>> spliterator() {
+            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).createSpliteratorFor(Type.Entry)
+                    : ((SubMap<V>) m).new SubMapEntryIterator();
+        }
+
+        @Override
+        public boolean removeIf(Predicate<? super LongEntry<V>> filter) {
+            if (filter == null) throw new NullPointerException();
+            if (m instanceof SkipListLongMap) return ((SkipListLongMap<V>) m).removeEntryIf(filter);
+            // else use iterator
+            Iterator<LongEntry<V>> it = ((SubMap<V>) m).new SubMapEntryIterator();
+            boolean removed = false;
+            while (it.hasNext()) {
+                LongEntry<V> e = it.next();
+                if (filter.test(e) && m.remove(e.getLongKey(), e.getValue())) removed = true;
+            }
+            return removed;
+        }
+    }
+
     // default Map method overrides
-
-    @Override
-    public void forEach(BiConsumer<? super Long, ? super V> action) {
-        if (action == null) throw new NullPointerException();
-        Node<V> b, n;
-        V v;
-        if ((b = baseHead()) != null) {
-            while ((n = b.next) != null) {
-                if ((v = n.value) != null) action.accept(n.key, v);
-                b = n;
-            }
-        }
-    }
-
-    @Override
-    public void replaceAll(BiFunction<? super Long, ? super V, ? extends V> function) {
-        if (function == null) throw new NullPointerException();
-        Node<V> b, n;
-        V v;
-        if ((b = baseHead()) != null) {
-            while ((n = b.next) != null) {
-                while ((v = n.value) != null) {
-                    V r = function.apply(n.key, v);
-                    if (r == null) throw new NullPointerException();
-                    if (VALUE.compareAndSet(n, v, r)) break;
-                }
-                b = n;
-            }
-        }
-    }
-
-    /**
-     * Helper method for EntrySet.removeIf.
-     */
-    boolean removeEntryIf(Predicate<? super LongEntry<V>> function) {
-        if (function == null) throw new NullPointerException();
-        boolean removed = false;
-        Node<V> b, n;
-        V v;
-        if ((b = baseHead()) != null) {
-            while ((n = b.next) != null) {
-                if ((v = n.value) != null) {
-                    long k = n.key;
-                    LongEntry<V> e = LongEntry.immutable(k, v);
-                    if (function.test(e) && remove(k, v)) removed = true;
-                }
-                b = n;
-            }
-        }
-        return removed;
-    }
-
-    /**
-     * Helper method for Values.removeIf.
-     */
-    boolean removeValueIf(Predicate<? super V> function) {
-        if (function == null) throw new NullPointerException();
-        boolean removed = false;
-        Node<V> b, n;
-        V v;
-        if ((b = baseHead()) != null) {
-            while ((n = b.next) != null) {
-                if ((v = n.value) != null && function.test(v) && remove(n.key, v)) removed = true;
-                b = n;
-            }
-        }
-        return removed;
-    }
-
-    /**
-     * Base class providing common structure for Spliterators. (Although not all that much common
-     * functionality; as usual for view classes, details annoyingly vary in key, value, and entry
-     * subclasses in ways that are not worth abstracting out for internal classes.) The basic split
-     * strategy is to recursively descend from top level, row by row, descending to next row when
-     * either split off, or the end of row is encountered. Control of the number of splits relies on
-     * some statistical estimation: The expected remaining number of elements of a skip list when
-     * advancing either across or down decreases by about 25%.
-     */
-    protected abstract static class BaseSpliterator<V, Self extends BaseSpliterator<V, Self, R>, R> {
-
-        /** The value comparator. */
-        protected final LongComparator comparator;
-
-        /** exclusive upper bound for keys, or EMPTY if to end */
-        protected final long fence;
-
-        Index<V> row; // the level to split out
-
-        Node<V> current; // current traversal node; initialize at origin
-
-        long est; // size estimate
-
-        /**
-         * Build.
-         * 
-         * @param comparator
-         * @param row
-         * @param origin
-         * @param fence
-         * @param est
-         */
-        protected BaseSpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
-            this.comparator = comparator == null ? Long::compare : comparator;
-            this.row = row;
-            this.current = origin;
-            this.fence = fence;
-            this.est = est;
-        }
-
-        public final long estimateSize() {
-            return est;
-        }
-
-        public final Comparator<R> getComparator() {
-            return comparator;
-        }
-
-        public final Self trySplit() {
-            Node<V> e;
-            long ek;
-            LongComparator cmp = comparator;
-            long f = fence;
-            if ((e = current) != null && (ek = e.key) != EMPTY) {
-                for (Index<V> q = row; q != null; q = row = q.down) {
-                    Index<V> s;
-                    Node<V> b, n;
-                    long sk;
-                    if ((s = q.right) != null && (b = s.node) != null && (n = b.next) != null && n.value != null && (sk = n.key) != EMPTY && cmp
-                            .compare(sk, ek) > 0 && (f == EMPTY || cmp.compare(sk, f) < 0)) {
-                        current = n;
-                        Index<V> r = q.down;
-                        row = (s.right != null) ? s : s.down;
-                        est -= est >>> 2;
-                        return create(cmp, r, e, sk, est);
-                    }
-                }
-            }
-            return null;
-        }
-
-        public final void forEachRemaining(Consumer<? super R> action) {
-            if (action == null) throw new NullPointerException();
-            LongComparator cmp = comparator;
-            long f = fence;
-            Node<V> e = current;
-            current = null;
-            for (; e != null; e = e.next) {
-                long k;
-                V v;
-                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) break;
-                if ((v = e.value) != null) action.accept(create(k, v));
-            }
-        }
-
-        public final boolean tryAdvance(Consumer<? super R> action) {
-            if (action == null) throw new NullPointerException();
-            LongComparator cmp = comparator;
-            long f = fence;
-            Node<V> e = current;
-            for (; e != null; e = e.next) {
-                long k;
-                V v;
-                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) {
-                    e = null;
-                    break;
-                }
-                if ((v = e.value) != null) {
-                    current = e.next;
-                    action.accept(create(k, v));
-                    return true;
-                }
-            }
-            current = e;
-            return false;
-        }
-
-        protected abstract Self create(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est);
-
-        protected abstract R create(long key, V value);
-    }
-
-    /**
-     * 
-     */
-    private static final class KeySpliterator<V> extends BaseSpliterator<V, KeySpliterator<V>, Long> implements Spliterator<Long> {
-
-        /**
-         * Build
-         * 
-         * @param comparator
-         * @param row
-         * @param origin
-         * @param fence
-         * @param est
-         */
-        KeySpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
-            super(comparator, row, origin, fence, est);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected KeySpliterator<V> create(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
-            return new KeySpliterator(comparator, row, origin, fence, est);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected Long create(long key, V value) {
-            return key;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int characteristics() {
-            return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.CONCURRENT | Spliterator.NONNULL;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final LongComparator getComparator() {
-            return comparator;
-        }
-    }
-
-    // factory method for KeySpliterator
-    final KeySpliterator<V> keySpliterator() {
-        Index<V> h;
-        Node<V> n;
-        long est;
-        VarHandle.acquireFence();
-        if ((h = head) == null) {
-            n = null;
-            est = 0L;
-        } else {
-            n = h.node;
-            est = getAdderCount();
-        }
-        return new KeySpliterator<V>(comparator, h, n, EMPTY, est);
-    }
-
-    /**
-     * 
-     */
-    private static final class ValueSpliterator<V> extends BaseSpliterator<V, ValueSpliterator<V>, V> implements Spliterator<V> {
-
-        /**
-         * Build
-         * 
-         * @param comparator
-         * @param row
-         * @param origin
-         * @param fence
-         * @param est
-         */
-        ValueSpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
-            super(comparator, row, origin, fence, est);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected ValueSpliterator<V> create(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
-            return new ValueSpliterator(comparator, row, origin, fence, est);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected V create(long key, V value) {
-            return value;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int characteristics() {
-            return Spliterator.CONCURRENT | Spliterator.ORDERED | Spliterator.NONNULL;
-        }
-    }
-
-    // Almost the same as keySpliterator()
-    final ValueSpliterator<V> valueSpliterator() {
-        Index<V> h;
-        Node<V> n;
-        long est;
-        VarHandle.acquireFence();
-        if ((h = head) == null) {
-            n = null;
-            est = 0L;
-        } else {
-            n = h.node;
-            est = getAdderCount();
-        }
-        return new ValueSpliterator<V>(comparator, h, n, EMPTY, est);
-    }
-
-    /**
-     * 
-     */
-    private static final class EntrySpliterator<V> extends BaseSpliterator<V, EntrySpliterator<V>, LongEntry<V>>
-            implements Spliterator<LongEntry<V>> {
-
-        /**
-         * Build
-         * 
-         * @param comparator
-         * @param row
-         * @param origin
-         * @param fence
-         * @param est
-         */
-        EntrySpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
-            super(comparator, row, origin, fence, est);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected EntrySpliterator<V> create(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
-            return new EntrySpliterator(comparator, row, origin, fence, est);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected LongEntry<V> create(long key, V value) {
-            return LongEntry.immutable(key, value);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int characteristics() {
-            return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.CONCURRENT | Spliterator.NONNULL;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final Comparator<LongEntry<V>> getComparator() {
-            return (Comparator<LongEntry<V>> & Serializable) (one, other) -> comparator.compare(one.getLongKey(), other.getLongKey());
-        }
-    }
-
-    // Almost the same as keySpliterator()
-    final EntrySpliterator<V> entrySpliterator() {
-        Index<V> h;
-        Node<V> n;
-        long est;
-        VarHandle.acquireFence();
-        if ((h = head) == null) {
-            n = null;
-            est = 0L;
-        } else {
-            n = h.node;
-            est = getAdderCount();
-        }
-        return new EntrySpliterator<V>(comparator, h, n, EMPTY, est);
-    }
 
     /**
      * Nodes hold keys and values, and are singly linked in sorted order, possibly with some
@@ -3359,124 +3062,253 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     }
 
     /**
-     * Base of iterator classes
+     * Node access type.
      */
-    protected abstract class IteratorBase<T> implements Iterator<T> {
+    private static enum Type {
 
-        /** the last node returned by next() */
-        protected Node<V> lastReturned;
+        Key(Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.CONCURRENT | Spliterator.NONNULL) {
 
-        /** the next node to return from next(); */
-        protected Node<V> next;
-
-        /** Cache of next value field to maintain weak consistency */
-        protected V nextValue;
-
-        /** Initializes ascending iterator for entire range. */
-        protected IteratorBase() {
-            advance(baseHead());
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final boolean hasNext() {
-            return next != null;
-        }
-
-        /**
-         * Advances next to higher entry.
-         */
-        final void advance(Node<V> b) {
-            Node<V> node = null;
-            V value = null;
-            if ((lastReturned = b) != null) {
-                while ((node = b.next) != null && (value = node.value) == null)
-                    b = node;
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Object create(long key, Object value) {
+                return key;
             }
-            nextValue = value;
-            next = node;
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Comparator create(LongComparator comparator) {
+                return comparator;
+            }
+        },
+
+        Value(Spliterator.ORDERED | Spliterator.CONCURRENT | Spliterator.NONNULL) {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Object create(long key, Object value) {
+                return value;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Comparator create(LongComparator comparator) {
+                return null;
+            }
+        },
+
+        Entry(Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.CONCURRENT | Spliterator.NONNULL) {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Object create(long key, Object value) {
+                return value;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Comparator<LongEntry> create(LongComparator comparator) {
+                return (one, other) -> comparator.compare(one.getLongKey(), other.getLongKey());
+            }
+        };
+
+        /** The characteristics of {@link Spliterator}. */
+        private final int characteristics;
+
+        /**
+         * Build.
+         * 
+         * @param characteristics
+         */
+        private Type(int characteristics) {
+            this.characteristics = characteristics;
         }
 
         /**
-         * {@inheritDoc}
+         * Create value from {@link Node}.
+         * 
+         * @param key
+         * @param value
+         * @return
          */
-        @Override
-        public final void remove() {
-            Node<V> node;
-            long key;
-            if ((node = lastReturned) == null || (key = node.key) == EMPTY) {
-                throw new IllegalStateException();
-            }
-            // It would not be worth all of the overhead to directly
-            // unlink from here. Using remove is fast enough.
-            SkipListLongMap.this.remove(key);
-            lastReturned = null;
+        public abstract Object create(long key, Object value);
+
+        /**
+         * Create specila {@link Comparator} for {@link Spliterator}.
+         * 
+         * @param comprator
+         * @return
+         */
+        public abstract Comparator create(LongComparator comparator);
+    }
+
+    private Iterator createIteratorFor(Type type) {
+        return Spliterators.iterator(createSpliteratorFor(type));
+    }
+
+    private Spliterator createSpliteratorFor(Type type) {
+        Index<V> h;
+        Node<V> n;
+        long est;
+        VarHandle.acquireFence();
+        if ((h = head) == null) {
+            n = null;
+            est = 0L;
+        } else {
+            n = h.node;
+            est = getAdderCount();
         }
+        return new GeneralSpliterator(comparator, h, n, EMPTY, est, type);
     }
 
     /**
-     * {@link Iterator} for values.
+     * Base class providing common structure for Spliterators. (Although not all that much common
+     * functionality; as usual for view classes, details annoyingly vary in key, value, and entry
+     * subclasses in ways that are not worth abstracting out for internal classes.) The basic split
+     * strategy is to recursively descend from top level, row by row, descending to next row when
+     * either split off, or the end of row is encountered. Control of the number of splits relies on
+     * some statistical estimation: The expected remaining number of elements of a skip list when
+     * advancing either across or down decreases by about 25%.
      */
-    private class ValueIterator extends IteratorBase<V> {
+    private static class GeneralSpliterator<V, R> implements Spliterator<R> {
+
+        /** The value comparator. */
+        private final LongComparator comparator;
+
+        /** exclusive upper bound for keys, or EMPTY if to end */
+        private final long fence;
+
+        private Index<V> row; // the level to split out
+
+        private Node<V> current; // current traversal node; initialize at origin
+
+        private long est; // size estimate
+
+        /** The node access type. */
+        private final Type type;
 
         /**
-         * {@inheritDoc}
+         * Build.
+         * 
+         * @param comparator
+         * @param row
+         * @param origin
+         * @param fence
+         * @param est
          */
-        @Override
-        public V next() {
-            V value = nextValue;
-            if (value == null) {
-                throw new NoSuchElementException();
-            }
-
-            advance(next);
-            return value;
+        private GeneralSpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est, Type type) {
+            this.comparator = comparator == null ? Long::compare : comparator;
+            this.row = row;
+            this.current = origin;
+            this.fence = fence;
+            this.est = est;
+            this.type = type;
         }
-    }
-
-    /**
-     * {@link Iterator} for keys.
-     */
-    private class KeyIterator extends IteratorBase<Long> {
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Long next() {
-            Node<V> node = next;
-            if (node == null) {
-                throw new NoSuchElementException();
-            }
-
-            long key = node.key;
-            advance(node);
-            return key;
+        public final long estimateSize() {
+            return est;
         }
-    }
-
-    /**
-     * {@link Iterator} for entries.
-     */
-    private class EntryIterator extends IteratorBase<LongEntry<V>> {
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> next() {
-            Node<V> node = next;
-            if (node == null) {
-                throw new NoSuchElementException();
+        public final Comparator<R> getComparator() {
+            return type.create(comparator);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final int characteristics() {
+            return type.characteristics;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final GeneralSpliterator trySplit() {
+            Node<V> e;
+            long ek;
+            LongComparator cmp = comparator;
+            long f = fence;
+            if ((e = current) != null && (ek = e.key) != EMPTY) {
+                for (Index<V> q = row; q != null; q = row = q.down) {
+                    Index<V> s;
+                    Node<V> b, n;
+                    long sk;
+                    if ((s = q.right) != null && (b = s.node) != null && (n = b.next) != null && n.value != null && (sk = n.key) != EMPTY && cmp
+                            .compare(sk, ek) > 0 && (f == EMPTY || cmp.compare(sk, f) < 0)) {
+                        current = n;
+                        Index<V> r = q.down;
+                        row = (s.right != null) ? s : s.down;
+                        est -= est >>> 2;
+                        return new GeneralSpliterator(cmp, r, e, sk, est, type);
+                    }
+                }
             }
+            return null;
+        }
 
-            long key = node.key;
-            V value = nextValue;
-            advance(node);
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final void forEachRemaining(Consumer<? super R> action) {
+            if (action == null) throw new NullPointerException();
+            LongComparator cmp = comparator;
+            long f = fence;
+            Node<V> e = current;
+            current = null;
+            for (; e != null; e = e.next) {
+                long k;
+                V v;
+                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) break;
+                if ((v = e.value) != null) action.accept((R) type.create(k, v));
+            }
+        }
 
-            return LongEntry.immutable(key, value);
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final boolean tryAdvance(Consumer<? super R> action) {
+            if (action == null) throw new NullPointerException();
+            LongComparator cmp = comparator;
+            long f = fence;
+            Node<V> e = current;
+            for (; e != null; e = e.next) {
+                long k;
+                V v;
+                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) {
+                    e = null;
+                    break;
+                }
+                if ((v = e.value) != null) {
+                    current = e.next;
+                    action.accept((R) type.create(k, v));
+                    return true;
+                }
+            }
+            current = e;
+            return false;
         }
     }
 }
