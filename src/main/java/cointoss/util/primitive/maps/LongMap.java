@@ -9,7 +9,7 @@
  */
 package cointoss.util.primitive.maps;
 
-import static cointoss.util.primitive.Primitives.ensureLong;
+import static cointoss.util.primitive.Primitives.*;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -54,12 +54,10 @@ public interface LongMap<V> extends Map<Long, V> {
     /**
      * Returns the value to which the specified key is mapped, or {@code null} if this map contains
      * no mapping for the key.
-     *
      * <p>
      * More formally, if this map contains a mapping from a key {@code k} to a value {@code v} such
      * that {@code Objects.equals(key, k)}, then this method returns {@code v}; otherwise it returns
      * {@code null}. (There can be at most one such mapping.)
-     *
      * <p>
      * If this map permits null values, then a return value of {@code null} does not
      * <i>necessarily</i> indicate that the map contains no mapping for the key; it's also possible
@@ -121,16 +119,13 @@ public interface LongMap<V> extends Map<Long, V> {
      * formally, if this map contains a mapping from key {@code k} to value {@code v} such that
      * {@code Objects.equals(key, k)}, that mapping is removed. (The map can contain at most one
      * such mapping.)
-     *
      * <p>
      * Returns the value to which this map previously associated the key, or {@code null} if the map
      * contained no mapping for the key.
-     *
      * <p>
      * If this map permits null values, then a return value of {@code null} does not
      * <i>necessarily</i> indicate that the map contained no mapping for the key; it's also possible
      * that the map explicitly mapped the key to {@code null}.
-     *
      * <p>
      * The map will not contain a mapping for the specified key once the call returns.
      *
@@ -164,7 +159,7 @@ public interface LongMap<V> extends Map<Long, V> {
     /**
      * Specialized {@link Entry} for primitive long.
      */
-    interface LongEntry<V> extends Map.Entry<Long, V> {
+    interface LongEntry<V> extends Map.Entry<Long, V>, Comparable<LongEntry<V>> {
 
         /**
          * {@inheritDoc}
@@ -182,6 +177,14 @@ public interface LongMap<V> extends Map<Long, V> {
          *             exception if the entry has been removed from the backing map.
          */
         long getLongKey();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        default int compareTo(LongEntry<V> o) {
+            return Long.compare(getLongKey(), o.getLongKey());
+        }
 
         /**
          * Build immutable entry.

@@ -41,40 +41,33 @@ import kiss.I;
  * A scalable concurrent {@link ConcurrentNavigableMap} implementation. The map is sorted according
  * to the {@linkplain Comparable natural ordering} of its keys, or by a {@link Comparator} provided
  * at map creation time, depending on which constructor is used.
- *
  * <p>
  * This class implements a concurrent variant of
  * <a href="http://en.wikipedia.org/wiki/Skip_list" target="_top">SkipLists</a> providing expected
  * average <i>log(n)</i> time cost for the {@code containsKey}, {@code get}, {@code put} and
  * {@code remove} operations and their variants. Insertion, removal, update, and access operations
  * safely execute concurrently by multiple threads.
- *
  * <p>
  * Iterators and spliterators are <a href="package-summary.html#Weakly"><i>weakly
  * consistent</i></a>.
- *
  * <p>
  * Ascending key ordered views and their iterators are faster than descending ones.
- *
  * <p>
  * All {@code Map.Entry} pairs returned by methods in this class and its views represent snapshots
  * of mappings at the time they were produced. They do <em>not</em> support the
  * {@code Entry.setValue} method. (Note however that it is possible to change mappings in the
  * associated map using {@code put}, {@code putIfAbsent}, or {@code replace}, depending on exactly
  * which effect you need.)
- *
  * <p>
  * Beware that bulk operations {@code putAll}, {@code equals}, {@code toArray},
  * {@code containsValue}, and {@code clear} are <em>not</em> guaranteed to be performed atomically.
  * For example, an iterator operating concurrently with a {@code putAll} operation might view only
  * some of the added elements.
- *
  * <p>
  * This class and its views and iterators implement all of the <em>optional</em> methods of the
  * {@link Map} and {@link Iterator} interfaces. Like most other concurrent collections, this class
  * does <em>not</em> permit the use of {@code null} keys or values because some null return values
  * cannot be reliably distinguished from the absence of elements.
- *
  * <p>
  * This class is a member of the
  * <a href="{@docRoot}/java.base/java/util/package-summary.html#CollectionsFramework"> Java
@@ -594,11 +587,10 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * level looks non-empty after CAS, we try to change it back quick before anyone notices our
      * mistake! (This trick works pretty well because this method will practically never make
      * mistakes unless current thread stalls immediately before first CAS, in which case it is very
-     * unlikely to stall again immediately afterwards, so will recover.)
-     *
-     * We put up with all this rather than just let levels grow because otherwise, even a small map
-     * that has undergone a large number of insertions and removals will have a lot of levels,
-     * slowing down access more than would an occasional unwanted reduction.
+     * unlikely to stall again immediately afterwards, so will recover.) We put up with all this
+     * rather than just let levels grow because otherwise, even a small map that has undergone a
+     * large number of insertions and removals will have a lot of levels, slowing down access more
+     * than would an occasional unwanted reduction.
      */
     private void tryReduceLevel() {
         Index<V> h, d, e;
@@ -1201,28 +1193,23 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
 
     /**
      * Returns a {@link NavigableSet} view of the keys contained in this map.
-     *
      * <p>
      * The set's iterator returns the keys in ascending order. The set's spliterator additionally
      * reports {@link Spliterator#CONCURRENT}, {@link Spliterator#NONNULL},
      * {@link Spliterator#SORTED} and {@link Spliterator#ORDERED}, with an encounter order that is
      * ascending key order.
-     *
      * <p>
      * The {@linkplain Spliterator#getComparator() spliterator's comparator} is {@code null} if the
      * {@linkplain #comparator() map's comparator} is {@code null}. Otherwise, the spliterator's
      * comparator is the same as or imposes the same total ordering as the map's comparator.
-     *
      * <p>
      * The set is backed by the map, so changes to the map are reflected in the set, and vice-versa.
      * The set supports element removal, which removes the corresponding mapping from the map, via
      * the {@code Iterator.remove}, {@code Set.remove}, {@code removeAll}, {@code retainAll}, and
      * {@code clear} operations. It does not support the {@code add} or {@code addAll} operations.
-     *
      * <p>
      * The view's iterators and spliterators are <a href="package-summary.html#Weakly"><i>weakly
      * consistent</i></a>.
-     *
      * <p>
      * This method is equivalent to method {@code navigableKeySet}.
      *
@@ -1252,14 +1239,12 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * The collections's spliterator additionally reports {@link Spliterator#CONCURRENT},
      * {@link Spliterator#NONNULL} and {@link Spliterator#ORDERED}, with an encounter order that is
      * ascending order of the corresponding keys.
-     *
      * <p>
      * The collection is backed by the map, so changes to the map are reflected in the collection,
      * and vice-versa. The collection supports element removal, which removes the corresponding
      * mapping from the map, via the {@code Iterator.remove}, {@code Collection.remove},
      * {@code removeAll}, {@code retainAll} and {@code clear} operations. It does not support the
      * {@code add} or {@code addAll} operations.
-     *
      * <p>
      * The view's iterators and spliterators are <a href="package-summary.html#Weakly"><i>weakly
      * consistent</i></a>.
@@ -2091,6 +2076,11 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
 
         @Override
         public Spliterator<LongEntry<V>> spliterator() {
+            if (m instanceof SkipListLongMap) {
+                return ((SkipListLongMap) m).entrySpliterator();
+            } else {
+
+            }
             return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).entrySpliterator() : ((SubMap<V>) m).new SubMapEntryIterator();
         }
 
@@ -3023,17 +3013,19 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     /**
      * Base class providing common structure for Spliterators. (Although not all that much common
      * functionality; as usual for view classes, details annoyingly vary in key, value, and entry
-     * subclasses in ways that are not worth abstracting out for internal classes.)
-     *
-     * The basic split strategy is to recursively descend from top level, row by row, descending to
-     * next row when either split off, or the end of row is encountered. Control of the number of
-     * splits relies on some statistical estimation: The expected remaining number of elements of a
-     * skip list when advancing either across or down decreases by about 25%.
+     * subclasses in ways that are not worth abstracting out for internal classes.) The basic split
+     * strategy is to recursively descend from top level, row by row, descending to next row when
+     * either split off, or the end of row is encountered. Control of the number of splits relies on
+     * some statistical estimation: The expected remaining number of elements of a skip list when
+     * advancing either across or down decreases by about 25%.
      */
-    abstract static class CSLMSpliterator<V> {
-        final LongComparator comparator;
+    protected abstract static class BaseSpliterator<V, Self extends BaseSpliterator<V, Self, R>, R> {
 
-        final long fence; // exclusive upper bound for keys, or null if to end
+        /** The value comparator. */
+        protected final LongComparator comparator;
+
+        /** exclusive upper bound for keys, or EMPTY if to end */
+        protected final long fence;
 
         Index<V> row; // the level to split out
 
@@ -3041,7 +3033,16 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
 
         long est; // size estimate
 
-        CSLMSpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
+        /**
+         * Build.
+         * 
+         * @param comparator
+         * @param row
+         * @param origin
+         * @param fence
+         * @param est
+         */
+        protected BaseSpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
             this.comparator = comparator == null ? Long::compare : comparator;
             this.row = row;
             this.current = origin;
@@ -3052,15 +3053,12 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         public final long estimateSize() {
             return est;
         }
-    }
 
-    static final class KeySpliterator<V> extends CSLMSpliterator<V> implements Spliterator<Long> {
-        KeySpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
-            super(comparator, row, origin, fence, est);
+        public final Comparator<R> getComparator() {
+            return comparator;
         }
 
-        @Override
-        public KeySpliterator<V> trySplit() {
+        public final Self trySplit() {
             Node<V> e;
             long ek;
             LongComparator cmp = comparator;
@@ -3076,15 +3074,14 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
                         Index<V> r = q.down;
                         row = (s.right != null) ? s : s.down;
                         est -= est >>> 2;
-                        return new KeySpliterator<V>(cmp, r, e, sk, est);
+                        return create(cmp, r, e, sk, est);
                     }
                 }
             }
             return null;
         }
 
-        @Override
-        public void forEachRemaining(Consumer<? super Long> action) {
+        public final void forEachRemaining(Consumer<? super R> action) {
             if (action == null) throw new NullPointerException();
             LongComparator cmp = comparator;
             long f = fence;
@@ -3092,26 +3089,27 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
             current = null;
             for (; e != null; e = e.next) {
                 long k;
+                V v;
                 if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) break;
-                if (e.value != null) action.accept(k);
+                if ((v = e.value) != null) action.accept(create(k, v));
             }
         }
 
-        @Override
-        public boolean tryAdvance(Consumer<? super Long> action) {
+        public final boolean tryAdvance(Consumer<? super R> action) {
             if (action == null) throw new NullPointerException();
             LongComparator cmp = comparator;
             long f = fence;
             Node<V> e = current;
             for (; e != null; e = e.next) {
                 long k;
+                V v;
                 if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) {
                     e = null;
                     break;
                 }
-                if (e.value != null) {
+                if ((v = e.value) != null) {
                     current = e.next;
-                    action.accept(k);
+                    action.accept(create(k, v));
                     return true;
                 }
             }
@@ -3119,11 +3117,56 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
             return false;
         }
 
+        protected abstract Self create(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est);
+
+        protected abstract R create(long key, V value);
+    }
+
+    /**
+     * 
+     */
+    private static final class KeySpliterator<V> extends BaseSpliterator<V, KeySpliterator<V>, Long> implements Spliterator<Long> {
+
+        /**
+         * Build
+         * 
+         * @param comparator
+         * @param row
+         * @param origin
+         * @param fence
+         * @param est
+         */
+        KeySpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
+            super(comparator, row, origin, fence, est);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected KeySpliterator<V> create(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
+            return new KeySpliterator(comparator, row, origin, fence, est);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected Long create(long key, V value) {
+            return key;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int characteristics() {
             return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.CONCURRENT | Spliterator.NONNULL;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final LongComparator getComparator() {
             return comparator;
@@ -3146,73 +3189,43 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         return new KeySpliterator<V>(comparator, h, n, EMPTY, est);
     }
 
-    static final class ValueSpliterator<V> extends CSLMSpliterator<V> implements Spliterator<V> {
+    /**
+     * 
+     */
+    private static final class ValueSpliterator<V> extends BaseSpliterator<V, ValueSpliterator<V>, V> implements Spliterator<V> {
+
+        /**
+         * Build
+         * 
+         * @param comparator
+         * @param row
+         * @param origin
+         * @param fence
+         * @param est
+         */
         ValueSpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
             super(comparator, row, origin, fence, est);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public ValueSpliterator<V> trySplit() {
-            Node<V> e;
-            long ek;
-            LongComparator cmp = comparator;
-            long f = fence;
-            if ((e = current) != null && (ek = e.key) != EMPTY) {
-                for (Index<V> q = row; q != null; q = row = q.down) {
-                    Index<V> s;
-                    Node<V> b, n;
-                    long sk;
-                    if ((s = q.right) != null && (b = s.node) != null && (n = b.next) != null && n.value != null && (sk = n.key) != EMPTY && cmp
-                            .compare(sk, ek) > 0 && (f == EMPTY || cmp.compare(sk, f) < 0)) {
-                        current = n;
-                        Index<V> r = q.down;
-                        row = (s.right != null) ? s : s.down;
-                        est -= est >>> 2;
-                        return new ValueSpliterator<V>(cmp, r, e, sk, est);
-                    }
-                }
-            }
-            return null;
+        protected ValueSpliterator<V> create(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
+            return new ValueSpliterator(comparator, row, origin, fence, est);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public void forEachRemaining(Consumer<? super V> action) {
-            if (action == null) throw new NullPointerException();
-            LongComparator cmp = comparator;
-            long f = fence;
-            Node<V> e = current;
-            current = null;
-            for (; e != null; e = e.next) {
-                long k;
-                V v;
-                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) break;
-                if ((v = e.value) != null) action.accept(v);
-            }
+        protected V create(long key, V value) {
+            return value;
         }
 
-        @Override
-        public boolean tryAdvance(Consumer<? super V> action) {
-            if (action == null) throw new NullPointerException();
-            LongComparator cmp = comparator;
-            long f = fence;
-            Node<V> e = current;
-            for (; e != null; e = e.next) {
-                long k;
-                V v;
-                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) {
-                    e = null;
-                    break;
-                }
-                if ((v = e.value) != null) {
-                    current = e.next;
-                    action.accept(v);
-                    return true;
-                }
-            }
-            current = e;
-            return false;
-        }
-
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int characteristics() {
             return Spliterator.CONCURRENT | Spliterator.ORDERED | Spliterator.NONNULL;
@@ -3235,80 +3248,52 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         return new ValueSpliterator<V>(comparator, h, n, EMPTY, est);
     }
 
-    static final class EntrySpliterator<V> extends CSLMSpliterator<V> implements Spliterator<LongEntry<V>> {
+    /**
+     * 
+     */
+    private static final class EntrySpliterator<V> extends BaseSpliterator<V, EntrySpliterator<V>, LongEntry<V>>
+            implements Spliterator<LongEntry<V>> {
+
+        /**
+         * Build
+         * 
+         * @param comparator
+         * @param row
+         * @param origin
+         * @param fence
+         * @param est
+         */
         EntrySpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
             super(comparator, row, origin, fence, est);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public EntrySpliterator<V> trySplit() {
-            Node<V> e;
-            long ek;
-            LongComparator cmp = comparator;
-            long f = fence;
-            if ((e = current) != null && (ek = e.key) != EMPTY) {
-                for (Index<V> q = row; q != null; q = row = q.down) {
-                    Index<V> s;
-                    Node<V> b, n;
-                    long sk;
-                    if ((s = q.right) != null && (b = s.node) != null && (n = b.next) != null && n.value != null && (sk = n.key) != EMPTY && cmp
-                            .compare(sk, ek) > 0 && (f == EMPTY || cmp.compare(sk, f) < 0)) {
-                        current = n;
-                        Index<V> r = q.down;
-                        row = (s.right != null) ? s : s.down;
-                        est -= est >>> 2;
-                        return new EntrySpliterator<V>(cmp, r, e, sk, est);
-                    }
-                }
-            }
-            return null;
+        protected EntrySpliterator<V> create(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est) {
+            return new EntrySpliterator(comparator, row, origin, fence, est);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public void forEachRemaining(Consumer<? super LongEntry<V>> action) {
-            if (action == null) throw new NullPointerException();
-            LongComparator cmp = comparator;
-            long f = fence;
-            Node<V> e = current;
-            current = null;
-            for (; e != null; e = e.next) {
-                long k;
-                V v;
-                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) break;
-                if ((v = e.value) != null) {
-                    action.accept(LongEntry.immutable(k, v));
-                }
-            }
+        protected LongEntry<V> create(long key, V value) {
+            return LongEntry.immutable(key, value);
         }
 
-        @Override
-        public boolean tryAdvance(Consumer<? super LongEntry<V>> action) {
-            if (action == null) throw new NullPointerException();
-            LongComparator cmp = comparator;
-            long f = fence;
-            Node<V> e = current;
-            for (; e != null; e = e.next) {
-                long k;
-                V v;
-                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) {
-                    e = null;
-                    break;
-                }
-                if ((v = e.value) != null) {
-                    current = e.next;
-                    action.accept(LongEntry.immutable(k, v));
-                    return true;
-                }
-            }
-            current = e;
-            return false;
-        }
-
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int characteristics() {
             return Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED | Spliterator.CONCURRENT | Spliterator.NONNULL;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final Comparator<LongEntry<V>> getComparator() {
             return (Comparator<LongEntry<V>> & Serializable) (one, other) -> comparator.compare(one.getLongKey(), other.getLongKey());
