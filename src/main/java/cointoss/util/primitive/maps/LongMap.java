@@ -9,7 +9,7 @@
  */
 package cointoss.util.primitive.maps;
 
-import static cointoss.util.primitive.Primitives.*;
+import static cointoss.util.primitive.Primitives.ensureLong;
 
 import java.util.Comparator;
 import java.util.Map;
