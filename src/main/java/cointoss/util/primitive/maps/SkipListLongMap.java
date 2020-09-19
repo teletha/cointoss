@@ -9,7 +9,6 @@
  */
 package cointoss.util.primitive.maps;
 
-import java.io.Serializable;
 import java.lang.invoke.VarHandle;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
@@ -249,7 +248,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     private transient volatile Values<V> values;
 
     /** Lazily initialized entry set */
-    private transient EntrySet<V> entrySet;
+    private transient Entries<V> entrySet;
 
     /** Lazily initialized descending map */
     private transient SubMap<V> descendingMap;
@@ -1220,7 +1219,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     public NavigableSet<Long> keySet() {
         NavigableLongSet ks;
         if ((ks = keySet) != null) return ks;
-        return keySet = new KeySet<>(this);
+        return keySet = new Keys<>(this);
     }
 
     /**
@@ -1230,7 +1229,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     public NavigableLongSet navigableKeySet() {
         NavigableLongSet ks;
         if ((ks = keySet) != null) return ks;
-        return keySet = new KeySet<>(this);
+        return keySet = new Keys<>(this);
     }
 
     /**
@@ -1270,9 +1269,9 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      */
     @Override
     public Set<LongEntry<V>> longEntrySet() {
-        EntrySet<V> es;
+        Entries<V> es;
         if ((es = entrySet) != null) return es;
-        return entrySet = new EntrySet<V>(this);
+        return entrySet = new Entries<V>(this);
     }
 
     @Override
@@ -1743,7 +1742,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * this class are constructed only using the {@code subMap}, {@code headMap}, and
      * {@code tailMap} methods of their underlying maps.
      */
-    private static class SubMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V>, Serializable {
+    private static class SubMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
 
         /** Underlying map */
         private final SkipListLongMap<V> m;
@@ -1764,11 +1763,11 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         private final boolean isDescending;
 
         // Lazily initialized view holders
-        private transient KeySet<V> keySetView;
+        private transient Keys<V> keySetView;
 
         private transient Values<V> valuesView;
 
-        private transient EntrySet<V> entrySetView;
+        private transient Entries<V> entrySetView;
 
         /**
          * Creates a new submap, initializing all fields.
@@ -2365,7 +2364,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         public NavigableLongSet keySet() {
             NavigableLongSet ks;
             if ((ks = keySetView) != null) return ks;
-            return keySetView = new KeySet<>(this);
+            return keySetView = new Keys<>(this);
         }
 
         /**
@@ -2375,7 +2374,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         public NavigableLongSet navigableKeySet() {
             NavigableLongSet ks;
             if ((ks = keySetView) != null) return ks;
-            return keySetView = new KeySet<>(this);
+            return keySetView = new Keys<>(this);
         }
 
         @Override
@@ -2399,7 +2398,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         @Override
         public Set<LongEntry<V>> longEntrySet() {
             if (entrySetView == null) {
-                entrySetView = new EntrySet(this);
+                entrySetView = new Entries(this);
             }
             return entrySetView;
         }
@@ -2576,7 +2575,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     /**
      * 
      */
-    private static final class KeySet<V> extends AbstractSet<Long> implements NavigableLongSet {
+    private static final class Keys<V> extends AbstractSet<Long> implements NavigableLongSet {
 
         /** The original map. */
         private final ConcurrentNavigableLongMap<V> m;
@@ -2586,7 +2585,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          * 
          * @param map
          */
-        private KeySet(ConcurrentNavigableLongMap<V> map) {
+        private Keys(ConcurrentNavigableLongMap<V> map) {
             m = map;
         }
 
@@ -2766,7 +2765,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         @Override
         public NavigableLongSet subSet(long fromElement, boolean fromInclusive, long toElement, boolean toInclusive) {
-            return new KeySet(m.subMap(fromElement, fromInclusive, toElement, toInclusive));
+            return new Keys(m.subMap(fromElement, fromInclusive, toElement, toInclusive));
         }
 
         /**
@@ -2774,7 +2773,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         @Override
         public NavigableLongSet headSet(long toElement, boolean inclusive) {
-            return new KeySet<>(m.headMap(toElement, inclusive));
+            return new Keys<>(m.headMap(toElement, inclusive));
         }
 
         /**
@@ -2782,7 +2781,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         @Override
         public NavigableLongSet tailSet(long fromElement, boolean inclusive) {
-            return new KeySet<>(m.tailMap(fromElement, inclusive));
+            return new Keys<>(m.tailMap(fromElement, inclusive));
         }
 
         /**
@@ -2814,7 +2813,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         @Override
         public NavigableLongSet descendingSet() {
-            return new KeySet<>(m.descendingMap());
+            return new Keys<>(m.descendingMap());
         }
 
         /**
@@ -2914,7 +2913,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     /**
      * 
      */
-    private static class EntrySet<V> extends AbstractSet<LongEntry<V>> {
+    private static class Entries<V> extends AbstractSet<LongEntry<V>> {
 
         /** The original view. */
         private final ConcurrentNavigableLongMap<V> m;
@@ -2924,7 +2923,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          * 
          * @param map
          */
-        private EntrySet(ConcurrentNavigableLongMap<V> map) {
+        private Entries(ConcurrentNavigableLongMap<V> map) {
             m = map;
         }
 

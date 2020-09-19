@@ -9,6 +9,7 @@
  */
 package cointoss.util.primitive.map;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -73,6 +74,57 @@ class SortedLongMapTest {
             // remove from iterator
             removeFisrt(liveView.iterator());
             assert findFirst(liveView.iterator()).getLongKey() == i + 1;
+            assert map.firstLongKey() == i + 1;
+        }
+    }
+
+    @Test
+    void keySet() {
+        ConcurrentNavigableLongMap<Integer> map = LongMap.createSortedMap();
+        Set<Long> liveView = map.keySet();
+
+        for (int i = 0; i < 10; i++) {
+            map.put(i, i);
+
+            // map
+            assert liveView.size() == i + 1;
+            assert liveView.contains((long) i);
+
+            // iterator
+            assert Iterators.size(liveView.iterator()) == i + 1;
+            assert findLast(liveView.iterator()) == i;
+        }
+
+        for (int i = 0; i < 9; i++) {
+            // remove from iterator
+            removeFisrt(liveView.iterator());
+            assert findFirst(liveView.iterator()) == i + 1;
+            assert map.firstLongKey() == i + 1;
+        }
+    }
+
+    @Test
+    void values() {
+        ConcurrentNavigableLongMap<Integer> map = LongMap.createSortedMap();
+        Collection<Integer> liveView = map.values();
+
+        for (int i = 0; i < 10; i++) {
+            map.put(i, i);
+
+            // map
+            assert liveView.size() == i + 1;
+            assert liveView.contains(i);
+
+            // iterator
+            assert Iterators.size(liveView.iterator()) == i + 1;
+            assert findLast(liveView.iterator()) == i;
+        }
+
+        for (int i = 0; i < 9; i++) {
+            // remove from iterator
+            removeFisrt(liveView.iterator());
+            assert findFirst(liveView.iterator()) == i + 1;
+            assert map.firstLongKey() == i + 1;
         }
     }
 
