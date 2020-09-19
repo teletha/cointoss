@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -36,6 +35,7 @@ import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
+import cointoss.util.primitive.CollectionSupport;
 import kiss.I;
 
 /**
@@ -1785,8 +1785,6 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
             this.isDescending = isDescending;
         }
 
-        /* ---------------- Utilities -------------- */
-
         boolean tooLow(long key, LongComparator cmp) {
             int c;
             return (lo != EMPTY && ((c = cmp.compare(key, lo)) < 0 || (c == 0 && !loInclusive)));
@@ -2400,9 +2398,10 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         @Override
         public Set<LongEntry<V>> longEntrySet() {
-            EntrySet<V> es;
-            if ((es = entrySetView) != null) return es;
-            return entrySetView = new EntrySet<V>(this);
+            if (entrySetView == null) {
+                entrySetView = new EntrySet(this);
+            }
+            return entrySetView;
         }
 
         /**
@@ -3111,7 +3110,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
              */
             @Override
             public Object create(long key, Object value) {
-                return value;
+                return LongEntry.immutable(key, value);
             }
 
             /**
@@ -3154,7 +3153,21 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     }
 
     private Iterator createIteratorFor(Type type) {
-        return Spliterators.iterator(createSpliteratorFor(type));
+        return CollectionSupport.iteratorFrom(createSpliteratorFor(type), value -> {
+            switch (type) {
+            case Key:
+                remove(value);
+                break;
+
+            case Value:
+                removeValueIf(v -> v == value);
+                break;
+
+            case Entry:
+                removeEntryIf(entry -> entry.equals(value));
+                break;
+            }
+        });
     }
 
     private Spliterator createSpliteratorFor(Type type) {

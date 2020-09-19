@@ -9,11 +9,13 @@
  */
 package cointoss.util.primitive.maps;
 
-import static cointoss.util.primitive.Primitives.ensureLong;
+import static cointoss.util.primitive.Primitives.*;
 
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.base.Objects;
 
 /**
  * Specialized {@link Map} interface for primitive long.
@@ -219,6 +221,28 @@ public interface LongMap<V> extends Map<Long, V> {
                 @Override
                 public Object setValue(Object value) {
                     throw new UnsupportedOperationException("This is immutable entry.");
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public int hashCode() {
+                    return Objects.hashCode(key, value);
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public boolean equals(Object obj) {
+                    if (obj instanceof LongEntry) {
+                        LongEntry other = (LongEntry) obj;
+                        if (key == other.getLongKey() && Objects.equal(value, other.getValue())) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
             };
         }

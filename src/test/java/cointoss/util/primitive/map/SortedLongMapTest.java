@@ -9,21 +9,85 @@
  */
 package cointoss.util.primitive.map;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
+
+import com.google.common.collect.Iterators;
 
 import cointoss.util.primitive.maps.ConcurrentNavigableLongMap;
 import cointoss.util.primitive.maps.LongMap;
+import cointoss.util.primitive.maps.LongMap.LongEntry;
 
 class SortedLongMapTest {
 
     @Test
-    void get() {
+    void putAndGet() {
         ConcurrentNavigableLongMap<String> map = LongMap.createSortedMap();
         for (int i = 0; i < 10; i++) {
             String value = String.valueOf(i);
 
             map.put(i, value);
             assert map.get(i).equals(value);
+        }
+    }
+
+    @Test
+    void size() {
+        ConcurrentNavigableLongMap<Integer> map = LongMap.createSortedMap();
+        for (int i = 1; i < 10; i++) {
+            map.put(i, i);
+            assert map.size() == i;
+        }
+    }
+
+    @Test
+    void remove() {
+        ConcurrentNavigableLongMap<Integer> map = LongMap.createSortedMap();
+        for (int i = 1; i < 10; i++) {
+            map.put(i, i);
+            assert map.remove(i) == i;
+            assert map.get(i) == null;
+        }
+    }
+
+    @Test
+    void longEntrySet() {
+        ConcurrentNavigableLongMap<Integer> map = LongMap.createSortedMap();
+        Set<LongEntry<Integer>> liveView = map.longEntrySet();
+
+        for (int i = 0; i < 10; i++) {
+            map.put(i, i);
+
+            // map
+            assert liveView.size() == i + 1;
+            assert liveView.contains(LongEntry.immutable(i, i));
+
+            // iterator
+            assert Iterators.size(liveView.iterator()) == i + 1;
+            assert findLast(liveView.iterator()).getLongKey() == i;
+        }
+
+        for (int i = 0; i < 9; i++) {
+            // remove from iterator
+            removeFisrt(liveView.iterator());
+            assert findFirst(liveView.iterator()).getLongKey() == i + 1;
+        }
+    }
+
+    private <V> V findFirst(Iterator<V> iterator) {
+        return Iterators.get(iterator, 0);
+    }
+
+    private <V> V findLast(Iterator<V> iterator) {
+        return Iterators.getLast(iterator);
+    }
+
+    private void removeFisrt(Iterator iterator) {
+        if (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
         }
     }
 }
