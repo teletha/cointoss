@@ -2683,16 +2683,16 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          * {@inheritDoc}
          */
         @Override
-        public Long first() {
-            return m.firstKey();
+        public long firstLong() {
+            return m.firstLongKey();
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Long last() {
-            return m.lastKey();
+        public long lastLong() {
+            return m.lastLongKey();
         }
 
         /**
@@ -2717,18 +2717,6 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
                 throw new NoSuchElementException();
             }
             return entry.getLongKey();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Iterator<Long> iterator() {
-            if (m instanceof SkipListLongMap) {
-                return ((SkipListLongMap) m).createIteratorFor(Type.Key);
-            } else {
-                return ((SubMap) m).new SubMapGenericIterator(Type.Key);
-            }
         }
 
         /**
@@ -2830,6 +2818,18 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          * {@inheritDoc}
          */
         @Override
+        public Iterator<Long> iterator() {
+            if (m instanceof SkipListLongMap) {
+                return ((SkipListLongMap) m).createIteratorFor(Type.Key);
+            } else {
+                return ((SubMap) m).new SubMapGenericIterator(Type.Key);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public Spliterator<Long> spliterator() {
             return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).createSpliteratorFor(Type.Key)
                     : ((SubMap<V>) m).new SubMapGenericIterator(Type.Key);
@@ -2851,15 +2851,6 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         private Values(ConcurrentNavigableLongMap<V> map) {
             m = map;
-        }
-
-        @Override
-        public Iterator<V> iterator() {
-            if (m instanceof SkipListLongMap) {
-                return ((SkipListLongMap) m).createIteratorFor(Type.Value);
-            } else {
-                return ((SubMap) m).new SubMapGenericIterator(Type.Value);
-            }
         }
 
         @Override
@@ -2896,6 +2887,15 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         @Override
         public <T> T[] toArray(T[] a) {
             return I.signal(this).toList().toArray(a);
+        }
+
+        @Override
+        public Iterator<V> iterator() {
+            if (m instanceof SkipListLongMap) {
+                return ((SkipListLongMap) m).createIteratorFor(Type.Value);
+            } else {
+                return ((SubMap) m).new SubMapGenericIterator(Type.Value);
+            }
         }
 
         @Override

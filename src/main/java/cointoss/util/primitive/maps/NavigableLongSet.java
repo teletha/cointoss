@@ -9,17 +9,14 @@
  */
 package cointoss.util.primitive.maps;
 
-import static cointoss.util.primitive.Primitives.ensureLong;
+import static cointoss.util.primitive.Primitives.*;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.NavigableSet;
 
 /**
  * Sepcialized {@link NavigableSet} interface for primitive long.
  */
-public interface NavigableLongSet extends NavigableSet<Long> {
+public interface NavigableLongSet extends NavigableSet<Long>, SortedLongSet {
 
     /**
      * {@inheritDoc}
@@ -160,7 +157,6 @@ public interface NavigableLongSet extends NavigableSet<Long> {
      * fromInclusive} and {@code toInclusive} are both true. The returned set is backed by this set,
      * so changes in the returned set are reflected in this set, and vice-versa. The returned set
      * supports all optional set operations that this set supports.
-     *
      * <p>
      * The returned set will throw an {@code IllegalArgumentException} on an attempt to insert an
      * element outside its range.
@@ -197,7 +193,6 @@ public interface NavigableLongSet extends NavigableSet<Long> {
      * {@code inclusive} is true) {@code toElement}. The returned set is backed by this set, so
      * changes in the returned set are reflected in this set, and vice-versa. The returned set
      * supports all optional set operations that this set supports.
-     *
      * <p>
      * The returned set will throw an {@code IllegalArgumentException} on an attempt to insert an
      * element outside its range.
@@ -231,7 +226,6 @@ public interface NavigableLongSet extends NavigableSet<Long> {
      * {@code inclusive} is true) {@code fromElement}. The returned set is backed by this set, so
      * changes in the returned set are reflected in this set, and vice-versa. The returned set
      * supports all optional set operations that this set supports.
-     *
      * <p>
      * The returned set will throw an {@code IllegalArgumentException} on an attempt to insert an
      * element outside its range.
@@ -262,7 +256,6 @@ public interface NavigableLongSet extends NavigableSet<Long> {
 
     /**
      * {@inheritDoc}
-     *
      * <p>
      * Equivalent to {@code subSet(fromElement, true, toElement, false)}.
      *
@@ -270,6 +263,7 @@ public interface NavigableLongSet extends NavigableSet<Long> {
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    @Override
     NavigableLongSet subSet(long fromElement, long toElement);
 
     /**
@@ -282,7 +276,6 @@ public interface NavigableLongSet extends NavigableSet<Long> {
 
     /**
      * {@inheritDoc}
-     *
      * <p>
      * Equivalent to {@code headSet(toElement, false)}.
      *
@@ -290,6 +283,7 @@ public interface NavigableLongSet extends NavigableSet<Long> {
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    @Override
     NavigableLongSet headSet(long toElement);
 
     /**
@@ -302,7 +296,6 @@ public interface NavigableLongSet extends NavigableSet<Long> {
 
     /**
      * {@inheritDoc}
-     *
      * <p>
      * Equivalent to {@code tailSet(fromElement, true)}.
      *
@@ -310,5 +303,6 @@ public interface NavigableLongSet extends NavigableSet<Long> {
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    @Override
     NavigableLongSet tailSet(long fromElement);
 }
