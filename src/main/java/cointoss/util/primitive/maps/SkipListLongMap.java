@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -35,7 +36,6 @@ import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
-import cointoss.util.primitive.CollectionSupport;
 import kiss.I;
 
 /**
@@ -2997,6 +2997,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
 
         @Override
         public Spliterator<LongEntry<V>> spliterator() {
+            System.out.println("OK");
             return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).createSpliteratorFor(Type.Entry)
                     : ((SubMap<V>) m).new SubMapEntryIterator();
         }
@@ -3153,175 +3154,90 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     }
 
     private Iterator createIteratorFor(Type type) {
-        return CollectionSupport.iteratorFrom(createSpliteratorFor(type), value -> {
-            switch (type) {
-            case Key:
-                remove(value);
-                break;
-
-            case Value:
-                removeValueIf(v -> v == value);
-                break;
-
-            case Entry:
-                removeEntryIf(entry -> entry.equals(value));
-                break;
-            }
-        });
+        return new GenericIterator(type);
     }
 
     private Spliterator createSpliteratorFor(Type type) {
-        Index<V> h;
-        Node<V> n;
-        long est;
-        VarHandle.acquireFence();
-        if ((h = head) == null) {
-            n = null;
-            est = 0L;
-        } else {
-            n = h.node;
-            est = getAdderCount();
-        }
-        return new GeneralSpliterator(comparator, h, n, EMPTY, est, type);
+        return Spliterators.spliteratorUnknownSize(createIteratorFor(type), type.characteristics);
     }
 
     /**
-     * Base class providing common structure for Spliterators. (Although not all that much common
-     * functionality; as usual for view classes, details annoyingly vary in key, value, and entry
-     * subclasses in ways that are not worth abstracting out for internal classes.) The basic split
-     * strategy is to recursively descend from top level, row by row, descending to next row when
-     * either split off, or the end of row is encountered. Control of the number of splits relies on
-     * some statistical estimation: The expected remaining number of elements of a skip list when
-     * advancing either across or down decreases by about 25%.
+     * Generic iterator.
      */
-    private static class GeneralSpliterator<V, R> implements Spliterator<R> {
-
-        /** The value comparator. */
-        private final LongComparator comparator;
-
-        /** exclusive upper bound for keys, or EMPTY if to end */
-        private final long fence;
-
-        private Index<V> row; // the level to split out
-
-        private Node<V> current; // current traversal node; initialize at origin
-
-        private long est; // size estimate
+    private class GenericIterator<R> implements Iterator<R> {
 
         /** The node access type. */
         private final Type type;
 
-        /**
-         * Build.
-         * 
-         * @param comparator
-         * @param row
-         * @param origin
-         * @param fence
-         * @param est
-         */
-        private GeneralSpliterator(LongComparator comparator, Index<V> row, Node<V> origin, long fence, long est, Type type) {
-            this.comparator = comparator == null ? Long::compare : comparator;
-            this.row = row;
-            this.current = origin;
-            this.fence = fence;
-            this.est = est;
+        /** the last node returned by next() */
+        private Node<V> lastReturned;
+
+        /** the next node to return from next(); */
+        private Node<V> next;
+
+        /** Cache of next value field to maintain weak consistency */
+        private V nextValue;
+
+        /** Initializes ascending iterator for entire range. */
+        private GenericIterator(Type type) {
             this.type = type;
+            advance(baseHead());
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public final long estimateSize() {
-            return est;
+        public final boolean hasNext() {
+            return next != null;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public final Comparator<R> getComparator() {
-            return type.create(comparator);
+        public R next() {
+            Node<V> node;
+            if ((node = next) == null) {
+                throw new NoSuchElementException();
+            }
+            long key = node.key;
+            V value = nextValue;
+            advance(node);
+            return (R) type.create(key, value);
         }
 
         /**
-         * {@inheritDoc}
+         * Advances next to higher entry.
+         * 
+         * @param base
          */
-        @Override
-        public final int characteristics() {
-            return type.characteristics;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final GeneralSpliterator trySplit() {
-            Node<V> e;
-            long ek;
-            LongComparator cmp = comparator;
-            long f = fence;
-            if ((e = current) != null && (ek = e.key) != EMPTY) {
-                for (Index<V> q = row; q != null; q = row = q.down) {
-                    Index<V> s;
-                    Node<V> b, n;
-                    long sk;
-                    if ((s = q.right) != null && (b = s.node) != null && (n = b.next) != null && n.value != null && (sk = n.key) != EMPTY && cmp
-                            .compare(sk, ek) > 0 && (f == EMPTY || cmp.compare(sk, f) < 0)) {
-                        current = n;
-                        Index<V> r = q.down;
-                        row = (s.right != null) ? s : s.down;
-                        est -= est >>> 2;
-                        return new GeneralSpliterator(cmp, r, e, sk, est, type);
-                    }
+        private void advance(Node<V> base) {
+            Node<V> node = null;
+            V value = null;
+            if ((lastReturned = base) != null) {
+                while ((node = base.next) != null && (value = node.value) == null) {
+                    base = node;
                 }
             }
-            return null;
+            nextValue = value;
+            next = node;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public final void forEachRemaining(Consumer<? super R> action) {
-            if (action == null) throw new NullPointerException();
-            LongComparator cmp = comparator;
-            long f = fence;
-            Node<V> e = current;
-            current = null;
-            for (; e != null; e = e.next) {
-                long k;
-                V v;
-                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) break;
-                if ((v = e.value) != null) action.accept((R) type.create(k, v));
+        public final void remove() {
+            Node<V> node;
+            long key;
+            if ((node = lastReturned) == null || (key = node.key) == EMPTY) {
+                throw new IllegalStateException();
             }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final boolean tryAdvance(Consumer<? super R> action) {
-            if (action == null) throw new NullPointerException();
-            LongComparator cmp = comparator;
-            long f = fence;
-            Node<V> e = current;
-            for (; e != null; e = e.next) {
-                long k;
-                V v;
-                if ((k = e.key) != EMPTY && f != EMPTY && cmp.compare(f, k) <= 0) {
-                    e = null;
-                    break;
-                }
-                if ((v = e.value) != null) {
-                    current = e.next;
-                    action.accept((R) type.create(k, v));
-                    return true;
-                }
-            }
-            current = e;
-            return false;
+            // It would not be worth all of the overhead to directly
+            // unlink from here. Using remove is fast enough.
+            SkipListLongMap.this.remove(key);
+            lastReturned = null;
         }
     }
 }
