@@ -14,7 +14,7 @@ import static cointoss.util.primitive.Primitives.*;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
-public interface SortedLongSet extends SortedSet<Long> {
+public interface SortedLongSet extends SortedSet<Long>, LongSet {
 
     /**
      * {@inheritDoc}
