@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.primitive.maps;
+package cointoss.util.primitive.map;
 
 import static cointoss.util.primitive.Primitives.ensureLong;
 
@@ -17,7 +17,8 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 
-import cointoss.util.primitive.maps.LongMap.LongEntry;
+import cointoss.util.primitive.map.LongMap.LongEntry;
+import cointoss.util.primitive.set.NavigableLongSet;
 
 public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
 

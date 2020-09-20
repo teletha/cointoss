@@ -28,9 +28,9 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.util.Chrono;
-import cointoss.util.primitive.maps.ConcurrentNavigableLongMap;
-import cointoss.util.primitive.maps.LongMap;
-import cointoss.util.primitive.maps.LongMap.LongEntry;
+import cointoss.util.primitive.map.ConcurrentNavigableLongMap;
+import cointoss.util.primitive.map.LongMap;
+import cointoss.util.primitive.map.LongMap.LongEntry;
 import psychopath.Directory;
 import psychopath.File;
 

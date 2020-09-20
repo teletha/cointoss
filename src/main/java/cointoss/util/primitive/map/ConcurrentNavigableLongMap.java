@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.primitive.maps;
+package cointoss.util.primitive.map;
 
 import static cointoss.util.primitive.Primitives.ensureLong;
 

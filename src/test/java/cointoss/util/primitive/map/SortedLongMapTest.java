@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Test;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterators;
 
-import cointoss.util.primitive.maps.ConcurrentNavigableLongMap;
-import cointoss.util.primitive.maps.LongMap;
-import cointoss.util.primitive.maps.LongMap.LongEntry;
+import cointoss.util.primitive.map.ConcurrentNavigableLongMap;
+import cointoss.util.primitive.map.LongMap;
+import cointoss.util.primitive.map.LongMap.LongEntry;
 
 class SortedLongMapTest {
 

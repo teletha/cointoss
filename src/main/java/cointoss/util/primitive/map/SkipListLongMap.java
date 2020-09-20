@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.primitive.maps;
+package cointoss.util.primitive.map;
 
 import java.lang.invoke.VarHandle;
 import java.util.AbstractCollection;
@@ -35,6 +35,7 @@ import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
+import cointoss.util.primitive.set.NavigableLongSet;
 import kiss.I;
 
 /**
