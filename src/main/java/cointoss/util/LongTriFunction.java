@@ -7,9 +7,9 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util.primitive;
+package cointoss.util;
 
-public interface DoubleTetraFunction {
+public interface LongTriFunction {
 
     /**
      * Composes a single value from three arguments.
@@ -17,8 +17,7 @@ public interface DoubleTetraFunction {
      * @param param1 First parameter.
      * @param param2 Second parameter.
      * @param param3 Third parameter.
-     * @param param4 Fourth parameter.
      * @return A calculated result.
      */
-    double applyAsDouble(double param1, double param2, double param3, double param4);
+    long applyAsLong(long param1, long param2, long param3);
 }

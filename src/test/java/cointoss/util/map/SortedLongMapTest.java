@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.primitive.map;
+package cointoss.util.map;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,9 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterators;
 
-import cointoss.util.primitive.map.ConcurrentNavigableLongMap;
-import cointoss.util.primitive.map.LongMap;
-import cointoss.util.primitive.map.LongMap.LongEntry;
+import cointoss.util.map.LongMap.LongEntry;
 
 class SortedLongMapTest {
 

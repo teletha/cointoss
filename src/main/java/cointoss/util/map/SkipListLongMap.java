@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.primitive.map;
+package cointoss.util.map;
 
 import java.lang.invoke.VarHandle;
 import java.util.AbstractCollection;
@@ -35,7 +35,7 @@ import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
-import cointoss.util.primitive.set.NavigableLongSet;
+import cointoss.util.set.NavigableLongSet;
 import kiss.I;
 
 /**
@@ -69,16 +69,9 @@ import kiss.I;
  * {@link Map} and {@link Iterator} interfaces. Like most other concurrent collections, this class
  * does <em>not</em> permit the use of {@code null} keys or values because some null return values
  * cannot be reliably distinguished from the absence of elements.
- * <p>
- * This class is a member of the
- * <a href="{@docRoot}/java.base/java/util/package-summary.html#CollectionsFramework"> Java
- * Collections Framework</a>.
  *
- * @author Doug Lea
- * @param <Long> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-@SuppressWarnings("serial")
 class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
 
     /** The field updater. */
@@ -798,7 +791,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * @param rel the relation -- OR'ed combination of EQ, LT, GT
      * @return nearest node fitting relation, or null if no such
      */
-    final Node<V> findNear(long key, int rel, LongComparator cmp) {
+    private Node<V> findNear(long key, int rel, LongComparator cmp) {
         Node<V> result;
         outer: for (Node<V> b;;) {
             if ((b = findPredecessor(key, cmp)) == null) {
@@ -836,7 +829,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * @param rel the relation -- OR'ed combination of EQ, LT, GT
      * @return Entry fitting relation, or null if no such
      */
-    final LongEntry<V> findNearEntry(long key, int rel, LongComparator cmp) {
+    private LongEntry<V> findNearEntry(long key, int rel, LongComparator cmp) {
         for (;;) {
             Node<V> n;
             V v;
@@ -1047,7 +1040,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * @param value if non-null, the value that must be associated with key
      * @return the node, or null if not found
      */
-    final V doRemove(long key, Object value) {
+    private V doRemove(long key, Object value) {
         LongComparator cmp = comparator;
         V result = null;
         Node<V> b;

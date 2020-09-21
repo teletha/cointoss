@@ -7,9 +7,9 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.primitive.map;
+package cointoss.util.map;
 
-import static cointoss.util.primitive.Primitives.ensureLong;
+import static cointoss.util.Primitives.*;
 
 import java.util.Comparator;
 import java.util.NavigableMap;

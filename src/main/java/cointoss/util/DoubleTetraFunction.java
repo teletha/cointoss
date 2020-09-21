@@ -7,9 +7,9 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util.primitive;
+package cointoss.util;
 
-public interface DoublePentaFunction {
+public interface DoubleTetraFunction {
 
     /**
      * Composes a single value from three arguments.
@@ -18,8 +18,7 @@ public interface DoublePentaFunction {
      * @param param2 Second parameter.
      * @param param3 Third parameter.
      * @param param4 Fourth parameter.
-     * @param param5 Fifth parameter.
      * @return A calculated result.
      */
-    double applyAsDouble(double param1, double param2, double param3, double param4, double param5);
+    double applyAsDouble(double param1, double param2, double param3, double param4);
 }

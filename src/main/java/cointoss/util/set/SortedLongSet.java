@@ -7,9 +7,9 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.primitive.set;
+package cointoss.util.set;
 
-import static cointoss.util.primitive.Primitives.*;
+import static cointoss.util.Primitives.*;
 
 import java.util.NoSuchElementException;
 import java.util.SortedSet;

@@ -7,9 +7,9 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util.primitive;
+package cointoss.util;
 
-public interface LongTriFunction {
+public interface DoubleTriFunction {
 
     /**
      * Composes a single value from three arguments.
@@ -19,5 +19,5 @@ public interface LongTriFunction {
      * @param param3 Third parameter.
      * @return A calculated result.
      */
-    long applyAsLong(long param1, long param2, long param3);
+    double applyAsDouble(double param1, double param2, double param3);
 }

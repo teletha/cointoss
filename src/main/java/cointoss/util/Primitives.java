@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util.primitive;
+package cointoss.util;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;

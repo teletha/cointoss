@@ -30,7 +30,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
-import cointoss.util.primitive.Primitives;
+import cointoss.util.Primitives;
 import kiss.Disposable;
 import kiss.Variable;
 import stylist.Style;
