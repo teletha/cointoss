@@ -16,17 +16,17 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-import cointoss.util.ring.RingBuffer;
+import cointoss.util.ring.DoubleRingBuffer;
 import kiss.WiseTriFunction;
 
 public class OnlineAlgorithm {
 
     public static Collector<Double, ?, Double> sumDouble(int size) {
-        return calculate(size, (current, prev, now) -> current - prev + now);
+        return calculateDouble(size, (current, prev, now) -> current - prev + now);
     }
 
-    public static <T, R> Collector<T, ?, R> calculate(int size, WiseTriFunction<R, T, T, R> calculator) {
-        return new Collector<T, RingBuffer<T>, R>() {
+    public static <R> Collector<Double, ?, R> calculateDouble(int size, WiseTriFunction<R, Double, Double, R> calculator) {
+        return new Collector<Double, DoubleRingBuffer, R>() {
 
             private R current;
 
@@ -34,15 +34,15 @@ public class OnlineAlgorithm {
              * {@inheritDoc}
              */
             @Override
-            public Supplier<RingBuffer<T>> supplier() {
-                return () -> new RingBuffer<>(size);
+            public Supplier<DoubleRingBuffer> supplier() {
+                return () -> new DoubleRingBuffer(size);
             }
 
             /**
              * {@inheritDoc}
              */
             @Override
-            public BiConsumer<RingBuffer<T>, T> accumulator() {
+            public BiConsumer<DoubleRingBuffer, Double> accumulator() {
                 return (buffer, v) -> {
                     current = calculator.apply(current, buffer.add(v), v);
                 };
@@ -52,7 +52,7 @@ public class OnlineAlgorithm {
              * {@inheritDoc}
              */
             @Override
-            public BinaryOperator<RingBuffer<T>> combiner() {
+            public BinaryOperator<DoubleRingBuffer> combiner() {
                 return null;
             }
 
@@ -60,7 +60,7 @@ public class OnlineAlgorithm {
              * {@inheritDoc}
              */
             @Override
-            public Function<RingBuffer<T>, R> finisher() {
+            public Function<DoubleRingBuffer, R> finisher() {
                 return v -> current;
             }
 

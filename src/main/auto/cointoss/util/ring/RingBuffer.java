@@ -1,16 +1,19 @@
 /*
- * Copyright (C) 2020 cointoss Development Team
+ * Copyright (C) 2020 Nameless Production Committee
  *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *          https://opensource.org/licenses/MIT
+ *          http://opensource.org/licenses/mit-license.php
  */
 package cointoss.util.ring;
 
 import java.lang.reflect.Array;
 
+import javax.annotation.processing.Generated;
+
+@Generated("SpecializedCodeGenerator")
 public class RingBuffer<E> {
 
     /** The fixed buffer size. */
