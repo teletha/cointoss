@@ -12,8 +12,6 @@ package cointoss.util.array;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.array.DoubleArray;
-
 class DoubleArrayTest {
 
     private int sizeForTest = 5000;

@@ -13,6 +13,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Objects;
 
+import cointoss.util.array.PrefixArray;
 import cointoss.util.ring.PrefixRingBuffer;
 import psychopath.File;
 import psychopath.Locator;
@@ -54,13 +55,13 @@ public class SpecializedCodeGenerator {
      */
     public enum Type {
 
-        Object("", "", "E", false, "(E[]) Array.newInstance(Object.class, $1)", Array.class),
+        Object("", "", "E", false, "(E[]) Array.newInstance(Object.class, $1)", Array.class, "null"),
 
-        Int("Int", "int", "int", true, "new int[$1]", null),
+        Int("Int", "int", "int", true, "new int[$1]", null, "0"),
 
-        Long("Long", "long", "long", true, "new long[$1]", null),
+        Long("Long", "long", "long", true, "new long[$1]", null, "0L"),
 
-        Double("Double", "double", "double", true, "new double[$1]", null);
+        Double("Double", "double", "double", true, "new double[$1]", null, "0d");
 
         private final String Prefix;
 
@@ -74,16 +75,19 @@ public class SpecializedCodeGenerator {
 
         private final String newArrayImport;
 
+        private final String initialValue;
+
         /**
          * @param specializedType
          */
-        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, boolean removeGeneric, String newArrayPattern, Class newArrayImport) {
+        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, boolean removeGeneric, String newArrayPattern, Class newArrayImport, String initialValue) {
             this.Prefix = upperCasePrefix;
             this.prefix = lowerCasePrefix;
             this.specializable = specializable;
             this.removeGeneric = removeGeneric;
             this.newArrayPattern = newArrayPattern;
             this.newArrayImport = newArrayImport == null ? "" : "import " + newArrayImport.getName() + ";";
+            this.initialValue = initialValue;
         }
 
         String replace(String text) {
@@ -92,8 +96,17 @@ public class SpecializedCodeGenerator {
                 result = result.replace("<" + specializable + ">", "");
             }
 
+            // initial value
+            result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".initital\\(\\)", initialValue);
+
             // new Sepcializable[size]
             result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".newArray\\((.+)\\)", newArrayPattern);
+
+            // increment
+            result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".increment\\((.+), (.+)\\)", "$1 += $2");
+            result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".decrement\\((.+), (.+)\\)", "$1 -= $2");
+
+            // import
             result = result.replace("import " + SpecializedCodeGenerator.class.getName() + ";", newArrayImport);
 
             return result;
@@ -105,6 +118,7 @@ public class SpecializedCodeGenerator {
      */
     public static void main(String[] args) {
         SpecializedCodeGenerator.write(PrefixRingBuffer.class);
+        SpecializedCodeGenerator.write(PrefixArray.class, Type.Int, Type.Long, Type.Double);
     }
 
     /**
@@ -114,6 +128,33 @@ public class SpecializedCodeGenerator {
      * @return
      */
     public static <Specializable> Specializable[] newArray(int size) {
+        throw new Error("Dummy code");
+    }
+
+    /**
+     * Create inital value.
+     * 
+     * @return
+     */
+    public static <Specializable> Specializable initital() {
+        throw new Error("Dummy code");
+    }
+
+    /**
+     * Increment value.
+     * 
+     * @return
+     */
+    public static <Specializable> Specializable increment(Specializable base, Specializable increment) {
+        throw new Error("Dummy code");
+    }
+
+    /**
+     * Decrement value.
+     * 
+     * @return
+     */
+    public static <Specializable> Specializable decrement(Specializable base, Specializable decrement) {
         throw new Error("Dummy code");
     }
 }
