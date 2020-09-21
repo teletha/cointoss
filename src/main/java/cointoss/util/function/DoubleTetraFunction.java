@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.util.function;
 
 public interface DoubleTetraFunction {
 

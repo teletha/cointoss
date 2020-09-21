@@ -15,9 +15,9 @@ import java.text.NumberFormat;
 import java.util.function.DoubleBinaryOperator;
 
 import cointoss.Directional;
-import cointoss.util.DoublePentaFunction;
-import cointoss.util.DoubleTetraFunction;
-import cointoss.util.DoubleTriFunction;
+import cointoss.util.function.DoublePentaFunction;
+import cointoss.util.function.DoubleTetraFunction;
+import cointoss.util.function.DoubleTriFunction;
 import kiss.Variable;
 
 @SuppressWarnings("serial")
