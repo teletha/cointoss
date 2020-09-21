@@ -12,11 +12,14 @@ package cointoss.util.array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.annotation.processing.Generated;
+
 
 
 /**
  * {@link ArrayList} like data structure for numeric primitive type.
  */
+@Generated("SpecializedCodeGenerator")
 public class DoubleArray {
 
     /** The current size. */

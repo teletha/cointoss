@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Objects;
 
 import cointoss.util.array.PrefixArray;
+import cointoss.util.function.PrefixPentaFunction;
+import cointoss.util.function.PrefixTetraFunction;
+import cointoss.util.function.PrefixTriFunction;
 import cointoss.util.ring.PrefixRingBuffer;
 import psychopath.File;
 import psychopath.Locator;
@@ -119,6 +122,9 @@ public class SpecializedCodeGenerator {
     public static void main(String[] args) {
         SpecializedCodeGenerator.write(PrefixRingBuffer.class);
         SpecializedCodeGenerator.write(PrefixArray.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(PrefixPentaFunction.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(PrefixTetraFunction.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(PrefixTriFunction.class, Type.Int, Type.Long, Type.Double);
     }
 
     /**
