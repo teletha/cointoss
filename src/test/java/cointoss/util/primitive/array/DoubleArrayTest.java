@@ -7,12 +7,12 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.primitive;
+package cointoss.util.primitive.array;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.primitive.DoubleArray;
+import cointoss.util.primitive.array.DoubleArray;
 
 class DoubleArrayTest {
 

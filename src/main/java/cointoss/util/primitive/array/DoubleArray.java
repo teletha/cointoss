@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util.primitive;
+package cointoss.util.primitive.array;
 
 import java.util.Arrays;
 
