@@ -160,94 +160,98 @@ public class Num extends Arithmetic<Num> {
         if (length <= 18) {
             int index = value.indexOf('.');
             if (index == -1) {
-                return create(Long.parseLong(value));
-            } else {
-                int lastDigitIndex = findLastNonZeroDigit(value, length);
+                try {
+                    return create(Long.parseLong(value));
+                } catch (NumberFormatException e) {
+                    // parse as exponential expression
+                }
+            }
 
-                // parse as long directly and insanely fast
-                long result = 0;
-                boolean negative = false;
-                length = 1 + lastDigitIndex;
-                for (int i = 0; i < length; i++) {
-                    switch (value.charAt(i)) {
-                    case '0':
-                        result = result * 10;
-                        break;
-                    case '1':
-                        result = result * 10 - 1;
-                        break;
-                    case '2':
-                        result = result * 10 - 2;
-                        break;
-                    case '3':
-                        result = result * 10 - 3;
-                        break;
-                    case '4':
-                        result = result * 10 - 4;
-                        break;
-                    case '5':
-                        result = result * 10 - 5;
-                        break;
-                    case '6':
-                        result = result * 10 - 6;
-                        break;
-                    case '7':
-                        result = result * 10 - 7;
-                        break;
-                    case '8':
-                        result = result * 10 - 8;
-                        break;
-                    case '9':
-                        result = result * 10 - 9;
-                        break;
+            int lastDigitIndex = findLastNonZeroDigit(value, length);
 
-                    case '-':
-                        if (i != 0) {
-                            throw new NumberFormatException("Invalid Format [" + value + "]");
-                        }
-                        negative = true;
-                        break;
+            // parse as long directly and insanely fast
+            long result = 0;
+            boolean negative = false;
+            length = 1 + lastDigitIndex;
+            for (int i = 0; i < length; i++) {
+                switch (value.charAt(i)) {
+                case '0':
+                    result = result * 10;
+                    break;
+                case '1':
+                    result = result * 10 - 1;
+                    break;
+                case '2':
+                    result = result * 10 - 2;
+                    break;
+                case '3':
+                    result = result * 10 - 3;
+                    break;
+                case '4':
+                    result = result * 10 - 4;
+                    break;
+                case '5':
+                    result = result * 10 - 5;
+                    break;
+                case '6':
+                    result = result * 10 - 6;
+                    break;
+                case '7':
+                    result = result * 10 - 7;
+                    break;
+                case '8':
+                    result = result * 10 - 8;
+                    break;
+                case '9':
+                    result = result * 10 - 9;
+                    break;
 
-                    case '+':
-                        if (i != 0) {
-                            throw new NumberFormatException("Invalid Format [" + value + "]");
-                        }
-                        break; // ignore
+                case '-':
+                    if (i != 0) {
+                        throw new NumberFormatException("Invalid Format [" + value + "]");
+                    }
+                    negative = true;
+                    break;
 
-                    case '.':
-                        break; // ignore
+                case '+':
+                    if (i != 0) {
+                        throw new NumberFormatException("Invalid Format [" + value + "]");
+                    }
+                    break; // ignore
 
-                    // Don't apply exponential case, it occurs using lookuptable instruction
-                    // instead of tableswitch instruction.
-                    // case 'e':
-                    // case 'E':
-                    default:
-                        char c = value.charAt(i);
-                        if (c == 'E' || c == 'e') {
-                            // reculculate the last digit index
-                            lastDigitIndex = findLastNonZeroDigit(value, i);
+                case '.':
+                    break; // ignore
 
-                            // revert the extra calculation
-                            result /= positives[i - 1 - lastDigitIndex];
+                // Don't apply exponential case, it occurs using lookuptable instruction
+                // instead of tableswitch instruction.
+                // case 'e':
+                // case 'E':
+                default:
+                    char c = value.charAt(i);
+                    if (c == 'E' || c == 'e') {
+                        // reculculate the last digit index
+                        lastDigitIndex = findLastNonZeroDigit(value, i);
 
-                            // Estimate Scale
-                            // scale
-                            // = (textLength - pointIndex) - (textLength - lastDigitIndex) - exp
-                            // = lastDigitIndex - pointIndex - exp
-                            return new Num(negative ? result : -result, lastDigitIndex - index - parseInt(value, i + 1, length));
-                        } else {
-                            // fallback
-                            return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
-                        }
+                        // revert the extra calculation
+                        result /= positives[i - 1 - lastDigitIndex];
+
+                        // Estimate Scale
+                        // scale
+                        // = (textLength - pointIndex) - (textLength - lastDigitIndex) - exp
+                        // = lastDigitIndex - pointIndex - exp
+                        return new Num(negative ? result : -result, lastDigitIndex - Math.max(0, index) - parseInt(value, i + 1, length));
+                    } else {
+                        // fallback
+                        return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
                     }
                 }
-
-                // Estimate Scale
-                // scale
-                // = (textLength - pointIndex) - (textLength - lastDigitIndex)
-                // = lastDigitIndex - pointIndex
-                return new Num(negative ? result : -result, lastDigitIndex - index);
             }
+
+            // Estimate Scale
+            // scale
+            // = (textLength - pointIndex) - (textLength - lastDigitIndex)
+            // = lastDigitIndex - pointIndex
+            return new Num(negative ? result : -result, lastDigitIndex - index);
         }
 
         // https://github.com/eobermuhlner/big-math#why-is-there-bigdecimalmathtobigdecimalstring-if-java-already-has-a-bigdecimalstring-constructor

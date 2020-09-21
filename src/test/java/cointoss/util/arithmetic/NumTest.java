@@ -47,6 +47,7 @@ class NumTest {
         assert Num.of("0.12E-2").is(0.0012);
         assert Num.of("12.34e-5").is(0.0001234);
         assert Num.of("-12.34e-5").is(-0.0001234);
+        assert Num.of("2e-5").is(0.00002);
     }
 
     @Test
