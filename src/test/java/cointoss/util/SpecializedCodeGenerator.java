@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,13 +54,13 @@ public class SpecializedCodeGenerator {
      */
     public enum Type {
 
-        Object("", "", "E", false),
+        Object("", "", "E", false, "(E[]) Array.newInstance(Object.class, $1)", Array.class),
 
-        Int("Int", "int", "int", true),
+        Int("Int", "int", "int", true, "new int[$1]", null),
 
-        Long("Long", "long", "long", true),
+        Long("Long", "long", "long", true, "new long[$1]", null),
 
-        Double("Double", "double", "double", true);
+        Double("Double", "double", "double", true, "new double[$1]", null);
 
         private final String Prefix;
 
@@ -69,21 +70,32 @@ public class SpecializedCodeGenerator {
 
         private final boolean removeGeneric;
 
+        private final String newArrayPattern;
+
+        private final String newArrayImport;
+
         /**
          * @param specializedType
          */
-        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, boolean removeGeneric) {
+        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, boolean removeGeneric, String newArrayPattern, Class newArrayImport) {
             this.Prefix = upperCasePrefix;
             this.prefix = lowerCasePrefix;
             this.specializable = specializable;
             this.removeGeneric = removeGeneric;
+            this.newArrayPattern = newArrayPattern;
+            this.newArrayImport = newArrayImport == null ? "" : "import " + newArrayImport.getName() + ";";
         }
 
         String replace(String text) {
-            String result = text.replace("Prefix", Prefix).replace("Specializable", specializable);
+            String result = text.replace("Prefix", Prefix).replace("prefix", prefix).replace("Specializable", specializable);
             if (removeGeneric) {
                 result = result.replace("<" + specializable + ">", "");
             }
+
+            // new Sepcializable[size]
+            result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".newArray\\((.+)\\)", newArrayPattern);
+            result = result.replace("import " + SpecializedCodeGenerator.class.getName() + ";", newArrayImport);
+
             return result;
         }
     }
@@ -93,5 +105,15 @@ public class SpecializedCodeGenerator {
      */
     public static void main(String[] args) {
         SpecializedCodeGenerator.write(PrefixRingBuffer.class);
+    }
+
+    /**
+     * Create array.
+     * 
+     * @param size
+     * @return
+     */
+    public static <Specializable> Specializable[] newArray(int size) {
+        throw new Error("Dummy code");
     }
 }

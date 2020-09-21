@@ -9,9 +9,9 @@
  */
 package cointoss.util.ring;
 
-import java.lang.reflect.Array;
-
 import javax.annotation.processing.Generated;
+
+
 
 @Generated("SpecializedCodeGenerator")
 public class LongRingBuffer {
@@ -26,18 +26,20 @@ public class LongRingBuffer {
     private int index;
 
     /**
-     * @param size
+     * Create new buffer.
+     * 
+     * @param size A fixed buffer size.
      */
     public LongRingBuffer(int size) {
         this.size = size;
-        this.buffer = (long[]) Array.newInstance(Object.class, size);
+        this.buffer = new long[size];
     }
 
     /**
      * Add an item at tail.
      * 
-     * @param item
-     * @return Removed value.
+     * @param item An item to add.
+     * @return Removed item.
      */
     public long add(long item) {
         long prev = buffer[index];

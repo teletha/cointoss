@@ -9,9 +9,9 @@
  */
 package cointoss.util.ring;
 
-import java.lang.reflect.Array;
-
 import javax.annotation.processing.Generated;
+
+import cointoss.util.SpecializedCodeGenerator;
 
 @Generated("SpecializedCodeGenerator")
 public class PrefixRingBuffer<Specializable> {
@@ -26,18 +26,20 @@ public class PrefixRingBuffer<Specializable> {
     private int index;
 
     /**
-     * @param size
+     * Create new buffer.
+     * 
+     * @param size A fixed buffer size.
      */
     public PrefixRingBuffer(int size) {
         this.size = size;
-        this.buffer = (Specializable[]) Array.newInstance(Object.class, size);
+        this.buffer = SpecializedCodeGenerator.newArray(size);
     }
 
     /**
      * Add an item at tail.
      * 
-     * @param item
-     * @return Removed value.
+     * @param item An item to add.
+     * @return Removed item.
      */
     public Specializable add(Specializable item) {
         Specializable prev = buffer[index];

@@ -9,9 +9,9 @@
  */
 package cointoss.util.ring;
 
-import java.lang.reflect.Array;
-
 import javax.annotation.processing.Generated;
+
+
 
 @Generated("SpecializedCodeGenerator")
 public class DoubleRingBuffer {
@@ -26,18 +26,20 @@ public class DoubleRingBuffer {
     private int index;
 
     /**
-     * @param size
+     * Create new buffer.
+     * 
+     * @param size A fixed buffer size.
      */
     public DoubleRingBuffer(int size) {
         this.size = size;
-        this.buffer = (double[]) Array.newInstance(double.class, size);
+        this.buffer = new double[size];
     }
 
     /**
      * Add an item at tail.
      * 
-     * @param item
-     * @return Removed value.
+     * @param item An item to add.
+     * @return Removed item.
      */
     public double add(double item) {
         double prev = buffer[index];
