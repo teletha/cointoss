@@ -19,6 +19,7 @@ import cointoss.util.function.PrefixTetraFunction;
 import cointoss.util.function.PrefixTriFunction;
 import cointoss.util.ring.PrefixRingBuffer;
 import cointoss.util.set.PrefixSet;
+import cointoss.util.set.SortedPrefixSet;
 import psychopath.File;
 import psychopath.Locator;
 
@@ -133,6 +134,7 @@ public class SpecializedCodeGenerator {
         SpecializedCodeGenerator.write(PrefixRingBuffer.class);
         SpecializedCodeGenerator.write(PrefixArray.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(PrefixSet.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(SortedPrefixSet.class, Type.Int, Type.Long, Type.Double);
 
         SpecializedCodeGenerator.write(PrefixPentaFunction.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(PrefixTetraFunction.class, Type.Int, Type.Long, Type.Double);

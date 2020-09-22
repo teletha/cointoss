@@ -9,10 +9,11 @@
  */
 package cointoss.util.set;
 
-import static cointoss.util.Primitives.*;
-
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
+
+
+
 
 public interface SortedLongSet extends SortedSet<Long>, LongSet {
 
@@ -21,7 +22,7 @@ public interface SortedLongSet extends SortedSet<Long>, LongSet {
      */
     @Override
     default SortedSet<Long> subSet(Long fromElement, Long toElement) {
-        return subSet(ensureLong(fromElement), ensureLong(toElement));
+        return subSet((long) fromElement, (long) toElement);
     }
 
     /**
@@ -56,7 +57,7 @@ public interface SortedLongSet extends SortedSet<Long>, LongSet {
      */
     @Override
     default SortedSet<Long> headSet(Long toElement) {
-        return headSet(ensureLong(toElement));
+        return headSet((long) toElement);
     }
 
     /**
@@ -88,7 +89,7 @@ public interface SortedLongSet extends SortedSet<Long>, LongSet {
      */
     @Override
     default SortedSet<Long> tailSet(Long fromElement) {
-        return tailSet(ensureLong(fromElement));
+        return tailSet((long) fromElement);
     }
 
     /**
@@ -120,7 +121,7 @@ public interface SortedLongSet extends SortedSet<Long>, LongSet {
      */
     @Override
     default Long first() {
-        return firstLong();
+        return (Long) firstLong();
     }
 
     /**
@@ -136,7 +137,7 @@ public interface SortedLongSet extends SortedSet<Long>, LongSet {
      */
     @Override
     default Long last() {
-        return lastLong();
+        return (Long) lastLong();
     }
 
     /**
