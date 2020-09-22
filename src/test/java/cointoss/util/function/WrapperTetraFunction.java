@@ -11,8 +11,10 @@ package cointoss.util.function;
 
 import javax.annotation.processing.Generated;
 
+import cointoss.util.SpecializedCodeGenerator.Primitive;
+
 @Generated("SpecializedCodeGenerator")
-public interface WrapperTetraFunction<Specializable> {
+public interface WrapperTetraFunction {
 
     /**
      * Composes a single value from four arguments.
@@ -23,5 +25,5 @@ public interface WrapperTetraFunction<Specializable> {
      * @param param4 Fourth parameter.
      * @return A calculated result.
      */
-    Specializable applyAsPrefix(Specializable param1, Specializable param2, Specializable param3, Specializable param4);
+    Primitive applyAsWrapper(Primitive param1, Primitive param2, Primitive param3, Primitive param4);
 }

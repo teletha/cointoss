@@ -16,6 +16,7 @@ import javax.annotation.processing.Generated;
 
 
 
+
 /**
  * {@link ArrayList} like data structure for numeric primitive type.
  */
@@ -202,6 +203,6 @@ public class DoubleArray {
      */
     @Override
     public String toString() {
-        return "DoubleArray[Size: " + size + " Items: " + Arrays.toString(array) + "]";
+        return "PrefixArray[Size: " + size + " Items: " + Arrays.toString(array) + "]";
     }
 }

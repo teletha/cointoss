@@ -12,15 +12,17 @@ package cointoss.util.ring;
 import javax.annotation.processing.Generated;
 
 import cointoss.util.SpecializedCodeGenerator;
+import cointoss.util.SpecializedCodeGenerator.Erasable;
+import cointoss.util.SpecializedCodeGenerator.Primitive;
 
 @Generated("SpecializedCodeGenerator")
-public class WrapperRingBuffer<Specializable> {
+public class WrapperRingBuffer<@Erasable Wrapper> {
 
     /** The fixed buffer size. */
     private final int size;
 
     /** The actual buffer. */
-    private final Specializable[] buffer;
+    private final Primitive[] buffer;
 
     /** The current index. */
     private int index;
@@ -41,8 +43,8 @@ public class WrapperRingBuffer<Specializable> {
      * @param item An item to add.
      * @return Removed item.
      */
-    public Specializable add(Specializable item) {
-        Specializable prev = buffer[index];
+    public Primitive add(Primitive item) {
+        Primitive prev = buffer[index];
         buffer[index] = item;
         index = (index + 1) % size;
         return prev;

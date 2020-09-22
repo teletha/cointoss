@@ -9,6 +9,8 @@
  */
 package cointoss.util;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Objects;
@@ -69,23 +71,21 @@ public class SpecializedCodeGenerator {
      */
     public enum Type {
 
-        Object("", "", "E", "E", false, "(E[]) Array.newInstance(Object.class, $1)", Array.class, "null", Function.class),
+        Object("", "E", "E", "<E>", "(E[]) Array.newInstance(Object.class, $1)", Array.class, "null", Function.class),
 
-        Int("Int", "int", "int", "Integer", true, "new int[$1]", null, "0", IntFunction.class),
+        Int("Int", "int", "Integer", "", "new int[$1]", null, "0", IntFunction.class),
 
-        Long("Long", "long", "long", "Long", true, "new long[$1]", null, "0L", LongFunction.class),
+        Long("Long", "long", "Long", "", "new long[$1]", null, "0L", LongFunction.class),
 
-        Double("Double", "double", "double", "Double", true, "new double[$1]", null, "0d", DoubleFunction.class);
+        Double("Double", "double", "Double", "", "new double[$1]", null, "0d", DoubleFunction.class);
 
         private final String Prefix;
 
         private final String prefix;
 
-        private final String specializable;
-
         private final String wrapperType;
 
-        private final boolean removeGeneric;
+        private final String erasedWrapper;
 
         private final String newArrayPattern;
 
@@ -98,12 +98,11 @@ public class SpecializedCodeGenerator {
         /**
          * @param specializedType
          */
-        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, String wrapperType, boolean removeGeneric, String newArrayPattern, Class newArrayImport, String initialValue, Class functionType) {
+        private Type(String upperCasePrefix, String lowerCasePrefix, String wrapperType, String erasedType, String newArrayPattern, Class newArrayImport, String initialValue, Class functionType) {
             this.Prefix = upperCasePrefix;
             this.prefix = lowerCasePrefix;
-            this.specializable = specializable;
             this.wrapperType = wrapperType;
-            this.removeGeneric = removeGeneric;
+            this.erasedWrapper = erasedType;
             this.newArrayPattern = newArrayPattern;
             this.newArrayImport = newArrayImport == null ? "" : "import " + newArrayImport.getName() + ";";
             this.initialValue = initialValue;
@@ -111,34 +110,36 @@ public class SpecializedCodeGenerator {
         }
 
         String replace(String text) {
-            String result = text.replace("Prefix", Prefix).replace("prefix", prefix).replace("Specializable", specializable);
-            if (removeGeneric) {
-                result = result.replace("<" + specializable + ">", "");
-            }
-
             // initial value
-            result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".initital\\(\\)", initialValue);
+            text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".initital\\(\\)", initialValue);
 
             // new Sepcializable[size]
-            result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".newArray\\((.+)\\)", newArrayPattern);
+            text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".newArray\\((.+)\\)", newArrayPattern);
 
             // increment
-            result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".increment\\((.+), (.+)\\)", "$1 += $2");
-            result = result.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".decrement\\((.+), (.+)\\)", "$1 -= $2");
+            text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".increment\\((.+), (.+)\\)", "$1 += $2");
+            text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".decrement\\((.+), (.+)\\)", "$1 -= $2");
 
             // import
-            result = result.replace("import " + SpecializedCodeGenerator.class.getName() + ";", newArrayImport);
-            result = result.replace("import " + Wrapper.class.getCanonicalName() + ";", "");
-            result = result.replace("import " + Primitive.class.getCanonicalName() + ";", "");
-            result = result.replace("import " + PrimitiveFunction.class.getCanonicalName() + ";", functionImport);
+            text = text.replace("import " + SpecializedCodeGenerator.class.getName() + ";", newArrayImport);
+            text = text.replace("import " + Wrapper.class.getCanonicalName() + ";", "");
+            text = text.replace("import " + Primitive.class.getCanonicalName() + ";", "");
+            text = text.replace("import " + Erasable.class.getCanonicalName() + ";", "");
+            text = text.replace("import " + PrimitiveFunction.class.getCanonicalName() + ";", functionImport);
 
             // Primitive and Wrapper
-            result = result.replace(PrimitiveFunction.class.getSimpleName(), Prefix + "Function");
-            result = result.replace(Primitive.class.getSimpleName(), prefix);
-            result = result.replaceAll("(\\W)" + Wrapper.class.getSimpleName() + "(\\W)", "$1" + wrapperType + "$2");
-            result = result.replace(Wrapper.class.getSimpleName(), Prefix);
+            String primitiveFunction = PrimitiveFunction.class.getSimpleName();
+            String primitive = Primitive.class.getSimpleName();
+            String wrapper = Wrapper.class.getSimpleName();
+            String erasable = "@" + Erasable.class.getSimpleName() + " ";
 
-            return result;
+            text = text.replace(primitiveFunction, Prefix + "Function");
+            text = text.replace(primitive, prefix);
+            text = text.replace("<" + erasable + wrapper + ">", erasedWrapper);
+            text = text.replaceAll("(\\W)" + wrapper + "(\\W)", "$1" + wrapperType + "$2");
+            text = text.replace(wrapper, Prefix);
+
+            return text;
         }
     }
 
@@ -221,5 +222,9 @@ public class SpecializedCodeGenerator {
     public static interface PrimitiveFunction<V> {
 
         V apply(Primitive value);
+    }
+
+    @Target(ElementType.TYPE_PARAMETER)
+    public @interface Erasable {
     }
 }

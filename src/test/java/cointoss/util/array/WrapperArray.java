@@ -15,18 +15,19 @@ import java.util.Arrays;
 import javax.annotation.processing.Generated;
 
 import cointoss.util.SpecializedCodeGenerator;
+import cointoss.util.SpecializedCodeGenerator.Primitive;
 
 /**
  * {@link ArrayList} like data structure for numeric primitive type.
  */
 @Generated("SpecializedCodeGenerator")
-public class WrapperArray<Specializable> {
+public class WrapperArray {
 
     /** The current size. */
     private volatile int size = 0;
 
     /** The actual data store. */
-    private Specializable[] array;
+    private Primitive[] array;
 
     /**
      * Create empty array.
@@ -48,7 +49,7 @@ public class WrapperArray<Specializable> {
      * @param value A value to append.
      * @return Chainable API.
      */
-    public WrapperArray add(Specializable value) {
+    public WrapperArray add(Primitive value) {
         if (array.length <= size) {
             widenBaseArary(size + 1);
         }
@@ -63,7 +64,7 @@ public class WrapperArray<Specializable> {
     private synchronized void widenBaseArary(int require) {
         int length = array.length;
         if (length <= require) {
-            Specializable[] large = SpecializedCodeGenerator.newArray(Math.max(require, length + Math.min(length, 1024)));
+            Primitive[] large = SpecializedCodeGenerator.newArray(Math.max(require, length + Math.min(length, 1024)));
             System.arraycopy(array, 0, large, 0, length);
             array = large;
         }
@@ -74,7 +75,7 @@ public class WrapperArray<Specializable> {
      * 
      * @return A first element.
      */
-    public Specializable first() {
+    public Primitive first() {
         return size == 0 ? SpecializedCodeGenerator.initital() : array[0];
     }
 
@@ -83,7 +84,7 @@ public class WrapperArray<Specializable> {
      * 
      * @return A last element.
      */
-    public Specializable last() {
+    public Primitive last() {
         return size == 0 ? SpecializedCodeGenerator.initital() : array[size - 1];
     }
 
@@ -94,7 +95,7 @@ public class WrapperArray<Specializable> {
      * @param index An index to get.
      * @return The indexed value.
      */
-    public Specializable get(int index) {
+    public Primitive get(int index) {
         return 0 <= index && index < size ? array[index] : SpecializedCodeGenerator.initital();
     }
 
@@ -105,7 +106,7 @@ public class WrapperArray<Specializable> {
      * @param value A value to set.
      * @return Chainable API.
      */
-    public WrapperArray set(int index, Specializable value) {
+    public WrapperArray set(int index, Primitive value) {
         ensureSize(index);
         array[index] = value;
         return this;
@@ -118,7 +119,7 @@ public class WrapperArray<Specializable> {
      * @param increment A value to increment.
      * @return An updated value.
      */
-    public Specializable increment(int index, Specializable increment) {
+    public Primitive increment(int index, Primitive increment) {
         ensureSize(index);
         return SpecializedCodeGenerator.increment(array[index], increment);
     }
@@ -130,7 +131,7 @@ public class WrapperArray<Specializable> {
      * @param decrement A value to decrement.
      * @return An updated value.
      */
-    public Specializable decrement(int index, Specializable decrement) {
+    public Primitive decrement(int index, Primitive decrement) {
         ensureSize(index);
         return SpecializedCodeGenerator.decrement(array[index], decrement);
     }
@@ -193,7 +194,7 @@ public class WrapperArray<Specializable> {
      * 
      * @return Actual array.
      */
-    public Specializable[] asArray() {
+    public Primitive[] asArray() {
         return array;
     }
 
