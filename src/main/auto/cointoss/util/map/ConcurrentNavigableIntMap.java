@@ -20,7 +20,8 @@ import java.util.concurrent.ConcurrentNavigableMap;
 /**
  * Sepcialized {@link ConcurrentMap} and {@link NavigableMap} interface for primitive key.
  */
-public interface ConcurrentNavigableIntMap<V> extends ConcurrentNavigableMap<Integer, V>, ConcurrentIntMap<V>, NavigableIntMap<V> {
+public interface ConcurrentNavigableIntMap<V>
+        extends ConcurrentNavigableMap<Integer, V>, ConcurrentIntMap<V>, NavigableIntMap<V> {
 
     /**
      * {@inheritDoc}

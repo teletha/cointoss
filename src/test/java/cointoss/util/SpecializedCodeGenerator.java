@@ -17,18 +17,18 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.LongFunction;
 
-import cointoss.util.array.PrefixArray;
-import cointoss.util.function.PrefixPentaFunction;
-import cointoss.util.function.PrefixTetraFunction;
-import cointoss.util.function.PrefixTriFunction;
-import cointoss.util.map.ConcurrentNavigablePrefixMap;
-import cointoss.util.map.ConcurrentPrefixMap;
-import cointoss.util.map.NavigablePrefixMap;
-import cointoss.util.map.PrefixMap;
-import cointoss.util.ring.PrefixRingBuffer;
-import cointoss.util.set.NavigablePrefixSet;
-import cointoss.util.set.PrefixSet;
-import cointoss.util.set.SortedPrefixSet;
+import cointoss.util.array.WrapperArray;
+import cointoss.util.function.WrapperPentaFunction;
+import cointoss.util.function.WrapperTetraFunction;
+import cointoss.util.function.WrapperTriFunction;
+import cointoss.util.map.ConcurrentNavigableWrapperMap;
+import cointoss.util.map.ConcurrentWrapperMap;
+import cointoss.util.map.NavigableWrapperMap;
+import cointoss.util.map.WrapperMap;
+import cointoss.util.ring.WrapperRingBuffer;
+import cointoss.util.set.NavigableWrapperSet;
+import cointoss.util.set.SortedWrapperSet;
+import cointoss.util.set.WrapperSet;
 import psychopath.File;
 import psychopath.Locator;
 
@@ -135,7 +135,8 @@ public class SpecializedCodeGenerator {
             // Primitive and Wrapper
             result = result.replace(PrimitiveFunction.class.getSimpleName(), Prefix + "Function");
             result = result.replace(Primitive.class.getSimpleName(), prefix);
-            result = result.replace(Wrapper.class.getSimpleName(), wrapperType);
+            result = result.replaceAll("(\\W)" + Wrapper.class.getSimpleName() + "(\\W)", "$1" + wrapperType + "$2");
+            result = result.replace(Wrapper.class.getSimpleName(), Prefix);
 
             return result;
         }
@@ -146,25 +147,25 @@ public class SpecializedCodeGenerator {
      */
     public static void main(String[] args) {
         // Array
-        SpecializedCodeGenerator.write(PrefixRingBuffer.class);
-        SpecializedCodeGenerator.write(PrefixArray.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(WrapperRingBuffer.class);
+        SpecializedCodeGenerator.write(WrapperArray.class, Type.Int, Type.Long, Type.Double);
 
         // Set
-        SpecializedCodeGenerator.write(PrefixSet.class, Type.Int, Type.Long, Type.Double);
-        SpecializedCodeGenerator.write(SortedPrefixSet.class, Type.Int, Type.Long, Type.Double);
-        SpecializedCodeGenerator.write(SortedPrefixSet.class, Type.Int, Type.Long, Type.Double);
-        SpecializedCodeGenerator.write(NavigablePrefixSet.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(WrapperSet.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(SortedWrapperSet.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(SortedWrapperSet.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(NavigableWrapperSet.class, Type.Int, Type.Long, Type.Double);
 
         // Map
-        SpecializedCodeGenerator.write(PrefixMap.class, Type.Int, Type.Double);
-        SpecializedCodeGenerator.write(NavigablePrefixMap.class, Type.Int, Type.Double);
-        SpecializedCodeGenerator.write(ConcurrentPrefixMap.class, Type.Int, Type.Double);
-        SpecializedCodeGenerator.write(ConcurrentNavigablePrefixMap.class, Type.Int, Type.Double);
+        SpecializedCodeGenerator.write(WrapperMap.class, Type.Int, Type.Double);
+        SpecializedCodeGenerator.write(NavigableWrapperMap.class, Type.Int, Type.Double);
+        SpecializedCodeGenerator.write(ConcurrentWrapperMap.class, Type.Int, Type.Double);
+        SpecializedCodeGenerator.write(ConcurrentNavigableWrapperMap.class, Type.Int, Type.Double);
 
         // Function
-        SpecializedCodeGenerator.write(PrefixPentaFunction.class, Type.Int, Type.Long, Type.Double);
-        SpecializedCodeGenerator.write(PrefixTetraFunction.class, Type.Int, Type.Long, Type.Double);
-        SpecializedCodeGenerator.write(PrefixTriFunction.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(WrapperPentaFunction.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(WrapperTetraFunction.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(WrapperTriFunction.class, Type.Int, Type.Long, Type.Double);
     }
 
     /**

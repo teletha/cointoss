@@ -110,7 +110,7 @@ public interface NavigableLongSet extends NavigableSet<Long>, SortedLongSet {
      */
     @Override
     default Long pollFirst() {
-        return (Long) pollFirstLong();
+        return pollFirstLong();
     }
 
     /**
@@ -126,7 +126,7 @@ public interface NavigableLongSet extends NavigableSet<Long>, SortedLongSet {
      */
     @Override
     default Long pollLast() {
-        return (Long) pollLastLong();
+        return pollLastLong();
     }
 
     /**

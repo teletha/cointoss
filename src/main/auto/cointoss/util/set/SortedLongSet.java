@@ -121,7 +121,7 @@ public interface SortedLongSet extends SortedSet<Long>, LongSet {
      */
     @Override
     default Long first() {
-        return (Long) firstLong();
+        return firstLong();
     }
 
     /**
@@ -137,7 +137,7 @@ public interface SortedLongSet extends SortedSet<Long>, LongSet {
      */
     @Override
     default Long last() {
-        return (Long) lastLong();
+        return lastLong();
     }
 
     /**

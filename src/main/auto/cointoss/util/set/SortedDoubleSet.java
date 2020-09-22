@@ -121,7 +121,7 @@ public interface SortedDoubleSet extends SortedSet<Double>, DoubleSet {
      */
     @Override
     default Double first() {
-        return (Double) firstDouble();
+        return firstDouble();
     }
 
     /**
@@ -137,7 +137,7 @@ public interface SortedDoubleSet extends SortedSet<Double>, DoubleSet {
      */
     @Override
     default Double last() {
-        return (Double) lastDouble();
+        return lastDouble();
     }
 
     /**

@@ -17,8 +17,8 @@ import java.util.NoSuchElementException;
 
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
-import cointoss.util.map.PrefixMap.WrapperEntry;
-import cointoss.util.set.NavigablePrefixSet;
+import cointoss.util.map.WrapperMap.WrapperEntry;
+import cointoss.util.set.NavigableWrapperSet;
 
 public interface NavigableWrapperMap<V> extends NavigableMap<Wrapper, V> {
 
@@ -314,7 +314,7 @@ public interface NavigableWrapperMap<V> extends NavigableMap<Wrapper, V> {
      * @return a navigable set view of the keys in this map
      */
     @Override
-    NavigablePrefixSet navigableKeySet();
+    NavigableWrapperSet navigableKeySet();
 
     /**
      * Returns a reverse order {@link NavigableSet} view of the keys contained in this map. The
@@ -329,7 +329,7 @@ public interface NavigableWrapperMap<V> extends NavigableMap<Wrapper, V> {
      * @return a reverse order navigable set view of the keys in this map
      */
     @Override
-    NavigablePrefixSet descendingKeySet();
+    NavigableWrapperSet descendingKeySet();
 
     /**
      * {@inheritDoc}

@@ -20,7 +20,8 @@ import cointoss.util.SpecializedCodeGenerator.Wrapper;
 /**
  * Sepcialized {@link ConcurrentMap} and {@link NavigableMap} interface for primitive key.
  */
-public interface ConcurrentNavigableWrapperMap<V> extends ConcurrentNavigableMap<Wrapper, V>, ConcurrentPrefixMap<V>, NavigablePrefixMap<V> {
+public interface ConcurrentNavigableWrapperMap<V>
+        extends ConcurrentNavigableMap<Wrapper, V>, ConcurrentWrapperMap<V>, NavigableWrapperMap<V> {
 
     /**
      * {@inheritDoc}

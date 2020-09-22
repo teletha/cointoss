@@ -157,19 +157,19 @@ public interface IntMap<V> extends Map<Integer, V> {
      *
      * @return a set view of the mappings contained in this map
      */
-    Set<IntegerEntry<V>> intEntrySet();
+    Set<IntEntry<V>> intEntrySet();
 
     /**
      * Specialized {@link Entry} for primitive int.
      */
-    interface IntegerEntry<V> extends Map.Entry<Integer, V>, Comparable<IntegerEntry<V>> {
+    interface IntEntry<V> extends Map.Entry<Integer, V>, Comparable<IntEntry<V>> {
 
         /**
          * {@inheritDoc}
          */
         @Override
         default Integer getKey() {
-            return getIntegerKey();
+            return getIntKey();
         }
 
         /**
@@ -179,14 +179,14 @@ public interface IntMap<V> extends Map<Integer, V> {
          * @throws IllegalStateException implementations may, but are not required to, throw this
          *             exception if the entry has been removed from the backing map.
          */
-        int getIntegerKey();
+        int getIntKey();
 
         /**
          * {@inheritDoc}
          */
         @Override
-        default int compareTo(IntegerEntry<V> o) {
-            return Integer.compare(getIntegerKey(), o.getIntegerKey());
+        default int compareTo(IntEntry<V> o) {
+            return Integer.compare(getIntKey(), o.getIntKey());
         }
 
         /**
@@ -197,14 +197,14 @@ public interface IntMap<V> extends Map<Integer, V> {
          * @param value
          * @return
          */
-        static <V> IntegerEntry<V> immutable(int key, V value) {
-            return new IntegerEntry() {
+        static <V> IntEntry<V> immutable(int key, V value) {
+            return new IntEntry() {
 
                 /**
                  * {@inheritDoc}
                  */
                 @Override
-                public int getIntegerKey() {
+                public int getIntKey() {
                     return key;
                 }
 
@@ -237,9 +237,9 @@ public interface IntMap<V> extends Map<Integer, V> {
                  */
                 @Override
                 public boolean equals(Object obj) {
-                    if (obj instanceof IntegerEntry) {
-                        IntegerEntry other = (IntegerEntry) obj;
-                        if (key == other.getIntegerKey() && Objects.equal(value, other.getValue())) {
+                    if (obj instanceof IntEntry) {
+                        IntEntry other = (IntEntry) obj;
+                        if (key == other.getIntKey() && Objects.equal(value, other.getValue())) {
                             return true;
                         }
                     }
@@ -252,7 +252,7 @@ public interface IntMap<V> extends Map<Integer, V> {
     /**
      * Specialized {@link Comparator} for primitive value.
      */
-    interface IntegerComparator extends Comparator<Integer> {
+    interface IntComparator extends Comparator<Integer> {
 
         /**
          * Compare values.
@@ -279,7 +279,7 @@ public interface IntMap<V> extends Map<Integer, V> {
      * @return A new created map.
      */
     public static <V> ConcurrentNavigableIntMap<V> createSortedMap() {
-        return null;// new SkipListIntegerMap(null);
+        return null;// new SkipListIntMap(null);
     }
 
     /**
@@ -288,7 +288,7 @@ public interface IntMap<V> extends Map<Integer, V> {
      * @param <V> A value type.
      * @return A new created map.
      */
-    public static <V> ConcurrentNavigableIntMap<V> createSortedMap(IntegerComparator comparator) {
-        return null; // new SkipListIntegerMap(comparator);
+    public static <V> ConcurrentNavigableIntMap<V> createSortedMap(IntComparator comparator) {
+        return null; // new SkipListIntMap(comparator);
     }
 }

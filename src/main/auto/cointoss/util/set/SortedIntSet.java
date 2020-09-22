@@ -121,7 +121,7 @@ public interface SortedIntSet extends SortedSet<Integer>, IntSet {
      */
     @Override
     default Integer first() {
-        return (Integer) firstInteger();
+        return firstInt();
     }
 
     /**
@@ -130,14 +130,14 @@ public interface SortedIntSet extends SortedSet<Integer>, IntSet {
      * @return the first (lowest) element currently in this set
      * @throws NoSuchElementException if this set is empty
      */
-    int firstInteger();
+    int firstInt();
 
     /**
      * {@inheritDoc}
      */
     @Override
     default Integer last() {
-        return (Integer) lastInteger();
+        return lastInt();
     }
 
     /**
@@ -146,5 +146,5 @@ public interface SortedIntSet extends SortedSet<Integer>, IntSet {
      * @return the last (highest) element currently in this set
      * @throws NoSuchElementException if this set is empty
      */
-    int lastInteger();
+    int lastInt();
 }

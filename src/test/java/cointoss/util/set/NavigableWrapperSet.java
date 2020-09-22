@@ -17,7 +17,7 @@ import cointoss.util.SpecializedCodeGenerator.Wrapper;
 /**
  * Sepcialized {@link NavigableSet} interface for Primitive value.
  */
-public interface NavigableWrapperSet extends NavigableSet<Wrapper>, SortedPrefixSet {
+public interface NavigableWrapperSet extends NavigableSet<Wrapper>, SortedWrapperSet {
 
     /**
      * {@inheritDoc}
@@ -110,7 +110,7 @@ public interface NavigableWrapperSet extends NavigableSet<Wrapper>, SortedPrefix
      */
     @Override
     default Wrapper pollFirst() {
-        return (Wrapper) pollFirstWrapper();
+        return pollFirstWrapper();
     }
 
     /**
@@ -126,7 +126,7 @@ public interface NavigableWrapperSet extends NavigableSet<Wrapper>, SortedPrefix
      */
     @Override
     default Wrapper pollLast() {
-        return (Wrapper) pollLastWrapper();
+        return pollLastWrapper();
     }
 
     /**

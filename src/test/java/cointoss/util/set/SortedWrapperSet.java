@@ -15,7 +15,7 @@ import java.util.SortedSet;
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 
-public interface SortedWrapperSet extends SortedSet<Wrapper>, PrefixSet {
+public interface SortedWrapperSet extends SortedSet<Wrapper>, WrapperSet {
 
     /**
      * {@inheritDoc}
@@ -121,7 +121,7 @@ public interface SortedWrapperSet extends SortedSet<Wrapper>, PrefixSet {
      */
     @Override
     default Wrapper first() {
-        return (Wrapper) firstWrapper();
+        return firstWrapper();
     }
 
     /**
@@ -137,7 +137,7 @@ public interface SortedWrapperSet extends SortedSet<Wrapper>, PrefixSet {
      */
     @Override
     default Wrapper last() {
-        return (Wrapper) lastWrapper();
+        return lastWrapper();
     }
 
     /**

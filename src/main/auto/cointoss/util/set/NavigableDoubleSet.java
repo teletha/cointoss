@@ -110,7 +110,7 @@ public interface NavigableDoubleSet extends NavigableSet<Double>, SortedDoubleSe
      */
     @Override
     default Double pollFirst() {
-        return (Double) pollFirstDouble();
+        return pollFirstDouble();
     }
 
     /**
@@ -126,7 +126,7 @@ public interface NavigableDoubleSet extends NavigableSet<Double>, SortedDoubleSe
      */
     @Override
     default Double pollLast() {
-        return (Double) pollLastDouble();
+        return pollLastDouble();
     }
 
     /**

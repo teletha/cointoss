@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
 
 
 
-import cointoss.util.map.IntMap.IntegerEntry;
+import cointoss.util.map.IntMap.IntEntry;
 import cointoss.util.set.NavigableIntSet;
 
 public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
@@ -42,7 +42,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @throws NullPointerException if the specified key is null and this map does not permit null
      *             keys
      */
-    IntegerEntry<V> lowerEntry(int key);
+    IntEntry<V> lowerEntry(int key);
 
     /**
      * {@inheritDoc}
@@ -85,7 +85,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @throws NullPointerException if the specified key is null and this map does not permit null
      *             keys
      */
-    IntegerEntry<V> floorEntry(int key);
+    IntEntry<V> floorEntry(int key);
 
     /**
      * {@inheritDoc}
@@ -129,7 +129,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @throws NullPointerException if the specified key is null and this map does not permit null
      *             keys
      */
-    IntegerEntry<V> ceilingEntry(int key);
+    IntEntry<V> ceilingEntry(int key);
 
     /**
      * {@inheritDoc}
@@ -173,7 +173,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @throws NullPointerException if the specified key is null and this map does not permit null
      *             keys
      */
-    IntegerEntry<V> higherEntry(int key);
+    IntEntry<V> higherEntry(int key);
 
     /**
      * {@inheritDoc}
@@ -201,7 +201,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      */
     @Override
     default Integer firstKey() {
-        return firstIntegerKey();
+        return firstIntKey();
     }
 
     /**
@@ -210,7 +210,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @return the first (lowest) key currently in this map
      * @throws NoSuchElementException if this map is empty
      */
-    int firstIntegerKey();
+    int firstIntKey();
 
     /**
      * Returns a value mapping associated with the least key in this map, or {@code null} if the map
@@ -229,14 +229,14 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @return an entry with the least key, or {@code null} if this map is empty
      */
     @Override
-    IntegerEntry<V> firstEntry();
+    IntEntry<V> firstEntry();
 
     /**
      * {@inheritDoc}
      */
     @Override
     default Integer lastKey() {
-        return lastIntegerKey();
+        return lastIntKey();
     }
 
     /**
@@ -245,7 +245,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @return the last (highest) key currently in this map
      * @throws NoSuchElementException if this map is empty
      */
-    int lastIntegerKey();
+    int lastIntKey();
 
     /**
      * Returns a value mapping associated with the greatest key in this map, or {@code null} if the
@@ -264,7 +264,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @return an entry with the greatest key, or {@code null} if this map is empty
      */
     @Override
-    IntegerEntry<V> lastEntry();
+    IntEntry<V> lastEntry();
 
     /**
      * Removes and returns a key-value mapping associated with the least key in this map, or
@@ -273,7 +273,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @return the removed first entry of this map, or {@code null} if this map is empty
      */
     @Override
-    IntegerEntry<V> pollFirstEntry();
+    IntEntry<V> pollFirstEntry();
 
     /**
      * Removes and returns a key-value mapping associated with the greatest key in this map, or
@@ -282,7 +282,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @return the removed last entry of this map, or {@code null} if this map is empty
      */
     @Override
-    IntegerEntry<V> pollLastEntry();
+    IntEntry<V> pollLastEntry();
 
     /**
      * Returns a reverse order view of the mappings contained in this map. The descending map is

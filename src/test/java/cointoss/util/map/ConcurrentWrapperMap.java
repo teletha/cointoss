@@ -17,7 +17,7 @@ import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.PrimitiveFunction;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 
-public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, PrefixMap<V> {
+public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, WrapperMap<V> {
 
     /**
      * {@inheritDoc}

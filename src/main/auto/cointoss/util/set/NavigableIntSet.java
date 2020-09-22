@@ -110,7 +110,7 @@ public interface NavigableIntSet extends NavigableSet<Integer>, SortedIntSet {
      */
     @Override
     default Integer pollFirst() {
-        return (Integer) pollFirstInteger();
+        return pollFirstInt();
     }
 
     /**
@@ -119,14 +119,14 @@ public interface NavigableIntSet extends NavigableSet<Integer>, SortedIntSet {
      *
      * @return the first element, or {@code null} if this set is empty
      */
-    int pollFirstInteger();
+    int pollFirstInt();
 
     /**
      * {@inheritDoc}
      */
     @Override
     default Integer pollLast() {
-        return (Integer) pollLastInteger();
+        return pollLastInt();
     }
 
     /**
@@ -135,7 +135,7 @@ public interface NavigableIntSet extends NavigableSet<Integer>, SortedIntSet {
      *
      * @return the last element, or {@code null} if this set is empty
      */
-    int pollLastInteger();
+    int pollLastInt();
 
     /**
      * {@inheritDoc}
