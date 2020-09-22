@@ -9,23 +9,22 @@
  */
 package cointoss.util.set;
 
-import static cointoss.util.Primitives.*;
-
 import java.util.NavigableSet;
 
+import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 
 /**
  * Sepcialized {@link NavigableSet} interface for Primitive value.
  */
-public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet {
+public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedPrefixSet {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default Long lower(Long e) {
-        return lower(ensureLong(e));
+    default Wrapper lower(Wrapper e) {
+        return lower((Primitive) e);
     }
 
     /**
@@ -39,14 +38,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws NullPointerException if the specified element is null and this set does not permit
      *             null elements
      */
-    long lower(long e);
+    Primitive lower(Primitive e);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default Long floor(Long e) {
-        return floor(ensureLong(e));
+    default Wrapper floor(Wrapper e) {
+        return floor((Primitive) e);
     }
 
     /**
@@ -61,14 +60,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws NullPointerException if the specified element is null and this set does not permit
      *             null elements
      */
-    long floor(long e);
+    Primitive floor(Primitive e);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default Long ceiling(Long e) {
-        return ceiling(ensureLong(e));
+    default Wrapper ceiling(Wrapper e) {
+        return ceiling((Primitive) e);
     }
 
     /**
@@ -83,14 +82,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws NullPointerException if the specified element is null and this set does not permit
      *             null elements
      */
-    long ceiling(long e);
+    Primitive ceiling(Primitive e);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default Long higher(Long e) {
-        return higher(ensureLong(e));
+    default Wrapper higher(Wrapper e) {
+        return higher((Primitive) e);
     }
 
     /**
@@ -104,14 +103,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws NullPointerException if the specified element is null and this set does not permit
      *             null elements
      */
-    long higher(long e);
+    Primitive higher(Primitive e);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default Long pollFirst() {
-        return pollFirstLong();
+    default Wrapper pollFirst() {
+        return (Wrapper) pollFirstWrapper();
     }
 
     /**
@@ -120,14 +119,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      *
      * @return the first element, or {@code null} if this set is empty
      */
-    long pollFirstLong();
+    Primitive pollFirstWrapper();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default Long pollLast() {
-        return pollLastLong();
+    default Wrapper pollLast() {
+        return (Wrapper) pollLastWrapper();
     }
 
     /**
@@ -136,7 +135,7 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      *
      * @return the last element, or {@code null} if this set is empty
      */
-    long pollLastLong();
+    Primitive pollLastWrapper();
 
     /**
      * {@inheritDoc}
@@ -148,8 +147,8 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * {@inheritDoc}
      */
     @Override
-    default NavigablePrefixSet subSet(Long fromElement, boolean fromInclusive, Long toElement, boolean toInclusive) {
-        return subSet(ensureLong(fromElement), fromInclusive, ensureLong(toElement), toInclusive);
+    default NavigablePrefixSet subSet(Wrapper fromElement, boolean fromInclusive, Wrapper toElement, boolean toInclusive) {
+        return subSet((Primitive) fromElement, fromInclusive, (Primitive) toElement, toInclusive);
     }
 
     /**
@@ -180,14 +179,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      *             if this set itself has a restricted range, and {@code fromElement} or
      *             {@code toElement} lies outside the bounds of the range.
      */
-    NavigablePrefixSet subSet(long fromElement, boolean fromInclusive, long toElement, boolean toInclusive);
+    NavigablePrefixSet subSet(Primitive fromElement, boolean fromInclusive, Primitive toElement, boolean toInclusive);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default NavigablePrefixSet headSet(Long toElement, boolean inclusive) {
-        return headSet(ensureLong(toElement), inclusive);
+    default NavigablePrefixSet headSet(Wrapper toElement, boolean inclusive) {
+        return headSet((Primitive) toElement, inclusive);
     }
 
     /**
@@ -213,14 +212,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws IllegalArgumentException if this set itself has a restricted range, and
      *             {@code toElement} lies outside the bounds of the range
      */
-    NavigablePrefixSet headSet(long toElement, boolean inclusive);
+    NavigablePrefixSet headSet(Primitive toElement, boolean inclusive);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default NavigablePrefixSet tailSet(Long fromElement, boolean inclusive) {
-        return tailSet(ensureLong(fromElement), inclusive);
+    default NavigablePrefixSet tailSet(Wrapper fromElement, boolean inclusive) {
+        return tailSet((Primitive) fromElement, inclusive);
     }
 
     /**
@@ -246,14 +245,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws IllegalArgumentException if this set itself has a restricted range, and
      *             {@code fromElement} lies outside the bounds of the range
      */
-    NavigablePrefixSet tailSet(long fromElement, boolean inclusive);
+    NavigablePrefixSet tailSet(Primitive fromElement, boolean inclusive);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default NavigablePrefixSet subSet(Long fromElement, Long toElement) {
-        return subSet(ensureLong(fromElement), ensureLong(toElement));
+    default NavigablePrefixSet subSet(Wrapper fromElement, Wrapper toElement) {
+        return subSet((Primitive) fromElement, (Primitive) toElement);
     }
 
     /**
@@ -266,14 +265,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @Override
-    NavigablePrefixSet subSet(long fromElement, long toElement);
+    NavigablePrefixSet subSet(Primitive fromElement, Primitive toElement);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default NavigablePrefixSet headSet(Long toElement) {
-        return headSet(ensureLong(toElement));
+    default NavigablePrefixSet headSet(Wrapper toElement) {
+        return headSet((Primitive) toElement);
     }
 
     /**
@@ -286,14 +285,14 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @Override
-    NavigablePrefixSet headSet(long toElement);
+    NavigablePrefixSet headSet(Primitive toElement);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default NavigablePrefixSet tailSet(Long fromElement) {
-        return tailSet(ensureLong(fromElement));
+    default NavigablePrefixSet tailSet(Wrapper fromElement) {
+        return tailSet((Primitive) fromElement);
     }
 
     /**
@@ -306,5 +305,5 @@ public interface NavigablePrefixSet extends NavigableSet<Wrapper>, SortedLongSet
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @Override
-    NavigablePrefixSet tailSet(long fromElement);
+    NavigablePrefixSet tailSet(Primitive fromElement);
 }
