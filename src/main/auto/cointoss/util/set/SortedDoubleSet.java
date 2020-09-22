@@ -13,8 +13,6 @@ import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
 
-
-
 public interface SortedDoubleSet extends SortedSet<Double>, DoubleSet {
 
     /**

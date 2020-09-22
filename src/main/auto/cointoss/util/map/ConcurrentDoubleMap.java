@@ -13,9 +13,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 
-
 import java.util.function.DoubleFunction;
-
 
 public interface ConcurrentDoubleMap<V> extends ConcurrentMap<Double, V>, DoubleMap<V> {
 

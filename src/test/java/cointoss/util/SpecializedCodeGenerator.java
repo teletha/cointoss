@@ -9,15 +9,8 @@
  */
 package cointoss.util;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.DoubleFunction;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.LongFunction;
 
 import cointoss.util.array.WrapperArray;
 import cointoss.util.function.WrapperPentaFunction;
@@ -60,7 +53,7 @@ public class SpecializedCodeGenerator {
 
         for (Type type : types) {
             File generateFile = Locator.directory("src/main/auto").file(type.replace(sourceCode.getName().replace('.', '/') + ".java"));
-            List<String> lines = sourceFile.lines().map(line -> type.replace(line)).toList();
+            List<String> lines = sourceFile.lines().map(line -> type.replace(line)).skip(line -> line.equals("SKIPLINE")).toList();
             generateFile.text(lines);
             System.out.println("Generate " + generateFile);
         }
@@ -71,73 +64,67 @@ public class SpecializedCodeGenerator {
      */
     public enum Type {
 
-        Object("", "E", "E", "<E>", "(E[]) Array.newInstance(Object.class, $1)", Array.class, "null", Function.class),
+        Object(false, "E", "", "E", "null"),
 
-        Int("Int", "int", "Integer", "", "new int[$1]", null, "0", IntFunction.class),
+        Int(true, "int", "Int", "Integer", "0"),
 
-        Long("Long", "long", "Long", "", "new long[$1]", null, "0L", LongFunction.class),
+        Long(true, "long", "Long", "Long", "0L"),
 
-        Double("Double", "double", "Double", "", "new double[$1]", null, "0d", DoubleFunction.class);
+        Double(true, "double", "Double", "Double", "0d");
 
-        private final String Prefix;
+        private final boolean numeric;
 
-        private final String prefix;
+        private final String primitiveName;
+
+        private final String wrapperName;
 
         private final String wrapperType;
 
-        private final String erasedWrapper;
-
-        private final String newArrayPattern;
-
-        private final String newArrayImport;
-
         private final String initialValue;
-
-        private String functionImport;
 
         /**
          * @param specializedType
          */
-        private Type(String upperCasePrefix, String lowerCasePrefix, String wrapperType, String erasedType, String newArrayPattern, Class newArrayImport, String initialValue, Class functionType) {
-            this.Prefix = upperCasePrefix;
-            this.prefix = lowerCasePrefix;
+        private Type(boolean numeric, String primitiveName, String wrapperName, String wrapperType, String initialValue) {
+            this.numeric = numeric;
+            this.primitiveName = primitiveName;
+            this.wrapperName = wrapperName;
             this.wrapperType = wrapperType;
-            this.erasedWrapper = erasedType;
-            this.newArrayPattern = newArrayPattern;
-            this.newArrayImport = newArrayImport == null ? "" : "import " + newArrayImport.getName() + ";";
             this.initialValue = initialValue;
-            this.functionImport = "import " + functionType.getCanonicalName() + ";";
         }
 
         String replace(String text) {
+            if (text.startsWith("import " + SpecializedCodeGenerator.class.getCanonicalName())) {
+                if (text.startsWith("import " + WrapperFunction.class.getCanonicalName())) {
+                    return "import java.util.function." + wrapperName + "Function;";
+                } else {
+                    return "SKIPLINE";
+                }
+            }
+
+            String sp = SpecializedCodeGenerator.class.getSimpleName();
+            String primitiveFunction = WrapperFunction.class.getSimpleName();
+            String primitive = Primitive.class.getSimpleName();
+            String w = Wrapper.class.getSimpleName();
+
             // initial value
             text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".initital\\(\\)", initialValue);
 
-            // new Sepcializable[size]
-            text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".newArray\\((.+)\\)", newArrayPattern);
+            // new int[size] or (E[]) Array.newInstance(Object.class, size)
+            text = text.replaceAll(sp + ".newArray\\((.+)\\)", //
+                    numeric ? "new " + primitiveName + "[$1]" : "(E[]) java.lang.reflect.Array.newInstance(Object.class, $1)");
 
             // increment
             text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".increment\\((.+), (.+)\\)", "$1 += $2");
             text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".decrement\\((.+), (.+)\\)", "$1 -= $2");
 
-            // import
-            text = text.replace("import " + SpecializedCodeGenerator.class.getName() + ";", newArrayImport);
-            text = text.replace("import " + Wrapper.class.getCanonicalName() + ";", "");
-            text = text.replace("import " + Primitive.class.getCanonicalName() + ";", "");
-            text = text.replace("import " + Erasable.class.getCanonicalName() + ";", "");
-            text = text.replace("import " + PrimitiveFunction.class.getCanonicalName() + ";", functionImport);
-
             // Primitive and Wrapper
-            String primitiveFunction = PrimitiveFunction.class.getSimpleName();
-            String primitive = Primitive.class.getSimpleName();
-            String wrapper = Wrapper.class.getSimpleName();
-            String erasable = "@" + Erasable.class.getSimpleName() + " ";
-
-            text = text.replace(primitiveFunction, Prefix + "Function");
-            text = text.replace(primitive, prefix);
-            text = text.replace("<" + erasable + wrapper + ">", erasedWrapper);
-            text = text.replaceAll("(\\W)" + wrapper + "(\\W)", "$1" + wrapperType + "$2");
-            text = text.replace(wrapper, Prefix);
+            text = text.replace(primitiveFunction, wrapperName + "Function");
+            text = text.replace(primitive, primitiveName);
+            text = text.replaceAll("(\\w*)" + w + "(\\w*)<" + w + ">", //
+                    "$1" + wrapperName + "$2" + (numeric ? "" : "<" + wrapperType + ">"));
+            text = text.replaceAll("(\\W)" + w + "(\\W)", "$1" + wrapperType + "$2");
+            text = text.replace(w, wrapperName);
 
             return text;
         }
@@ -216,15 +203,11 @@ public class SpecializedCodeGenerator {
         }
     }
 
-    public static interface Primitive extends Wrapper {
-    }
-
-    public static interface PrimitiveFunction<V> {
+    public static interface WrapperFunction<V> {
 
         V apply(Primitive value);
     }
 
-    @Target(ElementType.TYPE_PARAMETER)
-    public @interface Erasable {
+    public static interface Primitive extends Wrapper {
     }
 }

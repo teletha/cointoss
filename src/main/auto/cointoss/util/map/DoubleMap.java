@@ -16,8 +16,6 @@ import java.util.Set;
 import com.google.common.base.Objects;
 
 
-
-
 /**
  * Specialized {@link Map} interface for double key.
  */

@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 
 import cointoss.util.SpecializedCodeGenerator.Primitive;
-import cointoss.util.SpecializedCodeGenerator.PrimitiveFunction;
+import cointoss.util.SpecializedCodeGenerator.WrapperFunction;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 
 public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, WrapperMap<V> {
@@ -209,7 +209,7 @@ public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, Wrap
      * @throws NullPointerException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
-    default V computeIfAbsent(Primitive key, PrimitiveFunction<? extends V> mappingFunction) {
+    default V computeIfAbsent(Primitive key, WrapperFunction<? extends V> mappingFunction) {
         Objects.requireNonNull(mappingFunction);
         V oldValue, newValue;
         return ((oldValue = get(key)) == null && (newValue = mappingFunction

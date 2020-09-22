@@ -15,8 +15,6 @@ import java.util.Arrays;
 import javax.annotation.processing.Generated;
 
 
-
-
 /**
  * {@link ArrayList} like data structure for numeric primitive type.
  */

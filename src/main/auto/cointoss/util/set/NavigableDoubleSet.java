@@ -12,8 +12,6 @@ package cointoss.util.set;
 import java.util.NavigableSet;
 
 
-
-
 /**
  * Sepcialized {@link NavigableSet} interface for double value.
  */

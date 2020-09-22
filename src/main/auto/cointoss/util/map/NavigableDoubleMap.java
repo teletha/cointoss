@@ -15,8 +15,6 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 
-
-
 import cointoss.util.map.DoubleMap.DoubleEntry;
 import cointoss.util.set.NavigableDoubleSet;
 

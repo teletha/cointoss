@@ -12,11 +12,10 @@ package cointoss.util.ring;
 import javax.annotation.processing.Generated;
 
 import cointoss.util.SpecializedCodeGenerator;
-import cointoss.util.SpecializedCodeGenerator.Erasable;
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 
 @Generated("SpecializedCodeGenerator")
-public class WrapperRingBuffer<@Erasable Wrapper> {
+public class WrapperRingBuffer<Wrapper> {
 
     /** The fixed buffer size. */
     private final int size;

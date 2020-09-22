@@ -11,9 +11,6 @@ package cointoss.util.ring;
 
 import javax.annotation.processing.Generated;
 
-import java.lang.reflect.Array;
-
-
 
 @Generated("SpecializedCodeGenerator")
 public class RingBuffer<E> {
@@ -34,7 +31,7 @@ public class RingBuffer<E> {
      */
     public RingBuffer(int size) {
         this.size = size;
-        this.buffer = (E[]) Array.newInstance(Object.class, size);
+        this.buffer = (E[]) java.lang.reflect.Array.newInstance(Object.class, size);
     }
 
     /**

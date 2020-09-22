@@ -12,7 +12,6 @@ package cointoss.util.function;
 import javax.annotation.processing.Generated;
 
 
-
 @Generated("SpecializedCodeGenerator")
 public interface DoubleTriFunction {
 

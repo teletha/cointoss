@@ -12,8 +12,6 @@ package cointoss.util.set;
 import java.util.Collection;
 import java.util.Set;
 
-
-
 import kiss.I;
 
 public interface LongSet extends Set<Long> {
