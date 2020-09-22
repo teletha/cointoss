@@ -15,9 +15,12 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 
+import javax.annotation.processing.Generated;
+
 import cointoss.util.map.IntMap.IntEntry;
 import cointoss.util.set.NavigableIntSet;
 
+@Generated("SpecializedCodeGenerator")
 public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
 
     /**

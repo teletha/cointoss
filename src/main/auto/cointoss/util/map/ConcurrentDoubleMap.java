@@ -13,8 +13,11 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 
+import javax.annotation.processing.Generated;
+
 import java.util.function.DoubleFunction;
 
+@Generated("SpecializedCodeGenerator")
 public interface ConcurrentDoubleMap<V> extends ConcurrentMap<Double, V>, DoubleMap<V> {
 
     /**

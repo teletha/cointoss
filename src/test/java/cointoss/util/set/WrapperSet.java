@@ -12,10 +12,13 @@ package cointoss.util.set;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.annotation.processing.Generated;
+
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 import kiss.I;
 
+@Generated("SpecializedCodeGenerator")
 public interface WrapperSet extends Set<Wrapper> {
 
     /**

@@ -13,12 +13,15 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.processing.Generated;
+
 import com.google.common.base.Objects;
 
 
 /**
  * Specialized {@link Map} interface for int key.
  */
+@Generated("SpecializedCodeGenerator")
 public interface IntMap<V> extends Map<Integer, V> {
 
     /**

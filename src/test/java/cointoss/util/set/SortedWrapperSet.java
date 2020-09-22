@@ -12,9 +12,12 @@ package cointoss.util.set;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
+import javax.annotation.processing.Generated;
+
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 
+@Generated("SpecializedCodeGenerator")
 public interface SortedWrapperSet extends SortedSet<Wrapper>, WrapperSet {
 
     /**

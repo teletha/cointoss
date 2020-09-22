@@ -14,12 +14,15 @@ import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 
+import javax.annotation.processing.Generated;
+
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 
 /**
  * Sepcialized {@link ConcurrentMap} and {@link NavigableMap} interface for primitive key.
  */
+@Generated("SpecializedCodeGenerator")
 public interface ConcurrentNavigableWrapperMap<V>
         extends ConcurrentNavigableMap<Wrapper, V>, ConcurrentWrapperMap<V>, NavigableWrapperMap<V> {
 

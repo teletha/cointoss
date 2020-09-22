@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.processing.Generated;
+
 import com.google.common.base.Objects;
 
 import cointoss.util.SpecializedCodeGenerator.Primitive;
@@ -21,6 +23,7 @@ import cointoss.util.SpecializedCodeGenerator.Wrapper;
 /**
  * Specialized {@link Map} interface for Primitive key.
  */
+@Generated("SpecializedCodeGenerator")
 public interface WrapperMap<V> extends Map<Wrapper, V> {
 
     /**

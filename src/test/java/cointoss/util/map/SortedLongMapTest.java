@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.annotation.processing.Generated;
+
 import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Objects;
@@ -21,6 +23,7 @@ import com.google.common.collect.Iterators;
 
 import cointoss.util.map.LongMap.LongEntry;
 
+@Generated("SpecializedCodeGenerator")
 class SortedLongMapTest {
 
     @Test

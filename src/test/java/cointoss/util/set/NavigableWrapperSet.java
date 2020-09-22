@@ -11,12 +11,15 @@ package cointoss.util.set;
 
 import java.util.NavigableSet;
 
+import javax.annotation.processing.Generated;
+
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 
 /**
  * Sepcialized {@link NavigableSet} interface for Primitive value.
  */
+@Generated("SpecializedCodeGenerator")
 public interface NavigableWrapperSet extends NavigableSet<Wrapper>, SortedWrapperSet {
 
     /**

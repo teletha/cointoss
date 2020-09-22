@@ -11,10 +11,13 @@ package cointoss.util.set;
 
 import java.util.NavigableSet;
 
+import javax.annotation.processing.Generated;
+
 
 /**
  * Sepcialized {@link NavigableSet} interface for long value.
  */
+@Generated("SpecializedCodeGenerator")
 public interface NavigableLongSet extends NavigableSet<Long>, SortedLongSet {
 
     /**

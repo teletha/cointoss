@@ -15,9 +15,12 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 
+import javax.annotation.processing.Generated;
+
 import cointoss.util.map.DoubleMap.DoubleEntry;
 import cointoss.util.set.NavigableDoubleSet;
 
+@Generated("SpecializedCodeGenerator")
 public interface NavigableDoubleMap<V> extends NavigableMap<Double, V> {
 
     /**

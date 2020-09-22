@@ -14,10 +14,13 @@ import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 
+import javax.annotation.processing.Generated;
+
 
 /**
  * Sepcialized {@link ConcurrentMap} and {@link NavigableMap} interface for primitive key.
  */
+@Generated("SpecializedCodeGenerator")
 public interface ConcurrentNavigableDoubleMap<V>
         extends ConcurrentNavigableMap<Double, V>, ConcurrentDoubleMap<V>, NavigableDoubleMap<V> {
 

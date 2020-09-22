@@ -13,8 +13,11 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 
+import javax.annotation.processing.Generated;
+
 import java.util.function.IntFunction;
 
+@Generated("SpecializedCodeGenerator")
 public interface ConcurrentIntMap<V> extends ConcurrentMap<Integer, V>, IntMap<V> {
 
     /**

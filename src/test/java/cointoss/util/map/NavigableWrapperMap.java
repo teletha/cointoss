@@ -15,11 +15,14 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 
+import javax.annotation.processing.Generated;
+
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 import cointoss.util.map.WrapperMap.WrapperEntry;
 import cointoss.util.set.NavigableWrapperSet;
 
+@Generated("SpecializedCodeGenerator")
 public interface NavigableWrapperMap<V> extends NavigableMap<Wrapper, V> {
 
     /**

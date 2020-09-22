@@ -13,12 +13,15 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.processing.Generated;
+
 import com.google.common.base.Objects;
 
 
 /**
  * Specialized {@link Map} interface for double key.
  */
+@Generated("SpecializedCodeGenerator")
 public interface DoubleMap<V> extends Map<Double, V> {
 
     /**

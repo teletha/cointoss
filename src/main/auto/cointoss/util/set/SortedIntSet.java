@@ -12,7 +12,10 @@ package cointoss.util.set;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
+import javax.annotation.processing.Generated;
 
+
+@Generated("SpecializedCodeGenerator")
 public interface SortedIntSet extends SortedSet<Integer>, IntSet {
 
     /**

@@ -12,8 +12,11 @@ package cointoss.util.set;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.annotation.processing.Generated;
+
 import kiss.I;
 
+@Generated("SpecializedCodeGenerator")
 public interface LongSet extends Set<Long> {
 
     /**

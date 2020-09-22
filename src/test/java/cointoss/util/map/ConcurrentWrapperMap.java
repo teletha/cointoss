@@ -13,10 +13,13 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 
-import cointoss.util.SpecializedCodeGenerator.Primitive;
-import cointoss.util.SpecializedCodeGenerator.WrapperFunction;
-import cointoss.util.SpecializedCodeGenerator.Wrapper;
+import javax.annotation.processing.Generated;
 
+import cointoss.util.SpecializedCodeGenerator.Primitive;
+import cointoss.util.SpecializedCodeGenerator.Wrapper;
+import cointoss.util.SpecializedCodeGenerator.WrapperFunction;
+
+@Generated("SpecializedCodeGenerator")
 public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, WrapperMap<V> {
 
     /**
