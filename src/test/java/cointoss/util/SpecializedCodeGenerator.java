@@ -104,8 +104,6 @@ public class SpecializedCodeGenerator {
 
             String sp = SpecializedCodeGenerator.class.getSimpleName();
             String primitiveFunction = WrapperFunction.class.getSimpleName();
-            String primitive = Primitive.class.getSimpleName();
-            String w = Wrapper.class.getSimpleName();
 
             // initial value
             text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".initital\\(\\)", initialValue);
@@ -114,17 +112,16 @@ public class SpecializedCodeGenerator {
             text = text.replaceAll(sp + ".newArray\\((.+)\\)", //
                     numeric ? "new " + primitiveName + "[$1]" : "(E[]) java.lang.reflect.Array.newInstance(Object.class, $1)");
 
-            // increment
-            text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".increment\\((.+), (.+)\\)", "$1 += $2");
-            text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".decrement\\((.+), (.+)\\)", "$1 -= $2");
+            // increment and decrement
+            text = text.replaceAll("Primitive\\.increment\\((.+), (.+)\\)", "$1 += $2");
+            text = text.replaceAll("Primitive\\.decrement\\((.+), (.+)\\)", "$1 -= $2");
 
             // Primitive and Wrapper
             text = text.replace(primitiveFunction, wrapperName + "Function");
-            text = text.replace(primitive, primitiveName);
-            text = text.replaceAll("(\\w*)" + w + "(\\w*)<" + w + ">", //
-                    "$1" + wrapperName + "$2" + (numeric ? "" : "<" + wrapperType + ">"));
-            text = text.replaceAll("(\\W)" + w + "(\\W)", "$1" + wrapperType + "$2");
-            text = text.replace(w, wrapperName);
+            text = text.replace("Primitive", primitiveName);
+            text = text.replaceAll("(\\w*)Wrapper(\\w*)<Wrapper>", "$1" + wrapperName + "$2" + (numeric ? "" : "<" + wrapperType + ">"));
+            text = text.replaceAll("(\\W)Wrapper(\\W)", "$1" + wrapperType + "$2");
+            text = text.replace("Wrapper", wrapperName);
 
             return text;
         }
@@ -176,26 +173,8 @@ public class SpecializedCodeGenerator {
     }
 
     /**
-     * Increment value.
-     * 
-     * @return
+     * Replaceable type for wrapper types.
      */
-    public static <Specializable> Specializable increment(Specializable base, Specializable increment) {
-        throw new Error("Dummy code");
-    }
-
-    /**
-     * Decrement value.
-     * 
-     * @return
-     */
-    public static <Specializable> Specializable decrement(Specializable base, Specializable decrement) {
-        throw new Error("Dummy code");
-    }
-
-    public static interface SpecializableType {
-    }
-
     public static interface Wrapper {
 
         static int compare(Primitive one, Primitive other) {
@@ -203,11 +182,39 @@ public class SpecializedCodeGenerator {
         }
     }
 
+    /**
+     * Replaceable type for primitive function types.
+     */
     public static interface WrapperFunction<V> {
 
         V apply(Primitive value);
     }
 
+    /**
+     * Replaceable type for primitive types.
+     */
     public static interface Primitive extends Wrapper {
+
+        /**
+         * This code will be replaced by increment code of primitive type (i.e. base += 3).
+         * 
+         * @param base A base value.
+         * @param increment A increment size.
+         * @return Increment code.
+         */
+        public static Primitive increment(Primitive base, Primitive increment) {
+            throw new Error("Dummy code");
+        }
+
+        /**
+         * This code will be replaced by decrement code of primitive type (i.e. base -= 3).
+         * 
+         * @param base A base value.
+         * @param decrement A decrement size.
+         * @return Decrement code.
+         */
+        public static Primitive decrement(Primitive base, Primitive decrement) {
+            throw new Error("Dummy code");
+        }
     }
 }

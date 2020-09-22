@@ -121,7 +121,7 @@ public class WrapperArray {
      */
     public Primitive increment(int index, Primitive increment) {
         ensureSize(index);
-        return SpecializedCodeGenerator.increment(array[index], increment);
+        return Primitive.increment(array[index], increment);
     }
 
     /**
@@ -133,7 +133,7 @@ public class WrapperArray {
      */
     public Primitive decrement(int index, Primitive decrement) {
         ensureSize(index);
-        return SpecializedCodeGenerator.decrement(array[index], decrement);
+        return Primitive.decrement(array[index], decrement);
     }
 
     /**
