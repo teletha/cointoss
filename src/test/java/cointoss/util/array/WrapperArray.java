@@ -14,8 +14,8 @@ import java.util.Arrays;
 
 import javax.annotation.processing.Generated;
 
-import cointoss.util.SpecializedCodeGenerator;
 import cointoss.util.SpecializedCodeGenerator.Primitive;
+import cointoss.util.SpecializedCodeGenerator.Wrapper;
 
 /**
  * {@link ArrayList} like data structure for numeric primitive type.
@@ -40,7 +40,7 @@ public class WrapperArray {
      * Create empty array with the specified array size.
      */
     public WrapperArray(int initialRawArraySize) {
-        array = SpecializedCodeGenerator.newArray(initialRawArraySize);
+        array = Wrapper.newArray(initialRawArraySize);
     }
 
     /**
@@ -64,7 +64,7 @@ public class WrapperArray {
     private synchronized void widenBaseArary(int require) {
         int length = array.length;
         if (length <= require) {
-            Primitive[] large = SpecializedCodeGenerator.newArray(Math.max(require, length + Math.min(length, 1024)));
+            Primitive[] large = Wrapper.newArray(Math.max(require, length + Math.min(length, 1024)));
             System.arraycopy(array, 0, large, 0, length);
             array = large;
         }
@@ -76,7 +76,7 @@ public class WrapperArray {
      * @return A first element.
      */
     public Primitive first() {
-        return size == 0 ? SpecializedCodeGenerator.initital() : array[0];
+        return size == 0 ? Wrapper.initital() : array[0];
     }
 
     /**
@@ -85,7 +85,7 @@ public class WrapperArray {
      * @return A last element.
      */
     public Primitive last() {
-        return size == 0 ? SpecializedCodeGenerator.initital() : array[size - 1];
+        return size == 0 ? Wrapper.initital() : array[size - 1];
     }
 
     /**
@@ -96,7 +96,7 @@ public class WrapperArray {
      * @return The indexed value.
      */
     public Primitive get(int index) {
-        return 0 <= index && index < size ? array[index] : SpecializedCodeGenerator.initital();
+        return 0 <= index && index < size ? array[index] : Wrapper.initital();
     }
 
     /**

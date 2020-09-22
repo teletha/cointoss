@@ -102,14 +102,13 @@ public class SpecializedCodeGenerator {
                 }
             }
 
-            String sp = SpecializedCodeGenerator.class.getSimpleName();
             String primitiveFunction = WrapperFunction.class.getSimpleName();
 
             // initial value
-            text = text.replaceAll(SpecializedCodeGenerator.class.getSimpleName() + ".initital\\(\\)", initialValue);
+            text = text.replaceAll("Wrapper\\.initital\\(\\)", initialValue);
 
             // new int[size] or (E[]) Array.newInstance(Object.class, size)
-            text = text.replaceAll(sp + ".newArray\\((.+)\\)", //
+            text = text.replaceAll("Wrapper.newArray\\((.+)\\)", //
                     numeric ? "new " + primitiveName + "[$1]" : "(E[]) java.lang.reflect.Array.newInstance(Object.class, $1)");
 
             // increment and decrement
@@ -119,9 +118,10 @@ public class SpecializedCodeGenerator {
             // Primitive and Wrapper
             text = text.replace(primitiveFunction, wrapperName + "Function");
             text = text.replace("Primitive", primitiveName);
-            text = text.replaceAll("(\\w*)Wrapper(\\w*)<Wrapper>", "$1" + wrapperName + "$2" + (numeric ? "" : "<" + wrapperType + ">"));
-            text = text.replaceAll("(\\W)Wrapper(\\W)", "$1" + wrapperType + "$2");
-            text = text.replace("Wrapper", wrapperName);
+            text = text
+                    .replaceAll("(\\w*)WrapperW?(\\w*)<Wrapper\\d?>", "$1" + wrapperName + "$2" + (numeric ? "" : "<" + wrapperType + ">"));
+            text = text.replaceAll("(\\W)Wrapper\\d?(\\W)", "$1" + wrapperType + "$2");
+            text = text.replaceAll("Wrapper\\d?", wrapperName);
 
             return text;
         }
@@ -154,30 +154,30 @@ public class SpecializedCodeGenerator {
     }
 
     /**
-     * Create array.
-     * 
-     * @param size
-     * @return
-     */
-    public static <Specializable> Specializable[] newArray(int size) {
-        throw new Error("Dummy code");
-    }
-
-    /**
-     * Create inital value.
-     * 
-     * @return
-     */
-    public static <Specializable> Specializable initital() {
-        throw new Error("Dummy code");
-    }
-
-    /**
      * Replaceable type for wrapper types.
      */
     public static interface Wrapper {
 
         static int compare(Primitive one, Primitive other) {
+            throw new Error("Dummy code");
+        }
+
+        /**
+         * Create inital value.
+         * 
+         * @return
+         */
+        public static <AnyType> AnyType initital() {
+            throw new Error("Dummy code");
+        }
+
+        /**
+         * Create array.
+         * 
+         * @param size
+         * @return
+         */
+        public static <AnyType> AnyType[] newArray(int size) {
             throw new Error("Dummy code");
         }
     }
