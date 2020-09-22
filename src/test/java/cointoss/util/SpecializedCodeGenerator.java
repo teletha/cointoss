@@ -12,11 +12,19 @@ package cointoss.util;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.DoubleFunction;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.LongFunction;
 
 import cointoss.util.array.PrefixArray;
 import cointoss.util.function.PrefixPentaFunction;
 import cointoss.util.function.PrefixTetraFunction;
 import cointoss.util.function.PrefixTriFunction;
+import cointoss.util.map.ConcurrentNavigablePrefixMap;
+import cointoss.util.map.ConcurrentPrefixMap;
+import cointoss.util.map.NavigablePrefixMap;
+import cointoss.util.map.PrefixMap;
 import cointoss.util.ring.PrefixRingBuffer;
 import cointoss.util.set.NavigablePrefixSet;
 import cointoss.util.set.PrefixSet;
@@ -61,13 +69,13 @@ public class SpecializedCodeGenerator {
      */
     public enum Type {
 
-        Object("", "", "E", "E", false, "(E[]) Array.newInstance(Object.class, $1)", Array.class, "null"),
+        Object("", "", "E", "E", false, "(E[]) Array.newInstance(Object.class, $1)", Array.class, "null", Function.class),
 
-        Int("Int", "int", "int", "Integer", true, "new int[$1]", null, "0"),
+        Int("Int", "int", "int", "Integer", true, "new int[$1]", null, "0", IntFunction.class),
 
-        Long("Long", "long", "long", "Long", true, "new long[$1]", null, "0L"),
+        Long("Long", "long", "long", "Long", true, "new long[$1]", null, "0L", LongFunction.class),
 
-        Double("Double", "double", "double", "Double", true, "new double[$1]", null, "0d");
+        Double("Double", "double", "double", "Double", true, "new double[$1]", null, "0d", DoubleFunction.class);
 
         private final String Prefix;
 
@@ -85,10 +93,12 @@ public class SpecializedCodeGenerator {
 
         private final String initialValue;
 
+        private String functionImport;
+
         /**
          * @param specializedType
          */
-        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, String wrapperType, boolean removeGeneric, String newArrayPattern, Class newArrayImport, String initialValue) {
+        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, String wrapperType, boolean removeGeneric, String newArrayPattern, Class newArrayImport, String initialValue, Class functionType) {
             this.Prefix = upperCasePrefix;
             this.prefix = lowerCasePrefix;
             this.specializable = specializable;
@@ -97,6 +107,7 @@ public class SpecializedCodeGenerator {
             this.newArrayPattern = newArrayPattern;
             this.newArrayImport = newArrayImport == null ? "" : "import " + newArrayImport.getName() + ";";
             this.initialValue = initialValue;
+            this.functionImport = "import " + functionType.getCanonicalName() + ";";
         }
 
         String replace(String text) {
@@ -117,10 +128,12 @@ public class SpecializedCodeGenerator {
 
             // import
             result = result.replace("import " + SpecializedCodeGenerator.class.getName() + ";", newArrayImport);
-            result = result.replace("import " + Primitive.class.getCanonicalName() + ";", "");
             result = result.replace("import " + Wrapper.class.getCanonicalName() + ";", "");
+            result = result.replace("import " + Primitive.class.getCanonicalName() + ";", "");
+            result = result.replace("import " + PrimitiveFunction.class.getCanonicalName() + ";", functionImport);
 
             // Primitive and Wrapper
+            result = result.replace(PrimitiveFunction.class.getSimpleName(), Prefix + "Function");
             result = result.replace(Primitive.class.getSimpleName(), prefix);
             result = result.replace(Wrapper.class.getSimpleName(), wrapperType);
 
@@ -141,6 +154,12 @@ public class SpecializedCodeGenerator {
         SpecializedCodeGenerator.write(SortedPrefixSet.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(SortedPrefixSet.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(NavigablePrefixSet.class, Type.Int, Type.Long, Type.Double);
+
+        // Map
+        SpecializedCodeGenerator.write(PrefixMap.class, Type.Int, Type.Double);
+        SpecializedCodeGenerator.write(NavigablePrefixMap.class, Type.Int, Type.Double);
+        SpecializedCodeGenerator.write(ConcurrentPrefixMap.class, Type.Int, Type.Double);
+        SpecializedCodeGenerator.write(ConcurrentNavigablePrefixMap.class, Type.Int, Type.Double);
 
         // Function
         SpecializedCodeGenerator.write(PrefixPentaFunction.class, Type.Int, Type.Long, Type.Double);
@@ -189,8 +208,17 @@ public class SpecializedCodeGenerator {
     }
 
     public static interface Wrapper {
+
+        static int compare(Primitive one, Primitive other) {
+            throw new Error("Dummy code");
+        }
     }
 
     public static interface Primitive extends Wrapper {
+    }
+
+    public static interface PrimitiveFunction<V> {
+
+        V apply(Primitive value);
     }
 }
