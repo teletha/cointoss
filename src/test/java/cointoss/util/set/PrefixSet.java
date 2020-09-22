@@ -9,21 +9,21 @@
  */
 package cointoss.util.set;
 
-import static cointoss.util.Primitives.*;
-
 import java.util.Collection;
 import java.util.Set;
 
+import cointoss.util.SpecializedCodeGenerator.Primitive;
+import cointoss.util.SpecializedCodeGenerator.Wrapper;
 import kiss.I;
 
-public interface LongSet extends Set<Long> {
+public interface PrefixSet extends Set<Wrapper> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default boolean add(Long e) {
-        return add(ensureLong(e));
+    default boolean add(Wrapper e) {
+        return add((Primitive) e);
     }
 
     /**
@@ -49,14 +49,14 @@ public interface LongSet extends Set<Long> {
      * @throws IllegalArgumentException if some property of the specified element prevents it from
      *             being added to this set
      */
-    boolean add(long value);
+    boolean add(Primitive value);
 
     /**
      * {@inheritDoc}
      */
     @Override
     default boolean remove(Object o) {
-        return remove(ensureLong(o));
+        return remove((Primitive) o);
     }
 
     /**
@@ -75,14 +75,14 @@ public interface LongSet extends Set<Long> {
      * @throws UnsupportedOperationException if the {@code remove} operation is not supported by
      *             this set
      */
-    boolean remove(long value);
+    boolean remove(Primitive value);
 
     /**
      * {@inheritDoc}
      */
     @Override
     default boolean contains(Object o) {
-        return contains(ensureLong(o));
+        return contains((Primitive) o);
     }
 
     /**
@@ -97,7 +97,7 @@ public interface LongSet extends Set<Long> {
      * @throws NullPointerException if the specified element is null and this set does not permit
      *             null elements (<a href="Collection.html#optional-restrictions">optional</a>)
      */
-    boolean contains(long value);
+    boolean contains(Primitive value);
 
     /**
      * {@inheritDoc}

@@ -18,6 +18,7 @@ import cointoss.util.function.PrefixPentaFunction;
 import cointoss.util.function.PrefixTetraFunction;
 import cointoss.util.function.PrefixTriFunction;
 import cointoss.util.ring.PrefixRingBuffer;
+import cointoss.util.set.PrefixSet;
 import psychopath.File;
 import psychopath.Locator;
 
@@ -58,19 +59,21 @@ public class SpecializedCodeGenerator {
      */
     public enum Type {
 
-        Object("", "", "E", false, "(E[]) Array.newInstance(Object.class, $1)", Array.class, "null"),
+        Object("", "", "E", "E", false, "(E[]) Array.newInstance(Object.class, $1)", Array.class, "null"),
 
-        Int("Int", "int", "int", true, "new int[$1]", null, "0"),
+        Int("Int", "int", "int", "Integer", true, "new int[$1]", null, "0"),
 
-        Long("Long", "long", "long", true, "new long[$1]", null, "0L"),
+        Long("Long", "long", "long", "Long", true, "new long[$1]", null, "0L"),
 
-        Double("Double", "double", "double", true, "new double[$1]", null, "0d");
+        Double("Double", "double", "double", "Double", true, "new double[$1]", null, "0d");
 
         private final String Prefix;
 
         private final String prefix;
 
         private final String specializable;
+
+        private final String wrapperType;
 
         private final boolean removeGeneric;
 
@@ -83,10 +86,11 @@ public class SpecializedCodeGenerator {
         /**
          * @param specializedType
          */
-        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, boolean removeGeneric, String newArrayPattern, Class newArrayImport, String initialValue) {
+        private Type(String upperCasePrefix, String lowerCasePrefix, String specializable, String wrapperType, boolean removeGeneric, String newArrayPattern, Class newArrayImport, String initialValue) {
             this.Prefix = upperCasePrefix;
             this.prefix = lowerCasePrefix;
             this.specializable = specializable;
+            this.wrapperType = wrapperType;
             this.removeGeneric = removeGeneric;
             this.newArrayPattern = newArrayPattern;
             this.newArrayImport = newArrayImport == null ? "" : "import " + newArrayImport.getName() + ";";
@@ -111,6 +115,12 @@ public class SpecializedCodeGenerator {
 
             // import
             result = result.replace("import " + SpecializedCodeGenerator.class.getName() + ";", newArrayImport);
+            result = result.replace("import " + Primitive.class.getCanonicalName() + ";", "");
+            result = result.replace("import " + Wrapper.class.getCanonicalName() + ";", "");
+
+            // Primitive and Wrapper
+            result = result.replace(Primitive.class.getSimpleName(), prefix);
+            result = result.replace(Wrapper.class.getSimpleName(), wrapperType);
 
             return result;
         }
@@ -122,6 +132,8 @@ public class SpecializedCodeGenerator {
     public static void main(String[] args) {
         SpecializedCodeGenerator.write(PrefixRingBuffer.class);
         SpecializedCodeGenerator.write(PrefixArray.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(PrefixSet.class, Type.Int, Type.Long, Type.Double);
+
         SpecializedCodeGenerator.write(PrefixPentaFunction.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(PrefixTetraFunction.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(PrefixTriFunction.class, Type.Int, Type.Long, Type.Double);
@@ -162,5 +174,14 @@ public class SpecializedCodeGenerator {
      */
     public static <Specializable> Specializable decrement(Specializable base, Specializable decrement) {
         throw new Error("Dummy code");
+    }
+
+    public static interface SpecializableType {
+    }
+
+    public static interface Wrapper {
+    }
+
+    public static interface Primitive {
     }
 }
