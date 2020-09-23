@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 import cointoss.util.array.WrapperArray;
+import cointoss.util.function.ToWrapperTriFunction;
 import cointoss.util.function.WrapperPentaFunction;
 import cointoss.util.function.WrapperTetraFunction;
 import cointoss.util.function.WrapperTriFunction;
@@ -108,7 +109,7 @@ public class SpecializedCodeGenerator {
             text = text.replaceAll("Wrapper\\.initital\\(\\)", initialValue);
 
             // new int[size] or (E[]) Array.newInstance(Object.class, size)
-            text = text.replaceAll("Wrapper.newArray\\((.+)\\)", //
+            text = text.replaceAll("Wrapper\\.newArray\\((.+)\\)", //
                     numeric ? "new " + primitiveName + "[$1]" : "(E[]) java.lang.reflect.Array.newInstance(Object.class, $1)");
 
             // increment and decrement
@@ -118,8 +119,8 @@ public class SpecializedCodeGenerator {
             // Primitive and Wrapper
             text = text.replace(primitiveFunction, wrapperName + "Function");
             text = text.replace("Primitive", primitiveName);
-            text = text
-                    .replaceAll("(\\w*)WrapperW?(\\w*)<Wrapper\\d?>", "$1" + wrapperName + "$2" + (numeric ? "" : "<" + wrapperType + ">"));
+            text = text.replaceAll("(\\w*)Wrapper\\d?(\\w*)<Wrapper\\d?>", //
+                    "$1" + wrapperName + "$2" + (numeric ? "" : "<" + wrapperType + ">"));
             text = text.replaceAll("(\\W)Wrapper\\d?(\\W)", "$1" + wrapperType + "$2");
             text = text.replaceAll("Wrapper\\d?", wrapperName);
 
@@ -151,6 +152,7 @@ public class SpecializedCodeGenerator {
         SpecializedCodeGenerator.write(WrapperPentaFunction.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(WrapperTetraFunction.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(WrapperTriFunction.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(ToWrapperTriFunction.class, Type.Int, Type.Long, Type.Double);
     }
 
     /**
