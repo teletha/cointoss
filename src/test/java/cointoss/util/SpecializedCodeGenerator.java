@@ -37,7 +37,7 @@ public class SpecializedCodeGenerator {
      * @param sourceCode
      * @param types
      */
-    private static void write(Class sourceCode) {
+    public static void write(Class sourceCode) {
         write(sourceCode, Type.values());
     }
 
@@ -47,7 +47,37 @@ public class SpecializedCodeGenerator {
      * @param sourceCode
      * @param types
      */
-    private static void write(Class sourceCode, Type... types) {
+    public static void write(Class sourceCode, Type... types) {
+        write(sourceCode, false, types);
+    }
+
+    /**
+     * Generates the specialized code for each type from the specified source code.
+     * 
+     * @param sourceCode
+     * @param types
+     */
+    public static void writeAsPackagePrivate(Class sourceCode) {
+        write(sourceCode, true, Type.values());
+    }
+
+    /**
+     * Generates the specialized code for each type from the specified source code.
+     * 
+     * @param sourceCode
+     * @param types
+     */
+    public static void writeAsPackagePrivate(Class sourceCode, Type... types) {
+        write(sourceCode, true, types);
+    }
+
+    /**
+     * Generates the specialized code for each type from the specified source code.
+     * 
+     * @param sourceCode
+     * @param types
+     */
+    private static void write(Class sourceCode, boolean packagePrivate, Type... types) {
         Objects.requireNonNull(sourceCode);
 
         // find source code
@@ -56,8 +86,24 @@ public class SpecializedCodeGenerator {
         for (Type type : types) {
             File generateFile = Locator.directory("src/main/auto").file(type.replace(sourceCode.getName().replace('.', '/') + ".java"));
             List<String> lines = sourceFile.lines().map(line -> type.replace(line)).skip(line -> line.equals("SKIPLINE")).toList();
+            if (packagePrivate) makePackagePrivate(lines);
             generateFile.text(lines);
             System.out.println("Generate " + generateFile);
+        }
+    }
+
+    /**
+     * Make the modifier of top-level type package-private.
+     * 
+     * @param lines
+     */
+    private static void makePackagePrivate(List<String> lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.startsWith("public ")) {
+                lines.set(i, line.replace("public ", ""));
+                return;
+            }
         }
     }
 
@@ -148,7 +194,7 @@ public class SpecializedCodeGenerator {
         SpecializedCodeGenerator.write(NavigableWrapperMap.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(ConcurrentWrapperMap.class, Type.Int, Type.Long, Type.Double);
         SpecializedCodeGenerator.write(ConcurrentNavigableWrapperMap.class, Type.Int, Type.Long, Type.Double);
-        SpecializedCodeGenerator.write(SkipListWrapperMap.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.writeAsPackagePrivate(SkipListWrapperMap.class, Type.Int, Type.Long, Type.Double);
 
         // Function
         SpecializedCodeGenerator.write(WrapperPentaFunction.class, Type.Int, Type.Long, Type.Double);

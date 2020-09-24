@@ -72,7 +72,7 @@ import kiss.I;
  *
  * @param <V> the type of mapped values
  */
-public class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
+class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
 
     /** The field updater. */
     private static final AtomicReferenceFieldUpdater<SkipListLongMap, Index> HEAD = AtomicReferenceFieldUpdater
@@ -194,27 +194,28 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
     private Node<V> findPredecessor(long key, LongComparator cmp) {
         Index<V> q;
         VarHandle.acquireFence();
-        if ((q = head) == null || key == EMPTY)
+        if ((q = head) == null || key == EMPTY) {
             return null;
-        else {
+        } else {
             for (Index<V> r, d;;) {
                 while ((r = q.right) != null) {
                     Node<V> p;
                     long k;
-                    if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null) // unlink
-                                                                                         // index to
-                                                                                         // deleted
-                                                                                         // node
+                    if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null) {
+                        // unlink index to deleted node
                         RIGHT.compareAndSet(q, r, r.right);
-                    else if (cmp.compare(key, k) > 0)
+                    } else if (cmp.compare(key, k) > 0) {
                         q = r;
-                    else
+                    } else {
                         break;
+                    }
                 }
-                if ((d = q.down) != null)
+
+                if ((d = q.down) != null) {
                     q = d;
-                else
+                } else {
                     return q.node;
+                }
             }
         }
     }
@@ -236,19 +237,19 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
         Node<V> b;
         outer: while ((b = findPredecessor(key, cmp)) != null) {
             for (;;) {
-                Node<V> n;
+                Node<V> node;
                 long k;
                 int c;
-                if ((n = b.next) == null) {
+                if ((node = b.next) == null) {
                     break outer; // empty
-                } else if ((k = n.key) == EMPTY) {
+                } else if ((k = node.key) == EMPTY) {
                     break; // b is deleted
-                } else if (n.value == null) {
-                    unlinkNode(b, n); // n is deleted
+                } else if (node.value == null) {
+                    unlinkNode(b, node); // n is deleted
                 } else if ((c = cmp.compare(key, k)) > 0) {
-                    b = n;
+                    b = node;
                 } else if (c == 0) {
-                    return n;
+                    return node;
                 } else {
                     break outer;
                 }
@@ -270,8 +271,8 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
     private static <V> boolean addIndices(Index<V> q, int skips, Index<V> x, LongComparator cmp) {
         Node<V> z;
         long key;
-        if (x != null && (z = x.node) != null && (key = z.key) != EMPTY && q != null) { // hoist
-                                                                                        // checks
+        if (x != null && (z = x.node) != null && (key = z.key) != EMPTY && q != null) {
+            // hoist checks
             boolean retrying = false;
             for (;;) { // find splice point
                 Index<V> r, d;
@@ -285,21 +286,23 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                     } else if ((c = cmp.compare(key, k)) > 0)
                         q = r;
                     else if (c == 0) break; // stale
-                } else
+                } else {
                     c = -1;
+                }
 
                 if (c < 0) {
                     if ((d = q.down) != null && skips > 0) {
                         --skips;
                         q = d;
-                    } else if (d != null && !retrying && !addIndices(d, 0, x.down, cmp))
+                    } else if (d != null && !retrying && !addIndices(d, 0, x.down, cmp)) {
                         break;
-                    else {
+                    } else {
                         x.right = r;
-                        if (RIGHT.compareAndSet(q, r, x))
+                        if (RIGHT.compareAndSet(q, r, x)) {
                             return true;
-                        else
+                        } else {
                             retrying = true; // re-find splice point
+                        }
                     }
                 }
             }
@@ -333,8 +336,10 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
     private void tryReduceLevel() {
         Index<V> h, d, e;
         if ((h = head) != null && h.right == null && (d = h.down) != null && d.right == null && (e = d.down) != null && e.right == null && HEAD
-                .compareAndSet(this, h, d) && h.right != null) // recheck
+                .compareAndSet(this, h, d) && h.right != null) {
             HEAD.compareAndSet(this, d, h); // try to backout
+        }
+
     }
 
     /**
@@ -346,10 +351,11 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
         Node<V> b, n;
         if ((b = baseHead()) != null) {
             while ((n = b.next) != null) {
-                if (n.value == null)
+                if (n.value == null) {
                     unlinkNode(b, n);
-                else
+                } else {
                     return n;
+                }
             }
         }
         return null;
@@ -369,14 +375,16 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
             for (Index<V> r, d;;) {
                 while ((r = q.right) != null) {
                     Node<V> p;
-                    if ((p = r.node) == null || p.value == null)
+                    if ((p = r.node) == null || p.value == null) {
                         RIGHT.compareAndSet(q, r, r.right);
-                    else
+                    } else {
                         q = r;
+                    }
                 }
-                if ((d = q.down) != null)
+
+                if ((d = q.down) != null) {
                     q = d;
-                else {
+                } else {
                     b = q.node;
                     break;
                 }
@@ -385,16 +393,18 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                 for (;;) {
                     Node<V> n;
                     if ((n = b.next) == null) {
-                        if (b.key == EMPTY) // empty
+                        if (b.key == EMPTY) {
                             break outer;
-                        else
+                        } else {
                             return b;
-                    } else if (n.key == EMPTY)
+                        }
+                    } else if (n.key == EMPTY) {
                         break;
-                    else if (n.value == null)
+                    } else if (n.value == null) {
                         unlinkNode(b, n);
-                    else
+                    } else {
                         b = n;
+                    }
                 }
             }
         }
@@ -422,18 +432,19 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                 if ((n = b.next) == null) {
                     result = ((rel & LT) != 0 && b.key != EMPTY) ? b : null;
                     break outer;
-                } else if ((k = n.key) == EMPTY)
+                } else if ((k = n.key) == EMPTY) {
                     break;
-                else if (n.value == null)
+                } else if (n.value == null) {
                     unlinkNode(b, n);
-                else if (((c = cmp.compare(key, k)) == 0 && (rel & EQ) != 0) || (c < 0 && (rel & LT) == 0)) {
+                } else if (((c = cmp.compare(key, k)) == 0 && (rel & EQ) != 0) || (c < 0 && (rel & LT) == 0)) {
                     result = n;
                     break outer;
                 } else if (c <= 0 && (rel & LT) != 0) {
                     result = (b.key != EMPTY) ? b : null;
                     break outer;
-                } else
+                } else {
                     b = n;
+                }
             }
         }
         return result;
@@ -490,28 +501,29 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                     long k;
                     V v;
                     int c;
-                    if ((p = r.node) == null || (k = p.key) == EMPTY || (v = p.value) == null)
+                    if ((p = r.node) == null || (k = p.key) == EMPTY || (v = p.value) == null) {
                         RIGHT.compareAndSet(q, r, r.right);
-                    else if ((c = cmp.compare(key, k)) > 0)
+                    } else if ((c = cmp.compare(key, k)) > 0) {
                         q = r;
-                    else if (c == 0) {
+                    } else if (c == 0) {
                         result = v;
                         break outer;
-                    } else
+                    } else {
                         break;
+                    }
                 }
-                if ((d = q.down) != null)
+                if ((d = q.down) != null) {
                     q = d;
-                else {
+                } else {
                     Node<V> b, n;
                     if ((b = q.node) != null) {
                         while ((n = b.next) != null) {
                             V v;
                             int c;
                             long k = n.key;
-                            if ((v = n.value) == null || k == EMPTY || (c = cmp.compare(key, k)) > 0)
+                            if ((v = n.value) == null || k == EMPTY || (c = cmp.compare(key, k)) > 0) {
                                 b = n;
-                            else {
+                            } else {
                                 if (c == 0) result = v;
                                 break;
                             }
@@ -560,12 +572,13 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                     while ((r = q.right) != null) {
                         Node<V> p;
                         long k;
-                        if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null)
+                        if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null) {
                             RIGHT.compareAndSet(q, r, r.right);
-                        else if (cmp.compare(key, k) > 0)
+                        } else if (cmp.compare(key, k) > 0) {
                             q = r;
-                        else
+                        } else {
                             break;
+                        }
                     }
                     if ((d = q.down) != null) {
                         ++levels;
@@ -587,14 +600,16 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                         if (b.key == EMPTY) // if empty, type check key now
                             cmp.compare(key, key);
                         c = -1;
-                    } else if ((k = n.key) == EMPTY)
+                    } else if ((k = n.key) == EMPTY) {
                         break; // can't append; restart
-                    else if ((v = n.value) == null) {
+                    } else if ((v = n.value) == null) {
                         unlinkNode(b, n);
                         c = 1;
-                    } else if ((c = cmp.compare(key, k)) > 0)
+                    } else if ((c = cmp.compare(key, k)) > 0) {
                         b = n;
-                    else if (c == 0 && (onlyIfAbsent || VALUE.compareAndSet(n, v, value))) return v;
+                    } else if (c == 0 && (onlyIfAbsent || VALUE.compareAndSet(n, v, value))) {
+                        return v;
+                    }
 
                     if (c < 0 && NEXT.compareAndSet(b, n, p = new Node<V>(key, value, n))) {
                         z = p;
@@ -611,19 +626,22 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                         Index<V> x = null;
                         for (;;) { // create at most 62 indices
                             x = new Index<V>(z, x, null);
-                            if (rnd >= 0L || --skips < 0)
+                            if (rnd >= 0L || --skips < 0) {
                                 break;
-                            else
+                            } else {
                                 rnd <<= 1;
+                            }
                         }
-                        if (addIndices(h, skips, x, cmp) && skips < 0 && head == h) { // try to add
-                                                                                      // new level
+                        if (addIndices(h, skips, x, cmp) && skips < 0 && head == h) {
+                            // try to add new level
                             Index<V> hx = new Index<V>(z, x, null);
                             Index<V> nh = new Index<V>(h.node, h, hx);
                             HEAD.compareAndSet(this, h, nh);
                         }
-                        if (z.value == null) // deleted while adding indices
+                        if (z.value == null) {
+                            // deleted while adding indices
                             findPredecessor(key, cmp); // clean
+                        }
                     }
                     addCount(1L);
                     return null;
@@ -665,19 +683,19 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                 long k;
                 V v;
                 int c;
-                if ((n = b.next) == null)
+                if ((n = b.next) == null) {
                     break outer;
-                else if ((k = n.key) == EMPTY)
+                } else if ((k = n.key) == EMPTY) {
                     break;
-                else if ((v = n.value) == null)
+                } else if ((v = n.value) == null) {
                     unlinkNode(b, n);
-                else if ((c = cmp.compare(key, k)) > 0)
+                } else if ((c = cmp.compare(key, k)) > 0) {
                     b = n;
-                else if (c < 0)
+                } else if (c < 0) {
                     break outer;
-                else if (value != null && !value.equals(v))
+                } else if (value != null && !value.equals(v)) {
                     break outer;
-                else if (VALUE.compareAndSet(n, v, null)) {
+                } else if (VALUE.compareAndSet(n, v, null)) {
                     result = v;
                     unlinkNode(b, n);
                     break; // loop to clean up
@@ -707,10 +725,11 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
         V v;
         if ((b = baseHead()) != null) {
             while ((n = b.next) != null) {
-                if ((v = n.value) != null && value.equals(v))
+                if ((v = n.value) != null && value.equals(v)) {
                     return true;
-                else
+                } else {
                     b = n;
+                }
             }
         }
         return false;
@@ -759,10 +778,11 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                         if (v == null) unlinkNode(b, n);
                     }
                 }
-                if (count != 0L)
+                if (count != 0L) {
                     addCount(count);
-                else
+                } else {
                     break;
+                }
             }
         }
     }
@@ -2626,8 +2646,6 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
             return removed;
         }
     }
-
-    // default Map method overrides
 
     /**
      * Nodes hold keys and values, and are singly linked in sorted order, possibly with some
