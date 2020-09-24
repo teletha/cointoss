@@ -19,17 +19,17 @@ import com.google.common.base.Objects;
 
 
 /**
- * Specialized {@link Map} interface for int key.
+ * Specialized {@link Map} interface for long key.
  */
 @Generated("SpecializedCodeGenerator")
-public interface IntMap<V> extends Map<Integer, V> {
+public interface LongMap<V> extends Map<Long, V> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     default boolean containsKey(Object key) {
-        return containsKey((int) key);
+        return containsKey((long) key);
     }
 
     /**
@@ -45,14 +45,14 @@ public interface IntMap<V> extends Map<Integer, V> {
      *             keys (<a href=
      *             "{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-    boolean containsKey(int key);
+    boolean containsKey(long key);
 
     /**
      * {@inheritDoc}
      */
     @Override
     default V get(Object key) {
-        return get((int) key);
+        return get((long) key);
     }
 
     /**
@@ -77,14 +77,14 @@ public interface IntMap<V> extends Map<Integer, V> {
      *             keys (<a href=
      *             "{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-    V get(int key);
+    V get(long key);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    default V put(Integer key, V value) {
-        return put((int) key, value);
+    default V put(Long key, V value) {
+        return put((long) key, value);
     }
 
     /**
@@ -108,14 +108,14 @@ public interface IntMap<V> extends Map<Integer, V> {
      * @throws IllegalArgumentException if some property of the specified key or value prevents it
      *             from being stored in this map
      */
-    V put(int key, V value);
+    V put(long key, V value);
 
     /**
      * {@inheritDoc}
      */
     @Override
     default V remove(Object key) {
-        return remove((int) key);
+        return remove((long) key);
     }
 
     /**
@@ -144,7 +144,7 @@ public interface IntMap<V> extends Map<Integer, V> {
      *             keys (<a href=
      *             "{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-    V remove(int key);
+    V remove(long key);
 
     /**
      * Returns a {@link Set} view of the mappings contained in this map. The set is backed by the
@@ -158,19 +158,19 @@ public interface IntMap<V> extends Map<Integer, V> {
      *
      * @return a set view of the mappings contained in this map
      */
-    Set<IntEntry<V>> intEntrySet();
+    Set<LongEntry<V>> longEntrySet();
 
     /**
-     * Specialized {@link Entry} for primitive int.
+     * Specialized {@link Entry} for primitive long.
      */
-    interface IntEntry<V> extends Map.Entry<Integer, V>, Comparable<IntEntry<V>> {
+    interface LongEntry<V> extends Map.Entry<Long, V>, Comparable<LongEntry<V>> {
 
         /**
          * {@inheritDoc}
          */
         @Override
-        default Integer getKey() {
-            return getIntKey();
+        default Long getKey() {
+            return getLongKey();
         }
 
         /**
@@ -180,14 +180,14 @@ public interface IntMap<V> extends Map<Integer, V> {
          * @throws IllegalStateException implementations may, but are not required to, throw this
          *             exception if the entry has been removed from the backing map.
          */
-        int getIntKey();
+        long getLongKey();
 
         /**
          * {@inheritDoc}
          */
         @Override
-        default int compareTo(IntEntry<V> o) {
-            return Integer.compare(getIntKey(), o.getIntKey());
+        default int compareTo(LongEntry<V> o) {
+            return Long.compare(getLongKey(), o.getLongKey());
         }
 
         /**
@@ -198,14 +198,14 @@ public interface IntMap<V> extends Map<Integer, V> {
          * @param value
          * @return
          */
-        static <V> IntEntry<V> immutable(int key, V value) {
-            return new IntEntry() {
+        static <V> LongEntry<V> immutable(long key, V value) {
+            return new LongEntry() {
 
                 /**
                  * {@inheritDoc}
                  */
                 @Override
-                public int getIntKey() {
+                public long getLongKey() {
                     return key;
                 }
 
@@ -238,9 +238,9 @@ public interface IntMap<V> extends Map<Integer, V> {
                  */
                 @Override
                 public boolean equals(Object obj) {
-                    if (obj instanceof IntEntry) {
-                        IntEntry other = (IntEntry) obj;
-                        if (key == other.getIntKey() && Objects.equal(value, other.getValue())) {
+                    if (obj instanceof LongEntry) {
+                        LongEntry other = (LongEntry) obj;
+                        if (key == other.getLongKey() && Objects.equal(value, other.getValue())) {
                             return true;
                         }
                     }
@@ -253,7 +253,7 @@ public interface IntMap<V> extends Map<Integer, V> {
     /**
      * Specialized {@link Comparator} for primitive value.
      */
-    interface IntComparator extends Comparator<Integer> {
+    interface LongComparator extends Comparator<Long> {
 
         /**
          * Compare values.
@@ -262,34 +262,34 @@ public interface IntMap<V> extends Map<Integer, V> {
          * @param other A value to compare.
          * @return
          */
-        int compare(int one, int other);
+        int compare(long one, long other);
 
         /**
          * {@inheritDoc}
          */
         @Override
-        default int compare(Integer one, Integer other) {
-            return compare((int) one, (int) other);
+        default int compare(Long one, Long other) {
+            return compare((long) one, (long) other);
         }
     }
 
     /**
-     * Create the concurrent-safe sorted map for primitive int with natual order.
+     * Create the concurrent-safe sorted map for primitive long with natual order.
      *
      * @param <V> A value type.
      * @return A new created map.
      */
-    public static <V> ConcurrentNavigableIntMap<V> createSortedMap() {
-        return new SkipListIntMap(null);
+    public static <V> ConcurrentNavigableLongMap<V> createSortedMap() {
+        return new SkipListLongMap(null);
     }
 
     /**
-     * Create the concurrent-safe sorted map for primitive int with your order.
+     * Create the concurrent-safe sorted map for primitive long with your order.
      *
      * @param <V> A value type.
      * @return A new created map.
      */
-    public static <V> ConcurrentNavigableIntMap<V> createSortedMap(IntComparator comparator) {
-        return new SkipListIntMap(comparator);
+    public static <V> ConcurrentNavigableLongMap<V> createSortedMap(LongComparator comparator) {
+        return new SkipListLongMap(comparator);
     }
 }

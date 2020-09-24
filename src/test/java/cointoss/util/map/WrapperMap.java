@@ -282,7 +282,7 @@ public interface WrapperMap<V> extends Map<Wrapper, V> {
      * @return A new created map.
      */
     public static <V> ConcurrentNavigableWrapperMap<V> createSortedMap() {
-        return null;// new SkipListWrapperMap(null);
+        return new SkipListWrapperMap(null);
     }
 
     /**
@@ -292,6 +292,6 @@ public interface WrapperMap<V> extends Map<Wrapper, V> {
      * @return A new created map.
      */
     public static <V> ConcurrentNavigableWrapperMap<V> createSortedMap(WrapperComparator comparator) {
-        return null; // new SkipListWrapperMap(comparator);
+        return new SkipListWrapperMap(comparator);
     }
 }

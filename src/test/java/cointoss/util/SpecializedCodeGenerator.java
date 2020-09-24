@@ -144,11 +144,11 @@ public class SpecializedCodeGenerator {
         SpecializedCodeGenerator.write(NavigableWrapperSet.class, Type.Int, Type.Long, Type.Double);
 
         // Map
-        SpecializedCodeGenerator.write(WrapperMap.class, Type.Int, Type.Double);
-        SpecializedCodeGenerator.write(NavigableWrapperMap.class, Type.Int, Type.Double);
-        SpecializedCodeGenerator.write(ConcurrentWrapperMap.class, Type.Int, Type.Double);
-        SpecializedCodeGenerator.write(ConcurrentNavigableWrapperMap.class, Type.Int, Type.Double);
-        SpecializedCodeGenerator.write(SkipListWrapperMap.class, Type.Long);
+        SpecializedCodeGenerator.write(WrapperMap.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(NavigableWrapperMap.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(ConcurrentWrapperMap.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(ConcurrentNavigableWrapperMap.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(SkipListWrapperMap.class, Type.Int, Type.Long, Type.Double);
 
         // Function
         SpecializedCodeGenerator.write(WrapperPentaFunction.class, Type.Int, Type.Long, Type.Double);

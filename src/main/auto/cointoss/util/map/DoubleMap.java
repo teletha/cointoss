@@ -280,7 +280,7 @@ public interface DoubleMap<V> extends Map<Double, V> {
      * @return A new created map.
      */
     public static <V> ConcurrentNavigableDoubleMap<V> createSortedMap() {
-        return null;// new SkipListDoubleMap(null);
+        return new SkipListDoubleMap(null);
     }
 
     /**
@@ -290,6 +290,6 @@ public interface DoubleMap<V> extends Map<Double, V> {
      * @return A new created map.
      */
     public static <V> ConcurrentNavigableDoubleMap<V> createSortedMap(DoubleComparator comparator) {
-        return null; // new SkipListDoubleMap(comparator);
+        return new SkipListDoubleMap(comparator);
     }
 }
