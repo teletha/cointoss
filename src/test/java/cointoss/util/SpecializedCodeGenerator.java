@@ -162,6 +162,12 @@ public class SpecializedCodeGenerator {
      */
     public static interface Wrapper {
 
+        /** The minimum value of primitive type. */
+        Primitive MIN_VALUE = null;
+
+        /** The maximum value of primitive type. */
+        Primitive MAX_VALUE = null;
+
         static int compare(Primitive one, Primitive other) {
             throw new Error("Dummy code");
         }

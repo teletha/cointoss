@@ -32,10 +32,12 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
-import cointoss.util.set.NavigableLongSet;
+import cointoss.util.SpecializedCodeGenerator.Primitive;
+import cointoss.util.SpecializedCodeGenerator.Wrapper;
+import cointoss.util.SpecializedCodeGenerator.WrapperFunction;
+import cointoss.util.set.NavigableWrapperSet;
 import kiss.I;
 
 /**
@@ -72,7 +74,7 @@ import kiss.I;
  *
  * @param <V> the type of mapped values
  */
-public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
+public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements ConcurrentNavigableWrapperMap<V> {
 
     /** The field updater. */
     private static final AtomicReferenceFieldUpdater<SkipListWrapperMap, Index> HEAD = AtomicReferenceFieldUpdater
@@ -94,140 +96,14 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     private static final AtomicReferenceFieldUpdater<Index, Index> RIGHT = AtomicReferenceFieldUpdater
             .newUpdater(Index.class, Index.class, "right");
 
-    /* ---------------- Deletion -------------- */
-
-    /* ---------------- Finding and removing first element -------------- */
-
-    /* ---------------- Finding and removing last element -------------- */
-
-    /* ---------------- Relational operations -------------- */
-
     // Control values OR'ed as arguments to findNear
-
     private static final int EQ = 1;
 
     private static final int LT = 2;
 
     private static final int GT = 0; // Actually checked as !LT
 
-    /*
-     * This class implements a tree-like two-dimensionally linked skip list in which the index
-     * levels are represented in separate nodes from the base nodes holding data. There are two
-     * reasons for taking this approach instead of the usual array-based structure: 1) Array based
-     * implementations seem to encounter more complexity and overhead 2) We can use cheaper
-     * algorithms for the heavily-traversed index lists than can be used for the base lists. Here's
-     * a picture of some of the basics for a possible list with 2 levels of index: Head nodes Index
-     * nodes +-+ right +-+ +-+ |2|---------------->| |--------------------->| |->null +-+ +-+ +-+ |
-     * down | | v v v +-+ +-+ +-+ +-+ +-+ +-+ |1|----------->| |->| |------>| |----------->|
-     * |------>| |->null +-+ +-+ +-+ +-+ +-+ +-+ v | | | | | Nodes next v v v v v +-+ +-+ +-+ +-+
-     * +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ |
-     * |->|A|->|B|->|C|->|D|->|E|->|F|->|G|->|H|->|I|->|J|->|K|->null +-+ +-+ +-+ +-+ +-+ +-+ +-+
-     * +-+ +-+ +-+ +-+ +-+ The base lists use a variant of the HM linked ordered set algorithm. See
-     * Tim Harris, "A pragmatic implementation of non-blocking linked lists"
-     * http://www.cl.cam.ac.uk/~tlh20/publications.html and Maged Michael "High Performance Dynamic
-     * Lock-Free Hash Tables and List-Based Sets"
-     * http://www.research.ibm.com/people/m/michael/pubs.htm. The basic idea in these lists is to
-     * mark the "next" pointers of deleted nodes when deleting to avoid conflicts with concurrent
-     * insertions, and when traversing to keep track of triples (predecessor, node, successor) in
-     * order to detect when and how to unlink these deleted nodes. Rather than using mark-bits to
-     * mark list deletions (which can be slow and space-intensive using AtomicMarkedReference),
-     * nodes use direct CAS'able next pointers. On deletion, instead of marking a pointer, they
-     * splice in another node that can be thought of as standing for a marked pointer (see method
-     * unlinkNode). Using plain nodes acts roughly like "boxed" implementations of marked pointers,
-     * but uses new nodes only when nodes are deleted, not for every link. This requires less space
-     * and supports faster traversal. Even if marked references were better supported by JVMs,
-     * traversal using this technique might still be faster because any search need only read ahead
-     * one more node than otherwise required (to check for trailing marker) rather than unmasking
-     * mark bits or whatever on each read. This approach maintains the essential property needed in
-     * the HM algorithm of changing the next-pointer of a deleted node so that any other CAS of it
-     * will fail, but implements the idea by changing the pointer to point to a different node (with
-     * otherwise illegal null fields), not by marking it. While it would be possible to further
-     * squeeze space by defining marker nodes not to have key/value fields, it isn't worth the extra
-     * type-testing overhead. The deletion markers are rarely encountered during traversal, are
-     * easily detected via null checks that are needed anyway, and are normally quickly garbage
-     * collected. (Note that this technique would not work well in systems without garbage
-     * collection.) In addition to using deletion markers, the lists also use nullness of value
-     * fields to indicate deletion, in a style similar to typical lazy-deletion schemes. If a node's
-     * value is null, then it is considered logically deleted and ignored even though it is still
-     * reachable. Here's the sequence of events for a deletion of node n with predecessor b and
-     * successor f, initially: +------+ +------+ +------+ ... | b |------>| n |----->| f | ...
-     * +------+ +------+ +------+ 1. CAS n's value field from non-null to null. Traversals
-     * encountering a node with null value ignore it. However, ongoing insertions and deletions
-     * might still modify n's next pointer. 2. CAS n's next pointer to point to a new marker node.
-     * From this point on, no other nodes can be appended to n. which avoids deletion errors in
-     * CAS-based linked lists. +------+ +------+ +------+ +------+ ... | b |------>| n
-     * |----->|marker|------>| f | ... +------+ +------+ +------+ +------+ 3. CAS b's next pointer
-     * over both n and its marker. From this point on, no new traversals will encounter n, and it
-     * can eventually be GCed. +------+ +------+ ... | b |----------------------------------->| f |
-     * ... +------+ +------+ A failure at step 1 leads to simple retry due to a lost race with
-     * another operation. Steps 2-3 can fail because some other thread noticed during a traversal a
-     * node with null value and helped out by marking and/or unlinking. This helping-out ensures
-     * that no thread can become stuck waiting for progress of the deleting thread. Skip lists add
-     * indexing to this scheme, so that the base-level traversals start close to the locations being
-     * found, inserted or deleted -- usually base level traversals only traverse a few nodes. This
-     * doesn't change the basic algorithm except for the need to make sure base traversals start at
-     * predecessors (here, b) that are not (structurally) deleted, otherwise retrying after
-     * processing the deletion. Index levels are maintained using CAS to link and unlink successors
-     * ("right" fields). Races are allowed in index-list operations that can (rarely) fail to link
-     * in a new index node. (We can't do this of course for data nodes.) However, even when this
-     * happens, the index lists correctly guide search. This can impact performance, but since skip
-     * lists are probabilistic anyway, the net result is that under contention, the effective "p"
-     * value may be lower than its nominal value. Index insertion and deletion sometimes require a
-     * separate traversal pass occurring after the base-level action, to add or remove index nodes.
-     * This adds to single-threaded overhead, but improves contended multithreaded performance by
-     * narrowing interference windows, and allows deletion to ensure that all index nodes will be
-     * made unreachable upon return from a public remove operation, thus avoiding unwanted garbage
-     * retention. Indexing uses skip list parameters that maintain good search performance while
-     * using sparser-than-usual indices: The hardwired parameters k=1, p=0.5 (see method doPut) mean
-     * that about one-quarter of the nodes have indices. Of those that do, half have one level, a
-     * quarter have two, and so on (see Pugh's Skip List Cookbook, sec 3.4), up to a maximum of 62
-     * levels (appropriate for up to 2^63 elements). The expected total space requirement for a map
-     * is slightly less than for the current implementation of java.util.TreeMap. Changing the level
-     * of the index (i.e, the height of the tree-like structure) also uses CAS. Creation of an index
-     * with height greater than the current level adds a level to the head index by CAS'ing on a new
-     * top-most head. To maintain good performance after a lot of removals, deletion methods
-     * heuristically try to reduce the height if the topmost levels appear to be empty. This may
-     * encounter races in which it is possible (but rare) to reduce and "lose" a level just as it is
-     * about to contain an index (that will then never be encountered). This does no structural
-     * harm, and in practice appears to be a better option than allowing unrestrained growth of
-     * levels. This class provides concurrent-reader-style memory consistency, ensuring that
-     * read-only methods report status and/or values no staler than those holding at method entry.
-     * This is done by performing all publication and structural updates using (volatile) CAS,
-     * placing an acquireFence in a few access methods, and ensuring that linked objects are
-     * transitively acquired via dependent reads (normally once) unless performing a volatile-mode
-     * CAS operation (that also acts as an acquire and release). This form of fence-hoisting is
-     * similar to RCU and related techniques (see McKenney's online book
-     * https://www.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html) It minimizes
-     * overhead that may otherwise occur when using so many volatile-mode reads. Using explicit
-     * acquireFences is logistically easier than targeting particular fields to be read in acquire
-     * mode: fences are just hoisted up as far as possible, to the entry points or loop headers of a
-     * few methods. A potential disadvantage is that these few remaining fences are not easily
-     * optimized away by compilers under exclusively single-thread use. It requires some care to
-     * avoid volatile mode reads of other fields. (Note that the memory semantics of a reference
-     * dependently read in plain mode exactly once are equivalent to those for atomic opaque mode.)
-     * Iterators and other traversals encounter each node and value exactly once. Other operations
-     * locate an element (or position to insert an element) via a sequence of dereferences. This
-     * search is broken into two parts. Method findPredecessor (and its specialized embeddings)
-     * searches index nodes only, returning a base-level predecessor of the key. Callers carry out
-     * the base-level search, restarting if encountering a marker preventing link modification. In
-     * some cases, it is possible to encounter a node multiple times while descending levels. For
-     * mutative operations, the reported value is validated using CAS (else retrying), preserving
-     * linearizability with respect to each other. Others may return any (non-null) value holding in
-     * the course of the method call. (Search-based methods also include some useless-looking
-     * explicit null checks designed to allow more fields to be nulled out upon removal, to reduce
-     * floating garbage, but which is not currently done, pending discovery of a way to do this with
-     * less impact on other operations.) To produce random values without interference across
-     * threads, we use within-JDK thread local random support (via the "secondary seed", to avoid
-     * interference with user-level ThreadLocalRandom.) For explanation of algorithms sharing at
-     * least a couple of features with this one, see Mikhail Fomitchev's thesis
-     * (http://www.cs.yorku.ca/~mikhail/), Keir Fraser's thesis
-     * (http://www.cl.cam.ac.uk/users/kaf24/), and Hakan Sundell's thesis
-     * (http://www.cs.chalmers.se/~phs/). Notation guide for local variables Node: b, n, f, p for
-     * predecessor, node, successor, aux Index: q, r, d for index node, right, down. Head: h Keys:
-     * k, key Values: v, value Comparisons: c
-     */
-
-    private static final long EMPTY = Long.MIN_VALUE;
+    private static final Primitive EMPTY = Wrapper.MIN_VALUE;
 
     /** Lazily initialized topmost index of the skiplist. */
     private transient volatile Index<V> head;
@@ -236,7 +112,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     private transient volatile LongAdder adder;
 
     /** Lazily initialized key set */
-    private transient volatile NavigableLongSet keySet;
+    private transient volatile NavigableWrapperSet keySet;
 
     /** Lazily initialized values collection */
     private transient volatile Values<V> values;
@@ -251,7 +127,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * The comparator used to maintain order in this map. (Non-private to simplify access in nested
      * classes.)
      */
-    private final LongComparator comparator;
+    private final WrapperComparator comparator;
 
     /**
      * Returns the header for base node list, or null if uninitialized
@@ -313,13 +189,13 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
 
     /**
      * Returns an index node with key strictly less than given key. Also unlinks indexes to deleted
-     * nodes found along the way. Callers rely on this side-effect of clearing indices to deleted
-     * nodes.
+     * nodes found aPrimitive the way. Callers rely on this side-effect of clearing indices to
+     * deleted nodes.
      *
      * @param key if nonnull the key
      * @return a predecessor node of key, or null if uninitialized or null key
      */
-    private Node<V> findPredecessor(long key, LongComparator cmp) {
+    private Node<V> findPredecessor(Primitive key, WrapperComparator cmp) {
         Index<V> q;
         VarHandle.acquireFence();
         if ((q = head) == null || key == EMPTY)
@@ -328,7 +204,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             for (Index<V> r, d;;) {
                 while ((r = q.right) != null) {
                     Node<V> p;
-                    long k;
+                    Primitive k;
                     if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null) // unlink
                                                                                          // index to
                                                                                          // deleted
@@ -348,23 +224,24 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     }
 
     /**
-     * Returns node holding key or null if no such, clearing out any deleted nodes seen along the
-     * way. Repeatedly traverses at base-level looking for key starting at predecessor returned from
-     * findPredecessor, processing base-level deletions as encountered. Restarts occur, at traversal
-     * step encountering node n, if n's key field is null, indicating it is a marker, so its
-     * predecessor is deleted before continuing, which we help do by re-finding a valid predecessor.
-     * The traversal loops in doPut, doRemove, and findNear all include the same checks.
+     * Returns node holding key or null if no such, clearing out any deleted nodes seen aPrimitive
+     * the way. Repeatedly traverses at base-level looking for key starting at predecessor returned
+     * from findPredecessor, processing base-level deletions as encountered. Restarts occur, at
+     * traversal step encountering node n, if n's key field is null, indicating it is a marker, so
+     * its predecessor is deleted before continuing, which we help do by re-finding a valid
+     * predecessor. The traversal loops in doPut, doRemove, and findNear all include the same
+     * checks.
      *
      * @param key the key
      * @return node holding key, or null if no such
      */
-    private Node<V> findNode(long key) {
-        LongComparator cmp = comparator;
+    private Node<V> findNode(Primitive key) {
+        WrapperComparator cmp = comparator;
         Node<V> b;
         outer: while ((b = findPredecessor(key, cmp)) != null) {
             for (;;) {
                 Node<V> n;
-                long k;
+                Primitive k;
                 int c;
                 if ((n = b.next) == null) {
                     break outer; // empty
@@ -396,9 +273,9 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @param x index for this insertion
      * @param cmp comparator
      */
-    private static <V> boolean addIndices(Index<V> q, int skips, Index<V> x, LongComparator cmp) {
+    private static <V> boolean addIndices(Index<V> q, int skips, Index<V> x, WrapperComparator cmp) {
         Node<V> z;
-        long key;
+        Primitive key;
         if (x != null && (z = x.node) != null && (key = z.key) != EMPTY && q != null) { // hoist
                                                                                         // checks
             boolean retrying = false;
@@ -407,7 +284,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
                 int c;
                 if ((r = q.right) != null) {
                     Node<V> p;
-                    long k;
+                    Primitive k;
                     if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null) {
                         RIGHT.compareAndSet(q, r, r.right);
                         c = 0;
@@ -569,8 +446,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @param comparator the comparator that will be used to order this map. If {@code null}, the
      *            {@linkplain Comparable natural ordering} of the keys will be used.
      */
-    SkipListWrapperMap(LongComparator comparator) {
-        this.comparator = comparator == null ? Long::compare : comparator;
+    SkipListWrapperMap(WrapperComparator comparator) {
+        this.comparator = comparator == null ? Wrapper::compare : comparator;
     }
 
     /**
@@ -791,7 +668,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @param rel the relation -- OR'ed combination of EQ, LT, GT
      * @return nearest node fitting relation, or null if no such
      */
-    private Node<V> findNear(long key, int rel, LongComparator cmp) {
+    private Node<V> findNear(Primitive key, int rel, WrapperComparator cmp) {
         Node<V> result;
         outer: for (Node<V> b;;) {
             if ((b = findPredecessor(key, cmp)) == null) {
@@ -800,7 +677,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             }
             for (;;) {
                 Node<V> n;
-                long k;
+                Primitive k;
                 int c;
                 if ((n = b.next) == null) {
                     result = ((rel & LT) != 0 && b.key != EMPTY) ? b : null;
@@ -829,12 +706,12 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @param rel the relation -- OR'ed combination of EQ, LT, GT
      * @return Entry fitting relation, or null if no such
      */
-    private LongEntry<V> findNearEntry(long key, int rel, LongComparator cmp) {
+    private WrapperEntry<V> findNearEntry(Primitive key, int rel, WrapperComparator cmp) {
         for (;;) {
             Node<V> n;
             V v;
             if ((n = findNear(key, rel, cmp)) == null) return null;
-            if ((v = n.value) != null) return LongEntry.immutable(n.key, v);
+            if ((v = n.value) != null) return WrapperEntry.immutable(n.key, v);
         }
     }
 
@@ -842,7 +719,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public boolean containsKey(long key) {
+    public boolean containsKey(Primitive key) {
         return doGet(key) != null;
     }
 
@@ -850,7 +727,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public V get(long key) {
+    public V get(Primitive key) {
         return doGet(key);
     }
 
@@ -861,16 +738,16 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @param key the key
      * @return the value, or null if absent
      */
-    private V doGet(long key) {
+    private V doGet(Primitive key) {
         Index<V> q;
         VarHandle.acquireFence();
-        LongComparator cmp = comparator;
+        WrapperComparator cmp = comparator;
         V result = null;
         if ((q = head) != null) {
             outer: for (Index<V> r, d;;) {
                 while ((r = q.right) != null) {
                     Node<V> p;
-                    long k;
+                    Primitive k;
                     V v;
                     int c;
                     if ((p = r.node) == null || (k = p.key) == EMPTY || (v = p.value) == null)
@@ -891,7 +768,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
                         while ((n = b.next) != null) {
                             V v;
                             int c;
-                            long k = n.key;
+                            Primitive k = n.key;
                             if ((v = n.value) == null || k == EMPTY || (c = cmp.compare(key, k)) > 0)
                                 b = n;
                             else {
@@ -911,7 +788,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public V put(long key, V value) {
+    public V put(Primitive key, V value) {
         if (value == null) {
             throw new NullPointerException();
         }
@@ -929,8 +806,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @param onlyIfAbsent if should not insert if already present
      * @return the old value, or null if newly inserted
      */
-    private V doPut(long key, V value, boolean onlyIfAbsent) {
-        LongComparator cmp = comparator;
+    private V doPut(Primitive key, V value, boolean onlyIfAbsent) {
+        WrapperComparator cmp = comparator;
         for (;;) {
             Index<V> h;
             Node<V> b;
@@ -944,7 +821,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
                 for (Index<V> q = h, r, d;;) { // count while descending
                     while ((r = q.right) != null) {
                         Node<V> p;
-                        long k;
+                        Primitive k;
                         if ((p = r.node) == null || (k = p.key) == EMPTY || p.value == null)
                             RIGHT.compareAndSet(q, r, r.right);
                         else if (cmp.compare(key, k) > 0)
@@ -965,7 +842,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
                 Node<V> z = null; // new node, if inserted
                 for (;;) { // find insertion point
                     Node<V> n, p;
-                    long k;
+                    Primitive k;
                     V v;
                     int c;
                     if ((n = b.next) == null) {
@@ -1028,7 +905,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @throws NullPointerException if the specified key is null
      */
     @Override
-    public V remove(long key) {
+    public V remove(Primitive key) {
         return doRemove(key, null);
     }
 
@@ -1040,14 +917,14 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @param value if non-null, the value that must be associated with key
      * @return the node, or null if not found
      */
-    private V doRemove(long key, Object value) {
-        LongComparator cmp = comparator;
+    private V doRemove(Primitive key, Object value) {
+        WrapperComparator cmp = comparator;
         V result = null;
         Node<V> b;
         outer: while ((b = findPredecessor(key, cmp)) != null && result == null) {
             for (;;) {
                 Node<V> n;
-                long k;
+                Primitive k;
                 V v;
                 int c;
                 if ((n = b.next) == null)
@@ -1156,7 +1033,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public V computeIfAbsent(long key, LongFunction<? extends V> mappingFunction) {
+    public V computeIfAbsent(Primitive key, WrapperFunction<? extends V> mappingFunction) {
         if (key == EMPTY || mappingFunction == null) throw new NullPointerException();
         V v, p, r;
         if ((v = doGet(key)) == null && (r = mappingFunction.apply(key)) != null) v = (p = doPut(key, r, true)) == null ? r : p;
@@ -1167,7 +1044,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public V merge(long key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+    public V merge(Primitive key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
         Objects.requireNonNull(value);
         Objects.requireNonNull(remappingFunction);
 
@@ -1210,8 +1087,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * @return a navigable set view of the keys in this map
      */
     @Override
-    public NavigableSet<Long> keySet() {
-        NavigableLongSet ks;
+    public NavigableSet<Wrapper> keySet() {
+        NavigableWrapperSet ks;
         if ((ks = keySet) != null) return ks;
         return keySet = new Keys<>(this);
     }
@@ -1220,8 +1097,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public NavigableLongSet navigableKeySet() {
-        NavigableLongSet ks;
+    public NavigableWrapperSet navigableKeySet() {
+        NavigableWrapperSet ks;
         if ((ks = keySet) != null) return ks;
         return keySet = new Keys<>(this);
     }
@@ -1254,23 +1131,23 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public Set<Entry<Long, V>> entrySet() {
-        return (Set) longEntrySet();
+    public Set<Entry<Wrapper, V>> entrySet() {
+        return (Set) PrimitiveEntrySet();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<LongEntry<V>> longEntrySet() {
+    public Set<WrapperEntry<V>> PrimitiveEntrySet() {
         Entries<V> es;
         if ((es = entrySet) != null) return es;
         return entrySet = new Entries<V>(this);
     }
 
     @Override
-    public ConcurrentNavigableLongMap<V> descendingMap() {
-        ConcurrentNavigableLongMap<V> dm;
+    public ConcurrentNavigableWrapperMap<V> descendingMap() {
+        ConcurrentNavigableWrapperMap<V> dm;
         if ((dm = descendingMap) != null) return dm;
         return descendingMap = new SubMap<V>(this, EMPTY, false, EMPTY, false, true);
     }
@@ -1279,7 +1156,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public NavigableLongSet descendingKeySet() {
+    public NavigableWrapperSet descendingKeySet() {
         return descendingMap().navigableKeySet();
     }
 
@@ -1299,19 +1176,19 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         if (!(o instanceof Map)) return false;
         Map<?, ?> m = (Map<?, ?>) o;
         try {
-            LongComparator cmp = comparator;
+            WrapperComparator cmp = comparator;
             // See JDK-8223553 for Iterator type wildcard rationale
             Iterator<? extends Map.Entry<?, ?>> it = m.entrySet().iterator();
             if (m instanceof SortedMap && ((SortedMap<?, ?>) m).comparator() == cmp) {
                 Node<V> b, n;
                 if ((b = baseHead()) != null) {
                     while ((n = b.next) != null) {
-                        long k;
+                        Primitive k;
                         V v;
                         if ((v = n.value) != null && (k = n.key) != EMPTY) {
                             if (!it.hasNext()) return false;
                             Map.Entry<?, ?> e = it.next();
-                            long mk = (Long) e.getKey();
+                            Primitive mk = (Primitive) e.getKey();
                             Object mv = e.getValue();
                             if (mk == EMPTY || mv == null) return false;
                             try {
@@ -1335,7 +1212,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
                 }
                 Node<V> b, n;
                 if ((b = baseHead()) != null) {
-                    long k;
+                    Primitive k;
                     V v;
                     Object mv;
                     while ((n = b.next) != null) {
@@ -1354,7 +1231,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public V putIfAbsent(long key, V value) {
+    public V putIfAbsent(Primitive key, V value) {
         return doPut(key, value, true);
     }
 
@@ -1362,7 +1239,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public boolean remove(long key, Object value) {
+    public boolean remove(Primitive key, Object value) {
         return value != null && doRemove(key, value) != null;
     }
 
@@ -1370,7 +1247,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public boolean replace(long key, V oldValue, V newValue) {
+    public boolean replace(Primitive key, V oldValue, V newValue) {
         if (key == EMPTY || oldValue == null || newValue == null) throw new NullPointerException();
         for (;;) {
             Node<V> n;
@@ -1387,7 +1264,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public V replace(long key, V value) {
+    public V replace(Primitive key, V value) {
         if (key == EMPTY || value == null) throw new NullPointerException();
         for (;;) {
             Node<V> n;
@@ -1401,7 +1278,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public LongComparator comparator() {
+    public WrapperComparator comparator() {
         return comparator;
     }
 
@@ -1409,7 +1286,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public long firstLongKey() {
+    public Primitive firstWrapperKey() {
         Node<V> n = findFirst();
         if (n == null) {
             throw new NoSuchElementException();
@@ -1423,7 +1300,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public long lastLongKey() {
+    public Primitive lastWrapperKey() {
         Node<V> n = findLast();
         if (n == null) {
             throw new NoSuchElementException();
@@ -1435,7 +1312,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public ConcurrentNavigableLongMap<V> subMap(long fromKey, boolean fromInclusive, long toKey, boolean toInclusive) {
+    public ConcurrentNavigableWrapperMap<V> subMap(Primitive fromKey, boolean fromInclusive, Primitive toKey, boolean toInclusive) {
         return new SubMap<V>(this, fromKey, fromInclusive, toKey, toInclusive, false);
     }
 
@@ -1443,7 +1320,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public ConcurrentNavigableLongMap<V> headMap(long toKey, boolean inclusive) {
+    public ConcurrentNavigableWrapperMap<V> headMap(Primitive toKey, boolean inclusive) {
         return new SubMap<V>(this, EMPTY, false, toKey, inclusive, false);
     }
 
@@ -1451,7 +1328,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public ConcurrentNavigableLongMap<V> tailMap(long fromKey, boolean inclusive) {
+    public ConcurrentNavigableWrapperMap<V> tailMap(Primitive fromKey, boolean inclusive) {
         return new SubMap<V>(this, fromKey, inclusive, EMPTY, false, false);
     }
 
@@ -1459,7 +1336,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public ConcurrentNavigableLongMap<V> subMap(long fromKey, long toKey) {
+    public ConcurrentNavigableWrapperMap<V> subMap(Primitive fromKey, Primitive toKey) {
         return subMap(fromKey, true, toKey, false);
     }
 
@@ -1467,7 +1344,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public ConcurrentNavigableLongMap<V> headMap(long toKey) {
+    public ConcurrentNavigableWrapperMap<V> headMap(Primitive toKey) {
         return headMap(toKey, false);
     }
 
@@ -1475,7 +1352,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public ConcurrentNavigableLongMap<V> tailMap(long fromKey) {
+    public ConcurrentNavigableWrapperMap<V> tailMap(Primitive fromKey) {
         return tailMap(fromKey, true);
     }
 
@@ -1483,7 +1360,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public LongEntry<V> lowerEntry(long key) {
+    public WrapperEntry<V> lowerEntry(Primitive key) {
         return findNearEntry(key, LT, comparator);
     }
 
@@ -1491,7 +1368,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public long lowerKey(long key) {
+    public Primitive lowerKey(Primitive key) {
         Node<V> node = findNear(key, LT, comparator);
         if (node == null) {
             throw new NoSuchElementException();
@@ -1503,7 +1380,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public LongEntry<V> floorEntry(long key) {
+    public WrapperEntry<V> floorEntry(Primitive key) {
         return findNearEntry(key, LT | EQ, comparator);
     }
 
@@ -1511,7 +1388,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public long floorKey(long key) {
+    public Primitive floorKey(Primitive key) {
         Node<V> node = findNear(key, LT | EQ, comparator);
         if (node == null) {
             throw new NoSuchElementException();
@@ -1523,7 +1400,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public LongEntry<V> ceilingEntry(long key) {
+    public WrapperEntry<V> ceilingEntry(Primitive key) {
         return findNearEntry(key, GT | EQ, comparator);
     }
 
@@ -1531,7 +1408,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public long ceilingKey(long key) {
+    public Primitive ceilingKey(Primitive key) {
         Node<V> node = findNear(key, GT | EQ, comparator);
         if (node == null) {
             throw new NoSuchElementException();
@@ -1543,7 +1420,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public LongEntry<V> higherEntry(long key) {
+    public WrapperEntry<V> higherEntry(Primitive key) {
         return findNearEntry(key, GT, comparator);
     }
 
@@ -1551,7 +1428,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public long higherKey(long key) {
+    public Primitive higherKey(Primitive key) {
         Node<V> node = findNear(key, GT, comparator);
         if (node == null) {
             throw new NoSuchElementException();
@@ -1563,37 +1440,37 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public LongEntry firstEntry() {
+    public WrapperEntry firstEntry() {
         Node<V> node = findFirst();
-        return node == null || node.value == null ? null : LongEntry.immutable(node.key, node.value);
+        return node == null || node.value == null ? null : WrapperEntry.immutable(node.key, node.value);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LongEntry<V> lastEntry() {
+    public WrapperEntry<V> lastEntry() {
         Node<V> node = findLast();
-        return node == null || node.value == null ? null : LongEntry.immutable(node.key, node.value);
+        return node == null || node.value == null ? null : WrapperEntry.immutable(node.key, node.value);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LongEntry<V> pollFirstEntry() {
+    public WrapperEntry<V> pollFirstEntry() {
         Node<V> b, n;
         V v;
         if ((b = baseHead()) != null) {
             while ((n = b.next) != null) {
                 if ((v = n.value) == null || VALUE.compareAndSet(n, v, null)) {
-                    long k = n.key;
+                    Primitive k = n.key;
                     unlinkNode(b, n);
                     if (v != null) {
                         tryReduceLevel();
                         findPredecessor(k, comparator); // clean index
                         addCount(-1L);
-                        return LongEntry.immutable(k, v);
+                        return WrapperEntry.immutable(k, v);
                     }
                 }
             }
@@ -1605,7 +1482,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * {@inheritDoc}
      */
     @Override
-    public LongEntry<V> pollLastEntry() {
+    public WrapperEntry<V> pollLastEntry() {
         outer: for (;;) {
             Index<V> q;
             Node<V> b;
@@ -1632,7 +1509,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             if (b != null) {
                 for (;;) {
                     Node<V> n;
-                    long k;
+                    Primitive k;
                     V v;
                     if ((n = b.next) == null) {
                         if (b.key == EMPTY) // empty
@@ -1650,7 +1527,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
                         tryReduceLevel();
                         findPredecessor(k, comparator); // clean index
                         addCount(-1L);
-                        return LongEntry.immutable(k, v);
+                        return WrapperEntry.immutable(k, v);
                     }
                 }
             }
@@ -1661,7 +1538,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     // default Map method overrides
 
     @Override
-    public void forEach(BiConsumer<? super Long, ? super V> action) {
+    public void forEach(BiConsumer<? super Wrapper, ? super V> action) {
         if (action == null) throw new NullPointerException();
         Node<V> b, n;
         V v;
@@ -1674,7 +1551,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     }
 
     @Override
-    public void replaceAll(BiFunction<? super Long, ? super V, ? extends V> function) {
+    public void replaceAll(BiFunction<? super Wrapper, ? super V, ? extends V> function) {
         if (function == null) throw new NullPointerException();
         Node<V> b, n;
         V v;
@@ -1693,7 +1570,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     /**
      * Helper method for EntrySet.removeIf.
      */
-    private boolean removeEntryIf(Predicate<? super LongEntry<V>> function) {
+    private boolean removeEntryIf(Predicate<? super WrapperEntry<V>> function) {
         if (function == null) throw new NullPointerException();
         boolean removed = false;
         Node<V> b, n;
@@ -1701,8 +1578,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         if ((b = baseHead()) != null) {
             while ((n = b.next) != null) {
                 if ((v = n.value) != null) {
-                    long k = n.key;
-                    LongEntry<V> e = LongEntry.immutable(k, v);
+                    Primitive k = n.key;
+                    WrapperEntry<V> e = WrapperEntry.immutable(k, v);
                     if (function.test(e) && remove(k, v)) removed = true;
                 }
                 b = n;
@@ -1736,16 +1613,16 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
      * this class are constructed only using the {@code subMap}, {@code headMap}, and
      * {@code tailMap} methods of their underlying maps.
      */
-    private static class SubMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
+    private static class SubMap<V> extends AbstractMap<Wrapper, V> implements ConcurrentNavigableWrapperMap<V> {
 
         /** Underlying map */
         private final SkipListWrapperMap<V> m;
 
         /** lower bound key, or null if from start */
-        private final long lo;
+        private final Primitive lo;
 
         /** upper bound key, or null if to end */
-        private final long hi;
+        private final Primitive hi;
 
         /** inclusion flag for lo */
         private final boolean loInclusive;
@@ -1766,8 +1643,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         /**
          * Creates a new submap, initializing all fields.
          */
-        SubMap(SkipListWrapperMap<V> map, long fromKey, boolean fromInclusive, long toKey, boolean toInclusive, boolean isDescending) {
-            LongComparator cmp = map.comparator;
+        SubMap(SkipListWrapperMap<V> map, Primitive fromKey, boolean fromInclusive, Primitive toKey, boolean toInclusive, boolean isDescending) {
+            WrapperComparator cmp = map.comparator;
             if (fromKey != EMPTY && toKey != EMPTY && cmp.compare(fromKey, toKey) > 0)
                 throw new IllegalArgumentException("inconsistent range");
             this.m = map;
@@ -1778,31 +1655,31 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             this.isDescending = isDescending;
         }
 
-        boolean tooLow(long key, LongComparator cmp) {
+        boolean tooLow(Primitive key, WrapperComparator cmp) {
             int c;
             return (lo != EMPTY && ((c = cmp.compare(key, lo)) < 0 || (c == 0 && !loInclusive)));
         }
 
-        boolean tooHigh(long key, LongComparator cmp) {
+        boolean tooHigh(Primitive key, WrapperComparator cmp) {
             int c;
             return (hi != EMPTY && ((c = cmp.compare(key, hi)) > 0 || (c == 0 && !hiInclusive)));
         }
 
-        boolean inBounds(long key, LongComparator cmp) {
+        boolean inBounds(Primitive key, WrapperComparator cmp) {
             return !tooLow(key, cmp) && !tooHigh(key, cmp);
         }
 
-        void checkKeyBounds(long key, LongComparator cmp) {
+        void checkKeyBounds(Primitive key, WrapperComparator cmp) {
             if (!inBounds(key, cmp)) throw new IllegalArgumentException("key out of range");
         }
 
         /**
          * Returns true if node key is less than upper bound of range.
          */
-        boolean isBeforeEnd(SkipListWrapperMap.Node<V> n, LongComparator cmp) {
+        boolean isBeforeEnd(SkipListWrapperMap.Node<V> n, WrapperComparator cmp) {
             if (n == null) return false;
             if (hi == EMPTY) return true;
-            long k = n.key;
+            Primitive k = n.key;
             if (k == EMPTY) // pass by markers and headers
                 return true;
             int c = cmp.compare(k, hi);
@@ -1813,7 +1690,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * Returns lowest node. This node might not be in range, so most usages need to check
          * bounds.
          */
-        SkipListWrapperMap.Node<V> loNode(LongComparator cmp) {
+        SkipListWrapperMap.Node<V> loNode(WrapperComparator cmp) {
             if (lo == EMPTY)
                 return m.findFirst();
             else if (loInclusive)
@@ -1826,7 +1703,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * Returns highest node. This node might not be in range, so most usages need to check
          * bounds.
          */
-        SkipListWrapperMap.Node<V> hiNode(LongComparator cmp) {
+        SkipListWrapperMap.Node<V> hiNode(WrapperComparator cmp) {
             if (hi == EMPTY)
                 return m.findLast();
             else if (hiInclusive)
@@ -1838,8 +1715,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         /**
          * Returns lowest absolute key (ignoring directionality).
          */
-        long lowestKey() {
-            LongComparator cmp = m.comparator;
+        Primitive lowestKey() {
+            WrapperComparator cmp = m.comparator;
             SkipListWrapperMap.Node<V> n = loNode(cmp);
             if (isBeforeEnd(n, cmp))
                 return n.key;
@@ -1850,71 +1727,71 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         /**
          * Returns highest absolute key (ignoring directionality).
          */
-        long highestKey() {
-            LongComparator cmp = m.comparator;
+        Primitive highestKey() {
+            WrapperComparator cmp = m.comparator;
             SkipListWrapperMap.Node<V> n = hiNode(cmp);
             if (n != null) {
-                long last = n.key;
+                Primitive last = n.key;
                 if (inBounds(last, cmp)) return last;
             }
             throw new NoSuchElementException();
         }
 
-        LongEntry<V> lowestEntry() {
-            LongComparator cmp = m.comparator;
+        WrapperEntry<V> lowestEntry() {
+            WrapperComparator cmp = m.comparator;
             for (;;) {
                 SkipListWrapperMap.Node<V> n;
                 V v;
                 if ((n = loNode(cmp)) == null || !isBeforeEnd(n, cmp))
                     return null;
-                else if ((v = n.value) != null) return LongEntry.immutable(n.key, v);
+                else if ((v = n.value) != null) return WrapperEntry.immutable(n.key, v);
             }
         }
 
-        LongEntry<V> highestEntry() {
-            LongComparator cmp = m.comparator;
+        WrapperEntry<V> highestEntry() {
+            WrapperComparator cmp = m.comparator;
             for (;;) {
                 SkipListWrapperMap.Node<V> n;
                 V v;
                 if ((n = hiNode(cmp)) == null || !inBounds(n.key, cmp))
                     return null;
-                else if ((v = n.value) != null) return LongEntry.immutable(n.key, v);
+                else if ((v = n.value) != null) return WrapperEntry.immutable(n.key, v);
             }
         }
 
-        LongEntry<V> removeLowest() {
-            LongComparator cmp = m.comparator;
+        WrapperEntry<V> removeLowest() {
+            WrapperComparator cmp = m.comparator;
             for (;;) {
                 SkipListWrapperMap.Node<V> n;
-                long k;
+                Primitive k;
                 V v;
                 if ((n = loNode(cmp)) == null)
                     return null;
                 else if (!inBounds((k = n.key), cmp))
                     return null;
-                else if ((v = m.doRemove(k, null)) != null) return LongEntry.immutable(k, v);
+                else if ((v = m.doRemove(k, null)) != null) return WrapperEntry.immutable(k, v);
             }
         }
 
-        LongEntry<V> removeHighest() {
-            LongComparator cmp = m.comparator;
+        WrapperEntry<V> removeHighest() {
+            WrapperComparator cmp = m.comparator;
             for (;;) {
                 SkipListWrapperMap.Node<V> n;
-                long k;
+                Primitive k;
                 V v;
                 if ((n = hiNode(cmp)) == null)
                     return null;
                 else if (!inBounds((k = n.key), cmp))
                     return null;
-                else if ((v = m.doRemove(k, null)) != null) return LongEntry.immutable(k, v);
+                else if ((v = m.doRemove(k, null)) != null) return WrapperEntry.immutable(k, v);
             }
         }
 
         /**
-         * Submap version of ConcurrentSkipListLongMap.findNearEntry.
+         * Submap version of ConcurrentSkipListWrapperMap.findNearEntry.
          */
-        LongEntry<V> getNearEntry(long key, int rel) {
-            LongComparator cmp = m.comparator;
+        WrapperEntry<V> getNearEntry(Primitive key, int rel) {
+            WrapperComparator cmp = m.comparator;
             if (isDescending) { // adjust relation for direction
                 if ((rel & LT) == 0)
                     rel |= LT;
@@ -1923,16 +1800,16 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             }
             if (tooLow(key, cmp)) return ((rel & LT) != 0) ? null : lowestEntry();
             if (tooHigh(key, cmp)) return ((rel & LT) != 0) ? highestEntry() : null;
-            LongEntry<V> e = m.findNearEntry(key, rel, cmp);
-            if (e == null || !inBounds(e.getLongKey(), cmp))
+            WrapperEntry<V> e = m.findNearEntry(key, rel, cmp);
+            if (e == null || !inBounds(e.getWrapperKey(), cmp))
                 return null;
             else
                 return e;
         }
 
         // Almost the same as getNearEntry, except for keys
-        long getNearKey(long key, int rel) {
-            LongComparator cmp = m.comparator;
+        Primitive getNearKey(Primitive key, int rel) {
+            WrapperComparator cmp = m.comparator;
             if (isDescending) { // adjust relation for direction
                 if ((rel & LT) == 0)
                     rel |= LT;
@@ -1950,7 +1827,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
                 if ((rel & LT) != 0) {
                     SkipListWrapperMap.Node<V> n = hiNode(cmp);
                     if (n != null) {
-                        long last = n.key;
+                        Primitive last = n.key;
                         if (inBounds(last, cmp)) return last;
                     }
                 }
@@ -1967,7 +1844,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public boolean containsKey(long key) {
+        public boolean containsKey(Primitive key) {
             return inBounds(key, m.comparator) && m.containsKey(key);
         }
 
@@ -1975,7 +1852,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public V get(long key) {
+        public V get(Primitive key) {
             return (!inBounds(key, m.comparator)) ? null : m.get(key);
         }
 
@@ -1983,7 +1860,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public V put(long key, V value) {
+        public V put(Primitive key, V value) {
             checkKeyBounds(key, m.comparator);
             return m.put(key, value);
         }
@@ -1992,7 +1869,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public V remove(long key) {
+        public V remove(Primitive key) {
             return (!inBounds(key, m.comparator)) ? null : m.remove(key);
         }
 
@@ -2001,7 +1878,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          */
         @Override
         public int size() {
-            LongComparator cmp = m.comparator;
+            WrapperComparator cmp = m.comparator;
             long count = 0;
             for (SkipListWrapperMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
                 if (n.value != null) ++count;
@@ -2014,7 +1891,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          */
         @Override
         public boolean isEmpty() {
-            LongComparator cmp = m.comparator;
+            WrapperComparator cmp = m.comparator;
             return !isBeforeEnd(loNode(cmp), cmp);
         }
 
@@ -2024,7 +1901,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         @Override
         public boolean containsValue(Object value) {
             if (value == null) throw new NullPointerException();
-            LongComparator cmp = m.comparator;
+            WrapperComparator cmp = m.comparator;
             for (SkipListWrapperMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
                 V v = n.value;
                 if (v != null && value.equals(v)) return true;
@@ -2037,7 +1914,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          */
         @Override
         public void clear() {
-            LongComparator cmp = m.comparator;
+            WrapperComparator cmp = m.comparator;
             for (SkipListWrapperMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
                 if (n.value != null) m.remove(n.key);
             }
@@ -2047,7 +1924,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public V putIfAbsent(long key, V value) {
+        public V putIfAbsent(Primitive key, V value) {
             checkKeyBounds(key, m.comparator);
             return m.putIfAbsent(key, value);
         }
@@ -2056,7 +1933,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public boolean remove(long key, Object value) {
+        public boolean remove(Primitive key, Object value) {
             return inBounds(key, m.comparator) && m.remove(key, value);
         }
 
@@ -2064,7 +1941,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public boolean replace(long key, V oldValue, V newValue) {
+        public boolean replace(Primitive key, V oldValue, V newValue) {
             checkKeyBounds(key, m.comparator);
             return m.replace(key, oldValue, newValue);
         }
@@ -2073,14 +1950,14 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public V replace(long key, V value) {
+        public V replace(Primitive key, V value) {
             checkKeyBounds(key, m.comparator);
             return m.replace(key, value);
         }
 
         @Override
-        public Comparator<Long> comparator() {
-            LongComparator cmp = m.comparator();
+        public Comparator<Wrapper> comparator() {
+            WrapperComparator cmp = m.comparator();
             if (isDescending) {
                 return Collections.reverseOrder(cmp);
             } else {
@@ -2092,10 +1969,10 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * Utility to create submaps, where given bounds override unbounded(null) ones and/or are
          * checked against bounded ones.
          */
-        SubMap<V> newSubMap(long fromKey, boolean fromInclusive, long toKey, boolean toInclusive) {
-            LongComparator cmp = m.comparator;
+        SubMap<V> newSubMap(Primitive fromKey, boolean fromInclusive, Primitive toKey, boolean toInclusive) {
+            WrapperComparator cmp = m.comparator;
             if (isDescending) { // flip senses
-                long tk = fromKey;
+                Primitive tk = fromKey;
                 fromKey = toKey;
                 toKey = tk;
                 boolean ti = fromInclusive;
@@ -2127,7 +2004,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public ConcurrentNavigableLongMap<V> subMap(long fromKey, boolean fromInclusive, long toKey, boolean toInclusive) {
+        public ConcurrentNavigableWrapperMap<V> subMap(Primitive fromKey, boolean fromInclusive, Primitive toKey, boolean toInclusive) {
             return newSubMap(fromKey, fromInclusive, toKey, toInclusive);
         }
 
@@ -2135,7 +2012,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public ConcurrentNavigableLongMap<V> headMap(long toKey, boolean inclusive) {
+        public ConcurrentNavigableWrapperMap<V> headMap(Primitive toKey, boolean inclusive) {
             return newSubMap(EMPTY, false, toKey, inclusive);
         }
 
@@ -2143,7 +2020,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public ConcurrentNavigableLongMap<V> tailMap(long fromKey, boolean inclusive) {
+        public ConcurrentNavigableWrapperMap<V> tailMap(Primitive fromKey, boolean inclusive) {
             return newSubMap(fromKey, inclusive, EMPTY, false);
         }
 
@@ -2151,7 +2028,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public ConcurrentNavigableLongMap<V> subMap(long fromKey, long toKey) {
+        public ConcurrentNavigableWrapperMap<V> subMap(Primitive fromKey, Primitive toKey) {
             return subMap(fromKey, true, toKey, false);
         }
 
@@ -2159,7 +2036,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public ConcurrentNavigableLongMap<V> headMap(long toKey) {
+        public ConcurrentNavigableWrapperMap<V> headMap(Primitive toKey) {
             return headMap(toKey, false);
         }
 
@@ -2167,7 +2044,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public ConcurrentNavigableLongMap<V> tailMap(long fromKey) {
+        public ConcurrentNavigableWrapperMap<V> tailMap(Primitive fromKey) {
             return tailMap(fromKey, true);
         }
 
@@ -2180,7 +2057,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> lowerEntry(long key) {
+        public WrapperEntry<V> lowerEntry(Primitive key) {
             return getNearEntry(key, LT);
         }
 
@@ -2188,7 +2065,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long lowerKey(long key) {
+        public Primitive lowerKey(Primitive key) {
             return getNearKey(key, LT);
         }
 
@@ -2196,7 +2073,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> floorEntry(long key) {
+        public WrapperEntry<V> floorEntry(Primitive key) {
             return getNearEntry(key, LT | EQ);
         }
 
@@ -2204,7 +2081,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long floorKey(long key) {
+        public Primitive floorKey(Primitive key) {
             return getNearKey(key, LT | EQ);
         }
 
@@ -2212,7 +2089,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> ceilingEntry(long key) {
+        public WrapperEntry<V> ceilingEntry(Primitive key) {
             return getNearEntry(key, GT | EQ);
         }
 
@@ -2220,7 +2097,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long ceilingKey(long key) {
+        public Primitive ceilingKey(Primitive key) {
             return getNearKey(key, GT | EQ);
         }
 
@@ -2228,7 +2105,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> higherEntry(long key) {
+        public WrapperEntry<V> higherEntry(Primitive key) {
             return getNearEntry(key, GT);
         }
 
@@ -2236,7 +2113,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long higherKey(long key) {
+        public Primitive higherKey(Primitive key) {
             return getNearKey(key, GT);
         }
 
@@ -2244,7 +2121,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Entry<Long, V> lowerEntry(Long key) {
+        public Entry<Wrapper, V> lowerEntry(Wrapper key) {
             return null;
         }
 
@@ -2252,7 +2129,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Long lowerKey(Long key) {
+        public Wrapper lowerKey(Wrapper key) {
             return null;
         }
 
@@ -2260,7 +2137,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Entry<Long, V> floorEntry(Long key) {
+        public Entry<Wrapper, V> floorEntry(Wrapper key) {
             return null;
         }
 
@@ -2268,7 +2145,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Long floorKey(Long key) {
+        public Wrapper floorKey(Wrapper key) {
             return null;
         }
 
@@ -2276,7 +2153,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Entry<Long, V> ceilingEntry(Long key) {
+        public Entry<Wrapper, V> ceilingEntry(Wrapper key) {
             return null;
         }
 
@@ -2284,7 +2161,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Long ceilingKey(Long key) {
+        public Wrapper ceilingKey(Wrapper key) {
             return null;
         }
 
@@ -2292,7 +2169,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Entry<Long, V> higherEntry(Long key) {
+        public Entry<Wrapper, V> higherEntry(Wrapper key) {
             return null;
         }
 
@@ -2300,7 +2177,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Long higherKey(Long key) {
+        public Wrapper higherKey(Wrapper key) {
             return null;
         }
 
@@ -2308,7 +2185,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long firstLongKey() {
+        public Primitive firstWrapperKey() {
             return isDescending ? highestKey() : lowestKey();
         }
 
@@ -2316,7 +2193,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> firstEntry() {
+        public WrapperEntry<V> firstEntry() {
             return isDescending ? highestEntry() : lowestEntry();
         }
 
@@ -2324,7 +2201,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long lastLongKey() {
+        public Primitive lastWrapperKey() {
             return isDescending ? lowestKey() : highestKey();
         }
 
@@ -2332,7 +2209,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> lastEntry() {
+        public WrapperEntry<V> lastEntry() {
             return isDescending ? lowestEntry() : highestEntry();
         }
 
@@ -2340,7 +2217,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> pollFirstEntry() {
+        public WrapperEntry<V> pollFirstEntry() {
             return isDescending ? removeHighest() : removeLowest();
         }
 
@@ -2348,7 +2225,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public LongEntry<V> pollLastEntry() {
+        public WrapperEntry<V> pollLastEntry() {
             return isDescending ? removeLowest() : removeHighest();
         }
 
@@ -2356,8 +2233,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet keySet() {
-            NavigableLongSet ks;
+        public NavigableWrapperSet keySet() {
+            NavigableWrapperSet ks;
             if ((ks = keySetView) != null) return ks;
             return keySetView = new Keys<>(this);
         }
@@ -2366,8 +2243,8 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet navigableKeySet() {
-            NavigableLongSet ks;
+        public NavigableWrapperSet navigableKeySet() {
+            NavigableWrapperSet ks;
             if ((ks = keySetView) != null) return ks;
             return keySetView = new Keys<>(this);
         }
@@ -2383,15 +2260,15 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Set<Entry<Long, V>> entrySet() {
-            return (Set) longEntrySet();
+        public Set<Entry<Wrapper, V>> entrySet() {
+            return (Set) PrimitiveEntrySet();
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Set<LongEntry<V>> longEntrySet() {
+        public Set<WrapperEntry<V>> PrimitiveEntrySet() {
             if (entrySetView == null) {
                 entrySetView = new Entries(this);
             }
@@ -2402,7 +2279,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet descendingKeySet() {
+        public NavigableWrapperSet descendingKeySet() {
             return descendingMap().navigableKeySet();
         }
 
@@ -2431,7 +2308,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
                 this.type = type;
 
                 VarHandle.acquireFence();
-                LongComparator cmp = m.comparator;
+                WrapperComparator cmp = m.comparator;
                 for (;;) {
                     next = isDescending ? hiNode(cmp) : loNode(cmp);
                     if (next == null) break;
@@ -2483,7 +2360,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             }
 
             private void ascend() {
-                LongComparator cmp = m.comparator;
+                WrapperComparator cmp = m.comparator;
                 for (;;) {
                     next = next.next;
                     if (next == null) break;
@@ -2499,7 +2376,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             }
 
             private void descend() {
-                LongComparator cmp = m.comparator;
+                WrapperComparator cmp = m.comparator;
                 for (;;) {
                     next = m.findNear(lastReturned.key, LT, cmp);
                     if (next == null) break;
@@ -2579,17 +2456,17 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     /**
      * 
      */
-    private static final class Keys<V> extends AbstractSet<Long> implements NavigableLongSet {
+    private static final class Keys<V> extends AbstractSet<Wrapper> implements NavigableWrapperSet {
 
         /** The original map. */
-        private final ConcurrentNavigableLongMap<V> m;
+        private final ConcurrentNavigableWrapperMap<V> m;
 
         /**
          * Build key-set view.
          * 
          * @param map
          */
-        private Keys(ConcurrentNavigableLongMap<V> map) {
+        private Keys(ConcurrentNavigableWrapperMap<V> map) {
             m = map;
         }
 
@@ -2613,7 +2490,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public boolean add(long e) {
+        public boolean add(Primitive e) {
             throw new UnsupportedOperationException();
         }
 
@@ -2621,7 +2498,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public boolean contains(long o) {
+        public boolean contains(Primitive o) {
             return m.containsKey(o);
         }
 
@@ -2629,7 +2506,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public boolean remove(long o) {
+        public boolean remove(Primitive o) {
             return m.remove(o) != null;
         }
 
@@ -2645,7 +2522,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long lower(long e) {
+        public Primitive lower(Primitive e) {
             return m.lowerKey(e);
         }
 
@@ -2653,7 +2530,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long floor(long e) {
+        public Primitive floor(Primitive e) {
             return m.floorKey(e);
         }
 
@@ -2661,7 +2538,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long ceiling(long e) {
+        public Primitive ceiling(Primitive e) {
             return m.ceilingKey(e);
         }
 
@@ -2669,7 +2546,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long higher(long e) {
+        public Primitive higher(Primitive e) {
             return m.higherKey(e);
         }
 
@@ -2677,7 +2554,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Comparator<? super Long> comparator() {
+        public Comparator<? super Wrapper> comparator() {
             return m.comparator();
         }
 
@@ -2685,40 +2562,40 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public long firstLong() {
-            return m.firstLongKey();
+        public Primitive firstWrapper() {
+            return m.firstWrapperKey();
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public long lastLong() {
-            return m.lastLongKey();
+        public Primitive lastWrapper() {
+            return m.lastWrapperKey();
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public long pollFirstLong() {
-            LongEntry<V> entry = m.pollFirstEntry();
+        public Primitive pollFirstWrapper() {
+            WrapperEntry<V> entry = m.pollFirstEntry();
             if (entry == null) {
                 throw new NoSuchElementException();
             }
-            return entry.getLongKey();
+            return entry.getWrapperKey();
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public long pollLastLong() {
-            LongEntry<V> entry = m.pollLastEntry();
+        public Primitive pollLastWrapper() {
+            WrapperEntry<V> entry = m.pollLastEntry();
             if (entry == null) {
                 throw new NoSuchElementException();
             }
-            return entry.getLongKey();
+            return entry.getWrapperKey();
         }
 
         /**
@@ -2740,7 +2617,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Iterator<Long> descendingIterator() {
+        public Iterator<Wrapper> descendingIterator() {
             return descendingSet().iterator();
         }
 
@@ -2748,7 +2625,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet subSet(long fromElement, boolean fromInclusive, long toElement, boolean toInclusive) {
+        public NavigableWrapperSet subSet(Primitive fromElement, boolean fromInclusive, Primitive toElement, boolean toInclusive) {
             return new Keys(m.subMap(fromElement, fromInclusive, toElement, toInclusive));
         }
 
@@ -2756,7 +2633,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet headSet(long toElement, boolean inclusive) {
+        public NavigableWrapperSet headSet(Primitive toElement, boolean inclusive) {
             return new Keys<>(m.headMap(toElement, inclusive));
         }
 
@@ -2764,7 +2641,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet tailSet(long fromElement, boolean inclusive) {
+        public NavigableWrapperSet tailSet(Primitive fromElement, boolean inclusive) {
             return new Keys<>(m.tailMap(fromElement, inclusive));
         }
 
@@ -2772,7 +2649,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet subSet(long fromElement, long toElement) {
+        public NavigableWrapperSet subSet(Primitive fromElement, Primitive toElement) {
             return subSet(fromElement, true, toElement, false);
         }
 
@@ -2780,7 +2657,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet headSet(long toElement) {
+        public NavigableWrapperSet headSet(Primitive toElement) {
             return headSet(toElement, false);
         }
 
@@ -2788,7 +2665,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet tailSet(long fromElement) {
+        public NavigableWrapperSet tailSet(Primitive fromElement) {
             return tailSet(fromElement, true);
         }
 
@@ -2796,7 +2673,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public NavigableLongSet descendingSet() {
+        public NavigableWrapperSet descendingSet() {
             return new Keys<>(m.descendingMap());
         }
 
@@ -2804,7 +2681,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Iterator<Long> iterator() {
+        public Iterator<Wrapper> iterator() {
             if (m instanceof SkipListWrapperMap) {
                 return ((SkipListWrapperMap) m).createIteratorFor(Type.Key);
             } else {
@@ -2816,7 +2693,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * {@inheritDoc}
          */
         @Override
-        public Spliterator<Long> spliterator() {
+        public Spliterator<Wrapper> spliterator() {
             if (m instanceof SkipListWrapperMap) {
                 return ((SkipListWrapperMap) m).createSpliteratorFor(Type.Key);
             } else {
@@ -2831,14 +2708,14 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     private static class Values<V> extends AbstractCollection<V> {
 
         /** The original view. */
-        private final ConcurrentNavigableLongMap<V> m;
+        private final ConcurrentNavigableWrapperMap<V> m;
 
         /**
          * Build view.
          * 
          * @param map
          */
-        private Values(ConcurrentNavigableLongMap<V> map) {
+        private Values(ConcurrentNavigableWrapperMap<V> map) {
             m = map;
         }
 
@@ -2898,12 +2775,12 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             if (filter == null) throw new NullPointerException();
             if (m instanceof SkipListWrapperMap) return ((SkipListWrapperMap<V>) m).removeValueIf(filter);
             // else use iterator
-            Iterator<LongEntry<V>> it = ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
+            Iterator<WrapperEntry<V>> it = ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
             boolean removed = false;
             while (it.hasNext()) {
-                LongEntry<V> e = it.next();
+                WrapperEntry<V> e = it.next();
                 V v = e.getValue();
-                if (filter.test(v) && m.remove(e.getLongKey(), v)) removed = true;
+                if (filter.test(v) && m.remove(e.getWrapperKey(), v)) removed = true;
             }
             return removed;
         }
@@ -2912,22 +2789,22 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     /**
      * 
      */
-    private static class Entries<V> extends AbstractSet<LongEntry<V>> {
+    private static class Entries<V> extends AbstractSet<WrapperEntry<V>> {
 
         /** The original view. */
-        private final ConcurrentNavigableLongMap<V> m;
+        private final ConcurrentNavigableWrapperMap<V> m;
 
         /**
          * Build view.
          * 
          * @param map
          */
-        private Entries(ConcurrentNavigableLongMap<V> map) {
+        private Entries(ConcurrentNavigableWrapperMap<V> map) {
             m = map;
         }
 
         @Override
-        public Iterator<LongEntry<V>> iterator() {
+        public Iterator<WrapperEntry<V>> iterator() {
             if (m instanceof SkipListWrapperMap) {
                 return ((SkipListWrapperMap) m).createIteratorFor(Type.Entry);
             } else {
@@ -2994,21 +2871,21 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         }
 
         @Override
-        public Spliterator<LongEntry<V>> spliterator() {
+        public Spliterator<WrapperEntry<V>> spliterator() {
             return (m instanceof SkipListWrapperMap) ? ((SkipListWrapperMap<V>) m).createSpliteratorFor(Type.Entry)
                     : ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
         }
 
         @Override
-        public boolean removeIf(Predicate<? super LongEntry<V>> filter) {
+        public boolean removeIf(Predicate<? super WrapperEntry<V>> filter) {
             if (filter == null) throw new NullPointerException();
             if (m instanceof SkipListWrapperMap) return ((SkipListWrapperMap<V>) m).removeEntryIf(filter);
             // else use iterator
-            Iterator<LongEntry<V>> it = ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
+            Iterator<WrapperEntry<V>> it = ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
             boolean removed = false;
             while (it.hasNext()) {
-                LongEntry<V> e = it.next();
-                if (filter.test(e) && m.remove(e.getLongKey(), e.getValue())) removed = true;
+                WrapperEntry<V> e = it.next();
+                if (filter.test(e) && m.remove(e.getWrapperKey(), e.getValue())) removed = true;
             }
             return removed;
         }
@@ -3025,7 +2902,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
     private static final class Node<V> {
 
         /** The entry key. */
-        private final long key;
+        private final Primitive key;
 
         /** The entry value. */
         private volatile V value;
@@ -3033,7 +2910,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         /** The next entry. */
         private volatile Node<V> next;
 
-        private Node(long key, V value, Node<V> next) {
+        private Node(Primitive key, V value, Node<V> next) {
             this.key = key;
             this.value = value;
             this.next = next;
@@ -3069,7 +2946,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
              * {@inheritDoc}
              */
             @Override
-            public Object create(long key, Object value) {
+            public Object create(Primitive key, Object value) {
                 return key;
             }
 
@@ -3077,7 +2954,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
              * {@inheritDoc}
              */
             @Override
-            public Comparator create(LongComparator comparator) {
+            public Comparator create(WrapperComparator comparator) {
                 return comparator;
             }
         },
@@ -3088,7 +2965,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
              * {@inheritDoc}
              */
             @Override
-            public Object create(long key, Object value) {
+            public Object create(Primitive key, Object value) {
                 return value;
             }
 
@@ -3096,7 +2973,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
              * {@inheritDoc}
              */
             @Override
-            public Comparator create(LongComparator comparator) {
+            public Comparator create(WrapperComparator comparator) {
                 return null;
             }
         },
@@ -3107,16 +2984,16 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
              * {@inheritDoc}
              */
             @Override
-            public Object create(long key, Object value) {
-                return LongEntry.immutable(key, value);
+            public Object create(Primitive key, Object value) {
+                return WrapperEntry.immutable(key, value);
             }
 
             /**
              * {@inheritDoc}
              */
             @Override
-            public Comparator<LongEntry> create(LongComparator comparator) {
-                return (one, other) -> comparator.compare(one.getLongKey(), other.getLongKey());
+            public Comparator<WrapperEntry> create(WrapperComparator comparator) {
+                return (one, other) -> comparator.compare(one.getWrapperKey(), other.getWrapperKey());
             }
         };
 
@@ -3139,7 +3016,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * @param value
          * @return
          */
-        public abstract Object create(long key, Object value);
+        public abstract Object create(Primitive key, Object value);
 
         /**
          * Create specila {@link Comparator} for {@link Spliterator}.
@@ -3147,7 +3024,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
          * @param comprator
          * @return
          */
-        public abstract Comparator create(LongComparator comparator);
+        public abstract Comparator create(WrapperComparator comparator);
     }
 
     private Iterator createIteratorFor(Type type) {
@@ -3198,7 +3075,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
             if ((node = next) == null) {
                 throw new NoSuchElementException();
             }
-            long key = node.key;
+            Primitive key = node.key;
             V value = nextValue;
             advance(node);
             return (R) type.create(key, value);
@@ -3227,7 +3104,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements Concu
         @Override
         public final void remove() {
             Node<V> node;
-            long key;
+            Primitive key;
             if ((node = lastReturned) == null || (key = node.key) == EMPTY) {
                 throw new IllegalStateException();
             }

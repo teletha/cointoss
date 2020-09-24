@@ -32,9 +32,9 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
+import java.util.function.LongFunction;
 import cointoss.util.set.NavigableLongSet;
 import kiss.I;
 
@@ -94,138 +94,12 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
     private static final AtomicReferenceFieldUpdater<Index, Index> RIGHT = AtomicReferenceFieldUpdater
             .newUpdater(Index.class, Index.class, "right");
 
-    /* ---------------- Deletion -------------- */
-
-    /* ---------------- Finding and removing first element -------------- */
-
-    /* ---------------- Finding and removing last element -------------- */
-
-    /* ---------------- Relational operations -------------- */
-
     // Control values OR'ed as arguments to findNear
-
     private static final int EQ = 1;
 
     private static final int LT = 2;
 
     private static final int GT = 0; // Actually checked as !LT
-
-    /*
-     * This class implements a tree-like two-dimensionally linked skip list in which the index
-     * levels are represented in separate nodes from the base nodes holding data. There are two
-     * reasons for taking this approach instead of the usual array-based structure: 1) Array based
-     * implementations seem to encounter more complexity and overhead 2) We can use cheaper
-     * algorithms for the heavily-traversed index lists than can be used for the base lists. Here's
-     * a picture of some of the basics for a possible list with 2 levels of index: Head nodes Index
-     * nodes +-+ right +-+ +-+ |2|---------------->| |--------------------->| |->null +-+ +-+ +-+ |
-     * down | | v v v +-+ +-+ +-+ +-+ +-+ +-+ |1|----------->| |->| |------>| |----------->|
-     * |------>| |->null +-+ +-+ +-+ +-+ +-+ +-+ v | | | | | Nodes next v v v v v +-+ +-+ +-+ +-+
-     * +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ |
-     * |->|A|->|B|->|C|->|D|->|E|->|F|->|G|->|H|->|I|->|J|->|K|->null +-+ +-+ +-+ +-+ +-+ +-+ +-+
-     * +-+ +-+ +-+ +-+ +-+ The base lists use a variant of the HM linked ordered set algorithm. See
-     * Tim Harris, "A pragmatic implementation of non-blocking linked lists"
-     * http://www.cl.cam.ac.uk/~tlh20/publications.html and Maged Michael "High Performance Dynamic
-     * Lock-Free Hash Tables and List-Based Sets"
-     * http://www.research.ibm.com/people/m/michael/pubs.htm. The basic idea in these lists is to
-     * mark the "next" pointers of deleted nodes when deleting to avoid conflicts with concurrent
-     * insertions, and when traversing to keep track of triples (predecessor, node, successor) in
-     * order to detect when and how to unlink these deleted nodes. Rather than using mark-bits to
-     * mark list deletions (which can be slow and space-intensive using AtomicMarkedReference),
-     * nodes use direct CAS'able next pointers. On deletion, instead of marking a pointer, they
-     * splice in another node that can be thought of as standing for a marked pointer (see method
-     * unlinkNode). Using plain nodes acts roughly like "boxed" implementations of marked pointers,
-     * but uses new nodes only when nodes are deleted, not for every link. This requires less space
-     * and supports faster traversal. Even if marked references were better supported by JVMs,
-     * traversal using this technique might still be faster because any search need only read ahead
-     * one more node than otherwise required (to check for trailing marker) rather than unmasking
-     * mark bits or whatever on each read. This approach maintains the essential property needed in
-     * the HM algorithm of changing the next-pointer of a deleted node so that any other CAS of it
-     * will fail, but implements the idea by changing the pointer to point to a different node (with
-     * otherwise illegal null fields), not by marking it. While it would be possible to further
-     * squeeze space by defining marker nodes not to have key/value fields, it isn't worth the extra
-     * type-testing overhead. The deletion markers are rarely encountered during traversal, are
-     * easily detected via null checks that are needed anyway, and are normally quickly garbage
-     * collected. (Note that this technique would not work well in systems without garbage
-     * collection.) In addition to using deletion markers, the lists also use nullness of value
-     * fields to indicate deletion, in a style similar to typical lazy-deletion schemes. If a node's
-     * value is null, then it is considered logically deleted and ignored even though it is still
-     * reachable. Here's the sequence of events for a deletion of node n with predecessor b and
-     * successor f, initially: +------+ +------+ +------+ ... | b |------>| n |----->| f | ...
-     * +------+ +------+ +------+ 1. CAS n's value field from non-null to null. Traversals
-     * encountering a node with null value ignore it. However, ongoing insertions and deletions
-     * might still modify n's next pointer. 2. CAS n's next pointer to point to a new marker node.
-     * From this point on, no other nodes can be appended to n. which avoids deletion errors in
-     * CAS-based linked lists. +------+ +------+ +------+ +------+ ... | b |------>| n
-     * |----->|marker|------>| f | ... +------+ +------+ +------+ +------+ 3. CAS b's next pointer
-     * over both n and its marker. From this point on, no new traversals will encounter n, and it
-     * can eventually be GCed. +------+ +------+ ... | b |----------------------------------->| f |
-     * ... +------+ +------+ A failure at step 1 leads to simple retry due to a lost race with
-     * another operation. Steps 2-3 can fail because some other thread noticed during a traversal a
-     * node with null value and helped out by marking and/or unlinking. This helping-out ensures
-     * that no thread can become stuck waiting for progress of the deleting thread. Skip lists add
-     * indexing to this scheme, so that the base-level traversals start close to the locations being
-     * found, inserted or deleted -- usually base level traversals only traverse a few nodes. This
-     * doesn't change the basic algorithm except for the need to make sure base traversals start at
-     * predecessors (here, b) that are not (structurally) deleted, otherwise retrying after
-     * processing the deletion. Index levels are maintained using CAS to link and unlink successors
-     * ("right" fields). Races are allowed in index-list operations that can (rarely) fail to link
-     * in a new index node. (We can't do this of course for data nodes.) However, even when this
-     * happens, the index lists correctly guide search. This can impact performance, but since skip
-     * lists are probabilistic anyway, the net result is that under contention, the effective "p"
-     * value may be lower than its nominal value. Index insertion and deletion sometimes require a
-     * separate traversal pass occurring after the base-level action, to add or remove index nodes.
-     * This adds to single-threaded overhead, but improves contended multithreaded performance by
-     * narrowing interference windows, and allows deletion to ensure that all index nodes will be
-     * made unreachable upon return from a public remove operation, thus avoiding unwanted garbage
-     * retention. Indexing uses skip list parameters that maintain good search performance while
-     * using sparser-than-usual indices: The hardwired parameters k=1, p=0.5 (see method doPut) mean
-     * that about one-quarter of the nodes have indices. Of those that do, half have one level, a
-     * quarter have two, and so on (see Pugh's Skip List Cookbook, sec 3.4), up to a maximum of 62
-     * levels (appropriate for up to 2^63 elements). The expected total space requirement for a map
-     * is slightly less than for the current implementation of java.util.TreeMap. Changing the level
-     * of the index (i.e, the height of the tree-like structure) also uses CAS. Creation of an index
-     * with height greater than the current level adds a level to the head index by CAS'ing on a new
-     * top-most head. To maintain good performance after a lot of removals, deletion methods
-     * heuristically try to reduce the height if the topmost levels appear to be empty. This may
-     * encounter races in which it is possible (but rare) to reduce and "lose" a level just as it is
-     * about to contain an index (that will then never be encountered). This does no structural
-     * harm, and in practice appears to be a better option than allowing unrestrained growth of
-     * levels. This class provides concurrent-reader-style memory consistency, ensuring that
-     * read-only methods report status and/or values no staler than those holding at method entry.
-     * This is done by performing all publication and structural updates using (volatile) CAS,
-     * placing an acquireFence in a few access methods, and ensuring that linked objects are
-     * transitively acquired via dependent reads (normally once) unless performing a volatile-mode
-     * CAS operation (that also acts as an acquire and release). This form of fence-hoisting is
-     * similar to RCU and related techniques (see McKenney's online book
-     * https://www.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html) It minimizes
-     * overhead that may otherwise occur when using so many volatile-mode reads. Using explicit
-     * acquireFences is logistically easier than targeting particular fields to be read in acquire
-     * mode: fences are just hoisted up as far as possible, to the entry points or loop headers of a
-     * few methods. A potential disadvantage is that these few remaining fences are not easily
-     * optimized away by compilers under exclusively single-thread use. It requires some care to
-     * avoid volatile mode reads of other fields. (Note that the memory semantics of a reference
-     * dependently read in plain mode exactly once are equivalent to those for atomic opaque mode.)
-     * Iterators and other traversals encounter each node and value exactly once. Other operations
-     * locate an element (or position to insert an element) via a sequence of dereferences. This
-     * search is broken into two parts. Method findPredecessor (and its specialized embeddings)
-     * searches index nodes only, returning a base-level predecessor of the key. Callers carry out
-     * the base-level search, restarting if encountering a marker preventing link modification. In
-     * some cases, it is possible to encounter a node multiple times while descending levels. For
-     * mutative operations, the reported value is validated using CAS (else retrying), preserving
-     * linearizability with respect to each other. Others may return any (non-null) value holding in
-     * the course of the method call. (Search-based methods also include some useless-looking
-     * explicit null checks designed to allow more fields to be nulled out upon removal, to reduce
-     * floating garbage, but which is not currently done, pending discovery of a way to do this with
-     * less impact on other operations.) To produce random values without interference across
-     * threads, we use within-JDK thread local random support (via the "secondary seed", to avoid
-     * interference with user-level ThreadLocalRandom.) For explanation of algorithms sharing at
-     * least a couple of features with this one, see Mikhail Fomitchev's thesis
-     * (http://www.cs.yorku.ca/~mikhail/), Keir Fraser's thesis
-     * (http://www.cl.cam.ac.uk/users/kaf24/), and Hakan Sundell's thesis
-     * (http://www.cs.chalmers.se/~phs/). Notation guide for local variables Node: b, n, f, p for
-     * predecessor, node, successor, aux Index: q, r, d for index node, right, down. Head: h Keys:
-     * k, key Values: v, value Comparisons: c
-     */
 
     private static final long EMPTY = Long.MIN_VALUE;
 
@@ -313,8 +187,8 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
 
     /**
      * Returns an index node with key strictly less than given key. Also unlinks indexes to deleted
-     * nodes found along the way. Callers rely on this side-effect of clearing indices to deleted
-     * nodes.
+     * nodes found along the way. Callers rely on this side-effect of clearing indices to
+     * deleted nodes.
      *
      * @param key if nonnull the key
      * @return a predecessor node of key, or null if uninitialized or null key
@@ -348,12 +222,13 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
     }
 
     /**
-     * Returns node holding key or null if no such, clearing out any deleted nodes seen along the
-     * way. Repeatedly traverses at base-level looking for key starting at predecessor returned from
-     * findPredecessor, processing base-level deletions as encountered. Restarts occur, at traversal
-     * step encountering node n, if n's key field is null, indicating it is a marker, so its
-     * predecessor is deleted before continuing, which we help do by re-finding a valid predecessor.
-     * The traversal loops in doPut, doRemove, and findNear all include the same checks.
+     * Returns node holding key or null if no such, clearing out any deleted nodes seen along
+     * the way. Repeatedly traverses at base-level looking for key starting at predecessor returned
+     * from findPredecessor, processing base-level deletions as encountered. Restarts occur, at
+     * traversal step encountering node n, if n's key field is null, indicating it is a marker, so
+     * its predecessor is deleted before continuing, which we help do by re-finding a valid
+     * predecessor. The traversal loops in doPut, doRemove, and findNear all include the same
+     * checks.
      *
      * @param key the key
      * @return node holding key, or null if no such
@@ -1311,7 +1186,7 @@ public class SkipListLongMap<V> extends AbstractMap<Long, V> implements Concurre
                         if ((v = n.value) != null && (k = n.key) != EMPTY) {
                             if (!it.hasNext()) return false;
                             Map.Entry<?, ?> e = it.next();
-                            long mk = (Long) e.getKey();
+                            long mk = (long) e.getKey();
                             Object mv = e.getValue();
                             if (mk == EMPTY || mv == null) return false;
                             try {
