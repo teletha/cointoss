@@ -20,6 +20,7 @@ import cointoss.util.function.WrapperTriFunction;
 import cointoss.util.map.ConcurrentNavigableWrapperMap;
 import cointoss.util.map.ConcurrentWrapperMap;
 import cointoss.util.map.NavigableWrapperMap;
+import cointoss.util.map.SkipListWrapperMap;
 import cointoss.util.map.WrapperMap;
 import cointoss.util.ring.WrapperRingBuffer;
 import cointoss.util.set.NavigableWrapperSet;
@@ -147,6 +148,7 @@ public class SpecializedCodeGenerator {
         SpecializedCodeGenerator.write(NavigableWrapperMap.class, Type.Int, Type.Double);
         SpecializedCodeGenerator.write(ConcurrentWrapperMap.class, Type.Int, Type.Double);
         SpecializedCodeGenerator.write(ConcurrentNavigableWrapperMap.class, Type.Int, Type.Double);
+        SpecializedCodeGenerator.write(SkipListWrapperMap.class, Type.Long);
 
         // Function
         SpecializedCodeGenerator.write(WrapperPentaFunction.class, Type.Int, Type.Long, Type.Double);

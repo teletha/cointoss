@@ -72,15 +72,15 @@ import kiss.I;
  *
  * @param <V> the type of mapped values
  */
-class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
+public class SkipListWrapperMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
 
     /** The field updater. */
-    private static final AtomicReferenceFieldUpdater<SkipListLongMap, Index> HEAD = AtomicReferenceFieldUpdater
-            .newUpdater(SkipListLongMap.class, Index.class, "head");
+    private static final AtomicReferenceFieldUpdater<SkipListWrapperMap, Index> HEAD = AtomicReferenceFieldUpdater
+            .newUpdater(SkipListWrapperMap.class, Index.class, "head");
 
     /** The field updater. */
-    private static final AtomicReferenceFieldUpdater<SkipListLongMap, LongAdder> ADDER = AtomicReferenceFieldUpdater
-            .newUpdater(SkipListLongMap.class, LongAdder.class, "adder");
+    private static final AtomicReferenceFieldUpdater<SkipListWrapperMap, LongAdder> ADDER = AtomicReferenceFieldUpdater
+            .newUpdater(SkipListWrapperMap.class, LongAdder.class, "adder");
 
     /** The field updater. */
     private static final AtomicReferenceFieldUpdater<Node, Node> NEXT = AtomicReferenceFieldUpdater
@@ -569,7 +569,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
      * @param comparator the comparator that will be used to order this map. If {@code null}, the
      *            {@linkplain Comparable natural ordering} of the keys will be used.
      */
-    SkipListLongMap(LongComparator comparator) {
+    SkipListWrapperMap(LongComparator comparator) {
         this.comparator = comparator == null ? Long::compare : comparator;
     }
 
@@ -1729,7 +1729,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     }
 
     /**
-     * Submaps returned by {@link SkipListLongMap} submap operations represent a subrange of
+     * Submaps returned by {@link SkipListWrapperMap} submap operations represent a subrange of
      * mappings of their underlying maps. Instances of this class support all methods of their
      * underlying maps, differing in that mappings outside their range are ignored, and attempts to
      * add mappings outside their ranges result in {@link IllegalArgumentException}. Instances of
@@ -1739,7 +1739,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
     private static class SubMap<V> extends AbstractMap<Long, V> implements ConcurrentNavigableLongMap<V> {
 
         /** Underlying map */
-        private final SkipListLongMap<V> m;
+        private final SkipListWrapperMap<V> m;
 
         /** lower bound key, or null if from start */
         private final long lo;
@@ -1766,7 +1766,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         /**
          * Creates a new submap, initializing all fields.
          */
-        SubMap(SkipListLongMap<V> map, long fromKey, boolean fromInclusive, long toKey, boolean toInclusive, boolean isDescending) {
+        SubMap(SkipListWrapperMap<V> map, long fromKey, boolean fromInclusive, long toKey, boolean toInclusive, boolean isDescending) {
             LongComparator cmp = map.comparator;
             if (fromKey != EMPTY && toKey != EMPTY && cmp.compare(fromKey, toKey) > 0)
                 throw new IllegalArgumentException("inconsistent range");
@@ -1799,7 +1799,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         /**
          * Returns true if node key is less than upper bound of range.
          */
-        boolean isBeforeEnd(SkipListLongMap.Node<V> n, LongComparator cmp) {
+        boolean isBeforeEnd(SkipListWrapperMap.Node<V> n, LongComparator cmp) {
             if (n == null) return false;
             if (hi == EMPTY) return true;
             long k = n.key;
@@ -1813,7 +1813,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          * Returns lowest node. This node might not be in range, so most usages need to check
          * bounds.
          */
-        SkipListLongMap.Node<V> loNode(LongComparator cmp) {
+        SkipListWrapperMap.Node<V> loNode(LongComparator cmp) {
             if (lo == EMPTY)
                 return m.findFirst();
             else if (loInclusive)
@@ -1826,7 +1826,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          * Returns highest node. This node might not be in range, so most usages need to check
          * bounds.
          */
-        SkipListLongMap.Node<V> hiNode(LongComparator cmp) {
+        SkipListWrapperMap.Node<V> hiNode(LongComparator cmp) {
             if (hi == EMPTY)
                 return m.findLast();
             else if (hiInclusive)
@@ -1840,7 +1840,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         long lowestKey() {
             LongComparator cmp = m.comparator;
-            SkipListLongMap.Node<V> n = loNode(cmp);
+            SkipListWrapperMap.Node<V> n = loNode(cmp);
             if (isBeforeEnd(n, cmp))
                 return n.key;
             else
@@ -1852,7 +1852,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         long highestKey() {
             LongComparator cmp = m.comparator;
-            SkipListLongMap.Node<V> n = hiNode(cmp);
+            SkipListWrapperMap.Node<V> n = hiNode(cmp);
             if (n != null) {
                 long last = n.key;
                 if (inBounds(last, cmp)) return last;
@@ -1863,7 +1863,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         LongEntry<V> lowestEntry() {
             LongComparator cmp = m.comparator;
             for (;;) {
-                SkipListLongMap.Node<V> n;
+                SkipListWrapperMap.Node<V> n;
                 V v;
                 if ((n = loNode(cmp)) == null || !isBeforeEnd(n, cmp))
                     return null;
@@ -1874,7 +1874,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         LongEntry<V> highestEntry() {
             LongComparator cmp = m.comparator;
             for (;;) {
-                SkipListLongMap.Node<V> n;
+                SkipListWrapperMap.Node<V> n;
                 V v;
                 if ((n = hiNode(cmp)) == null || !inBounds(n.key, cmp))
                     return null;
@@ -1885,7 +1885,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         LongEntry<V> removeLowest() {
             LongComparator cmp = m.comparator;
             for (;;) {
-                SkipListLongMap.Node<V> n;
+                SkipListWrapperMap.Node<V> n;
                 long k;
                 V v;
                 if ((n = loNode(cmp)) == null)
@@ -1899,7 +1899,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         LongEntry<V> removeHighest() {
             LongComparator cmp = m.comparator;
             for (;;) {
-                SkipListLongMap.Node<V> n;
+                SkipListWrapperMap.Node<V> n;
                 long k;
                 V v;
                 if ((n = hiNode(cmp)) == null)
@@ -1941,14 +1941,14 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
             }
             if (tooLow(key, cmp)) {
                 if ((rel & LT) == 0) {
-                    SkipListLongMap.Node<V> n = loNode(cmp);
+                    SkipListWrapperMap.Node<V> n = loNode(cmp);
                     if (isBeforeEnd(n, cmp)) return n.key;
                 }
                 return EMPTY;
             }
             if (tooHigh(key, cmp)) {
                 if ((rel & LT) != 0) {
-                    SkipListLongMap.Node<V> n = hiNode(cmp);
+                    SkipListWrapperMap.Node<V> n = hiNode(cmp);
                     if (n != null) {
                         long last = n.key;
                         if (inBounds(last, cmp)) return last;
@@ -2003,7 +2003,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         public int size() {
             LongComparator cmp = m.comparator;
             long count = 0;
-            for (SkipListLongMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
+            for (SkipListWrapperMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
                 if (n.value != null) ++count;
             }
             return count >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) count;
@@ -2025,7 +2025,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         public boolean containsValue(Object value) {
             if (value == null) throw new NullPointerException();
             LongComparator cmp = m.comparator;
-            for (SkipListLongMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
+            for (SkipListWrapperMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
                 V v = n.value;
                 if (v != null && value.equals(v)) return true;
             }
@@ -2038,7 +2038,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         @Override
         public void clear() {
             LongComparator cmp = m.comparator;
-            for (SkipListLongMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
+            for (SkipListWrapperMap.Node<V> n = loNode(cmp); isBeforeEnd(n, cmp); n = n.next) {
                 if (n.value != null) m.remove(n.key);
             }
         }
@@ -2805,8 +2805,8 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         @Override
         public Iterator<Long> iterator() {
-            if (m instanceof SkipListLongMap) {
-                return ((SkipListLongMap) m).createIteratorFor(Type.Key);
+            if (m instanceof SkipListWrapperMap) {
+                return ((SkipListWrapperMap) m).createIteratorFor(Type.Key);
             } else {
                 return ((SubMap) m).new SubMapGenericIterator(Type.Key);
             }
@@ -2817,8 +2817,8 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
          */
         @Override
         public Spliterator<Long> spliterator() {
-            if (m instanceof SkipListLongMap) {
-                return ((SkipListLongMap) m).createSpliteratorFor(Type.Key);
+            if (m instanceof SkipListWrapperMap) {
+                return ((SkipListWrapperMap) m).createSpliteratorFor(Type.Key);
             } else {
                 return ((SubMap) m).new SubMapGenericIterator(Type.Key);
             }
@@ -2880,8 +2880,8 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
 
         @Override
         public Iterator<V> iterator() {
-            if (m instanceof SkipListLongMap) {
-                return ((SkipListLongMap) m).createIteratorFor(Type.Value);
+            if (m instanceof SkipListWrapperMap) {
+                return ((SkipListWrapperMap) m).createIteratorFor(Type.Value);
             } else {
                 return ((SubMap) m).new SubMapGenericIterator(Type.Value);
             }
@@ -2889,14 +2889,14 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
 
         @Override
         public Spliterator<V> spliterator() {
-            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).createSpliteratorFor(Type.Value)
+            return (m instanceof SkipListWrapperMap) ? ((SkipListWrapperMap<V>) m).createSpliteratorFor(Type.Value)
                     : ((SubMap<V>) m).new SubMapGenericIterator(Type.Value);
         }
 
         @Override
         public boolean removeIf(Predicate<? super V> filter) {
             if (filter == null) throw new NullPointerException();
-            if (m instanceof SkipListLongMap) return ((SkipListLongMap<V>) m).removeValueIf(filter);
+            if (m instanceof SkipListWrapperMap) return ((SkipListWrapperMap<V>) m).removeValueIf(filter);
             // else use iterator
             Iterator<LongEntry<V>> it = ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
             boolean removed = false;
@@ -2928,8 +2928,8 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
 
         @Override
         public Iterator<LongEntry<V>> iterator() {
-            if (m instanceof SkipListLongMap) {
-                return ((SkipListLongMap) m).createIteratorFor(Type.Entry);
+            if (m instanceof SkipListWrapperMap) {
+                return ((SkipListWrapperMap) m).createIteratorFor(Type.Entry);
             } else {
                 return ((SubMap) m).new SubMapGenericIterator(Type.Entry);
             }
@@ -2995,14 +2995,14 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
 
         @Override
         public Spliterator<LongEntry<V>> spliterator() {
-            return (m instanceof SkipListLongMap) ? ((SkipListLongMap<V>) m).createSpliteratorFor(Type.Entry)
+            return (m instanceof SkipListWrapperMap) ? ((SkipListWrapperMap<V>) m).createSpliteratorFor(Type.Entry)
                     : ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
         }
 
         @Override
         public boolean removeIf(Predicate<? super LongEntry<V>> filter) {
             if (filter == null) throw new NullPointerException();
-            if (m instanceof SkipListLongMap) return ((SkipListLongMap<V>) m).removeEntryIf(filter);
+            if (m instanceof SkipListWrapperMap) return ((SkipListWrapperMap<V>) m).removeEntryIf(filter);
             // else use iterator
             Iterator<LongEntry<V>> it = ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
             boolean removed = false;
@@ -3233,7 +3233,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
             }
             // It would not be worth all of the overhead to directly
             // unlink from here. Using remove is fast enough.
-            SkipListLongMap.this.remove(key);
+            SkipListWrapperMap.this.remove(key);
             lastReturned = null;
         }
     }
