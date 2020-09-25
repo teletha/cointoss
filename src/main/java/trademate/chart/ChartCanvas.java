@@ -177,7 +177,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas marketName = new EnhancedCanvas().size(230, 30).fontSize(24).fillColor(50, 50, 50);
+    private final EnhancedCanvas marketName = new EnhancedCanvas().size(230, 70).fontSize(18).fillColor(60, 60, 60);
 
     /** Chart UI */
     private final EnhancedCanvas chartInfo = new EnhancedCanvas().bindSizeTo(this);
@@ -226,7 +226,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final int chartInfoHeight = 16;
 
     /** The size of chart infomation area. */
-    private final int chartInfoLeftPadding = 10;
+    private final int chartInfoTopPadding = 26;
+
+    /** The size of chart infomation area. */
+    private final int chartInfoLeftPadding = 4;
 
     /** The size of chart infomation area. */
     private final int chartInfoHorizontalGap = 3;
@@ -255,7 +258,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
 
-        chart.market.observe().to(m -> marketName.clear().fillText(m.service.marketReadableName, 4, 28));
+        chart.market.observe()
+                .to(m -> marketName.clear().fillText(m.service.marketReadableName, chartInfoLeftPadding, chartInfoTopPadding + 20));
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
@@ -841,7 +845,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         String low = CommonText.LowPrice + " " + tick.lowPrice().scale(base);
         String close = CommonText.ClosePrice + " " + tick.closePrice().scale(base);
 
-        int y = chartInfoHeight;
+        int y = chartInfoHeight + chartInfoTopPadding;
         gc.setFill(InfoColor);
         gc.fillText(date, chartInfoLeftPadding, y, chartInfoTitle);
         gc.fillText(open, chartInfoLeftPadding + chartInfoTitle + chartInfoHorizontalGap, y, chartInfoWidth);
