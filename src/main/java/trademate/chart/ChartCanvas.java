@@ -93,6 +93,24 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The candle width. */
     private static final int BarWidth = 3;
 
+    /** The size of chart infomation area. */
+    private static final int chartInfoTitle = 105;
+
+    /** The size of chart infomation area. */
+    private static final int chartInfoWidth = 75;
+
+    /** The size of chart infomation area. */
+    private static final int chartInfoHeight = 16;
+
+    /** The size of chart infomation area. */
+    private static final int chartInfoTopPadding = 26;
+
+    /** The size of chart infomation area. */
+    private static final int chartInfoLeftPadding = 4;
+
+    /** The size of chart infomation area. */
+    private static final int chartInfoHorizontalGap = 3;
+
     /** The chart node. */
     private final ChartView chart;
 
@@ -215,24 +233,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     return combined.toArray(new Plotter[combined.size()]);
                 }
             });
-
-    /** The size of chart infomation area. */
-    private final int chartInfoTitle = 105;
-
-    /** The size of chart infomation area. */
-    private final int chartInfoWidth = 75;
-
-    /** The size of chart infomation area. */
-    private final int chartInfoHeight = 16;
-
-    /** The size of chart infomation area. */
-    private final int chartInfoTopPadding = 26;
-
-    /** The size of chart infomation area. */
-    private final int chartInfoLeftPadding = 4;
-
-    /** The size of chart infomation area. */
-    private final int chartInfoHorizontalGap = 3;
 
     /** The latest orderbook layer. */
     private OrderbookBar orderbookBar;
