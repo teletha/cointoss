@@ -22,7 +22,7 @@ public class DoubleRingBuffer {
     private final double[] buffer;
 
     /** The current index. */
-    private int index;
+    private int index = -1;
 
     /**
      * Create new buffer.
@@ -41,9 +41,19 @@ public class DoubleRingBuffer {
      * @return Removed item.
      */
     public double add(double item) {
-        double prev = buffer[index];
-        buffer[index] = item;
-        index = (index + 1) % size;
+        int nextIndex = (index + 1) % size;
+        double prev = buffer[nextIndex];
+        buffer[nextIndex] = item;
+        index = nextIndex;
         return prev;
+    }
+
+    /**
+     * Get the latest item.
+     * 
+     * @return A latest item.
+     */
+    public double latest() {
+        return buffer[index];
     }
 }

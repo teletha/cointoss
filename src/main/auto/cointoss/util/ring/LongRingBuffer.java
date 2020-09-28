@@ -22,7 +22,7 @@ public class LongRingBuffer {
     private final long[] buffer;
 
     /** The current index. */
-    private int index;
+    private int index = -1;
 
     /**
      * Create new buffer.
@@ -41,9 +41,19 @@ public class LongRingBuffer {
      * @return Removed item.
      */
     public long add(long item) {
-        long prev = buffer[index];
-        buffer[index] = item;
-        index = (index + 1) % size;
+        int nextIndex = (index + 1) % size;
+        long prev = buffer[nextIndex];
+        buffer[nextIndex] = item;
+        index = nextIndex;
         return prev;
+    }
+
+    /**
+     * Get the latest item.
+     * 
+     * @return A latest item.
+     */
+    public long latest() {
+        return buffer[index];
     }
 }

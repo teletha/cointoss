@@ -22,7 +22,7 @@ public class RingBuffer<E> {
     private final E[] buffer;
 
     /** The current index. */
-    private int index;
+    private int index = -1;
 
     /**
      * Create new buffer.
@@ -41,9 +41,19 @@ public class RingBuffer<E> {
      * @return Removed item.
      */
     public E add(E item) {
-        E prev = buffer[index];
-        buffer[index] = item;
-        index = (index + 1) % size;
+        int nextIndex = (index + 1) % size;
+        E prev = buffer[nextIndex];
+        buffer[nextIndex] = item;
+        index = nextIndex;
         return prev;
+    }
+
+    /**
+     * Get the latest item.
+     * 
+     * @return A latest item.
+     */
+    public E latest() {
+        return buffer[index];
     }
 }

@@ -201,6 +201,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final EnhancedCanvas chartInfo = new EnhancedCanvas().bindSizeTo(this);
 
     /** Chart UI */
+    private final EnhancedCanvas realtimeInfo = new EnhancedCanvas().bindSizeTo(this);
+
+    /** Chart UI */
     private final EnhancedCanvas supporter = new EnhancedCanvas().bindSizeTo(this);
 
     /** The script registry. */
@@ -298,7 +301,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizePriceSupporter();
 
         getChildren()
-                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, realtimeInfo, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     private Observable[] userInterfaceModification() {
@@ -659,6 +662,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         drawCandle();
         drawOrderbook();
         drawPriceVolume();
+        drawRealtimeInfo();
     }
 
     /**
@@ -828,6 +832,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             });
         });
+    }
+
+    /**
+     * Draw realtime chart-related info.
+     */
+    private void drawRealtimeInfo() {
+
     }
 
     /**
