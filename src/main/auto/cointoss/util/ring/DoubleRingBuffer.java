@@ -11,6 +11,7 @@ package cointoss.util.ring;
 
 import javax.annotation.processing.Generated;
 
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
 
 @Generated("SpecializedCodeGenerator")
@@ -64,9 +65,25 @@ public class DoubleRingBuffer {
      * @param consumer
      */
     public void forEach(DoubleConsumer consumer) {
-        int start = index;
+        int start = index + 1;
         for (int i = 0; i < size; i++) {
             consumer.accept(buffer[(start + i) % size]);
         }
+    }
+
+    /**
+     * Reduce items.
+     * 
+     * @param operator The calculation.
+     * @return The reduced result.
+     */
+    public double reduce(DoubleBinaryOperator operator) {
+        int start = index;
+        double result = buffer[start];
+        for (int i = 1; i < size; i++) {
+            double item = buffer[(start + i) % size];
+            if (item != 0d) result = operator.applyAsDouble(result, item);
+        }
+        return result;
     }
 }

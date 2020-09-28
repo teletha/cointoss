@@ -147,6 +147,8 @@ public class SpecializedCodeGenerator {
                     return "import java.util.function." + wrapperName + "Function;";
                 } else if (text.startsWith("import " + WrapperConsumer.class.getCanonicalName())) {
                     return "import java.util.function." + wrapperName + "Consumer;";
+                } else if (text.startsWith("import " + WrapperBinaryOperator.class.getCanonicalName())) {
+                    return "import java.util.function." + wrapperName + "BinaryOperator;";
                 } else {
                     return "SKIPLINE";
                 }
@@ -170,6 +172,7 @@ public class SpecializedCodeGenerator {
             text = text.replace("Primitive", primitiveName);
             text = text.replaceAll("(\\w*)Wrapper\\d?(\\w*)<Wrapper\\d?>", //
                     "$1" + wrapperName + "$2" + (numeric ? "" : "<" + wrapperType + ">"));
+            if (!numeric) text = text.replaceAll("AsWrapper\\d?", "");
             text = text.replaceAll("(\\W)Wrapper\\d?(\\W)", "$1" + wrapperType + "$2");
             text = text.replaceAll("Wrapper\\d?", wrapperName);
 
@@ -252,6 +255,13 @@ public class SpecializedCodeGenerator {
      */
     public static interface WrapperConsumer<V> {
         void accept(Primitive value);
+    }
+
+    /**
+     * Replaceable type for primitive function types.
+     */
+    public static interface WrapperBinaryOperator<V> {
+        Primitive applyAsWrapper(Primitive left, Primitive right);
     }
 
     /**

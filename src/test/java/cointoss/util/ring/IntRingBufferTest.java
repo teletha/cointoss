@@ -9,7 +9,8 @@
  */
 package cointoss.util.ring;
 
-import java.util.function.ToIntFunction;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,24 +31,50 @@ class IntRingBufferTest {
 
     @Test
     void forEach() {
-        ToIntFunction<IntRingBuffer> total = buffer -> {
-            int[] all = new int[1];
+        Function<IntRingBuffer, int[]> array = buffer -> {
+            AtomicInteger index = new AtomicInteger();
+            int[] all = new int[3];
             buffer.forEach(value -> {
-                all[0] += value;
+                all[index.getAndIncrement()] = value;
             });
-            return all[0];
+            return all;
         };
 
         IntRingBuffer buffer = new IntRingBuffer(3);
         buffer.add(1);
         buffer.add(2);
         buffer.add(3);
-        assert total.applyAsInt(buffer) == 6;
+        int[] set = array.apply(buffer);
+        assert set[0] == 1;
+        assert set[1] == 2;
+        assert set[2] == 3;
 
         buffer.add(4);
-        assert total.applyAsInt(buffer) == 9;
+        set = array.apply(buffer);
+        assert set[0] == 2;
+        assert set[1] == 3;
+        assert set[2] == 4;
 
         buffer.add(5);
-        assert total.applyAsInt(buffer) == 12;
+        set = array.apply(buffer);
+        assert set[0] == 3;
+        assert set[1] == 4;
+        assert set[2] == 5;
+
+    }
+
+    @Test
+    void reduce() {
+        IntRingBuffer buffer = new IntRingBuffer(3);
+        buffer.add(1);
+        buffer.add(2);
+        buffer.add(3);
+        assert buffer.reduce(Math::max) == 3;
+
+        buffer.add(4);
+        assert buffer.reduce(Math::max) == 4;
+
+        buffer.add(3);
+        assert buffer.reduce(Math::max) == 4;
     }
 }

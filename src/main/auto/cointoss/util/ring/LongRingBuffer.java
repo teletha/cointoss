@@ -11,6 +11,7 @@ package cointoss.util.ring;
 
 import javax.annotation.processing.Generated;
 
+import java.util.function.LongBinaryOperator;
 import java.util.function.LongConsumer;
 
 @Generated("SpecializedCodeGenerator")
@@ -64,9 +65,25 @@ public class LongRingBuffer {
      * @param consumer
      */
     public void forEach(LongConsumer consumer) {
-        int start = index;
+        int start = index + 1;
         for (int i = 0; i < size; i++) {
             consumer.accept(buffer[(start + i) % size]);
         }
+    }
+
+    /**
+     * Reduce items.
+     * 
+     * @param operator The calculation.
+     * @return The reduced result.
+     */
+    public long reduce(LongBinaryOperator operator) {
+        int start = index;
+        long result = buffer[start];
+        for (int i = 1; i < size; i++) {
+            long item = buffer[(start + i) % size];
+            if (item != 0L) result = operator.applyAsLong(result, item);
+        }
+        return result;
     }
 }

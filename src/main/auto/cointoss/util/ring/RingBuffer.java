@@ -11,6 +11,7 @@ package cointoss.util.ring;
 
 import javax.annotation.processing.Generated;
 
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 
 @Generated("SpecializedCodeGenerator")
@@ -64,9 +65,25 @@ public class RingBuffer<E> {
      * @param consumer
      */
     public void forEach(Consumer<E> consumer) {
-        int start = index;
+        int start = index + 1;
         for (int i = 0; i < size; i++) {
             consumer.accept(buffer[(start + i) % size]);
         }
+    }
+
+    /**
+     * Reduce items.
+     * 
+     * @param operator The calculation.
+     * @return The reduced result.
+     */
+    public E reduce(BinaryOperator<E> operator) {
+        int start = index;
+        E result = buffer[start];
+        for (int i = 1; i < size; i++) {
+            E item = buffer[(start + i) % size];
+            if (item != null) result = operator.apply(result, item);
+        }
+        return result;
     }
 }

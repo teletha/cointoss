@@ -13,6 +13,7 @@ import javax.annotation.processing.Generated;
 
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
+import cointoss.util.SpecializedCodeGenerator.WrapperBinaryOperator;
 import cointoss.util.SpecializedCodeGenerator.WrapperConsumer;
 
 @Generated("SpecializedCodeGenerator")
@@ -66,9 +67,25 @@ public class WrapperRingBuffer<Wrapper1> {
      * @param consumer
      */
     public void forEach(WrapperConsumer<Wrapper1> consumer) {
-        int start = index;
+        int start = index + 1;
         for (int i = 0; i < size; i++) {
             consumer.accept(buffer[(start + i) % size]);
         }
+    }
+
+    /**
+     * Reduce items.
+     * 
+     * @param operator The calculation.
+     * @return The reduced result.
+     */
+    public Primitive reduce(WrapperBinaryOperator<Wrapper1> operator) {
+        int start = index;
+        Primitive result = buffer[start];
+        for (int i = 1; i < size; i++) {
+            Primitive item = buffer[(start + i) % size];
+            if (item != Wrapper.initital()) result = operator.applyAsWrapper(result, item);
+        }
+        return result;
     }
 }

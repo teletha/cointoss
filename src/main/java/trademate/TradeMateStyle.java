@@ -14,12 +14,17 @@ import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
 import stylist.value.Color;
+import viewtify.util.FXUtils;
 
 public interface TradeMateStyle extends StyleDSL {
 
     Color BUY = Color.rgb(251, 189, 42);
 
+    javafx.scene.paint.Color BUY_FX = FXUtils.color(BUY);
+
     Color SELL = Color.rgb(247, 105, 77);
+
+    javafx.scene.paint.Color SELL_FX = FXUtils.color(SELL);
 
     Style Long = () -> {
         font.color(BUY);
