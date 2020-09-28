@@ -11,6 +11,7 @@ package cointoss.util.ring;
 
 import javax.annotation.processing.Generated;
 
+import java.util.function.IntConsumer;
 
 @Generated("SpecializedCodeGenerator")
 public class IntRingBuffer {
@@ -55,5 +56,17 @@ public class IntRingBuffer {
      */
     public int latest() {
         return buffer[index];
+    }
+
+    /**
+     * Take all items.
+     * 
+     * @param consumer
+     */
+    public void forEach(IntConsumer consumer) {
+        int start = index;
+        for (int i = 0; i < size; i++) {
+            consumer.accept(buffer[(start + i) % size]);
+        }
     }
 }

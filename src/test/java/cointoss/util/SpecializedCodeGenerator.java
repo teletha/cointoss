@@ -145,6 +145,8 @@ public class SpecializedCodeGenerator {
             if (text.startsWith("import " + SpecializedCodeGenerator.class.getCanonicalName())) {
                 if (text.startsWith("import " + WrapperFunction.class.getCanonicalName())) {
                     return "import java.util.function." + wrapperName + "Function;";
+                } else if (text.startsWith("import " + WrapperConsumer.class.getCanonicalName())) {
+                    return "import java.util.function." + wrapperName + "Consumer;";
                 } else {
                     return "SKIPLINE";
                 }
@@ -242,8 +244,14 @@ public class SpecializedCodeGenerator {
      * Replaceable type for primitive function types.
      */
     public static interface WrapperFunction<V> {
-
         V apply(Primitive value);
+    }
+
+    /**
+     * Replaceable type for primitive function types.
+     */
+    public static interface WrapperConsumer<V> {
+        void accept(Primitive value);
     }
 
     /**

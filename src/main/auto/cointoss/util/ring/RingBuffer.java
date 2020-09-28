@@ -11,6 +11,7 @@ package cointoss.util.ring;
 
 import javax.annotation.processing.Generated;
 
+import java.util.function.Consumer;
 
 @Generated("SpecializedCodeGenerator")
 public class RingBuffer<E> {
@@ -55,5 +56,17 @@ public class RingBuffer<E> {
      */
     public E latest() {
         return buffer[index];
+    }
+
+    /**
+     * Take all items.
+     * 
+     * @param consumer
+     */
+    public void forEach(Consumer<E> consumer) {
+        int start = index;
+        for (int i = 0; i < size; i++) {
+            consumer.accept(buffer[(start + i) % size]);
+        }
     }
 }

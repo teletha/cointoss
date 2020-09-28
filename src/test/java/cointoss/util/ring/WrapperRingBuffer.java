@@ -13,6 +13,7 @@ import javax.annotation.processing.Generated;
 
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
+import cointoss.util.SpecializedCodeGenerator.WrapperConsumer;
 
 @Generated("SpecializedCodeGenerator")
 public class WrapperRingBuffer<Wrapper1> {
@@ -57,5 +58,17 @@ public class WrapperRingBuffer<Wrapper1> {
      */
     public Primitive latest() {
         return buffer[index];
+    }
+
+    /**
+     * Take all items.
+     * 
+     * @param consumer
+     */
+    public void forEach(WrapperConsumer<Wrapper1> consumer) {
+        int start = index;
+        for (int i = 0; i < size; i++) {
+            consumer.accept(buffer[(start + i) % size]);
+        }
     }
 }
