@@ -25,6 +25,7 @@ import javafx.scene.paint.Color;
 
 import cointoss.Currency;
 import cointoss.MarketService;
+import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.binance.Binance;
 import cointoss.market.bitfinex.Bitfinex;
@@ -58,8 +59,8 @@ public class GlobalVolumeView extends View {
     /** The interval time(ms) for each update. */
     private static final int UpdateInterval = 1000;
 
-    private static final Map<String, Color> Colors = Map
-            .of(BitFlyer.BTC_JPY.exchangeName, Pastel10[0], BitMex.XBT_USD.exchangeName, Pastel10[1], Binance.BTC_USDT.exchangeName, Pastel10[2], Binance.FUTURE_BTC_USDT.exchangeName, Pastel10[2], Bitfinex.BTC_USD.exchangeName, Pastel10[3], FTX.BTC_PERP.exchangeName, Pastel10[4]);
+    private static final Map<Exchange, Color> Colors = Map
+            .of(BitFlyer.BTC_JPY.exchange, Pastel10[0], BitMex.XBT_USD.exchange, Pastel10[1], Binance.BTC_USDT.exchange, Pastel10[2], Binance.FUTURE_BTC_USDT.exchange, Pastel10[2], Bitfinex.BTC_USD.exchange, Pastel10[3], FTX.BTC_PERP.exchange, Pastel10[4]);
 
     private final ObservableList<CurrencyView> charts = FXCollections.observableArrayList();
 
@@ -223,18 +224,17 @@ public class GlobalVolumeView extends View {
                     x[0] -= width;
 
                     for (Entry<MarketService, double[]> entry : volume.volumes()) {
-                        String name = entry.getKey().exchangeName;
                         double[] volumes = entry.getValue();
 
                         // buyer
                         double buyerFixedVolume = volumes[0] * ratio;
-                        context.setFill(Colors.getOrDefault(name, TradeMateStyle.BUY_FX));
+                        context.setFill(Colors.getOrDefault(entry.getKey().exchange, TradeMateStyle.BUY_FX));
                         context.fillRect(x[0], buyerY - buyerFixedVolume, width, buyerFixedVolume);
                         buyerY = buyerY - buyerFixedVolume;
 
                         // seller
                         double sellerFixedVolume = volumes[1] * ratio;
-                        context.setFill(Colors.getOrDefault(name, TradeMateStyle.SELL_FX));
+                        context.setFill(Colors.getOrDefault(entry.getKey().exchange, TradeMateStyle.SELL_FX));
                         context.fillRect(x[0], sellerY, width, sellerFixedVolume);
                         sellerY = sellerY + sellerFixedVolume;
                     }

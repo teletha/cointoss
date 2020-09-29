@@ -22,6 +22,7 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -30,8 +31,8 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import cointoss.util.arithmetic.Num;
 import cointoss.util.Network;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -56,7 +57,7 @@ public class BinanceService extends MarketService {
      * @param setting
      */
     protected BinanceService(String marketName, boolean isFutures, MarketSetting setting) {
-        super(isFutures ? "BinanceF" : "Binance", marketName, setting);
+        super(isFutures ? Exchange.BinanceF : Exchange.Binance, marketName, setting);
 
         this.isFutures = isFutures;
     }

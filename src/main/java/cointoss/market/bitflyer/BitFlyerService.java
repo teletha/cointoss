@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.*;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -39,6 +39,7 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -48,8 +49,8 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import cointoss.util.arithmetic.Num;
 import cointoss.util.Network;
+import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
@@ -124,7 +125,7 @@ public class BitFlyerService extends MarketService {
      * @param forTest
      */
     protected BitFlyerService(String marketId, MarketSetting setting, boolean forTest) {
-        super("BitFlyer", marketId, setting);
+        super(Exchange.BitFlyer, marketId, setting);
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.schedule(0, 1, TimeUnit.SECONDS, false, scheduler()).map(v -> orders().toList()).share();

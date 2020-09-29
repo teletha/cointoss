@@ -23,6 +23,7 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -31,8 +32,8 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import cointoss.util.arithmetic.Num;
 import cointoss.util.Network;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -63,7 +64,7 @@ public class BitMexService extends MarketService {
      * @param setting
      */
     protected BitMexService(int id, String marketName, MarketSetting setting) {
-        super("BitMEX", marketName, setting);
+        super(Exchange.BitMEX, marketName, setting);
 
         this.marketId = id;
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.base.minimumSize;

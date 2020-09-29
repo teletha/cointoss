@@ -24,6 +24,7 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.market.Exchange;
 import cointoss.market.Numbering;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
@@ -33,8 +34,8 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import cointoss.util.arithmetic.Num;
 import cointoss.util.Network;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -61,7 +62,7 @@ public class FTXService extends MarketService {
      * @param setting
      */
     protected FTXService(String marketName, MarketSetting setting) {
-        super("FTX", marketName, setting);
+        super(Exchange.FTX, marketName, setting);
     }
 
     /**

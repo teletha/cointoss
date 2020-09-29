@@ -33,6 +33,7 @@ import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
@@ -89,7 +90,7 @@ public class VerifiableMarketService extends MarketService {
      * 
      */
     public VerifiableMarketService() {
-        super("TestableExchange", "TestableMarket", MarketSetting.with //
+        super(Exchange.TestNet, "TestableMarket", MarketSetting.with //
                 .target(Currency.UNKNOWN.minimumSize(0.0001))
                 .base(Currency.UNKNOWN.minimumSize(0.01)));
     }
@@ -98,7 +99,7 @@ public class VerifiableMarketService extends MarketService {
      * 
      */
     public VerifiableMarketService(MarketService delegation) {
-        super(delegation.exchangeName, delegation.marketName, delegation.setting);
+        super(delegation.exchange, delegation.marketName, delegation.setting);
     }
 
     /**

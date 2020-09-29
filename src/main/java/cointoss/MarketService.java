@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
+import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
@@ -44,8 +45,8 @@ public abstract class MarketService implements Disposable {
     /** The logging system. */
     protected static final Logger logger = LogManager.getLogger(MarketService.class);
 
-    /** The exchange name. */
-    public final String exchangeName;
+    /** The exchange. */
+    public final Exchange exchange;
 
     /** The market name. */
     public final String marketName;
@@ -75,11 +76,11 @@ public abstract class MarketService implements Disposable {
     private Variable<Order> orderStream;
 
     /**
-     * @param exchangeName
+     * @param exchange
      * @param marketName
      */
-    protected MarketService(String exchangeName, String marketName, MarketSetting setting) {
-        this.exchangeName = Objects.requireNonNull(exchangeName);
+    protected MarketService(Exchange exchange, String marketName, MarketSetting setting) {
+        this.exchange = Objects.requireNonNull(exchange);
         this.marketName = Objects.requireNonNull(marketName);
         this.marketReadableName = marketIdentity().replaceAll("_", "");
         this.setting = setting;
@@ -101,7 +102,7 @@ public abstract class MarketService implements Disposable {
      * @return A market identity.
      */
     public final String marketIdentity() {
-        return exchangeName + " " + marketName;
+        return exchange + " " + marketName;
     }
 
     /**
@@ -110,7 +111,7 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     public final Directory directory() {
-        return Locator.directory(".log").directory(exchangeName).directory(marketName);
+        return Locator.directory(".log").directory(exchange.name()).directory(marketName);
     }
 
     /**
