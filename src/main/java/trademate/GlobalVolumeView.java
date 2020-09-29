@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.*;
+import static trademate.FXColorPalettes.Pastel10;
 
 import java.util.List;
 import java.util.Map;
@@ -52,11 +52,11 @@ public class GlobalVolumeView extends View {
     /** The maximum store size. */
     private static final int MaxSpan = 20;
 
-    /** The interval time(second) for each span. */
-    private static final int SpanInterval = 10;
+    /** The interval time(ms) for each span. */
+    private static final int SpanInterval = 10000;
 
-    /** The interval time(second) for each update. */
-    private static final int UpdateInterval = 1;
+    /** The interval time(ms) for each update. */
+    private static final int UpdateInterval = 1000;
 
     private static final Map<String, Color> Colors = Map
             .of(BitFlyer.BTC_JPY.exchangeName, Pastel10[0], BitMex.XBT_USD.exchangeName, Pastel10[1], Binance.BTC_USDT.exchangeName, Pastel10[2], Binance.FUTURE_BTC_USDT.exchangeName, Pastel10[2], Bitfinex.BTC_USD.exchangeName, Pastel10[3], FTX.BTC_PERP.exchangeName, Pastel10[4]);
@@ -78,8 +78,8 @@ public class GlobalVolumeView extends View {
         for (Currency currency : currencies) {
             charts.add(new CurrencyView(currency));
         }
-        I.schedule(0, SpanInterval, TimeUnit.SECONDS, true).flatIterable(x -> charts).to(c -> c.chart.volumes.add(new GlobalVolume()));
-        I.schedule(0, UpdateInterval, TimeUnit.SECONDS, true).on(Viewtify.UIThread).flatIterable(x -> charts).to(c -> c.update());
+        I.schedule(0, SpanInterval, TimeUnit.MILLISECONDS, true).flatIterable(x -> charts).to(c -> c.chart.volumes.add(new GlobalVolume()));
+        I.schedule(0, UpdateInterval, TimeUnit.MILLISECONDS, true).on(Viewtify.UIThread).flatIterable(x -> charts).to(c -> c.update());
     }
 
     static class CurrencyView extends View {
@@ -114,10 +114,11 @@ public class GlobalVolumeView extends View {
 
             Style info = () -> {
                 display.width(45, px);
+                font.weight.bold();
             };
 
             Style chart = () -> {
-                display.width(300, px).height(110, px);
+                display.width(300, px).height(85, px);
             };
         }
 
@@ -165,7 +166,7 @@ public class GlobalVolumeView extends View {
         private final RingBuffer<GlobalVolume> volumes = new RingBuffer(MaxSpan);
 
         /** The chart pane. */
-        private final EnhancedCanvas canvas = new EnhancedCanvas().bindSizeTo(this).strokeColor(80, 80, 80).fontSize(8);
+        private final EnhancedCanvas canvas = new EnhancedCanvas().bindSizeTo(this).strokeColor(160, 160, 160).fontSize(8).lineWidth(0.4);
 
         /**
          * @param target
@@ -204,23 +205,21 @@ public class GlobalVolumeView extends View {
                 }
             });
             final double maxVolume = Math.max(maxs[0], maxs[1]);
-            final double padding = 15;
-            final double maxHeight = 35;
+            final double padding = 12;
+            final double maxHeight = 28;
             final double ratio = Math.min(1, maxHeight / maxVolume);
             final double width = 12;
 
             GraphicsContext context = canvas.getGraphicsContext2D();
-            context.setStroke(Color.GRAY);
-            context.setLineWidth(0.5);
             context.strokeLine(0, maxHeight + padding, canvas.getWidth(), maxHeight + padding);
 
-            double[] x = {width * (MaxSpan - 1)};
+            double[] x = {width * MaxSpan};
             boolean[] canDisplayVolume = {true, true};
 
             volumes.forEachFromLatest(volume -> {
                 if (volume != null) {
-                    double buyerY = maxHeight + padding;
-                    double sellerY = maxHeight + padding;
+                    double buyerY = maxHeight + padding - 1;
+                    double sellerY = maxHeight + padding + 1;
                     x[0] -= width;
 
                     for (Entry<MarketService, double[]> entry : volume.volumes()) {
@@ -240,21 +239,27 @@ public class GlobalVolumeView extends View {
                         sellerY = sellerY + sellerFixedVolume;
                     }
 
-                    if (canDisplayVolume[0] && maxs[0] * 0.6 <= volume.longVolume()) {
-                        context.strokeText(Primitives.roundString(volume.longVolume(), 1), x[0], buyerY - 3);
+                    if (canDisplayVolume[0] && 0 < maxs[0] && maxs[0] * 0.6 <= volume.longVolume()) {
+                        String text = Primitives.roundString(volume.longVolume(), 1);
+                        context.strokeText(text, x[0] + coordinate(text), buyerY - 3);
                         canDisplayVolume[0] = false;
                     } else {
                         canDisplayVolume[0] = true;
                     }
 
-                    if (canDisplayVolume[1] && maxs[1] * 0.6 <= volume.shortVolume()) {
-                        context.strokeText(Primitives.roundString(volume.shortVolume(), 1), x[0], sellerY + 3 + 6);
+                    if (canDisplayVolume[1] && 0 < maxs[1] && maxs[1] * 0.6 <= volume.shortVolume()) {
+                        String text = Primitives.roundString(volume.shortVolume(), 1);
+                        context.strokeText(text, x[0] + coordinate(text), sellerY + 3 + 6);
                         canDisplayVolume[1] = false;
                     } else {
                         canDisplayVolume[1] = true;
                     }
                 }
             });
+        }
+
+        private double coordinate(String text) {
+            return 7 - text.length() * 2.1;
         }
     }
 }
