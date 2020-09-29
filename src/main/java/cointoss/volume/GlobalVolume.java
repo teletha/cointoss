@@ -9,6 +9,8 @@
  */
 package cointoss.volume;
 
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cointoss.Directional;
@@ -45,7 +47,7 @@ public class GlobalVolume {
      * @param volume The volume to add.
      */
     public final void add(MarketService service, Directional side, Num volume) {
-        add(service, side, volume);
+        add(service, side, volume.doubleValue());
     }
 
     /**
@@ -60,8 +62,10 @@ public class GlobalVolume {
 
         if (side.isBuy()) {
             volumes[0] += volume;
+            longs += volume;
         } else {
             volumes[1] += volume;
+            shorts += volume;
         }
     }
 
@@ -113,5 +117,23 @@ public class GlobalVolume {
      */
     public final double shortVolume() {
         return shorts;
+    }
+
+    /**
+     * Retrieve the largest side's volume on all {@link MarketService}.
+     * 
+     * @return A total volume on the largest side.
+     */
+    public final double maximumVolume() {
+        return shorts < longs ? longs : shorts;
+    }
+
+    /**
+     * Retrieve all volume data.
+     * 
+     * @return
+     */
+    public final Set<Entry<MarketService, double[]>> volumes() {
+        return services.entrySet();
     }
 }

@@ -82,18 +82,27 @@ class GlobalVolumeTest {
         // different side
         volume.add(service1, Direction.SELL, 3);
         assert volume.longVolume() == 3;
+
+        // different market
+        volume.add(service2, Direction.BUY, 3);
+        assert volume.longVolume() == 6;
     }
 
     @Test
     void shortVolume() {
         GlobalVolume volume = new GlobalVolume();
         volume.add(service1, Direction.SELL, 1);
-        assert volume.shortVolumeAt(service1) == 1;
+        assert volume.shortVolume() == 1;
 
         volume.add(service1, Direction.SELL, 2);
-        assert volume.shortVolumeAt(service1) == 3;
+        assert volume.shortVolume() == 3;
 
+        // different side
         volume.add(service1, Direction.BUY, 3);
-        assert volume.shortVolumeAt(service1) == 3;
+        assert volume.shortVolume() == 3;
+
+        // different market
+        volume.add(service2, Direction.SELL, 3);
+        assert volume.shortVolume() == 6;
     }
 }
