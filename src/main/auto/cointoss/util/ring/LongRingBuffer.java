@@ -65,9 +65,39 @@ public class LongRingBuffer {
      * @param consumer
      */
     public void forEach(LongConsumer consumer) {
+        forEach(size, consumer);
+    }
+
+    /**
+     * Take all items.
+     * 
+     * @param consumer
+     */
+    public void forEach(int size, LongConsumer consumer) {
         int start = index + 1;
         for (int i = 0; i < size; i++) {
-            consumer.accept(buffer[(start + i) % size]);
+            consumer.accept(buffer[(start + i) % this.size]);
+        }
+    }
+
+    /**
+     * Take all items from latest.
+     * 
+     * @param consumer
+     */
+    public void forEachFromLatest(LongConsumer consumer) {
+        forEachFromLatest(size, consumer);
+    }
+
+    /**
+     * Take all items from latest.
+     * 
+     * @param consumer
+     */
+    public void forEachFromLatest(int size, LongConsumer consumer) {
+        int start = index + this.size;
+        for (int i = 0; i < size; i++) {
+            consumer.accept(buffer[(start - i) % this.size]);
         }
     }
 

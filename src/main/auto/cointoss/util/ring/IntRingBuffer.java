@@ -9,10 +9,10 @@
  */
 package cointoss.util.ring;
 
+import javax.annotation.processing.Generated;
+
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
-
-import javax.annotation.processing.Generated;
 
 @Generated("SpecializedCodeGenerator")
 public class IntRingBuffer {
@@ -65,9 +65,39 @@ public class IntRingBuffer {
      * @param consumer
      */
     public void forEach(IntConsumer consumer) {
+        forEach(size, consumer);
+    }
+
+    /**
+     * Take all items.
+     * 
+     * @param consumer
+     */
+    public void forEach(int size, IntConsumer consumer) {
         int start = index + 1;
         for (int i = 0; i < size; i++) {
-            consumer.accept(buffer[(start + i) % size]);
+            consumer.accept(buffer[(start + i) % this.size]);
+        }
+    }
+
+    /**
+     * Take all items from latest.
+     * 
+     * @param consumer
+     */
+    public void forEachFromLatest(IntConsumer consumer) {
+        forEachFromLatest(size, consumer);
+    }
+
+    /**
+     * Take all items from latest.
+     * 
+     * @param consumer
+     */
+    public void forEachFromLatest(int size, IntConsumer consumer) {
+        int start = index + this.size;
+        for (int i = 0; i < size; i++) {
+            consumer.accept(buffer[(start - i) % this.size]);
         }
     }
 

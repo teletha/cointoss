@@ -24,7 +24,6 @@ import kiss.Managed;
 import kiss.Signal;
 import kiss.Singleton;
 import psychopath.Locator;
-import trademate.locust.LocustView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
@@ -59,7 +58,7 @@ public class TradeMate extends View {
     protected void initialize() {
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
-        DockSystem.register("FlyingLocust").contents(LocustView.class).closable(false);
+        DockSystem.register("Global Volume").contents(GlobalVolumeView.class).closable(false);
 
         // ========================================================
         // Create Tab for each Markets

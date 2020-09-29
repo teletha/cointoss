@@ -65,9 +65,39 @@ public class RingBuffer<E> {
      * @param consumer
      */
     public void forEach(Consumer<E> consumer) {
+        forEach(size, consumer);
+    }
+
+    /**
+     * Take all items.
+     * 
+     * @param consumer
+     */
+    public void forEach(int size, Consumer<E> consumer) {
         int start = index + 1;
         for (int i = 0; i < size; i++) {
-            consumer.accept(buffer[(start + i) % size]);
+            consumer.accept(buffer[(start + i) % this.size]);
+        }
+    }
+
+    /**
+     * Take all items from latest.
+     * 
+     * @param consumer
+     */
+    public void forEachFromLatest(Consumer<E> consumer) {
+        forEachFromLatest(size, consumer);
+    }
+
+    /**
+     * Take all items from latest.
+     * 
+     * @param consumer
+     */
+    public void forEachFromLatest(int size, Consumer<E> consumer) {
+        int start = index + this.size;
+        for (int i = 0; i < size; i++) {
+            consumer.accept(buffer[(start - i) % this.size]);
         }
     }
 

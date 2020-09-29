@@ -67,9 +67,39 @@ public class WrapperRingBuffer<Wrapper1> {
      * @param consumer
      */
     public void forEach(WrapperConsumer<Wrapper1> consumer) {
+        forEach(size, consumer);
+    }
+
+    /**
+     * Take all items.
+     * 
+     * @param consumer
+     */
+    public void forEach(int size, WrapperConsumer<Wrapper1> consumer) {
         int start = index + 1;
         for (int i = 0; i < size; i++) {
-            consumer.accept(buffer[(start + i) % size]);
+            consumer.accept(buffer[(start + i) % this.size]);
+        }
+    }
+
+    /**
+     * Take all items from latest.
+     * 
+     * @param consumer
+     */
+    public void forEachFromLatest(WrapperConsumer<Wrapper1> consumer) {
+        forEachFromLatest(size, consumer);
+    }
+
+    /**
+     * Take all items from latest.
+     * 
+     * @param consumer
+     */
+    public void forEachFromLatest(int size, WrapperConsumer<Wrapper1> consumer) {
+        int start = index + this.size;
+        for (int i = 0; i < size; i++) {
+            consumer.accept(buffer[(start - i) % this.size]);
         }
     }
 

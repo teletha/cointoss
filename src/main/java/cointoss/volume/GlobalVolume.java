@@ -120,15 +120,6 @@ public class GlobalVolume {
     }
 
     /**
-     * Retrieve the largest side's volume on all {@link MarketService}.
-     * 
-     * @return A total volume on the largest side.
-     */
-    public final double maximumVolume() {
-        return shorts < longs ? longs : shorts;
-    }
-
-    /**
      * Retrieve all volume data.
      * 
      * @return
