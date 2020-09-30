@@ -15,7 +15,6 @@ import java.util.stream.IntStream;
 import com.google.common.base.Strings;
 
 import cointoss.execution.Execution;
-import cointoss.ticker.RealtimeTicker;
 import cointoss.util.Chrono;
 import cointoss.util.Primitives;
 import stylist.Style;
@@ -33,16 +32,6 @@ public class ExecutionView extends View {
 
     private UILabel delay;
 
-    private UILabel volumeLong;
-
-    private UILabel volumeShort;
-
-    private UILabel volumeRatio;
-
-    private UILabel losscutVolumeLong;
-
-    private UILabel losscutVolumeShort;
-
     private UILabel spread;
 
     /** The execution list. */
@@ -59,8 +48,6 @@ public class ExecutionView extends View {
         {
             $(vbox, style.root, FormLabelMin, () -> {
                 form(en("Delay"), delay);
-                form(en("Volume"), FormInputMin, volumeLong.style(Long), volumeShort.style(Short), volumeRatio);
-                form(en("Losscut"), FormInputMin, losscutVolumeLong.style(Long), losscutVolumeShort.style(Short));
                 form(en("Spread"), FormInputMin, spread);
 
                 $(hbox, () -> {
@@ -119,19 +106,6 @@ public class ExecutionView extends View {
                 .switchOn(view.tab.isSelecting())
                 .on(Viewtify.UIThread)
                 .to(price -> spread.text(price));
-
-        RealtimeTicker realtime = view.market.tickers.realtime(60);
-        Chrono.seconds().switchOff(view.isLoading()).switchOn(view.tab.isSelecting()).on(Viewtify.UIThread).to(() -> {
-            double longVolume = realtime.longVolume();
-            double shortVolume = realtime.shortVolume();
-
-            volumeLong.text(Primitives.roundString(longVolume, 1));
-            volumeShort.text(Primitives.roundString(shortVolume, 1));
-            volumeRatio.text(Primitives.percent(longVolume, longVolume + shortVolume));
-
-            losscutVolumeLong.text(Primitives.roundString(realtime.longLosscutVolume(), 1));
-            losscutVolumeShort.text(Primitives.roundString(realtime.shortLosscutVolume(), 1));
-        });
 
         int scale = view.market.service.setting.target.scale;
 

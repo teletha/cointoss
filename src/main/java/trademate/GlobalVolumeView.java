@@ -40,6 +40,7 @@ import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
 import viewtify.ui.UILabel;
+import viewtify.ui.UIScrollPane;
 import viewtify.ui.UserInterfaceProvider;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -64,9 +65,13 @@ public class GlobalVolumeView extends View {
 
     private final ObservableList<CurrencyView> charts = FXCollections.observableArrayList();
 
+    private UIScrollPane scroll;
+
     class view extends ViewDSL {
         {
-            $(vbox, charts);
+            $(scroll, () -> {
+                $(vbox, charts);
+            });
         }
     }
 
