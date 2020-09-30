@@ -30,6 +30,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -171,37 +172,37 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart UI */
     private final EnhancedCanvas orderbook = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
             .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
-            .fontSize(8)
+            .font(8)
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
     private final EnhancedCanvas orderbookDigit = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
             .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
-            .fontSize(8)
+            .font(8)
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
     private final EnhancedCanvas priceRangedVolume = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolume.canLayout)
             .bindSizeTo(this)
             .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
-            .fontSize(8)
+            .font(8)
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
     private final EnhancedCanvas priceRangedVolumeLatest = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolumeLatest.canLayout)
             .bindSizeTo(this)
             .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
-            .fontSize(8)
+            .font(8)
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas marketName = new EnhancedCanvas().size(230, 70).fontSize(18).fillColor(60, 60, 60);
+    private final EnhancedCanvas marketName = new EnhancedCanvas().size(200, 70).font(18, FontWeight.BOLD).fillColor(60, 60, 60);
 
     /** Chart UI */
     private final EnhancedCanvas chartInfo = new EnhancedCanvas().bindSizeTo(this);
 
     /** Chart UI */
-    private final EnhancedCanvas realtimeInfo = new EnhancedCanvas().bindSizeTo(this);
+    private final EnhancedCanvas realtimeInfo = new EnhancedCanvas().bindSizeTo(this).font(11, FontWeight.BOLD).fillColor(60, 60, 60);
 
     /** Chart UI */
     private final EnhancedCanvas supporter = new EnhancedCanvas().bindSizeTo(this);
@@ -261,8 +262,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
 
-        chart.market.observe()
-                .to(m -> marketName.clear().fillText(m.service.marketReadableName, chartInfoLeftPadding, chartInfoTopPadding + 20));
+        chart.market.observe().to(m -> {
+            marketName.clear().fillText(m.service.marketReadableName, chartInfoLeftPadding, chartInfoTopPadding + 20);
+        });
+
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
@@ -299,9 +302,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeMouseTrack();
         visualizeSFDPrice();
         visualizePriceSupporter();
+        visualizeRealtimeInfo();
 
         getChildren()
-                .addAll(marketName, realtimeInfo, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, backGridVertical, backGridHorizontal, realtimeInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     private Observable[] userInterfaceModification() {
@@ -643,6 +647,52 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         });
     }
 
+    private static final Variable<String> DelayLabel = I.translate("Delay");
+
+    private static final Variable<String> SpreadLabel = I.translate("Spread");
+
+    private static final Color WarningColor = Color.rgb(123, 55, 12);
+
+    private static final Color NameColor = Color.rgb(60, 60, 60);
+
+    /**
+     * Visualize realtime chart-related info.
+     */
+    private void visualizeRealtimeInfo() {
+        chart.market.observing()
+                .skipNull()
+                .switchOn(chart.showRealtimeUpdate.observing())
+                .switchMap(m -> m.tickers.latest.observing())
+                .throttle(1000, TimeUnit.MILLISECONDS)
+                .on(Viewtify.UIThread)
+                .to(e -> {
+                    GraphicsContext c = realtimeInfo.getGraphicsContext2D();
+                    Num spread = chart.market.v.orderBook.spread();
+                    long diff = Chrono.currentTimeMills() - e.mills;
+                    if (diff < 0) {
+                        // delay.tooltip("The time on your computer may not be accurate.\r\nPlease
+                        // synchronize the time with public NTP server.");
+                        // delay.ui.setGraphic(Icon.Error.image());
+                        c.setFill(WarningColor);
+                    } else if (1000 < diff) {
+                        // delay.tooltip("You are experiencing significant delays and may be
+                        // referring to outdated data.\r\nWe recommend that you stop trading.");
+                        // delay.ui.setGraphic(Icon.Error.image());
+                        c.setFill(WarningColor);
+                    } else {
+                        // delay.untooltip();
+                        // delay.ui.setGraphic(null);
+                        c.setFill(NameColor);
+                    }
+
+                    double width = realtimeInfo.getWidth();
+                    double height = realtimeInfo.getHeight();
+                    c.clearRect(0, 0, width, height);
+                    c.fillText(DelayLabel.v + " \t" + diff + "ms", chartInfoLeftPadding, chartInfoTopPadding + 35);
+                    c.fillText(SpreadLabel.v + " \t" + spread, chartInfoLeftPadding, chartInfoTopPadding + 50);
+                });
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -662,7 +712,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         drawCandle();
         drawOrderbook();
         drawPriceVolume();
-        drawRealtimeInfo();
     }
 
     /**
@@ -832,13 +881,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             });
         });
-    }
-
-    /**
-     * Draw realtime chart-related info.
-     */
-    private void drawRealtimeInfo() {
-
     }
 
     /**

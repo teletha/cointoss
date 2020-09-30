@@ -10,7 +10,6 @@
 package trademate;
 
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
 
 import com.google.common.base.Strings;
 
@@ -22,8 +21,6 @@ import stylist.StyleDSL;
 import viewtify.Viewtify;
 import viewtify.style.FormStyles;
 import viewtify.ui.UILabel;
-import viewtify.ui.UIListView;
-import viewtify.ui.UISpinner;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.util.Icon;
@@ -32,13 +29,11 @@ public class ExecutionView extends View {
 
     private UILabel delay;
 
-    private UILabel spread;
-
-    /** The execution list. */
-    private UIListView<Execution> executionCumulativeList;
-
-    /** UI for interval configuration. */
-    private UISpinner<Integer> takerSize;
+    // /** The execution list. */
+    // private UIListView<Execution> executionCumulativeList;
+    //
+    // /** UI for interval configuration. */
+    // private UISpinner<Integer> takerSize;
 
     /** Parent View */
     private TradingView view;
@@ -48,12 +43,11 @@ public class ExecutionView extends View {
         {
             $(vbox, style.root, FormLabelMin, () -> {
                 form(en("Delay"), delay);
-                form(en("Spread"), FormInputMin, spread);
 
-                $(hbox, () -> {
-                    $(takerSize, style.takerSize);
-                });
-                $(executionCumulativeList, style.fill);
+                // $(hbox, () -> {
+                // $(takerSize, style.takerSize);
+                // });
+                // $(executionCumulativeList, style.fill);
             });
         }
     }
@@ -101,28 +95,24 @@ public class ExecutionView extends View {
                     delay.text(diff + "ms");
                 });
 
-        view.market.orderBook.spread.observe()
-                .switchOff(view.isLoading())
-                .switchOn(view.tab.isSelecting())
-                .on(Viewtify.UIThread)
-                .to(price -> spread.text(price));
+        // int scale = view.market.service.setting.target.scale;
 
-        int scale = view.market.service.setting.target.scale;
-
-        // configure UI
-        takerSize.initialize(IntStream.range(1, 51).boxed());
-        executionCumulativeList.render((label, e) -> update(label, e, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
-
-        // load big taker log
-        view.service.add(view.market.timelineByTaker.switchOff(view.isLoading()).on(Viewtify.UIThread).to(e -> {
-            if (1 <= e.accumulative) {
-                executionCumulativeList.addItemAtFirst(e);
-
-                if (1000 < executionCumulativeList.size()) {
-                    executionCumulativeList.removeItemAtLast();
-                }
-            }
-        }));
+        // // configure UI
+        // takerSize.initialize(IntStream.range(1, 51).boxed());
+        // executionCumulativeList.render((label, e) -> update(label, e, scale)).take(takerSize, (e,
+        // size) -> size <= e.accumulative);
+        //
+        // // load big taker log
+        // view.service.add(view.market.timelineByTaker.switchOff(view.isLoading()).on(Viewtify.UIThread).to(e
+        // -> {
+        // if (1 <= e.accumulative) {
+        // executionCumulativeList.addItemAtFirst(e);
+        //
+        // if (1000 < executionCumulativeList.size()) {
+        // executionCumulativeList.removeItemAtLast();
+        // }
+        // }
+        // }));
     }
 
     private void update(UILabel label, Execution e, int scale) {

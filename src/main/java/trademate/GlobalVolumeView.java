@@ -172,7 +172,7 @@ public class GlobalVolumeView extends View {
         private final RingBuffer<GlobalVolume> volumes = new RingBuffer(MaxSpan);
 
         /** The chart pane. */
-        private final EnhancedCanvas canvas = new EnhancedCanvas().bindSizeTo(this).strokeColor(160, 160, 160).fontSize(8).lineWidth(0.4);
+        private final EnhancedCanvas canvas = new EnhancedCanvas().bindSizeTo(this).strokeColor(160, 160, 160).font(8).lineWidth(0.4);
 
         /**
          * @param target

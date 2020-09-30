@@ -47,8 +47,6 @@ public class TradingView extends View {
 
     public ChartView chart;
 
-    public ExecutionView executions;
-
     public OrderBuilder builder;
 
     private UICheckBox showExecution;
@@ -80,7 +78,6 @@ public class TradingView extends View {
                     $(chart);
                 });
 
-                $(executions);
                 $(builder);
             });
         }
@@ -142,7 +139,6 @@ public class TradingView extends View {
             c.menu(showOrderBuilder, false);
         });
 
-        showExecution.text(en("Trade History")).initialize(true).observing(executions::visible);
         showOrderBuilder.text(en("Order")).initialize(true).observing(builder::visible);
     }
 
