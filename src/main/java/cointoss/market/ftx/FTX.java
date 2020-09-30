@@ -53,6 +53,10 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.0005))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService COMP_PERP = new FTXService("COMP-PERP", MarketSetting.with.target(Currency.COMP.minimumSize(0.0001))
+            .base(Currency.USD.minimumSize(0.05))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService FTT_USDT = new FTXService("FTT/USDT", MarketSetting.with.target(Currency.FTT.minimumSize(1))
             .base(Currency.USDT.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));

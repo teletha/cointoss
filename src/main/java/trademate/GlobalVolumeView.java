@@ -75,7 +75,7 @@ public class GlobalVolumeView extends View {
      */
     @Override
     protected void initialize() {
-        List<Currency> currencies = List.of(Currency.BTC, Currency.ETH, Currency.XRP, Currency.EOS);
+        List<Currency> currencies = List.of(Currency.BTC, Currency.ETH, Currency.XRP, Currency.EOS, Currency.COMP, Currency.SRM);
         for (Currency currency : currencies) {
             charts.add(new CurrencyView(currency));
         }

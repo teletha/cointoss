@@ -395,6 +395,8 @@ public enum Currency {
 
     SRD("SRD", "Surinamese Dollar"),
 
+    SRM("SRM", "Serum"),
+
     START("START", "startcoin"),
 
     STEEM("STEEM", "Steem"),
