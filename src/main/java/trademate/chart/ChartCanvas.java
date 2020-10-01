@@ -79,6 +79,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Infomation Color */
     private static final Color InfoColor = Color.rgb(247, 239, 227);
 
+    /** Infomation Color */
+    private static final Color WarningColor = Color.rgb(193, 95, 82);
+
+    /** Infomation Color */
+    private static final Color BaseColor = Color.rgb(80, 80, 80);
+
     /** Chart Color */
     private static final Color BuyerColor = FXUtils.color(TradeMateStyle.BUY.opacify(-0.2));
 
@@ -104,13 +110,17 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private static final int chartInfoHeight = 16;
 
     /** The size of chart infomation area. */
-    private static final int chartInfoTopPadding = 26;
-
-    /** The size of chart infomation area. */
     private static final int chartInfoLeftPadding = 4;
 
     /** The size of chart infomation area. */
+    private static final int chartInfoTopPadding = 19;
+
+    /** The size of chart infomation area. */
     private static final int chartInfoHorizontalGap = 3;
+
+    private static final Variable<String> DelayLabel = I.translate("Delay");
+
+    private static final Variable<String> SpreadLabel = I.translate("Spread");
 
     /** The chart node. */
     private final ChartView chart;
@@ -196,13 +206,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas marketName = new EnhancedCanvas().size(200, 70).font(18, FontWeight.BOLD).fillColor(60, 60, 60);
-
-    /** Chart UI */
     private final EnhancedCanvas chartInfo = new EnhancedCanvas().bindSizeTo(this);
 
     /** Chart UI */
-    private final EnhancedCanvas realtimeInfo = new EnhancedCanvas().bindSizeTo(this).font(11, FontWeight.BOLD).fillColor(60, 60, 60);
+    private final EnhancedCanvas marketName = new EnhancedCanvas().size(180, 30).font(18, FontWeight.BOLD).fillColor(BaseColor);
+
+    /** Chart UI */
+    private final EnhancedCanvas marketInfo = new EnhancedCanvas().bindSizeTo(this).font(11, FontWeight.BOLD).fillColor(BaseColor);
 
     /** Chart UI */
     private final EnhancedCanvas supporter = new EnhancedCanvas().bindSizeTo(this);
@@ -263,7 +273,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
 
         chart.market.observe().to(m -> {
-            marketName.clear().fillText(m.service.marketReadableName, chartInfoLeftPadding, chartInfoTopPadding + 20);
+            marketName.clear().fillText(m.service.marketReadableName, chartInfoLeftPadding, marketName.fontSize());
         });
 
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
@@ -302,10 +312,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeMouseTrack();
         visualizeSFDPrice();
         visualizePriceSupporter();
-        visualizeRealtimeInfo();
+        visualizeMarketInfo();
 
         getChildren()
-                .addAll(marketName, backGridVertical, backGridHorizontal, realtimeInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, backGridVertical, backGridHorizontal, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     private Observable[] userInterfaceModification() {
@@ -647,49 +657,35 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         });
     }
 
-    private static final Variable<String> DelayLabel = I.translate("Delay");
-
-    private static final Variable<String> SpreadLabel = I.translate("Spread");
-
-    private static final Color WarningColor = Color.rgb(123, 55, 12);
-
-    private static final Color NameColor = Color.rgb(60, 60, 60);
-
     /**
-     * Visualize realtime chart-related info.
+     * Visualize realtime market-related info.
      */
-    private void visualizeRealtimeInfo() {
+    private void visualizeMarketInfo() {
         chart.market.observing()
                 .skipNull()
                 .switchOn(chart.showRealtimeUpdate.observing())
-                .switchMap(m -> m.tickers.latest.observing())
+                .switchMap(m -> m.tickers.latest.observe())
                 .throttle(1000, TimeUnit.MILLISECONDS)
                 .on(Viewtify.UIThread)
                 .to(e -> {
-                    GraphicsContext c = realtimeInfo.getGraphicsContext2D();
-                    Num spread = chart.market.v.orderBook.spread();
-                    long diff = Chrono.currentTimeMills() - e.mills;
-                    if (diff < 0) {
-                        // delay.tooltip("The time on your computer may not be accurate.\r\nPlease
-                        // synchronize the time with public NTP server.");
-                        // delay.ui.setGraphic(Icon.Error.image());
-                        c.setFill(WarningColor);
-                    } else if (1000 < diff) {
-                        // delay.tooltip("You are experiencing significant delays and may be
-                        // referring to outdated data.\r\nWe recommend that you stop trading.");
-                        // delay.ui.setGraphic(Icon.Error.image());
-                        c.setFill(WarningColor);
-                    } else {
-                        // delay.untooltip();
-                        // delay.ui.setGraphic(null);
-                        c.setFill(NameColor);
-                    }
+                    GraphicsContext c = marketInfo.getGraphicsContext2D();
 
-                    double width = realtimeInfo.getWidth();
-                    double height = realtimeInfo.getHeight();
+                    double width = marketInfo.getWidth();
+                    double height = marketInfo.getHeight();
                     c.clearRect(0, 0, width, height);
-                    c.fillText(DelayLabel.v + " \t" + diff + "ms", chartInfoLeftPadding, chartInfoTopPadding + 35);
-                    c.fillText(SpreadLabel.v + " \t" + spread, chartInfoLeftPadding, chartInfoTopPadding + 50);
+
+                    c.setFill(BaseColor);
+                    c.fillText(DelayLabel.v, chartInfoLeftPadding, 35);
+                    c.fillText(SpreadLabel.v, chartInfoLeftPadding, 50);
+
+                    long diff = Chrono.currentTimeMills() - e.mills;
+                    c.setFill(diff < 0 || 1000 < diff ? WarningColor : BaseColor);
+                    c.fillText(diff + "ms", 50, 35);
+
+                    Num spread = chart.market.v.orderBook.spread();
+                    Num range = chart.market.v.service.setting.base.minimumSize.multiply(100);
+                    c.setFill(spread.isLessThan(range) ? BaseColor : WarningColor);
+                    c.fillText(spread.toString(), 50, 50);
                 });
     }
 

@@ -109,7 +109,7 @@ public class ChartView extends View {
 
         Style configBox = () -> {
             display.maxWidth(130, px).maxHeight(26, px);
-            position.top(0, px).left(0, px);
+            position.top(0, px).right(54, px);
         };
 
         Style span = () -> {
