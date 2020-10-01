@@ -329,7 +329,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private Variable<PlotScript> findScriptByInfoText(MouseEvent e) {
         double x = e.getX();
-        double y = e.getY();
+        double y = e.getY() - chartInfoTopPadding;
 
         if (scripts != null && x < chartInfoLeftPadding + chartInfoTitle && y < (scripts.size() + 1) * chartInfoHeight) {
             int index = (int) (y / chartInfoHeight) - 1;
@@ -349,7 +349,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private Variable<LineChart> findLineChartByInfoText(MouseEvent e) {
         double x = e.getX();
-        double y = e.getY();
+        double y = e.getY() - chartInfoTopPadding;
 
         if (scripts != null && chartInfoLeftPadding + chartInfoTitle < x && y < (scripts.size() + 1) * chartInfoHeight) {
             int indexY = (int) (y / chartInfoHeight) - 1;
