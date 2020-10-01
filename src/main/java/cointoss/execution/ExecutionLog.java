@@ -301,7 +301,7 @@ public class ExecutionLog {
                 // the server is operating normally, so the real-time API is also connected.
                 if (activeRealtime == false) {
                     activeRealtime = true;
-                    disposer.add(service.executionsRealtimely().to(buffer, observer::error));
+                    disposer.add(service.executionsRealtimely(false).to(buffer, observer::error));
                 }
 
                 int retrieved = rests.size();

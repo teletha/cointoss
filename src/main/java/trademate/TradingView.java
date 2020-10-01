@@ -161,7 +161,6 @@ public class TradingView extends View {
                     .switchOff(isLoading())
                     .startWith(service.executionLatest())
                     .diff()
-                    .retryWhen(service.retryPolicy(100, "Title"))
                     .on(Viewtify.UIThread)
                     .to(e -> tab.text(service.marketReadableName + "\n" + e.price), error);
         }

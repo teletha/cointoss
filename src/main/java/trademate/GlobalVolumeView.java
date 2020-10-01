@@ -225,7 +225,7 @@ public class GlobalVolumeView extends View {
 
             volumes.add(new GlobalVolume());
             MarketServiceProvider.availableMarketServices().take(service -> service.setting.target.currency == target).to(service -> {
-                service.executionsRealtimely().retryWhen(service.retryPolicy(100, "GlobalVolume")).to(e -> {
+                service.executionsRealtimely().to(e -> {
                     volumes.latest().add(service, e);
                 });
             });

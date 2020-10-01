@@ -167,10 +167,25 @@ public abstract class MarketService implements Disposable {
      * @return A shared realtime execution logs.
      */
     public final synchronized Signal<Execution> executionsRealtimely() {
+        return executionsRealtimely(true);
+    }
+
+    /**
+     * Acquire execution log in realtime. This is infinitely.
+     * 
+     * @param autoReconnect Need to reconnect automatically.
+     * @return A shared realtime execution logs.
+     */
+    public final synchronized Signal<Execution> executionsRealtimely(boolean autoReconnect) {
         if (executions == null) {
             executions = connectExecutionRealtimely().effectOnObserve(disposer::add).share();
         }
-        return executions;
+
+        if (autoReconnect) {
+            return executions.retryWhen(retryPolicy(500, "ExecutionRealtimely"));
+        } else {
+            return executions;
+        }
     }
 
     /**
