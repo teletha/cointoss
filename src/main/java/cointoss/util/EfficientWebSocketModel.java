@@ -245,7 +245,7 @@ public abstract class EfficientWebSocketModel {
      * Disconnect websocket connection and send error message to all channels.
      */
     private void error(Throwable e) {
-        logger.trace("Disconnected websocket [{}].", address(), cause(e));
+        logger.error("Disconnected websocket [{}].", address(), cause(e));
         disconnect();
         signals.values().forEach(signal -> signal.error(e));
     }
