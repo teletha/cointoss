@@ -11,6 +11,7 @@ package trademate;
 
 import static trademate.FXColorPalettes.Pastel10;
 
+import java.text.Normalizer.Form;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,9 +39,12 @@ import cointoss.volume.GlobalVolume;
 import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
+import trademate.setting.Notificator;
 import viewtify.Viewtify;
+import viewtify.style.FormStyles;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIScrollPane;
+import viewtify.ui.UIText;
 import viewtify.ui.UserInterfaceProvider;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -84,7 +88,11 @@ public class GlobalVolumeView extends View {
         for (Currency currency : currencies) {
             charts.add(new CurrencyView(currency));
         }
-        I.schedule(0, SpanInterval, TimeUnit.MILLISECONDS, true).flatIterable(x -> charts).to(c -> c.chart.volumes.add(new GlobalVolume()));
+        I.schedule(0, SpanInterval, TimeUnit.MILLISECONDS, true).flatIterable(x -> charts).to(c -> {
+            c.chart.volumes.add(new GlobalVolume());
+            c.longCount = 1;
+            c.shortCount = 1;
+        });
         I.schedule(0, UpdateInterval, TimeUnit.MILLISECONDS, true).on(Viewtify.UIThread).flatIterable(x -> charts).to(c -> c.update());
     }
 
@@ -100,16 +108,25 @@ public class GlobalVolumeView extends View {
 
         private UILabel volumeRatio;
 
+        private UIText threshold;
+
         private final CurrencyVolume chart;
+
+        private final Notificator notificator = I.make(Notificator.class);
+
+        private int longCount = 1;
+
+        private int shortCount = 1;
 
         class view extends ViewDSL {
             {
                 $(vbox, () -> {
-                    $(hbox, () -> {
+                    $(hbox, FormStyles.FormRow, () -> {
                         $(name, style.info);
                         $(volumeLong, style.info, TradeMateStyle.Long);
                         $(volumeShort, style.info, TradeMateStyle.Short);
                         $(volumeRatio, style.info);
+                        $(threshold, style.form);
                     });
                     $(() -> chart, style.chart);
                 });
@@ -121,6 +138,10 @@ public class GlobalVolumeView extends View {
             Style info = () -> {
                 display.width(45, px);
                 font.weight.bold();
+            };
+
+            Style form = () -> {
+                display.width(60, px);
             };
 
             Style chart = () -> {
@@ -144,6 +165,7 @@ public class GlobalVolumeView extends View {
         @Override
         protected void initialize() {
             name.text(target.code);
+            threshold.acceptPositiveNumberInput().normalizeInput(Form.NFKD).initialize("0");
         }
 
         private void update() {
@@ -161,8 +183,29 @@ public class GlobalVolumeView extends View {
             volumeShort.text(Primitives.roundString(shortVolume[0], 1));
             volumeRatio.text(Primitives.percent(longVolume[0], longVolume[0] + shortVolume[0]));
 
+            double size = Double.parseDouble(threshold.value());
+            GlobalVolume latest = chart.volumes.latest();
+            if (0 < size) {
+                if (size * longCount <= latest.longVolume()) {
+                    notificator.longTrend.notify(target.code, "");
+                    longCount++;;
+                }
+                if (size * shortCount <= latest.shortVolume()) {
+                    notificator.shortTrend.notify(target.code, "");
+                    shortCount++;
+                }
+            }
+
             // chart
             chart.drawVolume();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String id() {
+            return target.code;
         }
     }
 
@@ -182,7 +225,7 @@ public class GlobalVolumeView extends View {
 
             volumes.add(new GlobalVolume());
             MarketServiceProvider.availableMarketServices().take(service -> service.setting.target.currency == target).to(service -> {
-                service.executionsRealtimely().to(e -> {
+                service.executionsRealtimely().retryWhen(service.retryPolicy(100, "GlobalVolume")).to(e -> {
                     volumes.latest().add(service, e);
                 });
             });
