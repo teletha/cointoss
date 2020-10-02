@@ -9,9 +9,6 @@
  */
 package cointoss.trading;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
@@ -30,29 +27,44 @@ public class CrossOrder extends Trader {
 
     public int diff = 10000;
 
-    public double size = 0.01;
+    public double size = 0.1;
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        when(market.open(span).first(), v -> new Scenario() {
+        when(market.open(span), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.random(), 1);
+                entry(Direction.random(), size);
             }
 
             @Override
             protected void exit() {
+                exitAt(entryPrice.minus(this, 10000));
+                exitAt(entryPrice.plus(this, 5000));
             }
         });
     }
 
     public static void main(String[] args) {
-        Logger log = LogManager.getLogger();
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
-
-        BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2020, 3, 2).end(2020, 3, 14).traders(new CrossOrder()).fast().detail(true).run();
+        if (true) {
+            BackTest.with.service(BitFlyer.FX_BTC_JPY)
+                    .start(2020, 9, 15)
+                    .end(2020, 9, 25)
+                    .traders(new CrossOrder())
+                    .fast()
+                    .detail(false)
+                    .run();
+        } else {
+            BackTest.with.service(BitFlyer.FX_BTC_JPY)
+                    .start(2020, 9, 1)
+                    .end(2020, 9, 10)
+                    .traders(new CrossOrder())
+                    .fast()
+                    .detail(false)
+                    .run();
+        }
     }
 }
