@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.Pastel10;
+import static trademate.FXColorPalettes.*;
 
 import java.text.Normalizer.Form;
 import java.util.List;
@@ -187,11 +187,11 @@ public class GlobalVolumeView extends View {
             GlobalVolume latest = chart.volumes.latest();
             if (0 < size) {
                 if (size * longCount <= latest.longVolume()) {
-                    notificator.longTrend.notify(target.code, "");
-                    longCount++;;
+                    notificator.longTrend.notify(target.code, "Long!!!!!!!!!");
+                    longCount++;
                 }
                 if (size * shortCount <= latest.shortVolume()) {
-                    notificator.shortTrend.notify(target.code, "");
+                    notificator.shortTrend.notify(target.code, "Short!!!!!!");
                     shortCount++;
                 }
             }
