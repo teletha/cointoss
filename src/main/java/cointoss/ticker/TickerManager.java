@@ -60,6 +60,18 @@ public final class TickerManager implements Disposable {
     }
 
     /**
+     * Disable the automatic memory saving.
+     * 
+     * @return Chainable API.
+     */
+    public TickerManager disableMemorySaving() {
+        for (Ticker ticker : tickers) {
+            ticker.ticks.disableMemorySaving();
+        }
+        return this;
+    }
+
+    /**
      * Retrieve the {@link Ticker} by {@link Span}.
      * 
      * @param span The target {@link Span}.

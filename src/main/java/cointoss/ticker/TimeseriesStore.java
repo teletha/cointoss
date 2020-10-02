@@ -123,11 +123,11 @@ public final class TimeseriesStore<E> {
     }
 
     /**
-     * Disable the memory shrinking.
+     * Disable the automatic memory saving.
      * 
-     * @return
+     * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> disableMemoryShrink() {
+    public synchronized TimeseriesStore<E> disableMemorySaving() {
         this.shrink = false;
         return this;
     }

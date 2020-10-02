@@ -9,22 +9,17 @@
  */
 package trademate;
 
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
-import cointoss.MarketService;
-import cointoss.market.binance.Binance;
-import cointoss.market.bitmex.BitMex;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
 import viewtify.Viewtify;
-import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
@@ -50,18 +45,6 @@ public class TradeTester extends View {
     @Override
     protected void initialize() {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
-
-        List<MarketService> services = List.of(BitMex.ETH_USD, BitMex.XBT_USD, Binance.BTC_USDT);
-
-        // ========================================================
-        // Create Tab for each Markets
-        // ========================================================
-        for (MarketService service : services) {
-            UITab tab = DockSystem.register(service.marketIdentity())
-                    .closable(false)
-                    .text(service.marketReadableName)
-                    .contents(ui -> new TradingView(ui, service));
-        }
     }
 
     /**

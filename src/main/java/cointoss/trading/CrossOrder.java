@@ -37,16 +37,14 @@ public class CrossOrder extends Trader {
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        when(market.close(span), v -> new Scenario() {
+        when(market.open(span).first(), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.random(), size);
+                entry(Direction.random(), 1);
             }
 
             @Override
             protected void exit() {
-                exitAt(entryPrice.plus(this, diff * 10));
-                exitAt(entryPrice.minus(this, diff));
             }
         });
     }
