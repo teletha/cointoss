@@ -14,6 +14,8 @@ import java.util.List;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import kiss.Decoder;
+import kiss.Encoder;
 import kiss.Extensible;
 import kiss.I;
 import kiss.Managed;
@@ -80,5 +82,27 @@ public abstract class MarketServiceProvider implements Extensible {
      */
     public static final Variable<MarketService> by(String identity) {
         return availableMarketServices().take(service -> service.marketIdentity().equals(identity)).to();
+    }
+
+    /**
+     * Codec for {@link MarketService}.
+     */
+    static class Codec implements Decoder<MarketService>, Encoder<MarketService> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String encode(MarketService value) {
+            return value.marketIdentity();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public MarketService decode(String value) {
+            return by(value).exact();
+        }
     }
 }
