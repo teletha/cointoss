@@ -71,7 +71,7 @@ public class Notificator implements Storable<Notificator> {
     /**
      * 
      */
-    public class Notify {
+    public static class Notify {
 
         /** Showing desktop notification. */
         final @Managed Variable<Boolean> onDesktop = Variable.of(false);
@@ -113,14 +113,16 @@ public class Notificator implements Storable<Notificator> {
                 String stripedTitle = Objects.toString(title).strip();
                 String stripedMessage = Objects.toString(message).strip();
                 if (stripedMessage.length() != 0) {
+                    Notificator notificator = I.make(Notificator.class);
+
                     // to desktop
                     if (onDesktop.is(true)) {
                         Notifications.create()
                                 .darkStyle()
                                 .title(stripedTitle)
                                 .text(stripedMessage)
-                                .position(desktopPosition.v.position)
-                                .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
+                                .position(notificator.desktopPosition.v.position)
+                                .hideAfter(Duration.seconds(notificator.desktopDuration.v.getSeconds()))
                                 .hideCloseButton()
                                 .owner(Screen.getPrimary())
                                 .onAction(e -> {
@@ -131,7 +133,7 @@ public class Notificator implements Storable<Notificator> {
 
                     // to LINE
                     if (onLine.is(true)) {
-                        Network.line(stripedTitle, stripedMessage, lineAccessToken.v).to(I.NoOP);
+                        Network.line(stripedTitle, stripedMessage, notificator.lineAccessToken.v).to(I.NoOP);
                     }
                 }
             }
@@ -182,5 +184,12 @@ public class Notificator implements Storable<Notificator> {
         public String toString() {
             return text.toString();
         }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Notificator n = I.make(Notificator.class);
+        n.lineAccessToken.set("ok");
+
+        Thread.sleep(10000);
     }
 }
