@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.arithmetic.Num.HUNDRED;
+import static cointoss.util.arithmetic.Num.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -247,9 +247,9 @@ public class TradingStats {
         try {
             String EOL = "\r\n";
 
-            for (Scenario entry : entries) {
-                builder.append(entry.toString()).append(EOL);
-            }
+            // for (Scenario entry : entries) {
+            // builder.append(entry.toString()).append(EOL);
+            // }
 
             builder.append("実行時間 ").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
             builder.append("枚数 現在").append(holdCurrentSize.toString()).append(" 最大").append(holdMaxSize.toString()).append(EOL);

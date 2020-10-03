@@ -42,25 +42,30 @@ public class CrossOrder extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(entryPrice.minus(this, 10000));
+                exitAt(entryPrice.minus(this, 5000));
                 exitAt(entryPrice.plus(this, 5000));
             }
         });
     }
 
     public static void main(String[] args) {
-        if (true) {
+        boolean trend = true;
+        boolean range = true;
+
+        if (trend) {
             BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                    .start(2020, 9, 15)
-                    .end(2020, 9, 25)
+                    .start(2020, 9, 1)
+                    .end(2020, 9, 10)
                     .traders(new CrossOrder())
                     .fast()
                     .detail(false)
                     .run();
-        } else {
+        }
+
+        if (range) {
             BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                    .start(2020, 9, 1)
-                    .end(2020, 9, 10)
+                    .start(2020, 9, 15)
+                    .end(2020, 9, 25)
                     .traders(new CrossOrder())
                     .fast()
                     .detail(false)
