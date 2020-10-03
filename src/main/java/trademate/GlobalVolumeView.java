@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.*;
+import static trademate.FXColorPalettes.Pastel10;
 
 import java.text.Normalizer.Form;
 import java.util.List;
@@ -56,7 +56,10 @@ import viewtify.ui.canvas.EnhancedCanvas;
 public class GlobalVolumeView extends View {
 
     /** The maximum store size. */
-    private static final int MaxSpan = 20;
+    private static final int MaxSpan = 25;
+
+    /** The width of volume chart. */
+    private static final int BarWidth = 10;
 
     /** The interval time(ms) for each span. */
     private static final int SpanInterval = 10000;
@@ -145,7 +148,7 @@ public class GlobalVolumeView extends View {
             };
 
             Style chart = () -> {
-                display.width(300, px).height(85, px);
+                display.width(BarWidth * MaxSpan + 4, px).height(85, px);
             };
         }
 
@@ -257,19 +260,18 @@ public class GlobalVolumeView extends View {
             final double padding = 12;
             final double maxHeight = 28;
             final double ratio = Math.min(1, maxHeight / maxVolume);
-            final double width = 12;
 
             GraphicsContext context = canvas.getGraphicsContext2D();
-            context.strokeLine(0, maxHeight + padding, canvas.getWidth(), maxHeight + padding);
+            context.strokeLine(0, maxHeight + padding, BarWidth * MaxSpan, maxHeight + padding);
 
-            double[] x = {width * MaxSpan};
+            double[] x = {BarWidth * MaxSpan};
             boolean[] canDisplayVolume = {true, true};
 
             volumes.forEachFromLatest(volume -> {
                 if (volume != null) {
                     double buyerY = maxHeight + padding - 1;
                     double sellerY = maxHeight + padding + 1;
-                    x[0] -= width;
+                    x[0] -= BarWidth;
 
                     for (Entry<MarketService, double[]> entry : volume.volumes()) {
                         double[] volumes = entry.getValue();
@@ -277,13 +279,13 @@ public class GlobalVolumeView extends View {
                         // buyer
                         double buyerFixedVolume = volumes[0] * ratio;
                         context.setFill(Colors.getOrDefault(entry.getKey().exchange, TradeMateStyle.BUY_FX));
-                        context.fillRect(x[0], buyerY - buyerFixedVolume, width, buyerFixedVolume);
+                        context.fillRect(x[0], buyerY - buyerFixedVolume, BarWidth, buyerFixedVolume);
                         buyerY = buyerY - buyerFixedVolume;
 
                         // seller
                         double sellerFixedVolume = volumes[1] * ratio;
                         context.setFill(Colors.getOrDefault(entry.getKey().exchange, TradeMateStyle.SELL_FX));
-                        context.fillRect(x[0], sellerY, width, sellerFixedVolume);
+                        context.fillRect(x[0], sellerY, BarWidth, sellerFixedVolume);
                         sellerY = sellerY + sellerFixedVolume;
                     }
 
@@ -307,7 +309,7 @@ public class GlobalVolumeView extends View {
         }
 
         private double coordinate(String text) {
-            return 7 - text.length() * 2.1;
+            return 6 - text.length() * 2.1;
         }
     }
 }
