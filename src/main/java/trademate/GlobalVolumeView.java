@@ -15,6 +15,7 @@ import java.text.Normalizer.Form;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import javafx.collections.FXCollections;
@@ -23,16 +24,12 @@ import javafx.css.Styleable;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.text.FontWeight;
 
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.binance.Binance;
-import cointoss.market.bitfinex.Bitfinex;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitmex.BitMex;
-import cointoss.market.ftx.FTX;
 import cointoss.util.Primitives;
 import cointoss.util.ring.RingBuffer;
 import cointoss.volume.GlobalVolume;
@@ -67,17 +64,59 @@ public class GlobalVolumeView extends View {
     /** The interval time(ms) for each update. */
     private static final int UpdateInterval = 1000;
 
-    private static final Map<Exchange, Color> Colors = Map
-            .of(BitFlyer.BTC_JPY.exchange, Pastel10[0], BitMex.XBT_USD.exchange, Pastel10[1], Binance.BTC_USDT.exchange, Pastel10[2], Binance.FUTURE_BTC_USDT.exchange, Pastel10[2], Bitfinex.BTC_USD.exchange, Pastel10[3], FTX.BTC_PERP.exchange, Pastel10[4]);
+    private static final Map<Exchange, Color> Colors = new TreeMap();
+
+    static {
+        int count = 0;
+        for (Exchange exchange : Exchange.values()) {
+            if (exchange == Exchange.BinanceF) {
+                Colors.put(exchange, Colors.get(Exchange.Binance));
+            } else {
+                Colors.put(exchange, Pastel10[count++]);
+            }
+        }
+    }
 
     private final ObservableList<CurrencyView> charts = FXCollections.observableArrayList();
 
     private UIScrollPane scroll;
 
+    private final EnhancedCanvas markets = new EnhancedCanvas().size(BarWidth * MaxSpan, 18);
+
+    private UILabel binance;
+
+    private UILabel bitbank;
+
+    private UILabel bitfinex;
+
+    private UILabel bitfyler;
+
+    private UILabel bitmex;
+
+    private UILabel bybit;
+
+    private UILabel ftx;
+
+    private UILabel huobi;
+
     class view extends ViewDSL {
         {
             $(scroll, () -> {
-                $(vbox, charts);
+                $(vbox, () -> {
+                    $(hbox, () -> {
+                        $(binance);
+                        $(bitbank);
+                        $(bitfinex);
+                        $(bitfyler);
+                        $(bitmex);
+                        $(bybit);
+                    });
+                    $(hbox, () -> {
+                        $(ftx);
+                        $(huobi);
+                    });
+                    $(vbox, charts);
+                });
             });
         }
     }
@@ -87,6 +126,15 @@ public class GlobalVolumeView extends View {
      */
     @Override
     protected void initialize() {
+        drawSample(binance, Exchange.Binance, Pastel10[0]);
+        drawSample(bitbank, Exchange.BitBank, Pastel10[1]);
+        drawSample(bitfinex, Exchange.Bitfinex, Pastel10[2]);
+        drawSample(bitfyler, Exchange.BitFlyer, Pastel10[3]);
+        drawSample(bitmex, Exchange.BitMEX, Pastel10[4]);
+        drawSample(bybit, Exchange.Bybit, Pastel10[5]);
+        drawSample(ftx, Exchange.FTX, Pastel10[6]);
+        drawSample(huobi, Exchange.Huobi, Pastel10[7]);
+
         List<Currency> currencies = List.of(Currency.BTC, Currency.ETH, Currency.XRP, Currency.EOS, Currency.COMP, Currency.SRM);
         for (Currency currency : currencies) {
             charts.add(new CurrencyView(currency));
@@ -97,6 +145,28 @@ public class GlobalVolumeView extends View {
             c.shortCount = 1;
         });
         I.schedule(0, UpdateInterval, TimeUnit.MILLISECONDS, true).on(Viewtify.UIThread).flatIterable(x -> charts).to(c -> c.update());
+    }
+
+    private void drawSample(UILabel label, Exchange exchange, Color color) {
+        label.text(exchange.name());
+        label.ui.setTextFill();
+    }
+
+    private void drawMarketSmaple() {
+        double x = 0;
+        double y = 1;
+
+        GraphicsContext c = markets.font(10.5, FontWeight.MEDIUM).getGraphicsContext2D();
+        for (Entry<Exchange, Color> entry : Colors.entrySet()) {
+            Exchange exchange = entry.getKey();
+            if (exchange == Exchange.BinanceF) {
+                continue;
+            }
+
+            c.setStroke(entry.getValue());
+            c.strokeText(entry.getKey().name(), x, y + 14, 38);
+            x += 40;
+        }
     }
 
     static class CurrencyView extends View {
@@ -148,7 +218,7 @@ public class GlobalVolumeView extends View {
             };
 
             Style chart = () -> {
-                display.width(BarWidth * MaxSpan + 4, px).height(85, px);
+                display.width(BarWidth * MaxSpan + 6, px).height(85, px);
             };
         }
 

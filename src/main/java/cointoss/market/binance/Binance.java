@@ -27,6 +27,10 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
+    static final MarketService ETH_USDT = new BinanceService("ETHUSDT", false, MarketSetting.with.target(Currency.ETH.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.00001))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService LINK_USDT = new BinanceService("LINKUSDT", false, MarketSetting.with
             .target(Currency.LINK.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
@@ -61,6 +65,6 @@ public final class Binance extends MarketServiceProvider {
     }
 
     public static void main(String[] args) {
-        MarketDevTool.collectLog(Binance.FUTURE_MKR_USDT);
+        MarketDevTool.collectLog(Binance.ETH_USDT);
     }
 }
