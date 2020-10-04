@@ -235,7 +235,6 @@ public abstract class MarketService implements Disposable {
         long middle = (start + end) / 2;
 
         while (true) {
-            System.out.println(start + "  " + middle + "  " + end);
             List<Execution> result = executionLatestAt(middle).skipError().waitForTerminate().toList();
             if (result.isEmpty()) {
                 start = middle;

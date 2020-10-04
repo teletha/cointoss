@@ -13,6 +13,7 @@ import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
+import cointoss.market.MarketDevTool;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
 
@@ -24,6 +25,10 @@ public final class Binance extends MarketServiceProvider {
     public static final MarketService BTC_USDT = new BinanceService("BTCUSDT", false, MarketSetting.with
             .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
+
+    static final MarketService EOS_USDT = new BinanceService("EOSUSDT", false, MarketSetting.with.target(Currency.EOS.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService ETH_USDT = new BinanceService("ETHUSDT", false, MarketSetting.with
@@ -39,6 +44,11 @@ public final class Binance extends MarketServiceProvider {
     public static final MarketService SRM_USDT = new BinanceService("SRMUSDT", false, MarketSetting.with
             .target(Currency.SRM.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService XRP_USDT = new BinanceService("XRPUSDT", false, MarketSetting.with
+            .target(Currency.XRP.minimumSize(0.1))
+            .base(Currency.USDT.minimumSize(0.00001))
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService FUTURE_BTC_USDT = new BinanceService("BTCUSDT", true, MarketSetting.with
@@ -72,5 +82,9 @@ public final class Binance extends MarketServiceProvider {
     @Override
     public MarketAccount account() {
         return I.make(BinanceAccount.class);
+    }
+
+    public static void main(String[] args) {
+        MarketDevTool.collectLog(EOS_USDT);
     }
 }
