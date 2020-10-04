@@ -26,7 +26,8 @@ public final class Bitfinex extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 
-    static final MarketService COMP_USD = new BitfinexService("COMP:USD", MarketSetting.with.target(Currency.COMP.minimumSize(0.0001))
+    public static final MarketService COMP_USD = new BitfinexService("COMP:USD", MarketSetting.with
+            .target(Currency.COMP.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
@@ -44,9 +45,5 @@ public final class Bitfinex extends MarketServiceProvider {
     @Override
     public MarketAccount account() {
         return I.make(BitfinexAccount.class);
-    }
-
-    public static void main(String[] args) {
-        MarketDevTool.collectLog(XRP_USD);
     }
 }

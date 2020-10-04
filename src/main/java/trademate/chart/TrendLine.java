@@ -52,8 +52,9 @@ public class TrendLine {
             regression.addData(values[0], values[1]);
             items.add(values);
         });
-
-        while (3 < regression.getN()) {
+        int last = 0;
+        while (3 < regression.getN() && last != items.size()) {
+            last = items.size();
             Iterator<double[]> iterator = items.iterator();
             while (iterator.hasNext()) {
                 double[] item = iterator.next();
