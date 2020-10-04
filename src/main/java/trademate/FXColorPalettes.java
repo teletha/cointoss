@@ -16,7 +16,7 @@ import javafx.scene.paint.Color;
  */
 public class FXColorPalettes {
 
-    public final static Color[] Pastel10 = {Color.web("#F94144"), Color.web("#F3722C"), Color.web("#F8961E"), Color.web("#F9844A"),
-            Color.web("#F9C74F"), Color.web("#90BE6D"), Color.web("#42AA8B"), Color.web("#4D908E"), Color.web("#577590"),
-            Color.web("#277DA1")};
+    public final static Color[] Pastel10 = {Color.web("#F3722C"), Color.web("#F8961E"), Color.web("FDD8C4"), Color.web("#F9C74F"),
+            Color.web("#90BE6D"), Color.web("#42AA8B"), Color.web("#407776"), Color.web("#577590"), Color.web("#277DA1"),
+            Color.web("#F9393C")};
 }
