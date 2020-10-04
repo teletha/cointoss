@@ -26,14 +26,13 @@ public final class Bitfinex extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService COMP_USD = new BitfinexService("COMP:USD", MarketSetting.with
-    .target(Currency.COMP.minimumSize(0.0001))
-    .base(Currency.USD.minimumSize(0.01))
-    .acquirableExecutionSize(AcquirableSize));
+    static final MarketService COMP_USD = new BitfinexService("COMP:USD", MarketSetting.with.target(Currency.COMP.minimumSize(0.0001))
+            .base(Currency.USD.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService ETH_USD = new BitfinexService("ETHUSD", MarketSetting.with.target(Currency.ETH.minimumSize(0.0001))
-    .base(Currency.USD.minimumSize(0.01).scale(8))
-    .acquirableExecutionSize(AcquirableSize));
+            .base(Currency.USD.minimumSize(0.01).scale(8))
+            .acquirableExecutionSize(AcquirableSize));
 
     static final MarketService XRP_USD = new BitfinexService("XRPUSD", MarketSetting.with.target(Currency.XRP.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.00001))

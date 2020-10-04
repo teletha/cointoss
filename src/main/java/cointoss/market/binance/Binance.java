@@ -13,7 +13,6 @@ import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
-import cointoss.market.MarketDevTool;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
 
@@ -46,7 +45,7 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    static final MarketService FUTURE_EHT_USDT = new BinanceService("ETHUSDT", true, MarketSetting.with
+    public static final MarketService FUTURE_EHT_USDT = new BinanceService("ETHUSDT", true, MarketSetting.with
             .target(Currency.ETH.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
@@ -72,9 +71,5 @@ public final class Binance extends MarketServiceProvider {
     @Override
     public MarketAccount account() {
         return I.make(BinanceAccount.class);
-    }
-
-    public static void main(String[] args) {
-        MarketDevTool.collectLog(Binance.FUTURE_EHT_USDT);
     }
 }
