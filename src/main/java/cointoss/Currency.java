@@ -445,6 +445,8 @@ public enum Currency {
 
     USDE("USDE", "Unitary Status Dollar eCoin"),
 
+    UNI("UNI", "Uniswap"),
+
     UTC("UTC", "Ultracoin"),
 
     UYU("UYU", "Uruguayan Peso"),
