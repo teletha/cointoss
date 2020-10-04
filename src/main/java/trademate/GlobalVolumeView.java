@@ -9,13 +9,13 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.Pastel10;
+import static trademate.FXColorPalettes.*;
 
 import java.text.Normalizer.Form;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import javafx.collections.FXCollections;
@@ -24,7 +24,6 @@ import javafx.css.Styleable;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.text.FontWeight;
 
 import cointoss.Currency;
 import cointoss.MarketService;
@@ -64,24 +63,11 @@ public class GlobalVolumeView extends View {
     /** The interval time(ms) for each update. */
     private static final int UpdateInterval = 1000;
 
-    private static final Map<Exchange, Color> Colors = new TreeMap();
-
-    static {
-        int count = 0;
-        for (Exchange exchange : Exchange.values()) {
-            if (exchange == Exchange.BinanceF) {
-                Colors.put(exchange, Colors.get(Exchange.Binance));
-            } else {
-                Colors.put(exchange, Pastel10[count++]);
-            }
-        }
-    }
+    private static final Map<Exchange, Color> colors = new HashMap();
 
     private final ObservableList<CurrencyView> charts = FXCollections.observableArrayList();
 
     private UIScrollPane scroll;
-
-    private final EnhancedCanvas markets = new EnhancedCanvas().size(BarWidth * MaxSpan, 18);
 
     private UILabel binance;
 
@@ -104,21 +90,29 @@ public class GlobalVolumeView extends View {
             $(scroll, () -> {
                 $(vbox, () -> {
                     $(hbox, () -> {
-                        $(binance);
-                        $(bitbank);
-                        $(bitfinex);
-                        $(bitfyler);
-                        $(bitmex);
-                        $(bybit);
+                        $(binance, style.name);
+                        $(bitbank, style.name);
+                        $(bitfinex, style.name);
+                        $(bitfyler, style.name);
                     });
                     $(hbox, () -> {
-                        $(ftx);
-                        $(huobi);
+                        $(bitmex, style.name);
+                        $(bybit, style.name);
+                        $(ftx, style.name);
+                        $(huobi, style.name);
                     });
                     $(vbox, charts);
                 });
             });
         }
+    }
+
+    interface style extends StyleDSL {
+        Style name = () -> {
+            font.size(10.5, px).weight.bold();
+            display.width(40, px);
+            padding.top(1, px);
+        };
     }
 
     /**
@@ -148,25 +142,9 @@ public class GlobalVolumeView extends View {
     }
 
     private void drawSample(UILabel label, Exchange exchange, Color color) {
-        label.text(exchange.name());
-        label.ui.setTextFill();
-    }
+        colors.put(exchange, color);
 
-    private void drawMarketSmaple() {
-        double x = 0;
-        double y = 1;
-
-        GraphicsContext c = markets.font(10.5, FontWeight.MEDIUM).getGraphicsContext2D();
-        for (Entry<Exchange, Color> entry : Colors.entrySet()) {
-            Exchange exchange = entry.getKey();
-            if (exchange == Exchange.BinanceF) {
-                continue;
-            }
-
-            c.setStroke(entry.getValue());
-            c.strokeText(entry.getKey().name(), x, y + 14, 38);
-            x += 40;
-        }
+        label.text(exchange.name()).color(color);
     }
 
     static class CurrencyView extends View {
@@ -348,13 +326,13 @@ public class GlobalVolumeView extends View {
 
                         // buyer
                         double buyerFixedVolume = volumes[0] * ratio;
-                        context.setFill(Colors.getOrDefault(entry.getKey().exchange, TradeMateStyle.BUY_FX));
+                        context.setFill(colors.getOrDefault(entry.getKey().exchange, TradeMateStyle.BUY_FX));
                         context.fillRect(x[0], buyerY - buyerFixedVolume, BarWidth, buyerFixedVolume);
                         buyerY = buyerY - buyerFixedVolume;
 
                         // seller
                         double sellerFixedVolume = volumes[1] * ratio;
-                        context.setFill(Colors.getOrDefault(entry.getKey().exchange, TradeMateStyle.SELL_FX));
+                        context.setFill(colors.getOrDefault(entry.getKey().exchange, TradeMateStyle.SELL_FX));
                         context.fillRect(x[0], sellerY, BarWidth, sellerFixedVolume);
                         sellerY = sellerY + sellerFixedVolume;
                     }
