@@ -27,7 +27,8 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    static final MarketService EOS_USDT = new BinanceService("EOSUSDT", false, MarketSetting.with.target(Currency.EOS.minimumSize(0.01))
+    public static final MarketService EOS_USDT = new BinanceService("EOSUSDT", false, MarketSetting.with
+            .target(Currency.EOS.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
