@@ -138,7 +138,10 @@ public class BitfinexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "trades/t" + marketName + "/hist?limit=1", LimitForTradeHistory).flatIterable(e -> e.find("*"))
+        long startTime = (id / PaddingForID) + 1;
+
+        return call("GET", "trades/t" + marketName + "/hist?limit=1&start=" + startTime + "&sort=1", LimitForTradeHistory)
+                .flatIterable(e -> e.find("*"))
                 .map(e -> convert(e, new AtomicLong(), new Object[2]));
     }
 
@@ -147,7 +150,11 @@ public class BitfinexService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return 15463008000000000L;
+        return call("GET", "trades/t" + marketName + "/hist?limit=1&sort=1", LimitForTradeHistory)
+                .flatIterable(e -> e.find(Long.class, "0", "1"))
+                .waitForTerminate()
+                .to()
+                .exact() * PaddingForID;
     }
 
     /**
