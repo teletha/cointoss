@@ -19,26 +19,26 @@ import javax.annotation.processing.Generated;
  * {@link ArrayList} like data structure for numeric primitive type.
  */
 @Generated("SpecializedCodeGenerator")
-public class IntArray {
+public class DoubleList {
 
     /** The current size. */
     private volatile int size = 0;
 
     /** The actual data store. */
-    private int[] array;
+    private double[] array;
 
     /**
      * Create empty array.
      */
-    public IntArray() {
+    public DoubleList() {
         this(16);
     }
 
     /**
      * Create empty array with the specified array size.
      */
-    public IntArray(int initialRawArraySize) {
-        array = new int[initialRawArraySize];
+    public DoubleList(int initialRawArraySize) {
+        array = new double[initialRawArraySize];
     }
 
     /**
@@ -47,7 +47,7 @@ public class IntArray {
      * @param value A value to append.
      * @return Chainable API.
      */
-    public IntArray add(int value) {
+    public DoubleList add(double value) {
         if (array.length <= size) {
             widenBaseArary(size + 1);
         }
@@ -62,7 +62,7 @@ public class IntArray {
     private synchronized void widenBaseArary(int require) {
         int length = array.length;
         if (length <= require) {
-            int[] large = new int[Math.max(require, length + Math.min(length, 1024))];
+            double[] large = new double[Math.max(require, length + Math.min(length, 1024))];
             System.arraycopy(array, 0, large, 0, length);
             array = large;
         }
@@ -73,8 +73,8 @@ public class IntArray {
      * 
      * @return A first element.
      */
-    public int first() {
-        return size == 0 ? 0 : array[0];
+    public double first() {
+        return size == 0 ? 0d : array[0];
     }
 
     /**
@@ -82,8 +82,8 @@ public class IntArray {
      * 
      * @return A last element.
      */
-    public int last() {
-        return size == 0 ? 0 : array[size - 1];
+    public double last() {
+        return size == 0 ? 0d : array[size - 1];
     }
 
     /**
@@ -93,8 +93,8 @@ public class IntArray {
      * @param index An index to get.
      * @return The indexed value.
      */
-    public int get(int index) {
-        return 0 <= index && index < size ? array[index] : 0;
+    public double get(int index) {
+        return 0 <= index && index < size ? array[index] : 0d;
     }
 
     /**
@@ -104,7 +104,7 @@ public class IntArray {
      * @param value A value to set.
      * @return Chainable API.
      */
-    public IntArray set(int index, int value) {
+    public DoubleList set(int index, double value) {
         ensureSize(index);
         array[index] = value;
         return this;
@@ -117,7 +117,7 @@ public class IntArray {
      * @param increment A value to increment.
      * @return An updated value.
      */
-    public int increment(int index, int increment) {
+    public double increment(int index, double increment) {
         ensureSize(index);
         return array[index] += increment;
     }
@@ -129,7 +129,7 @@ public class IntArray {
      * @param decrement A value to decrement.
      * @return An updated value.
      */
-    public int decrement(int index, int decrement) {
+    public double decrement(int index, double decrement) {
         ensureSize(index);
         return array[index] -= decrement;
     }
@@ -182,7 +182,7 @@ public class IntArray {
      * 
      * @return Chainable API.
      */
-    public IntArray clear() {
+    public DoubleList clear() {
         size = 0;
         return this;
     }
@@ -192,7 +192,7 @@ public class IntArray {
      * 
      * @return Actual array.
      */
-    public int[] asArray() {
+    public double[] asArray() {
         return array;
     }
 

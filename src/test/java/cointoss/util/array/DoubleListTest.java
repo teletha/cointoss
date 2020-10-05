@@ -12,13 +12,13 @@ package cointoss.util.array;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class DoubleArrayTest {
+class DoubleListTest {
 
     private int sizeForTest = 5000;
 
     @Test
     void size() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         assert array.size() == 0;
 
         array.add(0);
@@ -30,7 +30,7 @@ class DoubleArrayTest {
 
     @Test
     void get() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         for (int i = 0; i < sizeForTest; i++) {
             array.add(i);
         }
@@ -42,7 +42,7 @@ class DoubleArrayTest {
 
     @Test
     void getOutOfIndex() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         for (int i = 0; i < sizeForTest; i++) {
             assert array.get(i) == 0;
             array.set(i, i);
@@ -51,7 +51,7 @@ class DoubleArrayTest {
 
     @Test
     void set() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         for (int i = 0; i < sizeForTest; i++) {
             array.set(i, i);
         }
@@ -63,12 +63,12 @@ class DoubleArrayTest {
 
     @Test
     void setNegativeIndex() {
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleArray().set(-1, 10));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleList().set(-1, 10));
     }
 
     @Test
     void setLargeStep() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         for (int i = 0; i < 5; i++) {
             array.set(i * 2000, i);
         }
@@ -80,7 +80,7 @@ class DoubleArrayTest {
 
     @Test
     void increment() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         for (int i = 0; i < sizeForTest; i++) {
             array.increment(i, i);
         }
@@ -92,7 +92,7 @@ class DoubleArrayTest {
 
     @Test
     void incrementLargeStep() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         for (int i = 0; i < 5; i++) {
             array.increment(i * 2000, i);
         }
@@ -104,12 +104,12 @@ class DoubleArrayTest {
 
     @Test
     void incrementNegativeIndex() {
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleArray().increment(-1, 10));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleList().increment(-1, 10));
     }
 
     @Test
     void decrement() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         for (int i = 0; i < sizeForTest; i++) {
             array.decrement(i, i);
         }
@@ -121,7 +121,7 @@ class DoubleArrayTest {
 
     @Test
     void decrementLargeStep() {
-        DoubleArray array = new DoubleArray();
+        DoubleList array = new DoubleList();
         for (int i = 0; i < 5; i++) {
             array.decrement(i * 2000, i);
         }
@@ -133,6 +133,6 @@ class DoubleArrayTest {
 
     @Test
     void decrementNegativeIndex() {
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleArray().decrement(-1, 10));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> new DoubleList().decrement(-1, 10));
     }
 }

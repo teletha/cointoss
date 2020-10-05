@@ -118,4 +118,18 @@ public class WrapperRingBuffer<Wrapper1> {
         }
         return result;
     }
+
+    /**
+     * Recompose to array.
+     * 
+     * @return
+     */
+    public Primitive[] toArray() {
+        Primitive[] array = Wrapper.newArray(size);
+        int start = index + 1;
+        for (int i = 0; i < size; i++) {
+            array[i] = buffer[(start + i) % this.size];
+        }
+        return array;
+    }
 }

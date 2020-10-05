@@ -19,7 +19,7 @@ import javax.annotation.processing.Generated;
  * {@link ArrayList} like data structure for numeric primitive type.
  */
 @Generated("SpecializedCodeGenerator")
-public class LongArray {
+public class LongList {
 
     /** The current size. */
     private volatile int size = 0;
@@ -30,14 +30,14 @@ public class LongArray {
     /**
      * Create empty array.
      */
-    public LongArray() {
+    public LongList() {
         this(16);
     }
 
     /**
      * Create empty array with the specified array size.
      */
-    public LongArray(int initialRawArraySize) {
+    public LongList(int initialRawArraySize) {
         array = new long[initialRawArraySize];
     }
 
@@ -47,7 +47,7 @@ public class LongArray {
      * @param value A value to append.
      * @return Chainable API.
      */
-    public LongArray add(long value) {
+    public LongList add(long value) {
         if (array.length <= size) {
             widenBaseArary(size + 1);
         }
@@ -104,7 +104,7 @@ public class LongArray {
      * @param value A value to set.
      * @return Chainable API.
      */
-    public LongArray set(int index, long value) {
+    public LongList set(int index, long value) {
         ensureSize(index);
         array[index] = value;
         return this;
@@ -182,7 +182,7 @@ public class LongArray {
      * 
      * @return Chainable API.
      */
-    public LongArray clear() {
+    public LongList clear() {
         size = 0;
         return this;
     }

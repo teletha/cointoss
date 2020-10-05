@@ -21,7 +21,7 @@ import cointoss.util.SpecializedCodeGenerator.Wrapper;
  * {@link ArrayList} like data structure for numeric primitive type.
  */
 @Generated("SpecializedCodeGenerator")
-public class WrapperArray {
+public class WrapperList {
 
     /** The current size. */
     private volatile int size = 0;
@@ -32,14 +32,14 @@ public class WrapperArray {
     /**
      * Create empty array.
      */
-    public WrapperArray() {
+    public WrapperList() {
         this(16);
     }
 
     /**
      * Create empty array with the specified array size.
      */
-    public WrapperArray(int initialRawArraySize) {
+    public WrapperList(int initialRawArraySize) {
         array = Wrapper.newArray(initialRawArraySize);
     }
 
@@ -49,7 +49,7 @@ public class WrapperArray {
      * @param value A value to append.
      * @return Chainable API.
      */
-    public WrapperArray add(Primitive value) {
+    public WrapperList add(Primitive value) {
         if (array.length <= size) {
             widenBaseArary(size + 1);
         }
@@ -106,7 +106,7 @@ public class WrapperArray {
      * @param value A value to set.
      * @return Chainable API.
      */
-    public WrapperArray set(int index, Primitive value) {
+    public WrapperList set(int index, Primitive value) {
         ensureSize(index);
         array[index] = value;
         return this;
@@ -184,7 +184,7 @@ public class WrapperArray {
      * 
      * @return Chainable API.
      */
-    public WrapperArray clear() {
+    public WrapperList clear() {
         size = 0;
         return this;
     }

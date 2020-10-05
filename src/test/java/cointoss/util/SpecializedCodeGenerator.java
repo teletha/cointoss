@@ -12,7 +12,7 @@ package cointoss.util;
 import java.util.List;
 import java.util.Objects;
 
-import cointoss.util.array.WrapperArray;
+import cointoss.util.array.WrapperList;
 import cointoss.util.function.ToWrapperTriFunction;
 import cointoss.util.function.WrapperPentaFunction;
 import cointoss.util.function.WrapperTetraFunction;
@@ -186,7 +186,7 @@ public class SpecializedCodeGenerator {
     public static void main(String[] args) {
         // Array
         SpecializedCodeGenerator.write(WrapperRingBuffer.class);
-        SpecializedCodeGenerator.write(WrapperArray.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(WrapperList.class, Type.Int, Type.Long, Type.Double);
 
         // Set
         SpecializedCodeGenerator.write(WrapperSet.class, Type.Int, Type.Long, Type.Double);

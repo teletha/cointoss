@@ -10,7 +10,7 @@
 package cointoss.volume;
 
 import cointoss.util.arithmetic.Num;
-import cointoss.util.array.DoubleArray;
+import cointoss.util.array.DoubleList;
 
 public class PriceRangedVolumePeriod {
 
@@ -27,9 +27,9 @@ public class PriceRangedVolumePeriod {
 
     private final int tens;
 
-    private final DoubleArray upper = new DoubleArray();
+    private final DoubleList upper = new DoubleList();
 
-    private final DoubleArray lower = new DoubleArray();
+    private final DoubleList lower = new DoubleList();
 
     PriceRangedVolumePeriod(long startTime, Num startPrice, Num priceRange) {
         this.startTime = startTime;
@@ -96,8 +96,8 @@ public class PriceRangedVolumePeriod {
      */
     public GroupedVolumes aggregateBySize(int groupSize) {
         int size = (upper.size() + lower.size()) / groupSize + 1;
-        DoubleArray prices = new DoubleArray(size);
-        DoubleArray volumes = new DoubleArray(size);
+        DoubleList prices = new DoubleList(size);
+        DoubleList volumes = new DoubleList(size);
         double max = 0;
         double half = priceRange / tens / 2;
 
@@ -150,12 +150,12 @@ public class PriceRangedVolumePeriod {
         public final double maxVolume;
 
         /** The price list. */
-        public final DoubleArray prices;
+        public final DoubleList prices;
 
         /** The volume list. */
-        public final DoubleArray volumes;
+        public final DoubleList volumes;
 
-        private GroupedVolumes(long startTime, double maxVolume, DoubleArray prices, DoubleArray volumes) {
+        private GroupedVolumes(long startTime, double maxVolume, DoubleList prices, DoubleList volumes) {
             this.startTime = startTime;
             this.maxVolume = maxVolume;
             this.prices = prices;

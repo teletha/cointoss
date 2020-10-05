@@ -116,4 +116,18 @@ public class DoubleRingBuffer {
         }
         return result;
     }
+
+    /**
+     * Recompose to array.
+     * 
+     * @return
+     */
+    public double[] toArray() {
+        double[] array = new double[size];
+        int start = index + 1;
+        for (int i = 0; i < size; i++) {
+            array[i] = buffer[(start + i) % this.size];
+        }
+        return array;
+    }
 }

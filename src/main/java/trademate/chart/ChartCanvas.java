@@ -50,7 +50,7 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
-import cointoss.util.array.DoubleArray;
+import cointoss.util.array.DoubleList;
 import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
 import kiss.Disposable;
@@ -744,7 +744,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                     double[] channelStart = {start, start};
                     TrendLine highest = new TrendLine(true, 20);
-                    DoubleArray valueX = new DoubleArray((int) tickSize);
+                    DoubleList valueX = new DoubleList((int) tickSize);
 
                     ticker.ticks.each(start, end, tick -> {
                         double x = axisX.getPositionForValue(tick.openTime);
@@ -1034,7 +1034,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private final double[] dashArray;
 
         /** The y-axis values. */
-        private final DoubleArray valueY = new DoubleArray(64);
+        private final DoubleList valueY = new DoubleList(64);
 
         /** The visibility state. */
         private boolean visible = true;

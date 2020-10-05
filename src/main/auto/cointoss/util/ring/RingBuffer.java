@@ -116,4 +116,18 @@ public class RingBuffer<E> {
         }
         return result;
     }
+
+    /**
+     * Recompose to array.
+     * 
+     * @return
+     */
+    public E[] toArray() {
+        E[] array = (E[]) java.lang.reflect.Array.newInstance(Object.class, size);
+        int start = index + 1;
+        for (int i = 0; i < size; i++) {
+            array[i] = buffer[(start + i) % this.size];
+        }
+        return array;
+    }
 }
