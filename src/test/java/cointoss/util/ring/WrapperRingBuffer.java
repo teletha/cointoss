@@ -9,12 +9,15 @@
  */
 package cointoss.util.ring;
 
+import java.util.List;
+
 import javax.annotation.processing.Generated;
 
 import cointoss.util.SpecializedCodeGenerator.Primitive;
 import cointoss.util.SpecializedCodeGenerator.Wrapper;
 import cointoss.util.SpecializedCodeGenerator.WrapperBinaryOperator;
 import cointoss.util.SpecializedCodeGenerator.WrapperConsumer;
+import cointoss.util.array.WrapperList;
 
 @Generated("SpecializedCodeGenerator")
 public class WrapperRingBuffer<Wrapper1> {
@@ -120,16 +123,16 @@ public class WrapperRingBuffer<Wrapper1> {
     }
 
     /**
-     * Recompose to array.
+     * Recompose to {@link List}.
      * 
      * @return
      */
-    public Primitive[] toArray() {
-        Primitive[] array = Wrapper.newArray(size);
+    public WrapperList<Wrapper1> toList() {
+        WrapperList list = new WrapperList();
         int start = index + 1;
         for (int i = 0; i < size; i++) {
-            array[i] = buffer[(start + i) % this.size];
+            list.add(buffer[(start + i) % this.size]);
         }
-        return array;
+        return list;
     }
 }

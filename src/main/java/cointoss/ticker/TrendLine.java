@@ -9,7 +9,9 @@
  */
 package cointoss.ticker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import cointoss.util.ring.RingBuffer;
 
@@ -45,16 +47,25 @@ public class TrendLine {
     }
 
     public void build() {
-        double[][] base = data.toArray();
+        List<double[]> base = data.toList();
 
-        while (2 < base.length) {
-            int filteredSize = base.length % 4 == 0 ? base.length / 2 : base.length / 2 + 1;
-            double[][] filtered = new double[filteredSize][];
+        while (2 < base.size()) {
+            int filteredSize = base.size() / 2 + base.size() % 2;
+            List<double[]> filtered = new ArrayList();
             for (int i = 0; i < filteredSize; i++) {
-                filtered[i] = base[i + 1] != null && base[i][1] < base[i + 1][1] ? base[i + 1] : base[i];
+                double[] one = base.get(i * 2);
+                if (base.size() == i * 2 + 1) {
+                    filtered.add(one);
+                } else {
+                    double[] other = base.get(i * 2 + 1);
+                    filtered.add(other != null && one[1] < other[1] ? other : one);
+                }
             }
             base = filtered;
         }
-        System.out.println(Arrays.toString(base));
+
+        for (double[] item : base) {
+            System.out.println(Arrays.toString(item));
+        }
     }
 }

@@ -9,10 +9,12 @@
  */
 package cointoss.util.ring;
 
-import javax.annotation.processing.Generated;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
+
+import javax.annotation.processing.Generated;
 
 @Generated("SpecializedCodeGenerator")
 public class RingBuffer<E> {
@@ -118,16 +120,16 @@ public class RingBuffer<E> {
     }
 
     /**
-     * Recompose to array.
+     * Recompose to {@link List}.
      * 
      * @return
      */
-    public E[] toArray() {
-        E[] array = (E[]) java.lang.reflect.Array.newInstance(Object.class, size);
+    public List<E> toList() {
+        List list = new ArrayList();
         int start = index + 1;
         for (int i = 0; i < size; i++) {
-            array[i] = buffer[(start + i) % this.size];
+            list.add(buffer[(start + i) % this.size]);
         }
-        return array;
+        return list;
     }
 }

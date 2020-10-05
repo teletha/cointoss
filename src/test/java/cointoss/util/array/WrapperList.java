@@ -21,7 +21,7 @@ import cointoss.util.SpecializedCodeGenerator.Wrapper;
  * {@link ArrayList} like data structure for numeric primitive type.
  */
 @Generated("SpecializedCodeGenerator")
-public class WrapperList {
+public class WrapperList<Wrapper1> {
 
     /** The current size. */
     private volatile int size = 0;

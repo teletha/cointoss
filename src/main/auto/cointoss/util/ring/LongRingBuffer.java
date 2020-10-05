@@ -9,10 +9,13 @@
  */
 package cointoss.util.ring;
 
+import java.util.List;
+
 import javax.annotation.processing.Generated;
 
 import java.util.function.LongBinaryOperator;
 import java.util.function.LongConsumer;
+import cointoss.util.array.LongList;
 
 @Generated("SpecializedCodeGenerator")
 public class LongRingBuffer {
@@ -118,16 +121,16 @@ public class LongRingBuffer {
     }
 
     /**
-     * Recompose to array.
+     * Recompose to {@link List}.
      * 
      * @return
      */
-    public long[] toArray() {
-        long[] array = new long[size];
+    public LongList toList() {
+        LongList list = new LongList();
         int start = index + 1;
         for (int i = 0; i < size; i++) {
-            array[i] = buffer[(start + i) % this.size];
+            list.add(buffer[(start + i) % this.size]);
         }
-        return array;
+        return list;
     }
 }

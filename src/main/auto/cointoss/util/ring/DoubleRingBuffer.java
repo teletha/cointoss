@@ -9,10 +9,13 @@
  */
 package cointoss.util.ring;
 
+import java.util.List;
+
 import javax.annotation.processing.Generated;
 
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
+import cointoss.util.array.DoubleList;
 
 @Generated("SpecializedCodeGenerator")
 public class DoubleRingBuffer {
@@ -118,16 +121,16 @@ public class DoubleRingBuffer {
     }
 
     /**
-     * Recompose to array.
+     * Recompose to {@link List}.
      * 
      * @return
      */
-    public double[] toArray() {
-        double[] array = new double[size];
+    public DoubleList toList() {
+        DoubleList list = new DoubleList();
         int start = index + 1;
         for (int i = 0; i < size; i++) {
-            array[i] = buffer[(start + i) % this.size];
+            list.add(buffer[(start + i) % this.size]);
         }
-        return array;
+        return list;
     }
 }

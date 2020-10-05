@@ -175,6 +175,7 @@ public class SpecializedCodeGenerator {
             if (!numeric) text = text.replaceAll("AsWrapper\\d?", "");
             text = text.replaceAll("(\\W)Wrapper\\d?(\\W)", "$1" + wrapperType + "$2");
             text = text.replaceAll("Wrapper\\d?", wrapperName);
+            text = text.replaceAll("new List\\(\\)", "new ArrayList()");
 
             return text;
         }
