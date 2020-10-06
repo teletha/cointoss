@@ -9,13 +9,12 @@
  */
 package cointoss.util.ring;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.annotation.processing.Generated;
 
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
-import cointoss.util.array.IntList;
 
 @Generated("SpecializedCodeGenerator")
 public class IntRingBuffer {
@@ -121,16 +120,14 @@ public class IntRingBuffer {
     }
 
     /**
-     * Recompose to {@link List}.
+     * Recompose to the specified {@link Collection}.
      * 
-     * @return
+     * @param <C> A collection type.
+     * @param collection A target collection.
+     * @return A recomposed collection.
      */
-    public IntList toList() {
-        IntList list = new IntList();
-        int start = index + 1;
-        for (int i = 0; i < size; i++) {
-            list.add(buffer[(start + i) % this.size]);
-        }
-        return list;
+    public <C extends Collection<Integer>> C to(C collection) {
+        forEach(v -> collection.add(v));
+        return collection;
     }
 }

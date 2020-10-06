@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import cointoss.util.ring.RingBuffer;
@@ -47,6 +48,8 @@ public class TrendLine {
     }
 
     public void build() {
+        LinkedList<double[]> buffer = new LinkedList();
+        data.forEach(buffer::add);
         List<double[]> base = data.toList();
 
         while (2 < base.size()) {
