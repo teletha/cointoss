@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
@@ -47,6 +48,7 @@ import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.TrendLine;
 import cointoss.util.Chrono;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
@@ -282,26 +284,32 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
         });
 
-        layoutCandle.layoutBy(userInterfaceModification())
+        layoutCandle.layoutBy(chartAxisModification())
+                .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe())
                 .layoutBy(chart.ticker.observe()
-                        .switchMap(ticker -> ticker.open.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)));
-        layoutCandleLatest.layoutBy(userInterfaceModification())
+                        .switchMap(ticker -> ticker.open.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
+                .layoutWhile(chart.showRealtimeUpdate.observing());
+        layoutCandleLatest.layoutBy(chartAxisModification())
+                .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
-        layoutOrderbook.layoutBy(userInterfaceModification())
+        layoutOrderbook.layoutBy(chartAxisModification())
+                .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe()
                         .flatMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
-        layoutPriceRangedVolume.layoutBy(userInterfaceModification())
+        layoutPriceRangedVolume.layoutBy(chartAxisModification())
+                .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
                         .observe(), chart.orderbookPriceRange.observe())
                 .layoutBy(chart.ticker.observe().switchMap(t -> t.open))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
-        layoutPriceRangedVolumeLatest.layoutBy(userInterfaceModification())
+        layoutPriceRangedVolumeLatest.layoutBy(chartAxisModification())
+                .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
                         .observe(), chart.orderbookPriceRange.observe())
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(10, TimeUnit.SECONDS)))
@@ -319,9 +327,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
-    private Observable[] userInterfaceModification() {
-        return new Observable[] {widthProperty(), heightProperty(), axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty(),
-                axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty()};
+    private Signal userInterfaceModification() {
+        return Viewtify.observe(widthProperty()).merge(Viewtify.observe(heightProperty())).debounce(500, TimeUnit.MILLISECONDS);
+    }
+
+    private Observable[] chartAxisModification() {
+        return new DoubleProperty[] {axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty(), axisY.scroll.valueProperty(),
+                axisY.scroll.visibleAmountProperty()};
     }
 
     /**
@@ -743,7 +755,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
 
                     double[] channelStart = {start, start};
-                    TrendLine highest = new TrendLine(true, 20);
+                    TrendLine highest = new TrendLine(20);
                     DoubleList valueX = new DoubleList((int) tickSize);
 
                     ticker.ticks.each(start, end, tick -> {
