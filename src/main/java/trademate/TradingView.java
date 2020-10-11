@@ -114,7 +114,10 @@ public class TradingView extends View {
     protected void initialize() {
         configContextMenuOnTab();
 
-        Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
+        Viewtify.observing(tab.selectedProperty()).to(v -> {
+            chart.showRealtimeUpdate.set(v);
+            chart.showChart.set(true);
+        });
         Viewtify.inWorker(() -> {
             isLoading.set(true);
             boolean update = chart.showRealtimeUpdate.exact();

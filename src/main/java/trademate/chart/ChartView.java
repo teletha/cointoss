@@ -81,6 +81,9 @@ public class ChartView extends View {
     /** The chart configuration. */
     public final Variable<Boolean> showRealtimeUpdate = Variable.of(false);
 
+    /** The chart configuration. */
+    public final Variable<Boolean> showChart = Variable.of(true);
+
     /** The additional scripts. */
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
 
