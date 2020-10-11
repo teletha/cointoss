@@ -20,8 +20,6 @@ import cointoss.util.ring.RingBuffer;
 
 public class TrendLine {
 
-    private final boolean up;
-
     private final int size;
 
     private final RingBuffer<double[]> data;
@@ -29,11 +27,9 @@ public class TrendLine {
     private int currentInterval = 0;
 
     /**
-     * @param up
      * @param size
      */
-    public TrendLine(boolean up, int size) {
-        this.up = up;
+    public TrendLine(int size) {
         this.size = size;
         this.data = new RingBuffer(size);
     }
@@ -59,7 +55,7 @@ public class TrendLine {
             while (iterator.hasNext()) {
                 double[] item = iterator.next();
                 double predicated = regression.predict(item[0]);
-                if (up ? predicated < item[1] : item[1] < predicated) {
+                if (true ? predicated < item[1] : item[1] < predicated) {
                     iterator.remove();
                     regression.removeData(item[0], item[1]);
                 }

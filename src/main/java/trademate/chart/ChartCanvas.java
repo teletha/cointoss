@@ -48,7 +48,6 @@ import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.ticker.TrendLine;
 import cointoss.util.Chrono;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;

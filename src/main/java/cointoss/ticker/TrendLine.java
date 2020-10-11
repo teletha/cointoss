@@ -9,10 +9,11 @@
  */
 package cointoss.ticker;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.ListIterator;
+import java.util.function.DoubleUnaryOperator;
+
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import cointoss.util.ring.RingBuffer;
 
@@ -23,6 +24,8 @@ public class TrendLine {
 
     /** The actual data holder. */
     private final RingBuffer<double[]> data;
+
+    private int currentInterval = 0;
 
     /**
      * Create.
@@ -43,32 +46,43 @@ public class TrendLine {
      * @param x
      * @param y
      */
-    public void add(double x, double y) {
+    public DoubleUnaryOperator add(double x, double y) {
         data.add(new double[] {x, y});
+
+        if (++currentInterval != size) {
+            return null;
+        }
+        currentInterval = 0;
+        return build();
     }
 
-    public void build() {
-        LinkedList<double[]> buffer = new LinkedList();
-        data.forEach(buffer::add);
-        List<double[]> base = data.toList();
+    public DoubleUnaryOperator build() {
+        LinkedList<double[]> base = data.to(new LinkedList());
 
         while (2 < base.size()) {
-            int filteredSize = base.size() / 2 + base.size() % 2;
-            List<double[]> filtered = new ArrayList();
-            for (int i = 0; i < filteredSize; i++) {
-                double[] one = base.get(i * 2);
-                if (base.size() == i * 2 + 1) {
-                    filtered.add(one);
-                } else {
-                    double[] other = base.get(i * 2 + 1);
-                    filtered.add(other != null && one[1] < other[1] ? other : one);
+            ListIterator<double[]> iterator = base.listIterator();
+
+            while (iterator.hasNext()) {
+                double[] first = iterator.next();
+
+                if (iterator.hasNext()) {
+                    double[] second = iterator.next();
+                    if (first[1] < second[1]) {
+                        iterator.previous();
+                        iterator.previous();
+                        iterator.remove();
+                        iterator.next();
+                    } else {
+                        iterator.remove();
+                    }
                 }
             }
-            base = filtered;
         }
 
-        for (double[] item : base) {
-            System.out.println(Arrays.toString(item));
+        SimpleRegression simple = new SimpleRegression(true);
+        for (double[] point : base) {
+            simple.addData(point[0], point[1]);
         }
+        return simple::predict;
     }
 }
