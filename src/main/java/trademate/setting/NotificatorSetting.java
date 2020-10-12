@@ -9,6 +9,8 @@
  */
 package trademate.setting;
 
+import javafx.util.Duration;
+
 import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
@@ -28,6 +30,7 @@ import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
+import viewtify.ui.toast.Toast;
 import viewtify.util.Corner;
 import viewtify.util.Icon;
 
@@ -49,10 +52,13 @@ class NotificatorSetting extends View {
     private UITableColumn<Notify, Notify> sound;
 
     /** The desktop configuration UI. */
-    private UISpinner<Integer> desktopDuration;
+    private UISpinner<Duration> desktopDuration;
 
     /** The desktop configuration UI. */
     private UIComboBox<Corner> desktopPosition;
+
+    /** The desktop configuration UI. */
+    private UISpinner<Integer> desktopNumber;
 
     /** The LINE configuration UI. */
     private UIText lineAccessToken;
@@ -88,6 +94,7 @@ class NotificatorSetting extends View {
                     label(en("Desktop Notification"), Heading);
                     form(en("Display Time"), desktopDuration);
                     form(en("Display Location"), desktopPosition);
+                    form(en("Number of Displays"), desktopNumber);
                 });
 
                 // LINE
@@ -117,10 +124,11 @@ class NotificatorSetting extends View {
         });
 
         // For Desktop
-        desktopPosition.items(Corner.values()).sync(notificator.desktopPosition);
-        desktopDuration.items(I.signal(1).recurse(v -> v + 1).take(60))
-                .sync(notificator.desktopDuration)
-                .format(duration -> String.valueOf(duration) + en("mins"));
+        desktopPosition.items(Corner.values()).sync(Toast.setting.area);
+        desktopDuration.items(I.signal(1).recurse(v -> v + 1).take(60).map(v -> Duration.minutes(v)))
+                .sync(Toast.setting.autoHide)
+                .format(duration -> String.valueOf(duration.toMinutes()) + en("mins"));
+        desktopNumber.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).sync(Toast.setting.max);
 
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken).masking(true);

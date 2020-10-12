@@ -19,7 +19,6 @@ import kiss.Singleton;
 import kiss.Storable;
 import kiss.Variable;
 import viewtify.ui.toast.Toast;
-import viewtify.util.Corner;
 
 @Managed(Singleton.class)
 public class Notificator implements Storable<Notificator> {
@@ -38,15 +37,6 @@ public class Notificator implements Storable<Notificator> {
 
     /** The defined type. */
     public final Notify priceSignal = new Notify(I.translate("Price Signal"));
-
-    /** The desktop position. */
-    final @Managed Variable<Corner> desktopPosition = Variable.of(Corner.BottomRight).intercept((o, n) -> {
-        Toast.setArea(n);
-        return n;
-    });
-
-    /** The duration of desktop display. */
-    final @Managed Variable<Integer> desktopDuration = Variable.of(1);
 
     /** The access token for LINE. */
     final @Managed Variable<String> lineAccessToken = Variable.of("");
