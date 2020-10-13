@@ -125,7 +125,7 @@ class NotificatorSetting extends View {
 
         // For Desktop
         desktopPosition.items(Corner.values()).sync(Toast.setting.area);
-        desktopDuration.items(I.signal(1).recurse(v -> v + 1).take(60).map(v -> Duration.minutes(v)))
+        desktopDuration.items(I.signal(1).recurse(v -> v + 1).take(60).map(Duration::minutes))
                 .sync(Toast.setting.autoHide)
                 .format(duration -> String.valueOf(duration.toMinutes()) + en("mins"));
         desktopNumber.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).sync(Toast.setting.max);

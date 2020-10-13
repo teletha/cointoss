@@ -15,31 +15,29 @@ import java.util.Objects;
 import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
-import kiss.Singleton;
-import kiss.Storable;
 import kiss.Variable;
+import viewtify.model.Model;
 import viewtify.ui.toast.Toast;
 
-@Managed(Singleton.class)
-public class Notificator implements Storable<Notificator> {
+public class Notificator extends Model<Notificator> {
 
     /** The defined type. */
-    public final Notify longTrend = new Notify(I.translate("Long Trend"));
+    public final Notify longTrend = new Notify("Long Trend");
 
     /** The defined type. */
-    public final Notify shortTrend = new Notify(I.translate("Short Trend"));
+    public final Notify shortTrend = new Notify("Short Trend");
 
     /** The defined type. */
-    public final Notify execution = new Notify(I.translate("Execution"));
+    public final Notify execution = new Notify("Execution");
 
     /** The defined type. */
-    public final Notify orderFailed = new Notify(I.translate("Order Failed"));
+    public final Notify orderFailed = new Notify("Order Failed");
 
     /** The defined type. */
-    public final Notify priceSignal = new Notify(I.translate("Price Signal"));
+    public final Notify priceSignal = new Notify("Price Signal");
 
     /** The access token for LINE. */
-    final @Managed Variable<String> lineAccessToken = Variable.of("");
+    final @Managed Preference<String> lineAccessToken = initialize("");
 
     /**
      * 
@@ -60,16 +58,16 @@ public class Notificator implements Storable<Notificator> {
     /**
      * 
      */
-    public static class Notify {
+    public static class Notify extends Model<Notify> {
 
         /** Showing desktop notification. */
-        final @Managed Variable<Boolean> onDesktop = Variable.of(false);
+        final @Managed Preference<Boolean> onDesktop = initialize(false);
 
         /** Showing line notification. */
-        final @Managed Variable<Boolean> onLine = Variable.of(false);
+        final @Managed Preference<Boolean> onLine = initialize(false);
 
         /** Notifiy by sound. */
-        final @Managed Variable<Sound> onSound = Variable.of(Sound.なし);
+        final @Managed Preference<Sound> onSound = initialize(Sound.なし);
 
         /** The name. */
         final Variable<String> name;
@@ -77,8 +75,8 @@ public class Notificator implements Storable<Notificator> {
         /**
          * 
          */
-        Notify(Variable<String> name) {
-            this.name = name;
+        Notify(String name) {
+            this.name = I.translate(name);
         }
 
         /**
@@ -107,18 +105,6 @@ public class Notificator implements Storable<Notificator> {
                     // to desktop
                     if (onDesktop.is(true)) {
                         Toast.show(stripedTitle + " " + stripedMessage);
-                        // Notifications.create()
-                        // .darkStyle()
-                        // .title(stripedTitle)
-                        // .text(stripedMessage)
-                        // .position(notificator.desktopPosition.v.position)
-                        // .hideAfter(Duration.seconds(notificator.desktopDuration.v.getSeconds()))
-                        // .hideCloseButton()
-                        // .owner(Screen.getPrimary())
-                        // .onAction(e -> {
-                        // // hide on click
-                        // })
-                        // .show();
                     }
 
                     // to LINE
