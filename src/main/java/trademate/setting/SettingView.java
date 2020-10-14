@@ -54,7 +54,7 @@ public class SettingView extends View {
                     $(bitflyer, style.categoryLabel);
                 });
 
-                $(scroll, style.detailView, () -> {
+                $(scroll, () -> {
                     $(main);
                 });
             });
@@ -84,11 +84,6 @@ public class SettingView extends View {
         Style selectedLabel = () -> {
             background.color("derive(-fx-base, 6%)");
         };
-
-        Style detailView = () -> {
-            display.width(1000, px);
-        };
-
     }
 
     /**
