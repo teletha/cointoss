@@ -11,6 +11,8 @@ package cointoss.util;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import com.google.common.math.DoubleMath;
 
@@ -25,6 +27,9 @@ public class Primitives {
     /** Fix decimal point(6). */
     public static final DecimalFormat DecimalScale6 = new DecimalFormat("#.#");
 
+    /** Fix decimal point(340). */
+    private static final DecimalFormat DecimalScale340 = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
     static {
         DecimalScale2.setMinimumFractionDigits(2);
         DecimalScale2.setMaximumFractionDigits(2);
@@ -32,6 +37,9 @@ public class Primitives {
         DecimalScale4.setMaximumFractionDigits(4);
         DecimalScale6.setMinimumFractionDigits(6);
         DecimalScale6.setMaximumFractionDigits(6);
+
+        // 340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
+        DecimalScale340.setMaximumFractionDigits(340);
     }
 
     /**
@@ -66,8 +74,7 @@ public class Primitives {
      * @return A rounded value as string expression.
      */
     public static String roundString(double value, int scale) {
-        String text = String.valueOf(roundDecimal(value, scale));
-        return scale == 0 && text.endsWith(".0") ? text.substring(0, text.length() - 2) : text;
+        return DecimalScale340.format(roundDecimal(value, scale));
     }
 
     /**
@@ -78,8 +85,7 @@ public class Primitives {
      * @return A rounded value as string expression.
      */
     public static String roundString(double value, int scale, RoundingMode mode) {
-        String text = String.valueOf(roundDecimal(value, scale, mode));
-        return scale == 0 && text.endsWith(".0") ? text.substring(0, text.length() - 2) : text;
+        return DecimalScale340.format(roundDecimal(value, scale, mode));
     }
 
     /**

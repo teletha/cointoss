@@ -95,7 +95,9 @@ class PrimitivesTest {
     @Test
     void roundString() {
         assert Primitives.roundString(0.0d, 0).equals("0");
-        assert Primitives.roundString(0.0d, 1).equals("0.0");
+        assert Primitives.roundString(0.0d, 1).equals("0");
+        assert Primitives.roundString(0.00008, 5).equals("0.00008");
+        assert Primitives.roundString(123456789.00008, 15).equals("123456789.00008");
     }
 
     @Test
