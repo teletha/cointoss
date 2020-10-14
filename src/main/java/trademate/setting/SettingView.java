@@ -18,6 +18,7 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.ui.UILabel;
+import viewtify.ui.UIScrollPane;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
@@ -35,6 +36,8 @@ public class SettingView extends View {
 
     private UILabel bitflyer;
 
+    private UIScrollPane scroll;
+
     private final Variable<View> main = Variable.empty();
 
     /**
@@ -43,14 +46,17 @@ public class SettingView extends View {
     class view extends ViewDSL implements SettingStyles {
         {
             $(hbox, () -> {
-                $(vbox, style.categoryPane, () -> {
+                $(vbox, style.categoryView, () -> {
                     $(general, style.categoryLabel);
                     $(appearance, style.categoryLabel);
                     $(chart, style.categoryLabel);
                     $(notification, style.categoryLabel);
                     $(bitflyer, style.categoryLabel);
                 });
-                $(main);
+
+                $(scroll, style.detailView, () -> {
+                    $(main);
+                });
             });
         }
     }
@@ -60,12 +66,12 @@ public class SettingView extends View {
      */
     interface style extends StyleDSL {
 
-        Style categoryPane = () -> {
+        Style categoryView = () -> {
             padding.top(40, px).right(20, px);
         };
 
         Style categoryLabel = () -> {
-            display.width(200, px).height(20, px);
+            display.minWidth(200, px).height(20, px);
             padding.vertical(10, px).left(40, px);
             cursor.pointer();
             font.size(16, px);
@@ -75,8 +81,12 @@ public class SettingView extends View {
             });
         };
 
-        Style Selected = () -> {
+        Style selectedLabel = () -> {
             background.color("derive(-fx-base, 6%)");
+        };
+
+        Style detailView = () -> {
+            display.width(1000, px);
         };
 
     }
@@ -98,9 +108,9 @@ public class SettingView extends View {
     private void select(UILabel selected, Class<? extends View> view) {
         for (UILabel label : List.of(general, appearance, notification, bitflyer)) {
             if (label == selected) {
-                label.style(style.Selected);
+                label.style(style.selectedLabel);
             } else {
-                label.unstyle(style.Selected);
+                label.unstyle(style.selectedLabel);
             }
         }
         main.set(I.make(view));
