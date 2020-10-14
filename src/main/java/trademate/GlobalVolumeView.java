@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.Pastel10;
+import static trademate.FXColorPalettes.*;
 
 import java.text.Normalizer.Form;
 import java.util.HashMap;
@@ -349,7 +349,7 @@ public class GlobalVolumeView extends View {
                     }
 
                     if (canDisplayVolume[0] && 0 < maxs[0] && maxs[0] * 0.6 <= volume.longVolume()) {
-                        String text = Primitives.roundString(volume.longVolume(), 1);
+                        String text = Primitives.roundString(volume.longVolume(), 0);
                         context.strokeText(text, x[0] + coordinate(text), buyerY - 3);
                         canDisplayVolume[0] = false;
                     } else {
@@ -357,7 +357,7 @@ public class GlobalVolumeView extends View {
                     }
 
                     if (canDisplayVolume[1] && 0 < maxs[1] && maxs[1] * 0.6 <= volume.shortVolume()) {
-                        String text = Primitives.roundString(volume.shortVolume(), 1);
+                        String text = Primitives.roundString(volume.shortVolume(), 0);
                         context.strokeText(text, x[0] + coordinate(text), sellerY + 3 + 6);
                         canDisplayVolume[1] = false;
                     } else {
@@ -368,7 +368,7 @@ public class GlobalVolumeView extends View {
         }
 
         private double coordinate(String text) {
-            return 6 - text.length() * 2.1;
+            return 4.5 - text.length() * 2.1;
         }
     }
 }

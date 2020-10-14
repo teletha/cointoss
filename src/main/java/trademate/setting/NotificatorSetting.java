@@ -12,6 +12,7 @@ package trademate.setting;
 import javafx.util.Duration;
 
 import cointoss.util.Network;
+import cointoss.util.Primitives;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -92,8 +93,8 @@ class NotificatorSetting extends View {
                 // Desktop
                 $(vbox, Block, () -> {
                     label(en("Desktop Notification"), Heading);
-                    form(en("Display Time"), desktopDuration);
                     form(en("Display Location"), desktopPosition);
+                    form(en("Display Time"), desktopDuration);
                     form(en("Number of Displays"), desktopNumber);
                 });
 
@@ -115,20 +116,20 @@ class NotificatorSetting extends View {
         // For Notifications
         notifications.items(notificator.types()).operatable(false).simplify();
         name.model(n -> n.name);
-        desktop.text(en("Desktop")).renderAsCheckBox(n -> n.onDesktop, UICheckBox::sync);
-        line.text(en("LINE")).renderAsCheckBox(n -> n.onLine, (ui, value) -> {
-            ui.sync(value).disableWhen(notificator.lineAccessToken.observing().is(String::isEmpty));
+        desktop.text(en("Desktop")).renderAsCheckBox(notify -> notify.onDesktop, UICheckBox::sync);
+        line.text(en("LINE")).renderAsCheckBox(notify -> notify.onLine, (ui, model) -> {
+            ui.sync(model).disableWhen(notificator.lineAccessToken, String::isEmpty);
         });
-        sound.text(en("Sound")).renderAsComboBox(n -> n.onSound, (ui, value) -> {
-            ui.items(Sound.values()).sync(value).when(User.Action, () -> ui.value().play());
+        sound.text(en("Sound")).renderAsComboBox(notify -> notify.onSound, (ui, model) -> {
+            ui.items(Sound.values()).sync(model).when(User.Action, ui.value()::play);
         });
 
         // For Desktop
         desktopPosition.items(Corner.values()).sync(Toast.setting.area);
-        desktopDuration.items(I.signal(1).recurse(v -> v + 1).take(60).map(Duration::minutes))
+        desktopDuration.items(1, 30, Duration::minutes)
                 .sync(Toast.setting.autoHide)
-                .format(duration -> String.valueOf(duration.toMinutes()) + en("mins"));
-        desktopNumber.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).sync(Toast.setting.max);
+                .format(duration -> Primitives.roundString(duration.toMinutes(), 0) + en("mins"));
+        desktopNumber.items(1, 15, Integer::valueOf).sync(Toast.setting.max);
 
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken).masking(true);

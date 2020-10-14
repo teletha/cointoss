@@ -11,8 +11,6 @@ package cointoss.util;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.Primitives;
-
 class PrimitivesTest {
 
     @Test
@@ -92,6 +90,12 @@ class PrimitivesTest {
         assert Primitives.round(0d, 10, 20) == 10;
         assert Primitives.round(0d, -10, 20) == 0;
         assert Primitives.round(0d, 30, 20) == 20;
+    }
+
+    @Test
+    void roundString() {
+        assert Primitives.roundString(0.0d, 0).equals("0");
+        assert Primitives.roundString(0.0d, 1).equals("0.0");
     }
 
     @Test

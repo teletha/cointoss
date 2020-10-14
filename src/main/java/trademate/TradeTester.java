@@ -17,6 +17,7 @@ import cointoss.Market;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
+import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
 import viewtify.Viewtify;
@@ -45,6 +46,7 @@ public class TradeTester extends View {
     @Override
     protected void initialize() {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
+        DockSystem.register("Setting").contents(SettingView.class).closable(false);
     }
 
     /**

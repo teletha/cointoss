@@ -61,23 +61,25 @@ public class Primitives {
     /**
      * Round to the specified decimal place.
      * 
-     * @param value
-     * @param scale
-     * @return
+     * @param value A target value to round.
+     * @param scale A required scale.
+     * @return A rounded value as string expression.
      */
     public static String roundString(double value, int scale) {
-        return String.valueOf(roundDecimal(value, scale));
+        String text = String.valueOf(roundDecimal(value, scale));
+        return scale == 0 && text.endsWith(".0") ? text.substring(0, text.length() - 2) : text;
     }
 
     /**
      * Round to the specified decimal place.
      * 
-     * @param value
-     * @param scale
-     * @return
+     * @param value A target value to round.
+     * @param scale A required scale.
+     * @return A rounded value as string expression.
      */
     public static String roundString(double value, int scale, RoundingMode mode) {
-        return String.valueOf(roundDecimal(value, scale, mode));
+        String text = String.valueOf(roundDecimal(value, scale, mode));
+        return scale == 0 && text.endsWith(".0") ? text.substring(0, text.length() - 2) : text;
     }
 
     /**
