@@ -256,6 +256,7 @@ public abstract class EfficientWebSocketModel {
      * @param text
      */
     private void dispatch(String text) {
+        System.out.println(text);
         JSON json = I.json(text);
 
         Predicate<JSON> reject = ignoreMessageIf();
