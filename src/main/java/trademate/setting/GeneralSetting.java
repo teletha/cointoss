@@ -38,9 +38,9 @@ public class GeneralSetting extends View {
      */
     @Override
     protected void initialize() {
-        language.initialize(List.of(Locale.ENGLISH, Locale.JAPANESE))
+        language.initialize(Locale.forLanguageTag(I.Lang.v), List.of(Locale.ENGLISH, Locale.JAPANESE))
                 .render(lang -> lang.getDisplayLanguage(Locale.getDefault()))
                 .renderSelected(lang -> lang.getDisplayLanguage(Locale.getDefault()))
-                .observe(lang -> I.Lang.set(lang.getLanguage()));
+                .observing(lang -> I.Lang.set(lang.getLanguage()));
     }
 }
