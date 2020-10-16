@@ -161,6 +161,8 @@ public enum Currency {
 
     EUR("EUR", "Euro"),
 
+    FIL("FIL", "Filecoin"),
+
     FJD("FJD", "Fijian Dollar"),
 
     _1ST("1ST", "First Blood"),
