@@ -9,8 +9,6 @@
  */
 package trademate;
 
-import java.util.Locale;
-
 import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
@@ -56,11 +54,6 @@ public class TradeTester extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application()
-                .logging(LogManager.getLogger()::error)
-                .use(Theme.Dark)
-                .icon("icon/tester.png")
-                .language(I.env("language", Locale.getDefault().getLanguage()))
-                .activate(TradeTester.class);
+        Viewtify.application().logging(LogManager.getLogger()::error).use(Theme.Dark).icon("icon/tester.png").activate(TradeTester.class);
     }
 }

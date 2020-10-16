@@ -11,7 +11,6 @@ package trademate;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
@@ -143,11 +142,6 @@ public class TradeMate extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application()
-                .logging(LogManager.getLogger()::error)
-                .use(Theme.Dark)
-                .icon("icon/app.png")
-                .language(I.env("language", Locale.getDefault().getLanguage()))
-                .activate(TradeMate.class);
+        Viewtify.application().logging(LogManager.getLogger()::error).use(Theme.Dark).icon("icon/app.png").activate(TradeMate.class);
     }
 }
