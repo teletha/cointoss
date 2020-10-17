@@ -593,7 +593,7 @@ public class ExecutionLog {
          */
         private Cache enableAutoSave() {
             if (task == NOOP) {
-                task = scheduler.scheduleWithFixedDelay(this::write, 30, 120, TimeUnit.SECONDS);
+                task = scheduler.scheduleWithFixedDelay(this::write, 60, 240, TimeUnit.SECONDS);
             }
             return this;
         }
