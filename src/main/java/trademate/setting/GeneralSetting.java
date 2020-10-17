@@ -37,10 +37,23 @@ public class GeneralSetting extends View {
      */
     @Override
     protected void initialize() {
-        language.items(Locale.ENGLISH, Locale.JAPANESE)
-                .render(lang -> lang.getDisplayLanguage(Locale.getDefault()))
-                .renderSelected(lang -> lang.getDisplayLanguage(Locale.getDefault()))
+        language.items(Locale.ENGLISH, Locale.JAPANESE, Locale.CHINESE)
+                .render(this::language)
+                .renderSelected(this::language)
                 .select(Locale.forLanguageTag(I.Lang.exact()))
                 .observing(lang -> I.Lang.set(lang.getLanguage()));
+    }
+
+    /** The system language. */
+    private static final Locale systemLang = Locale.forLanguageTag(Locale.getDefault().getLanguage());
+
+    /**
+     * Display the current language.
+     * 
+     * @param lang A current language.
+     * @return The display name of the current language.
+     */
+    private String language(Locale lang) {
+        return lang.getDisplayLanguage(lang) + " (" + lang.getDisplayLanguage(systemLang) + ")";
     }
 }
