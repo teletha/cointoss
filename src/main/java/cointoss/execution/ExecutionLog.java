@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -836,8 +836,8 @@ public class ExecutionLog {
                         }
                     });
                     writer.close();
-                } catch (Exception e) {
-                    throw I.quiet(e);
+                } catch (Throwable e) {
+                    throw new Error("Failed writing the fast log. [" + fast + "]", e);
                 }
             }
         }

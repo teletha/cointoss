@@ -14,7 +14,6 @@ import java.util.Locale;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import viewtify.Viewtify;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -39,9 +38,9 @@ public class GeneralSetting extends View {
     @Override
     protected void initialize() {
         language.items(Locale.ENGLISH, Locale.JAPANESE)
-                .sync(Viewtify.Setting.language)
                 .render(lang -> lang.getDisplayLanguage(Locale.getDefault()))
                 .renderSelected(lang -> lang.getDisplayLanguage(Locale.getDefault()))
+                .select(Locale.forLanguageTag(I.Lang.exact()))
                 .observing(lang -> I.Lang.set(lang.getLanguage()));
     }
 }
