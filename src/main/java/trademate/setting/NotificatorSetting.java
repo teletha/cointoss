@@ -16,7 +16,6 @@ import cointoss.util.Primitives;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.setting.Notificator.Notify;
@@ -44,7 +43,7 @@ class NotificatorSetting extends View {
     /** The notificator configuration UI. */
     private UITableView<Notify> notifications;
 
-    private UITableColumn<Notify, Variable<String>> name;
+    private UITableColumn<Notify, String> name;
 
     private UITableColumn<Notify, Notify> desktop;
 
@@ -115,7 +114,7 @@ class NotificatorSetting extends View {
     protected void initialize() {
         // For Notifications
         notifications.items(notificator.types()).operatable(false).simplify();
-        name.model(n -> n.name);
+        name.modelByVar(n -> n.name);
         desktop.text(en("Desktop")).renderAsCheckBox(notify -> notify.onDesktop, UICheckBox::sync);
         line.text(en("LINE")).renderAsCheckBox(notify -> notify.onLine, (ui, model) -> {
             ui.sync(model).disableWhen(notificator.lineAccessToken, String::isEmpty);
