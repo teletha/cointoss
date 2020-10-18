@@ -36,6 +36,9 @@ public class Notificator extends Model<Notificator> {
     /** The defined type. */
     public final Notify priceSignal = new Notify("Price Signal");
 
+    /** The master volume for Sound. */
+    final @Managed DoublePreference masterVolume = initialize(100.0);
+
     /** The access token for LINE. */
     final @Managed Preference<String> lineAccessToken = initialize("");
 

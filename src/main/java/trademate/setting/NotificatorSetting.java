@@ -23,6 +23,7 @@ import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
+import viewtify.ui.UISlider;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
@@ -50,6 +51,9 @@ class NotificatorSetting extends View {
     private UITableColumn<Notify, Notify> line;
 
     private UITableColumn<Notify, Notify> sound;
+
+    /** The desktop configuration UI. */
+    private UISlider soundMasterVolume;;
 
     /** The desktop configuration UI. */
     private UISpinner<Duration> desktopDuration;
@@ -89,6 +93,12 @@ class NotificatorSetting extends View {
                     });
                 });
 
+                // Sound
+                $(vbox, Block, () -> {
+                    label(en("Sound Notification"), Heading);
+                    form(en("Volume Level"), soundMasterVolume);
+                });
+
                 // Desktop
                 $(vbox, Block, () -> {
                     label(en("Desktop Notification"), Heading);
@@ -122,6 +132,9 @@ class NotificatorSetting extends View {
         sound.text(en("Sound")).renderAsComboBox(notify -> notify.onSound, (ui, model) -> {
             ui.items(Sound.values()).sync(model).when(User.Action, ui.value()::play);
         });
+
+        // For Sound
+        soundMasterVolume.snapToTicks(true).showTickLabels(true).showTickMarks(true).sync(notificator.masterVolume);
 
         // For Desktop
         desktopPosition.items(Corner.values())
