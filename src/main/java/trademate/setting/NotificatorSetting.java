@@ -124,7 +124,10 @@ class NotificatorSetting extends View {
         });
 
         // For Desktop
-        desktopPosition.items(Corner.values()).sync(Toast.setting.area);
+        desktopPosition.items(Corner.values())
+                .renderByVariable(Corner::toTraslated)
+                .renderSelectedByVariable(Corner::toTraslated)
+                .sync(Toast.setting.area);
         desktopDuration.items(1, 30, Duration::minutes)
                 .sync(Toast.setting.autoHide)
                 .format(duration -> Primitives.roundString(duration.toMinutes(), 0) + en("mins"));
