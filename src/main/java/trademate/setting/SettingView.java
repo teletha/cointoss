@@ -26,8 +26,6 @@ import viewtify.ui.helper.User;
 @Managed(value = Singleton.class)
 public class SettingView extends View {
 
-    private UILabel general;
-
     private UILabel appearance;
 
     private UILabel chart;
@@ -47,7 +45,6 @@ public class SettingView extends View {
         {
             $(hbox, () -> {
                 $(vbox, style.categoryView, () -> {
-                    $(general, style.categoryLabel);
                     $(appearance, style.categoryLabel);
                     $(chart, style.categoryLabel);
                     $(notification, style.categoryLabel);
@@ -91,9 +88,8 @@ public class SettingView extends View {
      */
     @Override
     protected void initialize() {
-        select(notification, NotificatorSetting.class);
+        select(notification, AppearanceSetting.class);
 
-        general.text(en("General")).when(User.MouseClick, () -> select(general, GeneralSetting.class));
         appearance.text(en("Appearance")).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
         chart.text(en("Chart")).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
         notification.text(en("Notification")).when(User.MouseClick, () -> select(notification, NotificatorSetting.class));
@@ -101,7 +97,7 @@ public class SettingView extends View {
     }
 
     private void select(UILabel selected, Class<? extends View> view) {
-        for (UILabel label : List.of(general, appearance, notification, bitflyer)) {
+        for (UILabel label : List.of(appearance, notification, bitflyer)) {
             if (label == selected) {
                 label.style(style.selectedLabel);
             } else {

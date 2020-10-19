@@ -9,12 +9,16 @@
  */
 package trademate.setting;
 
+import java.util.Locale;
+
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import trademate.CommonText;
 import trademate.Theme;
 import viewtify.ui.UIColorPicker;
+import viewtify.ui.UIComboBox;
+import viewtify.ui.UIFontPicker;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
@@ -23,18 +27,24 @@ public class AppearanceSetting extends View {
 
     private Theme theme = I.make(Theme.class);
 
-    private UIColorPicker buy;
+    UIComboBox<Locale> language;
 
-    private UIColorPicker sell;
+    UIFontPicker font;
 
-    interface style extends SettingStyles {
-    }
+    UIColorPicker buy;
 
-    class view extends ViewDSL {
+    UIColorPicker sell;
+
+    class view extends ViewDSL implements SettingStyles {
         {
             $(vbox, () -> {
-                $(vbox, style.Block, () -> {
-                    label(en("Colors"), style.Heading);
+                $(vbox, Block, () -> {
+                    label(en("General"), Heading);
+                    form(en("Language"), language);
+                    form(en("Font"), font);
+                });
+                $(vbox, Block, () -> {
+                    label(en("Colors"), Heading);
                     form(CommonText.Buy, buy);
                     form(CommonText.Sell, sell);
                 });
@@ -47,6 +57,12 @@ public class AppearanceSetting extends View {
      */
     @Override
     protected void initialize() {
+        language.items(Locale.ENGLISH, Locale.JAPANESE, Locale.CHINESE)
+                .render(lang -> lang.getDisplayLanguage(lang))
+                .renderSelected(lang -> lang.getDisplayLanguage(lang))
+                .select(Locale.forLanguageTag(I.Lang.exact()))
+                .observing(lang -> I.Lang.set(lang.getLanguage()));
+
         buy.sync(theme.Long);
         sell.sync(theme.Short);
     }
