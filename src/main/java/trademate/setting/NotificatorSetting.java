@@ -130,7 +130,7 @@ class NotificatorSetting extends View {
             ui.sync(model).disableWhen(notificator.lineAccessToken, String::isEmpty);
         });
         sound.text(en("Sound")).renderAsComboBox(notify -> notify.onSound, (ui, model) -> {
-            ui.items(Sound.values()).sync(model).when(User.Action, ui.value()::play);
+            ui.items(Sound.values()).sync(model).when(User.Action, () -> ui.value().play());
         });
 
         // For Sound
