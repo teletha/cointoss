@@ -88,16 +88,16 @@ public class SettingView extends View {
      */
     @Override
     protected void initialize() {
-        select(notification, AppearanceSetting.class);
-
         appearance.text(en("Appearance")).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
-        chart.text(en("Chart")).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
+        chart.text(en("Chart")).when(User.MouseClick, () -> select(chart, ChartSetting.class));
         notification.text(en("Notification")).when(User.MouseClick, () -> select(notification, NotificatorSetting.class));
         bitflyer.text(en("Bitflyer")).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
+
+        select(appearance, AppearanceSetting.class);
     }
 
     private void select(UILabel selected, Class<? extends View> view) {
-        for (UILabel label : List.of(appearance, notification, bitflyer)) {
+        for (UILabel label : List.of(appearance, chart, notification, bitflyer)) {
             if (label == selected) {
                 label.style(style.selectedLabel);
             } else {
