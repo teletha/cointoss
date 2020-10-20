@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.*;
+import static trademate.FXColorPalettes.Pastel10;
 
 import java.text.Normalizer.Form;
 import java.util.HashMap;
@@ -185,8 +185,8 @@ public class GlobalVolumeView extends View {
                 $(vbox, () -> {
                     $(hbox, FormStyles.FormRow, () -> {
                         $(name, style.info);
-                        $(volumeLong, style.info, TradeMateStyle.Long);
-                        $(volumeShort, style.info, TradeMateStyle.Short);
+                        $(volumeLong, style.info);
+                        $(volumeShort, style.info);
                         $(volumeRatio, style.info);
                         $(threshold, style.form);
                     });
@@ -227,6 +227,8 @@ public class GlobalVolumeView extends View {
         @Override
         protected void initialize() {
             name.text(target.code);
+            volumeLong.color(Theme.$.Long);
+            volumeShort.color(Theme.$.Short);
             threshold.acceptPositiveNumberInput().normalizeInput(Form.NFKD).initialize("0");
         }
 

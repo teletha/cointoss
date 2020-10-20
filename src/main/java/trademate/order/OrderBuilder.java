@@ -36,7 +36,7 @@ import kiss.WiseConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
-import trademate.TradeMateStyle;
+import trademate.Theme;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.style.FormStyles;
@@ -133,7 +133,7 @@ public class OrderBuilder extends View {
 
     private UIScrollPane scroll;
 
-    class View extends ViewDSL implements TradeMateStyle, FormStyles {
+    class View extends ViewDSL implements FormStyles {
         {
             $(OrderBuilder.this.scroll, () -> {
                 $(vbox, S.Root, FormLabelMin, () -> {
@@ -142,7 +142,7 @@ public class OrderBuilder extends View {
                     form(en("Variances"), FormInputMin, orderDivideSize, orderDivideIntervalAmount);
                     form(en("Price Interval"), FormInputMin, orderPriceInterval, orderPriceIntervalAmount);
                     form(en("Threshold"), FormInputMin, optimizeThreshold);
-                    form(FormButton, orderLimitShort.style(Short), orderLimitLong.style(Long));
+                    form(FormButton, orderLimitShort.color(Theme.$.Short), orderLimitLong.color(Theme.$.Long));
                     form(FormButton, orderCancel, orderStop, orderReverse);
                     form(en("Position"), FormInputMin, positionSize);
 
@@ -220,7 +220,7 @@ public class OrderBuilder extends View {
         }
 
         view.market.orders.position.observing().on(Viewtify.UIThread).to(position -> {
-            positionSize.text(position).styleOnly(position.isPositiveOrZero() ? TradeMateStyle.Long : TradeMateStyle.Short);
+            positionSize.text(position).color(position.isPositiveOrZero() ? Theme.$.Long : Theme.$.Short);
         });
 
         bot.text("Active Bot").observe().take(1).to(v -> {
@@ -231,9 +231,7 @@ public class OrderBuilder extends View {
             $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
 
-        side.text(SiDe)
-                .model(Order.class, Order::direction)
-                .render((label, side) -> label.text(side).styleOnly(TradeMateStyle.Side.of(side)));
+        side.text(Side).model(Order.class, Order::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
         amount.text(Amount).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
         price.text(Price).model(Order.class, o -> o.price);
 

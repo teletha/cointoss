@@ -38,7 +38,7 @@ public class ExecutionView extends View {
     /** Parent View */
     private TradingView view;
 
-    class view extends ViewDSL implements TradeMateStyle, FormStyles {
+    class view extends ViewDSL implements FormStyles {
 
         {
             $(vbox, style.root, FormLabelMin, () -> {
@@ -119,6 +119,6 @@ public class ExecutionView extends View {
         String text = Chrono.system(e.date).format(Chrono.Time) + "  " + Strings.padEnd(e.price.toString(), 5, ' ') + " \t" + Primitives
                 .roundString(e.accumulative, scale);
 
-        label.text(text).styleOnly(TradeMateStyle.Side.of(e.direction));
+        label.text(text).color(Theme.colorBy(e));
     }
 }

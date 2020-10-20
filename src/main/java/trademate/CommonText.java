@@ -14,7 +14,7 @@ import kiss.Variable;
 
 public interface CommonText {
 
-    Variable<String> SiDe = I.translate("Side");
+    Variable<String> Side = I.translate("Side");
 
     Variable<String> Buy = I.translate("Buy");
 

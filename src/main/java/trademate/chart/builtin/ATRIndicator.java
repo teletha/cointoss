@@ -16,8 +16,9 @@ import cointoss.ticker.Ticker;
 import cointoss.util.arithmetic.Num;
 import stylist.Style;
 import stylist.StyleDSL;
-import trademate.TradeMateStyle;
+import trademate.Theme;
 import trademate.chart.PlotScript;
+import viewtify.util.FXUtils;
 
 public class ATRIndicator extends PlotScript {
 
@@ -41,11 +42,11 @@ public class ATRIndicator extends PlotScript {
      */
     interface style extends StyleDSL {
         Style Main = () -> {
-            stroke.color(TradeMateStyle.BUY).width(0.3, px);
+            stroke.color(FXUtils.color(Theme.$.Long.v)).width(0.3, px);
         };
 
         Style Per = () -> {
-            stroke.color(TradeMateStyle.SELL).width(0.3, px);
+            stroke.color(FXUtils.color(Theme.$.Short.v)).width(0.3, px);
         };
     }
 }

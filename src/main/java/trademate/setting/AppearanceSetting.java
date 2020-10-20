@@ -44,7 +44,7 @@ public class AppearanceSetting extends View {
                     form(en("Font"), font);
                 });
                 $(vbox, Block, () -> {
-                    label(en("Colors"), Heading);
+                    label(en("Color Combination"), Heading);
                     form(CommonText.Buy, buy);
                     form(CommonText.Sell, sell);
                 });

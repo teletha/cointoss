@@ -9,25 +9,38 @@
  */
 package trademate;
 
-import kiss.Managed;
-import kiss.Singleton;
-import kiss.Storable;
-import kiss.Variable;
-import stylist.value.Color;
+import javafx.scene.paint.Color;
 
-@Managed(value = Singleton.class)
-public class Theme implements Storable<Theme> {
+import cointoss.Directional;
+import kiss.I;
+import viewtify.model.Model;
+
+public class Theme extends Model<Theme> {
+
+    /** The current theme. */
+    public static final Theme $ = I.make(Theme.class);
 
     /* Long position color. */
-    public final Variable<Color> Long = Variable.of(Color.rgb(251, 189, 42));
+    public final Preference<Color> Long = initialize(Color.rgb(251, 189, 42));
 
     /* Short position color. */
-    public final Variable<Color> Short = Variable.of(Color.rgb(247, 105, 77));
+    public final Preference<Color> Short = initialize(Color.rgb(247, 105, 77));
 
     /**
-     * 
+     * Hide Constructor.
      */
     private Theme() {
         restore().auto();
+    }
+
+    /**
+     * Detec the color by direction.
+     * 
+     * @param direction
+     * @return
+     */
+    public static Color colorBy(Directional direction) {
+        Theme theme = I.make(Theme.class);
+        return direction.isBuy() ? theme.Long.v : theme.Short.v;
     }
 }

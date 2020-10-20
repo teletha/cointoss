@@ -18,9 +18,10 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.value.Color;
-import trademate.TradeMateStyle;
+import trademate.Theme;
 import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
+import viewtify.util.FXUtils;
 
 public class WaveTrendIndicator extends PlotScript {
 
@@ -53,7 +54,7 @@ public class WaveTrendIndicator extends PlotScript {
 
     interface style extends StyleDSL {
         Style Main = () -> {
-            stroke.color(TradeMateStyle.BUY).width(0.3, px);
+            stroke.color(FXUtils.color(Theme.$.Long.v)).width(0.3, px);
         };
 
         Style M10 = () -> {

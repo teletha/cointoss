@@ -61,7 +61,7 @@ import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
 import trademate.CommonText;
-import trademate.TradeMateStyle;
+import trademate.Theme;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.setting.Notificator;
@@ -88,10 +88,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private static final Color BaseColor = Color.rgb(80, 80, 80);
 
     /** Chart Color */
-    private static final Color BuyerColor = FXUtils.color(TradeMateStyle.BUY.opacify(-0.2));
+    private static final Color BuyerColor = Theme.$.Long.v.deriveColor(0, 1, 1, 0.8);
 
     /** Chart Color */
-    private static final Color SellerColor = FXUtils.color(TradeMateStyle.SELL.opacify(-0.2));
+    private static final Color SellerColor = Theme.$.Short.v.deriveColor(0, 1, 1, 0.8);
 
     /** The width orderbook bar graph. */
     private static final double OrderbookBarWidth = 40;
