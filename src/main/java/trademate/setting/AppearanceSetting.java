@@ -25,11 +25,11 @@ import viewtify.ui.ViewDSL;
 @Managed(value = Singleton.class)
 public class AppearanceSetting extends View {
 
-    private Theme theme = I.make(Theme.class);
-
     UIComboBox<Locale> language;
 
     UIFontPicker font;
+
+    UIComboBox<Theme> themes;
 
     UIColorPicker buy;
 
@@ -45,6 +45,7 @@ public class AppearanceSetting extends View {
                 });
                 $(vbox, Block, () -> {
                     label(en("Color Combination"), Heading);
+                    form(en("Theme"), themes);
                     form(CommonText.Buy, buy);
                     form(CommonText.Sell, sell);
                 });
@@ -63,7 +64,8 @@ public class AppearanceSetting extends View {
                 .select(Locale.forLanguageTag(I.Lang.exact()))
                 .observing(lang -> I.Lang.set(lang.getLanguage()));
 
-        buy.sync(theme.Long);
-        sell.sync(theme.Short);
+        themes.initialize(Theme.builtins()).observe(Theme::apply);
+        buy.sync(Theme.$.buy);
+        sell.sync(Theme.$.sell);
     }
 }

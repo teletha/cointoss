@@ -42,11 +42,11 @@ public class ATRIndicator extends PlotScript {
      */
     interface style extends StyleDSL {
         Style Main = () -> {
-            stroke.color(FXUtils.color(Theme.$.Long.v)).width(0.3, px);
+            stroke.color(FXUtils.color(Theme.$.buy.v)).width(0.3, px);
         };
 
         Style Per = () -> {
-            stroke.color(FXUtils.color(Theme.$.Short.v)).width(0.3, px);
+            stroke.color(FXUtils.color(Theme.$.sell.v)).width(0.3, px);
         };
     }
 }

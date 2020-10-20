@@ -88,10 +88,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private static final Color BaseColor = Color.rgb(80, 80, 80);
 
     /** Chart Color */
-    private static final Color BuyerColor = Theme.$.Long.v.deriveColor(0, 1, 1, 0.8);
+    private static final Color BuyerColor = Theme.$.buy.v.deriveColor(0, 1, 1, 0.8);
 
     /** Chart Color */
-    private static final Color SellerColor = Theme.$.Short.v.deriveColor(0, 1, 1, 0.8);
+    private static final Color SellerColor = Theme.$.sell.v.deriveColor(0, 1, 1, 0.8);
 
     /** The width orderbook bar graph. */
     private static final double OrderbookBarWidth = 40;

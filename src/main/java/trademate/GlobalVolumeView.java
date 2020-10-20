@@ -227,8 +227,8 @@ public class GlobalVolumeView extends View {
         @Override
         protected void initialize() {
             name.text(target.code);
-            volumeLong.color(Theme.$.Long);
-            volumeShort.color(Theme.$.Short);
+            volumeLong.color(Theme.$.buy);
+            volumeShort.color(Theme.$.sell);
             threshold.acceptPositiveNumberInput().normalizeInput(Form.NFKD).initialize("0");
         }
 

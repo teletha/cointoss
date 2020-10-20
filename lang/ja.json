@@ -102,6 +102,7 @@
 		"The specified token is valid.": "指定されたトークンは有効です。",
 		"The start date must be prior to the end date.": "開始日は終了日より前でなければなりません。",
 		"The start value must be less than the end value.": "開始値は終了値より小さくなければなりません。",
+		"Theme": "テーマ",
 		"This is invalid value, please correct.": "これは無効な値です。訂正してください。",
 		"Threshold": "閾枚数",
 		"TopLeft": "左上",

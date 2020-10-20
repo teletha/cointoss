@@ -54,7 +54,7 @@ public class WaveTrendIndicator extends PlotScript {
 
     interface style extends StyleDSL {
         Style Main = () -> {
-            stroke.color(FXUtils.color(Theme.$.Long.v)).width(0.3, px);
+            stroke.color(FXUtils.color(Theme.$.buy.v)).width(0.3, px);
         };
 
         Style M10 = () -> {

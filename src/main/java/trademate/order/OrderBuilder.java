@@ -142,7 +142,7 @@ public class OrderBuilder extends View {
                     form(en("Variances"), FormInputMin, orderDivideSize, orderDivideIntervalAmount);
                     form(en("Price Interval"), FormInputMin, orderPriceInterval, orderPriceIntervalAmount);
                     form(en("Threshold"), FormInputMin, optimizeThreshold);
-                    form(FormButton, orderLimitShort.color(Theme.$.Short), orderLimitLong.color(Theme.$.Long));
+                    form(FormButton, orderLimitShort.color(Theme.$.sell), orderLimitLong.color(Theme.$.buy));
                     form(FormButton, orderCancel, orderStop, orderReverse);
                     form(en("Position"), FormInputMin, positionSize);
 
@@ -220,7 +220,7 @@ public class OrderBuilder extends View {
         }
 
         view.market.orders.position.observing().on(Viewtify.UIThread).to(position -> {
-            positionSize.text(position).color(position.isPositiveOrZero() ? Theme.$.Long : Theme.$.Short);
+            positionSize.text(position).color(position.isPositiveOrZero() ? Theme.$.buy : Theme.$.sell);
         });
 
         bot.text("Active Bot").observe().take(1).to(v -> {
