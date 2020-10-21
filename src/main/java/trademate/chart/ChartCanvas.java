@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.function.DoubleUnaryOperator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -751,7 +750,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
 
                     double[] channelStart = {start, start};
-                    TrendLine highest = new TrendLine(20);
                     DoubleList valueX = new DoubleList((int) tickSize);
 
                     ticker.ticks.each(start, end, tick -> {
@@ -797,15 +795,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             }
                         }
                         valueX.add(x);
-
-                        DoubleUnaryOperator line = highest.add(x, high);
-                        if (line != null) {
-                            gc.setLineWidth(0.5);
-                            gc.setStroke(Color.RED);
-                            double forward = x * 2 - channelStart[0];
-                            gc.strokeLine(channelStart[0], line.applyAsDouble(channelStart[0]), x, line.applyAsDouble(x));
-                            channelStart[0] = x;
-                        }
                     });
 
                     double width = candles.getWidth();
