@@ -15,6 +15,8 @@ import javafx.scene.paint.Color;
 
 import cointoss.ticker.Tick;
 import cointoss.util.arithmetic.Num;
+import kiss.Variable;
+import trademate.Theme;
 import viewtify.util.FXUtils;
 
 public enum CandleType {
@@ -25,9 +27,9 @@ public enum CandleType {
         Num close = tick.closePrice();
 
         if (open.isLessThan(close)) {
-            return CandleType.Buy;
+            return Theme.$.buy.v;
         } else if (open.isGreaterThan(close)) {
-            return CandleType.Sell;
+            return Theme.$.sell.v;
         } else {
             return CandleType.Same;
         }
@@ -39,9 +41,9 @@ public enum CandleType {
         double sell = tick.shortVolume();
 
         if (buy > sell) {
-            return CandleType.Buy;
+            return Theme.$.buy.v;
         } else if (buy < sell) {
-            return CandleType.Sell;
+            return Theme.$.sell.v;
         } else {
             return CandleType.Same;
         }
@@ -56,21 +58,21 @@ public enum CandleType {
 
         if (open.isLessThan(close)) {
             if (buy >= sell) {
-                return CandleType.Buy;
+                return Theme.$.buy.v;
             } else {
-                return CandleType.BuyT;
+                return CandleType.BuyT.v;
             }
         } else if (open.isGreaterThan(close)) {
             if (buy >= sell) {
-                return CandleType.SellT;
+                return CandleType.SellT.v;
             } else {
-                return CandleType.Sell;
+                return Theme.$.sell.v;
             }
         } else {
             if (buy >= sell) {
-                return CandleType.Buy;
+                return Theme.$.buy.v;
             } else {
-                return CandleType.Sell;
+                return Theme.$.sell.v;
             }
         }
     }),
@@ -84,25 +86,19 @@ public enum CandleType {
         double weight = Math.pow(buy / sell, 4);
 
         if (open.isLessThan(close)) {
-            return CandleType.Buy.deriveColor(0, weight, 1, 1);
+            return Theme.$.buy.v.deriveColor(0, weight, 1, 1);
         } else if (open.isGreaterThan(close)) {
-            return CandleType.Sell.deriveColor(0, weight, 1, 1);
+            return Theme.$.sell.v.deriveColor(0, weight, 1, 1);
         } else {
             return CandleType.Same;
         }
     });
 
     /** The candle color. */
-    private static final Color Buy = FXUtils.color(ChartStyles.buy);
+    private static final Variable<Color> BuyT = Theme.$.buy.observing().map(color -> color.deriveColor(0, 1, 100, 1)).to();
 
     /** The candle color. */
-    private static final Color Sell = FXUtils.color(ChartStyles.sell);
-
-    /** The candle color. */
-    private static final Color BuyT = Buy.deriveColor(0, 1, 100, 1);
-
-    /** The candle color. */
-    private static final Color SellT = Sell.deriveColor(30, 1, 100, 1);
+    private static final Variable<Color> SellT = Theme.$.sell.observing().map(color -> color.deriveColor(30, 1, 100, 1)).to();
 
     /** The candle color. */
     private static final Color Same = FXUtils.color(ChartStyles.same);

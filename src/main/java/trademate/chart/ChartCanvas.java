@@ -9,6 +9,8 @@
  */
 package trademate.chart;
 
+import static cointoss.Direction.*;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
@@ -86,12 +89,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Infomation Color */
     private static final Color BaseColor = Color.rgb(80, 80, 80);
-
-    /** Chart Color */
-    private static final Color BuyerColor = Theme.$.buy.v.deriveColor(0, 1, 1, 0.8);
-
-    /** Chart Color */
-    private static final Color SellerColor = Theme.$.sell.v.deriveColor(0, 1, 1, 0.8);
 
     /** The width orderbook bar graph. */
     private static final double OrderbookBarWidth = 40;
@@ -497,7 +494,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         Num price = largest.rangedPrice();
                         double position = axisY.getPositionForValue(price.doubleValue());
                         orderbookDigit.clear()
-                                .strokeColor(price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BuyerColor : SellerColor)
+                                .strokeColor(Theme.colorBy(price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BUY : SELL))
                                 .strokeText((int) largest.size, orderbookDigit
                                         .getWidth() - largest.size * orderbookBar.scale - 15, position);
                     }
@@ -1328,8 +1325,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * Draw orderbooks on chart' side.
          */
         private void draw() {
-            draw(buyers, buyerMaxSize, BuyerColor);
-            draw(sellers, sellerMaxSize, SellerColor);
+            draw(buyers, buyerMaxSize, Theme.colorBy(Direction.BUY));
+            draw(sellers, sellerMaxSize, Theme.colorBy(Direction.SELL));
         }
 
         /**
