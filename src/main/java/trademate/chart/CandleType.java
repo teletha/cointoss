@@ -22,7 +22,37 @@ import viewtify.util.FXUtils;
 public enum CandleType {
 
     /** Coordinate by price. */
-    Price(tick -> {
+    Price(CandleType::price),
+
+    /** Coordinate by volume. */
+    Volume(CandleType::volume),
+
+    /** Coordinate by volume. */
+    PriceVolume(CandleType::priceVolume),
+
+    /** Coordinate by volume. */
+    PriceVolumeWeight(CandleType::priceVolumeWeight);
+
+    /** The candle color. */
+    private static final Variable<Color> BuyT = Theme.$.buy.observing().map(color -> color.deriveColor(0, 1, 1, 0.4)).to();
+
+    /** The candle color. */
+    private static final Variable<Color> SellT = Theme.$.sell.observing().map(color -> color.deriveColor(0, 1, 1, 0.4)).to();
+
+    /** The candle color. */
+    private static final Color Same = FXUtils.color(ChartStyles.same);
+
+    /** The color coordinator. */
+    final Function<Tick, Color> coordinator;
+
+    /**
+     * @param coordinator
+     */
+    private CandleType(Function<Tick, Color> coordinator) {
+        this.coordinator = coordinator;
+    }
+
+    private static Color price(Tick tick) {
         Num open = tick.openPrice;
         Num close = tick.closePrice();
 
@@ -33,10 +63,9 @@ public enum CandleType {
         } else {
             return CandleType.Same;
         }
-    }),
+    }
 
-    /** Coordinate by volume. */
-    Volume(tick -> {
+    private static Color volume(Tick tick) {
         double buy = tick.longVolume();
         double sell = tick.shortVolume();
 
@@ -47,10 +76,9 @@ public enum CandleType {
         } else {
             return CandleType.Same;
         }
-    }),
+    }
 
-    /** Coordinate by volume. */
-    PriceVolume(tick -> {
+    private static Color priceVolume(Tick tick) {
         Num open = tick.openPrice;
         Num close = tick.closePrice();
         double buy = tick.longVolume();
@@ -75,41 +103,20 @@ public enum CandleType {
                 return Theme.$.sell.v;
             }
         }
-    }),
+    }
 
-    /** Coordinate by volume. */
-    PriceVolumeWeight(tick -> {
+    private static Color priceVolumeWeight(Tick tick) {
         Num open = tick.openPrice;
         Num close = tick.closePrice();
         double buy = tick.longVolume();
         double sell = tick.shortVolume();
-        double weight = Math.pow(buy / sell, 4);
 
         if (open.isLessThan(close)) {
-            return Theme.$.buy.v.deriveColor(0, weight, 1, 1);
+            return Theme.$.buy.v.deriveColor(0, buy / sell, 1, 1);
         } else if (open.isGreaterThan(close)) {
-            return Theme.$.sell.v.deriveColor(0, weight, 1, 1);
+            return Theme.$.sell.v.deriveColor(0, sell / buy, 1, 1);
         } else {
             return CandleType.Same;
         }
-    });
-
-    /** The candle color. */
-    private static final Variable<Color> BuyT = Theme.$.buy.observing().map(color -> color.deriveColor(0, 1, 100, 1)).to();
-
-    /** The candle color. */
-    private static final Variable<Color> SellT = Theme.$.sell.observing().map(color -> color.deriveColor(30, 1, 100, 1)).to();
-
-    /** The candle color. */
-    private static final Color Same = FXUtils.color(ChartStyles.same);
-
-    /** The color coordinator. */
-    final Function<Tick, Color> coordinator;
-
-    /**
-     * @param coordinator
-     */
-    private CandleType(Function<Tick, Color> coordinator) {
-        this.coordinator = coordinator;
     }
 }

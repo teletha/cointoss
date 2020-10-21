@@ -219,7 +219,7 @@ public final class Tick {
      * @return
      */
     private Trend estimateTrend() {
-        int buy, sell, range;
+        int point = 0;
 
         return Trend.Unknown;
     }
