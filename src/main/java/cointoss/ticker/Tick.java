@@ -49,6 +49,9 @@ public final class Tick {
     /** Snapshot of short losscut volume at tick initialization. */
     double shortLosscutVolume;
 
+    /** The trend type. */
+    Trend trend;
+
     /**
      * Empty Dummt Tick.
      */
@@ -202,6 +205,26 @@ public final class Tick {
     }
 
     /**
+     * Detect the trend type at this {@link Tick}.
+     * 
+     * @return
+     */
+    public Trend trend() {
+        return realtime == null ? trend : estimateTrend();
+    }
+
+    /**
+     * Estimate the trend type at this {@link Tick}.
+     * 
+     * @return
+     */
+    private Trend estimateTrend() {
+        int buy, sell, range;
+
+        return Trend.Unknown;
+    }
+
+    /**
      * Make this {@link Tick}'s related values fixed.
      * 
      * @return
@@ -212,6 +235,7 @@ public final class Tick {
         longLosscutVolume = longLosscutVolume();
         shortVolume = shortVolume();
         shortLosscutVolume = shortLosscutVolume();
+        trend = estimateTrend();
         realtime = null;
     }
 

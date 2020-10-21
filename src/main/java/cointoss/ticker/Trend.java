@@ -10,5 +10,5 @@
 package cointoss.ticker;
 
 public enum Trend {
-    Buy, Sell, Unknown;
+    Buy, Sell, Range, Unknown;
 }
