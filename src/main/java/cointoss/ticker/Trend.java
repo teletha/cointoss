@@ -9,17 +9,6 @@
  */
 package cointoss.ticker;
 
-import org.junit.jupiter.api.Test;
-
-class TrendLineTest {
-
-    @Test
-    void testName() {
-        TrendLine line = new TrendLine(20);
-        for (int i = 0; i < 20; i++) {
-            line.add(i, i);
-        }
-
-        line.build();
-    }
+public enum Trend {
+    Buy, Sell, Unknown;
 }
