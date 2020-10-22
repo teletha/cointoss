@@ -11,11 +11,11 @@ package cointoss.analyze;
 
 import org.junit.jupiter.api.Test;
 
-public class DoubleStatisticsUpdaterTest {
+public class OnlineStatisticsTest {
 
     @Test
-    public void add() {
-        final DoubleStatisticsUpdater updater = new DoubleStatisticsUpdater();
+    public void add1() {
+        final OnlineStatistics updater = new OnlineStatistics();
         updater.add(1);
         updater.add(2);
         updater.add(3);
@@ -31,8 +31,27 @@ public class DoubleStatisticsUpdaterTest {
     }
 
     @Test
+    public void add2() {
+        final OnlineStatistics updater = new OnlineStatistics();
+        updater.add(1);
+        updater.add(2);
+        updater.add(3);
+        updater.add(4);
+        updater.add(5);
+        updater.add(6);
+
+        assert updater.getCount() == 6;
+        assert updater.getSum() == 21;
+        assert updater.getMean() == 3.5;
+        assert updater.getVariance() == 2.9166666666666665;
+        assert updater.getVarianceUnbiased() == 3.5;
+        assert updater.getStdDev() == 1.707825127659933;
+        assert updater.getStdDevUnbiased() == 1.8708286933869707;
+    }
+
+    @Test
     public void remove() {
-        final DoubleStatisticsUpdater updater = new DoubleStatisticsUpdater();
+        final OnlineStatistics updater = new OnlineStatistics();
         updater.add(1);
         updater.add(2);
         updater.add(3);
@@ -53,7 +72,7 @@ public class DoubleStatisticsUpdaterTest {
 
     @Test
     public void replace() {
-        final DoubleStatisticsUpdater updater = new DoubleStatisticsUpdater();
+        final OnlineStatistics updater = new OnlineStatistics();
         updater.add(1);
         updater.add(2);
         updater.add(3);
@@ -71,11 +90,11 @@ public class DoubleStatisticsUpdaterTest {
 
     @Test
     public void reset() {
-        final DoubleStatisticsUpdater updater = new DoubleStatisticsUpdater();
+        final OnlineStatistics updater = new OnlineStatistics();
         updater.add(1);
         updater.add(2);
         updater.reset();
-    
+
         assert updater.getCount() == 0;
         assert updater.getMean() == 0;
         assert updater.getSum() == 0;

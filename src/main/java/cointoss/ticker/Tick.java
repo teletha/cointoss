@@ -210,18 +210,7 @@ public final class Tick {
      * @return
      */
     public Trend trend() {
-        return realtime == null ? trend : estimateTrend();
-    }
-
-    /**
-     * Estimate the trend type at this {@link Tick}.
-     * 
-     * @return
-     */
-    private Trend estimateTrend() {
-        int point = 0;
-
-        return Trend.Unknown;
+        return realtime == null ? trend : Trend.estimate(this);
     }
 
     /**
@@ -235,7 +224,7 @@ public final class Tick {
         longLosscutVolume = longLosscutVolume();
         shortVolume = shortVolume();
         shortLosscutVolume = shortLosscutVolume();
-        trend = estimateTrend();
+        trend = Trend.estimate(this);
         realtime = null;
     }
 

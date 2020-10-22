@@ -11,4 +11,18 @@ package cointoss.ticker;
 
 public enum Trend {
     Buy, Sell, Range, Unknown;
+
+    /**
+     * Estimate trend type from {@link Tick}.
+     * 
+     * @param tick
+     * @return
+     */
+    static Trend estimate(Tick tick) {
+        int point = 0;
+
+        double volume = tick.volume();
+
+        return Unknown;
+    }
 }

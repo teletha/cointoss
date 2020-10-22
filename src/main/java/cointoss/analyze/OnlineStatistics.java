@@ -18,7 +18,7 @@ package cointoss.analyze;
  * <p>
  * This class is <i>NOT</i> thread safe.
  */
-public class DoubleStatisticsUpdater {
+public class OnlineStatistics {
 
     private long count;
 
@@ -77,6 +77,15 @@ public class DoubleStatisticsUpdater {
     }
 
     /**
+     * Returns the number of values in the sample.
+     * 
+     * @return the number of values in the sample
+     */
+    public long getCount() {
+        return count;
+    }
+
+    /**
      * Returns the sum value of the sample. Returns 0 if the sample count is zero.
      * 
      * @return
@@ -97,19 +106,6 @@ public class DoubleStatisticsUpdater {
     }
 
     /**
-     * Returns the variance of the sample using the {@code (n-1)} method. Returns 0 if the sample
-     * count is zero, and Inf or NaN if count is 1.
-     * <p>
-     * The method is based on calculated values and returns almost immediately (involves a simple
-     * division).
-     * 
-     * @return the variance of the sample (bias corrected)
-     */
-    public double getVarianceUnbiased() {
-        return count > 0 ? s / (count - 1) : 0;// yes, this returns Inf if count==1
-    }
-
-    /**
      * Returns the variance of the sample using the {@code (n)} method. Returns NaN if count is 0.
      * <p>
      * The method is based on calculated values and returns almost immediately (involves a simple
@@ -122,16 +118,16 @@ public class DoubleStatisticsUpdater {
     }
 
     /**
-     * Returns the standard deviation of the sample using the {@code (n-1)} method. Returns 0 if the
-     * sample count is zero, and Inf or NaN if count is 1.
+     * Returns the variance of the sample using the {@code (n-1)} method. Returns 0 if the sample
+     * count is zero, and Inf or NaN if count is 1.
      * <p>
-     * The method is based on calculated values and returns almost immediately (involves a square
-     * root and division operation).
+     * The method is based on calculated values and returns almost immediately (involves a simple
+     * division).
      * 
-     * @return the standard deviation of the sample (bias corrected)
+     * @return the variance of the sample (bias corrected)
      */
-    public double getStdDevUnbiased() {
-        return Math.sqrt(getVarianceUnbiased());
+    public double getVarianceUnbiased() {
+        return count > 0 ? s / (count - 1) : 0;// yes, this returns Inf if count==1
     }
 
     /**
@@ -148,12 +144,16 @@ public class DoubleStatisticsUpdater {
     }
 
     /**
-     * Returns the number of values in the sample.
+     * Returns the standard deviation of the sample using the {@code (n-1)} method. Returns 0 if the
+     * sample count is zero, and Inf or NaN if count is 1.
+     * <p>
+     * The method is based on calculated values and returns almost immediately (involves a square
+     * root and division operation).
      * 
-     * @return the number of values in the sample
+     * @return the standard deviation of the sample (bias corrected)
      */
-    public long getCount() {
-        return count;
+    public double getStdDevUnbiased() {
+        return Math.sqrt(getVarianceUnbiased());
     }
 
     /**
@@ -175,7 +175,7 @@ public class DoubleStatisticsUpdater {
      *
      * @param with the sampler with which this sampler is combined
      */
-    public void combine(final DoubleStatisticsUpdater with) {
+    public void combine(final OnlineStatistics with) {
         // e.g. see https://en.wikipedia.org/wiki/Standard_deviation#Combining_standard_deviations
         final long n1 = this.count;
         final long n2 = with.count;
