@@ -42,6 +42,7 @@ import com.google.common.cache.LoadingCache;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
@@ -117,9 +118,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The size of chart infomation area. */
     private static final int chartInfoHorizontalGap = 3;
 
+    /** The market info's label. */
     private static final Variable<String> DelayLabel = I.translate("Delay");
 
+    /** The market info's label. */
     private static final Variable<String> SpreadLabel = I.translate("Spread");
+
+    /** The market info's label. */
+    private static final Variable<String> VolatilityLabel = I.translate("Volatility");
 
     /** The chart node. */
     private final ChartView chart;
@@ -686,6 +692,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     c.setFill(BaseColor);
                     c.fillText(DelayLabel.v, chartInfoLeftPadding, 35);
                     c.fillText(SpreadLabel.v, chartInfoLeftPadding, 50);
+                    c.fillText(VolatilityLabel.v, chartInfoLeftPadding, 65);
 
                     long diff = Chrono.currentTimeMills() - e.mills;
                     c.setFill(diff < 0 || 1000 < diff ? WarningColor : BaseColor);
@@ -695,6 +702,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     Num range = chart.market.v.service.setting.base.minimumSize.multiply(100);
                     c.setFill(spread.isLessThan(range) ? BaseColor : WarningColor);
                     c.fillText(spread.toString(), 50, 50);
+
+                    OnlineStats volatilityStats = chart.ticker.v.spreadStats;
+                    double volatility = chart.ticker.v.ticks.last().spreadDouble();
+                    c.setFill(volatilityStats.sigma(volatility) <= 2 ? BaseColor : WarningColor);
+                    c.fillText(Primitives.roundString(volatility, chart.market.v.service.setting.target.scale), 50, 65);
                 });
     }
 
