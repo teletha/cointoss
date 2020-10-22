@@ -18,7 +18,7 @@ package cointoss.analyze;
  * <p>
  * This class is <i>NOT</i> thread safe.
  */
-public class OnlineStatistics {
+public class OnlineStats {
 
     private long count;
 
@@ -175,7 +175,7 @@ public class OnlineStatistics {
      *
      * @param with the sampler with which this sampler is combined
      */
-    public void combine(final OnlineStatistics with) {
+    public void combine(final OnlineStats with) {
         // e.g. see https://en.wikipedia.org/wiki/Standard_deviation#Combining_standard_deviations
         final long n1 = this.count;
         final long n2 = with.count;

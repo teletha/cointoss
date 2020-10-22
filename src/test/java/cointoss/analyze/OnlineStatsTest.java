@@ -11,11 +11,11 @@ package cointoss.analyze;
 
 import org.junit.jupiter.api.Test;
 
-public class OnlineStatisticsTest {
+public class OnlineStatsTest {
 
     @Test
     public void add1() {
-        final OnlineStatistics updater = new OnlineStatistics();
+        final OnlineStats updater = new OnlineStats();
         updater.add(1);
         updater.add(2);
         updater.add(3);
@@ -32,7 +32,7 @@ public class OnlineStatisticsTest {
 
     @Test
     public void add2() {
-        final OnlineStatistics updater = new OnlineStatistics();
+        final OnlineStats updater = new OnlineStats();
         updater.add(1);
         updater.add(2);
         updater.add(3);
@@ -51,7 +51,7 @@ public class OnlineStatisticsTest {
 
     @Test
     public void remove() {
-        final OnlineStatistics updater = new OnlineStatistics();
+        final OnlineStats updater = new OnlineStats();
         updater.add(1);
         updater.add(2);
         updater.add(3);
@@ -72,7 +72,7 @@ public class OnlineStatisticsTest {
 
     @Test
     public void replace() {
-        final OnlineStatistics updater = new OnlineStatistics();
+        final OnlineStats updater = new OnlineStats();
         updater.add(1);
         updater.add(2);
         updater.add(3);
@@ -90,7 +90,7 @@ public class OnlineStatisticsTest {
 
     @Test
     public void reset() {
-        final OnlineStatistics updater = new OnlineStatistics();
+        final OnlineStats updater = new OnlineStats();
         updater.add(1);
         updater.add(2);
         updater.reset();
