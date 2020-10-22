@@ -34,9 +34,6 @@ public final class Tick {
     /** Min price of the period */
     Num lowPrice;
 
-    /** The realtime execution statistic. */
-    TickerManager realtime;
-
     /** Snapshot of long volume at tick initialization. */
     double longVolume;
 
@@ -51,6 +48,9 @@ public final class Tick {
 
     /** The trend type. */
     Trend trend;
+
+    /** The source ticker. */
+    Ticker ticker;
 
     /**
      * Empty Dummt Tick.
@@ -67,15 +67,15 @@ public final class Tick {
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(long startEpochSeconds, Num open, TickerManager realtime) {
+    Tick(long startEpochSeconds, Num open, Ticker ticker) {
         this.openTime = startEpochSeconds;
         this.openPrice = this.highPrice = this.lowPrice = open;
 
-        this.realtime = realtime;
-        this.longVolume = realtime.longVolume;
-        this.longLosscutVolume = realtime.longLosscutVolume;
-        this.shortVolume = realtime.shortVolume;
-        this.shortLosscutVolume = realtime.shortLosscutVolume;
+        this.ticker = ticker;
+        this.longVolume = ticker.realtime.longVolume;
+        this.longLosscutVolume = ticker.realtime.longLosscutVolume;
+        this.shortVolume = ticker.realtime.shortVolume;
+        this.shortLosscutVolume = ticker.realtime.shortLosscutVolume;
     }
 
     /**
@@ -102,7 +102,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num closePrice() {
-        return realtime == null ? closePrice : realtime.latest.v.price;
+        return ticker == null ? closePrice : ticker.realtime.latest.v.price;
     }
 
     /**
@@ -178,14 +178,14 @@ public final class Tick {
      * @return The tick related value.
      */
     public double longVolume() {
-        return realtime == null ? longVolume : realtime.longVolume - longVolume;
+        return ticker == null ? longVolume : ticker.realtime.longVolume - longVolume;
     }
 
     /**
      * Retrieve the tick related value.
      */
     public double longLosscutVolume() {
-        return realtime == null ? longLosscutVolume : realtime.longLosscutVolume - longLosscutVolume;
+        return ticker == null ? longLosscutVolume : ticker.realtime.longLosscutVolume - longLosscutVolume;
     }
 
     /**
@@ -194,14 +194,14 @@ public final class Tick {
      * @return The tick related value.
      */
     public double shortVolume() {
-        return realtime == null ? shortVolume : realtime.shortVolume - shortVolume;
+        return ticker == null ? shortVolume : ticker.realtime.shortVolume - shortVolume;
     }
 
     /**
      * Retrieve the tick related value.
      */
     public double shortLosscutVolume() {
-        return realtime == null ? shortLosscutVolume : realtime.shortLosscutVolume - shortLosscutVolume;
+        return ticker == null ? shortLosscutVolume : ticker.realtime.shortLosscutVolume - shortLosscutVolume;
     }
 
     /**
@@ -210,7 +210,7 @@ public final class Tick {
      * @return
      */
     public Trend trend() {
-        return realtime == null ? trend : Trend.estimate(this);
+        return ticker == null ? trend : Trend.estimate(this);
     }
 
     /**
@@ -225,7 +225,7 @@ public final class Tick {
         shortVolume = shortVolume();
         shortLosscutVolume = shortLosscutVolume();
         trend = Trend.estimate(this);
-        realtime = null;
+        ticker = null;
     }
 
     /**

@@ -12,6 +12,7 @@ package cointoss.ticker;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
+import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
 import kiss.Disposable;
 import kiss.Signal;
@@ -43,15 +44,21 @@ public final class Ticker implements Disposable {
     /** The latest tick. */
     Tick current;
 
+    /** The realtime statistics for volume. */
+    final OnlineStats volumeStats = new OnlineStats();
+
+    final TickerManager realtime;
+
     /**
      * Create {@link Ticker}.
      * 
      * @param span An associated span.
      */
-    Ticker(Span span) {
+    Ticker(Span span, TickerManager realtime) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
         this.ticks = new TimeseriesStore<Tick>(span, tick -> tick.openTime);
+        this.realtime = realtime;
     }
 
     /**
@@ -60,8 +67,8 @@ public final class Ticker implements Disposable {
      * @param execution The latest {@link Execution}.
      * @param realtime The realtime execution statistic.
      */
-    final void init(Execution execution, TickerManager realtime) {
-        current = new Tick(span.calculateStartTime(execution.date).toEpochSecond(), execution.price, realtime);
+    final void init(Execution execution) {
+        current = new Tick(span.calculateStartTime(execution.date).toEpochSecond(), execution.price, this);
 
         ticks.store(current);
         opening.accept(current);
@@ -74,7 +81,7 @@ public final class Ticker implements Disposable {
      * @param realtime The realtime execution statistic.
      * @return When the new {@link Tick} was added, this method will return <code>true</code>.
      */
-    final boolean createTick(Execution execution, TickerManager realtime) {
+    final boolean createTick(Execution execution) {
         // Make sure whether the execution does not exceed the end time of current tick.
         if (!execution.isBeforeSeconds(current.openTime + span.seconds)) {
 
@@ -86,14 +93,14 @@ public final class Ticker implements Disposable {
             while (current.openTime + span.seconds < start.toEpochSecond()) {
                 current.freeze();
                 closing.accept(current);
-                current = new Tick(current.openTime + span.seconds, current.closePrice(), realtime);
+                current = new Tick(current.openTime + span.seconds, current.closePrice(), this);
                 ticks.store(current);
             }
 
             // create the latest tick for execution
             current.freeze();
             closing.accept(current);
-            current = new Tick(current.openTime + span.seconds, execution.price, realtime);
+            current = new Tick(current.openTime + span.seconds, execution.price, this);
             ticks.store(current);
             opening.accept(current);
             return true;

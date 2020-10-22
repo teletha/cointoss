@@ -49,7 +49,7 @@ public final class TickerManager implements Disposable {
      */
     public TickerManager() {
         for (int i = size - 1; 0 <= i; i--) {
-            Ticker ticker = tickers[i] = new Ticker(Span.values()[i]);
+            Ticker ticker = tickers[i] = new Ticker(Span.values()[i], this);
 
             // cache associated upper tickers
             int index = 0;
@@ -106,7 +106,7 @@ public final class TickerManager implements Disposable {
             latest.set(e);
 
             for (Ticker ticker : tickers) {
-                ticker.init(e, this);
+                ticker.init(e);
             }
         } else {
             // update tickers
@@ -139,7 +139,7 @@ public final class TickerManager implements Disposable {
      * @param comparisonResult The comparison result between previous price and current price.
      */
     private void update(Ticker ticker, Execution execution, Num price, int comparisonResult) {
-        if (ticker.createTick(execution, this)) {
+        if (ticker.createTick(execution)) {
             for (Ticker upper : ticker.uppers) {
                 update(upper, execution, price, comparisonResult);
             }
