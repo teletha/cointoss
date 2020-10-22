@@ -50,6 +50,7 @@ import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.Trend;
 import cointoss.util.Chrono;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
@@ -749,7 +750,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         }
                     }
 
-                    double[] channelStart = {start, start};
+                    double width = candles.getWidth();
+                    double height = candles.getHeight();
                     DoubleList valueX = new DoubleList((int) tickSize);
 
                     ticker.ticks.each(start, end, tick -> {
@@ -757,8 +759,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
                         double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
-                        gc.setStroke(chart.candleType.value().coordinator.apply(tick));
                         gc.setLineWidth(1);
+                        if (tick.trend() == Trend.Range) {
+                            gc.setStroke(Color.DARKGREY);
+                            gc.strokeLine(x, 0, x, height);
+                        }
+                        gc.setStroke(chart.candleType.value().coordinator.apply(tick));
                         gc.strokeLine(x, high, x, low);
                         if (needDrawingOpenAndClose) {
                             double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
@@ -796,9 +802,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         }
                         valueX.add(x);
                     });
-
-                    double width = candles.getWidth();
-                    double height = candles.getHeight();
 
                     for (Plotter plotter : plotters) {
                         if (registry.globalSetting(plotter.origin).visible.is(false)) {

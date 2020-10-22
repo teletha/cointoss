@@ -191,4 +191,13 @@ public class OnlineStats {
         this.s = s;
     }
 
+    /**
+     * Compute sigma of the specified value.
+     * 
+     * @param value
+     * @return
+     */
+    public int sigma(double value) {
+        return (int) Math.floor(Math.abs(value - mean) / getStdDev());
+    }
 }

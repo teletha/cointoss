@@ -12,17 +12,17 @@ package cointoss.ticker;
 public enum Trend {
     Buy, Sell, Range, Unknown;
 
-    /**
-     * Estimate trend type from {@link Tick}.
-     * 
-     * @param tick
-     * @return
-     */
-    static Trend estimate(Tick tick) {
-        int point = 0;
-
-        double volume = tick.volume();
-
-        return Unknown;
+    private static boolean rangeDirection(Tick tick) {
+        int count = 2;
+        if (tick.isBear()) {
+            if (!tick.ticker.ticks.before(tick, count).stream().allMatch(Tick::isBear)) {
+                return true;
+            }
+        } else {
+            if (!tick.ticker.ticks.before(tick, count).stream().allMatch(Tick::isBull)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

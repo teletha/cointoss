@@ -65,7 +65,7 @@ public final class Tick {
      * 
      * @param openTime A start time of period.
      * @param open A open price.
-     * @param realtime The realtime execution statistic.
+     * @param ticker The data source.
      */
     Tick(long startEpochSeconds, Num open, Ticker ticker) {
         this.openTime = startEpochSeconds;
@@ -205,12 +205,30 @@ public final class Tick {
     }
 
     /**
+     * Compute the spread in prices.
+     * 
+     * @return
+     */
+    public Num spread() {
+        return highPrice().minus(lowPrice());
+    }
+
+    /**
+     * Compute the spread in prices.
+     * 
+     * @return
+     */
+    public double spreadDouble() {
+        return highPrice().doubleValue() - lowPrice().doubleValue();
+    }
+
+    /**
      * Detect the trend type at this {@link Tick}.
      * 
      * @return
      */
     public Trend trend() {
-        return ticker == null ? trend : Trend.estimate(this);
+        return ticker == null ? trend : new TrendDetector(this).detect();
     }
 
     /**
@@ -219,12 +237,15 @@ public final class Tick {
      * @return
      */
     void freeze() {
+        ticker.spreadStats.add(spreadDouble());
+        ticker.volumeStats.add(volume());
+        trend = new TrendDetector(this).detect();
+
         closePrice = closePrice();
         longVolume = longVolume();
         longLosscutVolume = longLosscutVolume();
         shortVolume = shortVolume();
         shortLosscutVolume = shortLosscutVolume();
-        trend = Trend.estimate(this);
         ticker = null;
     }
 
@@ -288,5 +309,58 @@ public final class Tick {
 
         Tick other = (Tick) obj;
         return openTime == other.openTime;
+    }
+
+    /**
+     * Estimate trend type from {@link Tick}.
+     */
+    static class TrendDetector {
+
+        private int range;
+
+        private int buy;
+
+        private int sell;
+
+        private final Tick tick;
+
+        /**
+         * @param tick
+         */
+        TrendDetector(Tick tick) {
+            this.tick = tick;
+
+            byVolume();
+            bySpread();
+            byPriceRange();
+        }
+
+        private void byVolume() {
+            double volume = tick.volume();
+            if (tick.ticker.volumeStats.sigma(volume) <= 1) {
+                range++;
+            } else {
+                buy++;
+                sell++;
+            }
+        }
+
+        private void bySpread() {
+            double spread = tick.spreadDouble();
+            if (tick.ticker.spreadStats.sigma(spread) <= 1) {
+                range++;
+            } else {
+                buy++;
+                sell++;
+            }
+        }
+
+        private void byPriceRange() {
+
+        }
+
+        private Trend detect() {
+            return Trend.Unknown;
+        }
     }
 }
