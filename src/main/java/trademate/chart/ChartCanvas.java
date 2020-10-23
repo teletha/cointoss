@@ -39,6 +39,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import cointoss.CurrencySetting;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
@@ -683,6 +684,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .throttle(1000, TimeUnit.MILLISECONDS)
                 .on(Viewtify.UIThread)
                 .to(e -> {
+                    CurrencySetting base = chart.market.v.service.setting.base;
                     GraphicsContext c = marketInfo.getGraphicsContext2D();
 
                     double width = marketInfo.getWidth();
@@ -699,14 +701,17 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     c.fillText(diff + "ms", 50, 35);
 
                     Num spread = chart.market.v.orderBook.spread();
-                    Num range = chart.market.v.service.setting.base.minimumSize.multiply(100);
+                    Num range = base.minimumSize.multiply(100);
                     c.setFill(spread.isLessThan(range) ? BaseColor : WarningColor);
                     c.fillText(spread.toString(), 50, 50);
 
                     OnlineStats volatilityStats = chart.ticker.v.spreadStats;
                     double volatility = chart.ticker.v.ticks.last().spreadDouble();
-                    c.setFill(volatilityStats.sigma(volatility) <= 2 ? BaseColor : WarningColor);
-                    c.fillText(Primitives.roundString(volatility, chart.market.v.service.setting.target.scale), 50, 65);
+                    c.setFill(volatilityStats.calculateSigma(volatility) <= 2 ? BaseColor : WarningColor);
+                    c.fillText(Primitives.roundString(volatility, base.scale), 50, 65);
+                    c.setFill(BaseColor);
+                    c.fillText("(" + Primitives.roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives
+                            .roundString(volatilityStats.sigma(2), base.scale) + ")", 85, 65);
                 });
     }
 
@@ -730,8 +735,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         drawOrderbook();
         drawPriceVolume();
     }
-
-    private static int ChannelRange = 10;
 
     /**
      * Draw candle chart.
@@ -772,8 +775,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
                         gc.setLineWidth(1);
-                        if (tick.trend() == Trend.Range) {
-                            gc.setStroke(Color.DARKGREY);
+                        Trend trend = tick.trend();
+                        if (trend != Trend.Unknown) {
+                            gc.setStroke(trend == Trend.Range ? Color.DARKGREY : trend == Trend.Buy ? Color.GREEN : Color.DARKRED);
                             gc.strokeLine(x, 0, x, height);
                         }
                         gc.setStroke(chart.candleType.value().coordinator.apply(tick));

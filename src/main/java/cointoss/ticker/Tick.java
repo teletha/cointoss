@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 
+import cointoss.analyze.OnlineStats;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 
@@ -121,6 +122,26 @@ public final class Tick {
      */
     public Num lowPrice() {
         return lowPrice;
+    }
+
+    /**
+     * Retrieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
+    public Num upperPrice() {
+        Num close = closePrice();
+        return openPrice.isLessThan(close) ? close : openPrice;
+    }
+
+    /**
+     * Retrieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
+    public Num lowerPrice() {
+        Num close = closePrice();
+        return openPrice.isLessThan(close) ? openPrice : close;
     }
 
     /**
@@ -316,50 +337,116 @@ public final class Tick {
      */
     static class TrendDetector {
 
-        private int range;
+        private int rangeOrTrend;
 
-        private int buy;
-
-        private int sell;
+        private int buyOrSell;
 
         private final Tick tick;
+
+        private final Tick prev;
+
+        private final OnlineStats volumes;
+
+        private final OnlineStats spreds;
 
         /**
          * @param tick
          */
         TrendDetector(Tick tick) {
             this.tick = tick;
+            this.prev = tick.ticker.ticks.before(tick);
+            this.volumes = tick.ticker.volumeStats;
+            this.spreds = tick.ticker.spreadStats;
 
-            byVolume();
-            bySpread();
-            byPriceRange();
-        }
-
-        private void byVolume() {
-            double volume = tick.volume();
-            if (tick.ticker.volumeStats.sigma(volume) <= 1) {
-                range++;
-            } else {
-                buy++;
-                sell++;
+            if (prev != null) {
+                volumeSizeOutlier();
+                volumeSideRatio();
+                volatilityOutlier();
+                priceAction();
             }
         }
 
-        private void bySpread() {
-            double spread = tick.spreadDouble();
-            if (tick.ticker.spreadStats.sigma(spread) <= 1) {
-                range++;
+        /**
+         * Check abnormal volume size.
+         */
+        private void volumeSizeOutlier() {
+            if (volumes.calculateSigma(tick.volume()) <= 1) {
+                rangeOrTrend++;
             } else {
-                buy++;
-                sell++;
+                rangeOrTrend--;
             }
         }
 
-        private void byPriceRange() {
+        /**
+         * Check volume side.
+         */
+        private void volumeSideRatio() {
+            double delta = tick.longVolume - tick.shortVolume;
+            if (volumes.getStdDev() < Math.abs(delta)) {
+                rangeOrTrend--;
 
+                if (0 < delta) {
+                    buyOrSell++;
+                } else {
+                    buyOrSell--;
+                }
+            } else {
+                rangeOrTrend++;
+            }
+        }
+
+        /**
+         * Check abnormal volatility.
+         */
+        private void volatilityOutlier() {
+            if (spreds.calculateSigma(tick.spreadDouble()) <= 1) {
+                rangeOrTrend++;
+            } else {
+                rangeOrTrend--;
+            }
+        }
+
+        private void priceAction() {
+            int point = 0;
+            point += comparePrice(prev.highPrice, tick.highPrice);
+            point += comparePrice(prev.lowPrice, tick.lowPrice);
+            point += comparePrice(prev.upperPrice(), tick.upperPrice());
+            point += comparePrice(prev.lowerPrice(), tick.lowerPrice());
+
+            if (point <= -2 || 2 <= point) {
+                rangeOrTrend--;
+            } else {
+                rangeOrTrend++;
+            }
+        }
+
+        private int comparePrice(Num prev, Num now) {
+            double prevPrice = prev.doubleValue();
+            double nowPrice = now.doubleValue();
+
+            if (prevPrice < nowPrice) {
+                buyOrSell++;
+                return 1;
+            } else if (prevPrice > nowPrice) {
+                buyOrSell--;
+                return -1;
+            } else {
+                return 0;
+            }
         }
 
         private Trend detect() {
+            if (prev != null) {
+                if (1 <= rangeOrTrend) {
+                    return Trend.Range;
+                } else if (rangeOrTrend <= -1) {
+                    if (1 <= buyOrSell) {
+                        return Trend.Buy;
+                    } else if (buyOrSell <= -1) {
+                        return Trend.Sell;
+                    }
+                }
+            }
             return Trend.Unknown;
         }
     }
