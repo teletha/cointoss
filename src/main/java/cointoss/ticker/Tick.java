@@ -361,6 +361,7 @@ public final class Tick {
             if (prev != null) {
                 volumeSizeOutlier();
                 volumeSideRatio();
+                volumeAction();
                 volatilityOutlier();
                 priceAction();
             }
@@ -395,6 +396,17 @@ public final class Tick {
             }
         }
 
+        private void volumeAction() {
+            double delta = tick.volume() - prev.volume();
+            if (volumes.getStdDev() < Math.abs(delta)) {
+                if (0 < delta) {
+                    rangeOrTrend++;
+                } else {
+                    rangeOrTrend--;
+                }
+            }
+        }
+
         /**
          * Check abnormal volatility.
          */
@@ -414,9 +426,9 @@ public final class Tick {
             point += comparePrice(prev.lowerPrice(), tick.lowerPrice());
 
             if (point <= -2 || 2 <= point) {
-                rangeOrTrend--;
+                rangeOrTrend -= Math.abs(point);
             } else {
-                rangeOrTrend++;
+                rangeOrTrend += Math.abs(point);
             }
         }
 
