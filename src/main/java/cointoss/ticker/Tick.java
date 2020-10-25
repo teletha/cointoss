@@ -260,6 +260,7 @@ public final class Tick {
     void freeze() {
         ticker.spreadStats.add(spreadDouble());
         ticker.volumeStats.add(volume());
+        ticker.typicalStats.add(typicalDoublePrice());
         trend = new TrendDetector(this).detect();
 
         closePrice = closePrice();
@@ -349,6 +350,8 @@ public final class Tick {
 
         private final OnlineStats spreds;
 
+        private final OnlineStats typicals;
+
         /**
          * @param tick
          */
@@ -357,6 +360,7 @@ public final class Tick {
             this.prev = tick.ticker.ticks.before(tick);
             this.volumes = tick.ticker.volumeStats;
             this.spreds = tick.ticker.spreadStats;
+            this.typicals = tick.ticker.typicalStats;
 
             if (prev != null) {
                 volumeSizeOutlier();
@@ -419,39 +423,33 @@ public final class Tick {
         }
 
         private void priceAction() {
-            int point = 0;
-            point += comparePrice(prev.highPrice, tick.highPrice);
-            point += comparePrice(prev.lowPrice, tick.lowPrice);
-            point += comparePrice(prev.upperPrice(), tick.upperPrice());
-            point += comparePrice(prev.lowerPrice(), tick.lowerPrice());
-
-            if (point <= -2 || 2 <= point) {
-                rangeOrTrend -= Math.abs(point);
-            } else {
-                rangeOrTrend += Math.abs(point);
-            }
+            comparePrice(prev.highPrice, tick.highPrice);
+            comparePrice(prev.lowPrice, tick.lowPrice);
+            comparePrice(prev.upperPrice(), tick.upperPrice());
+            comparePrice(prev.lowerPrice(), tick.lowerPrice());
         }
 
-        private int comparePrice(Num prev, Num now) {
+        private void comparePrice(Num prev, Num now) {
+            double typical = 0;
             double prevPrice = prev.doubleValue();
             double nowPrice = now.doubleValue();
 
-            if (prevPrice < nowPrice) {
+            if (typical < nowPrice - prevPrice) {
+                rangeOrTrend--;
                 buyOrSell++;
-                return 1;
-            } else if (prevPrice > nowPrice) {
+            } else if (prevPrice - nowPrice > typical) {
+                rangeOrTrend--;
                 buyOrSell--;
-                return -1;
             } else {
-                return 0;
+                rangeOrTrend++;
             }
         }
 
         private Trend detect() {
             if (prev != null) {
-                if (1 <= rangeOrTrend) {
+                if (2 <= rangeOrTrend) {
                     return Trend.Range;
-                } else if (rangeOrTrend <= -1) {
+                } else if (rangeOrTrend <= -2) {
                     if (1 <= buyOrSell) {
                         return Trend.Buy;
                     } else if (buyOrSell <= -1) {

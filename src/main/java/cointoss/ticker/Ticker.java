@@ -50,6 +50,8 @@ public final class Ticker implements Disposable {
     /** The realtime statistics for volume. */
     public final OnlineStats volumeStats = new OnlineStats();
 
+    public final OnlineStats typicalStats = new OnlineStats();
+
     /** The realtime data holder. */
     final TickerManager realtime;
 
