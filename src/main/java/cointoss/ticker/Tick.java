@@ -259,7 +259,8 @@ public final class Tick {
      */
     void freeze() {
         ticker.spreadStats.add(spreadDouble());
-        ticker.volumeStats.add(volume());
+        ticker.buyVolumeStats.add(longVolume());
+        ticker.sellVolumeStats.add(shortVolume());
         ticker.typicalStats.add(typicalDoublePrice());
         trend = new TrendDetector(this).detect();
 
@@ -346,7 +347,9 @@ public final class Tick {
 
         private final Tick prev;
 
-        private final OnlineStats volumes;
+        private final OnlineStats buyVolumes;
+
+        private final OnlineStats sellVolumes;
 
         private final OnlineStats spreds;
 
@@ -358,13 +361,13 @@ public final class Tick {
         TrendDetector(Tick tick) {
             this.tick = tick;
             this.prev = tick.ticker.ticks.before(tick);
-            this.volumes = tick.ticker.volumeStats;
+            this.buyVolumes = tick.ticker.buyVolumeStats;
+            this.sellVolumes = tick.ticker.sellVolumeStats;
             this.spreds = tick.ticker.spreadStats;
             this.typicals = tick.ticker.typicalStats;
 
             if (prev != null) {
                 volumeSizeOutlier();
-                volumeSideRatio();
                 volumeAction();
                 volatilityOutlier();
                 priceAction();
@@ -375,38 +378,41 @@ public final class Tick {
          * Check abnormal volume size.
          */
         private void volumeSizeOutlier() {
-            if (volumes.calculateSigma(tick.volume()) <= 1) {
+            if (buyVolumes.calculateSigma(tick.longVolume()) <= 1) {
                 rangeOrTrend++;
             } else {
                 rangeOrTrend--;
+                buyOrSell++;
             }
-        }
 
-        /**
-         * Check volume side.
-         */
-        private void volumeSideRatio() {
-            double delta = tick.longVolume - tick.shortVolume;
-            if (volumes.getStdDev() < Math.abs(delta)) {
-                rangeOrTrend--;
-
-                if (0 < delta) {
-                    buyOrSell++;
-                } else {
-                    buyOrSell--;
-                }
-            } else {
+            if (sellVolumes.calculateSigma(tick.shortVolume()) <= 1) {
                 rangeOrTrend++;
+            } else {
+                rangeOrTrend--;
+                buyOrSell--;
             }
         }
 
         private void volumeAction() {
-            double delta = tick.volume() - prev.volume();
-            if (volumes.getStdDev() < Math.abs(delta)) {
+            double delta = tick.longVolume() - prev.longVolume();
+            if (buyVolumes.getStdDev() < Math.abs(delta)) {
+                buyOrSell++;
+
                 if (0 < delta) {
-                    rangeOrTrend++;
-                } else {
                     rangeOrTrend--;
+                } else {
+                    rangeOrTrend++;
+                }
+            }
+
+            delta = tick.shortVolume() - prev.shortVolume();
+            if (sellVolumes.getStdDev() < Math.abs(delta)) {
+                buyOrSell--;
+
+                if (0 < delta) {
+                    rangeOrTrend--;
+                } else {
+                    rangeOrTrend++;
                 }
             }
         }
@@ -447,7 +453,7 @@ public final class Tick {
 
         private Trend detect() {
             if (prev != null) {
-                if (2 <= rangeOrTrend) {
+                if (1 <= rangeOrTrend) {
                     return Trend.Range;
                 } else if (rangeOrTrend <= -2) {
                     if (1 <= buyOrSell) {
