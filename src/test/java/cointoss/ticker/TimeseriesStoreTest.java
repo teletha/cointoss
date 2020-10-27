@@ -9,7 +9,7 @@
  */
 package cointoss.ticker;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -367,11 +367,26 @@ class TimeseriesStoreTest {
 
     @Test
     void store() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
-        store.enableDiskStore(Locator.directory(room.root), v -> new String[] {String.valueOf(v)}, v -> Integer.valueOf(v[0]));
+        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v)
+                .enableDiskStore(Locator.directory(room.root), v -> new String[] {String.valueOf(v)}, v -> Long.valueOf(v[0]));
+
+        long base = Span.Second5.segment;
 
         for (int i = 1; i <= 20; i++) {
-            store.store((int) Span.Second5.segment * i);
+            store.store(base * i);
         }
+
+        assert store.existOnHeap(base * 18);
+        assert store.existOnHeap(base * 19);
+        assert store.existOnHeap(base * 20);
+        assert store.existOnHeap(base * 2) == false;
+        assert store.existOnHeap(base * 8) == false;
+        assert store.existOnHeap(base * 17) == false;
+
+        store.store(base * 2);
+        assert store.existOnHeap(base * 18) == false;
+        assert store.existOnHeap(base * 19);
+        assert store.existOnHeap(base * 20);
+        assert store.existOnHeap(base * 2);
     }
 }

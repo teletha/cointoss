@@ -23,25 +23,25 @@ import kiss.Variable;
  */
 public enum Span {
 
-    Second5(5, SECOND_OF_MINUTE, 1, HOUR_OF_DAY, 3, 1),
+    Second5(5, SECOND_OF_MINUTE, 1, HOUR_OF_DAY, 3, 1), // 12 * 60 * 3 = 2160
 
-    Minute1(1, MINUTE_OF_HOUR, 4, HOUR_OF_DAY, 7, 1),
+    Minute1(1, MINUTE_OF_HOUR, 4, HOUR_OF_DAY, 7, 1), // 60 * 4 * 7 = 1680
 
-    Minute5(5, MINUTE_OF_HOUR, 6, HOUR_OF_DAY, 20, 1),
+    Minute5(5, MINUTE_OF_HOUR, 6, HOUR_OF_DAY, 20, 1), // 12 * 6 * 20 = 1440
 
-    Minute15(15, MINUTE_OF_HOUR, 1, EPOCH_DAY, 8, 1),
+    Minute15(15, MINUTE_OF_HOUR, 1, EPOCH_DAY, 8, 1), // 4 * 24 * 8 = 768
 
-    Minute30(30, MINUTE_OF_HOUR, 1, EPOCH_DAY, 16, 1),
+    Minute30(30, MINUTE_OF_HOUR, 1, EPOCH_DAY, 16, 1), // 2 * 24 * 16 = 768
 
-    Hour1(1, HOUR_OF_DAY, 1, EPOCH_DAY, 40, 1),
+    Hour1(1, HOUR_OF_DAY, 1, EPOCH_DAY, 40, 1), // 24 * 40 = 960
 
-    Hour2(2, HOUR_OF_DAY, 1, EPOCH_DAY, 80, 1, 2),
+    Hour2(2, HOUR_OF_DAY, 1, EPOCH_DAY, 80, 1, 2), // 12 * 80 =960
 
-    Hour4(4, HOUR_OF_DAY, 1, EPOCH_DAY, 160),
+    Hour4(4, HOUR_OF_DAY, 1, EPOCH_DAY, 160), // 6 * 160 = 960
 
-    Hour6(6, HOUR_OF_DAY, 1, EPOCH_DAY, 240, 1),
+    Hour6(6, HOUR_OF_DAY, 1, EPOCH_DAY, 240, 1), // 4 * 240 = 960
 
-    Hour12(12, HOUR_OF_DAY, 1, EPOCH_DAY, 480, 1),
+    Hour12(12, HOUR_OF_DAY, 1, EPOCH_DAY, 480, 1), // 2 * 480 = 960
 
     Day1(1, EPOCH_DAY, 365, EPOCH_DAY, 1, 1, 2),
 

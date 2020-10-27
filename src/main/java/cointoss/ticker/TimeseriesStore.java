@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToLongFunction;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
@@ -138,9 +139,30 @@ public final class TimeseriesStore<E> {
      * @param timestamp
      * @return
      */
+    @VisibleForTesting
     long[] index(long timestamp) {
         long remainder = timestamp % span.segment;
         return new long[] {timestamp - remainder, remainder / span.seconds};
+    }
+
+    /**
+     * For test.
+     * 
+     * @param item
+     * @return
+     */
+    @VisibleForTesting
+    boolean existOnHeap(E item) {
+        long[] index = index(timestampExtractor.applyAsLong(item));
+        Segment segment = indexed.get(index[0]);
+
+        if (segment != null) {
+            E e = segment.get((int) index[1]);
+            if (item.equals(e)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -671,7 +693,7 @@ public final class TimeseriesStore<E> {
 
         private void store(long time, Segment segment) {
             File file = name(time);
-
+            System.out.println(file.isAbsent() + "  " + file);
             if (file.isAbsent()) {
                 CsvWriterSettings setting = new CsvWriterSettings();
                 setting.getFormat().setDelimiter(' ');
@@ -694,8 +716,8 @@ public final class TimeseriesStore<E> {
                 setting.getFormat().setDelimiter(' ');
                 setting.getFormat().setComment('無');
 
-                CsvParser parser = new CsvParser(setting);
-                parser.iterate(file.newInputStream(), StandardCharsets.ISO_8859_1).forEach(values -> {
+                CsvParser reader = new CsvParser(setting);
+                reader.iterate(file.newInputStream(), StandardCharsets.ISO_8859_1).forEach(values -> {
                     E item = decoder.apply(values);
                     System.out.println(item);
                 });
@@ -709,7 +731,7 @@ public final class TimeseriesStore<E> {
          * @return
          */
         private File name(long time) {
-            return root.file(FileName.format(Chrono.utcBySeconds(time)) + ".cache");
+            return root.directory(span.name()).file(FileName.format(Chrono.utcBySeconds(time)) + ".cache");
         }
     }
 }
