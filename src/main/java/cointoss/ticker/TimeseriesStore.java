@@ -67,7 +67,7 @@ public final class TimeseriesStore<E> {
         @Override
         protected boolean removeEldestEntry(Entry<Long, Segment> eldest) {
             if (shrink && span.segmentSize < size()) {
-                persist(eldest.getKey(), eldest.getValue());
+                store(eldest.getKey(), eldest.getValue());
                 return true;
             } else {
                 return false;
@@ -85,17 +85,27 @@ public final class TimeseriesStore<E> {
     }
 
     /**
-     * Persiste data from heap to disk.
+     * Store data from heap to disk.
      * 
      * @param time
      * @param segment
      */
-    private void persist(long time, Segment segment) {
+    private void store(long time, Segment segment) {
         if (store != null) {
             store.store(time, segment);
+        } else {
+            indexed.remove(time);
+            segment.clear();
         }
-        indexed.remove(time);
-        segment.clear();
+    }
+
+    /**
+     * Restore data from disk to heap.
+     * 
+     * @param time
+     */
+    private void restore(long time) {
+
     }
 
     /**
@@ -504,7 +514,7 @@ public final class TimeseriesStore<E> {
         /** The first item index. */
         private int min = Integer.MAX_VALUE;
 
-        /** THe last item index. */
+        /** The last item index. */
         private int max = Integer.MIN_VALUE;
 
         /**
@@ -593,10 +603,23 @@ public final class TimeseriesStore<E> {
 
         private Segment heap;
 
-        private int size;
+        private final long time;
 
-        private void load() {
+        private final int size;
 
+        /**
+         * @param size
+         */
+        private OnDisk(long time, int size) {
+            this.time = time;
+            this.size = size;
+        }
+
+        private Segment heap() {
+            if (heap == null) {
+
+            }
+            return heap;
         }
 
         /**
@@ -612,7 +635,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         E get(int index) {
-            return null;
+            return heap().get(index);
         }
 
         /**
@@ -620,7 +643,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         int set(int index, E item) {
-            return 0;
+            return heap().set(index, item);
         }
 
         /**
@@ -628,6 +651,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         void clear() {
+            heap().clear();
         }
 
         /**
@@ -635,7 +659,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         E first() {
-            return null;
+            return heap().first();
         }
 
         /**
@@ -643,7 +667,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         E last() {
-            return null;
+            return heap().last();
         }
 
         /**
@@ -651,6 +675,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         void each(Consumer<? super E> each) {
+            heap().each(each);
         }
 
         /**
@@ -658,6 +683,7 @@ public final class TimeseriesStore<E> {
          */
         @Override
         void each(int start, int end, Consumer<? super E> each) {
+            heap().each(start, end, each);
         }
     }
 
@@ -693,7 +719,7 @@ public final class TimeseriesStore<E> {
 
         private void store(long time, Segment segment) {
             File file = name(time);
-            System.out.println(file.isAbsent() + "  " + file);
+
             if (file.isAbsent()) {
                 CsvWriterSettings setting = new CsvWriterSettings();
                 setting.getFormat().setDelimiter(' ');
@@ -706,6 +732,8 @@ public final class TimeseriesStore<E> {
                 writer.close();
                 System.out.println("Persist data [" + span + "]  at " + file);
             }
+
+            indexed.put(time, new OnDisk(time, segment.size()));
         }
 
         private void restore(long time) {
