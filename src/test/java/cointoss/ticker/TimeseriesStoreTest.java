@@ -396,7 +396,5 @@ class TimeseriesStoreTest {
                 .enableDiskStore(Locator.directory(room.root), v -> new String[] {String.valueOf(v)}, v -> Long.valueOf(v[0]));
 
         long base = Span.Second5.segment;
-        
-        store.
     }
 }

@@ -776,7 +776,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                         gc.setLineWidth(1);
                         Trend trend = tick.trend();
-                        if (trend != Trend.Unknown) {
+                        if (trend == null) {
                             gc.setStroke(trend == Trend.Range ? Color.DARKGREY : trend == Trend.Buy ? Color.GREEN : Color.DARKRED);
                             gc.strokeLine(x, 0, x, height);
                         }
