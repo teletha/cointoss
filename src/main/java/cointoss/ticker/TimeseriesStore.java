@@ -166,7 +166,7 @@ public final class TimeseriesStore<E> {
         long[] index = index(timestampExtractor.applyAsLong(item));
         Segment segment = indexed.get(index[0]);
 
-        if (segment != null) {
+        if (segment instanceof TimeseriesStore.OnHeap) {
             E e = segment.get((int) index[1]);
             if (item.equals(e)) {
                 return true;
@@ -617,7 +617,7 @@ public final class TimeseriesStore<E> {
 
         private Segment heap() {
             if (heap == null) {
-
+                store.restore(time);
             }
             return heap;
         }

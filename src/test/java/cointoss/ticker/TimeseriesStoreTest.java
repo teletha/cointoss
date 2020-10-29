@@ -383,7 +383,7 @@ class TimeseriesStoreTest {
         assert store.existOnHeap(base * 8) == false;
         assert store.existOnHeap(base * 17) == false;
 
-        store.store(base * 2);
+        assert store.at(base * 2) == base * 2;
         assert store.existOnHeap(base * 18) == false;
         assert store.existOnHeap(base * 19);
         assert store.existOnHeap(base * 20);
