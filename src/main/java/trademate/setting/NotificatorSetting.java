@@ -60,7 +60,7 @@ class NotificatorSetting extends View {
     private UISpinner<Duration> desktopDuration;
 
     /** The desktop configuration UI. */
-    private UIComboBox<ScreenSelector> desktopScreen;
+    private UIComboBox<ScreenSelector> desktopMonitor;
 
     /** The desktop configuration UI. */
     private UIComboBox<Corner> desktopPosition;
@@ -106,7 +106,7 @@ class NotificatorSetting extends View {
                 // Desktop
                 $(vbox, Block, () -> {
                     label(en("Desktop Notification"), Heading);
-                    form(en("Display Screen"), desktopScreen);
+                    form(en("Display Monitor"), desktopMonitor);
                     form(en("Display Location"), desktopPosition);
                     form(en("Display Time"), desktopDuration);
                     form(en("Number of Displays"), desktopNumber);
@@ -142,11 +142,8 @@ class NotificatorSetting extends View {
         soundMasterVolume.snapToTicks(true).showTickLabels(true).showTickMarks(true).sync(notificator.masterVolume);
 
         // For Desktop
-        desktopScreen.items(ScreenSelector.values()).render();
-        desktopPosition.items(Corner.values())
-                .renderByVariable(Corner::toTraslated)
-                .renderSelectedByVariable(Corner::toTraslated)
-                .sync(Toast.setting.area);
+        desktopMonitor.items(ScreenSelector.values()).sync(Toast.setting.screen);
+        desktopPosition.items(Corner.values()).sync(Toast.setting.area);
         desktopDuration.items(1, 30, Duration::minutes)
                 .sync(Toast.setting.autoHide)
                 .format(duration -> Primitives.roundString(duration.toMinutes(), 0) + en("mins"));
