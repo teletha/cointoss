@@ -34,6 +34,7 @@ public class Project extends bee.api.Project {
         require("ch.obermuhlner", "big-math");
         require("org.decimal4j", "decimal4j").atTest();
         require("org.questdb", "questdb");
+        require("com.h2database", "h2");
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }
