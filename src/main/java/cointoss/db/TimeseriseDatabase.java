@@ -9,8 +9,10 @@
  */
 package cointoss.db;
 
+import static io.questdb.cairo.TableUtils.TABLE_DOES_NOT_EXIST;
+
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -36,54 +38,76 @@ import kiss.model.Property;
 import psychopath.Directory;
 import psychopath.Locator;
 
-public class QDB<T> {
+public class TimeseriseDatabase<T> {
 
+    /** The database directory. */
     private static final Directory root = Locator.directory(".log/db");
+
+    /** The QuestDB configuration. */
+    private static final CairoConfiguration config = new DefaultCairoConfiguration(".log/db");
+
+    /** Singleton */
+    private static final CairoEngine engine = new CairoEngine(config);
+
+    /** The datatype and name mapping. */
+    private static final Map<Class, String> types = Map
+            .of(int.class, "int", long.class, "long", double.class, "double", boolean.class, "boolean", String.class, "string", Num.class, "double");
 
     static {
         root.create();
     }
 
-    private static final CairoConfiguration config = new DefaultCairoConfiguration(".log/db");
-
-    private static final CairoEngine engine = new CairoEngine(config);
-
+    /** The table name. */
     private final String table;
 
+    /** The item model. */
     private final Model<T> model;
 
+    /** The property list. */
     private final List<Property> properties;
 
+    /** The timestamp property. */
     private final Property timestampProperty;
 
     private final SqlExecutionContext context = new SqlExecutionContextImpl(engine, 1);
 
-    public QDB(String tableName, Class<T> type, String timestampPropertyName) {
-        this.table = Objects.requireNonNull(tableName);
+    /**
+     * Hide constructor.
+     * 
+     * @param table
+     * @param type
+     * @param timestampPropertyName
+     */
+    private TimeseriseDatabase(String table, Class<T> type, String timestampPropertyName) {
+        this.table = table;
         this.model = Model.of(type);
         this.properties = model.properties();
-        this.timestampProperty = Objects.requireNonNull(model.property(timestampPropertyName));
+        this.timestampProperty = model.property(timestampPropertyName);
 
-        if (TableUtils.exists(engine.getConfiguration().getFilesFacade(), new Path(), engine.getConfiguration()
-                .getRoot(), tableName) == TableUtils.TABLE_DOES_NOT_EXIST) {
-            StringJoiner joiner = new StringJoiner(", ", "create table " + tableName + " (", ")");
+        if (timestampProperty == null) {
+            throw new IllegalArgumentException("The property '" + timestampPropertyName + "' is not found in " + type + ".");
+        }
+
+        if (TableUtils.exists(config.getFilesFacade(), new Path(), config.getRoot(), table) == TABLE_DOES_NOT_EXIST) {
+            StringJoiner joiner = new StringJoiner(", ", "create table " + table + " (", ")");
             for (Property property : properties) {
-                Class t = property.model.type;
-                String propertyType = "";
-                if (property == timestampProperty) {
-                    propertyType = "timestamp";
-                } else if (t == int.class) {
-                    propertyType = "int";
-                } else if (t == long.class) {
-                    propertyType = "long";
-                } else if (t == double.class || t == Num.class) {
-                    propertyType = "double";
-                }
-
-                joiner.add(property.name + " " + propertyType);
+                joiner.add(property.name + " " + typeToName(property));
             }
             executeQuery(joiner.toString(), null);
         }
+    }
+
+    /**
+     * Convert {@link Property} to type name.
+     * 
+     * @param property A target property.
+     * @return A type name.
+     */
+    private String typeToName(Property property) {
+        if (property == timestampProperty) {
+            return "timestamp";
+        }
+        return types.get(property.model.type);
     }
 
     private <R> R executeQuery(String query, Function<Record, R> result) {
@@ -189,6 +213,10 @@ public class QDB<T> {
         }
     }
 
+    public static <T> TimeseriseDatabase<T> create(String name, Class<T> type, String timestampPropertyName) {
+        return new TimeseriseDatabase(name, type, timestampPropertyName);
+    }
+
     public static class Bean {
         public int id;
 
@@ -218,7 +246,7 @@ public class QDB<T> {
         // beans.add(new Bean(i, i));
         // }
 
-        QDB<Bean> db = new QDB<>("bean", Bean.class, "time");
+        TimeseriseDatabase<Bean> db = TimeseriseDatabase.create("bean", Bean.class, "time");
         // db.insert(beans);
         System.out.println(db.max("time") + "   " + db.min("time", "20 < time") + "   " + db.avg("time") + "   " + db.sum("time"));
     }
