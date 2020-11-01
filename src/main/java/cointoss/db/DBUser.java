@@ -40,7 +40,7 @@ public class DBUser {
 
     public static void main(String[] args) throws SqlException {
         List<Bean> beans = new ArrayList();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100; i++) {
             beans.add(new Bean(i, i));
         }
 
