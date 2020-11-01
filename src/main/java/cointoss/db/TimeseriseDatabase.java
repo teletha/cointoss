@@ -30,6 +30,7 @@ import io.questdb.griffin.SqlCompiler;
 import io.questdb.griffin.SqlException;
 import io.questdb.griffin.SqlExecutionContext;
 import io.questdb.griffin.SqlExecutionContextImpl;
+import io.questdb.griffin.engine.functions.bind.BindVariableService;
 import kiss.I;
 import kiss.model.Model;
 import kiss.model.Property;
@@ -46,6 +47,9 @@ public class TimeseriseDatabase<T> {
 
     /** Singleton */
     private static final CairoEngine engine = new CairoEngine(config);
+
+    /** Pre Thread */
+    private static final ThreadLocal<SqlExecutionContext> contexts = ThreadLocal.withInitial(() -> new SqlExecutionContextImpl(engine, 1));
 
     /** The datatype and name mapping. */
     private static final Map<Class, String> types = Map
@@ -70,6 +74,20 @@ public class TimeseriseDatabase<T> {
     /** The latest timestamp in database. */
     private long latestTimestamp;
 
+    @SuppressWarnings("serial")
+    private final Map<String, RecordCursorFactory> factories = new LinkedHashMap<>(15, 0.75f, true) {
+
+        @Override
+        protected boolean removeEldestEntry(Entry<String, RecordCursorFactory> eldest) {
+            if (25 < size()) {
+                eldest.getValue().close();
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
+
     /**
      * Hide constructor.
      * 
@@ -91,7 +109,7 @@ public class TimeseriseDatabase<T> {
             String columns = properties.stream().map(p -> p.name + " " + typeToName(p)).collect(Collectors.joining(","));
             query("CREATE TABLE " + table + " (" + columns + ") timestamp(" + timestampPropertyName + ")");
         } else {
-            latestTimestamp = queryAsLong("SELECT " + timestampPropertyName + " FROM " + table + " LATEST BY " + timestampPropertyName);
+            latestTimestamp = queryAsLong("SELECT " + timestampPropertyName + " FROM " + table + " LATEST BY " + timestampPropertyName + " LIMIT 1");
         }
         System.out.println(latestTimestamp);
     }
@@ -109,29 +127,6 @@ public class TimeseriseDatabase<T> {
         return types.get(property.model.type);
     }
 
-    private final Map<String, RecordCursorFactory> factories = new LinkedHashMap<>(15, 0.75f, true) {
-
-        @Override
-        protected boolean removeEldestEntry(Entry<String, RecordCursorFactory> eldest) {
-            if (25 < size()) {
-                eldest.getValue().close();
-                return true;
-            } else {
-                return false;
-            }
-        }
-    };
-
-    private final RecordCursorFactory factory(String query) {
-        return factories.computeIfAbsent(query, key -> {
-            try (SqlCompiler compiler = new SqlCompiler(engine)) {
-                return compiler.compile(query, new SqlExecutionContextImpl(engine, 1)).getRecordCursorFactory();
-            } catch (SqlException e) {
-                throw new Error("The query [" + query + "] is failed.", e);
-            }
-        });
-    }
-
     /**
      * Execute query which returns no value.
      * 
@@ -139,7 +134,7 @@ public class TimeseriseDatabase<T> {
      * @return Result.
      */
     private final void query(String query) {
-        executeQuery(void.class, query, null);
+        executeQuery(void.class, query, null, null);
     }
 
     /**
@@ -149,7 +144,17 @@ public class TimeseriseDatabase<T> {
      * @return Result.
      */
     public final int queryAsInt(String query) {
-        return executeQuery(int.class, query, rec -> rec.getInt(0));
+        return queryAsInt(query, null);
+    }
+
+    /**
+     * Execute query which returns single value.
+     * 
+     * @param query Your query which returns single value.
+     * @return Result.
+     */
+    public final int queryAsInt(String query, Consumer<BindVariableService> variables) {
+        return executeQuery(int.class, query, variables, rec -> rec.getInt(0));
     }
 
     /**
@@ -159,7 +164,17 @@ public class TimeseriseDatabase<T> {
      * @return Result.
      */
     public final long queryAsLong(String query) {
-        return executeQuery(long.class, query, rec -> rec.getLong(0));
+        return queryAsLong(query, null);
+    }
+
+    /**
+     * Execute query which returns single value.
+     * 
+     * @param query Your query which returns single value.
+     * @return Result.
+     */
+    public final long queryAsLong(String query, Consumer<BindVariableService> variables) {
+        return executeQuery(long.class, query, variables, rec -> rec.getLong(0));
     }
 
     /**
@@ -169,7 +184,17 @@ public class TimeseriseDatabase<T> {
      * @return Result.
      */
     public final double queryAsDouble(String query) {
-        return executeQuery(double.class, query, rec -> rec.getDouble(0));
+        return queryAsDouble(query, null);
+    }
+
+    /**
+     * Execute query which returns single value.
+     * 
+     * @param query Your query which returns single value.
+     * @return Result.
+     */
+    public final double queryAsDouble(String query, Consumer<BindVariableService> variables) {
+        return executeQuery(double.class, query, variables, rec -> rec.getDouble(0));
     }
 
     /**
@@ -181,20 +206,31 @@ public class TimeseriseDatabase<T> {
      * @param decoder
      * @return
      */
-    private <R> R executeQuery(Class<R> type, String query, Function<Record, R> decoder) {
-        RecordCursorFactory factory = factory(query);
+    private <R> R executeQuery(Class<R> type, String query, Consumer<BindVariableService> variables, Function<Record, R> decoder) {
+        SqlExecutionContext context = contexts.get();
+        if (variables != null) variables.accept(context.getBindVariableService());
+
+        RecordCursorFactory factory = factories.computeIfAbsent(query, key -> {
+            try (SqlCompiler compiler = new SqlCompiler(engine)) {
+                return compiler.compile(query, context).getRecordCursorFactory();
+            } catch (SqlException e) {
+                throw new Error("The query [" + query + "] is failed.", e);
+            }
+        });
 
         if (factory == null) {
             return null;
         }
 
-        try (RecordCursor cursor = factory.getCursor(new SqlExecutionContextImpl(engine, 1))) {
+        try (RecordCursor cursor = factory.getCursor(context)) {
+            System.out.println(cursor);
             while (cursor.hasNext()) {
+                Record record = cursor.getRecord();
+                record.System.out.println(cursor.getRecord().getInt(1));
                 return decoder.apply(cursor.getRecord());
             }
-        } catch (Exception e) {
-            throw I.quiet(e);
         }
+
         throw new Error("This query [" + query + "] doesn't return " + type.getSimpleName() + " value.");
     }
 

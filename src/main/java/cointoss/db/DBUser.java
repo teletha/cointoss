@@ -40,14 +40,14 @@ public class DBUser {
 
     public static void main(String[] args) throws SqlException {
         List<Bean> beans = new ArrayList();
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 10000; i++) {
             beans.add(new Bean(i, i));
         }
 
-        TimeseriseDatabase.clearTable("bean");
+        // TimeseriseDatabase.clearTable("bean");
 
         TimeseriseDatabase<Bean> db = TimeseriseDatabase.create("bean", Bean.class, "time");
         db.insert(beans);
-        System.out.println(db.max("time") + "   " + db.min("time", "20 < time") + "   " + db.avg("time") + "   " + db.sum("time"));
+        System.out.println(db.max("id") + "   " + db.min("time", "20 < id") + "   " + db.avg("id") + "   " + db.sum("id"));
     }
 }

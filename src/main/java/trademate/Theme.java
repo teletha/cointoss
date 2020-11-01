@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static javafx.scene.paint.Color.rgb;
+import static javafx.scene.paint.Color.*;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import javafx.scene.paint.Color;
 
 import cointoss.Directional;
 import kiss.I;
-import kiss.model.Model;
+import viewtify.model.Model;
 
 public class Theme extends Model<Theme> {
 
