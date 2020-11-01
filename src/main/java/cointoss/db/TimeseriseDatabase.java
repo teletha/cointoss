@@ -32,6 +32,7 @@ import io.questdb.griffin.SqlExecutionContext;
 import io.questdb.griffin.SqlExecutionContextImpl;
 import io.questdb.griffin.engine.functions.bind.BindVariableService;
 import kiss.I;
+import kiss.Signal;
 import kiss.model.Model;
 import kiss.model.Property;
 import psychopath.Directory;
@@ -109,9 +110,8 @@ public class TimeseriseDatabase<T> {
             String columns = properties.stream().map(p -> p.name + " " + typeToName(p)).collect(Collectors.joining(","));
             query("CREATE TABLE " + table + " (" + columns + ") timestamp(" + timestampPropertyName + ")");
         } else {
-            latestTimestamp = queryAsInt("SELECT " + timestampPropertyName + " FROM " + table + " ORDER BY " + timestampPropertyName + " DESC");
+            latestTimestamp = queryAsLong("SELECT " + timestampPropertyName + " FROM " + table + " ORDER BY " + timestampPropertyName + " DESC LIMIT 1");
         }
-        System.out.println(latestTimestamp);
     }
 
     /**
@@ -135,6 +135,19 @@ public class TimeseriseDatabase<T> {
      */
     private final void query(String query) {
         executeQuery(void.class, query, null, null);
+    }
+
+    /**
+     * Execute query which returns single value.
+     * 
+     * @param query Your query which returns single value.
+     * @return Result.
+     */
+    public final Signal<T> query2(String query) {
+        return new Signal<>((observer, disposer) -> {
+
+            return disposer;
+        });
     }
 
     /**
@@ -207,6 +220,7 @@ public class TimeseriseDatabase<T> {
      * @return
      */
     private <R> R executeQuery(Class<R> type, String query, Consumer<BindVariableService> variables, Function<Record, R> decoder) {
+        System.out.println(query);
         SqlExecutionContext context = contexts.get();
         if (variables != null) variables.accept(context.getBindVariableService());
 
@@ -224,8 +238,6 @@ public class TimeseriseDatabase<T> {
 
         try (RecordCursor cursor = factory.getCursor(context)) {
             while (cursor.hasNext()) {
-                System.out.println(cursor.getRecord().getInt(0) + "  " + cursor.getRecord().getInt(1) + "  " + cursor.getRecord()
-                        .getLong(0) + "   " + cursor.getRecord().getLong(1));
                 return decoder.apply(cursor.getRecord());
             }
         }
@@ -238,11 +250,22 @@ public class TimeseriseDatabase<T> {
     }
 
     public void insert(Iterable<T> items) {
-        try (TableWriter writer = engine.getWriter(new SqlExecutionContextImpl(engine, 1).getCairoSecurityContext(), table)) {
+        try (TableWriter writer = engine.getWriter(contexts.get().getCairoSecurityContext(), table)) {
             for (T item : items) {
-                Row row = writer.newRow((long) model.get(item, timestampProperty));
+                long time = (long) model.get(item, timestampProperty);
+
+                if (time < latestTimestamp) {
+                    continue;
+                }
+                latestTimestamp = time;
+
+                Row row = writer.newRow(time);
                 for (int i = 0; i < properties.size(); i++) {
                     Property property = properties.get(i);
+
+                    if (property == timestampProperty) {
+                        continue;
+                    }
                     Object value = model.get(item, property);
                     Class type = property.model.type;
                     if (type == int.class) {

@@ -41,13 +41,15 @@ public class DBUser {
     public static void main(String[] args) throws SqlException {
         List<Bean> beans = new ArrayList();
         for (int i = 11; i < 100; i++) {
-            beans.add(new Bean(i, i * 1000000));
+            Bean bean = new Bean(i, 1000000000L * i);
+            beans.add(bean);
         }
 
         // TimeseriseDatabase.clearTable("bean");
 
         TimeseriseDatabase<Bean> db = TimeseriseDatabase.create("bean", Bean.class, "time");
         db.insert(beans);
-        System.out.println(db.max("id") + "   " + db.min("time", "20 < id") + "   " + db.avg("id") + "   " + db.sum("id"));
+        db.selectAll(i -> System.out.println(i));
+        System.out.println(db.max("time") + "   " + db.min("time") + "   " + db.avg("time") + "   " + db.sum("time"));
     }
 }
