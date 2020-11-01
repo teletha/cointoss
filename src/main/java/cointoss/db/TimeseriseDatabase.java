@@ -9,19 +9,16 @@
  */
 package cointoss.db;
 
-import static io.questdb.cairo.TableUtils.TABLE_DOES_NOT_EXIST;
-
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import cointoss.util.arithmetic.Num;
 import io.questdb.cairo.CairoConfiguration;
 import io.questdb.cairo.CairoEngine;
 import io.questdb.cairo.DefaultCairoConfiguration;
-import io.questdb.cairo.TableUtils;
 import io.questdb.cairo.TableWriter;
 import io.questdb.cairo.TableWriter.Row;
 import io.questdb.cairo.sql.Record;
@@ -29,9 +26,6 @@ import io.questdb.cairo.sql.RecordCursor;
 import io.questdb.cairo.sql.RecordCursorFactory;
 import io.questdb.griffin.SqlCompiler;
 import io.questdb.griffin.SqlException;
-import io.questdb.griffin.SqlExecutionContext;
-import io.questdb.griffin.SqlExecutionContextImpl;
-import io.questdb.std.str.Path;
 import kiss.I;
 import kiss.model.Model;
 import kiss.model.Property;
@@ -69,7 +63,8 @@ public class TimeseriseDatabase<T> {
     /** The timestamp property. */
     private final Property timestampProperty;
 
-    private final SqlExecutionContext context = new SqlExecutionContextImpl(engine, 1);
+    /** The latest timestamp in database. */
+    private long latestTimestamp;
 
     /**
      * Hide constructor.
@@ -88,13 +83,13 @@ public class TimeseriseDatabase<T> {
             throw new IllegalArgumentException("The property '" + timestampPropertyName + "' is not found in " + type + ".");
         }
 
-        if (TableUtils.exists(config.getFilesFacade(), new Path(), config.getRoot(), table) == TABLE_DOES_NOT_EXIST) {
-            StringJoiner joiner = new StringJoiner(", ", "create table " + table + " (", ")");
-            for (Property property : properties) {
-                joiner.add(property.name + " " + typeToName(property));
-            }
-            executeQuery(joiner.toString(), null);
+        if (!existTable(table)) {
+            String columns = properties.stream().map(p -> p.name + " " + typeToName(p)).collect(Collectors.joining(","));
+            executeQuery("create table (" + columns + ") timestamp(" + timestampPropertyName + ")", null);
+        } else {
+            latestTimestamp = queryLong("SELECT " + timestampPropertyName + " FROM " + table + " LATEST BY " + timestampPropertyName);
         }
+        System.out.println(latestTimestamp);
     }
 
     /**
@@ -108,6 +103,12 @@ public class TimeseriseDatabase<T> {
             return "timestamp";
         }
         return types.get(property.model.type);
+    }
+
+    private long queryLong(String query) {
+        try (SqlCompiler compiler = new SqlCompiler(engine)) {
+        }
+        return 0;
     }
 
     private <R> R executeQuery(String query, Function<Record, R> result) {
@@ -213,41 +214,35 @@ public class TimeseriseDatabase<T> {
         }
     }
 
+    /**
+     * Create database accessor.
+     * 
+     * @param <T>
+     * @param name
+     * @param type
+     * @param timestampPropertyName
+     * @return
+     */
     public static <T> TimeseriseDatabase<T> create(String name, Class<T> type, String timestampPropertyName) {
         return new TimeseriseDatabase(name, type, timestampPropertyName);
     }
 
-    public static class Bean {
-        public int id;
-
-        public long time;
-
-        /**
-         * @param id
-         * @param value
-         */
-        public Bean(int id, long time) {
-            this.id = id;
-            this.time = time;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "Bean [id=" + id + ", time=" + time + "]";
-        }
+    /**
+     * Helper to check whether the target table exists or not.
+     * 
+     * @param table A target table name.
+     * @return Result.
+     */
+    private static boolean existTable(String table) {
+        return root.directory(table).isPresent();
     }
 
-    public static void main(String[] args) throws SqlException {
-        // List<Bean> beans = new ArrayList();
-        // for (int i = 0; i < 100000000; i++) {
-        // beans.add(new Bean(i, i));
-        // }
-
-        TimeseriseDatabase<Bean> db = TimeseriseDatabase.create("bean", Bean.class, "time");
-        // db.insert(beans);
-        System.out.println(db.max("time") + "   " + db.min("time", "20 < time") + "   " + db.avg("time") + "   " + db.sum("time"));
+    /**
+     * Helper to clear the target table completely.
+     * 
+     * @param table A target table name.
+     */
+    private static void clearTable(String table) {
+        root.directory(table).delete();
     }
 }
