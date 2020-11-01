@@ -9,8 +9,10 @@
  */
 package cointoss.db;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,6 +28,8 @@ import io.questdb.cairo.sql.RecordCursor;
 import io.questdb.cairo.sql.RecordCursorFactory;
 import io.questdb.griffin.SqlCompiler;
 import io.questdb.griffin.SqlException;
+import io.questdb.griffin.SqlExecutionContext;
+import io.questdb.griffin.SqlExecutionContextImpl;
 import kiss.I;
 import kiss.model.Model;
 import kiss.model.Property;
@@ -85,9 +89,9 @@ public class TimeseriseDatabase<T> {
 
         if (!existTable(table)) {
             String columns = properties.stream().map(p -> p.name + " " + typeToName(p)).collect(Collectors.joining(","));
-            executeQuery("create table (" + columns + ") timestamp(" + timestampPropertyName + ")", null);
+            query("CREATE TABLE " + table + " (" + columns + ") timestamp(" + timestampPropertyName + ")");
         } else {
-            latestTimestamp = queryLong("SELECT " + timestampPropertyName + " FROM " + table + " LATEST BY " + timestampPropertyName);
+            latestTimestamp = queryAsLong("SELECT " + timestampPropertyName + " FROM " + table + " LATEST BY " + timestampPropertyName);
         }
         System.out.println(latestTimestamp);
     }
@@ -105,30 +109,93 @@ public class TimeseriseDatabase<T> {
         return types.get(property.model.type);
     }
 
-    private long queryLong(String query) {
-        try (SqlCompiler compiler = new SqlCompiler(engine)) {
+    private final Map<String, RecordCursorFactory> factories = new LinkedHashMap<>(15, 0.75f, true) {
+
+        @Override
+        protected boolean removeEldestEntry(Entry<String, RecordCursorFactory> eldest) {
+            if (25 < size()) {
+                eldest.getValue().close();
+                return true;
+            } else {
+                return false;
+            }
         }
-        return 0;
+    };
+
+    private final RecordCursorFactory factory(String query) {
+        return factories.computeIfAbsent(query, key -> {
+            try (SqlCompiler compiler = new SqlCompiler(engine)) {
+                return compiler.compile(query, new SqlExecutionContextImpl(engine, 1)).getRecordCursorFactory();
+            } catch (SqlException e) {
+                throw new Error("The query [" + query + "] is failed.", e);
+            }
+        });
     }
 
-    private <R> R executeQuery(String query, Function<Record, R> result) {
-        try (SqlCompiler compiler = new SqlCompiler(engine)) {
-            try (RecordCursorFactory factory = compiler.compile(query, context).getRecordCursorFactory()) {
-                if (factory != null) {
-                    try (RecordCursor cursor = factory.getCursor(context)) {
-                        if (cursor.hasNext()) {
-                            Record record = cursor.getRecord();
-                            if (record != null) {
-                                return result.apply(record);
-                            }
-                        }
-                    }
-                }
-                return null;
+    /**
+     * Execute query which returns no value.
+     * 
+     * @param query Your query which returns no value.
+     * @return Result.
+     */
+    private final void query(String query) {
+        executeQuery(void.class, query, null);
+    }
+
+    /**
+     * Execute query which returns single value.
+     * 
+     * @param query Your query which returns single value.
+     * @return Result.
+     */
+    public final int queryAsInt(String query) {
+        return executeQuery(int.class, query, rec -> rec.getInt(0));
+    }
+
+    /**
+     * Execute query which returns single value.
+     * 
+     * @param query Your query which returns single value.
+     * @return Result.
+     */
+    public final long queryAsLong(String query) {
+        return executeQuery(long.class, query, rec -> rec.getLong(0));
+    }
+
+    /**
+     * Execute query which returns single value.
+     * 
+     * @param query Your query which returns single value.
+     * @return Result.
+     */
+    public final double queryAsDouble(String query) {
+        return executeQuery(double.class, query, rec -> rec.getDouble(0));
+    }
+
+    /**
+     * Execute query.
+     * 
+     * @param <R>
+     * @param type
+     * @param query
+     * @param decoder
+     * @return
+     */
+    private <R> R executeQuery(Class<R> type, String query, Function<Record, R> decoder) {
+        RecordCursorFactory factory = factory(query);
+
+        if (factory == null) {
+            return null;
+        }
+
+        try (RecordCursor cursor = factory.getCursor(new SqlExecutionContextImpl(engine, 1))) {
+            while (cursor.hasNext()) {
+                return decoder.apply(cursor.getRecord());
             }
-        } catch (SqlException e) {
+        } catch (Exception e) {
             throw I.quiet(e);
         }
+        throw new Error("This query [" + query + "] doesn't return " + type.getSimpleName() + " value.");
     }
 
     public void insert(T item) {
@@ -136,7 +203,7 @@ public class TimeseriseDatabase<T> {
     }
 
     public void insert(Iterable<T> items) {
-        try (TableWriter writer = engine.getWriter(context.getCairoSecurityContext(), table)) {
+        try (TableWriter writer = engine.getWriter(new SqlExecutionContextImpl(engine, 1).getCairoSecurityContext(), table)) {
             for (T item : items) {
                 Row row = writer.newRow((long) model.get(item, timestampProperty));
                 for (int i = 0; i < properties.size(); i++) {
@@ -160,30 +227,32 @@ public class TimeseriseDatabase<T> {
     }
 
     public double avg(String propertyName) {
-        return executeQuery("select avg(" + propertyName + ") from " + table, record -> record.getDouble(0));
+        return queryAsDouble("SELECT avg(" + propertyName + ") FROM " + table);
     }
 
     public long count() {
-        return executeQuery("select count() from " + table, record -> record.getLong(0));
+        return queryAsLong("SELECT count() FROM " + table);
     }
 
     public double sum(String propertyName) {
-        return executeQuery("select sum(" + propertyName + ") from " + table, record -> record.getDouble(0));
+        return queryAsDouble("SELECT sum(" + propertyName + ") FROM " + table);
     }
 
     public double max(String propertyName) {
-        return executeQuery("select max(" + propertyName + ") from " + table, record -> record.getDouble(0));
+        return queryAsDouble("SELECT max(" + propertyName + ") FROM " + table);
     }
 
     public double min(String propertyName, String... where) {
         if (where.length != 1) {
-            return executeQuery("select min(" + propertyName + ") from " + table, record -> record.getDouble(0));
+            return queryAsDouble("SELECT min(" + propertyName + ") FROM " + table);
         } else {
-            return executeQuery("select min(" + propertyName + ") from " + table + " where " + where[0], record -> record.getDouble(0));
+            return queryAsDouble("SELECT min(" + propertyName + ") FROM " + table + " WHERE " + where[0]);
         }
     }
 
     public void selectAll(Consumer<T> items) {
+        SqlExecutionContext context = new SqlExecutionContextImpl(engine, 1);
+
         try (SqlCompiler compiler = new SqlCompiler(engine)) {
             try (RecordCursorFactory factory = compiler.compile(table, context).getRecordCursorFactory()) {
                 try (RecordCursor cursor = factory.getCursor(context)) {
@@ -233,7 +302,7 @@ public class TimeseriseDatabase<T> {
      * @param table A target table name.
      * @return Result.
      */
-    private static boolean existTable(String table) {
+    public static boolean existTable(String table) {
         return root.directory(table).isPresent();
     }
 
@@ -242,7 +311,7 @@ public class TimeseriseDatabase<T> {
      * 
      * @param table A target table name.
      */
-    private static void clearTable(String table) {
+    public static void clearTable(String table) {
         root.directory(table).delete();
     }
 }

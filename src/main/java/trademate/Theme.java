@@ -17,7 +17,7 @@ import javafx.scene.paint.Color;
 
 import cointoss.Directional;
 import kiss.I;
-import viewtify.model.Model;
+import kiss.model.Model;
 
 public class Theme extends Model<Theme> {
 

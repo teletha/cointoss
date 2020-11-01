@@ -44,6 +44,8 @@ public class DBUser {
             beans.add(new Bean(i, i));
         }
 
+        TimeseriseDatabase.clearTable("bean");
+
         TimeseriseDatabase<Bean> db = TimeseriseDatabase.create("bean", Bean.class, "time");
         db.insert(beans);
         System.out.println(db.max("time") + "   " + db.min("time", "20 < time") + "   " + db.avg("time") + "   " + db.sum("time"));
