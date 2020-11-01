@@ -40,8 +40,8 @@ public class DBUser {
 
     public static void main(String[] args) throws SqlException {
         List<Bean> beans = new ArrayList();
-        for (int i = 0; i < 100; i++) {
-            beans.add(new Bean(i, i));
+        for (int i = 11; i < 100; i++) {
+            beans.add(new Bean(i, i * 1000000));
         }
 
         // TimeseriseDatabase.clearTable("bean");

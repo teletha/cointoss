@@ -109,7 +109,7 @@ public class TimeseriseDatabase<T> {
             String columns = properties.stream().map(p -> p.name + " " + typeToName(p)).collect(Collectors.joining(","));
             query("CREATE TABLE " + table + " (" + columns + ") timestamp(" + timestampPropertyName + ")");
         } else {
-            latestTimestamp = queryAsLong("SELECT " + timestampPropertyName + " FROM " + table + " LIMIT 1");
+            latestTimestamp = queryAsInt("SELECT " + timestampPropertyName + " FROM " + table + " ORDER BY " + timestampPropertyName + " DESC");
         }
         System.out.println(latestTimestamp);
     }
@@ -224,6 +224,8 @@ public class TimeseriseDatabase<T> {
 
         try (RecordCursor cursor = factory.getCursor(context)) {
             while (cursor.hasNext()) {
+                System.out.println(cursor.getRecord().getInt(0) + "  " + cursor.getRecord().getInt(1) + "  " + cursor.getRecord()
+                        .getLong(0) + "   " + cursor.getRecord().getLong(1));
                 return decoder.apply(cursor.getRecord());
             }
         }
