@@ -12,6 +12,7 @@ package cointoss.db;
 import java.util.ArrayList;
 import java.util.List;
 
+import cointoss.util.arithmetic.Num;
 import io.questdb.griffin.SqlException;
 
 public class DBUser {
@@ -20,6 +21,8 @@ public class DBUser {
 
         public long time;
 
+        public Num price;
+
         /**
          * @param id
          * @param value
@@ -27,6 +30,7 @@ public class DBUser {
         public Bean(int id, long time) {
             this.id = id;
             this.time = time;
+            this.price = Num.random(1, 10000);
         }
 
         /**
@@ -34,22 +38,22 @@ public class DBUser {
          */
         @Override
         public String toString() {
-            return "Bean [id=" + id + ", time=" + time + "]";
+            return "Bean [id=" + id + ", time=" + time + ", price=" + price + "]";
         }
     }
 
     public static void main(String[] args) throws SqlException {
         List<Bean> beans = new ArrayList();
-        for (int i = 11; i < 100; i++) {
+        for (int i = 11; i < 10000; i++) {
             Bean bean = new Bean(i, 1000000000L * i);
             beans.add(bean);
         }
 
-        // TimeseriseDatabase.clearTable("bean");
+        TimeseriseDatabase.clearTable("bean");
 
         TimeseriseDatabase<Bean> db = TimeseriseDatabase.create("bean", Bean.class, "time");
         db.insert(beans);
-        db.selectAll(i -> System.out.println(i));
-        System.out.println(db.max("time") + "   " + db.min("time") + "   " + db.avg("time") + "   " + db.sum("time"));
+        db.select("where 9800 < id order by time desc limit 1").to(item -> System.out.println(item));
+        System.out.println(db.max("price") + "   " + db.min("price") + "   " + db.avg("price") + "   " + db.sum("price"));
     }
 }

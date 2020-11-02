@@ -133,21 +133,8 @@ public class TimeseriseDatabase<T> {
      * @param query Your query which returns no value.
      * @return Result.
      */
-    private final void query(String query) {
+    private void query(String query) {
         executeQuery(void.class, query, null, null);
-    }
-
-    /**
-     * Execute query which returns single value.
-     * 
-     * @param query Your query which returns single value.
-     * @return Result.
-     */
-    public final Signal<T> query2(String query) {
-        return new Signal<>((observer, disposer) -> {
-
-            return disposer;
-        });
     }
 
     /**
@@ -220,18 +207,10 @@ public class TimeseriseDatabase<T> {
      * @return
      */
     private <R> R executeQuery(Class<R> type, String query, Consumer<BindVariableService> variables, Function<Record, R> decoder) {
-        System.out.println(query);
         SqlExecutionContext context = contexts.get();
         if (variables != null) variables.accept(context.getBindVariableService());
 
-        RecordCursorFactory factory = factories.computeIfAbsent(query, key -> {
-            try (SqlCompiler compiler = new SqlCompiler(engine)) {
-                return compiler.compile(query, context).getRecordCursorFactory();
-            } catch (SqlException e) {
-                throw new Error("The query [" + query + "] is failed.", e);
-            }
-        });
-
+        RecordCursorFactory factory = factory(query);
         if (factory == null) {
             return null;
         }
@@ -245,100 +224,190 @@ public class TimeseriseDatabase<T> {
         throw new Error("This query [" + query + "] doesn't return " + type.getSimpleName() + " value.");
     }
 
-    public void insert(T item) {
-
+    private RecordCursorFactory factory(String query) {
+        return factories.computeIfAbsent(query, key -> {
+            try (SqlCompiler compiler = new SqlCompiler(engine)) {
+                return compiler.compile(query, contexts.get()).getRecordCursorFactory();
+            } catch (SqlException e) {
+                throw new Error("The query [" + query + "] is failed.", e);
+            }
+        });
     }
 
-    public void insert(Iterable<T> items) {
+    /**
+     * Format query.
+     * 
+     * @param base A base query.
+     * @param additions A list of additional queries.
+     * @return A merged query.
+     */
+    private String format(String base, String... additions) {
+        String joined = String.join(" ", additions);
+        if (joined.isBlank()) {
+            return base;
+        } else {
+            return base + " " + joined;
+        }
+    }
+
+    /**
+     * Add itmes.
+     * 
+     * @param items A list of items to add.
+     */
+    public final void insert(T... items) {
+        insert(I.signal(items));
+    }
+
+    /**
+     * Add items.
+     * 
+     * @param items A list of items to add.
+     */
+    public final void insert(Iterable<T> items) {
+        insert(I.signal(items));
+    }
+
+    /**
+     * Add items.
+     * 
+     * @param items A list of items to add.
+     */
+    public final void insert(Signal<T> items) {
         try (TableWriter writer = engine.getWriter(contexts.get().getCairoSecurityContext(), table)) {
-            for (T item : items) {
-                long time = (long) model.get(item, timestampProperty);
+            items.to(item -> {
+                long timestamp = (long) model.get(item, timestampProperty);
+                if (latestTimestamp < timestamp) {
+                    latestTimestamp = timestamp;
 
-                if (time < latestTimestamp) {
-                    continue;
-                }
-                latestTimestamp = time;
+                    Row row = writer.newRow(timestamp);
+                    for (int i = 0; i < properties.size(); i++) {
+                        Property property = properties.get(i);
+                        if (property == timestampProperty) {
+                            continue;
+                        }
 
-                Row row = writer.newRow(time);
-                for (int i = 0; i < properties.size(); i++) {
-                    Property property = properties.get(i);
-
-                    if (property == timestampProperty) {
-                        continue;
+                        Object value = model.get(item, property);
+                        Class type = property.model.type;
+                        if (type == int.class) {
+                            row.putInt(i, (int) value);
+                        } else if (type == long.class) {
+                            row.putLong(i, (long) value);
+                        } else if (type == double.class) {
+                            row.putDouble(i, (double) value);
+                        } else if (type == Num.class) {
+                            row.putDouble(i, ((Num) value).doubleValue());
+                        }
                     }
-                    Object value = model.get(item, property);
-                    Class type = property.model.type;
-                    if (type == int.class) {
-                        row.putInt(i, (int) value);
-                    } else if (type == long.class) {
-                        row.putLong(i, (long) value);
-                    } else if (type == double.class) {
-                        row.putDouble(i, (double) value);
-                    } else if (type == Num.class) {
-                        row.putDouble(i, ((Num) value).doubleValue());
-                    }
+                    row.append();
                 }
-                row.append();
-            }
+            });
             writer.commit();
         }
     }
 
-    public double avg(String propertyName) {
-        return queryAsDouble("SELECT avg(" + propertyName + ") FROM " + table);
+    /**
+     * Calculate the average of the target property.
+     * 
+     * @param propertyName A target property name.
+     * @param additionalQuery A list of additional conditions.
+     * @return
+     */
+    public final double avg(String propertyName, String... additionalQuery) {
+        return queryAsDouble(format("SELECT avg(" + propertyName + ") FROM " + table, additionalQuery));
     }
 
-    public long count() {
-        return queryAsLong("SELECT count() FROM " + table);
+    /**
+     * Get the item size.
+     * 
+     * @param additionalQuery A list of additional conditions.
+     * @return
+     */
+    public final long count(String... additionalQuery) {
+        return queryAsLong(format("SELECT count() FROM " + table, additionalQuery));
     }
 
-    public double sum(String propertyName) {
-        return queryAsDouble("SELECT sum(" + propertyName + ") FROM " + table);
+    /**
+     * Calculate the maximum value of the target property.
+     * 
+     * @param propertyName A target property name.
+     * @param additionalQuery A list of additional conditions.
+     * @return
+     */
+    public final double max(String propertyName, String... additionalQuery) {
+        return queryAsDouble(format("SELECT max(" + propertyName + ") FROM " + table, additionalQuery));
     }
 
-    public double max(String propertyName) {
-        return queryAsDouble("SELECT max(" + propertyName + ") FROM " + table);
+    /**
+     * Calculate the minimum value of the target property.
+     * 
+     * @param propertyName A target property name.
+     * @param additionalQuery A list of additional conditions.
+     * @return
+     */
+    public final double min(String propertyName, String... additionalQuery) {
+        return queryAsDouble(format("SELECT min(" + propertyName + ") FROM " + table, additionalQuery));
     }
 
-    public double min(String propertyName, String... where) {
-        if (where.length != 1) {
-            return queryAsDouble("SELECT min(" + propertyName + ") FROM " + table);
-        } else {
-            return queryAsDouble("SELECT min(" + propertyName + ") FROM " + table + " WHERE " + where[0]);
-        }
+    /**
+     * Calculate the sum value of the target property.
+     * 
+     * @param propertyName A target property name.
+     * @param additionalQuery A list of additional conditions.
+     * @return
+     */
+    public final double sum(String propertyName, String... additionalQuery) {
+        return queryAsDouble(format("SELECT sum(" + propertyName + ") FROM " + table, additionalQuery));
     }
 
-    public void selectAll(Consumer<T> items) {
-        SqlExecutionContext context = new SqlExecutionContextImpl(engine, 1);
+    /**
+     * Select items by your condition.
+     * 
+     * @param additinalQuery Condition expression.
+     * @return The matched items.
+     */
+    public final Signal<T> select(String additinalQuery) {
+        String query = additinalQuery == null || additinalQuery.isBlank() ? table : "SELECT * FROM " + table + " " + additinalQuery;
 
-        try (SqlCompiler compiler = new SqlCompiler(engine)) {
-            try (RecordCursorFactory factory = compiler.compile(table, context).getRecordCursorFactory()) {
-                try (RecordCursor cursor = factory.getCursor(context)) {
-                    final io.questdb.cairo.sql.Record record = cursor.getRecord();
-                    while (cursor.hasNext()) {
-                        T o = I.make(model.type);
-                        for (int i = 0; i < properties.size(); i++) {
-                            Property property = properties.get(i);
-                            Object value = null;
-                            Class t = property.model.type;
-                            if (t == int.class) {
-                                value = record.getInt(i);
-                            } else if (t == long.class) {
-                                value = record.getLong(i);
-                            } else if (t == double.class) {
-                                value = record.getDouble(i);
-                            } else if (t == Num.class) {
-                                value = Num.of(record.getDouble(i));
-                            }
-                            model.set(o, property, value);
+        return new Signal<>((observer, disposer) -> {
+            RecordCursorFactory factory = factory(query);
+            try (RecordCursor cursor = factory.getCursor(contexts.get())) {
+                while (cursor.hasNext() && !disposer.isDisposed()) {
+                    Record record = cursor.getRecord();
+
+                    T o = I.make(model.type);
+                    for (int i = 0; i < properties.size(); i++) {
+                        Property property = properties.get(i);
+                        Object value = null;
+                        Class t = property.model.type;
+                        if (t == int.class) {
+                            value = record.getInt(i);
+                        } else if (t == long.class) {
+                            value = record.getLong(i);
+                        } else if (t == double.class) {
+                            value = record.getDouble(i);
+                        } else if (t == Num.class) {
+                            value = Num.of(record.getDouble(i));
                         }
-                        items.accept(o);
+                        model.set(o, property, value);
                     }
+                    observer.accept(o);
                 }
-            } catch (SqlException e) {
-                throw I.quiet(e);
+                observer.complete();
+            } catch (Throwable e) {
+                observer.error(e);
             }
-        }
+            return disposer;
+        });
+    }
+
+    /**
+     * Select all items.
+     * 
+     * @return All items.
+     */
+    public final Signal<T> selectAll() {
+        return select(null);
     }
 
     /**
