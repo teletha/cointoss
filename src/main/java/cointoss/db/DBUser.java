@@ -11,7 +11,9 @@ package cointoss.db;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import cointoss.db.TimeseriseDatabase.Timestamp;
 import cointoss.util.arithmetic.Num;
 import io.questdb.griffin.SqlException;
 
@@ -19,6 +21,7 @@ public class DBUser {
     public static class Bean {
         public int id;
 
+        @Timestamp(TimeUnit.SECONDS)
         public long time;
 
         public Num price;
@@ -45,15 +48,15 @@ public class DBUser {
     public static void main(String[] args) throws SqlException {
         List<Bean> beans = new ArrayList();
         for (int i = 11; i < 10000; i++) {
-            Bean bean = new Bean(i, 1000000000L * i);
+            Bean bean = new Bean(i, i);
             beans.add(bean);
         }
 
         TimeseriseDatabase.clearTable("bean");
 
-        TimeseriseDatabase<Bean> db = TimeseriseDatabase.create("bean", Bean.class, "time");
+        TimeseriseDatabase<Bean> db = TimeseriseDatabase.create("bean", Bean.class);
         db.insert(beans);
-        db.select("where 9800 < id order by time desc limit 1").to(item -> System.out.println(item));
+        db.select("").to(item -> System.out.println(item));
         System.out.println(db.max("price") + "   " + db.min("price") + "   " + db.avg("price") + "   " + db.sum("price"));
     }
 }

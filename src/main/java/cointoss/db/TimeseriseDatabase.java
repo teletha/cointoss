@@ -9,10 +9,17 @@
  */
 package cointoss.db;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -72,6 +79,9 @@ public class TimeseriseDatabase<T> {
     /** The timestamp property. */
     private final Property timestampProperty;
 
+    /** The unit of timestamp. */
+    private final TimeUnit timestampUnit;
+
     /** The latest timestamp in database. */
     private long latestTimestamp;
 
@@ -94,17 +104,21 @@ public class TimeseriseDatabase<T> {
      * 
      * @param table
      * @param type
-     * @param timestampPropertyName
      */
-    private TimeseriseDatabase(String table, Class<T> type, String timestampPropertyName) {
+    private TimeseriseDatabase(String table, Class<T> type) {
         this.table = table;
         this.model = Model.of(type);
         this.properties = model.properties();
-        this.timestampProperty = model.property(timestampPropertyName);
 
-        if (timestampProperty == null) {
-            throw new IllegalArgumentException("The property '" + timestampPropertyName + "' is not found in " + type + ".");
+        // search timestamp property
+        Field field = I.signal(type.getDeclaredFields()).take(f -> f.isAnnotationPresent(Timestamp.class)).first().to().v;
+        if (field == null) {
+            throw new IllegalArgumentException("The timestamp property is not found in " + type + ", you must annotate the property by " + Timestamp.class);
         }
+
+        String timestampPropertyName = field.getName();
+        this.timestampProperty = model.property(timestampPropertyName);
+        this.timestampUnit = field.getAnnotation(Timestamp.class).value();
 
         if (!existTable(table)) {
             String columns = properties.stream().map(p -> p.name + " " + typeToName(p)).collect(Collectors.joining(","));
@@ -276,7 +290,7 @@ public class TimeseriseDatabase<T> {
     public final void insert(Signal<T> items) {
         try (TableWriter writer = engine.getWriter(contexts.get().getCairoSecurityContext(), table)) {
             items.to(item -> {
-                long timestamp = (long) model.get(item, timestampProperty);
+                long timestamp = timestampUnit.toMicros((long) model.get(item, timestampProperty));
                 if (latestTimestamp < timestamp) {
                     latestTimestamp = timestamp;
 
@@ -379,16 +393,22 @@ public class TimeseriseDatabase<T> {
                     for (int i = 0; i < properties.size(); i++) {
                         Property property = properties.get(i);
                         Object value = null;
-                        Class t = property.model.type;
-                        if (t == int.class) {
-                            value = record.getInt(i);
-                        } else if (t == long.class) {
-                            value = record.getLong(i);
-                        } else if (t == double.class) {
-                            value = record.getDouble(i);
-                        } else if (t == Num.class) {
-                            value = Num.of(record.getDouble(i));
+
+                        if (property == timestampProperty) {
+                            value = timestampUnit.convert(record.getLong(i), TimeUnit.MICROSECONDS);
+                        } else {
+                            Class t = property.model.type;
+                            if (t == int.class) {
+                                value = record.getInt(i);
+                            } else if (t == long.class) {
+                                value = record.getLong(i);
+                            } else if (t == double.class) {
+                                value = record.getDouble(i);
+                            } else if (t == Num.class) {
+                                value = Num.of(record.getDouble(i));
+                            }
                         }
+
                         model.set(o, property, value);
                     }
                     observer.accept(o);
@@ -419,8 +439,8 @@ public class TimeseriseDatabase<T> {
      * @param timestampPropertyName
      * @return
      */
-    public static <T> TimeseriseDatabase<T> create(String name, Class<T> type, String timestampPropertyName) {
-        return new TimeseriseDatabase(name, type, timestampPropertyName);
+    public static <T> TimeseriseDatabase<T> create(String name, Class<T> type) {
+        return new TimeseriseDatabase(name, type);
     }
 
     /**
@@ -440,5 +460,15 @@ public class TimeseriseDatabase<T> {
      */
     public static void clearTable(String table) {
         root.directory(table).delete();
+    }
+
+    /**
+     * Property marker.
+     */
+    @Documented
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Timestamp {
+        TimeUnit value() default TimeUnit.MILLISECONDS;
     }
 }
