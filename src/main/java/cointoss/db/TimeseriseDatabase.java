@@ -15,6 +15,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,10 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
+import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import io.questdb.cairo.CairoConfiguration;
 import io.questdb.cairo.CairoEngine;
@@ -76,6 +79,8 @@ public class TimeseriseDatabase<T> {
     /** The property list. */
     private final List<Property> properties;
 
+    private final ToLongFunction timestampExtractor;
+
     /** The timestamp property. */
     private final Property timestampProperty;
 
@@ -112,19 +117,28 @@ public class TimeseriseDatabase<T> {
 
         // search timestamp property
         Field field = I.signal(type.getDeclaredFields()).take(f -> f.isAnnotationPresent(Timestamp.class)).first().to().v;
-        if (field == null) {
-            throw new IllegalArgumentException("The timestamp property is not found in " + type + ", you must annotate the property by " + Timestamp.class);
+        if (field != null) {
+            this.timestampProperty = model.property(field.getName());
+            this.timestampUnit = field.getAnnotation(Timestamp.class).value();
+            this.timestampExtractor = v -> (long) v;
+        } else {
+            Property property = I.signal(properties).take(p -> p.model.type == ZonedDateTime.class).first().to().v;
+            if (property != null) {
+                this.timestampProperty = property;
+                this.timestampUnit = TimeUnit.MILLISECONDS;
+                this.timestampExtractor = v -> ((ZonedDateTime) v).toInstant().toEpochMilli();
+            } else {
+                throw new IllegalArgumentException("The timestamp property is not found in " + type + ", you must annotate the property by " + Timestamp.class);
+            }
         }
-
-        String timestampPropertyName = field.getName();
-        this.timestampProperty = model.property(timestampPropertyName);
-        this.timestampUnit = field.getAnnotation(Timestamp.class).value();
 
         if (!existTable(table)) {
             String columns = properties.stream().map(p -> p.name + " " + typeToName(p)).collect(Collectors.joining(","));
-            query("CREATE TABLE " + table + " (" + columns + ") timestamp(" + timestampPropertyName + ")");
+            query("CREATE TABLE " + table + " (" + columns + ") timestamp(" + timestampProperty.name + ")");
         } else {
-            latestTimestamp = queryAsLong("SELECT " + timestampPropertyName + " FROM " + table + " ORDER BY " + timestampPropertyName + " DESC LIMIT 1");
+            latestTimestamp = 0; // queryAsLong("SELECT " + timestampProperty.name + " FROM " +
+                                 // table + " ORDER BY " + timestampProperty.name + " DESC LIMIT
+                                 // 1");
         }
     }
 
@@ -137,6 +151,8 @@ public class TimeseriseDatabase<T> {
     private String typeToName(Property property) {
         if (property == timestampProperty) {
             return "timestamp";
+        } else if (property.model.type.isEnum()) {
+            return "int";
         }
         return types.get(property.model.type);
     }
@@ -290,7 +306,7 @@ public class TimeseriseDatabase<T> {
     public final void insert(Signal<T> items) {
         try (TableWriter writer = engine.getWriter(contexts.get().getCairoSecurityContext(), table)) {
             items.to(item -> {
-                long timestamp = timestampUnit.toMicros((long) model.get(item, timestampProperty));
+                long timestamp = timestampUnit.toMicros(timestampExtractor.applyAsLong(model.get(item, timestampProperty)));
                 if (latestTimestamp < timestamp) {
                     latestTimestamp = timestamp;
 
@@ -311,6 +327,8 @@ public class TimeseriseDatabase<T> {
                             row.putDouble(i, (double) value);
                         } else if (type == Num.class) {
                             row.putDouble(i, ((Num) value).doubleValue());
+                        } else if (type.isEnum()) {
+                            row.putInt(i, ((Enum) value).ordinal());
                         }
                     }
                     row.append();
@@ -406,6 +424,10 @@ public class TimeseriseDatabase<T> {
                                 value = record.getDouble(i);
                             } else if (t == Num.class) {
                                 value = Num.of(record.getDouble(i));
+                            } else if (t == ZonedDateTime.class) {
+                                value = Chrono.utcByMills(record.getLong(i));
+                            } else if (t.isEnum()) {
+                                value = t.getEnumConstants()[record.getInt(i)];
                             }
                         }
 
