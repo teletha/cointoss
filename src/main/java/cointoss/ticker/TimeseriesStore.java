@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.LongFunction;
 import java.util.function.ToLongFunction;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -32,6 +33,7 @@ import cointoss.util.Chrono;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
 import cointoss.util.map.LongMap.LongEntry;
+import kiss.Signal;
 import psychopath.Directory;
 import psychopath.File;
 
@@ -75,6 +77,9 @@ public final class TimeseriesStore<E> {
         }
     };
 
+    /** The data supplier. */
+    private LongFunction<Signal<E>> supplier;
+
     /**
      * 
      */
@@ -106,6 +111,17 @@ public final class TimeseriesStore<E> {
      */
     private void restore(long time) {
 
+    }
+
+    /**
+     * Enable the data suppliance.
+     * 
+     * @param supplier
+     * @return
+     */
+    public synchronized TimeseriesStore<E> enableDataSupplier(LongFunction<Signal<E>> supplier) {
+        this.supplier = supplier;
+        return this;
     }
 
     /**
@@ -164,7 +180,7 @@ public final class TimeseriesStore<E> {
     @VisibleForTesting
     boolean existOnHeap(E item) {
         long[] index = index(timestampExtractor.applyAsLong(item));
-        Segment segment = indexed.get(index[0]);
+        Segment segment = supply(index[0]);
 
         if (segment instanceof TimeseriesStore.OnHeap) {
             E e = segment.get((int) index[1]);
@@ -210,7 +226,7 @@ public final class TimeseriesStore<E> {
     public void store(E item) {
         long[] index = index(timestampExtractor.applyAsLong(item));
 
-        Segment segment = indexed.get(index[0]);
+        Segment segment = supply(index[0]);
 
         if (segment == null) {
             segment = new OnHeap();
@@ -243,8 +259,7 @@ public final class TimeseriesStore<E> {
         }
 
         long[] index = index(timestamp);
-
-        Segment segment = indexed.get(index[0]);
+        Segment segment = supply(index[0]);
 
         if (segment == null) {
             return null;
@@ -407,7 +422,7 @@ public final class TimeseriesStore<E> {
         long[] index = index(timestamp);
         long timeIndex = index[0];
         int segmentIndex = ((int) index[1]);
-        Segment segment = indexed.get(timeIndex);
+        Segment segment = supply(timeIndex);
 
         if (with) {
             E item = segment.get(segmentIndex);
@@ -419,7 +434,7 @@ public final class TimeseriesStore<E> {
         while (items.size() < maximumSize) {
             if (--segmentIndex == -1) {
                 timeIndex -= span.segment;
-                segment = indexed.get(timeIndex);
+                segment = supply(timeIndex);
 
                 if (segment == null) {
                     break;
@@ -435,6 +450,54 @@ public final class TimeseriesStore<E> {
         }
 
         return items;
+    }
+
+    /**
+     * Get the data segment at the specified date and time.
+     * 
+     * @param startTime
+     * @return
+     */
+    private Segment supply(long startTime) {
+        // Memory Cache
+        Segment segment = indexed.get(startTime);
+        if (segment != null) {
+            return segment;
+        }
+
+        // Disk Cache
+        if (store != null) {
+            segment = store.restore(startTime);
+
+            if (segment != null) {
+                indexed.put(startTime, segment);
+                stats.put(startTime, segment);
+
+                return segment;
+            }
+        }
+
+        // Original Data Source
+        if (supplier != null) {
+            Signal<E> supply = supplier.apply(startTime);
+            if (supply != null) {
+                long endTime = startTime + span.segment;
+
+                OnHeap onheap = new OnHeap();
+                indexed.put(startTime, onheap);
+                stats.put(startTime, onheap);
+                supply.to(item -> {
+                    long timestamp = timestampExtractor.applyAsLong(item);
+                    if (startTime <= timestamp && timestamp < endTime) {
+                        onheap.set((int) index(timestamp)[1], item);
+                    }
+                });
+                return onheap;
+            }
+        }
+
+        // Not Found
+        return null;
     }
 
     /**
@@ -736,7 +799,7 @@ public final class TimeseriesStore<E> {
             indexed.put(time, new OnDisk(time, segment.size()));
         }
 
-        private void restore(long time) {
+        Segment restore(long time) {
             File file = name(time);
 
             if (file.isPresent()) {
@@ -750,6 +813,8 @@ public final class TimeseriesStore<E> {
                     System.out.println(item);
                 });
             }
+
+            return null;
         }
 
         /**
