@@ -184,6 +184,16 @@ public final class TimeseriesStore<E> {
     }
 
     /**
+     * Enable the automatic memory saving.
+     * 
+     * @return Chainable API.
+     */
+    public synchronized TimeseriesStore<E> enableMemorySaving() {
+        this.shrink = true;
+        return this;
+    }
+
+    /**
      * Disable the automatic memory saving.
      * 
      * @return Chainable API.
