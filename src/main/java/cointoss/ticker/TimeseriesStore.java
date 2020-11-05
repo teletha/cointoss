@@ -58,22 +58,22 @@ public final class TimeseriesStore<E> {
     private final ToLongFunction<E> timestampExtractor;
 
     /** The completed data manager. */
-    private final ConcurrentNavigableLongMap<Segment> indexed = LongMap.createSortedMap();
+    private final ConcurrentNavigableLongMap<OnHeap> indexed = LongMap.createSortedMap();
 
     /** The usage of memory shrinking. */
     private boolean shrink = true;
 
     /** The disk store. */
-    private DiskStore disk;
+    private OnDisk disk;
 
     @SuppressWarnings("serial")
-    private final Map<Long, Segment> stats = new LinkedHashMap<>(8, 0.75f, true) {
+    private final Map<Long, OnHeap> stats = new LinkedHashMap<>(8, 0.75f, true) {
 
         @Override
-        protected boolean removeEldestEntry(Entry<Long, Segment> eldest) {
+        protected boolean removeEldestEntry(Entry<Long, OnHeap> eldest) {
             if (shrink && span.segmentSize < size()) {
                 long time = eldest.getKey();
-                Segment segment = eldest.getValue();
+                OnHeap segment = eldest.getValue();
 
                 if (disk != null) {
                     disk.store(time, segment);
@@ -158,7 +158,7 @@ public final class TimeseriesStore<E> {
      */
     public synchronized TimeseriesStore<E> enableDiskStore(Path directory, Function<E, String[]> encoder, Function<String[], E> decoder) {
         if (directory != null && this.disk == null && encoder != null && decoder != null) {
-            this.disk = new DiskStore(Locator.directory(directory), encoder, decoder);
+            this.disk = new OnDisk(Locator.directory(directory), encoder, decoder);
         }
         return this;
     }
@@ -201,7 +201,7 @@ public final class TimeseriesStore<E> {
      * @return A positive size or zero.
      */
     public int size() {
-        return indexed.values().stream().mapToInt(Segment::size).sum();
+        return indexed.values().stream().mapToInt(OnHeap::size).sum();
     }
 
     /**
@@ -230,10 +230,10 @@ public final class TimeseriesStore<E> {
     public void store(E item) {
         long[] index = index(timestampExtractor.applyAsLong(item));
 
-        Segment segment = supply(index[0]);
+        OnHeap segment = supply(index[0]);
 
         if (segment == null) {
-            segment = new Segment();
+            segment = new OnHeap();
             indexed.put(index[0], segment);
             stats.put(index[0], segment);
         }
@@ -263,7 +263,7 @@ public final class TimeseriesStore<E> {
         }
 
         long[] index = index(timestamp);
-        Segment segment = supply(index[0]);
+        OnHeap segment = supply(index[0]);
 
         if (segment == null) {
             return null;
@@ -277,7 +277,7 @@ public final class TimeseriesStore<E> {
      * @return The first stored time series item.
      */
     public E first() {
-        Segment entry = indexed.firstValue();
+        OnHeap entry = indexed.firstValue();
 
         if (entry == null) {
             return null;
@@ -292,7 +292,7 @@ public final class TimeseriesStore<E> {
      * @return The last stored time series item.
      */
     public E last() {
-        Segment entry = indexed.lastValue();
+        OnHeap entry = indexed.lastValue();
 
         if (entry == null) {
             return null;
@@ -307,7 +307,7 @@ public final class TimeseriesStore<E> {
      * @param each An item processor.
      */
     public void each(Consumer<? super E> each) {
-        for (Segment segment : indexed.values()) {
+        for (OnHeap segment : indexed.values()) {
             segment.each(0, length, each);
         }
     }
@@ -327,9 +327,9 @@ public final class TimeseriesStore<E> {
 
         long[] startIndex = index(start);
         long[] endIndex = index(end);
-        ConcurrentNavigableLongMap<Segment> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
+        ConcurrentNavigableLongMap<OnHeap> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
 
-        for (LongEntry<Segment> entry : sub.longEntrySet()) {
+        for (LongEntry<OnHeap> entry : sub.longEntrySet()) {
             long time = entry.getLongKey();
             int startItemIndex = 0;
             int endItemIndex = length;
@@ -348,7 +348,7 @@ public final class TimeseriesStore<E> {
      * Clear all items.
      */
     public void clear() {
-        for (Segment segment : indexed.values()) {
+        for (OnHeap segment : indexed.values()) {
             segment.clear();
         }
         indexed.clear();
@@ -426,7 +426,7 @@ public final class TimeseriesStore<E> {
         long[] index = index(timestamp);
         long timeIndex = index[0];
         int segmentIndex = ((int) index[1]);
-        Segment segment = supply(timeIndex);
+        OnHeap segment = supply(timeIndex);
 
         if (with) {
             E item = segment.get(segmentIndex);
@@ -462,9 +462,9 @@ public final class TimeseriesStore<E> {
      * @param startTime
      * @return
      */
-    private Segment supply(long startTime) {
+    private OnHeap supply(long startTime) {
         // Memory Cache
-        Segment segment = indexed.get(startTime);
+        OnHeap segment = indexed.get(startTime);
         if (segment != null) {
             return segment;
         }
@@ -487,7 +487,7 @@ public final class TimeseriesStore<E> {
             if (supply != null) {
                 long endTime = startTime + span.segment;
 
-                Segment heap = new Segment();
+                OnHeap heap = new OnHeap();
                 indexed.put(startTime, heap);
                 stats.put(startTime, heap);
                 supply.to(item -> {
@@ -513,7 +513,7 @@ public final class TimeseriesStore<E> {
     @VisibleForTesting
     boolean existOnHeap(E item) {
         long[] index = index(timestampExtractor.applyAsLong(item));
-        Segment segment = indexed.get(index[0]);
+        OnHeap segment = indexed.get(index[0]);
         if (segment == null) {
             return false;
         }
@@ -523,7 +523,7 @@ public final class TimeseriesStore<E> {
     /**
      * On-Heap data container.
      */
-    private class Segment {
+    private class OnHeap {
 
         /** The managed items. */
         private E[] items = (E[]) new Object[length];
@@ -535,7 +535,7 @@ public final class TimeseriesStore<E> {
         private int max = Integer.MIN_VALUE;
 
         /**
-         * Return the size of this {@link Segment}.
+         * Return the size of this {@link OnHeap}.
          * 
          * @return A positive size or zero.
          */
@@ -625,7 +625,7 @@ public final class TimeseriesStore<E> {
     /**
      * 
      */
-    private class DiskStore {
+    private class OnDisk {
 
         /** The disk store. */
         private final Directory root;
@@ -641,7 +641,7 @@ public final class TimeseriesStore<E> {
          * @param encoder
          * @param decoder
          */
-        private DiskStore(Directory root, Function<E, String[]> encoder, Function<String[], E> decoder) {
+        private OnDisk(Directory root, Function<E, String[]> encoder, Function<String[], E> decoder) {
             this.root = root;
             this.encoder = encoder;
             this.decoder = decoder;
@@ -658,7 +658,7 @@ public final class TimeseriesStore<E> {
          * @param time
          * @param segment
          */
-        private void store(long time, Segment segment) {
+        private void store(long time, OnHeap segment) {
             File file = name(time);
 
             if (file.isAbsent()) {
@@ -680,14 +680,14 @@ public final class TimeseriesStore<E> {
          * @param time
          * @return
          */
-        private Segment restore(long time) {
+        private OnHeap restore(long time) {
             File file = name(time);
 
             if (file.isAbsent()) {
                 return null;
             }
 
-            Segment heap = new Segment();
+            OnHeap heap = new OnHeap();
 
             CsvParserSettings setting = new CsvParserSettings();
             setting.getFormat().setDelimiter(' ');
