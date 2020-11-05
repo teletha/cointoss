@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,9 +34,15 @@ import cointoss.util.Chrono;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
 import cointoss.util.map.LongMap.LongEntry;
+import kiss.Decoder;
+import kiss.Encoder;
+import kiss.I;
 import kiss.Signal;
+import kiss.model.Model;
+import kiss.model.Property;
 import psychopath.Directory;
 import psychopath.File;
+import psychopath.Locator;
 
 public final class TimeseriesStore<E> {
 
@@ -61,7 +68,7 @@ public final class TimeseriesStore<E> {
     private boolean shrink = true;
 
     /** The disk store. */
-    private DiskStore store;
+    private DiskStore disk;
 
     @SuppressWarnings("serial")
     private final Map<Long, Segment> stats = new LinkedHashMap<>(8, 0.75f, true) {
@@ -69,7 +76,14 @@ public final class TimeseriesStore<E> {
         @Override
         protected boolean removeEldestEntry(Entry<Long, Segment> eldest) {
             if (shrink && span.segmentSize < size()) {
-                store(eldest.getKey(), eldest.getValue());
+                long time = eldest.getKey();
+                Segment segment = eldest.getValue();
+
+                if (disk != null) {
+                    disk.store(time, segment);
+                }
+                indexed.remove(time);
+                segment.clear();
                 return true;
             } else {
                 return false;
@@ -90,30 +104,6 @@ public final class TimeseriesStore<E> {
     }
 
     /**
-     * Store data from heap to disk.
-     * 
-     * @param time
-     * @param segment
-     */
-    private void store(long time, Segment segment) {
-        if (store != null) {
-            store.store(time, segment);
-        } else {
-            indexed.remove(time);
-            segment.clear();
-        }
-    }
-
-    /**
-     * Restore data from disk to heap.
-     * 
-     * @param time
-     */
-    private void restore(long time) {
-
-    }
-
-    /**
      * Enable the data suppliance.
      * 
      * @param supplier
@@ -125,16 +115,54 @@ public final class TimeseriesStore<E> {
     }
 
     /**
+     * Enable the transparent disk persistence using property-based encoder and decoder.
+     * 
+     * @param directory A root directory to store data.
+     * @param type A type of items.
+     * @return Chainable API.
+     */
+    public synchronized TimeseriesStore<E> enableDiskStore(Path directory, Class<E> type) {
+        if (type != null) {
+            Model<E> model = Model.of(type);
+
+            if (model.atomic) {
+                enableDiskStore(directory, item -> {
+                    return new String[] {I.find(Encoder.class, model.type).encode(item)};
+                }, values -> {
+                    return (E) I.find(Decoder.class, model.type).decode(values[0]);
+                });
+            } else {
+                enableDiskStore(directory, item -> {
+                    List<Property> properties = model.properties();
+                    String[] values = new String[properties.size()];
+                    for (int i = 0; i < values.length; i++) {
+                        values[i] = I.find(Encoder.class, properties.get(i).model.type).encode(item);
+                    }
+                    return values;
+                }, values -> {
+                    E item = I.make(type);
+                    for (int i = 0; i < values.length; i++) {
+                        Property property = model.properties().get(i);
+                        model.set(item, property, I.find(Decoder.class, property.model.type).decode(values[i]));
+                    }
+                    return item;
+                });
+            }
+        }
+        return this;
+    }
+
+    /**
      * Enable the transparent disk persistence.
      * 
-     * @param store A root directory to store data.
+     * @param directory A root directory to store data.
      * @param encoder A date serializer.
      * @param decoder A date deserializer.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Directory store, Function<E, String[]> encoder, Function<String[], E> decoder) {
-        if (store != null && this.store == null && encoder != null && decoder != null) {
-            this.store = new DiskStore(store, encoder, decoder);
+    public synchronized TimeseriesStore<E> enableDiskStore(Path directory, Function<E, String[]> encoder, Function<String[], E> decoder) {
+        if (directory != null && this.disk == null && encoder != null && decoder != null) {
+            this.disk = new DiskStore(Locator.directory(directory), encoder, decoder);
         }
         return this;
     }
@@ -145,7 +173,7 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public synchronized TimeseriesStore<E> disableDiskStore() {
-        this.store = null;
+        this.disk = null;
         return this;
     }
 
@@ -169,26 +197,6 @@ public final class TimeseriesStore<E> {
     long[] index(long timestamp) {
         long remainder = timestamp % span.segment;
         return new long[] {timestamp - remainder, remainder / span.seconds};
-    }
-
-    /**
-     * For test.
-     * 
-     * @param item
-     * @return
-     */
-    @VisibleForTesting
-    boolean existOnHeap(E item) {
-        long[] index = index(timestampExtractor.applyAsLong(item));
-        Segment segment = supply(index[0]);
-
-        if (segment instanceof TimeseriesStore.OnHeap) {
-            E e = segment.get((int) index[1]);
-            if (item.equals(e)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -466,8 +474,8 @@ public final class TimeseriesStore<E> {
         }
 
         // Disk Cache
-        if (store != null) {
-            segment = store.restore(startTime);
+        if (disk != null) {
+            segment = disk.restore(startTime);
 
             if (segment != null) {
                 indexed.put(startTime, segment);
@@ -498,6 +506,26 @@ public final class TimeseriesStore<E> {
 
         // Not Found
         return null;
+    }
+
+    /**
+     * For test.
+     * 
+     * @param item
+     * @return
+     */
+    @VisibleForTesting
+    boolean existOnHeap(E item) {
+        long[] index = index(timestampExtractor.applyAsLong(item));
+        Segment segment = indexed.get(index[0]);
+
+        if (segment instanceof TimeseriesStore.OnHeap) {
+            E e = segment.get((int) index[1]);
+            if (item.equals(e)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -680,7 +708,7 @@ public final class TimeseriesStore<E> {
 
         private Segment heap() {
             if (heap == null) {
-                store.restore(time);
+                disk.restore(time);
             }
             return heap;
         }
@@ -780,6 +808,12 @@ public final class TimeseriesStore<E> {
             });
         }
 
+        /**
+         * Store data to disk cache.
+         * 
+         * @param time
+         * @param segment
+         */
         private void store(long time, Segment segment) {
             File file = name(time);
 
@@ -793,28 +827,34 @@ public final class TimeseriesStore<E> {
                     writer.writeRow(encoder.apply(item));
                 });
                 writer.close();
-                System.out.println("Persist data [" + span + "]  at " + file);
             }
-
-            indexed.put(time, new OnDisk(time, segment.size()));
         }
 
-        Segment restore(long time) {
+        /**
+         * Restore data from disk cache.
+         * 
+         * @param time
+         * @return
+         */
+        private Segment restore(long time) {
             File file = name(time);
 
-            if (file.isPresent()) {
-                CsvParserSettings setting = new CsvParserSettings();
-                setting.getFormat().setDelimiter(' ');
-                setting.getFormat().setComment('無');
-
-                CsvParser reader = new CsvParser(setting);
-                reader.iterate(file.newInputStream(), StandardCharsets.ISO_8859_1).forEach(values -> {
-                    E item = decoder.apply(values);
-                    System.out.println(item);
-                });
+            if (file.isAbsent()) {
+                return null;
             }
 
-            return null;
+            OnHeap heap = new OnHeap();
+
+            CsvParserSettings setting = new CsvParserSettings();
+            setting.getFormat().setDelimiter(' ');
+            setting.getFormat().setComment('無');
+            CsvParser reader = new CsvParser(setting);
+            reader.iterate(file.newInputStream(), StandardCharsets.ISO_8859_1).forEach(values -> {
+                E item = decoder.apply(values);
+                heap.set((int) index(timestampExtractor.applyAsLong(item))[1], item);
+            });
+
+            return heap;
         }
 
         /**

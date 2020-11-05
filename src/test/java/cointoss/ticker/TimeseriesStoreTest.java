@@ -9,16 +9,16 @@
  */
 package cointoss.ticker;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
-import psychopath.Locator;
 
 class TimeseriesStoreTest {
     int days = 60 * 60 * 24;
@@ -363,12 +363,12 @@ class TimeseriesStoreTest {
         assert store.beforeWith(4 * days, 3).equals(List.of(4 * days, 3 * days, 2 * days));
     }
 
+    @RegisterExtension
     CleanRoom room = new CleanRoom();
 
     @Test
     void store() {
-        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v)
-                .enableDiskStore(Locator.directory(room.root), v -> new String[] {String.valueOf(v)}, v -> Long.valueOf(v[0]));
+        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v).enableDiskStore(room.locateRadom(), long.class);
 
         long base = Span.Second5.segment;
 
@@ -392,8 +392,7 @@ class TimeseriesStoreTest {
 
     @Test
     void restore() {
-        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v)
-                .enableDiskStore(Locator.directory(room.root), v -> new String[] {String.valueOf(v)}, v -> Long.valueOf(v[0]));
+        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v).enableDiskStore(room.root, long.class);
 
         long base = Span.Second5.segment;
     }
