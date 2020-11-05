@@ -103,10 +103,20 @@ public final class TimeseriesStore<E> {
      * Enable the data suppliance.
      * 
      * @param supplier
-     * @return
+     * @return Chainable API.
      */
     public synchronized TimeseriesStore<E> enableDataSupplier(LongFunction<Signal<E>> supplier) {
         this.supplier = supplier;
+        return this;
+    }
+
+    /**
+     * Disable the data suppliance.
+     * 
+     * @return Chainable API.
+     */
+    public synchronized TimeseriesStore<E> disableDataSupplier() {
+        this.supplier = null;
         return this;
     }
 
