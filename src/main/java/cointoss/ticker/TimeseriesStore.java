@@ -9,7 +9,6 @@
  */
 package cointoss.ticker;
 
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
@@ -60,9 +59,6 @@ public final class TimeseriesStore<E> {
 
     /** The completed data manager. */
     private final ConcurrentNavigableLongMap<Segment> indexed = LongMap.createSortedMap();
-
-    /** A number of items. */
-    private int size;
 
     /** The usage of memory shrinking. */
     private boolean shrink = true;
@@ -205,7 +201,7 @@ public final class TimeseriesStore<E> {
      * @return A positive size or zero.
      */
     public int size() {
-        return size;
+        return indexed.values().stream().mapToInt(Segment::size).sum();
     }
 
     /**
@@ -237,11 +233,11 @@ public final class TimeseriesStore<E> {
         Segment segment = supply(index[0]);
 
         if (segment == null) {
-            segment = new OnHeap();
+            segment = new Segment();
             indexed.put(index[0], segment);
             stats.put(index[0], segment);
         }
-        size += segment.set((int) index[1], item);
+        segment.set((int) index[1], item);
     }
 
     /**
@@ -491,16 +487,16 @@ public final class TimeseriesStore<E> {
             if (supply != null) {
                 long endTime = startTime + span.segment;
 
-                OnHeap onheap = new OnHeap();
-                indexed.put(startTime, onheap);
-                stats.put(startTime, onheap);
+                Segment heap = new Segment();
+                indexed.put(startTime, heap);
+                stats.put(startTime, heap);
                 supply.to(item -> {
                     long timestamp = timestampExtractor.applyAsLong(item);
                     if (startTime <= timestamp && timestamp < endTime) {
-                        onheap.set((int) index(timestamp)[1], item);
+                        heap.set((int) index(timestamp)[1], item);
                     }
                 });
-                return onheap;
+                return heap;
             }
         }
 
@@ -518,86 +514,16 @@ public final class TimeseriesStore<E> {
     boolean existOnHeap(E item) {
         long[] index = index(timestampExtractor.applyAsLong(item));
         Segment segment = indexed.get(index[0]);
-
-        if (segment instanceof TimeseriesStore.OnHeap) {
-            E e = segment.get((int) index[1]);
-            if (item.equals(e)) {
-                return true;
-            }
+        if (segment == null) {
+            return false;
         }
-        return false;
+        return item.equals(segment.get((int) index[1]));
     }
 
     /**
-     * Item container.
+     * On-Heap data container.
      */
-    private abstract class Segment {
-        /**
-         * Return the size of this {@link Segment}.
-         * 
-         * @return A positive size or zero.
-         */
-        abstract int size();
-
-        /**
-         * Retrieve item by index.
-         * 
-         * @param index An item index.
-         * @return An item or null.
-         */
-        abstract E get(int index);
-
-        /**
-         * Set item by index.
-         * 
-         * @param index An item index.
-         * @param item An item to set.
-         * @return Adding new item returns 1, updating item returns 0.
-         */
-        abstract int set(int index, E item);
-
-        /**
-         * Clear data.
-         */
-        abstract void clear();
-
-        /**
-         * Retrieve first item in this container.
-         * 
-         * @return A first item or null.
-         */
-        abstract E first();
-
-        /**
-         * Retrieve last item in this container.
-         * 
-         * @return A last item or null.
-         */
-        abstract E last();
-
-        /**
-         * Get the time series items stored from the specified start index (inclusive) to end index
-         * (exclusive) in ascending order.
-         * 
-         * @param each An item processor.
-         */
-        abstract void each(Consumer<? super E> each);
-
-        /**
-         * Get the time series items stored from the specified start index (inclusive) to end index
-         * (exclusive) in ascending order.
-         * 
-         * @param start A start index (included).
-         * @param end A end index (exclusive).
-         * @param each An item processor.
-         */
-        abstract void each(int start, int end, Consumer<? super E> each);
-    }
-
-    /**
-     * On heap container.
-     */
-    private class OnHeap extends Segment implements Serializable {
+    private class Segment {
 
         /** The managed items. */
         private E[] items = (E[]) new Object[length];
@@ -609,72 +535,81 @@ public final class TimeseriesStore<E> {
         private int max = Integer.MIN_VALUE;
 
         /**
-         * {@inheritDoc}
+         * Return the size of this {@link Segment}.
+         * 
+         * @return A positive size or zero.
          */
-        @Override
         int size() {
             return max < 0 ? 0 : max - min + 1;
         }
 
         /**
-         * {@inheritDoc}
+         * Retrieve item by index.
+         * 
+         * @param index An item index.
+         * @return An item or null.
          */
-        @Override
         E get(int index) {
             return items[index];
         }
 
         /**
-         * {@inheritDoc}
+         * Set item by index.
+         * 
+         * @param index An item index.
+         * @param item An item to set.
          */
-        @Override
-        int set(int index, E item) {
-            boolean added = items[index] == null;
+        void set(int index, E item) {
             items[index] = item;
 
             // FAILSAFE : update min and max index after inserting item
             min = Math.min(min, index);
             max = Math.max(max, index);
-
-            return added ? 1 : 0;
         }
 
         /**
-         * {@inheritDoc}
+         * Clear data.
          */
-        @Override
         void clear() {
             items = null;
         }
 
         /**
-         * {@inheritDoc}
+         * Retrieve first item in this container.
+         * 
+         * @return A first item or null.
          */
-        @Override
         E first() {
             return items == null ? null : items[min];
         }
 
         /**
-         * {@inheritDoc}
+         * Retrieve last item in this container.
+         * 
+         * @return A last item or null.
          */
-        @Override
         E last() {
             return items == null ? null : items[max];
         }
 
         /**
-         * {@inheritDoc}
+         * Get the time series items stored from the specified start index (inclusive) to end index
+         * (exclusive) in ascending order.
+         * 
+         * @param each An item processor.
          */
-        @Override
         void each(Consumer<? super E> each) {
             each(min, max, each);
         }
 
         /**
-         * {@inheritDoc}
+         * Get the time series items stored from the specified start index (inclusive) to end index
+         * (exclusive) in ascending order.
+         * 
+         * @param start A start index (included).
+         * @param end A end index (exclusive).
+         * @param each An item processor.
          */
-        @Override
         void each(int start, int end, Consumer<? super E> consumer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
@@ -684,97 +619,6 @@ public final class TimeseriesStore<E> {
                     consumer.accept(avoidNPE[i]);
                 }
             }
-        }
-    }
-
-    /**
-     * On disk container.
-     */
-    private class OnDisk extends Segment {
-
-        private Segment heap;
-
-        private final long time;
-
-        private final int size;
-
-        /**
-         * @param size
-         */
-        private OnDisk(long time, int size) {
-            this.time = time;
-            this.size = size;
-        }
-
-        private Segment heap() {
-            if (heap == null) {
-                disk.restore(time);
-            }
-            return heap;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        int size() {
-            return size;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        E get(int index) {
-            return heap().get(index);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        int set(int index, E item) {
-            return heap().set(index, item);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        void clear() {
-            heap().clear();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        E first() {
-            return heap().first();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        E last() {
-            return heap().last();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        void each(Consumer<? super E> each) {
-            heap().each(each);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        void each(int start, int end, Consumer<? super E> each) {
-            heap().each(start, end, each);
         }
     }
 
@@ -843,7 +687,7 @@ public final class TimeseriesStore<E> {
                 return null;
             }
 
-            OnHeap heap = new OnHeap();
+            Segment heap = new Segment();
 
             CsvParserSettings setting = new CsvParserSettings();
             setting.getFormat().setDelimiter(' ');

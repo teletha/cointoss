@@ -367,7 +367,7 @@ class TimeseriesStoreTest {
     CleanRoom room = new CleanRoom();
 
     @Test
-    void store() {
+    void diskCache() {
         TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v).enableDiskStore(room.locateRadom(), long.class);
 
         long base = Span.Second5.segment;
