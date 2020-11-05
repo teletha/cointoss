@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
+import kiss.I;
 
 class TimeseriesStoreTest {
     int days = 60 * 60 * 24;
@@ -391,9 +392,21 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void restore() {
-        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v).enableDiskStore(room.root, long.class);
+    void dataSupply() {
+        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v).enableDataSupplier(time -> {
+            return I.signal(time);
+        });
 
         long base = Span.Second5.segment;
+        assert store.existOnHeap(base * 1) == false;
+        assert store.existOnHeap(base * 2) == false;
+        assert store.existOnHeap(base * 3) == false;
+        assert store.existOnHeap(base * 4) == false;
+
+        // automatic creation
+        assert store.at(base * 1) == base * 1;
+        assert store.at(base * 2) == base * 2;
+        assert store.at(base * 3) == base * 3;
+        assert store.at(base * 4) == base * 4;
     }
 }
