@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -637,6 +637,7 @@ public class ExecutionLog {
                                 .scanWith(Market.BASE, logger::decode)
                                 .effectOnComplete(parser::stopParsing)
                                 .effectOnObserve(stopwatch::start)
+                                .effectOnError(e -> System.out.println("Fail to read fast log. [" + fast + "]"))
                                 .effectOnComplete(() -> {
                                     log.trace("Read fast log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
@@ -646,6 +647,7 @@ public class ExecutionLog {
                                 .scanWith(Market.BASE, logger::decode)
                                 .effectOnComplete(parser::stopParsing)
                                 .effectOnObserve(stopwatch::start)
+                                .effectOnError(e -> System.out.println("Fail to read compact log. [" + compact + "]"))
                                 .effectOnComplete(() -> {
                                     log.trace("Read compact log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
@@ -659,6 +661,7 @@ public class ExecutionLog {
                             .map(this::parse)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
+                            .effectOnError(e -> System.out.println("Fail to read normal log. [" + normal + "]"))
                             .effectOnComplete(() -> {
                                 log.trace("Read normal log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                             });
