@@ -15,11 +15,10 @@ import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.TimeUnit;
 
 import cointoss.util.Chrono;
-import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import psychopath.Directory;
@@ -37,12 +36,6 @@ public class FileDB<T> {
     /** The local database file. */
     private final Directory dir;
 
-    /** The writing item queue. */
-    private ConcurrentSkipListSet<T> writerQueue;
-
-    /** The writing item thread. */
-    private Disposable writer;
-
     /**
      * @param definition
      */
@@ -51,7 +44,7 @@ public class FileDB<T> {
         this.definition = definition;
         this.dir = Locator.directory(name).create();
 
-        refreshWriterQueue();
+        // refreshWriterQueue();
     }
 
     /**
@@ -60,8 +53,8 @@ public class FileDB<T> {
      * @param items A list of items to insert.
      * @return Chainable API.
      */
-    public Signal<T> insert(T... items) {
-        return insert(I.signal(items));
+    public void insert(T... items) {
+        insert(I.signal(items));
     }
 
     /**
@@ -70,8 +63,8 @@ public class FileDB<T> {
      * @param items A list of items to insert.
      * @return Chainable API.
      */
-    public Signal<T> insert(Iterable<T> items) {
-        return insert(I.signal(items));
+    public void insert(Iterable<T> items) {
+        insert(I.signal(items));
     }
 
     /**
@@ -80,58 +73,90 @@ public class FileDB<T> {
      * @param items A list of items to insert.
      * @return Chainable API.
      */
-    public Signal<T> insert(Signal<T> items) {
-        return items.effectOnce(this::wakeUpWriter).effect(writerQueue::add);
+    public void insert(Signal<T> items) {
+        items.buffer(1000).effect(e -> System.out.println(e)).effect(this::write).to(e -> {
+            System.out.println(e);
+        });
     }
 
-    /**
-     * Refresh writing queue.
-     * 
-     * @return
-     */
-    private ConcurrentSkipListSet<T> refreshWriterQueue() {
-        ConcurrentSkipListSet<T> now = writerQueue;
-        writerQueue = new ConcurrentSkipListSet<>(Comparator.comparingLong(definition.timestampExtractor));
-        return now;
-    }
+    // /**
+    // * Refresh writing queue.
+    // *
+    // * @return
+    // */
+    // private ConcurrentSkipListSet<T> refreshWriterQueue() {
+    // ConcurrentSkipListSet<T> now = writerQueue;
+    // writerQueue = new
+    // ConcurrentSkipListSet<>(Comparator.comparingLong(definition.timestampExtractor));
+    // return now;
+    // }
+    //
+    // /**
+    // *
+    // */
+    // private synchronized void wakeUpWriter() {
+    // if (writer == null) {
+    // writer = I.schedule(1, TimeUnit.SECONDS).effectOnDispose(() -> writer = null).to(() -> {
+    // for (T item : refreshWriterQueue()) {
+    // write(item);
+    // }
+    // });
+    // }
+    // }
 
-    /**
-     * 
-     */
-    private synchronized void wakeUpWriter() {
-        if (writer == null) {
-            writer = I.schedule(1, TimeUnit.SECONDS).effectOnDispose(() -> writer = null).to(() -> {
-                for (T item : refreshWriterQueue()) {
-                    write(item);
-                }
-            });
-        }
-    }
-
-    private void write(T item) {
-        long timestamp = definition.timestampExtractor.applyAsLong(item);
-        long remaining = timestamp % definition.duration;
-        long index = timestamp - remaining;
-        long height = remaining / definition.span.seconds;
-
-        File file = dir.file(index + ".db");
+    private void write(List<T> items) {
+        File file = dir.file("0" + ".db");
         try (FileChannel channel = FileChannel.open(file.asJavaPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-            channel.position(height * definition.widthTotal);
 
-            ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
-            for (int i = 0; i < definition.width.length; i++) {
-                definition.writers[i].accept(item, buffer);
+            for (T item : items) {
+                long timestamp = definition.timestampExtractor.applyAsLong(item);
+                long remaining = timestamp % definition.duration;
+                long index = timestamp - remaining;
+                long height = remaining / definition.span.seconds;
+
+                channel.position(height * definition.widthTotal);
+
+                ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                for (int i = 0; i < definition.width.length; i++) {
+                    definition.writers[i].accept(item, buffer);
+                }
+                channel.write(buffer.flip());
             }
-            channel.write(buffer.flip());
         } catch (IOException e) {
             e.printStackTrace();
             throw I.quiet(e);
         }
     }
 
-    public Signal<T> at(long time) {
-        return new Signal<T>((observer, disposer) -> {
+    public Signal<T> at(long timestamp) {
+        return range(timestamp, 1);
+    }
 
+    public Signal<T> range(long timestamp, long size) {
+        return new Signal<T>((observer, disposer) -> {
+            long remaining = timestamp % definition.duration;
+            long index = timestamp - remaining;
+            long height = remaining / definition.span.seconds;
+
+            File file = dir.file(index + ".db");
+            try (FileChannel channel = FileChannel.open(file.asJavaPath(), StandardOpenOption.READ)) {
+                for (int j = 0; j < size; j++) {
+                    channel.position((height + j) * definition.widthTotal);
+
+                    T item = (T) I.make(definition.model.type);
+                    ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                    channel.read(buffer);
+                    buffer.flip();
+                    for (int i = 0; i < definition.width.length; i++) {
+                        definition.readers[i].accept(item, buffer);
+                    }
+
+                    observer.accept(item);
+                }
+                observer.complete();
+            } catch (Exception e) {
+                observer.error(e);
+            }
             return disposer;
         });
     }
@@ -146,12 +171,5 @@ public class FileDB<T> {
 
     public Signal<T> range(ZonedDateTime start, ZonedDateTime end) {
         return null;
-    }
-
-    private class Writer {
-
-        /** The writing item queue. */
-        private ConcurrentSkipListSet<T> writerQueue = new ConcurrentSkipListSet<>(Comparator.comparingLong(definition.timestampExtractor));
-
     }
 }

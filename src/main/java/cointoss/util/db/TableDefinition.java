@@ -35,16 +35,19 @@ public class TableDefinition<T> {
 
     final int widthTotal;
 
+    final BiConsumer<T, ByteBuffer>[] readers;
+
     final BiConsumer<T, ByteBuffer>[] writers;
 
     public TableDefinition(Span span, Class<T> type, ToLongFunction<T> timestampExtractor) {
         this.span = Objects.requireNonNull(span);
-        this.duration = span.seconds * 1024 * 1024;
+        this.duration = span.seconds * 100000000;
         this.model = Model.of(type);
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
 
         List<Property> properties = model.properties();
         this.width = new int[properties.size()];
+        this.readers = new BiConsumer[properties.size()];
         this.writers = new BiConsumer[properties.size()];
 
         for (int i = 0; i < width.length; i++) {
@@ -52,35 +55,45 @@ public class TableDefinition<T> {
             Class c = property.model.type;
             if (c == byte.class) {
                 width[i] = 1;
+                readers[i] = (o, b) -> model.set(o, property, b.get());
                 writers[i] = (o, b) -> b.put((byte) model.get(o, property));
             } else if (c == short.class) {
                 width[i] = 2;
+                readers[i] = (o, b) -> model.set(o, property, b.getShort());
                 writers[i] = (o, b) -> b.putShort((short) model.get(o, property));
             } else if (c == char.class) {
                 width[i] = 2;
+                readers[i] = (o, b) -> model.set(o, property, b.getChar());
                 writers[i] = (o, b) -> b.putChar((char) model.get(o, property));
             } else if (c == int.class) {
                 width[i] = 4;
+                readers[i] = (o, b) -> model.set(o, property, b.getInt());
                 writers[i] = (o, b) -> b.putInt((int) model.get(o, property));
             } else if (c == float.class) {
                 width[i] = 4;
+                readers[i] = (o, b) -> model.set(o, property, b.getFloat());
                 writers[i] = (o, b) -> b.putFloat((float) model.get(o, property));
             } else if (c == long.class) {
                 width[i] = 8;
+                readers[i] = (o, b) -> model.set(o, property, b.getLong());
                 writers[i] = (o, b) -> b.putLong((long) model.get(o, property));
             } else if (c == double.class) {
                 width[i] = 8;
+                readers[i] = (o, b) -> model.set(o, property, b.getDouble());
                 writers[i] = (o, b) -> b.putDouble((double) model.get(o, property));
             } else if (c.isEnum()) {
                 int size = c.getEnumConstants().length;
                 if (size < 8) {
                     width[i] = 1;
+                    readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.get()]);
                     writers[i] = (o, b) -> b.put((byte) ((Enum) model.get(o, property)).ordinal());
                 } else if (size < 128) {
                     width[i] = 2;
+                    readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.getShort()]);
                     writers[i] = (o, b) -> b.putShort((short) ((Enum) model.get(o, property)).ordinal());
                 } else {
                     width[i] = 4;
+                    readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.getInt()]);
                     writers[i] = (o, b) -> b.putInt(((Enum) model.get(o, property)).ordinal());
                 }
             } else if (Number.class.isAssignableFrom(c)) {

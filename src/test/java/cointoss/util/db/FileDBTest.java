@@ -24,16 +24,14 @@ public class FileDBTest {
 
         long base = Span.Hour1.seconds;
 
-        // for (int i = 1; i < 300000; i++) {
-        // db.insert(new Hourly(base * i)).to(v -> {
+        for (int i = 1; i < 100000000; i++) {
+            db.insert(new Hourly(base * i));
+        }
+
+        // db.range(base * 0, 10000000).map(e -> e.high).scanWith(0d, (o, p) -> Math.max(o,
+        // p)).last().to(e -> {
+        // System.out.println(e);
         // });
-        // }
-        //
-        // Thread.sleep(1000 * 10);
-
-        db.at(base * 0).to(e -> {
-
-        });
     }
 
     private static class Hourly {
