@@ -157,13 +157,13 @@ public class OrderBookView extends View {
                     Num min = unit.price;
                     Num max = min.plus(priceRange.value());
                     Num best = book.longs.computeBestPrice(max, Num.of(3), Num.ONE);
-                    view.builder.orderPrice.value(best.toString());
+                    // view.builder.orderPrice.value(best.toString());
                 });
             } else {
                 list.selectedItem().to(unit -> {
                     Num min = unit.price;
                     Num best = book.shorts.computeBestPrice(min, Num.of(3), Num.ONE);
-                    view.builder.orderPrice.value(best.toString());
+                    // view.builder.orderPrice.value(best.toString());
                 });
             }
         };

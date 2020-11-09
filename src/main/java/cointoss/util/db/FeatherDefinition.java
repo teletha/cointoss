@@ -41,6 +41,9 @@ public class FeatherDefinition<T> {
     /** The best size while item writing. */
     int writerSize;
 
+    /** The best size while item writing. */
+    int fileSize;
+
     final BiConsumer<T, ByteBuffer>[] readers;
 
     final BiConsumer<T, ByteBuffer>[] writers;
@@ -53,7 +56,7 @@ public class FeatherDefinition<T> {
      */
     FeatherDefinition(Span span, Class<T> type, ToLongFunction<T> timestamper) {
         this.span = span;
-        this.duration = span.seconds * 100000000;
+        this.duration = span.seconds * 100000;
         this.model = Model.of(type);
         this.timestamper = Objects.requireNonNull(timestamper);
 
@@ -133,6 +136,7 @@ public class FeatherDefinition<T> {
      */
     public FeatherDefinition<T> maxDataFileSize(int mb) {
         if (0 < mb) {
+            this.fileSize = mb * 1024 * 1024 / widthTotal;
         }
         return this;
     }

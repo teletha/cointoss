@@ -61,32 +61,27 @@ public class FeatherDB<T> {
      * @return Chainable API.
      */
     public void insert(List<T> items) {
-        try (FileChannel channel = FileChannel
-                .open(dir.file("0" + ".db").asJavaPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-            ByteBuffer writer = ByteBuffer.allocate(define.widthTotal * Math.min(define.writerSize, items.size()));
 
-            for (T item : items) {
-                long timestamp = define.timestamper.applyAsLong(item);
-                long remaining = timestamp % define.duration;
-                long index = timestamp - remaining;
-                long height = remaining / define.span.seconds;
+        for (T item : items) {
+            long timestamp = define.timestamper.applyAsLong(item);
+            long remaining = timestamp % define.duration;
+            long index = timestamp - remaining;
+            long height = remaining / define.span.seconds;
 
-                channel.position(height * define.widthTotal);
-
-                for (int i = 0; i < define.width.length; i++) {
-                    define.writers[i].accept(item, writer);
-                }
-
-                if (writer.remaining() == 0) {
-                    channel.write(writer.flip());
-                    writer.clear();
-                }
+            ByteBuffer writer = ByteBuffer.allocate(define.widthTotal);
+            for (int i = 0; i < define.width.length; i++) {
+                define.writers[i].accept(item, writer);
             }
-            channel.write(writer.flip());
-            System.out.println("Write all");
-        } catch (Exception e) {
-            throw I.quiet(e);
+
+            try (FileChannel channel = FileChannel
+                    .open(dir.file(index + ".db").asJavaPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+                channel.position(height * define.widthTotal);
+                channel.write(writer.flip());
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
         }
+        System.out.println("Write all");
     }
 
     /**

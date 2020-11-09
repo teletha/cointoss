@@ -24,9 +24,7 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
-import trademate.order.OrderBuilder;
 import viewtify.Viewtify;
-import viewtify.ui.UICheckBox;
 import viewtify.ui.UIHBox;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
@@ -46,12 +44,6 @@ public class TradingView extends View {
     private UIHBox box;
 
     public ChartView chart;
-
-    public OrderBuilder builder;
-
-    private UICheckBox showExecution;
-
-    private UICheckBox showOrderBuilder;
 
     private Variable<Boolean> isLoading = Variable.of(false);
 
@@ -77,8 +69,6 @@ public class TradingView extends View {
                 $(vbox, style.chartArea, () -> {
                     $(chart);
                 });
-
-                $(builder);
             });
         }
     }
@@ -112,8 +102,6 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        configContextMenuOnTab();
-
         Viewtify.observing(tab.selectedProperty()).to(v -> {
             chart.showRealtimeUpdate.set(v);
             chart.showChart.set(true);
@@ -131,18 +119,6 @@ public class TradingView extends View {
         });
 
         additionalInfo();
-    }
-
-    /**
-     * Configuration for tab's context menu.
-     */
-    private void configContextMenuOnTab() {
-        tab.context(c -> {
-            c.menu(showExecution, false);
-            c.menu(showOrderBuilder, false);
-        });
-
-        showOrderBuilder.text(en("Order")).initialize(true).observing(builder::visible);
     }
 
     private void additionalInfo() {

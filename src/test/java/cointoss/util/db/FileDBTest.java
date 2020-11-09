@@ -26,7 +26,7 @@ public class FileDBTest {
 
         long base = Span.Hour1.seconds;
 
-        I.signal(1000).recurse(i -> i + 1).take(1000).map(i -> new Hourly(i * base)).buffer(100).to(items -> {
+        I.signal(1000).recurse(i -> i + 1000).take(1000).map(i -> new Hourly(i * base)).buffer(100).to(items -> {
             System.out.println(items.get(0));
             db.insert(items);
         });
