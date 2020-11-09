@@ -21,7 +21,7 @@ import cointoss.util.arithmetic.Num;
 import kiss.model.Model;
 import kiss.model.Property;
 
-public class TableDefinition<T> {
+public class FeatherDefinition<T> {
 
     final Span span;
 
@@ -29,21 +29,33 @@ public class TableDefinition<T> {
 
     final Model<T> model;
 
-    final ToLongFunction<T> timestampExtractor;
+    final ToLongFunction<T> timestamper;
 
     final int[] width;
 
     final int widthTotal;
 
+    /** The best size while item reading. */
+    int readerSize;
+
+    /** The best size while item writing. */
+    int writerSize;
+
     final BiConsumer<T, ByteBuffer>[] readers;
 
     final BiConsumer<T, ByteBuffer>[] writers;
 
-    public TableDefinition(Span span, Class<T> type, ToLongFunction<T> timestampExtractor) {
-        this.span = Objects.requireNonNull(span);
+    /**
+     * Define database.
+     * 
+     * @param type
+     * @param timestamper
+     */
+    FeatherDefinition(Span span, Class<T> type, ToLongFunction<T> timestamper) {
+        this.span = span;
         this.duration = span.seconds * 100000000;
         this.model = Model.of(type);
-        this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
+        this.timestamper = Objects.requireNonNull(timestamper);
 
         List<Property> properties = model.properties();
         this.width = new int[properties.size()];
@@ -53,7 +65,11 @@ public class TableDefinition<T> {
         for (int i = 0; i < width.length; i++) {
             Property property = properties.get(i);
             Class c = property.model.type;
-            if (c == byte.class) {
+            if (c == boolean.class) {
+                width[i] = 1;
+                readers[i] = (o, b) -> model.set(o, property, b.get() == 0 ? Boolean.FALSE : Boolean.TRUE);
+                writers[i] = (o, b) -> b.put((byte) (model.get(o, property) == Boolean.FALSE ? 0 : 1));
+            } else if (c == byte.class) {
                 width[i] = 1;
                 readers[i] = (o, b) -> model.set(o, property, b.get());
                 writers[i] = (o, b) -> b.put((byte) model.get(o, property));
@@ -97,14 +113,63 @@ public class TableDefinition<T> {
                     writers[i] = (o, b) -> b.putInt(((Enum) model.get(o, property)).ordinal());
                 }
             } else if (Number.class.isAssignableFrom(c)) {
-                width[i] = 8;
-                writers[i] = (o, b) -> b.putDouble(((Num) model.get(o, property)).doubleValue());
+                width[i] = 4;
+                readers[i] = (o, b) -> model.set(o, property, Num.of(b.getFloat()));
+                writers[i] = (o, b) -> b.putFloat(((Num) model.get(o, property)).floatValue());
             }
         }
         this.widthTotal = IntStream.of(width).sum();
+
+        maxDataFileSize(512);
+        maxReaderMemorySize(8);
+        maxWriterMemorySize(32);
     }
 
-    public FileDB<T> build(String name) {
-        return new FileDB(name, this);
+    /**
+     * Configure time span.
+     * 
+     * @param span
+     * @return
+     */
+    public FeatherDefinition<T> maxDataFileSize(int mb) {
+        if (0 < mb) {
+        }
+        return this;
+    }
+
+    /**
+     * Configure time span.
+     * 
+     * @param span
+     * @return
+     */
+    public FeatherDefinition<T> maxReaderMemorySize(int mb) {
+        if (0 < mb) {
+            this.readerSize = mb * 1024 * 1024 / widthTotal;
+        }
+        return this;
+    }
+
+    /**
+     * Configure time span.
+     * 
+     * @param span
+     * @return
+     */
+    public FeatherDefinition<T> maxWriterMemorySize(int mb) {
+        if (0 < mb) {
+            this.writerSize = mb * 1024 * 1024 / widthTotal;
+        }
+        return this;
+    }
+
+    /**
+     * Build database.
+     * 
+     * @param name
+     * @return
+     */
+    public FeatherDB<T> createTable(String name) {
+        return new FeatherDB(name, this);
     }
 }

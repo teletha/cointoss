@@ -14,24 +14,26 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 import cointoss.ticker.Span;
+import kiss.I;
 
 public class FileDBTest {
 
     @Test
     void db() throws InterruptedException {
-        TableDefinition<Hourly> definition = new TableDefinition<>(Span.Hour1, Hourly.class, v -> v.seconds);
-        FileDB<Hourly> db = definition.build("test");
+        FeatherDefinition<Hourly> definition = FeatherDB.define(Span.Hour1, Hourly.class, v -> v.seconds).maxDataFileSize(1024);
+
+        FeatherDB<Hourly> db = definition.createTable("test");
 
         long base = Span.Hour1.seconds;
 
-        for (int i = 1; i < 100000000; i++) {
-            db.insert(new Hourly(base * i));
-        }
+        I.signal(1000).recurse(i -> i + 1).take(1000).map(i -> new Hourly(i * base)).buffer(100).to(items -> {
+            System.out.println(items.get(0));
+            db.insert(items);
+        });
 
-        // db.range(base * 0, 10000000).map(e -> e.high).scanWith(0d, (o, p) -> Math.max(o,
-        // p)).last().to(e -> {
-        // System.out.println(e);
-        // });
+        db.after(base * 0, 2000).effect(e -> System.out.println(e)).map(e -> e.high).scanWith(0f, (o, p) -> Math.max(o, p)).last().to(e -> {
+            System.out.println(e);
+        });
     }
 
     private static class Hourly {
@@ -40,13 +42,13 @@ public class FileDBTest {
 
         public long seconds;
 
-        public double open = R.nextDouble();
+        public float open = R.nextFloat() * 100;
 
-        public double close = R.nextDouble();
+        public float close = R.nextFloat() * 100;
 
-        public double high = R.nextDouble();
+        public float high = R.nextFloat() * 100;
 
-        public double low = R.nextDouble();
+        public float low = R.nextFloat() * 100;
 
         public Hourly(long start) {
             this.seconds = start;
