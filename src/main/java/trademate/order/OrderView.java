@@ -23,6 +23,7 @@ import cointoss.MarketService;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.arithmetic.Num;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Variable;
 import stylist.Style;
@@ -173,7 +174,11 @@ public class OrderView extends View {
         ActiveMarket.observing().skipNull().to(m -> update(m));
     }
 
-    private void update(Market m) {
+    Disposable disposer = Disposable.empty();
+
+    private Disposable update(Market m) {
+        disposer.dispose();
+
         MarketService s = m.service;
 
         market.text(s.marketReadableName);
@@ -186,7 +191,7 @@ public class OrderView extends View {
         I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
         // observe orders on clinet
-        m.orders.add.to(this::createOrderItem);
+        return m.orders.add.to(this::createOrderItem);
     }
 
     /**
