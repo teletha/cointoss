@@ -54,7 +54,11 @@ public class OrderBookManager {
      * @return
      */
     public Num spread() {
-        return shorts.best.v.price.minus(longs.best.v.price);
+        if (shorts.best.isAbsent() || longs.best.isAbsent()) {
+            return Num.ZERO;
+        } else {
+            return shorts.best.v.price.minus(longs.best.v.price);
+        }
     }
 
     /**

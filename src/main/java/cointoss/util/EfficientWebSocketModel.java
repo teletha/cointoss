@@ -157,6 +157,16 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
+     * Outputs a detailed log.
+     * 
+     * @return Chainable API.
+     */
+    @Icy.Property(copiable = true)
+    public APILimiter limiter() {
+        return null;
+    }
+
+    /**
      * Execute command on this connection.
      * 
      * @param topic A subscription command (i.e. bean-like object).
@@ -194,6 +204,10 @@ public abstract class EfficientWebSocketModel {
         if (ws != null) {
             subscribings.add(topic);
             topic.subscribing = I.schedule(0, 10, TimeUnit.SECONDS, true, scheduler()).to(count -> {
+                APILimiter limiter = limiter();
+                if (limiter != null) {
+                    limiter.acquire();
+                }
                 ws.sendText(I.write(topic), true);
                 logger.info("Sent websocket command {} to {}. @{}", topic, address(), count);
             });

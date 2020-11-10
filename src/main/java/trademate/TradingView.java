@@ -24,11 +24,13 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
+import trademate.order.OrderView;
 import viewtify.Viewtify;
-import viewtify.ui.UIHBox;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.helper.User;
+import viewtify.ui.helper.UserActionHelper;
 
 public class TradingView extends View {
 
@@ -40,8 +42,6 @@ public class TradingView extends View {
 
     /** The associated market. */
     public final Market market;
-
-    private UIHBox box;
 
     public ChartView chart;
 
@@ -64,11 +64,8 @@ public class TradingView extends View {
      */
     class view extends ViewDSL {
         {
-
-            $(box, () -> {
-                $(vbox, style.chartArea, () -> {
-                    $(chart);
-                });
+            $(sbox, () -> {
+                $(chart, style.chartArea);
             });
         }
     }
@@ -77,23 +74,13 @@ public class TradingView extends View {
      * Style definition.
      */
     interface style extends StyleDSL {
-        Style tabTitle = () -> {
-            font.size(11, px);
-        };
-
-        Style tabPrice = () -> {
-            font.size(11, px);
-        };
-
         Style chartArea = () -> {
             display.height.fill().width.fill();
         };
 
-        Style fill = () -> {
-            display.height.fill();
-        };
-
-        Style tab = () -> {
+        Style order = () -> {
+            position.left(0, px).bottom(0, px);
+            display.height(100, px).width(100, px);
         };
     }
 
@@ -119,6 +106,8 @@ public class TradingView extends View {
         });
 
         additionalInfo();
+
+        UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));
     }
 
     private void additionalInfo() {

@@ -9,35 +9,136 @@
  */
 package trademate.order;
 
+import static trademate.CommonText.*;
+
+import java.text.Normalizer.Form;
+import java.util.Comparator;
+
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
+
 import cointoss.Direction;
+import cointoss.Market;
+import cointoss.MarketService;
+import cointoss.order.Order;
+import cointoss.order.OrderState;
+import cointoss.util.arithmetic.Num;
+import kiss.I;
+import kiss.Variable;
+import stylist.Style;
+import stylist.StyleDSL;
+import stylist.ValueStyle;
 import trademate.Theme;
 import viewtify.Command;
 import viewtify.Key;
+import viewtify.Viewtify;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
+import viewtify.ui.UITableColumn;
+import viewtify.ui.UITableView;
+import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
+import viewtify.ui.helper.Verifier;
 
 public class OrderView extends View {
 
-    UILabel total;
+    /** The active market. */
+    public static final Variable<Market> ActiveMarket = Variable.empty();
 
-    UIButton buy;
+    /** UI */
+    private UILabel market;
 
-    UIButton sell;
+    /** UI */
+    private UIButton takerBuy;
 
-    UIButton clear;
+    /** UI */
+    private UIButton takerSell;
+
+    /** UI */
+    private UIButton clear;
+
+    /** UI */
+    private UIButton makerBuy;
+
+    /** UI */
+    private UIButton makerSell;
+
+    /** UI */
+    private UIButton cancel;
+
+    /** UI */
+    private UIText orderSize;
+
+    /** UI */
+    private UITableView<Order> table;
+
+    /** UI */
+    private UITableColumn<Order, Direction> side;
+
+    /** UI */
+    private UITableColumn<Order, Num> amount;
+
+    /** UI */
+    private UITableColumn<Order, Num> price;
 
     class view extends ViewDSL {
         {
-            $(hbox, FormStyles.FormRow, () -> {
-                $(buy, FormStyles.FormInputMin);
-                $(clear, FormStyles.FormInputMin);
-                $(sell, FormStyles.FormInputMin);
+            $(vbox, FormStyles.FormLabelMin, () -> {
+                $(hbox, FormStyles.FormRow, () -> {
+                    $(takerSell, FormStyles.FormInputMin);
+                    $(clear, FormStyles.FormInputMin);
+                    $(takerBuy, FormStyles.FormInputMin);
+                });
+
+                $(hbox, FormStyles.FormRow, () -> {
+                    $(makerSell, FormStyles.FormInputMin);
+                    $(cancel, FormStyles.FormInputMin);
+                    $(makerBuy, FormStyles.FormInputMin);
+                });
+
+                $(market);
+                form(Amount, FormStyles.FormInputMin, orderSize);
+
+                $(table, style.Root, () -> {
+                    $(side, style.Narrow);
+                    $(price, style.Wide);
+                    $(amount, style.Narrow);
+                });
             });
         }
+    }
+
+    interface style extends StyleDSL {
+
+        Style Root = () -> {
+            display.width(400, px).minHeight(300, px);
+            text.unselectable();
+        };
+
+        ValueStyle<OrderState> State = state -> {
+            switch (state) {
+            case REQUESTING:
+                $.descendant(() -> {
+                    font.color($.rgb(80, 80, 80));
+                });
+                break;
+
+            default:
+                break;
+            }
+        };
+
+        Style Wide = () -> {
+            display.width(120, px);
+        };
+
+        Style Narrow = () -> {
+            display.width(65, px);
+        };
     }
 
     /**
@@ -45,33 +146,133 @@ public class OrderView extends View {
      */
     @Override
     protected void initialize() {
-        Commands.TakeBuy.shortcut(Key.Q).contribute(this::buy);
+        Commands.TakeSell.shortcut(Key.Q).contribute(this::takeSelling);
         Commands.Clear.shortcut(Key.W).contribute(this::clear);
-        Commands.TakeSell.shortcut(Key.E).contribute(this::sell);
+        Commands.TakeBuy.shortcut(Key.E).contribute(this::takeBuying);
+        Commands.MakeSell.shortcut(Key.A).contribute(this::makeSelling);
+        Commands.Cancel.shortcut(Key.S).contribute(this::cancel);
+        Commands.MakeBuy.shortcut(Key.D).contribute(this::makeBuying);
 
-        buy.text(en("Buy")).color(Theme.colorBy(Direction.BUY)).when(User.Action, Commands.TakeBuy);
-        clear.text(en("Clearing")).when(User.Action, Commands.Clear);
-        sell.text(en("Sell")).color(Theme.colorBy(Direction.SELL)).when(User.Action, Commands.TakeSell);
+        takerBuy.text(en("Take Buying")).color(Theme.$.buy).when(User.Action, Commands.TakeBuy);
+        clear.text(en("Clear")).when(User.Action, Commands.Clear);
+        takerSell.text(en("Take Selling")).color(Theme.$.sell).when(User.Action, Commands.TakeSell);
+
+        makerBuy.text(en("Make Buying")).color(Theme.$.buy).when(User.Action, Commands.MakeBuy);
+        cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
+        makerSell.text(en("Make Selling")).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
+
+        orderSize.value("0").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
+
+        table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
+            // $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
+        });
+        side.text(Side).model(Order.class, Order::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
+        amount.text(Amount).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
+        price.text(Price).model(Order.class, o -> o.price);
+
+        ActiveMarket.observing().skipNull().to(m -> update(m));
     }
 
-    private void buy() {
+    private void update(Market m) {
+        MarketService s = m.service;
 
-        System.out.println("Buy");
+        market.text(s.marketReadableName);
+
+        // positionSize.text(m.orders.position).color(position.isPositiveOrZero() ? Theme.$.buy :
+        // Theme.$.sell);
+
+        // initialize orders on server
+        I.signal(m.orders.items).take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
+        I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
+
+        // observe orders on clinet
+        m.orders.add.to(this::createOrderItem);
     }
 
-    private void sell() {
-        System.out.println("Sell");
+    /**
+     * Create tree item for {@link OrderSet}.
+     * 
+     * @param set
+     */
+    private void createOrderItem(Order order) {
+        if (order != null) {
+            table.addItemAtLast(order);
+            order.observeTerminating().on(Viewtify.UIThread).to(() -> table.removeItem(order));
+        }
+    }
 
+    private Num estimateSize() {
+        if (orderSize.is("0")) {
+            return Num.of("0.01");
+        } else {
+            return Num.of(orderSize.value());
+        }
+    }
+
+    private void takeBuying() {
+        ActiveMarket.to(m -> {
+            m.orders.requestNow(Order.with.buy(estimateSize()));
+        });
+    }
+
+    private void takeSelling() {
+        ActiveMarket.to(m -> {
+            m.orders.requestNow(Order.with.sell(estimateSize()));
+        });
     }
 
     private void clear() {
-        System.out.println("Clear");
+        ActiveMarket.to(m -> {
+            Num pos = m.orders.position.v;
+            if (pos.isNotZero()) {
+                m.orders.requestNow(Order.with.direction(pos.isPositive() ? Direction.SELL : Direction.BUY, pos.abs()));
+            }
+        });
+    }
+
+    private void makeBuying() {
+        ActiveMarket.to(m -> {
+            m.orders.requestNow(Order.with.buy(estimateSize()).price(m.orderBook.longs.computeBestPrice(Num.ONE, Num.ONE)));
+        });
+    }
+
+    private void makeSelling() {
+        ActiveMarket.to(m -> {
+            m.orders.requestNow(Order.with.sell(estimateSize()).price(m.orderBook.shorts.computeBestPrice(Num.ONE, Num.ONE)));
+        });
+    }
+
+    private void cancel() {
+        ActiveMarket.to(m -> {
+            m.orders.cancelNowAll();
+        });
     }
 
     /**
      * 
      */
     private enum Commands implements Command<Commands> {
-        TakeBuy, Clear, TakeSell;
+        TakeBuy, Clear, TakeSell, MakeBuy, Cancel, MakeSell;
+    }
+
+    /**
+     * 
+     */
+    private class CatalogRow extends TableRow<Order> implements StyleHelper<CatalogRow, CatalogRow> {
+
+        /**
+         * 
+         */
+        private CatalogRow() {
+            styleOnly(Viewtify.observing(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(style.State::of));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public CatalogRow ui() {
+            return this;
+        }
     }
 }
