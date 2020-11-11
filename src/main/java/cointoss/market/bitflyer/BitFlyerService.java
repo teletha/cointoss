@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.*;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -24,10 +24,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,11 +49,9 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
-import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import kiss.Signaling;
 import viewtify.Viewtify;
 
 /**
@@ -76,7 +72,7 @@ public class BitFlyerService extends MarketService {
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
             .extractId(json -> json.find(String.class, "params", "channel").toString())
-            .connected(ws -> ws.sendText(I.write(new Auth()), true));
+            .whenConnected(ws -> ws.sendText(I.write(new Auth()), true));
 
     /** The realtime data format */
     static final DateTimeFormatter RealtimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -90,9 +86,6 @@ public class BitFlyerService extends MarketService {
     /** The realtime data format */
     static final DateTimeFormatter RealtimeFormatUntilHour = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH");
 
-    /** The internal order manager. */
-    private final Map<String, Order> orders = new ConcurrentHashMap();
-
     /** Flag for test. */
     private final boolean forTest;
 
@@ -101,9 +94,6 @@ public class BitFlyerService extends MarketService {
 
     /** The shared order list. */
     private final Signal<List<Order>> intervalOrderCheck;
-
-    /** The event stream of real-time order update. */
-    private final Signaling<Order> orderUpdateRealtimely = new Signaling();
 
     /** The session key. */
     private static final String sessionKey = "api_session_v2";
@@ -175,79 +165,7 @@ public class BitFlyerService extends MarketService {
             call = rest("POST", API.Internal, "/trade/sendorder", I.write(request)).map(json -> json.get("data").text("order_ref_id"));
         }
 
-        Complementer complementer = new Complementer(order);
-
-        return call //
-                .effectOnObserve(complementer::start)
-                .effect(complementer::complement)
-                .effectOnTerminate(complementer::stop);
-    }
-
-    /**
-     * <p>
-     * Comlement executions while order request and response.
-     * </p>
-     * <p>
-     * If the execution data comes to the real-time API before the oreder's response, the order
-     * cannot be identified from the real-time API.
-     * </p>
-     * <p>
-     * Record all execution data from request to response, and check if there is already an
-     * execution data at response.
-     * </p>
-     */
-    private class Complementer {
-
-        /** The associated order. */
-        private final Order order;
-
-        /** The realtime execution manager. */
-        private final LinkedList<Execution> executions = new LinkedList();
-
-        /** The disposer for realtime execution stream. */
-        private Disposable disposer;
-
-        /**
-         * 
-         */
-        private Complementer(Order order) {
-            this.order = order;
-        }
-
-        /**
-         * Start complementing.
-         */
-        private void start() {
-            disposer = executionsRealtimely().to(executions::add);
-        }
-
-        /**
-         * Stop complementing.
-         */
-        private void stop() {
-            disposer.dispose();
-        }
-
-        /**
-         * Because ID registration has been completed, it is possible to detect contracts from the
-         * real-time API. Check if there is an order in the execution data recorded after placing
-         * the order.
-         */
-        private void complement(String orderId) {
-            // stop recording realtime executions and register order id atomically
-            disposer.dispose();
-            orders.put(orderId, order);
-
-            // check order executions while request and response
-            executions.forEach(e -> {
-                if (e.buyer.equals(orderId) || e.seller.equals(orderId)) {
-                    updateOrder(order, e);
-                }
-            });
-
-            // order termination will unregister
-            order.observeTerminating().to(() -> orders.remove(orderId));
-        }
+        return call;
     }
 
     /**
@@ -283,7 +201,7 @@ public class BitFlyerService extends MarketService {
                     .executedSize(order.executedSize);
         }).skipNull();
 
-        return call.combine(isCancelled).take(1).map(v -> v.ⅱ).effect(orderUpdateRealtimely::accept);
+        return call.combine(isCancelled).take(1).map(v -> v.ⅱ);
     }
 
     /**
@@ -303,22 +221,7 @@ public class BitFlyerService extends MarketService {
 
         return clientRealtimely().subscribe(new Topic("lightning_executions_", marketName))
                 .flatIterable(json -> json.find("params", "message", "*"))
-                .map(json -> {
-                    Execution e = convertExecution(json, previous);
-
-                    // update order
-                    Order o = orders.get(e.buyer);
-                    if (o != null) {
-                        updateOrder(o, e);
-                    } else {
-                        o = orders.get(e.seller);
-
-                        if (o != null) {
-                            updateOrder(o, e);
-                        }
-                    }
-                    return e;
-                })
+                .map(json -> convertExecution(json, previous))
                 .skipNull();
     }
 
@@ -533,23 +436,55 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     protected Signal<Order> connectOrdersRealtimely() {
-        return orderUpdateRealtimely.expose;
-    }
+        // return orderUpdateRealtimely.expose;
+        return clientRealtimely().subscribe(new Topic("child_order_events", ""))
+                .flatIterable(json -> json.find("params", "message", "*"))
+                .map(json -> {
+                    System.out.println(json);
 
-    /**
-     * Update order by execution.
-     * 
-     * @param o
-     * @param e
-     */
-    private void updateOrder(Order o, Execution e) {
-        Num remaining = o.remainingSize.minus(e.size);
+                    String type = json.text("event_type");
+                    Direction side = json.get(Direction.class, "side");
+                    Num price = json.get(Num.class, "price");
+                    Num size = json.get(Num.class, "size");
+                    String id = json.text("child_order_acceptance_id");
+                    ZonedDateTime time = parse(json.text("event_date")).atZone(Chrono.UTC);
 
-        orderUpdateRealtimely.accept(Order.with.direction(o.direction, o.size)
-                .id(o.id)
-                .state(remaining.isZero() ? OrderState.COMPLETED : OrderState.ACTIVE)
-                .remainingSize(remaining)
-                .executedSize(o.executedSize.plus(e.size)));
+                    Order order = null;
+                    if (type.equals("ORDER")) {
+                        order = Order.with.direction(side, size)
+                                .price(price)
+                                .remainingSize(size)
+                                .executedSize(Num.ZERO)
+                                .id(id)
+                                .state(OrderState.ACTIVE)
+                                .creationTime(time);
+                    } else if (type.equals("CANCEL")) {
+                        order = Order.with.direction(Direction.BUY /* ignorable value */, size)
+                                .price(price)
+                                .remainingSize(size)
+                                .executedSize(Num.ZERO)
+                                .id(id)
+                                .state(OrderState.CANCELED)
+                                .terminationTime(time);
+                    } else if (type.equals("EXECUTION")) {
+                        Num remaining = json.get(Num.class, "outstanding_size");
+
+                        order = Order.with.direction(side, size)
+                                .price(price)
+                                .remainingSize(remaining)
+                                .executedSize(size.minus(remaining))
+                                .id(id)
+                                .state(remaining.isZero() ? OrderState.COMPLETED : OrderState.ACTIVE)
+                                .terminationTime(time);
+                    } else {
+                        // ORDER_FAILED
+                        // CANCEL_FAILED
+                        // EXPIRE
+                    }
+                    System.out.println(order);
+                    return order;
+                })
+                .skipNull();
     }
 
     /**
@@ -909,19 +844,31 @@ public class BitFlyerService extends MarketService {
 
         public String jsonrpc = "2.0";
 
-        public Map<String, Object> params = new HashMap();
+        public Params params = new Params();
 
         private Auth() {
-            String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-            String nonce = RandomStringUtils.random(16);
+            long timestamp = Chrono.utcNow().toEpochSecond();
+            String nonce = RandomStringUtils.randomNumeric(16);
             String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
                     .hashString(timestamp + nonce, StandardCharsets.UTF_8)
                     .toString();
 
-            params.put("api_key", account.apiKey.v);
-            params.put("timestamp", timestamp);
-            params.put("nonce", nonce);
-            params.put("signature", sign);
+            params.api_key = account.apiKey.v;
+            params.timestamp = timestamp;
+            params.nonce = nonce;
+            params.signature = sign;
+        }
+
+        @SuppressWarnings("unused")
+        private static class Params {
+
+            public String api_key;
+
+            public String signature;
+
+            public String nonce;
+
+            public long timestamp;
         }
     }
 

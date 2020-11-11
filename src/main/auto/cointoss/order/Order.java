@@ -1,6 +1,7 @@
 package cointoss.order;
 
 import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.order.Order;
 import cointoss.order.OrderModel;
 import cointoss.order.OrderState;
@@ -55,6 +56,9 @@ public abstract class Order extends OrderModel {
     }
 
     /** The overload or intercept method invoker. */
+    private static final MethodHandle direction$268375447= invoker("direction", Directional.class);
+
+    /** The overload or intercept method invoker. */
     private static final MethodHandle direction$927011984= invoker("direction", String.class);
 
     /** The overload or intercept method invoker. */
@@ -74,6 +78,12 @@ public abstract class Order extends OrderModel {
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$701841881= invoker("price", Num.class, Consumer.class);
+
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle executedSize$1093866057= invoker("executedSize", long.class);
+
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle executedSize$912239839= invoker("executedSize", double.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle validateState$41283920= invoker("validateState", OrderState.class);
@@ -525,20 +535,10 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTime() {
         return creationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return creationTimeCustomizer.observe$Now();
     }
@@ -580,20 +580,10 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTime() {
         return terminationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTimeNow() {
         return terminationTimeCustomizer.observe$Now();
     }
@@ -635,20 +625,10 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<OrderState> observeStateNow() {
         return stateCustomizer.observe$Now();
     }
@@ -770,6 +750,45 @@ public abstract class Order extends OrderModel {
         }
 
         /**
+         * Specify direction by {@link Directional}.
+         *  
+         *  @param direction A directional data.
+         *  @return
+         */
+        public Self direction(Directional direction, Num size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
+         * Specify direction by {@link Directional}.
+         *  
+         *  @param direction A directional data.
+         *  @return
+         */
+        public Self direction(Directional direction, long size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
+         * Specify direction by {@link Directional}.
+         *  
+         *  @param direction A directional data.
+         *  @return
+         */
+        public Self direction(Directional direction, double size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
          * Specify direction by literal.
          *  
          *  @param direction A direction literal.
@@ -841,6 +860,20 @@ public abstract class Order extends OrderModel {
          */
         default Next sell() {
             return direction(Direction.SELL);
+        }
+
+        /**
+         * Specify direction by {@link Directional}.
+         *  
+         *  @param direction A directional data.
+         *  @return
+         */
+        default Next direction(Directional direction) {
+            try {
+                return direction((Direction) direction$268375447.invoke(this, direction));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
         }
 
         /**
@@ -1034,6 +1067,34 @@ public abstract class Order extends OrderModel {
         default Next executedSize(Num value) {
             ((Order) this).setExecutedSize(value);
             return (Next) this;
+        }
+
+        /**
+         * Calculate executed size of this order.
+         *  
+         *  @param size An executed size.
+         *  @return Chainable API.
+         */
+        default Next executedSize(long size) {
+            try {
+                return executedSize((Num) executedSize$1093866057.invoke(this, size));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+        }
+
+        /**
+         * Calculate executed size of this order.
+         *  
+         *  @param size An executed size.
+         *  @return Chainable API.
+         */
+        default Next executedSize(double size) {
+            try {
+                return executedSize((Num) executedSize$912239839.invoke(this, size));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
         }
 
         /**

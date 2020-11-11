@@ -219,7 +219,7 @@ public class OrderBuilder extends View {
             }));
         }
 
-        view.market.orders.position.observing().on(Viewtify.UIThread).to(position -> {
+        view.market.orders.compoundSize.observing().on(Viewtify.UIThread).to(position -> {
             positionSize.text(position).color(position.isPositiveOrZero() ? Theme.$.buy : Theme.$.sell);
         });
 
@@ -240,7 +240,7 @@ public class OrderBuilder extends View {
         I.signal(view.market.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
         // observe orders on clinet
-        view.market.orders.add.to(this::createOrderItem);
+        view.market.orders.added.to(this::createOrderItem);
     }
 
     /**

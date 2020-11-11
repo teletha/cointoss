@@ -38,7 +38,7 @@ public interface WrapperSet extends Set<Wrapper> {
      * <p>
      * The stipulation above does not imply that sets must accept all elements; sets may refuse to
      * add any particular element, including {@code null}, and throw an exception, as described in
-     * the specification for {@link Collection#add Collection.add}. Individual set implementations
+     * the specification for {@link Collection#added Collection.add}. Individual set implementations
      * should clearly document any restrictions on the elements that they may contain.
      *
      * @param value element to be added to this set

@@ -46,6 +46,17 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     public abstract Direction direction();
 
     /**
+     * Specify direction by {@link Directional}.
+     * 
+     * @param direction A directional data.
+     * @return
+     */
+    @Icy.Overload("direction")
+    private Direction direction(Directional direction) {
+        return direction.direction();
+    }
+
+    /**
      * Specify direction by literal.
      * 
      * @param direction A direction literal.
@@ -223,6 +234,28 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     @Icy.Property(setterModifier = "final")
     public Num executedSize() {
         return Num.ZERO;
+    }
+
+    /**
+     * Calculate executed size of this order.
+     * 
+     * @param size An executed size.
+     * @return Chainable API.
+     */
+    @Icy.Overload("executedSize")
+    private Num executedSize(long size) {
+        return Num.of(size);
+    }
+
+    /**
+     * Calculate executed size of this order.
+     * 
+     * @param size An executed size.
+     * @return Chainable API.
+     */
+    @Icy.Overload("executedSize")
+    private Num executedSize(double size) {
+        return Num.of(size);
     }
 
     /**

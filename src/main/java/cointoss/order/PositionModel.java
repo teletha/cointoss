@@ -25,7 +25,7 @@ abstract class PositionModel implements Directional {
     @Override
     public abstract Direction direction();
 
-    @Icy.Property
+    @Icy.Property(mutable = true)
     public abstract Num price();
 
     @Icy.Property(mutable = true)
@@ -42,8 +42,6 @@ abstract class PositionModel implements Directional {
      */
     @PerformanceSensitive
     public final Num profit(Num currentPrice) {
-        Num profit = isBuy() ? currentPrice.minus(price()) : price().minus(currentPrice);
-
-        return profit.multiply(size()).scale(0);
+        return currentPrice.minus(this, price()).multiply(size());
     }
 }

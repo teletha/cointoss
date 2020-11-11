@@ -42,7 +42,7 @@ class OrderManagerTest {
 
     @Test
     void added() {
-        List<Order> added = orders.add.toList();
+        List<Order> added = orders.added.toList();
         assert added.size() == 0;
 
         orders.requestNow(Order.with.buy(1).price(10));
@@ -139,5 +139,23 @@ class OrderManagerTest {
         orders.cancelNow(o);
         assert o.remainingSize.is(0.5);
         assert o.executedSize.is(0.5);
+    }
+
+    @Test
+    void updateNew() {
+        orders.update(Order.with.buy(1).price(10).id("A"));
+
+        assert orders.items.size() == 1;
+        assert orders.items.get(0).id.equals("A");
+    }
+
+    @Test
+    void updateChange() {
+        orders.update(Order.with.buy(1).price(10).id("A"));
+        orders.update(Order.with.buy(1).price(10).id("A").executedSize(1));
+
+        assert orders.items.size() == 1;
+        assert orders.items.get(0).id.equals("A");
+        assert orders.items.get(0).executedSize.is(1);
     }
 }

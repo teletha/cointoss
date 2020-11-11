@@ -18,7 +18,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
@@ -65,30 +64,30 @@ public class OrderBook {
         this.group = new GroupedOrderBook(setting.base.minimumSize);
     }
 
-    /**
-     * Set book operation thread.
-     * 
-     * @param operator
-     */
-    public final void operateOn(Consumer<Runnable> operator) {
-        if (operator != null) {
-            this.operator = operator;
-        }
-    }
-
-    /**
-     * Replace the order book management container with your container.
-     * 
-     * @param replacer A list replacer.
-     * @return
-     */
-    public final void replaceBy(UnaryOperator<List<OrderBookPage>> replacer) {
-        // if (replacer != null) {
-        // this.replacer = replacer;
-        //
-        // group.pages = replacer.apply(group.pages);
-        // }
-    }
+    // /**
+    // * Set book operation thread.
+    // *
+    // * @param operator
+    // */
+    // public final void operateOn(Consumer<Runnable> operator) {
+    // if (operator != null) {
+    // this.operator = operator;
+    // }
+    // }
+    //
+    // /**
+    // * Replace the order book management container with your container.
+    // *
+    // * @param replacer A list replacer.
+    // * @return
+    // */
+    // public final void replaceBy(UnaryOperator<List<OrderBookPage>> replacer) {
+    // if (replacer != null) {
+    // this.replacer = replacer;
+    //
+    // group.pages = replacer.apply(group.pages);
+    // }
+    // }
 
     /**
      * Get the grouped view of this {@link OrderBook}.

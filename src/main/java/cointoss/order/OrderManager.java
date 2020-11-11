@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
@@ -39,10 +40,10 @@ public final class OrderManager {
     public final List<Order> items = Collections.unmodifiableList(managed);
 
     /** The order adding event. */
-    private final Signaling<Order> addition = new Signaling();
+    private final Signaling<Order> add = new Signaling();
 
     /** The order adding event. */
-    public final Signal<Order> add = addition.expose;
+    public final Signal<Order> added = add.expose;
 
     /** The order removed event. */
     private final Signaling<Order> remove = new Signaling();
@@ -50,20 +51,26 @@ public final class OrderManager {
     /** The order removed event. */
     public final Signal<Order> removed = remove.expose;
 
-    /** The managed position size and direction. */
-    public final Variable<Num> position = Variable.of(Num.ZERO);
+    /** The compound size and direction (minus means short position). */
+    public final Variable<Num> compoundSize = Variable.of(Num.ZERO);
+
+    /** The compound average position price. */
+    public final Variable<Num> compoundPrice = Variable.of(Num.ZERO);
+
+    /** The compound total position price. */
+    private Num compoundTotalPrice = Num.ZERO;
 
     /**
      * @param service
      */
     public OrderManager(MarketService service) {
         this.service = service;
-        add.to(managed::add);
+        added.to(managed::add);
         removed.to(managed::remove);
 
         // retrieve orders on server
         // don't use orders().to(addition); it completes addition signaling itself
-        service.orders(OrderState.ACTIVE).retryWhen(service.retryPolicy(5)).to(addition::accept);
+        service.orders(OrderState.ACTIVE).retryWhen(service.retryPolicy(5)).to(add::accept);
 
         // retrieve orders on realtime
         service.add(service.ordersRealtimely().to(updater -> {
@@ -77,18 +84,44 @@ public final class OrderManager {
     }
 
     /**
+     * Update order.
+     * 
+     * @param updater
+     */
+    final void update(Order updater) {
+        for (Order order : managed) {
+            if (order.id.equals(updater.id)) {
+                update(order, updater);
+                return;
+            }
+        }
+        add(updater);
+    }
+
+    /**
+     * Add new manageable order.
+     * 
+     * @param order
+     */
+    private void add(Order order) {
+        // calculate position
+        calculateCompoundPosition(order.direction, Num.ZERO, Num.ZERO, order.price, order.executedSize);
+
+        // store order and fire add event
+        add.accept(order);
+    }
+
+    /**
      * Update order state.
      * 
      * @param order Your order to update.
      * @param updater A new order info.
      */
     private void update(Order order, Order updater) {
-        if (updater.isBuy()) {
-            position.set(v -> v.minus(order.executedSize).plus(updater.executedSize));
-        } else {
-            position.set(v -> v.plus(order.executedSize).minus(updater.executedSize));
-        }
+        // calculate position
+        calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.executedSize);
 
+        // update info
         order.setPrice(updater.price);
         order.updateAtomically(updater.remainingSize, updater.executedSize);
         order.setState(updater.state);
@@ -99,12 +132,72 @@ public final class OrderManager {
     }
 
     /**
+     * Update the compound position.
+     * 
+     * @param side A changed position's direction.
+     * @param oldPrice An base position's price.
+     * @param oldSize A base position's size.
+     * @param newPrice An changed position's price.
+     * @param newSize A changed position's size.
+     */
+    private void calculateCompoundPosition(Direction side, Num oldPrice, Num oldSize, Num newPrice, Num newSize) {
+        Num size = newSize.minus(oldSize);
+        Num oldTotalPrice = oldPrice.multiply(oldSize);
+        Num newTotalPrice = newPrice.multiply(newSize);
+
+        // compute compound size and price
+        if (compoundSize.v.isZero()) {
+            // no position
+            if (side.isBuy()) {
+                compoundSize.set(size);
+            } else {
+                compoundSize.set(size.negate());
+            }
+            compoundTotalPrice = newTotalPrice;
+        } else {
+            if (compoundSize.v.isPositive()) {
+                // long position
+                if (side.isBuy()) {
+                    compoundSize.set(v -> v.plus(size));
+                    compoundTotalPrice = compoundTotalPrice.minus(oldTotalPrice).plus(newTotalPrice);
+                } else {
+                    compoundSize.set(v -> v.minus(size));
+                    if (compoundSize.v.isNegative()) {
+                        compoundTotalPrice = newPrice.multiply(compoundSize).abs();
+                    } else {
+                        compoundTotalPrice = compoundPrice.v.multiply(compoundSize);
+                    }
+                }
+            } else {
+                // short position
+                if (side.isBuy()) {
+                    compoundSize.set(v -> v.plus(size));
+                    if (compoundSize.v.isPositive()) {
+                        compoundTotalPrice = newPrice.multiply(compoundSize);
+                    } else {
+                        compoundTotalPrice = compoundPrice.v.multiply(compoundSize).abs();
+                    }
+                } else {
+                    compoundSize.set(v -> v.minus(size));
+                    compoundTotalPrice = compoundTotalPrice.minus(oldTotalPrice).plus(newTotalPrice);
+                }
+            }
+        }
+
+        if (compoundSize.v.isZero()) {
+            compoundPrice.set(Num.ZERO);
+        } else {
+            compoundPrice.set(compoundTotalPrice.divide(compoundSize.v.abs()));
+        }
+    }
+
+    /**
      * Stream for the current managed {@link Order}s and the incoming {@link Order}s.
      * 
      * @return
      */
     public Signal<Order> manages() {
-        return I.signal(managed).merge(add);
+        return I.signal(managed).merge(added);
     }
 
     /**
@@ -270,7 +363,7 @@ public final class OrderManager {
         private void complement(String orderId) {
             // stop recording realtime executions and register order id atomically
             disposer.dispose();
-            addition.accept(order);
+            add.accept(order);
 
             // check order executions while request and response
             orders.forEach(e -> {

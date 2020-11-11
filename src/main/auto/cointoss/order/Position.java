@@ -130,6 +130,28 @@ public abstract class Position extends PositionModel {
     }
 
     /**
+     * Assign the new value of price property.
+     *
+     * @paran value The new price property value to assign.
+     * @return Chainable API.
+     */
+    public final Position assignPrice(Num value) {
+        setPrice(value);
+        return this;
+    }
+
+    /**
+     * Assign the new value of price property.
+     *
+     * @paran value The price property assigner which accepts the current value and returns new value.
+     * @return Chainable API.
+     */
+    public final Position assignPrice(UnaryOperator<Num> value) {
+        setPrice(value.apply(this.price));
+        return this;
+    }
+
+    /**
      * Provide classic getter API.
      *
      * @return A value of price property.

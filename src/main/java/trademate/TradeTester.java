@@ -12,6 +12,8 @@ package trademate;
 import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
+import cointoss.MarketService;
+import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -20,6 +22,7 @@ import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
 import viewtify.Viewtify;
+import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
@@ -47,6 +50,17 @@ public class TradeTester extends View {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
         DockSystem.register("Order").contents(OrderView.class).closable(false);
+
+        // ========================================================
+        // Create Tab for each Markets
+        // ========================================================
+        MarketService service = BitFlyer.FX_BTC_JPY;
+        UITab tab = DockSystem.register(service.marketIdentity())
+                .closable(false)
+                .text(service.marketReadableName)
+                .contents(ui -> new TradingView(ui, service));
+
+        tab.load();
     }
 
     /**

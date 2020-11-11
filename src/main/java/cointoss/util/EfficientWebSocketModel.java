@@ -134,7 +134,7 @@ public abstract class EfficientWebSocketModel {
      * @return
      */
     @Icy.Property
-    public Consumer<WebSocket> connected() {
+    public Consumer<WebSocket> whenConnected() {
         return null;
     }
 
@@ -251,7 +251,7 @@ public abstract class EfficientWebSocketModel {
         I.http(address(), ws -> {
             logger.trace("Connected websocket [{}].", address());
 
-            Consumer<WebSocket> connected = connected();
+            Consumer<WebSocket> connected = whenConnected();
             if (connected != null) {
                 connected.accept(ws);
             }

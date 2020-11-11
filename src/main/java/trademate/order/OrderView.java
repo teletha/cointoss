@@ -187,11 +187,11 @@ public class OrderView extends View {
         // Theme.$.sell);
 
         // initialize orders on server
-        I.signal(m.orders.items).take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
+        m.orders.manages().take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
         I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
         // observe orders on clinet
-        return m.orders.add.to(this::createOrderItem);
+        return m.orders.added.to(this::createOrderItem);
     }
 
     /**
@@ -228,7 +228,7 @@ public class OrderView extends View {
 
     private void clear() {
         ActiveMarket.to(m -> {
-            Num pos = m.orders.position.v;
+            Num pos = m.orders.compoundSize.v;
             if (pos.isNotZero()) {
                 m.orders.requestNow(Order.with.direction(pos.isPositive() ? Direction.SELL : Direction.BUY, pos.abs()));
             }
@@ -237,13 +237,13 @@ public class OrderView extends View {
 
     private void makeBuying() {
         ActiveMarket.to(m -> {
-            m.orders.requestNow(Order.with.buy(estimateSize()).price(m.orderBook.longs.computeBestPrice(Num.ONE, Num.ONE)));
+            m.orders.requestNow(Order.with.buy(estimateSize()).price(m.orderBook.longs.computeBestPrice(Num.HUNDRED, Num.ONE)));
         });
     }
 
     private void makeSelling() {
         ActiveMarket.to(m -> {
-            m.orders.requestNow(Order.with.sell(estimateSize()).price(m.orderBook.shorts.computeBestPrice(Num.ONE, Num.ONE)));
+            m.orders.requestNow(Order.with.sell(estimateSize()).price(m.orderBook.shorts.computeBestPrice(Num.HUNDRED, Num.ONE)));
         });
     }
 
