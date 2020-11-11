@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.translate;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -75,7 +75,8 @@ public class BitFlyerService extends MarketService {
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
-            .extractId(json -> json.find(String.class, "params", "channel").toString());
+            .extractId(json -> json.find(String.class, "params", "channel").toString())
+            .connected(ws -> ws.sendText(I.write(new Auth()), true));
 
     /** The realtime data format */
     static final DateTimeFormatter RealtimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -899,6 +900,28 @@ public class BitFlyerService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return id == Integer.parseInt(reply.text("id")) && Boolean.parseBoolean(reply.text("result"));
+        }
+    }
+
+    static class Auth {
+
+        public String method = "auth";
+
+        public String jsonrpc = "2.0";
+
+        public Map<String, Object> params = new HashMap();
+
+        private Auth() {
+            String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
+            String nonce = RandomStringUtils.random(16);
+            String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
+                    .hashString(timestamp + nonce, StandardCharsets.UTF_8)
+                    .toString();
+
+            params.put("api_key", account.apiKey.v);
+            params.put("timestamp", timestamp);
+            params.put("nonce", nonce);
+            params.put("signature", sign);
         }
     }
 

@@ -11,8 +11,10 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.net.http.HttpClient;
+import java.net.http.WebSocket;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.annotation.processing.Generated;
@@ -74,6 +76,9 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     private static final MethodHandle stopRecconnectIfUpdater = updater("stopRecconnectIf");
 
     /** The final property updater. */
+    private static final MethodHandle connectedUpdater = updater("connected");
+
+    /** The final property updater. */
     private static final MethodHandle clientUpdater = updater("client");
 
     /** The final property updater. */
@@ -104,6 +109,9 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     public final Predicate<JSON> stopRecconnectIf;
 
     /** The exposed property. */
+    public final Consumer<WebSocket> connected;
+
+    /** The exposed property. */
     public final HttpClient client;
 
     /** The exposed property. */
@@ -123,6 +131,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         this.ignoreMessageIf = super.ignoreMessageIf();
         this.recconnectIf = super.recconnectIf();
         this.stopRecconnectIf = super.stopRecconnectIf();
+        this.connected = super.connected();
         this.client = super.client();
         this.scheduler = super.scheduler();
         this.limiter = super.limiter();
@@ -386,6 +395,42 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     }
 
     /**
+     * Invoked when connection is established.
+     *  
+     *  @return
+     */
+    @Override
+    public final Consumer<WebSocket> connected() {
+        return this.connected;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of connected property.
+     */
+    @SuppressWarnings("unused")
+    private final Consumer<WebSocket> getConnected() {
+        return this.connected;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of connected property to assign.
+     */
+    private final void setConnected(Consumer<WebSocket> value) {
+        if (value == null) {
+            value = super.connected();
+        }
+        try {
+            connectedUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Outputs a detailed log.
      *  
      *  @return Chainable API.
@@ -508,6 +553,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         builder.append("ignoreMessageIf=").append(ignoreMessageIf).append(", ");
         builder.append("recconnectIf=").append(recconnectIf).append(", ");
         builder.append("stopRecconnectIf=").append(stopRecconnectIf).append(", ");
+        builder.append("connected=").append(connected).append(", ");
         builder.append("client=").append(client).append(", ");
         builder.append("scheduler=").append(scheduler).append(", ");
         builder.append("limiter=").append(limiter).append("]");
@@ -521,7 +567,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(address, extractId, updateId, maximumSubscriptions, ignoreMessageIf, recconnectIf, stopRecconnectIf, client, scheduler, limiter);
+        return Objects.hash(address, extractId, updateId, maximumSubscriptions, ignoreMessageIf, recconnectIf, stopRecconnectIf, connected, client, scheduler, limiter);
     }
 
     /**
@@ -543,6 +589,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (!Objects.equals(ignoreMessageIf, other.ignoreMessageIf)) return false;
         if (!Objects.equals(recconnectIf, other.recconnectIf)) return false;
         if (!Objects.equals(stopRecconnectIf, other.stopRecconnectIf)) return false;
+        if (!Objects.equals(connected, other.connected)) return false;
         if (!Objects.equals(client, other.client)) return false;
         if (!Objects.equals(scheduler, other.scheduler)) return false;
         if (!Objects.equals(limiter, other.limiter)) return false;
@@ -559,7 +606,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.address == value) {
             return this;
         }
-        return with.address(value).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).client(this.client).scheduler(this.scheduler).limiter(this.limiter);
+        return with.address(value).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).connected(this.connected).client(this.client).scheduler(this.scheduler).limiter(this.limiter);
     }
 
     /**
@@ -572,7 +619,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.client == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).client(value).scheduler(this.scheduler).limiter(this.limiter);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).connected(this.connected).client(value).scheduler(this.scheduler).limiter(this.limiter);
     }
 
     /**
@@ -585,7 +632,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.scheduler == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).client(this.client).scheduler(value).limiter(this.limiter);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).connected(this.connected).client(this.client).scheduler(value).limiter(this.limiter);
     }
 
     /**
@@ -598,7 +645,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.limiter == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).client(this.client).scheduler(this.scheduler).limiter(value);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).connected(this.connected).client(this.client).scheduler(this.scheduler).limiter(value);
     }
 
     /** The singleton builder. */
@@ -716,6 +763,17 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
 
         /**
+         * Assign connected property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next connected(Consumer<WebSocket> value) {
+            ((EfficientWebSocket) this).setConnected(value);
+            return (Next) this;
+        }
+
+        /**
          * Assign client property.
          * 
          * @param value A new value to assign.
@@ -772,6 +830,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         static final String IgnoreMessageIf = "ignoreMessageIf";
         static final String RecconnectIf = "recconnectIf";
         static final String StopRecconnectIf = "stopRecconnectIf";
+        static final String Connected = "connected";
         static final String Client = "client";
         static final String Scheduler = "scheduler";
         static final String Limiter = "limiter";

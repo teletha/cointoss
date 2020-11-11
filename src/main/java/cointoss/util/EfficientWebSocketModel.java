@@ -129,6 +129,16 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
+     * Invoked when connection is established.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public Consumer<WebSocket> connected() {
+        return null;
+    }
+
+    /**
      * Outputs a detailed log.
      */
     public EfficientWebSocket enableDebug() {
@@ -240,6 +250,11 @@ public abstract class EfficientWebSocketModel {
 
         I.http(address(), ws -> {
             logger.trace("Connected websocket [{}].", address());
+
+            Consumer<WebSocket> connected = connected();
+            if (connected != null) {
+                connected.accept(ws);
+            }
 
             this.ws = ws;
             for (IdentifiableTopic command : queue) {
