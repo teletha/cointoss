@@ -214,4 +214,21 @@ class CompoundSizeAndPriceTest {
         assert orders.compoundSize.v.is(-side.sign * 3);
         assert orders.compoundPrice.v.is(20);
     }
+
+    @TradeTest
+    void complex03(SidePart side) {
+        OrderManager orders = new OrderManager(new VerifiableMarketService());
+
+        orders.update(Order.with.direction(side, 2).price(10).id("A"));
+        assert orders.compoundSize.v.is(0);
+        assert orders.compoundPrice.v.is(0);
+
+        orders.update(Order.with.direction(side, 2).price(10).id("A").executedSize(1));
+        assert orders.compoundSize.v.is(side.sign * 1);
+        assert orders.compoundPrice.v.is(10);
+
+        orders.update(Order.with.direction(side, 2).price(12).id("A").executedSize(2));
+        assert orders.compoundSize.v.is(side.sign * 2);
+        assert orders.compoundPrice.v.is(11);
+    }
 }

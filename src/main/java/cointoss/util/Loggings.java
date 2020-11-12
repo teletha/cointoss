@@ -36,13 +36,13 @@ public class Loggings {
 
         String type = backtest ? "backtest" : "trading";
         Appender appender = RollingFileAppender.newBuilder()
-                .withName(name)
+                .setName(name)
                 .withAppend(backtest ? false : true)
                 .withImmediateFlush(true)
                 .withBufferedIo(true)
                 .withFileName(".log/trading/" + name + "/" + type + ".log")
                 .withFilePattern(".log/trading/" + name + "/" + type + "%d{yyyyMMdd}.log")
-                .withLayout(layout)
+                .setLayout(layout)
                 .withPolicy(backtest ? BackTestPolicy : TimeBasedTriggeringPolicy.newBuilder().build())
                 .build();
         appender.start();

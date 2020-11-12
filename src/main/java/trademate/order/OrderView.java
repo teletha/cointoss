@@ -86,6 +86,10 @@ public class OrderView extends View {
     /** UI */
     private UITableColumn<Order, Num> price;
 
+    private UILabel amountTitle;
+
+    private UILabel amountSize;
+
     class view extends ViewDSL {
         {
             $(vbox, FormStyles.FormLabelMin, () -> {
@@ -168,7 +172,8 @@ public class OrderView extends View {
             // $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
         side.text(Side).model(Order.class, Order::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
-        amount.text(Amount).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
+        amount.text(amountTitle, amountSize).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
+        amountTitle.text(Amount);
         price.text(Price).model(Order.class, o -> o.price);
 
         ActiveMarket.observing().skipNull().to(m -> update(m));
@@ -189,6 +194,8 @@ public class OrderView extends View {
         // initialize orders on server
         m.orders.manages().take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
         I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
+
+        amountSize.text(m.orders.compoundSize);
 
         // observe orders on clinet
         return m.orders.added.to(this::createOrderItem);

@@ -70,17 +70,10 @@ public final class OrderManager {
 
         // retrieve orders on server
         // don't use orders().to(addition); it completes addition signaling itself
-        service.orders(OrderState.ACTIVE).retryWhen(service.retryPolicy(5)).to(add::accept);
+        service.orders(OrderState.ACTIVE).retryWhen(service.retryPolicy(5)).to(this::update);
 
         // retrieve orders on realtime
-        service.add(service.ordersRealtimely().to(updater -> {
-            for (Order order : managed) {
-                if (order.id.equals(updater.id)) {
-                    update(order, updater);
-                    return;
-                }
-            }
-        }));
+        service.add(service.ordersRealtimely().to(this::update));
     }
 
     /**

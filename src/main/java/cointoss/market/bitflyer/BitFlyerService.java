@@ -451,18 +451,10 @@ public class BitFlyerService extends MarketService {
 
                     Order order = null;
                     if (type.equals("ORDER")) {
-                        order = Order.with.direction(side, size)
-                                .price(price)
-                                .remainingSize(size)
-                                .executedSize(Num.ZERO)
-                                .id(id)
-                                .state(OrderState.ACTIVE)
-                                .creationTime(time);
+                        order = Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE).creationTime(time);
                     } else if (type.equals("CANCEL")) {
                         order = Order.with.direction(Direction.BUY /* ignorable value */, size)
                                 .price(price)
-                                .remainingSize(size)
-                                .executedSize(Num.ZERO)
                                 .id(id)
                                 .state(OrderState.CANCELED)
                                 .terminationTime(time);
@@ -471,8 +463,6 @@ public class BitFlyerService extends MarketService {
 
                         order = Order.with.direction(side, size)
                                 .price(price)
-                                .remainingSize(remaining)
-                                .executedSize(size.minus(remaining))
                                 .id(id)
                                 .state(remaining.isZero() ? OrderState.COMPLETED : OrderState.ACTIVE)
                                 .terminationTime(time);
