@@ -9,6 +9,8 @@
  */
 package cointoss.order;
 
+import org.junit.jupiter.api.Test;
+
 import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.SizePart;
@@ -140,7 +142,7 @@ class CompoundSizeAndPriceTest {
     }
 
     @TradeTest
-    void variousSideAndSizeAndPrice(SidePart side, SizePart size, PricePart price) {
+    void variousSideSizePrice(SidePart side, SizePart size, PricePart price) {
         OrderManager orders = new OrderManager(new VerifiableMarketService());
 
         orders.update(Order.with.direction(side, size).price(price.entry).id("A").executedSize(size));
@@ -157,5 +159,59 @@ class CompoundSizeAndPriceTest {
         orders.update(Order.with.direction(side.inverse(), size).price(price.entry).id("B").executedSize(size));
         assert orders.compoundSize.v.is(0);
         assert orders.compoundPrice.v.is(0);
+    }
+
+    @Test
+    void complex01() {
+        OrderManager orders = new OrderManager(new VerifiableMarketService());
+
+        orders.update(Order.with.buy(2).price(10).id("A").executedSize(2));
+        assert orders.compoundSize.v.is(2);
+        assert orders.compoundPrice.v.is(10);
+
+        orders.update(Order.with.sell(1).price(20).id("B").executedSize(1));
+        assert orders.compoundSize.v.is(1);
+        assert orders.compoundPrice.v.is(10);
+
+        orders.update(Order.with.buy(1).price(30).id("C").executedSize(1));
+        assert orders.compoundSize.v.is(2);
+        assert orders.compoundPrice.v.is(20);
+
+        orders.update(Order.with.sell(3).price(10).id("D").executedSize(3));
+        assert orders.compoundSize.v.is(-1);
+        assert orders.compoundPrice.v.is(10);
+
+        orders.update(Order.with.sell(1).price(2).id("E").executedSize(1));
+        assert orders.compoundSize.v.is(-2);
+        assert orders.compoundPrice.v.is(6);
+
+        orders.update(Order.with.buy(2).price(10).id("F").executedSize(2));
+        assert orders.compoundSize.v.is(0);
+        assert orders.compoundPrice.v.is(0);
+    }
+
+    @TradeTest
+    void complex02(SidePart side) {
+        OrderManager orders = new OrderManager(new VerifiableMarketService());
+
+        orders.update(Order.with.direction(side, 2).price(10).id("A").executedSize(1));
+        assert orders.compoundSize.v.is(side.sign * 1);
+        assert orders.compoundPrice.v.is(10);
+
+        orders.update(Order.with.direction(side.inverse(), 1).price(20).id("B").executedSize(1));
+        assert orders.compoundSize.v.is(0);
+        assert orders.compoundPrice.v.is(0);
+
+        orders.update(Order.with.direction(side, 2).price(10).id("A").executedSize(2));
+        assert orders.compoundSize.v.is(side.sign * 1);
+        assert orders.compoundPrice.v.is(10);
+
+        orders.update(Order.with.direction(side.inverse(), 4).price(20).id("C").executedSize(3));
+        assert orders.compoundSize.v.is(-side.sign * 2);
+        assert orders.compoundPrice.v.is(20);
+
+        orders.update(Order.with.direction(side.inverse(), 4).price(20).id("C").executedSize(4));
+        assert orders.compoundSize.v.is(-side.sign * 3);
+        assert orders.compoundPrice.v.is(20);
     }
 }

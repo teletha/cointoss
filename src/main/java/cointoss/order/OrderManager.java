@@ -141,27 +141,28 @@ public final class OrderManager {
      * @param newSize A changed position's size.
      */
     private void calculateCompoundPosition(Direction side, Num oldPrice, Num oldSize, Num newPrice, Num newSize) {
-        Num size = newSize.minus(oldSize);
-        Num oldTotalPrice = oldPrice.multiply(oldSize);
-        Num newTotalPrice = newPrice.multiply(newSize);
+        Num diffSize = newSize.minus(oldSize);
 
         // compute compound size and price
         if (compoundSize.v.isZero()) {
             // no position
             if (side.isBuy()) {
-                compoundSize.set(size);
+                compoundSize.set(diffSize);
             } else {
-                compoundSize.set(size.negate());
+                compoundSize.set(diffSize.negate());
             }
-            compoundTotalPrice = newTotalPrice;
+            compoundTotalPrice = newPrice.multiply(diffSize);
         } else {
             if (compoundSize.v.isPositive()) {
                 // long position
                 if (side.isBuy()) {
-                    compoundSize.set(v -> v.plus(size));
+                    Num oldTotalPrice = oldPrice.multiply(oldSize);
+                    Num newTotalPrice = newPrice.multiply(newSize);
+
+                    compoundSize.set(v -> v.plus(diffSize));
                     compoundTotalPrice = compoundTotalPrice.minus(oldTotalPrice).plus(newTotalPrice);
                 } else {
-                    compoundSize.set(v -> v.minus(size));
+                    compoundSize.set(v -> v.minus(diffSize));
                     if (compoundSize.v.isNegative()) {
                         compoundTotalPrice = newPrice.multiply(compoundSize).abs();
                     } else {
@@ -171,14 +172,17 @@ public final class OrderManager {
             } else {
                 // short position
                 if (side.isBuy()) {
-                    compoundSize.set(v -> v.plus(size));
+                    compoundSize.set(v -> v.plus(diffSize));
                     if (compoundSize.v.isPositive()) {
                         compoundTotalPrice = newPrice.multiply(compoundSize);
                     } else {
                         compoundTotalPrice = compoundPrice.v.multiply(compoundSize).abs();
                     }
                 } else {
-                    compoundSize.set(v -> v.minus(size));
+                    Num oldTotalPrice = oldPrice.multiply(oldSize);
+                    Num newTotalPrice = newPrice.multiply(newSize);
+
+                    compoundSize.set(v -> v.minus(diffSize));
                     compoundTotalPrice = compoundTotalPrice.minus(oldTotalPrice).plus(newTotalPrice);
                 }
             }
@@ -186,8 +190,9 @@ public final class OrderManager {
 
         if (compoundSize.v.isZero()) {
             compoundPrice.set(Num.ZERO);
+            compoundTotalPrice = Num.ZERO;
         } else {
-            compoundPrice.set(compoundTotalPrice.divide(compoundSize.v.abs()));
+            compoundPrice.set(compoundTotalPrice.divide(compoundSize.v.abs()).scale(service.setting.base.scale));
         }
     }
 
