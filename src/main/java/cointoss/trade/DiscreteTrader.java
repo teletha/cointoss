@@ -24,7 +24,7 @@ public class DiscreteTrader extends Trader {
      * {@inheritDoc}
      */
     @Override
-    protected final void declare(Market market, FundManager fund) {
+    protected final void declare(Market market, Funds fund) {
     }
 
     /**

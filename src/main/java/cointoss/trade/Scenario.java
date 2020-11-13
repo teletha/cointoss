@@ -49,7 +49,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     protected Market market;
 
     /** The fund management for this scenario. */
-    protected FundManager funds;
+    protected Funds funds;
 
     /** The parent {@link Trader}. */
     Trader trader;

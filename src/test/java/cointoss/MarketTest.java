@@ -14,7 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.order.Order;
-import cointoss.trade.FundManager;
+import cointoss.trade.Funds;
 import cointoss.trade.Trader;
 import cointoss.verify.VerifiableMarket;
 
@@ -41,7 +41,7 @@ class MarketTest {
         private Market declaredMarket;
 
         @Override
-        protected void declare(Market market, FundManager fund) {
+        protected void declare(Market market, Funds fund) {
             this.declaredMarket = market;
         }
     }

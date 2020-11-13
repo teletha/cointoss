@@ -19,7 +19,7 @@ import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
-import cointoss.trade.FundManager;
+import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.trade.Trailing;
@@ -50,7 +50,7 @@ public class LongWaveTrend extends Trader {
      * {@inheritDoc}
      */
     @Override
-    protected void declare(Market market, FundManager fund) {
+    protected void declare(Market market, Funds fund) {
 
         Ticker ticker = market.tickers.on(span);
         DoubleIndicator indicator = Indicators.waveTrend(ticker);

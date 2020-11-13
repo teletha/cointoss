@@ -60,8 +60,8 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
     /** The market. */
     private Market market;
 
-    /** The fund management. */
-    private FundManager funds;
+    /** The fund controller. */
+    private final Funds funds = new Funds();
 
     /** All managed entries. */
     private final Deque<Scenario> scenarios = new ArrayDeque();
@@ -90,7 +90,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
         snapshots.put(0L, EMPTY_SNAPSHOT);
 
         this.market = Objects.requireNonNull(market);
-        this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
+        this.funds.assign(market.service);
 
         declare(market, funds);
     }
@@ -101,7 +101,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
      * @param market A target market to deal.
      * @param fund A fund manager.
      */
-    protected abstract void declare(Market market, FundManager fund);
+    protected abstract void declare(Market market, Funds fund);
 
     /**
      * The human-readable identical name.

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import cointoss.Market;
-import cointoss.trade.FundManager;
+import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
@@ -141,7 +141,7 @@ public class TradingStats {
     /**
      * Analyze trading.
      */
-    public TradingStats(Market market, FundManager funds, Deque<Scenario> entries, Trader trader) {
+    public TradingStats(Market market, Funds funds, Deque<Scenario> entries, Trader trader) {
         this.name = trader.name();
         this.startDate = Variable.of(entries.peekFirst()).map(Scenario::holdStartTime).or(market.service::now);
         this.endDate = Variable.of(entries.peekLast()).map(Scenario::holdEndTime).or(market.service::now);
@@ -206,8 +206,7 @@ public class TradingStats {
             }
             maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total());
             drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total()));
-            drawDownRatio = Num
-                    .max(drawDownRatio, drawDown.divide(Num.max(Num.ONE, funds.totalAssets.plus(maxTotalProfitAndLoss))).scale(3));
+            drawDownRatio = Num.max(drawDownRatio, drawDown.divide(Num.max(Num.ONE, funds.assets.v.plus(maxTotalProfitAndLoss))).scale(3));
         }
     }
 

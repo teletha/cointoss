@@ -13,7 +13,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Span;
-import cointoss.trade.FundManager;
+import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.verify.BackTest;
@@ -33,7 +33,7 @@ public class CrossOrder extends Trader {
      * {@inheritDoc}
      */
     @Override
-    protected void declare(Market market, FundManager fund) {
+    protected void declare(Market market, Funds fund) {
         when(market.open(span), v -> new Scenario() {
             @Override
             protected void entry() {
