@@ -19,6 +19,7 @@ import javafx.scene.control.TableRow;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
@@ -29,6 +30,7 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
+import trademate.CommonText;
 import trademate.Theme;
 import viewtify.Command;
 import viewtify.Key;
@@ -38,6 +40,7 @@ import viewtify.ui.UILabel;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.UIText;
+import viewtify.ui.UIVBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.StyleHelper;
@@ -48,6 +51,9 @@ public class OrderView extends View {
 
     /** The active market. */
     public static final Variable<Market> ActiveMarket = Variable.empty();
+
+    /** UI */
+    private UIVBox rootP;
 
     /** UI */
     private UILabel market;
@@ -80,10 +86,16 @@ public class OrderView extends View {
     private UITableColumn<Scenario, Direction> side;
 
     /** UI */
-    private UITableColumn<Scenario, Num> amount;
+    private UITableColumn<Scenario, Num> price;
 
     /** UI */
-    private UITableColumn<Scenario, Num> price;
+    private UITableColumn<Scenario, Num> entrySize;
+
+    /** UI */
+    private UITableColumn<Scenario, Num> entryExecutedSize;
+
+    /** UI */
+    private UITableColumn<Scenario, Num> pnl;
 
     private UILabel amountTitle;
 
@@ -91,7 +103,7 @@ public class OrderView extends View {
 
     class view extends ViewDSL {
         {
-            $(vbox, FormStyles.FormLabelMin, () -> {
+            $(rootP, FormStyles.FormLabelMin, () -> {
                 $(hbox, FormStyles.FormRow, () -> {
                     $(takerSell, FormStyles.FormInputMin);
                     $(clear, FormStyles.FormInputMin);
@@ -110,7 +122,9 @@ public class OrderView extends View {
                 $(table, style.Root, () -> {
                     $(side, style.Narrow);
                     $(price, style.Wide);
-                    $(amount, style.Narrow);
+                    $(entrySize, style.Narrow);
+                    $(entryExecutedSize, style.Narrow);
+                    $(pnl, style.Wide);
                 });
             });
         }
@@ -137,7 +151,7 @@ public class OrderView extends View {
         };
 
         Style Wide = () -> {
-            display.width(120, px);
+            display.width(100, px);
         };
 
         Style Narrow = () -> {
@@ -157,6 +171,8 @@ public class OrderView extends View {
         Commands.Cancel.shortcut(Key.S).contribute(this::cancel);
         Commands.MakeBuy.shortcut(Key.D).contribute(this::makeBuying);
 
+        rootP.disableWhen(ActiveMarket, m -> m == null);
+
         takerBuy.text(en("Take Buying")).color(Theme.$.buy).when(User.Action, Commands.TakeBuy);
         clear.text(en("Clear")).when(User.Action, Commands.Clear);
         takerSell.text(en("Take Selling")).color(Theme.$.sell).when(User.Action, Commands.TakeSell);
@@ -171,8 +187,11 @@ public class OrderView extends View {
             // $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
         side.text(Side).model(Scenario.class, Scenario::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
-        amount.text(amountTitle, amountSize).modelBySignal(o -> o.observeEntrySizeNow());
         amountTitle.text(Amount);
+        entrySize.text(amountTitle, amountSize).modelBySignal(Scenario::observeEntrySizeNow);
+        entryExecutedSize.text("約定数").modelBySignal(Scenario::observeEntryExecutedSizeNow);
+        pnl.text(CommonText.Profit)
+                .modelBySignal(s -> ActiveMarket.observing().flatVariable(m -> m.tickers.latest).map(Execution::price).map(s::profit));
         price.text(Price).modelBySignal(o -> o.observeEntryPriceNow());
 
         ActiveMarket.observing().skipNull().to(m -> update(m));
