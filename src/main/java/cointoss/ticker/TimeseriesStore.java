@@ -570,7 +570,7 @@ public final class TimeseriesStore<E> {
          * @return An item or null.
          */
         E get(int index) {
-            return items[index];
+            return items == null ? null : items[index];
         }
 
         /**
