@@ -9,55 +9,63 @@
  */
 package cointoss.order;
 
-import cointoss.order.OrderResponse.Kind;
 import cointoss.util.arithmetic.Num;
 
-public record OrderResponse(Kind type, String id, Num size, Num price) {
+public abstract class OrderResponse {
+
+    public final String id;
 
     /**
-     * Shorthand for {@link OrderResponseType#Accepted}
-     * 
      * @param id
-     * @return
      */
-    public static OrderResponse accepted(String id) {
-        return new OrderResponse(Kind.Accepted, id, null, null);
-    }
-
-    /**
-     * Shorthand for {@link OrderResponseType#Rejected}
-     * 
-     * @param id
-     * @return
-     */
-    public static OrderResponse rejected(String id) {
-        return new OrderResponse(Kind.Rejected, id, null, null);
-    }
-
-    /**
-     * Shorthand for {@link OrderResponseType#Cancelled}
-     * 
-     * @param id
-     * @return
-     */
-    public static OrderResponse cancelled(String id) {
-        return new OrderResponse(Kind.Cancelled, id, null, null);
-    }
-
-    /**
-     * Shorthand for {@link OrderResponseType#Executed}
-     * 
-     * @param id
-     * @return
-     */
-    public static OrderResponse executed(String id, Num size, Num price) {
-        return new OrderResponse(Kind.Executed, id, size, price);
+    protected OrderResponse(String id) {
+        this.id = id;
     }
 
     /**
      * 
      */
-    public enum Kind {
-        Accepted, Rejected, Executed, Cancelled;
+    class Accepted extends OrderResponse {
+        public Accepted(String id) {
+            super(id);
+        }
+    }
+
+    /**
+     * 
+     */
+    class Rejected extends OrderResponse {
+
+        public final String reason;
+
+        public Rejected(String id, String reason) {
+            super(id);
+            this.reason = reason;
+        }
+    }
+
+    /**
+     * 
+     */
+    class Cancelled extends OrderResponse {
+        public Cancelled(String id) {
+            super(id);
+        }
+    }
+
+    /**
+     * 
+     */
+    class Executed extends OrderResponse {
+
+        public final Num size;
+
+        public final Num price;
+
+        public Executed(String id, Num size, Num price) {
+            super(id);
+            this.size = size;
+            this.price = price;
+        }
     }
 }

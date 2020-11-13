@@ -535,10 +535,20 @@ public abstract class Order extends OrderModel {
         }
     }
 
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
     public final Signal<ZonedDateTime> observeCreationTime() {
         return creationTimeCustomizer.observe$();
     }
 
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return creationTimeCustomizer.observe$Now();
     }
@@ -580,10 +590,20 @@ public abstract class Order extends OrderModel {
         }
     }
 
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
     public final Signal<ZonedDateTime> observeTerminationTime() {
         return terminationTimeCustomizer.observe$();
     }
 
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
     public final Signal<ZonedDateTime> observeTerminationTimeNow() {
         return terminationTimeCustomizer.observe$Now();
     }
@@ -625,10 +645,20 @@ public abstract class Order extends OrderModel {
         }
     }
 
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
     public final Signal<OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
     public final Signal<OrderState> observeStateNow() {
         return stateCustomizer.observe$Now();
     }
@@ -1025,15 +1055,6 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
-        }
-
-        /**
-         * Assign quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
         default Next goodTillCanceled() {
             return quantityCondition(QuantityCondition.GoodTillCanceled);
         }
@@ -1045,6 +1066,15 @@ public abstract class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(QuantityCondition.ImmediateOrCancel);
+        }
+
+        /**
+         * Assign quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1146,8 +1176,8 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next active() {
-            return state(OrderState.ACTIVE);
+        default Next init() {
+            return state(OrderState.INIT);
         }
 
         /**
@@ -1155,8 +1185,17 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next canceled() {
-            return state(OrderState.CANCELED);
+        default Next requesting() {
+            return state(OrderState.REQUESTING);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next active() {
+            return state(OrderState.ACTIVE);
         }
 
         /**
@@ -1173,6 +1212,15 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next canceled() {
+            return state(OrderState.CANCELED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next expired() {
             return state(OrderState.EXPIRED);
         }
@@ -1182,26 +1230,8 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next init() {
-            return state(OrderState.INIT);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
         default Next rejected() {
             return state(OrderState.REJECTED);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(OrderState.REQUESTING);
         }
     }
 
