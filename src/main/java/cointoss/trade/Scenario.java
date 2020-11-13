@@ -273,7 +273,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      */
     private void processEntryOrder(Order order) {
         entries.add(order);
-        setEntrySize(entrySize.plus(order.size));
+        updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntrySize, Order::size);
         logEntry("Launch entry");
 
         order.observeExecutedSize().to(v -> {

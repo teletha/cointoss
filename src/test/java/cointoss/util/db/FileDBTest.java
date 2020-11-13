@@ -11,6 +11,7 @@ package cointoss.util.db;
 
 import java.util.Random;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.ticker.Span;
@@ -18,6 +19,7 @@ import kiss.I;
 
 public class FileDBTest {
 
+    @Disabled
     @Test
     void db() throws InterruptedException {
         FeatherDefinition<Hourly> definition = FeatherDB.define(Span.Hour1, Hourly.class, v -> v.seconds).maxDataFileSize(1024);
