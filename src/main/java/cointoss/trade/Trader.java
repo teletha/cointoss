@@ -42,6 +42,7 @@ import kiss.Disposable;
 import kiss.Extensible;
 import kiss.I;
 import kiss.Signal;
+import kiss.Signaling;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
@@ -64,6 +65,9 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
 
     /** All managed entries. */
     private final Deque<Scenario> scenarios = new ArrayDeque();
+
+    /** The scenario managing event. */
+    private final Signaling<Scenario> scenarioAdded = new Signaling();
 
     /** The state snapshot. */
     private final NavigableMap<Long, Snapshot> snapshots = new TreeMap();
@@ -117,6 +121,15 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
         scenarios.clear();
         snapshots.clear();
         options.clear();
+    }
+
+    /**
+     * Retrieve the all managed scenarios.
+     * 
+     * @return
+     */
+    public final Signal<Scenario> scenarios() {
+        return I.signal(scenarios).merge(scenarioAdded.expose);
     }
 
     /**
@@ -230,6 +243,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
 
                 if (scenario.entries.isEmpty() == false) {
                     scenarios.add(scenario);
+                    scenarioAdded.accept(scenario);
                 }
             }
         }));
