@@ -33,9 +33,6 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     private Map<Class, Object> relations;
 
     /** The size related signal. */
-    private final Signaling<Num> remainingSize = new Signaling();
-
-    /** The size related signal. */
     private final Signaling<Num> executedSize = new Signaling();
 
     /**
@@ -104,11 +101,10 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      * @return
      */
     @Icy.Intercept("size")
-    private Num validateSize(Num size, Consumer<Num> remainingSize) {
+    private Num validateSize(Num size) {
         if (size.isNegativeOrZero()) {
             throw new IllegalArgumentException("Order size must be positive.");
         }
-        remainingSize.accept(size);
         return size;
     }
 
@@ -183,53 +179,9 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     }
 
     /**
-     * Calculate the remaining size of this order.
+     * Calculate the executed size.
      * 
-     * @return
-     */
-    @Icy.Property(setterModifier = "final")
-    public Num remainingSize() {
-        return Num.ZERO;
-    }
-
-    /**
-     * Expose setter to update size atomically.
-     * 
-     * @param size
-     */
-    abstract void setRemainingSize(Num size);
-
-    /**
-     * Observe remaining size modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeRemainingSize() {
-        return remainingSize.expose;
-    }
-
-    /**
-     * Observe remaining size modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeRemainingSizeNow() {
-        return observeRemainingSize().startWith(remainingSize());
-    }
-
-    /**
-     * Observe remaining size modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeRemainingSizeDiff() {
-        return observeRemainingSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
-    }
-
-    /**
-     * Calculate executed size of this order.
-     * 
-     * @return
+     * @return The executed size.
      */
     @Icy.Property(setterModifier = "final")
     public Num executedSize() {
@@ -299,10 +251,8 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      */
     final void updateAtomically(Num executedSize) {
         if (executedSize.isNot(executedSize())) {
-            setRemainingSize(size().minus(executedSize));
             setExecutedSize(executedSize);
 
-            this.remainingSize.accept(remainingSize());
             this.executedSize.accept(executedSize);
         }
     }
@@ -363,11 +313,24 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     public abstract Signal<OrderState> observeState();
 
     /**
-     * Calculate canceled size.
+     * Calculate the remaining size.
+     * 
+     * @return The unexecuted size
+     */
+    public final Num remainingSize() {
+        if (state() == OrderState.CANCELED) {
+            return Num.ZERO;
+        } else {
+            return size().minus(executedSize());
+        }
+    }
+
+    /**
+     * Calculate the cancelled size.
      * 
      * @return
      */
-    public final Num canceledSize() {
+    public final Num cancelledSize() {
         if (state() != OrderState.CANCELED) {
             return Num.ZERO;
         } else {
@@ -549,7 +512,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(type().isMaker() ? direction().mark() : direction().mark().toLowerCase());
-        builder.append(executedSize()).append("/").append(size()).append("(").append(canceledSize()).append(")@").append(price());
+        builder.append(executedSize()).append("/").append(size()).append("(").append(cancelledSize()).append(")@").append(price());
         builder.append("\t").append(state());
         if (terminationTime() == null) {
             builder.append("\t").append(Chrono.format(creationTime())).append("～  ");

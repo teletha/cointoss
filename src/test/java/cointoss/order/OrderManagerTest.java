@@ -121,11 +121,11 @@ class OrderManagerTest {
 
         Order o = Order.with.buy(1).price(10);
         orders.requestNow(o);
-        assert o.remainingSize.is(0.5);
+        assert o.remainingSize().is(0.5);
         assert o.executedSize.is(0.5);
 
         market.perform(Execution.with.buy(0.5).price(9));
-        assert o.remainingSize.is(0);
+        assert o.remainingSize().is(0);
         assert o.executedSize.is(1);
     }
 
@@ -133,13 +133,13 @@ class OrderManagerTest {
     void recieveExecutionsAfterCancelResponse() {
         Order o = Order.with.buy(1).price(10);
         orders.requestNow(o);
-        assert o.remainingSize.is(1);
+        assert o.remainingSize().is(1);
         assert o.executedSize.is(0);
 
         market.service.emulateExecutionAfterOrderCancelResponse(Execution.with.buy(0.2).price(9));
         market.service.emulateExecutionAfterOrderCancelResponse(Execution.with.buy(0.3).price(9));
         orders.cancelNow(o);
-        assert o.remainingSize.is(0.5);
+        assert o.remainingSize().is(0.5);
         assert o.executedSize.is(0.5);
     }
 

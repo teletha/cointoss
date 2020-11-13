@@ -299,7 +299,6 @@ public class VerifiableMarketService extends MarketService {
             Order order = Order.with.direction(o.direction, o.size)
                     .price(o.price)
                     .quantityCondition(o.condition)
-                    .remainingSize(o.remainingSize)
                     .executedSize(o.executedSize)
                     .id(o.id)
                     .state(o.state);
@@ -317,7 +316,6 @@ public class VerifiableMarketService extends MarketService {
             Order order = Order.with.direction(o.direction, o.size)
                     .price(o.price)
                     .quantityCondition(o.condition)
-                    .remainingSize(o.remainingSize)
                     .executedSize(o.executedSize)
                     .id(o.id)
                     .state(o.state);
@@ -473,7 +471,6 @@ public class VerifiableMarketService extends MarketService {
                         .id(order.id)
                         .type(order.type)
                         .price(order.price)
-                        .remainingSize(order.remainingSize)
                         .executedSize(order.executedSize)
                         .state(order.state));
 
@@ -627,7 +624,6 @@ public class VerifiableMarketService extends MarketService {
             this.front = o;
             this.direction = o.direction;
             this.size = o.size;
-            this.remainingSize = o.remainingSize;
             this.executedSize = o.executedSize;
             this.price = o.price;
             this.type = o.type;
@@ -651,12 +647,7 @@ public class VerifiableMarketService extends MarketService {
             orderActive.remove(this);
 
             state = OrderState.CANCELED;
-            orderUpdateRealtimely.accept(Order.with.direction(direction, size)
-                    .id(id)
-                    .state(state)
-                    .price(price)
-                    .remainingSize(remainingSize)
-                    .executedSize(executedSize));
+            orderUpdateRealtimely.accept(Order.with.direction(direction, size).id(id).state(state).price(price).executedSize(executedSize));
 
             canceling.accept(front);
         }

@@ -197,7 +197,6 @@ public class BitFlyerService extends MarketService {
             return Order.with.direction(order.direction, order.size)
                     .id(order.id)
                     .state(OrderState.CANCELED)
-                    .remainingSize(order.remainingSize)
                     .executedSize(order.executedSize);
         }).skipNull();
 
@@ -663,8 +662,6 @@ public class BitFlyerService extends MarketService {
 
         public Num average_price;
 
-        public Num outstanding_size;
-
         public Num executed_size;
 
         public Num canceled_size;
@@ -676,7 +673,6 @@ public class BitFlyerService extends MarketService {
         public Order toOrder() {
             Order o = Order.with.direction(side, size)
                     .price(price)
-                    .remainingSize(outstanding_size)
                     .executedSize(executed_size)
                     .state(child_order_state)
                     .id(child_order_acceptance_id)

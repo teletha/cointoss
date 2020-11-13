@@ -68,7 +68,7 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle size$912239839= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateSize$705502851= invoker("validateSize", Num.class, Consumer.class);
+    private static final MethodHandle validateSize$2101382901= invoker("validateSize", Num.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$1093866057= invoker("price", long.class);
@@ -120,9 +120,6 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle quantityConditionUpdater = updater("quantityCondition");
 
     /** The final property updater. */
-    private static final MethodHandle remainingSizeUpdater = updater("remainingSize");
-
-    /** The final property updater. */
     private static final MethodHandle executedSizeUpdater = updater("executedSize");
 
     /** The final property updater. */
@@ -151,9 +148,6 @@ public abstract class Order extends OrderModel {
 
     /** The exposed property. */
     public final QuantityCondition quantityCondition;
-
-    /** The exposed property. */
-    public final Num remainingSize;
 
     /** The exposed property. */
     public final Num executedSize;
@@ -206,7 +200,6 @@ public abstract class Order extends OrderModel {
         this.price = super.price();
         this.type = super.type();
         this.quantityCondition = super.quantityCondition();
-        this.remainingSize = super.remainingSize();
         this.executedSize = super.executedSize();
         this.id = super.id();
         this.creationTime = super.creationTime();
@@ -276,7 +269,7 @@ public abstract class Order extends OrderModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, validateSize$705502851.invoke(this, value, (Consumer<Num>) this::setRemainingSize));
+            sizeUpdater.invoke(this, validateSize$2101382901.invoke(this, value));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -391,45 +384,9 @@ public abstract class Order extends OrderModel {
     }
 
     /**
-     * Calculate the remaining size of this order.
+     * Calculate the executed size.
      *  
-     *  @return
-     */
-    @Override
-    public final Num remainingSize() {
-        return this.remainingSize;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of remainingSize property.
-     */
-    @SuppressWarnings("unused")
-    private final Num getRemainingSize() {
-        return this.remainingSize;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of remainingSize property to assign.
-     */
-    final void setRemainingSize(Num value) {
-        if (value == null) {
-            value = super.remainingSize();
-        }
-        try {
-            remainingSizeUpdater.invoke(this, value);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
-     * Calculate executed size of this order.
-     *  
-     *  @return
+     *  @return The executed size.
      */
     @Override
     public final Num executedSize() {
@@ -1048,17 +1005,6 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign remainingSize property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next remainingSize(Num value) {
-            ((Order) this).setRemainingSize(value);
-            return (Next) this;
-        }
-
-        /**
          * Assign executedSize property.
          * 
          * @param value A new value to assign.
@@ -1226,7 +1172,6 @@ public abstract class Order extends OrderModel {
         static final String Price = "price";
         static final String Type = "type";
         static final String QuantityCondition = "quantityCondition";
-        static final String RemainingSize = "remainingSize";
         static final String ExecutedSize = "executedSize";
         static final String Id = "id";
         static final String CreationTime = "creationTime";
