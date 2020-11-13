@@ -9,6 +9,7 @@
  */
 package cointoss.order;
 
+import cointoss.Direction;
 import cointoss.util.arithmetic.Num;
 
 public abstract class OrderResponse {
@@ -25,16 +26,26 @@ public abstract class OrderResponse {
     /**
      * 
      */
-    class Accepted extends OrderResponse {
-        public Accepted(String id) {
+    public class Accepted extends OrderResponse {
+
+        public final Direction side;
+
+        public final Num size;
+
+        public final Num price;
+
+        public Accepted(String id, Direction side, Num size, Num price) {
             super(id);
+            this.side = side;
+            this.size = size;
+            this.price = price;
         }
     }
 
     /**
      * 
      */
-    class Rejected extends OrderResponse {
+    public class Rejected extends OrderResponse {
 
         public final String reason;
 
@@ -47,7 +58,7 @@ public abstract class OrderResponse {
     /**
      * 
      */
-    class Cancelled extends OrderResponse {
+    public class Cancelled extends OrderResponse {
         public Cancelled(String id) {
             super(id);
         }
@@ -56,7 +67,7 @@ public abstract class OrderResponse {
     /**
      * 
      */
-    class Executed extends OrderResponse {
+    public class Executed extends OrderResponse {
 
         public final Num size;
 

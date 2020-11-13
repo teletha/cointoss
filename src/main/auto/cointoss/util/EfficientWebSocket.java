@@ -1,6 +1,6 @@
 package cointoss.util;
 
-import .APILimiter;
+import cointoss.util.APILimiter;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel;
 import java.lang.Override;

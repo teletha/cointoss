@@ -295,15 +295,14 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     /**
      * Update size atomically.
      * 
-     * @param remainingSize
      * @param executedSize
      */
-    final void updateAtomically(Num remainingSize, Num executedSize) {
-        if (remainingSize.isNot(remainingSize()) || executedSize.isNot(executedSize())) {
-            setRemainingSize(remainingSize);
+    final void updateAtomically(Num executedSize) {
+        if (executedSize.isNot(executedSize())) {
+            setRemainingSize(size().minus(executedSize));
             setExecutedSize(executedSize);
 
-            this.remainingSize.accept(remainingSize);
+            this.remainingSize.accept(remainingSize());
             this.executedSize.accept(executedSize);
         }
     }
