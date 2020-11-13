@@ -9,21 +9,47 @@
  */
 package cointoss.trade;
 
+import java.util.function.Consumer;
+
+import cointoss.Directional;
 import cointoss.Market;
+import cointoss.order.OrderStrategy.Makable;
+import cointoss.order.OrderStrategy.Orderable;
+import cointoss.order.OrderStrategy.Takable;
+import cointoss.util.arithmetic.Num;
 
 public class DiscreteTrader extends Trader {
-
-    /**
-     * 
-     */
-    public DiscreteTrader(Market market) {
-        initialize(market);
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected final void declare(Market market, FundManager fund) {
+    }
+
+    /**
+     * We will order with the specified quantity. Use the return the {@link Takable} &
+     * {@link Makable} value to define the details of the ordering method.
+     * 
+     * @param <S> Ordering interface
+     * @param size A entry size.
+     * @return A ordering method.
+     */
+    public final DiscreteScenario entry(Directional directional, Num size) {
+        return entry(directional, size, Orderable::take);
+    }
+
+    /**
+     * We will order with the specified quantity. Use the return the {@link Takable} &
+     * {@link Makable} value to define the details of the ordering method.
+     * 
+     * @param <S> Ordering interface
+     * @param size A entry size.
+     * @return A ordering method.
+     */
+    public final DiscreteScenario entry(Directional directional, Num size, Consumer<Orderable> declaration) {
+        DiscreteScenario scenario = new DiscreteScenario();
+        scenario.entry(directional, size, declaration);
+        return scenario;
     }
 }

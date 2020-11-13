@@ -35,6 +35,7 @@ import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickerManager;
+import cointoss.trade.DiscreteTrader;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.RetryPolicy;
@@ -118,6 +119,16 @@ public class Market implements Disposable {
         tickers.on(Span.Day1).open.to(priceVolume::start);
 
         readOrderBook();
+    }
+
+    private DiscreteTrader trader;
+
+    public synchronized DiscreteTrader trader() {
+        if (trader == null) {
+            trader = new DiscreteTrader();
+            trader.initialize(this);
+        }
+        return trader;
     }
 
     public void register(Trader... traders) {

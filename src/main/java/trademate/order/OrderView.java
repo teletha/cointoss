@@ -12,7 +12,6 @@ package trademate.order;
 import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
-import java.util.Comparator;
 
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
@@ -22,6 +21,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
+import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -32,7 +32,6 @@ import stylist.ValueStyle;
 import trademate.Theme;
 import viewtify.Command;
 import viewtify.Key;
-import viewtify.Viewtify;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
@@ -75,16 +74,16 @@ public class OrderView extends View {
     private UIText orderSize;
 
     /** UI */
-    private UITableView<Order> table;
+    private UITableView<Scenario> table;
 
     /** UI */
-    private UITableColumn<Order, Direction> side;
+    private UITableColumn<Scenario, Direction> side;
 
     /** UI */
-    private UITableColumn<Order, Num> amount;
+    private UITableColumn<Scenario, Num> amount;
 
     /** UI */
-    private UITableColumn<Order, Num> price;
+    private UITableColumn<Scenario, Num> price;
 
     private UILabel amountTitle;
 
@@ -171,10 +170,10 @@ public class OrderView extends View {
         table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
             // $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
-        side.text(Side).model(Order.class, Order::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
-        amount.text(amountTitle, amountSize).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
+        side.text(Side).model(Scenario.class, Scenario::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
+        amount.text(amountTitle, amountSize).modelBySignal(o -> o.observeEntrySizeNow());
         amountTitle.text(Amount);
-        price.text(Price).model(Order.class, o -> o.price);
+        price.text(Price).modelBySignal(o -> o.observeEntryPriceNow());
 
         ActiveMarket.observing().skipNull().to(m -> update(m));
     }
@@ -192,13 +191,13 @@ public class OrderView extends View {
         // Theme.$.sell);
 
         // initialize orders on server
-        m.orders.manages().take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
-        I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
+        // m.orders.manages().take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
+        // I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
         amountSize.text(m.orders.compoundSize);
 
         // observe orders on clinet
-        return m.orders.added.to(this::createOrderItem);
+        return m.trader().scenarios().to(this::createScenarioItem);
     }
 
     /**
@@ -206,10 +205,9 @@ public class OrderView extends View {
      * 
      * @param set
      */
-    private void createOrderItem(Order order) {
+    private void createScenarioItem(Scenario order) {
         if (order != null) {
             table.addItemAtLast(order);
-            order.observeTerminating().on(Viewtify.UIThread).to(() -> table.removeItem(order));
         }
     }
 
@@ -244,7 +242,17 @@ public class OrderView extends View {
 
     private void makeBuying() {
         ActiveMarket.to(m -> {
-            m.orders.requestNow(Order.with.buy(estimateSize()).price(m.orderBook.longs.computeBestPrice(Num.HUNDRED, Num.ONE)));
+            m.trader().when(I.signal(1), v -> new Scenario() {
+
+                @Override
+                protected void exit() {
+                }
+
+                @Override
+                protected void entry() {
+                    entry(Direction.BUY, estimateSize(), s -> s.make(m.orderBook.longs.computeBestPrice(Num.HUNDRED, Num.ONE)));
+                }
+            });
         });
     }
 
@@ -270,13 +278,12 @@ public class OrderView extends View {
     /**
      * 
      */
-    private class CatalogRow extends TableRow<Order> implements StyleHelper<CatalogRow, CatalogRow> {
+    private class CatalogRow extends TableRow<Scenario> implements StyleHelper<CatalogRow, CatalogRow> {
 
         /**
          * 
          */
         private CatalogRow() {
-            styleOnly(Viewtify.observing(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(style.State::of));
         }
 
         /**

@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -18,6 +18,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -278,7 +279,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         order.observeExecutedSize().to(v -> {
             Num deltaSize = v.minus(entryExecutedSize);
 
-            updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
+            updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize, Order::executedSize);
             trader.updateSnapshot(direction(), Num.ZERO, deltaSize, order.price);
 
             logEntry("Update entry ");
@@ -290,19 +291,20 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param orders
      * @param priceSetter
-     * @param executedSizeSetter
+     * @param sizeSetter
      */
-    private void updateOrderRelatedStatus(Deque<Order> orders, Consumer<Num> priceSetter, Consumer<Num> executedSizeSetter) {
+    private void updateOrderRelatedStatus(Deque<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter, Function<Order, Num> sizeExtractor) {
         Num totalSize = Num.ZERO;
         Num totalPrice = Num.ZERO;
 
         for (Order order : orders) {
-            totalSize = totalSize.plus(order.executedSize);
-            totalPrice = totalPrice.plus(order.executedSize.multiply(order.price));
+            Num size = sizeExtractor.apply(order);
+            totalSize = totalSize.plus(size);
+            totalPrice = totalPrice.plus(size.multiply(order.price));
         }
 
         priceSetter.accept(totalPrice.divide(totalSize));
-        executedSizeSetter.accept(totalSize);
+        sizeSetter.accept(totalSize);
     }
 
     /**
@@ -499,7 +501,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             Num previous = realizedProfit;
             Num deltaSize = v.minus(exitExecutedSize);
 
-            updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
+            updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize, Order::executedSize);
             trader.updateSnapshot(direction(), realizedProfit.minus(previous), deltaSize.negate(), null);
 
             logExit("Update " + type);

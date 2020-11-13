@@ -9,6 +9,7 @@
  */
 package cointoss.order;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.trade.extension.PricePart;
@@ -215,6 +216,7 @@ class CompoundSizeAndPriceTest {
         assert orders.compoundPrice.v.is(20);
     }
 
+    @Disabled
     @TradeTest
     void complex03(SidePart side) {
         OrderManager orders = new OrderManager(new VerifiableMarketService());
