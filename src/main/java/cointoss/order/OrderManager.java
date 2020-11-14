@@ -124,50 +124,6 @@ public final class OrderManager {
         }
     }
 
-    void create(String id, Direction side, Num size, Num price) {
-        Order o = findBy(id);
-        if (o != null) {
-            o.setId(id);
-            o.setPrice(price);
-            o.setState(OrderState.ACTIVE);
-        } else {
-            Order created = Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE);
-
-            // store order and fire add event
-            add.accept(created);
-        }
-    }
-
-    void cancel(String id) {
-        Order o = findBy(id);
-        if (o != null) {
-            o.setState(OrderState.CANCELED);
-        }
-    }
-
-    void execute(String id, Num size, Num price) {
-        Order o = findBy(id);
-        if (o != null) {
-            Num newSize = o.executedSize.plus(size);
-            Num newPrice = o.price.multiply(o.executedSize).plus(price.multiply(size)).divide(newSize).scale(service.setting.base.scale);
-            o.setPrice(newPrice);
-            o.setExecutedSize(newSize);
-
-            if (o.size.is(o.executedSize)) {
-                o.setState(OrderState.COMPLETED);
-            }
-        }
-    }
-
-    private Order findBy(String id) {
-        for (Order order : managed) {
-            if (order.id.equals(id)) {
-                return order;
-            }
-        }
-        return null;
-    }
-
     /**
      * Update the compound position.
      * 

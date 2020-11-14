@@ -43,7 +43,6 @@ import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
-import cointoss.order.OrderUpdate;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -449,13 +448,10 @@ public class BitFlyerService extends MarketService {
                     String id = json.text("child_order_acceptance_id");
 
                     if (type.equals("ORDER")) {
-                        OrderUpdate.create(id, side, price, size);
                         return Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE);
                     } else if (type.equals("CANCEL")) {
-                        OrderUpdate.cancell(id);
                         return Order.with.buy(size).price(price).id(id).state(OrderState.CANCELED);
                     } else if (type.equals("EXECUTION")) {
-                        OrderUpdate.executing(id, price, size);
                         return Order.with.direction(side, size).price(price).id(id).state(OrderState.EXECUTING);
                     } else { /* ORDER_FAILED || CANCEL_FAILED || EXPIRE */
                         return (Order) null;
