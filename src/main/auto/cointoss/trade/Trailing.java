@@ -8,7 +8,6 @@ import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -145,7 +144,6 @@ public abstract class Trailing extends TrailingModel {
         }
         try {
             losscutUpdater.invoke(this, losscut$2101382901.invoke(this, value));
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -182,7 +180,6 @@ public abstract class Trailing extends TrailingModel {
         }
         try {
             profitUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -219,7 +216,6 @@ public abstract class Trailing extends TrailingModel {
         }
         try {
             updateUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

@@ -7,7 +7,6 @@ import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -115,7 +114,6 @@ public abstract class Position extends PositionModel {
         }
         try {
             directionUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -174,7 +172,6 @@ public abstract class Position extends PositionModel {
         }
         try {
             priceUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -233,7 +230,6 @@ public abstract class Position extends PositionModel {
         }
         try {
             sizeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -270,7 +266,6 @@ public abstract class Position extends PositionModel {
         }
         try {
             dateUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

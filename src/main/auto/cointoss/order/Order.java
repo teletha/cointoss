@@ -12,7 +12,6 @@ import cointoss.util.ObservableProperty;
 import cointoss.util.arithmetic.Num;
 import java.lang.String;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -248,7 +247,6 @@ public abstract class Order extends OrderModel {
         }
         try {
             directionUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -285,7 +283,6 @@ public abstract class Order extends OrderModel {
         }
         try {
             sizeUpdater.invoke(this, validateSize$2101382901.invoke(this, value));
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -322,7 +319,6 @@ public abstract class Order extends OrderModel {
         }
         try {
             priceUpdater.invoke(this, price$701841881.invoke(this, value, (Consumer<OrderType>) this::setType));
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -359,7 +355,6 @@ public abstract class Order extends OrderModel {
         }
         try {
             typeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -396,7 +391,6 @@ public abstract class Order extends OrderModel {
         }
         try {
             quantityConditionUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -434,35 +428,19 @@ public abstract class Order extends OrderModel {
         try {
             executedSizeUpdater.invoke(this, checkExecutedSize$2101382901.invoke(this, value));
             executedSizeCustomizer.accept(this.executedSize);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeDiff() {
         return executedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSize() {
         return executedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeNow() {
         return executedSizeCustomizer.observe$Now();
     }
@@ -498,7 +476,6 @@ public abstract class Order extends OrderModel {
         }
         try {
             idUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -536,26 +513,15 @@ public abstract class Order extends OrderModel {
         try {
             creationTimeUpdater.invoke(this, value);
             creationTimeCustomizer.accept(this.creationTime);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTime() {
         return creationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return creationTimeCustomizer.observe$Now();
     }
@@ -592,26 +558,15 @@ public abstract class Order extends OrderModel {
         try {
             terminationTimeUpdater.invoke(this, value);
             terminationTimeCustomizer.accept(this.terminationTime);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTime() {
         return terminationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTimeNow() {
         return terminationTimeCustomizer.observe$Now();
     }
@@ -648,26 +603,15 @@ public abstract class Order extends OrderModel {
         try {
             stateUpdater.invoke(this, validateState$41283920.invoke(this, value));
             stateCustomizer.accept(this.state);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<OrderState> observeStateNow() {
         return stateCustomizer.observe$Now();
     }
@@ -1064,6 +1008,15 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
+        }
+
+        /**
+         * Assign quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
         default Next goodTillCanceled() {
             return quantityCondition(QuantityCondition.GoodTillCanceled);
         }
@@ -1075,15 +1028,6 @@ public abstract class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(QuantityCondition.ImmediateOrCancel);
-        }
-
-        /**
-         * Assign quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1174,44 +1118,8 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next init() {
-            return state(OrderState.INIT);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(OrderState.REQUESTING);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
         default Next active() {
             return state(OrderState.ACTIVE);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next executing() {
-            return state(OrderState.EXECUTING);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next completed() {
-            return state(OrderState.COMPLETED);
         }
 
         /**
@@ -1228,6 +1136,24 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next completed() {
+            return state(OrderState.COMPLETED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next executing() {
+            return state(OrderState.EXECUTING);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next expired() {
             return state(OrderState.EXPIRED);
         }
@@ -1237,8 +1163,26 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next init() {
+            return state(OrderState.INIT);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next rejected() {
             return state(OrderState.REJECTED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(OrderState.REQUESTING);
         }
     }
 

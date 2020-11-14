@@ -7,7 +7,6 @@ import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -199,7 +198,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             entrySizeUpdater.invoke(this, value);
             entrySizeCustomizer.accept(this.entrySize);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -214,20 +212,10 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         return entrySizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySize() {
         return entrySizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySizeNow() {
         return entrySizeCustomizer.observe$Now();
     }
@@ -264,7 +252,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             entryExecutedSizeUpdater.invoke(this, value);
             entryExecutedSizeCustomizer.accept(this.entryExecutedSize);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -279,20 +266,10 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         return entryExecutedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSize() {
         return entryExecutedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSizeNow() {
         return entryExecutedSizeCustomizer.observe$Now();
     }
@@ -329,7 +306,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             entryPriceUpdater.invoke(this, value);
             entryPriceCustomizer.accept(this.entryPrice);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -344,20 +320,10 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         return entryPriceCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPrice() {
         return entryPriceCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPriceNow() {
         return entryPriceCustomizer.observe$Now();
     }
@@ -394,7 +360,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             exitSizeUpdater.invoke(this, value);
             exitSizeCustomizer.accept(this.exitSize);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -409,20 +374,10 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         return exitSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSize() {
         return exitSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSizeNow() {
         return exitSizeCustomizer.observe$Now();
     }
@@ -459,7 +414,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             exitExecutedSizeUpdater.invoke(this, value);
             exitExecutedSizeCustomizer.accept(this.exitExecutedSize);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -474,20 +428,10 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         return exitExecutedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSize() {
         return exitExecutedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSizeNow() {
         return exitExecutedSizeCustomizer.observe$Now();
     }
@@ -524,7 +468,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             exitPriceUpdater.invoke(this, value);
             exitPriceCustomizer.accept(this.exitPrice);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -539,20 +482,10 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         return exitPriceCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPrice() {
         return exitPriceCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPriceNow() {
         return exitPriceCustomizer.observe$Now();
     }
@@ -585,7 +518,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             realizedProfitUpdater.invoke(this, value);
             realizedProfitCustomizer.accept(this.realizedProfit);
-        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -600,20 +532,10 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         return realizedProfitCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfit() {
         return realizedProfitCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfitNow() {
         return realizedProfitCustomizer.observe$Now();
     }
