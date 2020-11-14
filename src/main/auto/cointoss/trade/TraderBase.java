@@ -7,6 +7,7 @@ import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
+import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -134,6 +135,7 @@ public abstract class TraderBase extends TraderBaseModel {
         try {
             holdSizeUpdater.invoke(this, value);
             holdSizeCustomizer.accept(this.holdSize);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -198,6 +200,7 @@ public abstract class TraderBase extends TraderBaseModel {
         try {
             holdMaxSizeUpdater.invoke(this, value);
             holdMaxSizeCustomizer.accept(this.holdMaxSize);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -262,6 +265,7 @@ public abstract class TraderBase extends TraderBaseModel {
         try {
             profitUpdater.invoke(this, value);
             profitCustomizer.accept(this.profit);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

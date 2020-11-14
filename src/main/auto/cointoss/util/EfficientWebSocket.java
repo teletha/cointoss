@@ -7,6 +7,7 @@ import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
+import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -168,6 +169,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             addressUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -205,6 +207,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             extractIdUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -242,6 +245,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             updateIdUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -277,6 +281,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     private final void setMaximumSubscriptions(int value) {
         try {
             maximumSubscriptionsUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -315,6 +320,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             ignoreMessageIfUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -352,6 +358,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             recconnectIfUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -389,6 +396,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             stopRecconnectIfUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -425,6 +433,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             whenConnectedUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -461,6 +470,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             clientUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -497,6 +507,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             schedulerUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -533,6 +544,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
         try {
             limiterUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

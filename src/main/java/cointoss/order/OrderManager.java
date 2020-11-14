@@ -116,7 +116,7 @@ public final class OrderManager {
 
         // update info
         order.setPrice(updater.price);
-        order.updateAtomically(updater.executedSize);
+        order.setExecutedSize(updater.executedSize);
         order.setState(updater.state);
 
         if (updater.isTerminated()) {

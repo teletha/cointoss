@@ -9,6 +9,7 @@ import java.lang.Class;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
+import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -129,6 +130,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         }
         try {
             targetUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -165,6 +167,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         }
         try {
             baseUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -197,6 +200,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         }
         try {
             targetCurrencyBidSizesUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -226,6 +230,7 @@ public abstract class MarketSetting implements MarketSettingModel {
     private final void setPriceRangeModifier(int value) {
         try {
             priceRangeModifierUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -259,6 +264,7 @@ public abstract class MarketSetting implements MarketSettingModel {
     private final void setAcquirableExecutionSize(int value) {
         try {
             acquirableExecutionSizeUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -295,6 +301,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         }
         try {
             executionLoggerUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

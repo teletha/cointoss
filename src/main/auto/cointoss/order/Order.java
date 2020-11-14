@@ -7,10 +7,12 @@ import cointoss.order.OrderModel;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
+import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
 import cointoss.util.arithmetic.Num;
 import java.lang.String;
 import java.lang.Throwable;
+import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -86,6 +88,9 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle executedSize$912239839= invoker("executedSize", double.class);
 
     /** The overload or intercept method invoker. */
+    private static final MethodHandle checkExecutedSize$2101382901= invoker("checkExecutedSize", Num.class);
+
+    /** The overload or intercept method invoker. */
     private static final MethodHandle validateState$41283920= invoker("validateState", OrderState.class);
 
     /**
@@ -151,6 +156,15 @@ public abstract class Order extends OrderModel {
 
     /** The exposed property. */
     public final Num executedSize;
+
+    /** The property customizer. */
+    private final ObservableNumProperty executedSizeCustomizer = new ObservableNumProperty() {
+
+        @Override
+        public Num get() {
+            return executedSize;
+        }
+    };
 
     /** The exposed property. */
     public final String id;
@@ -234,6 +248,7 @@ public abstract class Order extends OrderModel {
         }
         try {
             directionUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -270,6 +285,7 @@ public abstract class Order extends OrderModel {
         }
         try {
             sizeUpdater.invoke(this, validateSize$2101382901.invoke(this, value));
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -306,6 +322,7 @@ public abstract class Order extends OrderModel {
         }
         try {
             priceUpdater.invoke(this, price$701841881.invoke(this, value, (Consumer<OrderType>) this::setType));
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -342,6 +359,7 @@ public abstract class Order extends OrderModel {
         }
         try {
             typeUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -378,6 +396,7 @@ public abstract class Order extends OrderModel {
         }
         try {
             quantityConditionUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -413,10 +432,24 @@ public abstract class Order extends OrderModel {
             value = super.executedSize();
         }
         try {
-            executedSizeUpdater.invoke(this, value);
+            executedSizeUpdater.invoke(this, checkExecutedSize$2101382901.invoke(this, value));
+            executedSizeCustomizer.accept(this.executedSize);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
+    }
+
+    public final Signal<Num> observeExecutedSizeDiff() {
+        return executedSizeCustomizer.observe$Diff();
+    }
+
+    public final Signal<Num> observeExecutedSize() {
+        return executedSizeCustomizer.observe$();
+    }
+
+    public final Signal<Num> observeExecutedSizeNow() {
+        return executedSizeCustomizer.observe$Now();
     }
 
     /**
@@ -450,6 +483,7 @@ public abstract class Order extends OrderModel {
         }
         try {
             idUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -487,6 +521,7 @@ public abstract class Order extends OrderModel {
         try {
             creationTimeUpdater.invoke(this, value);
             creationTimeCustomizer.accept(this.creationTime);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -532,6 +567,7 @@ public abstract class Order extends OrderModel {
         try {
             terminationTimeUpdater.invoke(this, value);
             terminationTimeCustomizer.accept(this.terminationTime);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -577,6 +613,7 @@ public abstract class Order extends OrderModel {
         try {
             stateUpdater.invoke(this, validateState$41283920.invoke(this, value));
             stateCustomizer.accept(this.state);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

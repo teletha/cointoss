@@ -7,6 +7,7 @@ import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
+import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -198,6 +199,7 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             entrySizeUpdater.invoke(this, value);
             entrySizeCustomizer.accept(this.entrySize);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -262,6 +264,7 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             entryExecutedSizeUpdater.invoke(this, value);
             entryExecutedSizeCustomizer.accept(this.entryExecutedSize);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -326,6 +329,7 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             entryPriceUpdater.invoke(this, value);
             entryPriceCustomizer.accept(this.entryPrice);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -390,6 +394,7 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             exitSizeUpdater.invoke(this, value);
             exitSizeCustomizer.accept(this.exitSize);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -454,6 +459,7 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             exitExecutedSizeUpdater.invoke(this, value);
             exitExecutedSizeCustomizer.accept(this.exitExecutedSize);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -518,6 +524,7 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             exitPriceUpdater.invoke(this, value);
             exitPriceCustomizer.accept(this.exitPrice);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -578,6 +585,7 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         try {
             realizedProfitUpdater.invoke(this, value);
             realizedProfitCustomizer.accept(this.realizedProfit);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

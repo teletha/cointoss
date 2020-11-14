@@ -6,6 +6,7 @@ import java.lang.Class;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Throwable;
+import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -175,6 +176,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
     private final void setLimit(long value) {
         try {
             limitUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -211,6 +213,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         }
         try {
             delayUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -247,6 +250,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         }
         try {
             delayMinimumUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -283,6 +287,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         }
         try {
             delayMaximumUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -319,6 +324,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         }
         try {
             schedulerUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -352,6 +358,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
     private final void setAutoReset(boolean value) {
         try {
             autoResetUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -388,6 +395,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         }
         try {
             ignoreUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -424,6 +432,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         }
         try {
             debugUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

@@ -19,21 +19,18 @@ import java.util.function.Consumer;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Chrono;
+import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
-import kiss.Signaling;
 
 @Icy(grouping = 2)
 abstract class OrderModel implements Directional, Comparable<OrderModel> {
 
     /** The relation holder. */
     private Map<Class, Object> relations;
-
-    /** The size related signal. */
-    private final Signaling<Num> executedSize = new Signaling();
 
     /**
      * {@inheritDoc}
@@ -183,7 +180,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      * 
      * @return The executed size.
      */
-    @Icy.Property(setterModifier = "final")
+    @Icy.Property(setterModifier = "final", custom = ObservableNumProperty.class)
     public Num executedSize() {
         return Num.ZERO;
     }
@@ -211,50 +208,17 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     }
 
     /**
-     * Expose setter to update size atomically.
+     * Ignore same value.
      * 
-     * @param size
-     */
-    abstract void setExecutedSize(Num size);
-
-    /**
-     * Observe executed size modification.
-     * 
+     * @param num
      * @return
      */
-    public final Signal<Num> observeExecutedSize() {
-        return executedSize.expose;
-    }
-
-    /**
-     * Observe executed size modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeExecutedSizeNow() {
-        return observeExecutedSize().startWith(executedSize());
-    }
-
-    /**
-     * Observe executed size modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeExecutedSizeDiff() {
-        return observeExecutedSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
-    }
-
-    /**
-     * Update size atomically.
-     * 
-     * @param executedSize
-     */
-    final void updateAtomically(Num executedSize) {
-        if (executedSize.isNot(executedSize())) {
-            setExecutedSize(executedSize);
-
-            this.executedSize.accept(executedSize);
+    @Icy.Intercept("executedSize")
+    private Num checkExecutedSize(Num num) {
+        if (num.is(executedSize())) {
+            throw new UnsupportedOperationException();
         }
+        return num;
     }
 
     /**

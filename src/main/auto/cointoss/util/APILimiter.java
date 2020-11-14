@@ -5,6 +5,7 @@ import cointoss.util.APILimiterModel;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
+import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -122,6 +123,7 @@ public abstract class APILimiter extends APILimiterModel {
     private final void setLimit(int value) {
         try {
             limitUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -158,6 +160,7 @@ public abstract class APILimiter extends APILimiterModel {
         }
         try {
             refreshUpdater.invoke(this, config$823551244.invoke(this, value));
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -191,6 +194,7 @@ public abstract class APILimiter extends APILimiterModel {
     private final void setExpress(int value) {
         try {
             expressUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

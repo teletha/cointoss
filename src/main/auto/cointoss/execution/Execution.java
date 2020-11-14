@@ -8,6 +8,7 @@ import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Throwable;
+import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -221,6 +222,7 @@ public abstract class Execution extends ExecutionModel {
         }
         try {
             directionUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -257,6 +259,7 @@ public abstract class Execution extends ExecutionModel {
         }
         try {
             sizeUpdater.invoke(this, assignWithAccumulative$1150132994.invoke(this, value, (DoubleConsumer) this::setAccumulative));
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -312,6 +315,7 @@ public abstract class Execution extends ExecutionModel {
     private final void setId(long value) {
         try {
             idUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -348,6 +352,7 @@ public abstract class Execution extends ExecutionModel {
         }
         try {
             priceUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -403,6 +408,7 @@ public abstract class Execution extends ExecutionModel {
     private final void setAccumulative(double value) {
         try {
             accumulativeUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -439,6 +445,7 @@ public abstract class Execution extends ExecutionModel {
         }
         try {
             dateUpdater.invoke(this, assignWithMills$1104079711.invoke(this, value, (LongConsumer) this::setMills));
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -472,6 +479,7 @@ public abstract class Execution extends ExecutionModel {
     private final void setMills(long value) {
         try {
             millsUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -505,6 +513,7 @@ public abstract class Execution extends ExecutionModel {
     private final void setConsecutive(int value) {
         try {
             consecutiveUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -538,6 +547,7 @@ public abstract class Execution extends ExecutionModel {
     private final void setDelay(int value) {
         try {
             delayUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -574,6 +584,7 @@ public abstract class Execution extends ExecutionModel {
         }
         try {
             buyerUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -610,6 +621,7 @@ public abstract class Execution extends ExecutionModel {
         }
         try {
             sellerUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
         }

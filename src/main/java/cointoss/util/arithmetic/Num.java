@@ -894,39 +894,7 @@ public class Num extends Arithmetic<Num> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Num == false) {
-            return false;
-        }
-
-        Num other = (Num) obj;
-        if (big != null) {
-            if (other.big != null) {
-                return big.compareTo(other.big) == 0;
-            } else {
-                return checkEqualityBetweenPrimitiveAndBig(other, this);
-            }
-        } else {
-            if (other.big != null) {
-                return checkEqualityBetweenPrimitiveAndBig(this, other);
-            } else {
-                return this.scale == other.scale && this.v == other.v;
-            }
-        }
-    }
-
-    /**
-     * Test equality between the primive type and wrapped type.
-     * 
-     * @param primitive
-     * @param big
-     * @return
-     */
-    private boolean checkEqualityBetweenPrimitiveAndBig(Num primitive, Num big) {
-        if (primitive.scale == 0) {
-            return primitive.v == big.big.longValue();
-        } else {
-            return big.big.compareTo(primitive.big()) == 0;
-        }
+        return obj instanceof Num ? is((Num) obj) : false;
     }
 
     /**
