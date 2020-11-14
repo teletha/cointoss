@@ -38,7 +38,6 @@ import cointoss.ticker.TickerManager;
 import cointoss.trade.DiscreteTrader;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
-import cointoss.util.RetryPolicy;
 import cointoss.util.arithmetic.Num;
 import cointoss.volume.PriceRangedVolumeManager;
 import kiss.Disposable;
@@ -146,10 +145,8 @@ public class Market implements Disposable {
      * Start reading {@link OrderBook}.
      */
     protected void readOrderBook() {
-        RetryPolicy policy = service.retryPolicy(500, "OrderBook");
-
         // orderbook management
-        service.add(service.orderBookRealtimely().retryWhen(policy).to(board -> {
+        service.add(service.orderBookRealtimely().to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));

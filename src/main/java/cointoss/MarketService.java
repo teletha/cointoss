@@ -323,10 +323,25 @@ public abstract class MarketService implements Disposable {
      * @return A shared realtime order books.
      */
     public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely() {
+        return orderBookRealtimely(true);
+    }
+
+    /**
+     * Acquire order book in realtime. This is infinitely.
+     * 
+     * @param autoReconnect Need to reconnect automatically.
+     * @return A shared realtime order books.
+     */
+    public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely(boolean autoReconnect) {
         if (orderBooks == null) {
             orderBooks = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add).share();
         }
-        return orderBooks;
+
+        if (autoReconnect) {
+            return orderBooks.retryWhen(retryPolicy(500, "OrderBookRealtimely"));
+        } else {
+            return orderBooks;
+        }
     }
 
     /**
