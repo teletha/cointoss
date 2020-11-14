@@ -279,11 +279,26 @@ public abstract class MarketService implements Disposable {
      * @return A event stream of order state.
      */
     public final synchronized Signal<Order> ordersRealtimely() {
+        return ordersRealtimely(true);
+    }
+
+    /**
+     * Acquire the order state in realtime. This is infinitely.
+     * 
+     * @param autoReconnect Need to reconnect automatically.
+     * @return A event stream of order state.
+     */
+    public final synchronized Signal<Order> ordersRealtimely(boolean autoReconnect) {
         if (orderStream == null) {
             orderStream = Variable.empty();
             disposer.add(connectOrdersRealtimely().to(orderStream::set));
         }
-        return orderStream.observe();
+
+        if (autoReconnect) {
+            return orderStream.observe().retryWhen(retryPolicy(500, "OrderRealtimely"));
+        } else {
+            return orderStream.observe();
+        }
     }
 
     /**
