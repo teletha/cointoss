@@ -1,3 +1,35 @@
+{child_order_id=JFX20201112-023154-527883F, side=BUY, event_type=ORDER, expire_date=2020-11-13T02:31:54, size=0.01, price=0, event_date=2020-11-12T02:31:54.180157Z, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055, child_order_type=MARKET}
+b0/0.01(0)@0	ACTIVE	2020-11-12T11:31:54~  
+{child_order_id=JFX20201112-023154-527883F, sfd=0, exec_id=2014595559, side=BUY, event_type=EXECUTION, size=0.00588243, price=1660112, event_date=2020-11-12T02:31:54.180157Z, outstanding_size=0.00411757, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055}
+B0.00176486/0.00588243(0)@1660112	ACTIVE	1970-01-01T09:00:00~2020-11-12T11:31:54(18578:02:31:54)
+{child_order_id=JFX20201112-023154-527883F, sfd=0, exec_id=2014595560, side=BUY, event_type=EXECUTION, size=0.00411757, price=1660114, event_date=2020-11-12T02:31:54.180157Z, outstanding_size=0, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055}
+B0.00411757/0.00411757(0)@1660114	COMPLETED	1970-01-01T09:00:00~2020-11-12T11:31:54(18578:02:31:54)
+{child_order_id=JFX20201112-023154-527883F, side=BUY, event_type=ORDER, expire_date=2020-11-13T02:31:54, size=0.01, price=0, event_date=2020-11-12T02:31:54.180157Z, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055, child_order_type=MARKET}
+b0/0.01(0)@0	ACTIVE	2020-11-12T11:31:54~  
+{child_order_id=JFX20201112-023154-527883F, sfd=0, exec_id=2014595559, side=BUY, event_type=EXECUTION, size=0.00588243, price=1660112, event_date=2020-11-12T02:31:54.180157Z, outstanding_size=0.00411757, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055}
+B0.00176486/0.00588243(0)@1660112	ACTIVE	1970-01-01T09:00:00~2020-11-12T11:31:54(18578:02:31:54)
+{child_order_id=JFX20201112-023154-527883F, sfd=0, exec_id=2014595560, side=BUY, event_type=EXECUTION, size=0.00411757, price=1660114, event_date=2020-11-12T02:31:54.180157Z, outstanding_size=0, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055}
+B0.00411757/0.00411757(0)@1660114	COMPLETED	1970-01-01T09:00:00~2020-11-12T11:31:54(18578:02:31:54)
+{child_order_id=JFX20201112-023154-527883F, side=BUY, event_type=ORDER, expire_date=2020-11-13T02:31:54, size=0.01, price=0, event_date=2020-11-12T02:31:54.180157Z, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055, child_order_type=MARKET}
+b0/0.01(0)@0	ACTIVE	2020-11-12T11:31:54~  
+{child_order_id=JFX20201112-023154-527883F, sfd=0, exec_id=2014595559, side=BUY, event_type=EXECUTION, size=0.00588243, price=1660112, event_date=2020-11-12T02:31:54.180157Z, outstanding_size=0.00411757, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055}
+B0.00176486/0.00588243(0)@1660112	ACTIVE	1970-01-01T09:00:00~2020-11-12T11:31:54(18578:02:31:54)
+{child_order_id=JFX20201112-023154-527883F, sfd=0, exec_id=2014595560, side=BUY, event_type=EXECUTION, size=0.00411757, price=1660114, event_date=2020-11-12T02:31:54.180157Z, outstanding_size=0, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023154-283055}
+B0.00411757/0.00411757(0)@1660114	COMPLETED	1970-01-01T09:00:00~2020-11-12T11:31:54(18578:02:31:54)
+
+{child_order_id=JFX20201112-023405-663199F, side=SELL, event_type=ORDER, expire_date=2020-12-12T02:34:05, size=0.01, price=0, event_date=2020-11-12T02:34:05.7424038Z, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023405-206258, child_order_type=MARKET}
+s0/0.01(0)@0	ACTIVE	2020-11-12T11:34:05~  
+{child_order_id=JFX20201112-023405-663199F, sfd=0, exec_id=2014596732, side=SELL, event_type=EXECUTION, size=0.01, price=1660928, event_date=2020-11-12T02:34:05.7424038Z, outstanding_size=0, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023405-206258}
+S0.01/0.01(0)@1660928	COMPLETED	1970-01-01T09:00:00~2020-11-12T11:34:05(18578:02:34:05)
+{child_order_id=JFX20201112-023405-663199F, side=SELL, event_type=ORDER, expire_date=2020-12-12T02:34:05, size=0.01, price=0, event_date=2020-11-12T02:34:05.7424038Z, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023405-206258, child_order_type=MARKET}
+s0/0.01(0)@0	ACTIVE	2020-11-12T11:34:05~  
+{child_order_id=JFX20201112-023405-663199F, sfd=0, exec_id=2014596732, side=SELL, event_type=EXECUTION, size=0.01, price=1660928, event_date=2020-11-12T02:34:05.7424038Z, outstanding_size=0, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023405-206258}
+S0.01/0.01(0)@1660928	COMPLETED	1970-01-01T09:00:00~2020-11-12T11:34:05(18578:02:34:05)
+{child_order_id=JFX20201112-023405-663199F, side=SELL, event_type=ORDER, expire_date=2020-12-12T02:34:05, size=0.01, price=0, event_date=2020-11-12T02:34:05.7424038Z, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023405-206258, child_order_type=MARKET}
+s0/0.01(0)@0	ACTIVE	2020-11-12T11:34:05~  
+{child_order_id=JFX20201112-023405-663199F, sfd=0, exec_id=2014596732, side=SELL, event_type=EXECUTION, size=0.01, price=1660928, event_date=2020-11-12T02:34:05.7424038Z, outstanding_size=0, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023405-206258}
+S0.01/0.01(0)@1660928	COMPLETED	1970-01-01T09:00:00~2020-11-12T11:34:05(18578:02:34:05)
+
 [
 	{
 		"order": {
