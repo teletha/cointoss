@@ -172,7 +172,7 @@ public abstract class EfficientWebSocketModel {
      * @return Chainable API.
      */
     @Icy.Property(copiable = true)
-    public APILimiter limiter() {
+    public cointoss.util.APILimiter limiter() {
         return null;
     }
 
