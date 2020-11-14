@@ -1174,6 +1174,15 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next partial() {
+            return state(OrderState.PARTIAL);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next rejected() {
             return state(OrderState.REJECTED);
         }
