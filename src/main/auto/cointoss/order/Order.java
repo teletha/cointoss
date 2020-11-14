@@ -1156,6 +1156,15 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next executing() {
+            return state(OrderState.EXECUTING);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next expired() {
             return state(OrderState.EXPIRED);
         }
@@ -1167,15 +1176,6 @@ public abstract class Order extends OrderModel {
          */
         default Next init() {
             return state(OrderState.INIT);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next partial() {
-            return state(OrderState.PARTIAL);
         }
 
         /**

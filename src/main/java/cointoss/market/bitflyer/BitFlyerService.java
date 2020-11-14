@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.translate;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -43,6 +43,7 @@ import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
+import cointoss.order.OrderUpdate;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -446,32 +447,19 @@ public class BitFlyerService extends MarketService {
                     Num price = json.get(Num.class, "price");
                     Num size = json.get(Num.class, "size");
                     String id = json.text("child_order_acceptance_id");
-                    ZonedDateTime time = parse(json.text("event_date")).atZone(Chrono.UTC);
 
-                    Order order = null;
                     if (type.equals("ORDER")) {
-                        order = Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE).creationTime(time);
+                        OrderUpdate.create(id, side, price, size);
+                        return Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE);
                     } else if (type.equals("CANCEL")) {
-                        order = Order.with.direction(Direction.BUY /* ignorable value */, size)
-                                .price(price)
-                                .id(id)
-                                .state(OrderState.CANCELED)
-                                .terminationTime(time);
+                        OrderUpdate.cancell(id);
+                        return Order.with.buy(size).price(price).id(id).state(OrderState.CANCELED);
                     } else if (type.equals("EXECUTION")) {
-                        Num remaining = json.get(Num.class, "outstanding_size");
-
-                        order = Order.with.direction(side, size)
-                                .price(price)
-                                .id(id)
-                                .state(remaining.isZero() ? OrderState.COMPLETED : OrderState.ACTIVE)
-                                .terminationTime(time);
-                    } else {
-                        // ORDER_FAILED
-                        // CANCEL_FAILED
-                        // EXPIRE
+                        OrderUpdate.executing(id, price, size);
+                        return Order.with.direction(side, size).price(price).id(id).state(OrderState.EXECUTING);
+                    } else { /* ORDER_FAILED || CANCEL_FAILED || EXPIRE */
+                        return (Order) null;
                     }
-                    System.out.println(order);
-                    return order;
                 })
                 .skipNull();
     }
