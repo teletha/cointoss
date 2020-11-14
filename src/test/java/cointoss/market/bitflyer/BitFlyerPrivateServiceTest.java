@@ -67,7 +67,6 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
         assert order.size.is(0.01);
         assert order.remainingSize().is(0.01);
         assert order.executedSize.is(0);
-        assert order.cancelledSize().is(0);
         assert order.price.is(1096329);
         assert order.creationTime.isEqual(Chrono.utc(2020, 7, 14, 1, 58, 6, 0));
         assert order.isActive();
@@ -128,9 +127,8 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
         assert order.direction.isBuy();
         assert order.type.isMaker();
         assert order.size.is(0.5);
-        assert order.remainingSize().is(0);
+        assert order.remainingSize().is(0.2);
         assert order.executedSize.is(0.3);
-        assert order.cancelledSize().is(0.2);
         assert order.price.is(986402);
         assert order.creationTime.isEqual(Chrono.utc(2020, 7, 10, 9, 1, 43, 0));
         assert order.isNotActive();
@@ -193,7 +191,6 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
         assert order.size.is(0.5);
         assert order.remainingSize().is(0);
         assert order.executedSize.is(0.5);
-        assert order.cancelledSize().is(0);
         assert order.price.is(986402);
         assert order.creationTime.isEqual(Chrono.utc(2020, 7, 10, 9, 1, 43, 0));
         assert order.isNotActive();
@@ -274,7 +271,6 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
         assert order.size.is(0.01);
         assert order.remainingSize().is(0.01);
         assert order.executedSize.is(0);
-        assert order.cancelledSize().is(0);
         assert order.price.is(1096329);
         assert order.creationTime.isEqual(Chrono.utc(2020, 7, 14, 1, 58, 6, 0));
         assert order.isActive();
@@ -290,7 +286,6 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
         assert order.size.is(0.5);
         assert order.remainingSize().is(0);
         assert order.executedSize.is(0.5);
-        assert order.cancelledSize().is(0);
         assert order.price.is(986402);
         assert order.creationTime.isEqual(Chrono.utc(2020, 7, 10, 9, 1, 43, 0));
         assert order.isNotActive();

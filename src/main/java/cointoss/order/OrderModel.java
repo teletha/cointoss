@@ -318,24 +318,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      * @return The unexecuted size
      */
     public final Num remainingSize() {
-        if (state() == OrderState.CANCELED) {
-            return Num.ZERO;
-        } else {
-            return size().minus(executedSize());
-        }
-    }
-
-    /**
-     * Calculate the cancelled size.
-     * 
-     * @return
-     */
-    public final Num cancelledSize() {
-        if (state() != OrderState.CANCELED) {
-            return Num.ZERO;
-        } else {
-            return size().minus(executedSize());
-        }
+        return size().minus(executedSize());
     }
 
     /**
@@ -512,7 +495,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(type().isMaker() ? direction().mark() : direction().mark().toLowerCase());
-        builder.append(executedSize()).append("/").append(size()).append("(").append(cancelledSize()).append(")@").append(price());
+        builder.append(executedSize()).append("/").append(size()).append("@").append(price());
         builder.append("\t").append(state());
         if (terminationTime() == null) {
             builder.append("\t").append(Chrono.format(creationTime())).append("～  ");
