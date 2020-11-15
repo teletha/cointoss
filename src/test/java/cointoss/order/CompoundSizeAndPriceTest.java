@@ -18,6 +18,7 @@ import cointoss.trade.extension.SizePart;
 import cointoss.trade.extension.TradeTest;
 import cointoss.verify.VerifiableMarketService;
 
+@Disabled
 class CompoundSizeAndPriceTest {
 
     @TradeTest

@@ -277,6 +277,16 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     public abstract Signal<OrderState> observeState();
 
     /**
+     * The internal policy for updating.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public UpdatePolicy policy() {
+        return UpdatePolicy.DELTA;
+    }
+
+    /**
      * Calculate the remaining size.
      * 
      * @return The unexecuted size

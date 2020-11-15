@@ -7,6 +7,7 @@ import cointoss.order.OrderModel;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
+import cointoss.order.UpdatePolicy;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
 import cointoss.util.arithmetic.Num;
@@ -139,6 +140,9 @@ public abstract class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle stateUpdater = updater("state");
 
+    /** The final property updater. */
+    private static final MethodHandle policyUpdater = updater("policy");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -205,6 +209,9 @@ public abstract class Order extends OrderModel {
         }
     };
 
+    /** The exposed property. */
+    public final UpdatePolicy policy;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -219,6 +226,7 @@ public abstract class Order extends OrderModel {
         this.creationTime = super.creationTime();
         this.terminationTime = super.terminationTime();
         this.state = super.state();
+        this.policy = super.policy();
     }
 
     /** {@inheritDoc} */
@@ -440,29 +448,14 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeDiff() {
         return executedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSize() {
         return executedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeNow() {
         return executedSizeCustomizer.observe$Now();
     }
@@ -542,20 +535,10 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTime() {
         return creationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return creationTimeCustomizer.observe$Now();
     }
@@ -598,20 +581,10 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTime() {
         return terminationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTimeNow() {
         return terminationTimeCustomizer.observe$Now();
     }
@@ -654,22 +627,49 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
+    public final Signal<OrderState> observeStateNow() {
+        return stateCustomizer.observe$Now();
+    }
+
     /**
-     * Observe property modification with the current value.
+     * The internal policy for updating.
      *  
      *  @return
      */
-    public final Signal<OrderState> observeStateNow() {
-        return stateCustomizer.observe$Now();
+    @Override
+    public final UpdatePolicy policy() {
+        return this.policy;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of policy property.
+     */
+    @SuppressWarnings("unused")
+    private final UpdatePolicy getPolicy() {
+        return this.policy;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of policy property to assign.
+     */
+    private final void setPolicy(UpdatePolicy value) {
+        if (value == null) {
+            value = super.policy();
+        }
+        try {
+            policyUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /** The singleton builder. */
@@ -1064,6 +1064,15 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
+        }
+
+        /**
+         * Assign quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
         default Next goodTillCanceled() {
             return quantityCondition(QuantityCondition.GoodTillCanceled);
         }
@@ -1075,15 +1084,6 @@ public abstract class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(QuantityCondition.ImmediateOrCancel);
-        }
-
-        /**
-         * Assign quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1174,44 +1174,8 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next init() {
-            return state(OrderState.INIT);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(OrderState.REQUESTING);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
         default Next active() {
             return state(OrderState.ACTIVE);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next executing() {
-            return state(OrderState.EXECUTING);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next completed() {
-            return state(OrderState.COMPLETED);
         }
 
         /**
@@ -1228,6 +1192,15 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next completed() {
+            return state(OrderState.COMPLETED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next expired() {
             return state(OrderState.EXPIRED);
         }
@@ -1237,8 +1210,64 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next init() {
+            return state(OrderState.INIT);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next rejected() {
             return state(OrderState.REJECTED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(OrderState.REQUESTING);
+        }
+
+        /**
+         * Assign policy property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next policy(UpdatePolicy value) {
+            ((Order) this).setPolicy(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign policy property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next delta() {
+            return policy(UpdatePolicy.DELTA);
+        }
+
+        /**
+         * Assign policy property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next NEW() {
+            return policy(UpdatePolicy.NEW);
+        }
+
+        /**
+         * Assign policy property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next replace() {
+            return policy(UpdatePolicy.REPLACE);
         }
     }
 
@@ -1268,5 +1297,6 @@ public abstract class Order extends OrderModel {
         static final String CreationTime = "creationTime";
         static final String TerminationTime = "terminationTime";
         static final String State = "state";
+        static final String Policy = "policy";
     }
 }

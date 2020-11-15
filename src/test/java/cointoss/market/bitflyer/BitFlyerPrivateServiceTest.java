@@ -20,7 +20,7 @@ import cointoss.util.Chrono;
 
 public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFlyerService> {
 
-    /**
+    /*
      * {@inheritDoc}
      */
     @Override

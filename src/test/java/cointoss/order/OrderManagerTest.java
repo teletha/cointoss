@@ -154,7 +154,7 @@ class OrderManagerTest {
     @Test
     void updateChange() {
         orders.update(Order.with.buy(1).price(10).id("A"));
-        orders.update(Order.with.buy(1).price(10).id("A").executedSize(1));
+        orders.update(Order.with.buy(1).price(10).id("A").executedSize(1).state(OrderState.ACTIVE).policy(UpdatePolicy.REPLACE));
 
         assert orders.items.size() == 1;
         assert orders.items.get(0).id.equals("A");

@@ -84,8 +84,29 @@ public final class OrderManager {
     final void update(Order updater) {
         for (Order order : managed) {
             if (order.id.equals(updater.id)) {
-                update(order, updater);
-                return;
+                switch (updater.state) {
+                case CANCELED:
+                    cancel(order, updater);
+                    return;
+
+                case ACTIVE:
+                case COMPLETED:
+                    switch (updater.policy) {
+                    case DELTA:
+                        updateByDelta(order, updater);
+                        return;
+
+                    case REPLACE:
+                        updateByReplace(order, updater);
+                        return;
+
+                    default:
+                        break;
+                    }
+
+                default:
+                    return;
+                }
             }
         }
         add(updater);
@@ -105,21 +126,56 @@ public final class OrderManager {
     }
 
     /**
+     * Cancel order.
+     * 
+     * @param order
+     * @param updater
+     */
+    private void cancel(Order order, Order updater) {
+        order.setState(OrderState.CANCELED);
+        order.setTerminationTime(service.now());
+    }
+
+    /**
      * Update order state.
      * 
      * @param order Your order to update.
      * @param updater A new order info.
      */
-    private void update(Order order, Order updater) {
+    private void updateByDelta(Order order, Order updater) {
         // calculate position
         calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.executedSize);
 
-        // update info
+        Num newExecutedSize = order.executedSize.plus(updater.size);
+        Num newAveragePrice = order.price.multiply(order.executedSize)
+                .plus(updater.price.multiply(updater.size))
+                .divide(newExecutedSize)
+                .scale(service.setting.base.scale);
+
+        order.setPrice(newAveragePrice);
+        order.setExecutedSize(newExecutedSize);
+
+        if (order.size.is(order.executedSize)) {
+            order.setState(OrderState.COMPLETED);
+            order.setTerminationTime(service.now());
+        }
+    }
+
+    /**
+     * Update order state.
+     * 
+     * @param order Your order to update.
+     * @param updater A new order info.
+     */
+    private void updateByReplace(Order order, Order updater) {
+        // calculate position
+        calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.executedSize);
+
         order.setPrice(updater.price);
         order.setExecutedSize(updater.executedSize);
-        order.setState(updater.state);
 
-        if (updater.isTerminated()) {
+        if (order.size.is(order.executedSize)) {
+            order.setState(OrderState.COMPLETED);
             order.setTerminationTime(service.now());
         }
     }
@@ -366,7 +422,7 @@ public final class OrderManager {
             // check order executions while request and response
             orders.forEach(e -> {
                 if (e.id.equals(orderId)) {
-                    update(order, e);
+                    updateByDelta(order, e);
                 }
             });
 
