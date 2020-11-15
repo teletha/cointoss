@@ -35,6 +35,7 @@ import viewtify.Command;
 import viewtify.Key;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
+import viewtify.ui.UICheckBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
@@ -79,6 +80,9 @@ public class OrderView extends View {
     private UIText orderSize;
 
     /** UI */
+    private UICheckBox trainingMode;
+
+    /** UI */
     private UITableView<Scenario> table;
 
     /** UI */
@@ -116,6 +120,7 @@ public class OrderView extends View {
                 });
 
                 $(market);
+                form(ActiveMarket, trainingMode);
                 form(Amount, FormStyles.FormInputMin, orderSize);
 
                 $(table, style.Root, () -> {
@@ -180,6 +185,13 @@ public class OrderView extends View {
         cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
         makerSell.text(en("Make Selling")).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
 
+        trainingMode.tooltip("デモモード").when(User.Action, v -> {
+            if (trainingMode.value()) {
+                enableTrainingMode();
+            } else {
+                disableTrainingMode();
+            }
+        });
         orderSize.value("0").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
 
         table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
@@ -194,6 +206,14 @@ public class OrderView extends View {
         price.text(Price).modelBySignal(o -> o.observeEntryPriceNow());
 
         ActiveMarket.observing().skipNull().to(m -> update(m));
+    }
+
+    private void enableTrainingMode() {
+
+    }
+
+    private void disableTrainingMode() {
+
     }
 
     Disposable disposer = Disposable.empty();
