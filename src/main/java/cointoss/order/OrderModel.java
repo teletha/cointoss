@@ -277,16 +277,6 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     public abstract Signal<OrderState> observeState();
 
     /**
-     * The internal policy for updating.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public UpdatePolicy policy() {
-        return UpdatePolicy.DELTA;
-    }
-
-    /**
      * Calculate the remaining size.
      * 
      * @return The unexecuted size
@@ -319,7 +309,8 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      * @return The result.
      */
     public final boolean isActive() {
-        return state() == OrderState.ACTIVE;
+        OrderState state = state();
+        return state == OrderState.ACTIVE || state == OrderState.ACTIVE_PARTIAL;
     }
 
     /**

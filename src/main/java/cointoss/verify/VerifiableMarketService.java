@@ -36,10 +36,10 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
-import cointoss.order.UpdatePolicy;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.RetryPolicy;
@@ -473,8 +473,7 @@ public class VerifiableMarketService extends MarketService {
                         .type(order.type)
                         .price(order.price)
                         .executedSize(order.executedSize)
-                        .state(order.state)
-                        .policy(UpdatePolicy.REPLACE));
+                        .state(OrderState.ACTIVE));
 
                 while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
                     tasks.poll().run();
@@ -649,7 +648,7 @@ public class VerifiableMarketService extends MarketService {
             orderActive.remove(this);
 
             state = OrderState.CANCELED;
-            orderUpdateRealtimely.accept(Order.with.direction(direction, size).id(id).state(state).price(price).executedSize(executedSize));
+            orderUpdateRealtimely.accept(OrderManager.Update.cancel(id));
 
             canceling.accept(front);
         }

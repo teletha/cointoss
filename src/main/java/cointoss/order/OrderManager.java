@@ -90,19 +90,12 @@ public final class OrderManager {
                     return;
 
                 case ACTIVE:
-                case COMPLETED:
-                    switch (updater.policy) {
-                    case DELTA:
-                        updateByDelta(order, updater);
-                        return;
+                    updateByReplace(order, updater);
+                    return;
 
-                    case REPLACE:
-                        updateByReplace(order, updater);
-                        return;
-
-                    default:
-                        break;
-                    }
+                case ACTIVE_PARTIAL:
+                    updateByDelta(order, updater);
+                    return;
 
                 default:
                     return;
@@ -428,6 +421,58 @@ public final class OrderManager {
 
             // order termination will unregister
             order.observeTerminating().to(remove::accept);
+        }
+    }
+
+    /**
+     * Builder collections for the updating order.
+     */
+    public static class Update {
+        /**
+         * Create the updater to add the specified order.
+         * 
+         * @param id An order id that you want to add.
+         * @param side A order's direction.
+         * @param size A order's size.
+         * @param price A order's price.
+         * @return The updater.
+         */
+        public static Order create(String id, Direction side, Num size, Num price) {
+            return Order.with.direction(side, size).price(price).id(id);
+        }
+
+        /**
+         * Create the updater to cancle the specified order.
+         * 
+         * @param id An order id that you want to cancel.
+         * @return The updater.
+         */
+        public static Order cancel(String id) {
+            return Order.with.buy(Num.ONE).id(id).state(OrderState.CANCELED);
+        }
+
+        /**
+         * Create the updater to execute the specified order.
+         * 
+         * @param id An order id that you want to execute.
+         * @param size A order's total executed size.
+         * @param price A order's average executed price.
+         * @return The updater.
+         */
+        public static Order execute(String id, Num size, Num price) {
+            return Order.with.buy(size).price(price).id(id).state(OrderState.ACTIVE);
+        }
+
+        /**
+         * Create the updater to execute the specified order.
+         * 
+         * @param id An order id that you want to execute.
+         * @param size A order's current executed size.
+         * @param price A order's current executed price.
+         * @return The updater.
+         */
+        public static Order executePartially(String id, Num size, Num price) {
+            return Order.with.buy(size).price(price).id(id).state(OrderState.ACTIVE_PARTIAL);
         }
     }
 }

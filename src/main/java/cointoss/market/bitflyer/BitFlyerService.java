@@ -41,9 +41,9 @@ import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
-import cointoss.order.UpdatePolicy;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -451,13 +451,9 @@ public class BitFlyerService extends MarketService {
                     if (type.equals("ORDER")) {
                         return Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE);
                     } else if (type.equals("CANCEL")) {
-                        return Order.with.buy(size).price(price).id(id).state(OrderState.CANCELED);
+                        return OrderManager.Update.cancel(id);
                     } else if (type.equals("EXECUTION")) {
-                        return Order.with.direction(side, size)
-                                .price(price)
-                                .id(id)
-                                .state(OrderState.ACTIVE)
-                                .policy(UpdatePolicy.DELTA);
+                        return Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE_PARTIAL);
                     } else { /* ORDER_FAILED || CANCEL_FAILED || EXPIRE */
                         return (Order) null;
                     }
