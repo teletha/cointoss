@@ -90,11 +90,11 @@ public final class OrderManager {
                     return;
 
                 case ACTIVE:
-                    updateByReplace(order, updater);
+                    updateFully(order, updater);
                     return;
 
                 case ACTIVE_PARTIAL:
-                    updateByDelta(order, updater);
+                    updatePartially(order, updater);
                     return;
 
                 default:
@@ -135,19 +135,13 @@ public final class OrderManager {
      * @param order Your order to update.
      * @param updater A new order info.
      */
-    private void updateByDelta(Order order, Order updater) {
+    private void updateFully(Order order, Order updater) {
         // calculate position
         calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.executedSize);
-
-        Num newExecutedSize = order.executedSize.plus(updater.size);
-        Num newAveragePrice = order.price.multiply(order.executedSize)
-                .plus(updater.price.multiply(updater.size))
-                .divide(newExecutedSize)
-                .scale(service.setting.base.scale);
-
-        order.setPrice(newAveragePrice);
-        order.setExecutedSize(newExecutedSize);
-
+    
+        order.setPrice(updater.price);
+        order.setExecutedSize(updater.executedSize);
+    
         if (order.size.is(order.executedSize)) {
             order.setState(OrderState.COMPLETED);
             order.setTerminationTime(service.now());
@@ -160,12 +154,18 @@ public final class OrderManager {
      * @param order Your order to update.
      * @param updater A new order info.
      */
-    private void updateByReplace(Order order, Order updater) {
+    private void updatePartially(Order order, Order updater) {
         // calculate position
         calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.executedSize);
 
-        order.setPrice(updater.price);
-        order.setExecutedSize(updater.executedSize);
+        Num newExecutedSize = order.executedSize.plus(updater.size);
+        Num newAveragePrice = order.price.multiply(order.executedSize)
+                .plus(updater.price.multiply(updater.size))
+                .divide(newExecutedSize)
+                .scale(service.setting.base.scale);
+
+        order.setPrice(newAveragePrice);
+        order.setExecutedSize(newExecutedSize);
 
         if (order.size.is(order.executedSize)) {
             order.setState(OrderState.COMPLETED);
@@ -415,7 +415,7 @@ public final class OrderManager {
             // check order executions while request and response
             orders.forEach(e -> {
                 if (e.id.equals(orderId)) {
-                    updateByDelta(order, e);
+                    updatePartially(order, e);
                 }
             });
 

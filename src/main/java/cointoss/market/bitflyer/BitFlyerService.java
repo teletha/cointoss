@@ -449,11 +449,11 @@ public class BitFlyerService extends MarketService {
                     String id = json.text("child_order_acceptance_id");
 
                     if (type.equals("ORDER")) {
-                        return Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE);
+                        return OrderManager.Update.create(id, side, size, price);
                     } else if (type.equals("CANCEL")) {
                         return OrderManager.Update.cancel(id);
                     } else if (type.equals("EXECUTION")) {
-                        return Order.with.direction(side, size).price(price).id(id).state(OrderState.ACTIVE_PARTIAL);
+                        return OrderManager.Update.executePartially(id, size, price);
                     } else { /* ORDER_FAILED || CANCEL_FAILED || EXPIRE */
                         return (Order) null;
                     }
