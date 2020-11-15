@@ -36,7 +36,6 @@ import kiss.Decoder;
 import kiss.Disposable;
 import kiss.Encoder;
 import kiss.Signal;
-import kiss.Variable;
 import psychopath.Directory;
 import psychopath.Locator;
 
@@ -69,11 +68,11 @@ public abstract class MarketService implements Disposable {
     /** The shared real-time execution log. */
     private Signal<Execution> executions;
 
+    /** The shared real-time order. */
+    private Signal<Order> orders;
+
     /** The shared real-time order book. */
     private Signal<OrderBookPageChanges> orderBooks;
-
-    /** The realtime user order state. */
-    private Variable<Order> orderStream;
 
     /**
      * @param exchange
@@ -289,15 +288,14 @@ public abstract class MarketService implements Disposable {
      * @return A event stream of order state.
      */
     public final synchronized Signal<Order> ordersRealtimely(boolean autoReconnect) {
-        if (orderStream == null) {
-            orderStream = Variable.empty();
-            disposer.add(connectOrdersRealtimely().to(orderStream::set));
+        if (orders == null) {
+            orders = connectOrdersRealtimely().effectOnObserve(disposer::add).share();
         }
 
         if (autoReconnect) {
-            return orderStream.observe().retryWhen(retryPolicy(500, "OrderRealtimely"));
+            return orders.retryWhen(retryPolicy(500, "OrderRealtimely"));
         } else {
-            return orderStream.observe();
+            return orders;
         }
     }
 
