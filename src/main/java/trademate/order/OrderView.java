@@ -25,7 +25,6 @@ import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
-import kiss.I;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -240,13 +239,13 @@ public class OrderView extends View {
 
     private void takeBuying() {
         ActiveMarket.to(m -> {
-            m.orders.requestNow(Order.with.buy(estimateSize()));
+            m.trader().entry(Direction.BUY, estimateSize(), s -> s.take());
         });
     }
 
     private void takeSelling() {
         ActiveMarket.to(m -> {
-            m.orders.requestNow(Order.with.sell(estimateSize()));
+            m.trader().entry(Direction.SELL, estimateSize(), s -> s.take());
         });
     }
 
@@ -261,23 +260,13 @@ public class OrderView extends View {
 
     private void makeBuying() {
         ActiveMarket.to(m -> {
-            m.trader().when(I.signal(1), v -> new Scenario() {
-
-                @Override
-                protected void exit() {
-                }
-
-                @Override
-                protected void entry() {
-                    entry(Direction.BUY, estimateSize(), s -> s.make(m.orderBook.longs.computeBestPrice(Num.HUNDRED, Num.ONE)));
-                }
-            });
+            m.trader().entry(Direction.BUY, estimateSize(), s -> s.make(m.orderBook.longs.computeBestPrice(Num.HUNDRED, Num.ONE)));
         });
     }
 
     private void makeSelling() {
         ActiveMarket.to(m -> {
-            m.orders.requestNow(Order.with.sell(estimateSize()).price(m.orderBook.shorts.computeBestPrice(Num.HUNDRED, Num.ONE)));
+            m.trader().entry(Direction.SELL, estimateSize(), s -> s.make(m.orderBook.shorts.computeBestPrice(Num.HUNDRED, Num.ONE)));
         });
     }
 

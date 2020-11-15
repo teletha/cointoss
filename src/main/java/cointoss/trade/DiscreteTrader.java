@@ -17,6 +17,7 @@ import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 
 public class DiscreteTrader extends Trader {
 
@@ -49,6 +50,7 @@ public class DiscreteTrader extends Trader {
      */
     public final DiscreteScenario entry(Directional directional, Num size, Consumer<Orderable> declaration) {
         DiscreteScenario scenario = new DiscreteScenario();
+        when(I.signal(0), v -> scenario);
         scenario.entry(directional, size, declaration);
         return scenario;
     }

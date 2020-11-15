@@ -448,6 +448,10 @@ public final class TimeseriesStore<E> {
         int segmentIndex = ((int) index[1]);
         OnHeap segment = supply(timeIndex);
 
+        if (segment == null) {
+            return List.of();
+        }
+
         if (with) {
             E item = segment.get(segmentIndex);
             if (item != null) {

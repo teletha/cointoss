@@ -241,10 +241,8 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
                 scenario.funds = funds;
                 scenario.entry();
 
-                if (scenario.entries.isEmpty() == false) {
-                    scenarios.add(scenario);
-                    scenarioAdded.accept(scenario);
-                }
+                scenarios.add(scenario);
+                scenarioAdded.accept(scenario);
             }
         }));
         return this;
