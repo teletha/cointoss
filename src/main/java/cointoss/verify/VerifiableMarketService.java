@@ -468,12 +468,7 @@ public class VerifiableMarketService extends MarketService {
                     iterator.remove();
                 }
 
-                orderUpdateRealtimely.accept(Order.with.direction(order.direction, order.size)
-                        .id(order.id)
-                        .type(order.type)
-                        .price(order.price)
-                        .executedSize(order.executedSize)
-                        .state(OrderState.ACTIVE));
+                orderUpdateRealtimely.accept(OrderManager.Update.execute(order.id, order.executedSize, order.price));
 
                 while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
                     tasks.poll().run();
@@ -613,9 +608,6 @@ public class VerifiableMarketService extends MarketService {
         /** The cancel event emitter. */
         private final Signaling<Order> canceling = new Signaling();
 
-        /** The prepared execution store. */
-        private final LinkedList<Execution> executionsAfterOrderCancelResponse = new LinkedList();
-
         /**
          * Create backend managed order.
          * 
@@ -651,11 +643,6 @@ public class VerifiableMarketService extends MarketService {
             orderUpdateRealtimely.accept(OrderManager.Update.cancel(id));
 
             canceling.accept(front);
-        }
-
-        private void cancelBeforeEexecution() {
-            I.signal(orderActive).take(o -> o.id.equals(id)).take(1).to(o -> {
-            });
         }
 
         /**

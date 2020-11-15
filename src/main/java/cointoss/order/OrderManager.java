@@ -137,11 +137,11 @@ public final class OrderManager {
      */
     private void updateFully(Order order, Order updater) {
         // calculate position
-        calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.executedSize);
-    
+        calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.size);
+
         order.setPrice(updater.price);
-        order.setExecutedSize(updater.executedSize);
-    
+        order.setExecutedSize(updater.size);
+
         if (order.size.is(order.executedSize)) {
             order.setState(OrderState.COMPLETED);
             order.setTerminationTime(service.now());
