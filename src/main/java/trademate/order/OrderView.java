@@ -24,6 +24,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
+import cointoss.verify.TrainingMarket;
 import kiss.Disposable;
 import kiss.Variable;
 import stylist.Style;
@@ -55,7 +56,7 @@ public class OrderView extends View {
     /** UI */
     private UIVBox rootP;
 
-    /** UI */
+    /** Runner UI */
     private UILabel market;
 
     /** UI */
@@ -119,8 +120,7 @@ public class OrderView extends View {
                     $(makerBuy, FormStyles.FormInputMin);
                 });
 
-                $(market);
-                form(ActiveMarket, trainingMode);
+                form(en("Market"), FormStyles.FormInput, market, trainingMode);
                 form(Amount, FormStyles.FormInputMin, orderSize);
 
                 $(table, style.Root, () -> {
@@ -176,6 +176,7 @@ public class OrderView extends View {
         Commands.MakeBuy.shortcut(Key.D).contribute(this::makeBuying);
 
         rootP.disableWhen(ActiveMarket, m -> m == null);
+        market.text(ActiveMarket);
 
         takerBuy.text(en("Take Buying")).color(Theme.$.buy).when(User.Action, Commands.TakeBuy);
         clear.text(en("Clear")).when(User.Action, Commands.Clear);
@@ -185,12 +186,14 @@ public class OrderView extends View {
         cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
         makerSell.text(en("Make Selling")).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
 
-        trainingMode.tooltip("デモモード").when(User.Action, v -> {
-            if (trainingMode.value()) {
-                enableTrainingMode();
-            } else {
-                disableTrainingMode();
-            }
+        trainingMode.text(en("Use demo trade")).when(User.Action, v -> {
+            ActiveMarket.set(m -> {
+                if (m instanceof TrainingMarket) {
+                    return trainingMode.value() ? m : ((TrainingMarket) m).backend;
+                } else {
+                    return trainingMode.value() ? new TrainingMarket(m) : m;
+                }
+            });
         });
         orderSize.value("0").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
 
@@ -205,15 +208,12 @@ public class OrderView extends View {
                 .modelBySignal(s -> ActiveMarket.observing().flatVariable(m -> m.tickers.latest).map(Execution::price).map(s::profit));
         price.text(Price).modelBySignal(o -> o.observeEntryPriceNow());
 
-        ActiveMarket.observing().skipNull().to(m -> update(m));
-    }
-
-    private void enableTrainingMode() {
-
-    }
-
-    private void disableTrainingMode() {
-
+        ActiveMarket.observing().skipNull().to(m -> {
+            update(m);
+            if (m instanceof TrainingMarket == false) {
+                trainingMode.value(false);
+            }
+        });
     }
 
     Disposable disposer = Disposable.empty();
@@ -222,8 +222,6 @@ public class OrderView extends View {
         disposer.dispose();
 
         MarketService s = m.service;
-
-        market.text(s.marketReadableName);
 
         // positionSize.text(m.orders.position).color(position.isPositiveOrZero() ? Theme.$.buy :
         // Theme.$.sell);

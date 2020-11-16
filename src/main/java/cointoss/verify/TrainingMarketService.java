@@ -25,7 +25,7 @@ public class TrainingMarketService extends MarketService {
 
     private final MarketService backend;
 
-    private final VerifiableMarketService frontend;
+    final VerifiableMarketService frontend;
 
     /**
      * @param backend
@@ -46,7 +46,7 @@ public class TrainingMarketService extends MarketService {
      */
     private <T> T delegateInternal(Class<T> type, String name) {
         try {
-            Method method = MarketService.class.getDeclaredMethod("clientRealtimely");
+            Method method = MarketService.class.getDeclaredMethod(name);
             method.setAccessible(true);
             return (T) method.invoke(backend);
         } catch (Exception e) {
@@ -75,6 +75,7 @@ public class TrainingMarketService extends MarketService {
      */
     @Override
     public Signal<String> request(Order order) {
+        System.out.println("request " + order);
         return frontend.request(order);
     }
 
@@ -83,6 +84,7 @@ public class TrainingMarketService extends MarketService {
      */
     @Override
     public Signal<Order> cancel(Order order) {
+        System.out.println("cancel " + order);
         return frontend.cancel(order);
     }
 

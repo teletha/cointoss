@@ -338,6 +338,14 @@ public class Market implements Disposable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return service.marketReadableName;
+    }
+
+    /**
      * 
      */
     private class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {

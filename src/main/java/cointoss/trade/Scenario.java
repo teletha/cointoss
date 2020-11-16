@@ -303,7 +303,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             totalPrice = totalPrice.plus(size.multiply(order.price));
         }
 
-        priceSetter.accept(totalPrice.divide(totalSize));
+        priceSetter.accept(totalPrice.divide(totalSize).scale(this, market.service.setting.base.scale));
         sizeSetter.accept(totalSize);
     }
 

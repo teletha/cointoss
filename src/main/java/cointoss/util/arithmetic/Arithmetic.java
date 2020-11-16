@@ -1597,6 +1597,25 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self scale(int size, RoundingMode mode);
 
     /**
+     * Returns a {@code Self} whose scale is the specified value, and whose unscaled value is
+     * determined by multiplying or dividing this {@code Self}'s unscaled value by the appropriate
+     * power of ten to maintain its overall value. If the scale is reduced by the operation, the
+     * unscaled value must be divided (rather than multiplied), and the value may be changed; in
+     * this case, the specified rounding mode is applied to the division.
+     * 
+     * @param mode The rounding mode to apply.
+     * @param size scale of the {@code Self} value to be returned.
+     * @return a {@code Self} whose scale is the specified value, and whose unscaled value is
+     *         determined by multiplying or dividing this {@code Self}'s unscaled value by the
+     *         appropriate power of ten to maintain its overall value.
+     * @throws ArithmeticException if {@code roundingMode==UNNECESSARY} and the specified scaling
+     *             operation would require rounding.
+     */
+    public final Self scale(Directional mode, int size) {
+        return scale(size, mode.isBuy() ? RoundingMode.CEILING : RoundingMode.FLOOR);
+    }
+
+    /**
      * Returns an approximation to the square root of {@code this} with rounding according to the
      * context settings.
      * <p>
