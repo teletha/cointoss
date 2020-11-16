@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static javafx.scene.paint.Color.*;
+import static javafx.scene.paint.Color.rgb;
 
 import java.util.List;
 

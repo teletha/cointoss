@@ -13,7 +13,6 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 
 import cointoss.Direction;
@@ -87,7 +86,7 @@ public class OrderView extends View {
     private UITableView<Scenario> table;
 
     /** UI */
-    private UITableColumn<Scenario, Direction> side;
+    private UITableColumn<Scenario, Direction> entrySide;
 
     /** UI */
     private UITableColumn<Scenario, Num> price;
@@ -100,10 +99,6 @@ public class OrderView extends View {
 
     /** UI */
     private UITableColumn<Scenario, Num> pnl;
-
-    private UILabel amountTitle;
-
-    private UILabel amountSize;
 
     class view extends ViewDSL {
         {
@@ -124,7 +119,7 @@ public class OrderView extends View {
                 form(Amount, FormStyles.FormInputMin, orderSize);
 
                 $(table, style.Root, () -> {
-                    $(side, style.Narrow);
+                    $(entrySide, style.Narrow);
                     $(price, style.Wide);
                     $(entrySize, style.Narrow);
                     $(entryExecutedSize, style.Narrow);
@@ -186,7 +181,7 @@ public class OrderView extends View {
         cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
         makerSell.text(en("Make Selling")).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
 
-        trainingMode.text(en("Use demo trade")).when(User.Action, v -> {
+        trainingMode.text(en("Use demo trade")).initialize(true).when(User.Action, v -> {
             ActiveMarket.set(m -> {
                 if (m instanceof TrainingMarket) {
                     return trainingMode.value() ? m : ((TrainingMarket) m).backend;
@@ -195,14 +190,9 @@ public class OrderView extends View {
                 }
             });
         });
-        orderSize.value("0").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
+        orderSize.value("0.5").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
 
-        table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
-            // $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
-        });
-        side.text(Side).model(Scenario.class, Scenario::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
-        amountTitle.text(Amount);
-        entrySize.text(amountTitle, amountSize).modelBySignal(Scenario::observeEntrySizeNow);
+        initializeTable();
         entryExecutedSize.text("約定数").modelBySignal(Scenario::observeEntryExecutedSizeNow);
         pnl.text(CommonText.Profit)
                 .modelBySignal(s -> ActiveMarket.observing().flatVariable(m -> m.tickers.latest).map(Execution::price).map(s::profit));
@@ -214,6 +204,13 @@ public class OrderView extends View {
                 trainingMode.value(false);
             }
         });
+    }
+
+    private void initializeTable() {
+        entrySide.text(Side).model(Scenario::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
+        entrySize.text(Amount)
+                .modelBySignal(param -> param.observeEntryExecutedSizeNow())
+                .render((ui, sce, num) -> ui.text(num).color(Theme.colorBy(sce)));
     }
 
     Disposable disposer = Disposable.empty();
@@ -229,8 +226,6 @@ public class OrderView extends View {
         // initialize orders on server
         // m.orders.manages().take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
         // I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
-
-        amountSize.text(m.orders.compoundSize);
 
         // observe orders on clinet
         return m.trader().scenarios().to(this::createScenarioItem);

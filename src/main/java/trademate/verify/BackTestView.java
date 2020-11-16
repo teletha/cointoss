@@ -301,13 +301,13 @@ public class BackTestView extends View implements Analyzer {
         name.text(en("Name")).model(log -> log).render(this::renderName);
         period.text(en("Period")).model(log -> log).render(this::renderPeriod);
         holdSize.text(en("Hold Size")).model(log -> log).render(this::renderPositionSize);
-        holdTimeForProfit.text(en("Profit Span")).model(log -> log.holdTimeOnProfitTrade).render(this::render);
-        holdTimeForLoss.text(en("Loss Span")).model(log -> log.holdTimeOnLossTrade).render(this::render);
+        holdTimeForProfit.text(en("Profit Span")).model(log -> log.holdTimeOnProfitTrade).render(this::render1);
+        holdTimeForLoss.text(en("Loss Span")).model(log -> log.holdTimeOnLossTrade).render(this::render1);
         realizedProfit.text(en("Realized Profit"))
                 .model(log -> log)
-                .render((ui, log) -> render(ui, log.profitRange, log.unrealizedProfitRange));
-        realizedLoss.text(en("Realized Loss")).model(log -> log).render((ui, log) -> render(ui, log.lossRange, log.unrealizedLossRange));
-        profit.text(en("Profit")).model(log -> log.profitAndLoss).render(this::render);
+                .render((ui, log) -> render2(ui, log.profitRange, log.unrealizedProfitRange));
+        realizedLoss.text(en("Realized Loss")).model(log -> log).render((ui, log) -> render2(ui, log.lossRange, log.unrealizedLossRange));
+        profit.text(en("Profit")).model(log -> log.profitAndLoss).render(this::render1);
         total.text(en("Total Profit")).model(log -> log.profitAndLoss.formattedTotal());
         winRatio.text(en("Win Rate")).model(log -> log.winningRate());
         profitFactor.text(en("Profit Factor")).model(TradingStats::profitFactor);
@@ -376,7 +376,7 @@ public class BackTestView extends View implements Analyzer {
      * @param cell
      * @param statistics
      */
-    private void render(UILabel label, NumStats statistics) {
+    private void render1(UILabel label, NumStats statistics) {
         UILabel mean = new UILabel(this).tooltip(en("Mean")).text(statistics.formattedMean()).style(style.mean);
         UILabel max = new UILabel(this).tooltip(en("Max")).text(statistics.formattedMax()).style(style.max);
         UILabel min = new UILabel(this).tooltip(en("Min")).text(statistics.formattedMin()).style(style.max);
@@ -390,7 +390,7 @@ public class BackTestView extends View implements Analyzer {
      * @param cell
      * @param main
      */
-    private void render(UILabel label, NumStats main, NumStats sub) {
+    private void render2(UILabel label, NumStats main, NumStats sub) {
         UILabel mean = new UILabel(this).tooltip(en("Mean"))
                 .text(main.formattedMean() + " (" + sub.formattedMean() + ")")
                 .style(style.mean);
