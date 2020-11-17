@@ -200,9 +200,7 @@ public class OrderView extends View {
         entryPrice.text(Price)
                 .modelBySignal(Scenario::observeEntryPriceNow)
                 .render((ui, scenario, price) -> ui.text(price).color(Theme.colorBy(scenario)));
-        entrySize.text(Amount)
-                .modelBySignal(Scenario::observeEntryExecutedSizeNow)
-                .render((ui, scenario, size) -> ui.text(size).color(Theme.colorBy(scenario)));
+        entrySize.text(Amount).modelBySignal(Scenario::observeEntryExecutedSizeNow).render((ui, scenario, size) -> ui.text(size));
 
         // ===============================================
         // Exit Part
@@ -212,7 +210,7 @@ public class OrderView extends View {
         // Analyze Part
         // ===============================================
         profitAndLoss.text(Profit)
-                .modelBySignal2(s -> ActiveMarket.observing().flatVariable(m -> m.tickers.latest).map(Execution::price).map(s::profit))
+                .modelBySignal(s -> ActiveMarket.observing().flatVariable(m -> m.tickers.latest).map(Execution::price).map(s::profit))
                 .render((ui, profit) -> ui.text(profit).color(Theme.colorBy(profit)));
     }
 

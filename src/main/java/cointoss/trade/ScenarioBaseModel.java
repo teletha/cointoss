@@ -92,15 +92,6 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
      * {@inheritDoc}
      */
     @Override
-    @PerformanceSensitive
-    public final Num profit(Num currentPrice) {
-        return realizedProfit().plus(unrealizedProfit(currentPrice));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Icy.Property(custom = ObservableNumProperty.class)
     public Num realizedProfit() {
         return Num.ZERO;
@@ -120,7 +111,7 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
      */
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return super.hashCode(); // use Object#hashCode
     }
 
     /**
@@ -128,6 +119,6 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
      */
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        return super.equals(obj); // use Object#equals
     }
 }
