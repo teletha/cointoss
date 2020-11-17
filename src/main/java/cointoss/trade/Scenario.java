@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -628,5 +628,28 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     protected final void logExit(String message) {
         String date = Chrono.format(Chrono.system(market.service.now()));
         log(date + "\t" + message + "\t" + exitExecutedSize + "/" + exitSize + "@" + exitPrice);
+    }
+
+    /**
+     * Declare timing.
+     * 
+     * @return
+     */
+    protected final Signal<?> now() {
+        return I.signal("");
+    }
+
+    /**
+     * Operate to stop this {@link Scenario} right now.
+     */
+    public final void stop() {
+        exitWhen(now(), s -> s.take());
+    }
+
+    /**
+     * Operate to stop this {@link Scenario} right now.
+     */
+    public final void stopRetreat() {
+        exitAt(entryPrice);
     }
 }

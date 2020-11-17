@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.binance.Binance;
+import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -54,7 +54,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = Binance.FUTURE_BTC_USDT;
+        MarketService service = BitFlyer.FX_BTC_JPY;
         UITab tab = DockSystem.register(service.marketIdentity())
                 .closable(false)
                 .text(service.marketReadableName)

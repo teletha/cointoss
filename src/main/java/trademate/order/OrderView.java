@@ -13,6 +13,7 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 
 import cointoss.Direction;
@@ -91,6 +92,12 @@ public class OrderView extends View {
     private UITableColumn<Scenario, Num> entrySize;
 
     /** UI */
+    private UITableColumn<Scenario, Num> exitPrice;
+
+    /** UI */
+    private UITableColumn<Scenario, Num> exitSize;
+
+    /** UI */
     private UITableColumn<Scenario, Num> profitAndLoss;
 
     class view extends ViewDSL {
@@ -114,6 +121,8 @@ public class OrderView extends View {
                 $(table, style.Root, () -> {
                     $(entryPrice, style.Wide);
                     $(entrySize, style.Narrow);
+                    $(exitPrice, style.Wide);
+                    $(exitSize, style.Narrow);
                     $(profitAndLoss, style.Wide);
                 });
             });
@@ -195,6 +204,14 @@ public class OrderView extends View {
 
     private void initializeTable() {
         // ===============================================
+        // Table Part
+        // ===============================================
+        table.mode(SelectionMode.MULTIPLE).context(root -> {
+            root.menu(en("Clear")).when(User.Action, () -> table.selectedItems().forEach(Scenario::stop));
+            root.menu(en("Retreat")).when(User.Action, () -> table.selectedItems().forEach(Scenario::stopRetreat));
+        });
+
+        // ===============================================
         // Entry Part
         // ===============================================
         entryPrice.text(Price)
@@ -205,6 +222,8 @@ public class OrderView extends View {
         // ===============================================
         // Exit Part
         // ===============================================
+        exitPrice.text(Price).modelBySignal(Scenario::observeExitPriceNow).render((ui, scenario, price) -> ui.text(price));
+        exitSize.text(Amount).modelBySignal(Scenario::observeExitExecutedSizeNow).render((ui, scenario, size) -> ui.text(size));
 
         // ===============================================
         // Analyze Part

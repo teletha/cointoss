@@ -83,6 +83,7 @@
 		"Realized Loss": "損幅",
 		"Realized Profit": "利幅",
 		"Remaining": "残存",
+		"Retreat": "レトレット",
 		"Reverse": "ドテン",
 		"Run": "実行",
 		"Run backtests very fast using compressed execution history.\nHowever, the execution result may be inaccurate.": "圧縮された約定履歴を使用することで高速にバックテストを実行します。\nただし、実行結果が不正確になることがあります。",
