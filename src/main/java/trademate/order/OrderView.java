@@ -29,7 +29,6 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
-import trademate.CommonText;
 import trademate.Theme;
 import viewtify.Command;
 import viewtify.Key;
@@ -86,19 +85,13 @@ public class OrderView extends View {
     private UITableView<Scenario> table;
 
     /** UI */
-    private UITableColumn<Scenario, Direction> entrySide;
-
-    /** UI */
-    private UITableColumn<Scenario, Num> price;
+    private UITableColumn<Scenario, Num> entryPrice;
 
     /** UI */
     private UITableColumn<Scenario, Num> entrySize;
 
     /** UI */
-    private UITableColumn<Scenario, Num> entryExecutedSize;
-
-    /** UI */
-    private UITableColumn<Scenario, Num> pnl;
+    private UITableColumn<Scenario, Num> profitAndLoss;
 
     class view extends ViewDSL {
         {
@@ -119,11 +112,9 @@ public class OrderView extends View {
                 form(Amount, FormStyles.FormInputMin, orderSize);
 
                 $(table, style.Root, () -> {
-                    $(entrySide, style.Narrow);
-                    $(price, style.Wide);
+                    $(entryPrice, style.Wide);
                     $(entrySize, style.Narrow);
-                    $(entryExecutedSize, style.Narrow);
-                    $(pnl, style.Wide);
+                    $(profitAndLoss, style.Wide);
                 });
             });
         }
@@ -193,10 +184,6 @@ public class OrderView extends View {
         orderSize.value("0.5").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
 
         initializeTable();
-        entryExecutedSize.text("約定数").modelBySignal(Scenario::observeEntryExecutedSizeNow);
-        pnl.text(CommonText.Profit)
-                .modelBySignal(s -> ActiveMarket.observing().flatVariable(m -> m.tickers.latest).map(Execution::price).map(s::profit));
-        price.text(Price).modelBySignal(o -> o.observeEntryPriceNow());
 
         ActiveMarket.observing().skipNull().to(m -> {
             update(m);
@@ -207,10 +194,26 @@ public class OrderView extends View {
     }
 
     private void initializeTable() {
-        entrySide.text(Side).model(Scenario::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
+        // ===============================================
+        // Entry Part
+        // ===============================================
+        entryPrice.text(Price)
+                .modelBySignal(Scenario::observeEntryPriceNow)
+                .render((ui, scenario, price) -> ui.text(price).color(Theme.colorBy(scenario)));
         entrySize.text(Amount)
-                .modelBySignal(param -> param.observeEntryExecutedSizeNow())
-                .render((ui, sce, num) -> ui.text(num).color(Theme.colorBy(sce)));
+                .modelBySignal(Scenario::observeEntryExecutedSizeNow)
+                .render((ui, scenario, size) -> ui.text(size).color(Theme.colorBy(scenario)));
+
+        // ===============================================
+        // Exit Part
+        // ===============================================
+
+        // ===============================================
+        // Analyze Part
+        // ===============================================
+        profitAndLoss.text(Profit)
+                .modelBySignal2(s -> ActiveMarket.observing().flatVariable(m -> m.tickers.latest).map(Execution::price).map(s::profit))
+                .render((ui, profit) -> ui.text(profit).color(Theme.colorBy(profit)));
     }
 
     Disposable disposer = Disposable.empty();

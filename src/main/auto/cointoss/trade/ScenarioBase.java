@@ -11,7 +11,6 @@ import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.Objects;
 import javax.annotation.processing.Generated;
 import kiss.Signal;
 
@@ -205,11 +204,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySizeDiff() {
         return entrySizeCustomizer.observe$Diff();
     }
@@ -260,11 +254,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSizeDiff() {
         return entryExecutedSizeCustomizer.observe$Diff();
     }
@@ -315,11 +304,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPriceDiff() {
         return entryPriceCustomizer.observe$Diff();
     }
@@ -370,11 +354,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSizeDiff() {
         return exitSizeCustomizer.observe$Diff();
     }
@@ -425,11 +404,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSizeDiff() {
         return exitExecutedSizeCustomizer.observe$Diff();
     }
@@ -480,11 +454,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPriceDiff() {
         return exitPriceCustomizer.observe$Diff();
     }
@@ -531,11 +500,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfitDiff() {
         return realizedProfitCustomizer.observe$Diff();
     }
@@ -564,38 +528,6 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         builder.append("exitPrice=").append(exitPrice).append(", ");
         builder.append("realizedProfit=").append(realizedProfit).append("]");
         return builder.toString();
-    }
-
-    /**
-     * Generates a hash code for a sequence of property values. The hash code is generated as if all the property values were placed into an array, and that array were hashed by calling Arrays.hashCode(Object[]). 
-     *
-     * @return A hash value of the sequence of property values.
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(entrySize, entryExecutedSize, entryPrice, exitSize, exitExecutedSize, exitPrice, realizedProfit);
-    }
-
-    /**
-     * Returns true if the all properties are equal to each other and false otherwise. Consequently, if both properties are null, true is returned and if exactly one property is null, false is returned. Otherwise, equality is determined by using the equals method of the base model. 
-     *
-     * @return true if the all properties are equal to each other and false otherwise.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof ScenarioBase == false) {
-            return false;
-        }
-
-        ScenarioBase other = (ScenarioBase) o;
-        if (!Objects.equals(entrySize, other.entrySize)) return false;
-        if (!Objects.equals(entryExecutedSize, other.entryExecutedSize)) return false;
-        if (!Objects.equals(entryPrice, other.entryPrice)) return false;
-        if (!Objects.equals(exitSize, other.exitSize)) return false;
-        if (!Objects.equals(exitExecutedSize, other.exitExecutedSize)) return false;
-        if (!Objects.equals(exitPrice, other.exitPrice)) return false;
-        if (!Objects.equals(realizedProfit, other.realizedProfit)) return false;
-        return true;
     }
 
     /** The singleton builder. */

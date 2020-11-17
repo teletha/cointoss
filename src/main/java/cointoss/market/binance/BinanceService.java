@@ -206,7 +206,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Num> baseCurrency() {
-        throw new Error();
+        return I.signal(Num.ZERO);
     }
 
     /**
@@ -214,7 +214,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Num> targetCurrency() {
-        throw new Error();
+        return I.signal(Num.ZERO);
     }
 
     /**

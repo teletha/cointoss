@@ -9,13 +9,14 @@
  */
 package trademate;
 
-import static javafx.scene.paint.Color.rgb;
+import static javafx.scene.paint.Color.*;
 
 import java.util.List;
 
 import javafx.scene.paint.Color;
 
 import cointoss.Directional;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import viewtify.model.Model;
 
@@ -87,6 +88,17 @@ public class Theme extends Model<Theme> {
     public static Color colorBy(Directional direction) {
         Theme theme = I.make(Theme.class);
         return direction.isBuy() ? theme.buy.v : theme.sell.v;
+    }
+
+    /**
+     * Detec the color by number.
+     * 
+     * @param direction
+     * @return
+     */
+    public static Color colorBy(Num num) {
+        Theme theme = I.make(Theme.class);
+        return num.isPositiveOrZero() ? theme.buy.v : theme.sell.v;
     }
 
     /**

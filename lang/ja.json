@@ -73,7 +73,7 @@
 		"Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).": "[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。",
 		"Please input a positive number.": "正数を入力してください。",
 		"Position": "ポジション",
-		"Price": "値段",
+		"Price": "価格",
 		"Price Interval": "価格間隔",
 		"Price Signal": "指定値へ到達",
 		"Primary": "プライマリー",
