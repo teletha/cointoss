@@ -124,15 +124,6 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
     }
 
     /**
-     * Retrieve the all managed scenarios.
-     * 
-     * @return
-     */
-    public final Signal<Scenario> scenarios() {
-        return I.signal(scenarios).merge(scenarioAdded.expose);
-    }
-
-    /**
      * Retrieve the latest {@link Scenario}.
      */
     @VisibleForTesting

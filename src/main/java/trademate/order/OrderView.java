@@ -20,12 +20,12 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
-import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
 import kiss.Disposable;
+import kiss.I;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -248,7 +248,7 @@ public class OrderView extends View {
         // I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
         // observe orders on clinet
-        return m.trader().scenarios().to(this::createScenarioItem);
+        return I.signal(m.trader().scenarios()).to(this::createScenarioItem);
     }
 
     /**
@@ -284,10 +284,7 @@ public class OrderView extends View {
 
     private void clear() {
         ActiveMarket.to(m -> {
-            Num pos = m.orders.compoundSize.v;
-            if (pos.isNotZero()) {
-                m.orders.requestNow(Order.with.direction(pos.isPositive() ? Direction.SELL : Direction.BUY, pos.abs()));
-            }
+            I.signal(table.items()).take(Scenario::isActive).to(Scenario::stop);
         });
     }
 

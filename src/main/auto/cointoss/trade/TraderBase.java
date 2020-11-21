@@ -1,5 +1,6 @@
 package cointoss.trade;
 
+import cointoss.trade.Scenario;
 import cointoss.trade.TraderBase;
 import cointoss.trade.TraderBaseModel;
 import cointoss.util.ObservableNumProperty;
@@ -11,6 +12,7 @@ import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import kiss.Signal;
 
@@ -57,6 +59,9 @@ public abstract class TraderBase extends TraderBaseModel {
     /** The final property updater. */
     private static final MethodHandle profitUpdater = updater("profit");
 
+    /** The final property updater. */
+    private static final MethodHandle scenariosUpdater = updater("scenarios");
+
     /** The exposed property. */
     public final Num holdSize;
 
@@ -93,6 +98,9 @@ public abstract class TraderBase extends TraderBaseModel {
         }
     };
 
+    /** The exposed property. */
+    public final List<Scenario> scenarios;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -100,6 +108,7 @@ public abstract class TraderBase extends TraderBaseModel {
         this.holdSize = super.holdSize();
         this.holdMaxSize = super.holdMaxSize();
         this.profit = super.profit();
+        this.scenarios = super.scenarios();
     }
 
     /**
@@ -141,29 +150,14 @@ public abstract class TraderBase extends TraderBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldSizeDiff() {
         return holdSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldSize() {
         return holdSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldSizeNow() {
         return holdSizeCustomizer.observe$Now();
     }
@@ -206,29 +200,14 @@ public abstract class TraderBase extends TraderBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldMaxSizeDiff() {
         return holdMaxSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldMaxSize() {
         return holdMaxSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldMaxSizeNow() {
         return holdMaxSizeCustomizer.observe$Now();
     }
@@ -271,31 +250,53 @@ public abstract class TraderBase extends TraderBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeProfitDiff() {
         return profitCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeProfit() {
         return profitCustomizer.observe$();
     }
 
+    public final Signal<Num> observeProfitNow() {
+        return profitCustomizer.observe$Now();
+    }
+
     /**
-     * Observe property modification with the current value.
+     * Return the all active and completed {@link Scenario}s.
      *  
      *  @return
      */
-    public final Signal<Num> observeProfitNow() {
-        return profitCustomizer.observe$Now();
+    @Override
+    public final List<Scenario> scenarios() {
+        return this.scenarios;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of scenarios property.
+     */
+    @SuppressWarnings("unused")
+    private final List<Scenario> getScenarios() {
+        return this.scenarios;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of scenarios property to assign.
+     */
+    private final void setScenarios(List<Scenario> value) {
+        if (value == null) {
+            value = super.scenarios();
+        }
+        try {
+            scenariosUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -308,7 +309,8 @@ public abstract class TraderBase extends TraderBaseModel {
         StringBuilder builder = new StringBuilder("TraderBase [");
         builder.append("holdSize=").append(holdSize).append(", ");
         builder.append("holdMaxSize=").append(holdMaxSize).append(", ");
-        builder.append("profit=").append(profit).append("]");
+        builder.append("profit=").append(profit).append(", ");
+        builder.append("scenarios=").append(scenarios).append("]");
         return builder.toString();
     }
 
@@ -358,6 +360,26 @@ public abstract class TraderBase extends TraderBaseModel {
         public Self profit(Num value) {
             return create().profit(value);
         }
+
+        /**
+         * Create initialized {@link TraderBase} with scenarios property.
+         *
+         * @param value A value to assign.
+         * @return A initialized model.
+         */
+        public Self scenarios(List<Scenario> value) {
+            return create().scenarios(value);
+        }
+
+        /**
+         * Create initialized {@link TraderBase} with scenarios property.
+         *
+         * @param value A value to assign.
+         * @return A initialized model.
+         */
+        public Self scenarios(Scenario... values) {
+            return scenarios(List.of(values));
+        }
     }
 
     /**
@@ -397,6 +419,26 @@ public abstract class TraderBase extends TraderBaseModel {
             ((TraderBase) this).setProfit(value);
             return (Next) this;
         }
+
+        /**
+         * Assign scenarios property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next scenarios(List<Scenario> value) {
+            ((TraderBase) this).setScenarios(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign scenarios property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next scenarios(Scenario... values) {
+            return scenarios(List.of(values));
+        }
     }
 
     /**
@@ -418,5 +460,6 @@ public abstract class TraderBase extends TraderBaseModel {
         static final String HoldSize = "holdSize";
         static final String HoldMaxSize = "holdMaxSize";
         static final String Profit = "profit";
+        static final String Scenarios = "scenarios";
     }
 }

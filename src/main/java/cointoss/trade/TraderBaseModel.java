@@ -9,6 +9,9 @@
  */
 package cointoss.trade;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
@@ -45,6 +48,16 @@ abstract class TraderBaseModel {
     @Icy.Property(setterModifier = "final", custom = ObservableNumProperty.class)
     public Num profit() {
         return Num.ZERO;
+    }
+
+    /**
+     * Return the all active and completed {@link Scenario}s.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public List<Scenario> scenarios() {
+        return new ArrayList();
     }
 
     /**
