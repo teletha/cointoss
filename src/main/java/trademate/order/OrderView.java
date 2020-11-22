@@ -248,7 +248,7 @@ public class OrderView extends View {
         // I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
         // observe orders on clinet
-        return I.signal(m.trader().scenarios()).to(this::createScenarioItem);
+        return I.signal(m.trader().scenarios()).merge(m.trader().added).to(this::createScenarioItem);
     }
 
     /**
@@ -290,13 +290,13 @@ public class OrderView extends View {
 
     private void makeBuying() {
         ActiveMarket.to(m -> {
-            m.trader().entry(Direction.BUY, estimateSize(), s -> s.make(m.orderBook.longs.computeBestPrice(Num.HUNDRED, Num.ONE)));
+            m.trader().entry(Direction.BUY, estimateSize(), s -> s.make(m.orderBook.longs.computeBestPrice(Num.ONE, Num.ONE)));
         });
     }
 
     private void makeSelling() {
         ActiveMarket.to(m -> {
-            m.trader().entry(Direction.SELL, estimateSize(), s -> s.make(m.orderBook.shorts.computeBestPrice(Num.HUNDRED, Num.ONE)));
+            m.trader().entry(Direction.SELL, estimateSize(), s -> s.make(m.orderBook.shorts.computeBestPrice(Num.ONE, Num.ONE)));
         });
     }
 

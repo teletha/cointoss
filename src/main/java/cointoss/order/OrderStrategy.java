@@ -11,11 +11,15 @@ package cointoss.order;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import cointoss.Direction;
 import cointoss.ticker.Span;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
@@ -157,7 +161,9 @@ public interface OrderStrategy {
          * @param unit A time unit.
          * @return
          */
-        Orderable cancelAfter(long time, ChronoUnit unit);
+        default Orderable cancelAfter(long time, ChronoUnit unit) {
+            return cancelWhen(scheduler -> I.schedule(time, TimeUnit.of(unit), scheduler));
+        }
 
         /**
          * Cancel the order if it remains after the specified time has passed.
@@ -182,10 +188,19 @@ public interface OrderStrategy {
         /**
          * Cancel the order if it remains after the specified time has passed.
          * 
-         * @param <S>
          * @param timing A timing to cancel order.
          * @return
          */
-        Orderable cancelWhen(Signal<?> timing);
+        default Orderable cancelWhen(Signal<?> timing) {
+            return cancelWhen(scheduler -> timing);
+        }
+
+        /**
+         * Cancel the order if it remains after the specified time has passed.
+         * 
+         * @param timing A timing to cancel order.
+         * @return
+         */
+        Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing);
     }
 }

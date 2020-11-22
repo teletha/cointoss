@@ -9,12 +9,12 @@
  */
 package cointoss;
 
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -352,7 +352,7 @@ public class Market implements Disposable {
     /**
      * 
      */
-    private class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
+    private static class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
 
         /** The action sequence. */
         private final LinkedList<OrderAction> actions = new LinkedList();
@@ -459,18 +459,10 @@ public class Market implements Disposable {
          * {@inheritDoc}
          */
         @Override
-        public Orderable cancelAfter(long time, ChronoUnit unit) {
-            return cancelWhen(I.schedule(time, TimeUnit.of(unit), service.scheduler()));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Orderable cancelWhen(Signal<?> timing) {
+        public Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing) {
             actions.add((market, direction, size, previous, orders) -> {
                 if (previous != null && previous.isNotCompleted()) {
-                    timing.first().to(() -> {
+                    timing.apply(market.service.scheduler()).first().to(() -> {
                         if (previous.isNotCompleted()) {
                             market.orders.cancel(previous).to(() -> {
                                 if (previous.remainingSize().isPositive()) {

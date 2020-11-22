@@ -67,6 +67,9 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
     /** The scenario managing event. */
     private final Signaling<Scenario> scenarioAdded = new Signaling();
 
+    /** The scenario add event. */
+    public final Signal<Scenario> added = scenarioAdded.expose;
+
     /** The state snapshot. */
     private final NavigableMap<Long, Snapshot> snapshots = new TreeMap();
 
