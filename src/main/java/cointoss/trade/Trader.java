@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.apache.logging.log4j.Logger;
@@ -33,9 +34,11 @@ import org.apache.logging.log4j.Logger;
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.Market;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
+import cointoss.order.OrderStrategy.Orderable;
 import cointoss.util.Loggings;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
@@ -46,7 +49,7 @@ import kiss.Signaling;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
-public abstract class Trader extends TraderBase implements TradingFilters, Extensible, Disposable {
+public abstract class Trader extends AbstractTrader implements TradingFilters, Extensible, Disposable, TradingEntry {
 
     /** The identity element of {@link Snapshot}. */
     private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO);
@@ -200,11 +203,40 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Scenario entry(Directional directional, Num size, Consumer<Orderable> declaration) {
+        Scenario s = new Scenario() {
+            @Override
+            protected void entry() {
+                entry(directional, size, declaration);
+            }
+
+            @Override
+            protected void exit() {
+            }
+        };
+        now(() -> s);
+        return s;
+    }
+
+    /**
+     * Set up entry now.
+     * 
+     * @param builder Your trading scenario.
+     * @return Chainable API.
+     */
+    public final Trader now(WiseSupplier<Scenario> builder) {
+        return when(I.signal("now"), builder);
+    }
+
+    /**
      * Set up entry at your timing.
      * 
      * @param <T>
      * @param timing
-     * @param builder
+     * @param builder Your trading scenario.
      * @return Chainable API.
      */
     public final <T> Trader when(Signal<T> timing, WiseSupplier<Scenario> builder) {
@@ -216,7 +248,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
      * 
      * @param <T>
      * @param timing
-     * @param builder
+     * @param builder Your trading scenario.
      * @return Chainable API.
      */
     public final <T> Trader when(Signal<T> timing, WiseFunction<T, Scenario> builder) {

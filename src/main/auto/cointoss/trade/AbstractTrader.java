@@ -1,8 +1,8 @@
 package cointoss.trade;
 
+import cointoss.trade.AbstractTrader;
+import cointoss.trade.AbstractTraderModel;
 import cointoss.trade.Scenario;
-import cointoss.trade.TraderBase;
-import cointoss.trade.TraderBaseModel;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
 import java.lang.Override;
@@ -17,10 +17,10 @@ import javax.annotation.processing.Generated;
 import kiss.Signal;
 
 /**
- * Generated model for {@link TraderBaseModel}.
+ * Generated model for {@link AbstractTraderModel}.
  */
 @Generated("Icy Manipulator")
-public abstract class TraderBase extends TraderBaseModel {
+public abstract class AbstractTrader extends AbstractTraderModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
@@ -42,7 +42,7 @@ public abstract class TraderBase extends TraderBaseModel {
      */
     private static final MethodHandle updater(String name)  {
         try {
-            Field field = TraderBase.class.getDeclaredField(name);
+            Field field = AbstractTrader.class.getDeclaredField(name);
             field.setAccessible(true);
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
@@ -104,7 +104,7 @@ public abstract class TraderBase extends TraderBaseModel {
     /**
      * HIDE CONSTRUCTOR
      */
-    protected TraderBase() {
+    protected AbstractTrader() {
         this.holdSize = super.holdSize();
         this.holdMaxSize = super.holdMaxSize();
         this.profit = super.profit();
@@ -306,7 +306,7 @@ public abstract class TraderBase extends TraderBaseModel {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("TraderBase [");
+        StringBuilder builder = new StringBuilder("AbstractTrader [");
         builder.append("holdSize=").append(holdSize).append(", ");
         builder.append("holdMaxSize=").append(holdMaxSize).append(", ");
         builder.append("profit=").append(profit).append(", ");
@@ -318,12 +318,12 @@ public abstract class TraderBase extends TraderBaseModel {
     public static final  Ìnstantiator<?> with = new Ìnstantiator();
 
     /**
-     * Namespace for {@link TraderBase}  builder methods.
+     * Namespace for {@link AbstractTrader}  builder methods.
      */
-    public static class Ìnstantiator<Self extends TraderBase & ÅssignableÅrbitrary<Self>> {
+    public static class Ìnstantiator<Self extends AbstractTrader & ÅssignableÅrbitrary<Self>> {
 
         /**
-         * Create initialized {@link TraderBase}.
+         * Create initialized {@link AbstractTrader}.
          *
          * @return A initialized model.
          */
@@ -332,7 +332,7 @@ public abstract class TraderBase extends TraderBaseModel {
         }
 
         /**
-         * Create initialized {@link TraderBase} with holdSize property.
+         * Create initialized {@link AbstractTrader} with holdSize property.
          *
          * @param value A value to assign.
          * @return A initialized model.
@@ -342,7 +342,7 @@ public abstract class TraderBase extends TraderBaseModel {
         }
 
         /**
-         * Create initialized {@link TraderBase} with holdMaxSize property.
+         * Create initialized {@link AbstractTrader} with holdMaxSize property.
          *
          * @param value A value to assign.
          * @return A initialized model.
@@ -352,7 +352,7 @@ public abstract class TraderBase extends TraderBaseModel {
         }
 
         /**
-         * Create initialized {@link TraderBase} with profit property.
+         * Create initialized {@link AbstractTrader} with profit property.
          *
          * @param value A value to assign.
          * @return A initialized model.
@@ -362,7 +362,7 @@ public abstract class TraderBase extends TraderBaseModel {
         }
 
         /**
-         * Create initialized {@link TraderBase} with scenarios property.
+         * Create initialized {@link AbstractTrader} with scenarios property.
          *
          * @param value A value to assign.
          * @return A initialized model.
@@ -372,7 +372,7 @@ public abstract class TraderBase extends TraderBaseModel {
         }
 
         /**
-         * Create initialized {@link TraderBase} with scenarios property.
+         * Create initialized {@link AbstractTrader} with scenarios property.
          *
          * @param value A value to assign.
          * @return A initialized model.
@@ -385,7 +385,7 @@ public abstract class TraderBase extends TraderBaseModel {
     /**
      * Property assignment API.
      */
-    public static interface ÅssignableÅrbitrary<Next extends TraderBase> {
+    public static interface ÅssignableÅrbitrary<Next extends AbstractTrader> {
 
         /**
          * Assign holdSize property.
@@ -394,7 +394,7 @@ public abstract class TraderBase extends TraderBaseModel {
          * @return The next assignable model.
          */
         default Next holdSize(Num value) {
-            ((TraderBase) this).setHoldSize(value);
+            ((AbstractTrader) this).setHoldSize(value);
             return (Next) this;
         }
 
@@ -405,7 +405,7 @@ public abstract class TraderBase extends TraderBaseModel {
          * @return The next assignable model.
          */
         default Next holdMaxSize(Num value) {
-            ((TraderBase) this).setHoldMaxSize(value);
+            ((AbstractTrader) this).setHoldMaxSize(value);
             return (Next) this;
         }
 
@@ -416,7 +416,7 @@ public abstract class TraderBase extends TraderBaseModel {
          * @return The next assignable model.
          */
         default Next profit(Num value) {
-            ((TraderBase) this).setProfit(value);
+            ((AbstractTrader) this).setProfit(value);
             return (Next) this;
         }
 
@@ -427,7 +427,7 @@ public abstract class TraderBase extends TraderBaseModel {
          * @return The next assignable model.
          */
         default Next scenarios(List<Scenario> value) {
-            ((TraderBase) this).setScenarios(value);
+            ((AbstractTrader) this).setScenarios(value);
             return (Next) this;
         }
 
@@ -450,7 +450,7 @@ public abstract class TraderBase extends TraderBaseModel {
     /**
      * Mutable Model.
      */
-    private static final class Åssignable extends TraderBase implements ÅssignableAll, ÅssignableÅrbitrary {
+    private static final class Åssignable extends AbstractTrader implements ÅssignableAll, ÅssignableÅrbitrary {
     }
 
     /**

@@ -17,7 +17,7 @@ import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 
 @Icy
-abstract class TraderBaseModel {
+abstract class AbstractTraderModel {
 
     /**
      * Return the current hold size of target currency. Positive number means long position,

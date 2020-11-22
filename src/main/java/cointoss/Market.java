@@ -35,7 +35,7 @@ import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickerManager;
-import cointoss.trade.DiscreteTrader;
+import cointoss.trade.Funds;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
@@ -120,11 +120,15 @@ public class Market implements Disposable {
         readOrderBook();
     }
 
-    private DiscreteTrader trader;
+    private Trader trader;
 
-    public synchronized DiscreteTrader trader() {
+    public synchronized Trader trader() {
         if (trader == null) {
-            trader = new DiscreteTrader();
+            trader = new Trader() {
+                @Override
+                protected void declare(Market market, Funds fund) {
+                }
+            };
             trader.initialize(this);
         }
         return trader;

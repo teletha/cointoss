@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -40,7 +40,7 @@ import kiss.Variable;
 /**
  * Declarative entry and exit definition.
  */
-public abstract class Scenario extends ScenarioBase implements Directional, Disposable {
+public abstract class Scenario extends ScenarioBase implements Directional, Disposable, TradingEntry {
 
     /** The scenario direction. */
     private Directional directional;
@@ -199,71 +199,14 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param size A entry size.
      * @return A ordering method.
      */
-    protected final void entry(Directional directional, long size) {
-        entry(directional, size, Orderable::take);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param <S> Ordering interface
-     * @param size A entry size.
-     * @return A ordering method.
-     */
-    protected final void entry(Directional directional, long size, Consumer<Orderable> declaration) {
-        entry(directional, Num.of(size), declaration);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param <S> Ordering interface
-     * @param size A entry size.
-     * @return A ordering method.
-     */
-    protected final void entry(Directional directional, double size) {
-        entry(directional, size, Orderable::take);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param <S> Ordering interface
-     * @param size A entry size.
-     * @return A ordering method.
-     */
-    protected final void entry(Directional directional, double size, Consumer<Orderable> declaration) {
-        entry(directional, Num.of(size), declaration);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param <S> Ordering interface
-     * @param size A entry size.
-     * @return A ordering method.
-     */
-    protected final void entry(Directional directional, Num size) {
-        entry(directional, size, Orderable::take);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param <S> Ordering interface
-     * @param size A entry size.
-     * @return A ordering method.
-     */
-    protected final void entry(Directional directional, Num size, Consumer<Orderable> declaration) {
+    @Override
+    public final Scenario entry(Directional directional, Num size, Consumer<Orderable> declaration) {
         if (size == null || size.isLessThan(market.service.setting.target.minimumSize)) {
             throw new Error("Entry size is less than minimum bid size.");
         }
         market.request(this.directional = directional, size, declaration).to(this::processEntryOrder);
+
+        return this;
     }
 
     /**
@@ -319,7 +262,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param time
      * @param unit
      */
-    protected final void exitAfter(Span span) {
+    public final void exitAfter(Span span) {
         exitAfter(span.seconds, TimeUnit.SECONDS);
     }
 
@@ -330,7 +273,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param time
      * @param unit
      */
-    protected final void exitAfter(long time, TimeUnit unit) {
+    public final void exitAfter(long time, TimeUnit unit) {
         exitWhen(I.schedule(time, 0, unit, false, market.service.scheduler()).first(), Orderable::take);
     }
 
@@ -340,7 +283,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(long price) {
+    public final void exitAt(long price) {
         exitAt(Num.of(price));
     }
 
@@ -350,7 +293,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(double price) {
+    public final void exitAt(double price) {
         exitAt(Num.of(price));
     }
 
@@ -360,7 +303,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(Num price) {
+    public final void exitAt(Num price) {
         exitAt(Variable.of(price));
     }
 
@@ -370,7 +313,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(Variable<Num> price) {
+    public final void exitAt(Variable<Num> price) {
         exitAt(price, entryPrice.isLessThan(directional, price) ? s -> s.make(price) : s -> s.take());
     }
 
@@ -380,7 +323,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(Trailing price) {
+    public final void exitAt(Trailing price) {
         exitAt(price, Orderable::take);
     }
 
@@ -390,7 +333,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(long price, Consumer<Orderable> strategy) {
+    public final void exitAt(long price, Consumer<Orderable> strategy) {
         exitAt(Num.of(price), strategy);
     }
 
@@ -400,7 +343,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(double price, Consumer<Orderable> strategy) {
+    public final void exitAt(double price, Consumer<Orderable> strategy) {
         exitAt(Num.of(price), strategy);
     }
 
@@ -410,7 +353,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(Num price, Consumer<Orderable> strategy) {
+    public final void exitAt(Num price, Consumer<Orderable> strategy) {
         exitAt(Variable.of(price), strategy);
     }
 
@@ -420,7 +363,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(Variable<Num> price, Consumer<Orderable> strategy) {
+    public final void exitAt(Variable<Num> price, Consumer<Orderable> strategy) {
         Disposable disposer;
         if (entryPrice.isLessThan(directional, price)) {
             // profit
@@ -449,7 +392,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
-    protected final void exitAt(Trailing price, Consumer<Orderable> strategy) {
+    public final void exitAt(Trailing price, Consumer<Orderable> strategy) {
         Num max = entryPrice.plus(this, price.profit);
         Variable<Num> trailedPrice = Variable.of(entryPrice.minus(this, price.losscut));
 
@@ -468,7 +411,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param timing
      * @param strategy
      */
-    protected final void exitWhen(Signal<?> timing) {
+    public final void exitWhen(Signal<?> timing) {
         exitWhen(timing, Orderable::take);
     }
 
@@ -479,7 +422,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param timing
      * @param strategy
      */
-    protected final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
+    public final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
         disposerForExit.add(timing.first().to(() -> {
             market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(e -> {
                 processExitOrder(e, "exitWhen");
