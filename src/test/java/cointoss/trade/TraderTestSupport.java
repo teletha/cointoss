@@ -180,16 +180,16 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     }
 
     protected final Scenario exit(Consumer<Orderable> strategy) {
-        Scenario s = latest();
+        Scenario s = last();
         s.exitWhen(now(), strategy);
-        return latest();
+        return last();
     }
 
     /**
      * Execute entry order completelly.
      */
     protected final void executeEntryAll() {
-        Order o = latest().entries.peekFirst();
+        Order o = last().entries.peekFirst();
         executeEntry(o.size, o.price);
     }
 
@@ -197,7 +197,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute entry order partially.
      */
     protected final void executeEntryHalf() {
-        Order o = latest().entries.peekFirst();
+        Order o = last().entries.peekFirst();
         executeEntry(o.size.divide(2), o.price);
     }
 
@@ -212,7 +212,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute entry order partially.
      */
     private void executeEntry(Num size, Num price) {
-        Scenario s = latest();
+        Scenario s = last();
 
         market.perform(Execution.with.direction(s.inverse(), size).price(price.minus(s, 1)).date(market.service.now()));
     }
@@ -221,7 +221,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute exit order completelly.
      */
     protected final void executeExitAll() {
-        Order o = latest().exits.peekFirst();
+        Order o = last().exits.peekFirst();
         executeExit(o.size, o.price);
     }
 
@@ -229,7 +229,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute exit order partially.
      */
     protected final void executeExitHalf() {
-        Order o = latest().exits.peekFirst();
+        Order o = last().exits.peekFirst();
         executeExit(o.size.divide(2), o.price);
     }
 
@@ -244,7 +244,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute exit order partially.
      */
     private void executeExit(Num size, Num price) {
-        Scenario s = latest();
+        Scenario s = last();
 
         market.perform(Execution.with.direction(s.direction(), size).price(price.minus(s.inverse(), 1)).date(market.service.now()));
     }
@@ -446,7 +446,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Cancel all entry orders.
      */
     private void cancelEntry() {
-        for (Order order : latest().entries) {
+        for (Order order : last().entries) {
             market.cancel(order).to(I.NoOP);
         }
     }
@@ -455,7 +455,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Cancel all entry orders.
      */
     private void cancelExit() {
-        for (Order order : latest().exits) {
+        for (Order order : last().exits) {
             market.cancel(order).to(I.NoOP);
         }
     }

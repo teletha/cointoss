@@ -12,6 +12,8 @@ package cointoss.trade;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Iterables;
+
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
@@ -58,6 +60,20 @@ abstract class AbstractTraderModel {
     @Icy.Property
     public List<Scenario> scenarios() {
         return new ArrayList();
+    }
+
+    /**
+     * Retrieve the eldest {@link Scenario}.
+     */
+    final Scenario first() {
+        return Iterables.getFirst(scenarios(), null);
+    }
+
+    /**
+     * Retrieve the latest {@link Scenario}.
+     */
+    final Scenario last() {
+        return Iterables.getLast(scenarios(), null);
     }
 
     /**

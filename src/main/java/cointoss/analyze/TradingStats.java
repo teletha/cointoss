@@ -17,10 +17,12 @@ import java.lang.reflect.Modifier;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+import com.google.common.collect.Iterables;
 
 import cointoss.Market;
 import cointoss.trade.Funds;
@@ -136,15 +138,15 @@ public class TradingStats {
     public Duration duration = Duration.ZERO;
 
     /** All scenario. */
-    private final Deque<Scenario> entries;
+    private final List<Scenario> entries;
 
     /**
      * Analyze trading.
      */
-    public TradingStats(Market market, Funds funds, Deque<Scenario> entries, Trader trader) {
+    public TradingStats(Market market, Funds funds, List<Scenario> entries, Trader trader) {
         this.name = trader.name();
-        this.startDate = Variable.of(entries.peekFirst()).map(Scenario::holdStartTime).or(market.service::now);
-        this.endDate = Variable.of(entries.peekLast()).map(Scenario::holdEndTime).or(market.service::now);
+        this.startDate = Variable.of(Iterables.getFirst(entries, null)).map(Scenario::holdStartTime).or(market.service::now);
+        this.endDate = Variable.of(Iterables.getLast(entries, null)).map(Scenario::holdEndTime).or(market.service::now);
         this.baseCurrencyScale = market.service.setting.base.scale;
         this.targetCurrencyScale = market.service.setting.target.scale;
         this.holdMaxSize = trader.holdMaxSize;

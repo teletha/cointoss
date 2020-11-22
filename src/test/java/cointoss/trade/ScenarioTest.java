@@ -35,7 +35,7 @@ class ScenarioTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.exits.size() == 0;
 
         market.perform(Execution.with.buy(0.1).price(9));
@@ -63,7 +63,7 @@ class ScenarioTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.exits.size() == 0;
 
         // first entry
@@ -105,7 +105,7 @@ class ScenarioTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         market.perform(Execution.with.buy(1).price(15));
         assert s.entrySize.is(1);
@@ -131,7 +131,7 @@ class ScenarioTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.exits.size() == 0;
 
         // divided entries
@@ -177,7 +177,7 @@ class ScenarioTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.exits.size() == 0;
 
         market.perform(Execution.with.buy(1).price(9));
@@ -216,7 +216,7 @@ class ScenarioTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         market.perform(Execution.with.buy(1.316).price(1850));
         market.perform(Execution.with.buy(0.1).price(1036));
@@ -245,7 +245,7 @@ class ScenarioTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         market.perform(Execution.with.buy(0.5).price(15));
         assert s.entries.size() == 1;

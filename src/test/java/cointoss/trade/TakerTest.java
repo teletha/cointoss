@@ -35,7 +35,7 @@ class TakerTest extends TraderTestSupport {
         // trigger taker
         market.perform(Execution.with.direction(side, 1).price(10));
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.direction() == side.direction();
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(1);
@@ -59,7 +59,7 @@ class TakerTest extends TraderTestSupport {
         // trigger taker
         market.perform(Execution.with.direction(side.inverse(), 1).price(10));
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.direction() == side.direction();
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(1);
@@ -86,7 +86,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 0.25).price(14));
         market.perform(Execution.with.direction(side, 0.25).price(8));
 
-        Scenario s = latest();
+        Scenario s = last();
         if (side.isBuy()) {
             assert s.entryPrice.scale(0).is(12);
         } else {
@@ -114,7 +114,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 0.25).price(14));
         market.perform(Execution.with.direction(side, 0.25).price(16));
 
-        Scenario s = latest();
+        Scenario s = last();
         if (side.isBuy()) {
             assert s.entryPrice.is(13);
         } else {
@@ -142,7 +142,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 0.25).price(6));
         market.perform(Execution.with.direction(side, 0.25).price(4));
 
-        Scenario s = latest();
+        Scenario s = last();
         if (side.isBuy()) {
             assert s.entryPrice.is(10);
         } else {
@@ -169,7 +169,7 @@ class TakerTest extends TraderTestSupport {
         // trigger taker
         market.perform(Execution.with.direction(side, 1).price(10));
 
-        Scenario s = latest();
+        Scenario s = last();
         if (side.isBuy()) {
             assert s.entryPrice.is(10);
         } else {
@@ -196,7 +196,7 @@ class TakerTest extends TraderTestSupport {
         // trigger taker
         market.perform(Execution.with.direction(side, 1).price(5));
 
-        Scenario s = latest();
+        Scenario s = last();
         if (side.isBuy()) {
             assert s.entryPrice.is(10);
         } else {
@@ -227,7 +227,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.buy(1).price(5));
         awaitOrderBufferingTime();
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.exitExecutedSize.is(0);
 
         // taker has high priority

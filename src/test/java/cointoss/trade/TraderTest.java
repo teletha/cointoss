@@ -34,7 +34,7 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.isBuy();
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(0);
@@ -67,7 +67,7 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.isSell();
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(0);
@@ -101,7 +101,7 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         // execute entry
         market.perform(Execution.with.buy(1).price(9));
@@ -143,7 +143,7 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
@@ -217,7 +217,7 @@ class TraderTest extends TraderTestSupport {
         // don't executed because disabled
         entry(Execution.with.buy(1).price(10));
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s == null;
     }
 
@@ -228,20 +228,20 @@ class TraderTest extends TraderTestSupport {
 
         // enable
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.sell(1).price(20));
-        Scenario s = latest();
+        Scenario s = last();
         assert s.entrySize.is(1);
         assert s.exitSize.is(1);
 
         // disable
         disable.set(true);
         entryAndExit(Execution.with.buy(1).price(20), Execution.with.sell(1).price(30));
-        Scenario previous = latest();
+        Scenario previous = last();
         assert previous == s;
 
         // enable
         disable.set(false);
         entryAndExit(Execution.with.buy(2).price(30), Execution.with.sell(2).price(40));
-        s = latest();
+        s = last();
         assert previous != s;
         assert s.entrySize.is(2);
         assert s.exitSize.is(2);
@@ -259,28 +259,28 @@ class TraderTest extends TraderTestSupport {
         disable1.set(true);
         disable2.set(true);
         entry(Execution.with.buy(1).price(10));
-        Scenario s = latest();
+        Scenario s = last();
         assert s == null;
 
         // disable one and enabe other
         disable1.set(true);
         disable2.set(false);
         entry(Execution.with.buy(1).price(10));
-        s = latest();
+        s = last();
         assert s == null;
 
         // enable one and disable other
         disable1.set(false);
         disable2.set(true);
         entry(Execution.with.buy(1).price(10));
-        s = latest();
+        s = last();
         assert s == null;
 
         // enable one and other
         disable1.set(false);
         disable2.set(false);
         entry(Execution.with.buy(1).price(10));
-        s = latest();
+        s = last();
         assert s != null;
     }
 
@@ -298,7 +298,7 @@ class TraderTest extends TraderTestSupport {
         assert isEnable() == false;
         assert isDisable() == true;
         entry(Execution.with.buy(1).price(10));
-        Scenario s = latest();
+        Scenario s = last();
         assert s == null;
     }
 
@@ -313,7 +313,7 @@ class TraderTest extends TraderTestSupport {
         assert isEnable() == false;
         assert isDisable() == true;
         entry(Execution.with.buy(1).price(10));
-        Scenario s = latest();
+        Scenario s = last();
         assert s == null;
 
         // enable

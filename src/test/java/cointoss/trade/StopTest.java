@@ -30,7 +30,7 @@ public class StopTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.exits.size() == 0;
 
         // execute entry
@@ -66,7 +66,7 @@ public class StopTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
         assert s.exits.size() == 0;
 
         // execute entry

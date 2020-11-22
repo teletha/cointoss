@@ -14,9 +14,7 @@ import static java.time.temporal.ChronoUnit.*;
 import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableMap;
@@ -65,9 +63,6 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
 
     /** The fund controller. */
     private final Funds funds = new Funds();
-
-    /** All managed entries. */
-    private final Deque<Scenario> scenarios = new ArrayDeque();
 
     /** The scenario managing event. */
     private final Signaling<Scenario> scenarioAdded = new Signaling();
@@ -124,14 +119,6 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
         scenarios.clear();
         snapshots.clear();
         options.clear();
-    }
-
-    /**
-     * Retrieve the latest {@link Scenario}.
-     */
-    @VisibleForTesting
-    Scenario latest() {
-        return scenarios.peekLast();
     }
 
     /**

@@ -35,7 +35,7 @@ public class TrailingTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         // entry
         market.perform(Execution.with.buy(1).price(entryTriggerPrice));
@@ -78,7 +78,7 @@ public class TrailingTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         // entry
         market.perform(Execution.with.buy(1).price(entryTriggerPrice));
@@ -123,7 +123,7 @@ public class TrailingTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         // entry
         market.perform(Execution.with.buy(1).price(entryTriggerPrice));
@@ -168,7 +168,7 @@ public class TrailingTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         // entry
         market.perform(Execution.with.buy(1).price(entryTriggerPrice));
@@ -214,7 +214,7 @@ public class TrailingTest extends TraderTestSupport {
             }
         });
 
-        Scenario s = latest();
+        Scenario s = last();
 
         // entry
         market.perform(Execution.with.buy(1).price(entryTriggerPrice));
