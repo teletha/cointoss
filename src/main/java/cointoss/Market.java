@@ -492,13 +492,22 @@ public class Market implements Disposable {
                 action.execute(market, direction, size, previous, observer);
             }
         }
-    }
 
-    /**
-     * 
-     */
-    private interface OrderAction {
+        /**
+         * Internal API.
+         */
+        private interface OrderAction {
 
-        void execute(Market market, Direction direction, Num num, Order order, Observer<? super Order> observer);
+            /**
+             * Execute this order action.
+             * 
+             * @param market A target {@link Market}.
+             * @param direction A order's {@link Direction}.
+             * @param num A order size.
+             * @param order The previous order.
+             * @param observer A event observer.
+             */
+            void execute(Market market, Direction direction, Num num, Order order, Observer<? super Order> observer);
+        }
     }
 }
