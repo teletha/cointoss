@@ -204,29 +204,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySizeDiff() {
         return entrySizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySize() {
         return entrySizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySizeNow() {
         return entrySizeCustomizer.observe$Now();
     }
@@ -269,29 +254,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSizeDiff() {
         return entryExecutedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSize() {
         return entryExecutedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSizeNow() {
         return entryExecutedSizeCustomizer.observe$Now();
     }
@@ -334,29 +304,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPriceDiff() {
         return entryPriceCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPrice() {
         return entryPriceCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPriceNow() {
         return entryPriceCustomizer.observe$Now();
     }
@@ -399,29 +354,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSizeDiff() {
         return exitSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSize() {
         return exitSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSizeNow() {
         return exitSizeCustomizer.observe$Now();
     }
@@ -464,29 +404,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSizeDiff() {
         return exitExecutedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSize() {
         return exitExecutedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSizeNow() {
         return exitExecutedSizeCustomizer.observe$Now();
     }
@@ -529,29 +454,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPriceDiff() {
         return exitPriceCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPrice() {
         return exitPriceCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPriceNow() {
         return exitPriceCustomizer.observe$Now();
     }
@@ -590,29 +500,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfitDiff() {
         return realizedProfitCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfit() {
         return realizedProfitCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfitNow() {
         return realizedProfitCustomizer.observe$Now();
     }

@@ -14,6 +14,7 @@ import org.apache.logging.log4j.util.PerformanceSensitive;
 import cointoss.util.arithmetic.Num;
 
 public interface Profitable {
+
     /**
      * Calculate total profit or loss on the current price.
      * 

@@ -23,6 +23,7 @@ import cointoss.order.OrderStrategy.Takable;
 import cointoss.util.arithmetic.Num;
 import kiss.Observer;
 import kiss.Signal;
+import kiss.WiseTriFunction;
 
 /**
  * 
@@ -66,68 +67,16 @@ class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
      * {@inheritDoc}
      */
     @Override
-    public Cancellable make(Num price) {
+    public Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price) {
         actions.add((market, direction, size, previous, orders) -> {
-            make(price, market, direction, size, previous, orders);
+            Order order = Order.with.direction(direction, size).price(price.apply(market, direction, size));
+            orders.accept(order);
+
+            market.orders.request(order).to(() -> {
+                execute(market, direction, size, order, orders);
+            });
         });
         return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Cancellable makeBestPrice() {
-        actions.add((market, direction, size, previous, orders) -> {
-            make(market.orderBook.bookFor(direction)
-                    .computeBestPrice(market.service.setting.base.minimumSize), market, direction, size, previous, orders);
-        });
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Cancellable makeBestPrice(Direction directionForBestPrice) {
-        actions.add((market, direction, size, previous, orders) -> {
-            make(market.orderBook.bookFor(directionForBestPrice)
-                    .computeBestPrice(market.service.setting.base.minimumSize), market, direction, size, previous, orders);
-        });
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Cancellable makePositionPrice() {
-        throw new Error("FIX ME");
-        // actions.add((market, direction, size, previous, orders) -> {
-        // make(market.orders.positionPrice.v
-        // .scale(market.service.setting.baseCurrencyScaleSize), market, direction, size,
-        // previous, orders);
-        // });
-        // return this;
-    }
-
-    /**
-     * Request make order.
-     * 
-     * @param price
-     * @param market
-     * @param direction
-     * @param size
-     * @param previous
-     * @param orders
-     */
-    private void make(Num price, Market market, Direction direction, Num size, Order previous, Observer<? super Order> orders) {
-        Order order = Order.with.direction(direction, size).price(price);
-        orders.accept(order);
-
-        market.orders.request(order).to(() -> {
-            execute(market, direction, size, order, orders);
-        });
     }
 
     /**

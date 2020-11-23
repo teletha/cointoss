@@ -17,11 +17,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.ticker.Span;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
+import kiss.WiseTriFunction;
 
 public interface OrderStrategy {
 
@@ -82,7 +84,9 @@ public interface OrderStrategy {
          * @param price A limit price.
          * @return Maker is cancellable.
          */
-        Cancellable make(Num price);
+        default Cancellable make(Num price) {
+            return make((market, direction, size) -> price);
+        }
 
         /**
          * Limit order with the specified price.
@@ -95,18 +99,33 @@ public interface OrderStrategy {
         }
 
         /**
-         * Limit order with the best price by referrencing order books.
+         * Build your limit order by the current market infomation.
          * 
-         * @return Maker is cancellable.
+         * @param price
+         * @return
          */
-        Cancellable makeBestPrice();
+        Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price);
 
         /**
          * Limit order with the best price by referrencing order books.
          * 
          * @return Maker is cancellable.
          */
-        Cancellable makeBestPrice(Direction direction);
+        default Cancellable makeBestPrice() {
+            return make((market, direction, price) -> market.orderBook.bookFor(direction)
+                    .computeBestPrice(market.service.setting.base.minimumSize));
+        }
+
+        /**
+         * Limit order with the best price by referrencing order books.
+         * 
+         * @param direction You can reference orderbook by direction.
+         * @return Maker is cancellable.
+         */
+        default Cancellable makeBestPrice(Direction direction) {
+            return make((market, d, price) -> market.orderBook.bookFor(direction)
+                    .computeBestPrice(market.service.setting.base.minimumSize));
+        }
 
         /**
          * Limit order with the best price by referrencing order books.
@@ -125,13 +144,6 @@ public interface OrderStrategy {
         default Cancellable makeBestBuyPrice() {
             return makeBestPrice(Direction.BUY);
         }
-
-        /**
-         * Limit order with the current position price.
-         * 
-         * @return Maker is cancellable.
-         */
-        Cancellable makePositionPrice();
     }
 
     /**
