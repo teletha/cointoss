@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -130,6 +130,15 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      */
     public final boolean isTerminated() {
         return state.is(OrderState.COMPLETED) || state.is(OrderState.CANCELED);
+    }
+
+    /**
+     * Check status of this {@link Scenario}.
+     * 
+     * @return A result.
+     */
+    public final boolean isNotCancelled() {
+        return state.isNot(OrderState.CANCELED);
     }
 
     /**

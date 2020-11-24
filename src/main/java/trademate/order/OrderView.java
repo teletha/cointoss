@@ -204,11 +204,16 @@ public class OrderView extends View {
 
         trainingMode.text(en("Use demo trade")).initialize(true);
         orderSize.value("0.5").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
-        history.text(en("Full History")).initialize(false).observing(all -> table.take(all ? null : Scenario::isActive));
+        history.text(en("Full History"))
+                .initialize(false)
+                .observing(all -> table.take(all ? Scenario::isNotCancelled : Scenario::isActive));
 
         initializeTable();
     }
 
+    /**
+     * Initialize order table.
+     */
     private void initializeTable() {
         // ===============================================
         // Table Part
