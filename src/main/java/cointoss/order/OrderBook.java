@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
@@ -37,9 +36,6 @@ public class OrderBook {
 
     /** The scale for target currency. */
     private final int scale;
-
-    /** The book operation thread. (OPTIONAL) */
-    private Consumer<Runnable> operator = Runnable::run;
 
     /** The base boards. */
     private final ConcurrentSkipListMap<Num, OrderBookPage> base;
@@ -165,6 +161,68 @@ public class OrderBook {
     }
 
     /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Num predictTakingPrice(long size) {
+        return predictTakingPrice(Num.of(size));
+    }
+
+    /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Num predictTakingPrice(double size) {
+        return predictTakingPrice(Num.of(size));
+    }
+
+    /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Num predictTakingPrice(String size) {
+        return predictTakingPrice(Num.of(size));
+    }
+
+    /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Num predictTakingPrice(Variable<Num> size) {
+        return predictTakingPrice(size.v);
+    }
+
+    /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Num predictTakingPrice(Num size) {
+        double total = 0;
+        double remaining = size.doubleValue();
+
+        for (OrderBookPage page : base.values()) {
+            double decrease = Math.min(page.size, remaining);
+            total += decrease * page.price.doubleValue();
+            remaining -= decrease;
+
+            if (remaining <= 0) {
+                break;
+            }
+        }
+        return Num.of(total / size.doubleValue());
+    }
+
+    /**
      * Compute the best price with your conditions (diff price).
      * 
      * @param diff A difference price.
@@ -213,24 +271,22 @@ public class OrderBook {
      * @param hint A price hint.
      */
     public void fix(Num hint) {
-        operator.accept(() -> {
-            if (!base.isEmpty()) {
-                Num price = base.firstKey();
+        if (!base.isEmpty()) {
+            Num price = base.firstKey();
 
-                while (price != null && price.isGreaterThan(side, hint)) {
-                    OrderBookPage removed = base.remove(price);
+            while (price != null && price.isGreaterThan(side, hint)) {
+                OrderBookPage removed = base.remove(price);
 
-                    group.update(price, removed.size * -1);
-                    group.fix(hint);
+                group.update(price, removed.size * -1);
+                group.fix(hint);
 
-                    if (base.isEmpty()) {
-                        break;
-                    } else {
-                        price = base.firstKey();
-                    }
+                if (base.isEmpty()) {
+                    break;
+                } else {
+                    price = base.firstKey();
                 }
             }
-        });
+        }
     }
 
     /**
@@ -239,32 +295,30 @@ public class OrderBook {
      * @param asks
      */
     public void update(List<OrderBookPage> units) {
-        operator.accept(() -> {
-            for (OrderBookPage board : units) {
-                if (board.size == 0d) {
-                    // remove
-                    OrderBookPage removed = base.remove(board.price);
+        for (OrderBookPage board : units) {
+            if (board.size == 0d) {
+                // remove
+                OrderBookPage removed = base.remove(board.price);
 
-                    if (removed != null) {
-                        group.update(removed.price, removed.size * -1);
-                    }
+                if (removed != null) {
+                    group.update(removed.price, removed.size * -1);
+                }
+            } else {
+                // add
+                OrderBookPage previous = base.put(board.price, board);
+
+                if (previous == null) {
+                    group.update(board.price, board.size);
                 } else {
-                    // add
-                    OrderBookPage previous = base.put(board.price, board);
-
-                    if (previous == null) {
-                        group.update(board.price, board.size);
-                    } else {
-                        group.update(board.price, board.size - previous.size);
-                    }
+                    group.update(board.price, board.size - previous.size);
                 }
             }
+        }
 
-            if (base.isEmpty() == false) {
-                best.set(base.firstEntry().getValue());
-            }
-            updating.accept(this);
-        });
+        if (base.isEmpty() == false) {
+            best.set(base.firstEntry().getValue());
+        }
+        updating.accept(this);
     }
 
     /**

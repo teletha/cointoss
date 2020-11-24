@@ -337,6 +337,42 @@ class OrderBookTest {
         assert book.computeBestPrice(Num.of(100)).is(900);
     }
 
+    @Test
+    void predictTakingPriceOnBuy() {
+        OrderBook book = new OrderBook(setting, Direction.BUY);
+        book.update(unit(10, 1));
+        book.update(unit(12, 1));
+        book.update(unit(14, 1));
+        book.update(unit(16, 1));
+        book.update(unit(18, 1));
+        book.update(unit(20, 1));
+
+        assert book.predictTakingPrice(1).is(20);
+        assert book.predictTakingPrice(2).is(19);
+        assert book.predictTakingPrice(3).is(18);
+        assert book.predictTakingPrice(4).is(17);
+        assert book.predictTakingPrice(5).is(16);
+        assert book.predictTakingPrice(6).is(15);
+    }
+
+    @Test
+    void predictTakingPriceOnSell() {
+        OrderBook book = new OrderBook(setting, Direction.SELL);
+        book.update(unit(10, 1));
+        book.update(unit(12, 1));
+        book.update(unit(14, 1));
+        book.update(unit(16, 1));
+        book.update(unit(18, 1));
+        book.update(unit(20, 1));
+
+        assert book.predictTakingPrice(1).is(10);
+        assert book.predictTakingPrice(2).is(11);
+        assert book.predictTakingPrice(3).is(12);
+        assert book.predictTakingPrice(4).is(13);
+        assert book.predictTakingPrice(5).is(14);
+        assert book.predictTakingPrice(6).is(15);
+    }
+
     /**
      * Helper method to assert.
      * 
