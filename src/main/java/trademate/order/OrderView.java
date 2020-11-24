@@ -14,11 +14,9 @@ import static trademate.CommonText.*;
 import java.text.Normalizer.Form;
 
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableRow;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
@@ -43,7 +41,6 @@ import viewtify.ui.UIText;
 import viewtify.ui.UIVBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.Verifier;
 
@@ -52,8 +49,14 @@ public class OrderView extends View {
     /** The active market. */
     public static final Variable<Market> ActiveMarket = Variable.empty();
 
+    /** The current target markert. */
+    private Market current;
+
+    /** The market info reset. */
+    private Disposable disposer = Disposable.empty();
+
     /** UI */
-    private UIVBox rootP;
+    private UIVBox container;
 
     /** Runner UI */
     private UILabel market;
@@ -105,7 +108,7 @@ public class OrderView extends View {
 
     class view extends ViewDSL {
         {
-            $(rootP, FormStyles.FormLabelMin, () -> {
+            $(container, FormStyles.FormLabelMin, () -> {
                 $(hbox, FormStyles.FormRow, () -> {
                     $(takerSell, FormStyles.FormInputMin);
                     $(clear, FormStyles.FormInputMin);
@@ -166,15 +169,30 @@ public class OrderView extends View {
      */
     @Override
     protected void initialize() {
+        ActiveMarket.observing()
+                .effectOnce(container::disableNow)
+                .skipNull()
+                .combineLatest(trainingMode.observing())
+                .map(v -> v.ⅱ ? new TrainingMarket(v.ⅰ) : v.ⅰ)
+                .effectOnce(container::enableNow)
+                .to(m -> {
+                    // remove old market info
+                    table.removeItemAll();
+                    disposer.dispose();
+
+                    // new market
+                    current = m;
+                    market.text(m);
+                    disposer = Disposable.empty();
+                    disposer.add(I.signal(m.trader().scenarios()).merge(m.trader().added).to(table::addItemAtLast));
+                });
+
         Commands.TakeSell.shortcut(Key.Q).contribute(this::takeSelling);
         Commands.Clear.shortcut(Key.W).contribute(this::clear);
         Commands.TakeBuy.shortcut(Key.E).contribute(this::takeBuying);
         Commands.MakeSell.shortcut(Key.A).contribute(this::makeSelling);
         Commands.Cancel.shortcut(Key.S).contribute(this::cancel);
         Commands.MakeBuy.shortcut(Key.D).contribute(this::makeBuying);
-
-        rootP.disableWhen(ActiveMarket, m -> m == null);
-        market.text(ActiveMarket);
 
         takerBuy.text(en("Take Buying")).color(Theme.$.buy).when(User.Action, Commands.TakeBuy);
         clear.text(en("Clear")).when(User.Action, Commands.Clear);
@@ -184,28 +202,11 @@ public class OrderView extends View {
         cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
         makerSell.text(en("Make Selling")).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
 
-        trainingMode.text(en("Use demo trade")).initialize(true).when(User.Action, v -> {
-            ActiveMarket.set(m -> {
-                if (m instanceof TrainingMarket) {
-                    return trainingMode.value() ? m : ((TrainingMarket) m).backend;
-                } else {
-                    return trainingMode.value() ? new TrainingMarket(m) : m;
-                }
-            });
-        });
+        trainingMode.text(en("Use demo trade")).initialize(true);
         orderSize.value("0.5").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
         history.text(en("Full History")).initialize(false).observing(all -> table.take(all ? null : Scenario::isActive));
 
         initializeTable();
-
-        ActiveMarket.observing().skipNull().to(m ->
-
-        {
-            update(m);
-            if (m instanceof TrainingMarket == false) {
-                trainingMode.value(false);
-            }
-        });
     }
 
     private void initializeTable() {
@@ -239,35 +240,6 @@ public class OrderView extends View {
                 .render((ui, profit) -> ui.text(profit).color(Theme.colorBy(profit)));
     }
 
-    Disposable disposer = Disposable.empty();
-
-    private Disposable update(Market m) {
-        disposer.dispose();
-
-        MarketService s = m.service;
-
-        // positionSize.text(m.orders.position).color(position.isPositiveOrZero() ? Theme.$.buy :
-        // Theme.$.sell);
-
-        // initialize orders on server
-        // m.orders.manages().take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
-        // I.signal(m.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
-
-        // observe orders on clinet
-        return I.signal(m.trader().scenarios()).merge(m.trader().added).to(this::createScenarioItem);
-    }
-
-    /**
-     * Create new table item.
-     * 
-     * @param scenario
-     */
-    private void createScenarioItem(Scenario scenario) {
-        if (scenario != null) {
-            table.addItemAtLast(scenario);
-        }
-    }
-
     private Num estimateSize() {
         if (orderSize.is("0")) {
             return Num.of("0.01");
@@ -277,39 +249,40 @@ public class OrderView extends View {
     }
 
     private void takeBuying() {
-        ActiveMarket.to(m -> {
-            m.trader().entry(Direction.BUY, estimateSize(), s -> s.take());
-        });
+        if (current != null) {
+            current.trader().entry(Direction.BUY, estimateSize(), s -> s.take());
+        }
     }
 
     private void takeSelling() {
-        ActiveMarket.to(m -> {
-            m.trader().entry(Direction.SELL, estimateSize(), s -> s.take());
-        });
+        if (current != null) {
+            current.trader().entry(Direction.SELL, estimateSize(), s -> s.take());
+        }
     }
 
     private void clear() {
-        ActiveMarket.to(m -> {
+        if (current != null) {
             I.signal(table.items()).take(Scenario::isActive).to(Scenario::stop);
-        });
+        }
     }
 
     private void makeBuying() {
-        ActiveMarket.to(m -> {
-            m.trader().entry(Direction.BUY, estimateSize(), s -> s.make(m.orderBook.longs.computeBestPrice(Num.ONE, Num.ONE)));
-        });
+        if (current != null) {
+            current.trader().entry(Direction.BUY, estimateSize(), s -> s.make(current.orderBook.longs.computeBestPrice(Num.ONE, Num.ONE)));
+        }
     }
 
     private void makeSelling() {
-        ActiveMarket.to(m -> {
-            m.trader().entry(Direction.SELL, estimateSize(), s -> s.make(m.orderBook.shorts.computeBestPrice(Num.ONE, Num.ONE)));
-        });
+        if (current != null) {
+            current.trader()
+                    .entry(Direction.SELL, estimateSize(), s -> s.make(current.orderBook.shorts.computeBestPrice(Num.ONE, Num.ONE)));
+        }
     }
 
     private void cancel() {
-        ActiveMarket.to(m -> {
-            m.orders.cancelNowAll();
-        });
+        if (current != null) {
+            current.orders.cancelNowAll();
+        }
     }
 
     /**
@@ -317,25 +290,5 @@ public class OrderView extends View {
      */
     private enum Commands implements Command<Commands> {
         TakeBuy, Clear, TakeSell, MakeBuy, Cancel, MakeSell;
-    }
-
-    /**
-     * 
-     */
-    private class CatalogRow extends TableRow<Scenario> implements StyleHelper<CatalogRow, CatalogRow> {
-
-        /**
-         * 
-         */
-        private CatalogRow() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public CatalogRow ui() {
-            return this;
-        }
     }
 }
