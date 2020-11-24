@@ -26,6 +26,7 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
 import cointoss.order.Order;
+import cointoss.order.OrderState;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
@@ -71,6 +72,9 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     /** The debugging log. */
     private LinkedList<String> logs;
 
+    /** The scenario's state. */
+    public final Variable<OrderState> state = Variable.of(OrderState.INIT);
+
     /**
      * 
      */
@@ -107,6 +111,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         I.signal(exits).take(Order::isNotTerminated).flatMap(market::cancel).to(I.NoOP);
         disposerForExit.dispose();
         log("Dispose exit.");
+        state.set(OrderState.COMPLETED);
     }
 
     /**
@@ -115,7 +120,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return A result.
      */
     public final boolean isActive() {
-        return isTerminated() == false;
+        return state.is(OrderState.ACTIVE);
     }
 
     /**
@@ -124,16 +129,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return A result.
      */
     public final boolean isTerminated() {
-        return isEntryTerminated() && isExitTerminated();
-    }
-
-    /**
-     * Check status of this {@link Scenario}.
-     * 
-     * @return A result.
-     */
-    public final boolean isCanceled() {
-        return isTerminated() && entryExecutedSize.isZero();
+        return state.is(OrderState.COMPLETED) || state.is(OrderState.CANCELED);
     }
 
     /**
@@ -218,6 +214,16 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         entries.add(order);
         updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntrySize, Order::size);
         logEntry("Launch entry");
+        if (state.is(OrderState.INIT)) state.set(OrderState.ACTIVE);
+        disposerForEntry.add(order.observeState()
+                .take(OrderState.CANCELED)
+                .to(() -> {
+                    // If all entries have been cancelled without being executed, then this scenario
+                    // is considered cancelled.
+                    if (entryExecutedSize.isZero() && entries.stream().allMatch(Order::isCanceled)) {
+                        state.set(OrderState.CANCELED);
+                    }
+                }));
 
         order.observeExecutedSize().to(v -> {
             Num deltaSize = v.minus(entryExecutedSize);

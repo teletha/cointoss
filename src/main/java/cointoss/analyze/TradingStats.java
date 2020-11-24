@@ -25,6 +25,7 @@ import java.util.function.Function;
 import com.google.common.collect.Iterables;
 
 import cointoss.Market;
+import cointoss.order.OrderState;
 import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
@@ -138,20 +139,20 @@ public class TradingStats {
     public Duration duration = Duration.ZERO;
 
     /** All scenario. */
-    private final List<Scenario> entries;
+    private final List<Scenario> scenarios;
 
     /**
      * Analyze trading.
      */
-    public TradingStats(Market market, Funds funds, List<Scenario> entries, Trader trader) {
+    public TradingStats(Market market, Funds funds, List<Scenario> scenarios, Trader trader) {
         this.name = trader.name();
-        this.startDate = Variable.of(Iterables.getFirst(entries, null)).map(Scenario::holdStartTime).or(market.service::now);
-        this.endDate = Variable.of(Iterables.getLast(entries, null)).map(Scenario::holdEndTime).or(market.service::now);
+        this.startDate = Variable.of(Iterables.getFirst(scenarios, null)).map(Scenario::holdStartTime).or(market.service::now);
+        this.endDate = Variable.of(Iterables.getLast(scenarios, null)).map(Scenario::holdEndTime).or(market.service::now);
         this.baseCurrencyScale = market.service.setting.base.scale;
         this.targetCurrencyScale = market.service.setting.target.scale;
         this.holdMaxSize = trader.holdMaxSize;
         this.holdCurrentSize = trader.holdSize;
-        this.entries = entries;
+        this.scenarios = scenarios;
 
         // extract trader's properties
         I.signal(trader)
@@ -161,26 +162,26 @@ public class TradingStats {
                     properties.put(f.getName(), f.get(trader));
                 });
 
-        for (Scenario entry : entries) {
-            if (entry.isCanceled()) {
+        for (Scenario scenario : scenarios) {
+            if (scenario.state.is(OrderState.CANCELED)) {
                 continue;
             }
 
             total++;
-            if (entry.isActive()) active++;
-            if (entry.isTerminated()) terminated++;
+            if (scenario.state.is(OrderState.ACTIVE)) active++;
+            if (scenario.state.is(OrderState.COMPLETED)) terminated++;
 
             // calculate order and hold time
-            long hold = entry.holdTime().toMillis();
+            long hold = scenario.holdTime().toMillis();
             holdTime.add(hold);
 
             // calculate profit and loss
-            Num realized = entry.realizedProfit;
-            Num unrealized = entry.unrealizedProfit(market.tickers.latest.v.price);
+            Num realized = scenario.realizedProfit;
+            Num unrealized = scenario.unrealizedProfit(market.tickers.latest.v.price);
             Num pol = realized.plus(unrealized);
-            Num pips = entry.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(entry.entryExecutedSize);
-            Num realizedPips = entry.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(entry.entryExecutedSize);
-            Num unrealizedPips = entry.entryExecutedSize.isZero() ? Num.ZERO : unrealized.divide(entry.entryExecutedSize);
+            Num pips = scenario.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(scenario.entryExecutedSize);
+            Num realizedPips = scenario.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(scenario.entryExecutedSize);
+            Num unrealizedPips = scenario.entryExecutedSize.isZero() ? Num.ZERO : unrealized.divide(scenario.entryExecutedSize);
 
             profitAndLoss.add(pol);
             if (pol.isPositive()) {

@@ -9,6 +9,7 @@
  */
 package cointoss.trade;
 
+import cointoss.order.OrderState;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.TradeTest;
 
@@ -24,28 +25,12 @@ class ScenarioStatusTest extends TraderTestSupport {
         case ExitCompletely:
         case ExitMultiple:
         case ExitSeparately:
-        case ExitCanceled:
         case ExitCanceledThenOtherExitCompletely:
             assert s.isActive() == false;
             break;
 
         default:
             assert s.isActive() == true;
-            break;
-        }
-    }
-
-    @TradeTest
-    void isCanceled(ScenePart scene) {
-        Scenario s = scenario(scene);
-
-        switch (scene) {
-        case EntryCanceled:
-            assert s.isCanceled() == true;
-            break;
-
-        default:
-            assert s.isCanceled() == false;
             break;
         }
     }
@@ -60,7 +45,6 @@ class ScenarioStatusTest extends TraderTestSupport {
         case ExitCompletely:
         case ExitMultiple:
         case ExitSeparately:
-        case ExitCanceled:
         case ExitCanceledThenOtherExitCompletely:
             assert s.isTerminated() == true;
             break;
@@ -118,6 +102,41 @@ class ScenarioStatusTest extends TraderTestSupport {
         default:
             assert s.isExitTerminated() == false;
             break;
+        }
+    }
+
+    @TradeTest
+    void state(ScenePart scene) {
+        Scenario s = scenario(scene);
+
+        switch (scene) {
+        case Entry:
+        case EntryCompletely:
+        case EntryMultiple:
+        case EntryPartially:
+        case EntryPartiallyCanceled:
+        case EntrySeparately:
+            assert s.state.is(OrderState.ACTIVE);
+            break;
+
+        case Exit:
+        case ExitCanceled:
+        case ExitCanceledThenOtherExit:
+        case ExitPartially:
+        case ExitPartiallyCancelled:
+            assert s.state.is(OrderState.ACTIVE);
+            break;
+
+        case EntryPartiallyCanceledAndExitCompletely:
+        case ExitCanceledThenOtherExitCompletely:
+        case ExitCompletely:
+        case ExitMultiple:
+        case ExitSeparately:
+            assert s.state.is(OrderState.COMPLETED);
+            break;
+
+        case EntryCanceled:
+            assert s.state.is(OrderState.CANCELED);
         }
     }
 }
