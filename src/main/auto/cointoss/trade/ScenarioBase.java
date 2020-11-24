@@ -58,6 +58,9 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
     private static final MethodHandle entryPriceUpdater = updater("entryPrice");
 
     /** The final property updater. */
+    private static final MethodHandle entryCommissionUpdater = updater("entryCommission");
+
+    /** The final property updater. */
     private static final MethodHandle exitSizeUpdater = updater("exitSize");
 
     /** The final property updater. */
@@ -65,6 +68,9 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
 
     /** The final property updater. */
     private static final MethodHandle exitPriceUpdater = updater("exitPrice");
+
+    /** The final property updater. */
+    private static final MethodHandle exitCommissionUpdater = updater("exitCommission");
 
     /** The final property updater. */
     private static final MethodHandle realizedProfitUpdater = updater("realizedProfit");
@@ -106,6 +112,9 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
     };
 
     /** The exposed property. */
+    public final Num entryCommission;
+
+    /** The exposed property. */
     public final Num exitSize;
 
     /** The property customizer. */
@@ -142,6 +151,9 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
     };
 
     /** The exposed property. */
+    public final Num exitCommission;
+
+    /** The exposed property. */
     public final Num realizedProfit;
 
     /** The property customizer. */
@@ -160,9 +172,11 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         this.entrySize = super.entrySize();
         this.entryExecutedSize = super.entryExecutedSize();
         this.entryPrice = super.entryPrice();
+        this.entryCommission = super.entryCommission();
         this.exitSize = super.exitSize();
         this.exitExecutedSize = super.exitExecutedSize();
         this.exitPrice = super.exitPrice();
+        this.exitCommission = super.exitCommission();
         this.realizedProfit = super.realizedProfit();
     }
 
@@ -204,29 +218,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySizeDiff() {
         return entrySizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySize() {
         return entrySizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySizeNow() {
         return entrySizeCustomizer.observe$Now();
     }
@@ -269,29 +268,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSizeDiff() {
         return entryExecutedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSize() {
         return entryExecutedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSizeNow() {
         return entryExecutedSizeCustomizer.observe$Now();
     }
@@ -334,31 +318,53 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPriceDiff() {
         return entryPriceCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPrice() {
         return entryPriceCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPriceNow() {
         return entryPriceCustomizer.observe$Now();
+    }
+
+    /**
+     * The total of all entry orders.
+     *  
+     *  @return The total of all entry orders.
+     */
+    @Override
+    public final Num entryCommission() {
+        return this.entryCommission;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of entryCommission property.
+     */
+    @SuppressWarnings("unused")
+    private final Num getEntryCommission() {
+        return this.entryCommission;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of entryCommission property to assign.
+     */
+    final void setEntryCommission(Num value) {
+        if (value == null) {
+            value = super.entryCommission();
+        }
+        try {
+            entryCommissionUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -399,29 +405,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSizeDiff() {
         return exitSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSize() {
         return exitSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSizeNow() {
         return exitSizeCustomizer.observe$Now();
     }
@@ -464,29 +455,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSizeDiff() {
         return exitExecutedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSize() {
         return exitExecutedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSizeNow() {
         return exitExecutedSizeCustomizer.observe$Now();
     }
@@ -529,31 +505,53 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPriceDiff() {
         return exitPriceCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPrice() {
         return exitPriceCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPriceNow() {
         return exitPriceCustomizer.observe$Now();
+    }
+
+    /**
+     * The total of all exit orders.
+     *  
+     *  @return The total of all exit orders.
+     */
+    @Override
+    public final Num exitCommission() {
+        return this.exitCommission;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of exitCommission property.
+     */
+    @SuppressWarnings("unused")
+    private final Num getExitCommission() {
+        return this.exitCommission;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of exitCommission property to assign.
+     */
+    final void setExitCommission(Num value) {
+        if (value == null) {
+            value = super.exitCommission();
+        }
+        try {
+            exitCommissionUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /** {@inheritDoc} */
@@ -590,29 +588,14 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfitDiff() {
         return realizedProfitCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfit() {
         return realizedProfitCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfitNow() {
         return realizedProfitCustomizer.observe$Now();
     }
@@ -628,9 +611,11 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         builder.append("entrySize=").append(entrySize).append(", ");
         builder.append("entryExecutedSize=").append(entryExecutedSize).append(", ");
         builder.append("entryPrice=").append(entryPrice).append(", ");
+        builder.append("entryCommission=").append(entryCommission).append(", ");
         builder.append("exitSize=").append(exitSize).append(", ");
         builder.append("exitExecutedSize=").append(exitExecutedSize).append(", ");
         builder.append("exitPrice=").append(exitPrice).append(", ");
+        builder.append("exitCommission=").append(exitCommission).append(", ");
         builder.append("realizedProfit=").append(realizedProfit).append("]");
         return builder.toString();
     }
@@ -683,6 +668,16 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
 
         /**
+         * Create initialized {@link ScenarioBase} with entryCommission property.
+         *
+         * @param value A value to assign.
+         * @return A initialized model.
+         */
+        public Self entryCommission(Num value) {
+            return create().entryCommission(value);
+        }
+
+        /**
          * Create initialized {@link ScenarioBase} with exitSize property.
          *
          * @param value A value to assign.
@@ -710,6 +705,16 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
          */
         public Self exitPrice(Num value) {
             return create().exitPrice(value);
+        }
+
+        /**
+         * Create initialized {@link ScenarioBase} with exitCommission property.
+         *
+         * @param value A value to assign.
+         * @return A initialized model.
+         */
+        public Self exitCommission(Num value) {
+            return create().exitCommission(value);
         }
 
         /**
@@ -762,6 +767,17 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         }
 
         /**
+         * Assign entryCommission property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next entryCommission(Num value) {
+            ((ScenarioBase) this).setEntryCommission(value);
+            return (Next) this;
+        }
+
+        /**
          * Assign exitSize property.
          * 
          * @param value A new value to assign.
@@ -791,6 +807,17 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
          */
         default Next exitPrice(Num value) {
             ((ScenarioBase) this).setExitPrice(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign exitCommission property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next exitCommission(Num value) {
+            ((ScenarioBase) this).setExitCommission(value);
             return (Next) this;
         }
 
@@ -825,9 +852,11 @@ public abstract class ScenarioBase extends ScenarioBaseModel {
         static final String EntrySize = "entrySize";
         static final String EntryExecutedSize = "entryExecutedSize";
         static final String EntryPrice = "entryPrice";
+        static final String EntryCommission = "entryCommission";
         static final String ExitSize = "exitSize";
         static final String ExitExecutedSize = "exitExecutedSize";
         static final String ExitPrice = "exitPrice";
+        static final String ExitCommission = "exitCommission";
         static final String RealizedProfit = "realizedProfit";
     }
 }

@@ -128,6 +128,9 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle executedSizeUpdater = updater("executedSize");
 
     /** The final property updater. */
+    private static final MethodHandle commissionUpdater = updater("commission");
+
+    /** The final property updater. */
     private static final MethodHandle idUpdater = updater("id");
 
     /** The final property updater. */
@@ -165,6 +168,9 @@ public abstract class Order extends OrderModel {
             return executedSize;
         }
     };
+
+    /** The exposed property. */
+    public final Num commission;
 
     /** The exposed property. */
     public final String id;
@@ -215,6 +221,7 @@ public abstract class Order extends OrderModel {
         this.type = super.type();
         this.quantityCondition = super.quantityCondition();
         this.executedSize = super.executedSize();
+        this.commission = super.commission();
         this.id = super.id();
         this.creationTime = super.creationTime();
         this.terminationTime = super.terminationTime();
@@ -440,31 +447,53 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeDiff() {
         return executedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSize() {
         return executedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeNow() {
         return executedSizeCustomizer.observe$Now();
+    }
+
+    /**
+     * The commission.
+     *  
+     *  @return The commission.
+     */
+    @Override
+    public final Num commission() {
+        return this.commission;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of commission property.
+     */
+    @SuppressWarnings("unused")
+    private final Num getCommission() {
+        return this.commission;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of commission property to assign.
+     */
+    final void setCommission(Num value) {
+        if (value == null) {
+            value = super.commission();
+        }
+        try {
+            commissionUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -542,20 +571,10 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTime() {
         return creationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return creationTimeCustomizer.observe$Now();
     }
@@ -598,20 +617,10 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTime() {
         return terminationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTimeNow() {
         return terminationTimeCustomizer.observe$Now();
     }
@@ -654,20 +663,10 @@ public abstract class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<OrderState> observeStateNow() {
         return stateCustomizer.observe$Now();
     }
@@ -1064,6 +1063,15 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
+        }
+
+        /**
+         * Assign quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
         default Next goodTillCanceled() {
             return quantityCondition(QuantityCondition.GoodTillCanceled);
         }
@@ -1075,15 +1083,6 @@ public abstract class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(QuantityCondition.ImmediateOrCancel);
-        }
-
-        /**
-         * Assign quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1123,6 +1122,17 @@ public abstract class Order extends OrderModel {
             } catch (Throwable e) {
                 throw quiet(e);
             }
+        }
+
+        /**
+         * Assign commission property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next commission(Num value) {
+            ((Order) this).setCommission(value);
+            return (Next) this;
         }
 
         /**
@@ -1174,24 +1184,6 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next init() {
-            return state(OrderState.INIT);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(OrderState.REQUESTING);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
         default Next active() {
             return state(OrderState.ACTIVE);
         }
@@ -1210,8 +1202,8 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next completed() {
-            return state(OrderState.COMPLETED);
+        default Next canceled() {
+            return state(OrderState.CANCELED);
         }
 
         /**
@@ -1219,8 +1211,8 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next canceled() {
-            return state(OrderState.CANCELED);
+        default Next completed() {
+            return state(OrderState.COMPLETED);
         }
 
         /**
@@ -1237,8 +1229,26 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next init() {
+            return state(OrderState.INIT);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next rejected() {
             return state(OrderState.REJECTED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(OrderState.REQUESTING);
         }
     }
 
@@ -1264,6 +1274,7 @@ public abstract class Order extends OrderModel {
         static final String Type = "type";
         static final String QuantityCondition = "quantityCondition";
         static final String ExecutedSize = "executedSize";
+        static final String Commission = "commission";
         static final String Id = "id";
         static final String CreationTime = "creationTime";
         static final String TerminationTime = "terminationTime";

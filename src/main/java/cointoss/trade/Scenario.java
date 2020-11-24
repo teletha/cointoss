@@ -221,7 +221,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      */
     private void processEntryOrder(Order order) {
         entries.add(order);
-        updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntrySize, Order::size);
+        updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntrySize, Order::size, this::setEntryCommission);
         logEntry("Launch entry");
         if (state.is(OrderState.INIT)) state.set(OrderState.ACTIVE);
         disposerForEntry.add(order.observeState()
@@ -237,7 +237,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         order.observeExecutedSize().to(v -> {
             Num deltaSize = v.minus(entryExecutedSize);
 
-            updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize, Order::executedSize);
+            updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize, Order::executedSize, this::setEntryCommission);
             trader.updateSnapshot(direction(), Num.ZERO, deltaSize, order.price);
 
             logEntry("Update entry ");
@@ -245,24 +245,27 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     /**
-     * Calculate average price and total executed size.
+     * Calculate average price, total executed size and total commisision.
      * 
      * @param orders
      * @param priceSetter
      * @param sizeSetter
      */
-    private void updateOrderRelatedStatus(Deque<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter, Function<Order, Num> sizeExtractor) {
+    private void updateOrderRelatedStatus(Deque<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter, Function<Order, Num> sizeExtractor, Consumer<Num> commissionSetter) {
         Num totalSize = Num.ZERO;
         Num totalPrice = Num.ZERO;
+        Num totalCommision = Num.ZERO;
 
         for (Order order : orders) {
             Num size = sizeExtractor.apply(order);
             totalSize = totalSize.plus(size);
             totalPrice = totalPrice.plus(size.multiply(order.price));
+            totalCommision = totalCommision.plus(order.commission);
         }
 
         priceSetter.accept(totalPrice.divide(totalSize).scale(this, market.service.setting.base.scale));
         sizeSetter.accept(totalSize);
+        commissionSetter.accept(totalCommision);
     }
 
     /**
@@ -459,7 +462,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             Num previous = realizedProfit;
             Num deltaSize = v.minus(exitExecutedSize);
 
-            updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize, Order::executedSize);
+            updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize, Order::executedSize, this::setExitCommission);
             trader.updateSnapshot(direction(), realizedProfit.minus(previous), deltaSize.negate(), null);
 
             logExit("Update " + type);

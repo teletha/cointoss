@@ -30,6 +30,7 @@ s0/0.01(0)@0	ACTIVE	2020-11-12T11:34:05~
 {child_order_id=JFX20201112-023405-663199F, sfd=0, exec_id=2014596732, side=SELL, event_type=EXECUTION, size=0.01, price=1660928, event_date=2020-11-12T02:34:05.7424038Z, outstanding_size=0, commission=0, product_code=FX_BTC_JPY, child_order_acceptance_id=JRF20201112-023405-206258}
 S0.01/0.01(0)@1660928	COMPLETED	1970-01-01T09:00:00~2020-11-12T11:34:05(18578:02:34:05)
 
+
 [
 	{
 		"order": {

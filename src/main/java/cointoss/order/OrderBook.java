@@ -34,8 +34,11 @@ public class OrderBook {
     /** The search direction. */
     private final Direction side;
 
+    /** The scale for base currency. */
+    private final int scaleBase;
+
     /** The scale for target currency. */
-    private final int scale;
+    private final int scaleTarget;
 
     /** The base boards. */
     private final ConcurrentSkipListMap<Num, OrderBookPage> base;
@@ -56,7 +59,8 @@ public class OrderBook {
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
         this.base = new ConcurrentSkipListMap(side.isBuy() ? Comparator.reverseOrder() : Comparator.naturalOrder());
-        this.scale = setting.target.scale;
+        this.scaleBase = setting.base.scale;
+        this.scaleTarget = setting.target.scale;
         this.group = new GroupedOrderBook(setting.base.minimumSize);
     }
 
@@ -177,6 +181,9 @@ public class OrderBook {
      * @return A predicted price.
      */
     public final Num predictTakingPrice(double size) {
+        if (size == 0) {
+            return Num.ZERO;
+        }
         double total = 0;
         double remaining = size;
 
@@ -189,7 +196,7 @@ public class OrderBook {
                 break;
             }
         }
-        return Num.of(total / size).scale(scale);
+        return Num.of(total / size).scale(scaleBase);
     }
 
     /**
@@ -358,7 +365,7 @@ public class OrderBook {
             OrderBookPage page = pages.computeIfAbsent(price, key -> new OrderBookPage(key, 0, side.isBuy() ? Num.ZERO : range));
             page.size += size;
 
-            if (Primitives.roundDecimal(page.size, scale, RoundingMode.DOWN) <= 0) {
+            if (Primitives.roundDecimal(page.size, scaleTarget, RoundingMode.DOWN) <= 0) {
                 pages.remove(price);
             }
         }

@@ -9,9 +9,10 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.*;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
@@ -439,6 +440,7 @@ public class BitFlyerService extends MarketService {
         // return orderUpdateRealtimely.expose;
         return clientRealtimely().subscribe(new Topic("child_order_events", ""))
                 .flatIterable(json -> json.find("params", "message", "*"))
+                .take(json -> json.has("product_code", marketName))
                 .map(json -> {
                     System.out.println(json);
 
@@ -453,7 +455,9 @@ public class BitFlyerService extends MarketService {
                     } else if (type.equals("CANCEL")) {
                         return OrderManager.Update.cancel(id);
                     } else if (type.equals("EXECUTION")) {
-                        return OrderManager.Update.executePartially(id, size, price);
+                        Num commission = price.multiply(json.get(Num.class, "commission")).scale(setting.base.scale, RoundingMode.CEILING);
+                        Num sfd = json.get(Num.class, "sfd");
+                        return OrderManager.Update.executePartially(id, size, price, commission.plus(sfd));
                     } else { /* ORDER_FAILED || CANCEL_FAILED || EXPIRE */
                         return (Order) null;
                     }

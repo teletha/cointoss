@@ -59,6 +59,16 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
     }
 
     /**
+     * The total of all entry orders.
+     * 
+     * @return The total of all entry orders.
+     */
+    @Icy.Property(setterModifier = "final")
+    public Num entryCommission() {
+        return Num.ZERO;
+    }
+
+    /**
      * A total size of exit orders.
      * 
      * @return A total size of exit orders.
@@ -89,6 +99,16 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
     }
 
     /**
+     * The total of all exit orders.
+     * 
+     * @return The total of all exit orders.
+     */
+    @Icy.Property(setterModifier = "final")
+    public Num exitCommission() {
+        return Num.ZERO;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -103,7 +123,15 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
     @Override
     @PerformanceSensitive
     public final Num unrealizedProfit(Num currentPrice) {
-        return currentPrice.diff(direction(), entryPrice()).multiply(entryExecutedSize().minus(exitExecutedSize()));
+        return currentPrice.diff(direction(), entryPrice()).multiply(entryExecutedSize().minus(exitExecutedSize())).minus(commission());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Num commission() {
+        return entryCommission().plus(exitCommission());
     }
 
     /**

@@ -25,7 +25,7 @@ public final class BitFlyer extends MarketServiceProvider {
     private static final int AcquirableSize = 499;
 
     public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", MarketSetting.with
-            .target(Currency.BTC.minimumSize(0.01).scale(8))
+            .target(Currency.BTC.minimumSize(0.001).scale(8))
             .base(Currency.JPY.minimumSize(1))
             .targetCurrencyBidSizes(Num.of(0.01), Num.of(0.1), Num.of(1))
             .priceRangeModifier(200)

@@ -468,7 +468,7 @@ public class VerifiableMarketService extends MarketService {
                     iterator.remove();
                 }
 
-                orderUpdateRealtimely.accept(OrderManager.Update.execute(order.id, order.executedSize, order.price));
+                orderUpdateRealtimely.accept(OrderManager.Update.execute(order.id, order.executedSize, order.price, Num.ZERO));
 
                 while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
                     tasks.poll().run();

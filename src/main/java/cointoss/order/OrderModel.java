@@ -222,6 +222,16 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     }
 
     /**
+     * The commission.
+     * 
+     * @return The commission.
+     */
+    @Icy.Property(setterModifier = "final")
+    public Num commission() {
+        return Num.ZERO;
+    }
+
+    /**
      * The order identifier for the specific market.
      * 
      * @return

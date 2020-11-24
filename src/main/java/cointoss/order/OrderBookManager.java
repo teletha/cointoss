@@ -44,7 +44,7 @@ public class OrderBookManager {
      * @param side
      * @return
      */
-    public OrderBook bookFor(Direction side) {
+    public OrderBook bookFor(Directional side) {
         return side.isBuy() ? longs : shorts;
     }
 

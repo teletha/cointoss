@@ -141,6 +141,7 @@ public final class OrderManager {
 
         order.setPrice(updater.price);
         order.setExecutedSize(updater.size);
+        order.setCommission(updater.commission);
 
         if (order.size.is(order.executedSize)) {
             order.setState(OrderState.COMPLETED);
@@ -163,9 +164,11 @@ public final class OrderManager {
                 .plus(updater.price.multiply(updater.size))
                 .divide(newExecutedSize)
                 .scale(service.setting.base.scale);
+        Num newCommission = order.commission.plus(updater.commission);
 
         order.setPrice(newAveragePrice);
         order.setExecutedSize(newExecutedSize);
+        order.setCommission(newCommission);
 
         if (order.size.is(order.executedSize)) {
             order.setState(OrderState.COMPLETED);
@@ -459,8 +462,8 @@ public final class OrderManager {
          * @param price A order's average executed price.
          * @return The updater.
          */
-        public static Order execute(String id, Num size, Num price) {
-            return Order.with.buy(size).price(price).id(id).state(OrderState.ACTIVE);
+        public static Order execute(String id, Num size, Num price, Num commission) {
+            return Order.with.buy(size).price(price).commission(commission).id(id).state(OrderState.ACTIVE);
         }
 
         /**
@@ -471,8 +474,8 @@ public final class OrderManager {
          * @param price A order's current executed price.
          * @return The updater.
          */
-        public static Order executePartially(String id, Num size, Num price) {
-            return Order.with.buy(size).price(price).id(id).state(OrderState.ACTIVE_PARTIAL);
+        public static Order executePartially(String id, Num size, Num price, Num commission) {
+            return Order.with.buy(size).price(price).commission(commission).id(id).state(OrderState.ACTIVE_PARTIAL);
         }
     }
 }

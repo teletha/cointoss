@@ -457,6 +457,14 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
          * {@inheritDoc}
          */
         @Override
+        public Num commission() {
+            return Num.ZERO;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String toString() {
             return "Snapshot [realizedProfit=" + realizedProfit + ", longPrice=" + longPrice + ", shortPrice=" + shortPrice + ", longSize=" + longSize + ", shortSize=" + shortSize + "]";
         }

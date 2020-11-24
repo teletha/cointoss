@@ -17,7 +17,7 @@ import javafx.scene.control.SelectionMode;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.execution.Execution;
+import cointoss.order.OrderBook;
 import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
@@ -31,18 +31,18 @@ import stylist.ValueStyle;
 import trademate.Theme;
 import viewtify.Command;
 import viewtify.Key;
+import viewtify.Viewtify;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
-import viewtify.ui.UIText;
+import viewtify.ui.UITextValue;
 import viewtify.ui.UIVBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
-import viewtify.ui.helper.Verifier;
 
 public class OrderView extends View {
 
@@ -65,7 +65,19 @@ public class OrderView extends View {
     private UIButton takerBuy;
 
     /** UI */
+    private UILabel takerBuyText;
+
+    /** UI */
+    private UILabel takerBuyPrice;
+
+    /** UI */
     private UIButton takerSell;
+
+    /** UI */
+    private UILabel takerSellText;
+
+    /** UI */
+    private UILabel takerSellPrice;
 
     /** UI */
     private UIButton clear;
@@ -80,7 +92,7 @@ public class OrderView extends View {
     private UIButton cancel;
 
     /** UI */
-    private UIText orderSize;
+    private UITextValue<Num> orderSize;
 
     /** UI */
     private UICheckBox history;
@@ -185,6 +197,14 @@ public class OrderView extends View {
                     market.text(m);
                     disposer = Disposable.empty();
                     disposer.add(I.signal(m.trader().scenarios()).merge(m.trader().added).to(table::addItemAtLast));
+                    disposer.add(m.orderBook.longs.best.observing()
+                            .combineLatest(orderSize.observing())
+                            .on(Viewtify.UIThread)
+                            .to(v -> takerSellPrice.text(m.orderBook.longs.predictTakingPrice(v.ⅱ))));
+                    disposer.add(m.orderBook.shorts.best.observing()
+                            .combineLatest(orderSize.observing())
+                            .on(Viewtify.UIThread)
+                            .to(v -> takerBuyPrice.text(m.orderBook.shorts.predictTakingPrice(v.ⅱ))));
                 });
 
         Commands.TakeSell.shortcut(Key.Q).contribute(this::takeSelling);
@@ -194,16 +214,18 @@ public class OrderView extends View {
         Commands.Cancel.shortcut(Key.S).contribute(this::cancel);
         Commands.MakeBuy.shortcut(Key.D).contribute(this::makeBuying);
 
-        takerBuy.text(en("Take Buying")).color(Theme.$.buy).when(User.Action, Commands.TakeBuy);
         clear.text(en("Clear")).when(User.Action, Commands.Clear);
-        takerSell.text(en("Take Selling")).color(Theme.$.sell).when(User.Action, Commands.TakeSell);
+        takerSell.textV(takerSellText, takerSellPrice).color(Theme.$.sell).when(User.Action, Commands.TakeSell);
+        takerSellText.text(en("Take Selling")).color(Theme.$.sell);
+        takerBuy.textV(takerBuyText, takerBuyPrice).color(Theme.$.buy).when(User.Action, Commands.TakeBuy);
+        takerBuyText.text(en("Take Buying")).color(Theme.$.buy);
 
         makerBuy.text(en("Make Buying")).color(Theme.$.buy).when(User.Action, Commands.MakeBuy);
         cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
         makerSell.text(en("Make Selling")).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
 
-        trainingMode.text(en("Use demo trade")).initialize(true);
-        orderSize.value("0.5").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
+        trainingMode.text(en("Demo Trade")).initialize(true);
+        orderSize.value(Num.of("0.5")).normalizeInput(Form.NFKC).acceptPositiveNumberInput();
         history.text(en("Full History"))
                 .initialize(false)
                 .observing(all -> table.take(all ? Scenario::isNotCancelled : Scenario::isActive));
@@ -240,16 +262,21 @@ public class OrderView extends View {
         // ===============================================
         // Analyze Part
         // ===============================================
-        profitAndLoss.text(Profit)
-                .modelBySignal(s -> ActiveMarket.observing().flatVariable(m -> m.tickers.latest).map(Execution::price).map(s::profit))
+        profitAndLoss.text(Profit).modelBySignal(scenario -> {
+            OrderBook books = current.orderBook.bookFor(scenario);
+            return books.best.observing()
+                    .map(page -> scenario.profit(books.predictTakingPrice(scenario.entrySize.minus(scenario.exitExecutedSize))));
+        })
+                // .modelBySignal(s -> ActiveMarket.observing().flatVariable(m ->
+                // m.tickers.latest).map(Execution::price).map(s::profit))
                 .render((ui, profit) -> ui.text(profit).color(Theme.colorBy(profit)));
     }
 
     private Num estimateSize() {
-        if (orderSize.is("0")) {
+        if (orderSize.is(Num.ZERO)) {
             return Num.of("0.01");
         } else {
-            return Num.of(orderSize.value());
+            return orderSize.value();
         }
     }
 

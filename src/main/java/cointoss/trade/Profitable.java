@@ -41,4 +41,11 @@ public interface Profitable {
      */
     @PerformanceSensitive
     Num unrealizedProfit(Num currentPrice);
+
+    /**
+     * The total commission.
+     * 
+     * @return The total commission.
+     */
+    Num commission();
 }
