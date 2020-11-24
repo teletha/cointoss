@@ -85,7 +85,7 @@ public interface OrderStrategy {
          * @return Maker is cancellable.
          */
         default Cancellable make(Num price) {
-            return make((market, direction, size) -> price);
+            return make((market, direction, size) -> price, "Make order at the specified price.");
         }
 
         /**
@@ -104,7 +104,17 @@ public interface OrderStrategy {
          * @param price
          * @return
          */
-        Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price);
+        default Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price) {
+            return make(price, "Make order at the specified price.");
+        }
+
+        /**
+         * Build your limit order by the current market infomation.
+         * 
+         * @param price
+         * @return
+         */
+        Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price, String description);
 
         /**
          * Limit order with the best price by referrencing order books.
@@ -113,7 +123,7 @@ public interface OrderStrategy {
          */
         default Cancellable makeBestPrice() {
             return make((market, direction, price) -> market.orderBook.bookFor(direction)
-                    .computeBestPrice(market.service.setting.base.minimumSize));
+                    .computeBestPrice(market.service.setting.base.minimumSize), "Make order at the best price.");
         }
 
         /**
@@ -124,7 +134,7 @@ public interface OrderStrategy {
          */
         default Cancellable makeBestPrice(Direction direction) {
             return make((market, d, price) -> market.orderBook.bookFor(direction)
-                    .computeBestPrice(market.service.setting.base.minimumSize));
+                    .computeBestPrice(market.service.setting.base.minimumSize), "Make order at the bast price by side.");
         }
 
         /**
@@ -168,13 +178,23 @@ public interface OrderStrategy {
         /**
          * Cancel the order if it remains after the specified time has passed.
          * 
-         * @param <S>
          * @param time A time value.
          * @param unit A time unit.
          * @return
          */
         default Orderable cancelAfter(long time, ChronoUnit unit) {
-            return cancelWhen(scheduler -> I.schedule(time, TimeUnit.of(unit), scheduler));
+            return cancelAfter(time, TimeUnit.of(unit));
+        }
+
+        /**
+         * Cancel the order if it remains after the specified time has passed.
+         * 
+         * @param time A time value.
+         * @param unit A time unit.
+         * @return
+         */
+        default Orderable cancelAfter(long time, TimeUnit unit) {
+            return cancelWhen(scheduler -> I.schedule(time, unit, scheduler), "Cancel order after " + time + " " + unit + ".");
         }
 
         /**
@@ -204,7 +224,7 @@ public interface OrderStrategy {
          * @return
          */
         default Orderable cancelWhen(Signal<?> timing) {
-            return cancelWhen(scheduler -> timing);
+            return cancelWhen(timing, "Cancel order when the specifid timing.");
         }
 
         /**
@@ -213,6 +233,26 @@ public interface OrderStrategy {
          * @param timing A timing to cancel order.
          * @return
          */
-        Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing);
+        default Orderable cancelWhen(Signal<?> timing, String description) {
+            return cancelWhen(scheduler -> timing, description);
+        }
+
+        /**
+         * Cancel the order if it remains after the specified time has passed.
+         * 
+         * @param timing A timing to cancel order.
+         * @return
+         */
+        default Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing) {
+            return cancelWhen(timing, "Cancel order when the specified timing.");
+        }
+
+        /**
+         * Cancel the order if it remains after the specified time has passed.
+         * 
+         * @param timing A timing to cancel order.
+         * @return
+         */
+        Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing, String description);
     }
 }
