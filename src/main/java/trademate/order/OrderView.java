@@ -80,6 +80,9 @@ public class OrderView extends View {
     private UIText orderSize;
 
     /** UI */
+    private UICheckBox history;
+
+    /** UI */
     private UICheckBox trainingMode;
 
     /** UI */
@@ -116,7 +119,7 @@ public class OrderView extends View {
                 });
 
                 form(en("Market"), FormStyles.FormInput, market, trainingMode);
-                form(Amount, FormStyles.FormInputMin, orderSize);
+                form(Amount, FormStyles.FormInputMin, orderSize, history);
 
                 $(table, style.Root, () -> {
                     $(entryPrice, style.Wide);
@@ -191,10 +194,13 @@ public class OrderView extends View {
             });
         });
         orderSize.value("0.5").normalizeInput(Form.NFKC).acceptPositiveNumberInput().verifyBy(Verifier.PositiveNumber);
+        history.text(en("Full History")).initialize(false).observing(all -> table.take(all ? null : Scenario::isActive));
 
         initializeTable();
 
-        ActiveMarket.observing().skipNull().to(m -> {
+        ActiveMarket.observing().skipNull().to(m ->
+
+        {
             update(m);
             if (m instanceof TrainingMarket == false) {
                 trainingMode.value(false);
@@ -206,7 +212,7 @@ public class OrderView extends View {
         // ===============================================
         // Table Part
         // ===============================================
-        table.mode(SelectionMode.MULTIPLE).context(root -> {
+        table.mode(SelectionMode.MULTIPLE).observeItemState(s -> s.state).context(root -> {
             root.menu(en("Clear")).when(User.Action, () -> table.selectedItems().forEach(Scenario::stop));
             root.menu(en("Retreat")).when(User.Action, () -> table.selectedItems().forEach(Scenario::stopRetreat));
         });
@@ -252,13 +258,13 @@ public class OrderView extends View {
     }
 
     /**
-     * Create tree item for {@link OrderSet}.
+     * Create new table item.
      * 
-     * @param set
+     * @param scenario
      */
-    private void createScenarioItem(Scenario order) {
-        if (order != null) {
-            table.addItemAtLast(order);
+    private void createScenarioItem(Scenario scenario) {
+        if (scenario != null) {
+            table.addItemAtLast(scenario);
         }
     }
 
