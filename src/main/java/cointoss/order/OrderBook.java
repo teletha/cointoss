@@ -167,7 +167,7 @@ public class OrderBook {
      * @return A predicted price.
      */
     public final Num predictTakingPrice(long size) {
-        return predictTakingPrice(Num.of(size));
+        return predictTakingPrice((double) size);
     }
 
     /**
@@ -177,38 +177,8 @@ public class OrderBook {
      * @return A predicted price.
      */
     public final Num predictTakingPrice(double size) {
-        return predictTakingPrice(Num.of(size));
-    }
-
-    /**
-     * Predict the taking price.
-     * 
-     * @param size A taking size.
-     * @return A predicted price.
-     */
-    public final Num predictTakingPrice(String size) {
-        return predictTakingPrice(Num.of(size));
-    }
-
-    /**
-     * Predict the taking price.
-     * 
-     * @param size A taking size.
-     * @return A predicted price.
-     */
-    public final Num predictTakingPrice(Variable<Num> size) {
-        return predictTakingPrice(size.v);
-    }
-
-    /**
-     * Predict the taking price.
-     * 
-     * @param size A taking size.
-     * @return A predicted price.
-     */
-    public final Num predictTakingPrice(Num size) {
         double total = 0;
-        double remaining = size.doubleValue();
+        double remaining = size;
 
         for (OrderBookPage page : base.values()) {
             double decrease = Math.min(page.size, remaining);
@@ -219,7 +189,37 @@ public class OrderBook {
                 break;
             }
         }
-        return Num.of(total / size.doubleValue());
+        return Num.of(total / size).scale(scale);
+    }
+
+    /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Num predictTakingPrice(String size) {
+        return predictTakingPrice(Double.valueOf(size));
+    }
+
+    /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Num predictTakingPrice(Num size) {
+        return predictTakingPrice(size.doubleValue());
+    }
+
+    /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Num predictTakingPrice(Variable<Num> size) {
+        return predictTakingPrice(size.v);
     }
 
     /**
