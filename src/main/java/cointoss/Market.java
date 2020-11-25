@@ -88,6 +88,9 @@ public class Market implements Disposable {
     /** The managed {@link Trader}. */
     private final List<Trader> managedTraders = new ArrayList();
 
+    /** The base trader. */
+    private Trader trader;
+
     /** The managed {@link Trader}. */
     public final List<Trader> traders = Collections.unmodifiableList(managedTraders);
 
@@ -115,8 +118,6 @@ public class Market implements Disposable {
         readOrderBook();
     }
 
-    private Trader trader;
-
     public synchronized Trader trader() {
         if (trader == null) {
             trader = new Trader() {
@@ -124,7 +125,7 @@ public class Market implements Disposable {
                 protected void declare(Market market, Funds fund) {
                 }
             };
-            trader.initialize(this);
+            register(trader);
         }
         return trader;
     }

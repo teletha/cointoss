@@ -23,7 +23,7 @@ import cointoss.verify.BackTest;
  */
 public class CrossOrder extends Trader {
 
-    public Span span = Span.Hour1;
+    public Span span = Span.Minute1;
 
     public int diff = 10000;
 
@@ -42,8 +42,8 @@ public class CrossOrder extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(entryPrice.minus(this, 5000));
-                exitAt(entryPrice.plus(this, 5000));
+                exitAt(entryPrice.minus(this, 1000));
+                exitAt(entryPrice.plus(this, 1500));
             }
         });
     }
