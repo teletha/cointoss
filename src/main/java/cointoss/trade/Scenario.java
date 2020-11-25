@@ -495,6 +495,16 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     /**
+     * Observe and calculate the expected profit and loss considering the current state of the order
+     * book.
+     * 
+     * @return An event stream of the expected profit and loss.
+     */
+    public final Signal<Num> observePredictableProfit() {
+        return market.orderBook.by(this).best.observe().map(page -> predictProfit());
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -613,13 +623,42 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * Operate to stop this {@link Scenario} right now.
      */
     public final void stop() {
-        exitWhen(now(), s -> s.take());
+        exitWhen(now());
     }
 
     /**
      * Operate to stop this {@link Scenario} right now.
      */
-    public final void stopRetreat() {
-        exitAt(entryPrice);
+    public final void retreat() {
+        retreat(Num.ZERO);
+    }
+
+    /**
+     * Operate to stop this {@link Scenario} right now.
+     */
+    public final void retreat(long threshold) {
+        retreat(Num.of(threshold));
+    }
+
+    /**
+     * Operate to stop this {@link Scenario} right now.
+     */
+    public final void retreat(double threshold) {
+        retreat(Num.of(threshold));
+    }
+
+    /**
+     * Operate to stop this {@link Scenario} right now.
+     */
+    public final void retreat(Num threshold) {
+        exitWhen(observePredictableProfit().take(profit -> profit.isLessThanOrEqual(threshold)));
+    }
+
+    /**
+     * Operate to stop this {@link Scenario} right now.
+     */
+    public final void retreat(Num acceptableProfit, Num acceptableLoss) {
+        exitWhen(observePredictableProfit()
+                .take(pnl -> pnl.isLessThanOrEqual(acceptableProfit) && pnl.isGreaterThanOrEqual(acceptableLoss)));
     }
 }

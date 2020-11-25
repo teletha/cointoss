@@ -241,7 +241,7 @@ public class OrderView extends View {
         // ===============================================
         table.mode(SelectionMode.MULTIPLE).observeItemState(s -> s.state).context(root -> {
             root.menu(en("Clear")).when(User.Action, () -> table.selectedItems().forEach(Scenario::stop));
-            root.menu(en("Retreat")).when(User.Action, () -> table.selectedItems().forEach(Scenario::stopRetreat));
+            root.menu(en("Retreat")).when(User.Action, () -> table.selectedItems().forEach(s -> s.retreat(Num.of(100), Num.of(-100))));
         });
 
         // ===============================================
