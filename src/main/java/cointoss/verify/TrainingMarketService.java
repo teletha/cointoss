@@ -11,10 +11,15 @@ package cointoss.verify;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.lang3.RandomUtils;
+
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
+import cointoss.order.OrderBookManager;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.arithmetic.Num;
@@ -25,15 +30,18 @@ public class TrainingMarketService extends MarketService {
 
     private final MarketService backend;
 
+    private final OrderBookManager orderbooks;
+
     final VerifiableMarketService frontend;
 
     /**
      * @param backend
      */
-    public TrainingMarketService(MarketService backend) {
-        super(backend.exchange, backend.marketName, backend.setting);
-        this.backend = backend;
-        this.frontend = new VerifiableMarketService(backend);
+    public TrainingMarketService(Market backend) {
+        super(backend.service.exchange, backend.service.marketName, backend.service.setting);
+        this.backend = backend.service;
+        this.orderbooks = backend.orderBook;
+        this.frontend = new VerifiableMarketService(backend.service);
     }
 
     /**
@@ -76,7 +84,15 @@ public class TrainingMarketService extends MarketService {
     @Override
     public Signal<String> request(Order order) {
         System.out.println("request " + order);
-        return frontend.request(order);
+        if (order.type.isTaker()) {
+            String id = "ID" + RandomUtils.nextInt();
+            return I.signal(id).effectOnComplete(() -> {
+                frontend.orderUpdateRealtimely.accept(OrderManager.Update
+                        .execute(id, order.size, orderbooks.by(order.inverse()).predictTakingPrice(order.size), Num.ZERO));
+            });
+        } else {
+            return frontend.request(order);
+        }
     }
 
     /**

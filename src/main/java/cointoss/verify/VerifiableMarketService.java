@@ -61,7 +61,7 @@ public class VerifiableMarketService extends MarketService {
     private final List<BackendOrder> orderActive = new ArrayList<>();
 
     /** The order manager. */
-    private final Signaling<Order> orderUpdateRealtimely = new Signaling();
+    final Signaling<Order> orderUpdateRealtimely = new Signaling();
 
     /** The initial base currency. */
     public Num baseCurrency = Num.HUNDRED;

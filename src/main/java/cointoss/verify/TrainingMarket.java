@@ -20,7 +20,7 @@ public class TrainingMarket extends Market {
      * @param backend
      */
     public TrainingMarket(Market backend) {
-        super(new TrainingMarketService(backend.service));
+        super(new TrainingMarketService(backend));
         this.backend = backend;
 
         service.executionsRealtimely().to(e -> {
