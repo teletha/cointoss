@@ -122,7 +122,7 @@ public interface OrderStrategy {
          * @return Maker is cancellable.
          */
         default Cancellable makeBestPrice() {
-            return make((market, direction, price) -> market.orderBook.bookFor(direction)
+            return make((market, direction, price) -> market.orderBook.by(direction)
                     .computeBestPrice(market.service.setting.base.minimumSize), "Make order at the best price.");
         }
 
@@ -133,7 +133,7 @@ public interface OrderStrategy {
          * @return Maker is cancellable.
          */
         default Cancellable makeBestPrice(Direction direction) {
-            return make((market, d, price) -> market.orderBook.bookFor(direction)
+            return make((market, d, price) -> market.orderBook.by(direction)
                     .computeBestPrice(market.service.setting.base.minimumSize), "Make order at the bast price by side.");
         }
 

@@ -17,7 +17,6 @@ import javafx.scene.control.SelectionMode;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.order.OrderBook;
 import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
@@ -262,13 +261,8 @@ public class OrderView extends View {
         // ===============================================
         // Analyze Part
         // ===============================================
-        profitAndLoss.text(Profit).modelBySignal(scenario -> {
-            OrderBook books = current.orderBook.bookFor(scenario);
-            return books.best.observing()
-                    .map(page -> scenario.profit(books.predictTakingPrice(scenario.entrySize.minus(scenario.exitExecutedSize))));
-        })
-                // .modelBySignal(s -> ActiveMarket.observing().flatVariable(m ->
-                // m.tickers.latest).map(Execution::price).map(s::profit))
+        profitAndLoss.text(Profit)
+                .modelBySignal(scenario -> current.orderBook.by(scenario).best.observing().map(page -> scenario.predictProfit()))
                 .render((ui, profit) -> ui.text(profit).color(Theme.colorBy(profit)));
     }
 

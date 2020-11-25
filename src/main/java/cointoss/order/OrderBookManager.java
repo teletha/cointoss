@@ -39,12 +39,12 @@ public class OrderBookManager {
     }
 
     /**
-     * Retrieve the {@link OrderBook} for {@link Direction}.
+     * Retrieve the {@link OrderBook} by {@link Direction}.
      * 
-     * @param side
-     * @return
+     * @param side A target direction.
+     * @return The associated {@link OrderBook}.
      */
-    public OrderBook bookFor(Directional side) {
+    public OrderBook by(Directional side) {
         return side.isBuy() ? longs : shorts;
     }
 

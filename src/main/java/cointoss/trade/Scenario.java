@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -483,6 +483,15 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     @Override
     public final Direction direction() {
         return directional.direction();
+    }
+
+    /**
+     * Calculate the expected profit and loss considering the current state of the order book.
+     * 
+     * @return The expected profit and loss.
+     */
+    public final Num predictProfit() {
+        return profit(market.orderBook.by(this).predictTakingPrice(remainingSize()));
     }
 
     /**

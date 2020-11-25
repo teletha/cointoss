@@ -109,6 +109,15 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
     }
 
     /**
+     * The remaining size to stop this scenario.
+     * 
+     * @return
+     */
+    public final Num remainingSize() {
+        return entryExecutedSize().minus(exitExecutedSize());
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
