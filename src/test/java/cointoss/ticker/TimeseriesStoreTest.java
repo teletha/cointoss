@@ -349,58 +349,58 @@ class TimeseriesStoreTest {
     void befores() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
         store.store(0, 5, 10, 15);
-        assert store.before(0, 1).isEmpty();
-        assert store.before(3, 2).isEmpty();
-        assert store.before(5, 1).equals(List.of(0));
-        assert store.before(7, 2).equals(List.of(0));
-        assert store.before(10, 1).equals(List.of(5));
-        assert store.before(14, 2).equals(List.of(5, 0));
-        assert store.before(15, 3).equals(List.of(10, 5, 0));
-        assert store.before(20, 2).equals(List.of(15, 10));
-        assert store.before(25, 5).equals(List.of(15, 10, 5, 0));
+        assert store.beforeUntil(0, 1).isEmpty();
+        assert store.beforeUntil(3, 2).isEmpty();
+        assert store.beforeUntil(5, 1).equals(List.of(0));
+        assert store.beforeUntil(7, 2).equals(List.of(0));
+        assert store.beforeUntil(10, 1).equals(List.of(5));
+        assert store.beforeUntil(14, 2).equals(List.of(5, 0));
+        assert store.beforeUntil(15, 3).equals(List.of(10, 5, 0));
+        assert store.beforeUntil(20, 2).equals(List.of(15, 10));
+        assert store.beforeUntil(25, 5).equals(List.of(15, 10, 5, 0));
     }
 
     @Test
     void beforesOverTime() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
-        assert store.before(0, 1).isEmpty();
-        assert store.before(days - 1, 2).isEmpty();
-        assert store.before(days, 1).equals(List.of(0));
-        assert store.before(days + 1, 2).equals(List.of(0));
-        assert store.before(2 * days - 1, 3).equals(List.of(0));
-        assert store.before(2 * days, 1).equals(List.of(days));
-        assert store.before(2 * days + 1, 3).equals(List.of(days, 0));
-        assert store.before(4 * days, 3).equals(List.of(3 * days, 2 * days, days));
+        assert store.beforeUntil(0, 1).isEmpty();
+        assert store.beforeUntil(days - 1, 2).isEmpty();
+        assert store.beforeUntil(days, 1).equals(List.of(0));
+        assert store.beforeUntil(days + 1, 2).equals(List.of(0));
+        assert store.beforeUntil(2 * days - 1, 3).equals(List.of(0));
+        assert store.beforeUntil(2 * days, 1).equals(List.of(days));
+        assert store.beforeUntil(2 * days + 1, 3).equals(List.of(days, 0));
+        assert store.beforeUntil(4 * days, 3).equals(List.of(3 * days, 2 * days, days));
     }
 
     @Test
     void beforeWith() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
         store.store(0, 5, 10, 15);
-        assert store.beforeWith(0, 1).equals(List.of(0));
-        assert store.beforeWith(3, 2).equals(List.of(0));
-        assert store.beforeWith(5, 1).equals(List.of(5));
-        assert store.beforeWith(7, 2).equals(List.of(5, 0));
-        assert store.beforeWith(10, 1).equals(List.of(10));
-        assert store.beforeWith(14, 2).equals(List.of(10, 5));
-        assert store.beforeWith(15, 5).equals(List.of(15, 10, 5, 0));
-        assert store.beforeWith(20, 2).equals(List.of(15, 10));
-        assert store.beforeWith(25, 5).equals(List.of(15, 10, 5, 0));
+        assert store.beforeUntilWith(0, 1).equals(List.of(0));
+        assert store.beforeUntilWith(3, 2).equals(List.of(0));
+        assert store.beforeUntilWith(5, 1).equals(List.of(5));
+        assert store.beforeUntilWith(7, 2).equals(List.of(5, 0));
+        assert store.beforeUntilWith(10, 1).equals(List.of(10));
+        assert store.beforeUntilWith(14, 2).equals(List.of(10, 5));
+        assert store.beforeUntilWith(15, 5).equals(List.of(15, 10, 5, 0));
+        assert store.beforeUntilWith(20, 2).equals(List.of(15, 10));
+        assert store.beforeUntilWith(25, 5).equals(List.of(15, 10, 5, 0));
     }
 
     @Test
     void beforeWithOverTime() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
-        assert store.beforeWith(0, 1).equals(List.of(0));
-        assert store.beforeWith(days - 1, 2).equals(List.of(0));
-        assert store.beforeWith(days, 1).equals(List.of(days));
-        assert store.beforeWith(days + 1, 2).equals(List.of(days, 0));
-        assert store.beforeWith(2 * days - 1, 3).equals(List.of(days, 0));
-        assert store.beforeWith(2 * days, 1).equals(List.of(2 * days));
-        assert store.beforeWith(2 * days + 1, 5).equals(List.of(2 * days, days, 0));
-        assert store.beforeWith(4 * days, 3).equals(List.of(4 * days, 3 * days, 2 * days));
+        assert store.beforeUntilWith(0, 1).equals(List.of(0));
+        assert store.beforeUntilWith(days - 1, 2).equals(List.of(0));
+        assert store.beforeUntilWith(days, 1).equals(List.of(days));
+        assert store.beforeUntilWith(days + 1, 2).equals(List.of(days, 0));
+        assert store.beforeUntilWith(2 * days - 1, 3).equals(List.of(days, 0));
+        assert store.beforeUntilWith(2 * days, 1).equals(List.of(2 * days));
+        assert store.beforeUntilWith(2 * days + 1, 5).equals(List.of(2 * days, days, 0));
+        assert store.beforeUntilWith(4 * days, 3).equals(List.of(4 * days, 3 * days, 2 * days));
     }
 
     @RegisterExtension

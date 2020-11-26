@@ -38,9 +38,9 @@ public class TouchMovingAverage extends Trader {
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        Span span = Span.Minute30;
+        Span span = Span.Minute5;
         Ticker ticker = market.tickers.on(span);
-        NumIndicator sma = NumIndicator.build(ticker, tick -> tick.closePrice()).sma(21);
+        NumIndicator sma = NumIndicator.build(ticker, tick -> tick.closePrice()).sma(25);
 
         Signal<Tick> up = market.timeline.map(e -> e.price())
                 .plug(breakup(sma::valueAtLast))

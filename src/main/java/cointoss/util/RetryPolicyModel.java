@@ -215,12 +215,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
                 }
             }
 
-            if (parking) {
-                return I.signal();
-            } else {
-                parking = true;
-                return I.signal(e);
-            }
+            return I.signal(e);
         }).take(limit()).delay(e -> {
             if (autoReset()) {
                 if (autoReset != null) {
@@ -238,6 +233,36 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             }
 
             return duration;
-        }, scheduler()).effect(() -> parking = false).effect(onRetry);
+        }, scheduler()).effect(onRetry);
+    }
+
+    public static WiseFunction<Signal<Throwable>, Signal<?>> comply(long limit) {
+        return comply(limit, null);
+    }
+
+    public static WiseFunction<Signal<Throwable>, Signal<?>> comply(long limit, LongFunction<Duration> delay) {
+        return comply(limit, delay, null);
+    }
+
+    public static WiseFunction<Signal<Throwable>, Signal<?>> comply(long limit, LongFunction<Duration> delay, ScheduledExecutorService scheduler) {
+        long[] c = {0, 0};
+
+        return x -> x.flatMap(e -> limit <= 0 || e instanceof AssertionError ? I.signalError(e) : I.signal(e)).take(limit).delay(e -> {
+            long now = System.currentTimeMillis();
+            if (now - c[1] > 10 * 60 * 1000) {
+                c[0] = 0;
+            }
+            c[1] = now;
+
+            if (delay == null) {
+                return Duration.ZERO;
+            } else {
+                Duration duration = delay.apply(c[0]++);
+                if (10 < duration.toMinutes()) {
+                    duration = Duration.ofMinutes(10);
+                }
+                return duration;
+            }
+        }, scheduler);
     }
 }

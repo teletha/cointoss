@@ -300,26 +300,22 @@ public final class TimeseriesStore<E> {
      */
     public E first() {
         OnHeap entry = indexed.firstValue();
-
         if (entry == null) {
             return null;
         }
-
         return entry.first();
     }
 
     /**
-     * Get the last stored time series item.
+     * Get the last stored time series item which is .
      * 
      * @return The last stored time series item.
      */
     public E last() {
         OnHeap entry = indexed.lastValue();
-
         if (entry == null) {
             return null;
         }
-
         return entry.last();
     }
 
@@ -532,8 +528,8 @@ public final class TimeseriesStore<E> {
      * @param item An indexable item.
      * @return
      */
-    public List<E> before(E item, int maximumSize) {
-        return before(timestampExtractor.applyAsLong(item), maximumSize);
+    public List<E> beforeUntil(E item, int maximumSize) {
+        return beforeUntil(timestampExtractor.applyAsLong(item), maximumSize);
     }
 
     /**
@@ -542,7 +538,7 @@ public final class TimeseriesStore<E> {
      * @param timestamp A time stamp.
      * @return
      */
-    public List<E> before(long timestamp, int maximumSize) {
+    public List<E> beforeUntil(long timestamp, int maximumSize) {
         return before(timestamp, maximumSize, false);
     }
 
@@ -552,8 +548,8 @@ public final class TimeseriesStore<E> {
      * @param item An indexable item.
      * @return
      */
-    public List<E> beforeWith(E item, int maximumSize) {
-        return beforeWith(timestampExtractor.applyAsLong(item), maximumSize);
+    public List<E> beforeUntilWith(E item, int maximumSize) {
+        return beforeUntilWith(timestampExtractor.applyAsLong(item), maximumSize);
     }
 
     /**
@@ -562,7 +558,7 @@ public final class TimeseriesStore<E> {
      * @param timestamp A time stamp.
      * @return
      */
-    public List<E> beforeWith(long timestamp, int maximumSize) {
+    public List<E> beforeUntilWith(long timestamp, int maximumSize) {
         return before(timestamp, maximumSize, true);
     }
 
