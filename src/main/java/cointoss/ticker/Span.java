@@ -112,6 +112,21 @@ public enum Span {
     }
 
     /**
+     * Compute the distance between the specified ticks.
+     * 
+     * @param one A target.
+     * @param other A target.
+     * @return
+     */
+    public long distance(Tick one, Tick other) {
+        if (one == null || other == null) {
+            return 0;
+        } else {
+            return Math.abs(one.openTime - other.openTime) / seconds;
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

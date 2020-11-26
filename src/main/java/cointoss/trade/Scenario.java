@@ -442,9 +442,11 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      */
     public final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
         disposerForExit.add(timing.first().to(() -> {
-            market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(e -> {
-                processExitOrder(e, "exitWhen");
-            });
+            if (!isExitTerminated()) {
+                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(e -> {
+                    processExitOrder(e, "exitWhen");
+                });
+            }
         }));
     }
 

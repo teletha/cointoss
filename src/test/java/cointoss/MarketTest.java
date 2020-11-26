@@ -41,7 +41,7 @@ class MarketTest {
         private Market declaredMarket;
 
         @Override
-        protected void declare(Market market, Funds fund) {
+        protected void declareStrategy(Market market, Funds fund) {
             this.declaredMarket = market;
         }
     }

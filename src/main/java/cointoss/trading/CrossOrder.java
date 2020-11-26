@@ -33,7 +33,7 @@ public class CrossOrder extends Trader {
      * {@inheritDoc}
      */
     @Override
-    protected void declare(Market market, Funds fund) {
+    protected void declareStrategy(Market market, Funds fund) {
         when(market.open(span), v -> new Scenario() {
             @Override
             protected void entry() {

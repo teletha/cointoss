@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.LongFunction;
+import java.util.function.Predicate;
 import java.util.function.ToLongFunction;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -34,6 +35,7 @@ import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
 import cointoss.util.map.LongMap.LongEntry;
 import kiss.Decoder;
+import kiss.Disposable;
 import kiss.Encoder;
 import kiss.I;
 import kiss.Signal;
@@ -327,9 +329,19 @@ public final class TimeseriesStore<E> {
      * @param each An item processor.
      */
     public void each(Consumer<? super E> each) {
-        for (OnHeap segment : indexed.values()) {
-            segment.each(0, length, each);
-        }
+        each().to(each);
+    }
+
+    /**
+     * Get the time series items stored from the specified start time to end time in ascending
+     * order.
+     * 
+     * @param start A start time (included).
+     * @param end A end time (included).
+     * @param each An item processor.
+     */
+    public void each(E start, E end, Consumer<? super E> each) {
+        each(timestampExtractor.applyAsLong(start), timestampExtractor.applyAsLong(end), each);
     }
 
     /**
@@ -341,27 +353,116 @@ public final class TimeseriesStore<E> {
      * @param each An item processor.
      */
     public void each(long start, long end, Consumer<? super E> each) {
+        each(start, end).to(each);
+    }
+
+    /**
+     * Get the time series items stored from the specified start time to end time in ascending
+     * order.
+     * 
+     * @param start A start time (included).
+     * @param end A end time (included).
+     * @return An item stream.
+     */
+    public Signal<E> each() {
+        return new Signal<>((observer, disposer) -> {
+            for (OnHeap segment : indexed.values()) {
+                if (disposer.isDisposed()) {
+                    break;
+                }
+                segment.each(0, length, observer, disposer);
+            }
+            observer.complete();
+            return disposer;
+        });
+    }
+
+    /**
+     * Get the time series items stored from the specified start time to end time in ascending
+     * order.
+     * 
+     * @param start A start time (included).
+     * @param end A end time (included).
+     * @return An item stream.
+     */
+    public Signal<E> eachLatest() {
+        return new Signal<>((observer, disposer) -> {
+            for (OnHeap segment : indexed.descendingMap().values()) {
+                if (disposer.isDisposed()) {
+                    break;
+                }
+                segment.eachLatest(length, 0, observer, disposer);
+            }
+            observer.complete();
+            return disposer;
+        });
+    }
+
+    /**
+     * Get the time series items stored from the specified start time to end time in ascending
+     * order.
+     * 
+     * @param start A start time (included).
+     * @param end A end time (included).
+     * @return An item stream.
+     */
+    public Signal<E> each(E start, E end) {
+        return each(timestampExtractor.applyAsLong(start), timestampExtractor.applyAsLong(end));
+    }
+
+    /**
+     * Get the time series items stored from the specified start time to end time in ascending
+     * order.
+     * 
+     * @param start A start time (excluded).
+     * @param end A end time (excluded).
+     * @return An item stream.
+     */
+    public Signal<E> eachInside(E start, E end) {
+        return each(timestampExtractor.applyAsLong(start) + span.seconds, timestampExtractor.applyAsLong(end) - span.seconds);
+    }
+
+    /**
+     * Get the time series items stored from the specified start time to end time in ascending
+     * order.
+     * 
+     * @param start A start time (included).
+     * @param end A end time (included).
+     * @return An item stream.
+     */
+    public Signal<E> each(long start, long end) {
         if (end < start) {
-            return;
+            return I.signal();
         }
 
-        long[] startIndex = index(start);
-        long[] endIndex = index(end);
-        ConcurrentNavigableLongMap<OnHeap> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
+        return new Signal<>((observer, disposer) -> {
+            long[] startIndex = index(start);
+            long[] endIndex = index(end);
+            ConcurrentNavigableLongMap<OnHeap> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
 
-        for (LongEntry<OnHeap> entry : sub.longEntrySet()) {
-            long time = entry.getLongKey();
-            int startItemIndex = 0;
-            int endItemIndex = length;
+            try {
+                for (LongEntry<OnHeap> entry : sub.longEntrySet()) {
+                    if (disposer.isDisposed()) {
+                        break;
+                    }
+                    long time = entry.getLongKey();
+                    int startItemIndex = 0;
+                    int endItemIndex = length;
 
-            if (time == startIndex[0]) {
-                startItemIndex = (int) startIndex[1];
+                    if (time == startIndex[0]) {
+                        startItemIndex = (int) startIndex[1];
+                    }
+                    if (time == endIndex[0]) {
+                        endItemIndex = (int) endIndex[1];
+                    }
+                    entry.getValue().each(startItemIndex, endItemIndex, observer, disposer);
+                }
+                observer.complete();
+            } catch (Throwable e) {
+                observer.error(e);
             }
-            if (time == endIndex[0]) {
-                endItemIndex = (int) endIndex[1];
-            }
-            entry.getValue().each(startItemIndex, endItemIndex, each);
-        }
+            return disposer;
+        });
     }
 
     /**
@@ -385,6 +486,16 @@ public final class TimeseriesStore<E> {
     }
 
     /**
+     * Get the most recent item that matches the conditions before the indexable item.
+     * 
+     * @param item An indexable item.
+     * @return A matched item or null.
+     */
+    public E before(E item, Predicate<E> condition) {
+        return before(timestampExtractor.applyAsLong(item), condition);
+    }
+
+    /**
      * Get the item just before the specified timestamp (epoch seconds).
      * 
      * @param timestamp A time stamp.
@@ -392,6 +503,27 @@ public final class TimeseriesStore<E> {
      */
     public E before(long timestamp) {
         return at(timestamp - span.seconds);
+    }
+
+    /**
+     * Get the most recent item that matches the conditions before the indexable item.
+     * 
+     * @param item An indexable item.
+     * @return A matched item or null.
+     */
+    public E before(long timestamp, Predicate<E> condition) {
+        for (int i = 1; i < Integer.MAX_VALUE; i++) {
+            E item = at(timestamp - span.seconds * i);
+
+            if (item == null) {
+                break;
+            }
+
+            if (condition.test(item)) {
+                return item;
+            }
+        }
+        return null;
     }
 
     /**
@@ -623,7 +755,7 @@ public final class TimeseriesStore<E> {
          * @param each An item processor.
          */
         void each(Consumer<? super E> each) {
-            each(min, max, each);
+            each(min, max, each, Disposable.empty());
         }
 
         /**
@@ -634,12 +766,37 @@ public final class TimeseriesStore<E> {
          * @param end A end index (exclusive).
          * @param each An item processor.
          */
-        void each(int start, int end, Consumer<? super E> consumer) {
+        void each(int start, int end, Consumer<? super E> consumer, Disposable disposer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
             E[] avoidNPE = items; // copy reference to avoid NPE by #clear
             if (avoidNPE != null) {
                 for (int i = start; i <= end; i++) {
+                    if (disposer.isDisposed()) {
+                        return;
+                    }
+                    consumer.accept(avoidNPE[i]);
+                }
+            }
+        }
+
+        /**
+         * Get the time series items stored from the specified start index (inclusive) to end index
+         * (exclusive) in ascending order.
+         * 
+         * @param start A start index (included).
+         * @param end A end index (exclusive).
+         * @param each An item processor.
+         */
+        void eachLatest(int start, int end, Consumer<? super E> consumer, Disposable disposer) {
+            start = Math.min(max, start);
+            end = Math.max(min, end);
+            E[] avoidNPE = items; // copy reference to avoid NPE by #clear
+            if (avoidNPE != null) {
+                for (int i = start; end <= i; i--) {
+                    if (disposer.isDisposed()) {
+                        return;
+                    }
                     consumer.accept(avoidNPE[i]);
                 }
             }

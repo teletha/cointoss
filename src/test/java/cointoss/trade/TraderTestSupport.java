@@ -72,7 +72,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * {@inheritDoc}
      */
     @Override
-    protected void declare(Market market, Funds fund) {
+    protected void declareStrategy(Market market, Funds fund) {
     }
 
     /**

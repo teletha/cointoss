@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
@@ -89,6 +90,15 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     public abstract T valueAt(Tick timestamp);
 
     /**
+     * Acquires the latest value of this {@link Indicator}.
+     * 
+     * @return
+     */
+    public final T valueAtLast() {
+        return valueAt(ticker.current);
+    }
+
+    /**
      * Acquires the stream in which the indicator value flows at the specified timing.
      * 
      * @return
@@ -104,6 +114,16 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      */
     public final Signal<T> valueAt(Signal<Tick> ticker) {
         return ticker.map(this::valueAt);
+    }
+
+    /**
+     * Detects the first tick that meets the conditions in reverse order from the tail end.
+     * 
+     * @param condition
+     * @return
+     */
+    public final Tick findLatest(BiPredicate<Tick, T> condition) {
+        return ticker.ticks.before(ticker.current, tick -> condition.test(tick, valueAt(tick)));
     }
 
     /**

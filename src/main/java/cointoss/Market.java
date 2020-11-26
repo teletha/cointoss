@@ -122,7 +122,7 @@ public class Market implements Disposable {
         if (trader == null) {
             trader = new Trader() {
                 @Override
-                protected void declare(Market market, Funds fund) {
+                protected void declareStrategy(Market market, Funds fund) {
                 }
             };
             register(trader);

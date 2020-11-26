@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Chrono;
+import cointoss.util.arithmetic.Num;
 
 class SpanTest {
 
@@ -80,5 +81,24 @@ class SpanTest {
         assert Span.Minute15.ticksPerDay() == 96;
         assert Span.Minute5.ticksPerDay() == 288;
         assert Span.Minute1.ticksPerDay() == 1440;
+    }
+
+    @Test
+    void distance() {
+        assert Span.Minute1.distance(tick(0), tick(60)) == 1;
+        assert Span.Minute1.distance(tick(0), tick(120)) == 2;
+        assert Span.Minute1.distance(tick(0), tick(0)) == 0;
+        assert Span.Minute1.distance(tick(0), null) == 0;
+        assert Span.Minute1.distance(null, tick(0)) == 0;
+    }
+
+    /**
+     * Create {@link Tick} simply.
+     * 
+     * @param time
+     * @return
+     */
+    private Tick tick(int time) {
+        return new Tick(time, Num.ONE, new Ticker(Span.Minute1, new TickerManager()));
     }
 }

@@ -10,6 +10,7 @@
 package cointoss.trade;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import cointoss.util.arithmetic.Num;
 import kiss.Signal;
@@ -36,7 +37,20 @@ public interface TradingFilters {
      * @return A value transition filter.
      */
     default Function<Signal<Num>, Signal<Num>> breakup(Num threshold) {
-        return s -> s.take(Num.ZERO, (previous, current) -> previous.isLessThan(threshold) && current.isGreaterThanOrEqual(threshold));
+        return breakup(() -> threshold);
+    }
+
+    /**
+     * Provides a filter that allows only when the value exceeds the specified value.
+     * 
+     * @param threshold
+     * @return A value transition filter.
+     */
+    default Function<Signal<Num>, Signal<Num>> breakup(Supplier<Num> threshold) {
+        return s -> s.take(Num.ZERO, (previous, current) -> {
+            Num num = threshold.get();
+            return previous.isLessThan(num) && current.isGreaterThanOrEqual(num);
+        });
     }
 
     /**
@@ -86,7 +100,20 @@ public interface TradingFilters {
      * @return A value transition filter.
      */
     default Function<Signal<Num>, Signal<Num>> breakdown(Num threshold) {
-        return s -> s.take(Num.ZERO, (previous, current) -> previous.isGreaterThan(threshold) && current.isLessThanOrEqual(threshold));
+        return breakdown(() -> threshold);
+    }
+
+    /**
+     * Provides a filter that allows only when the value falls below the specified value.
+     * 
+     * @param threshold
+     * @return A value transition filter.
+     */
+    default Function<Signal<Num>, Signal<Num>> breakdown(Supplier<Num> threshold) {
+        return s -> s.take(Num.ZERO, (previous, current) -> {
+            Num num = threshold.get();
+            return previous.isGreaterThan(num) && current.isLessThanOrEqual(num);
+        });
     }
 
     /**

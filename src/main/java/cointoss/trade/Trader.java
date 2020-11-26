@@ -93,7 +93,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
         this.market = Objects.requireNonNull(market);
         this.funds.assign(market.service);
 
-        declare(market, funds);
+        declareStrategy(market, funds);
     }
 
     /**
@@ -102,7 +102,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
      * @param market A target market to deal.
      * @param fund A fund manager.
      */
-    protected abstract void declare(Market market, Funds fund);
+    protected abstract void declareStrategy(Market market, Funds fund);
 
     /**
      * The human-readable identical name.

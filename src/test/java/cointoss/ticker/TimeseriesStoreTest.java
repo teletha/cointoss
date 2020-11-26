@@ -184,7 +184,7 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void eachAll() {
+    void each() {
         // padding right
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
         store.store(0, 5, 10, 15, 20, 25, 30);
@@ -211,7 +211,7 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void eachAllOverDays() {
+    void eachOverDays() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
 
@@ -262,6 +262,45 @@ class TimeseriesStoreTest {
         list = new ArrayList();
         store.each(3 * days, 4 * days, list::add);
         assertIterableEquals(List.of(3 * days, 4 * days), list);
+    }
+
+    @Test
+    void eachByItem() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        store.store(0, 5, 10, 15, 20, 25, 30);
+
+        List<Integer> items = store.each(store.at(0), store.at(15)).toList();
+        assert items.size() == 4;
+        assert items.get(0) == 0;
+        assert items.get(1) == 5;
+        assert items.get(2) == 10;
+        assert items.get(3) == 15;
+    }
+
+    @Test
+    void eachLatest() {
+        // padding right
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        store.store(0, 5, 10, 15, 20, 25, 30);
+
+        List<Integer> list = store.eachLatest().toList();
+        assert list.size() == 7;
+        assert list.get(0) == 30;
+        assert list.get(1) == 25;
+        assert list.get(2) == 20;
+    }
+
+    @Test
+    void eachLatestOverDays() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        store.store(0, days, 2 * days, 3 * days, 4 * days);
+
+        List<Integer> list = store.eachLatest().toList();
+        assert list.size() == 5;
+        assert list.get(0) == 4 * days;
+        assert list.get(1) == 3 * days;
+        assert list.get(2) == 2 * days;
+        assert list.get(3) == 1 * days;
     }
 
     @Test

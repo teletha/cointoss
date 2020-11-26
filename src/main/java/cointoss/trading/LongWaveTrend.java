@@ -50,7 +50,7 @@ public class LongWaveTrend extends Trader {
      * {@inheritDoc}
      */
     @Override
-    protected void declare(Market market, Funds fund) {
+    protected void declareStrategy(Market market, Funds fund) {
 
         Ticker ticker = market.tickers.on(span);
         DoubleIndicator indicator = Indicators.waveTrend(ticker);
