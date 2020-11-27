@@ -12,10 +12,9 @@ package cointoss.util;
 import java.net.ConnectException;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -46,7 +45,7 @@ public abstract class EfficientWebSocketModel {
     private WebSocket ws;
 
     /** Temporary buffer for commands called before the connection was established. */
-    private final Deque<IdentifiableTopic> queue = new ArrayDeque();
+    private Set<IdentifiableTopic> queue;
 
     /** The signal tee. */
     private final Map<String, Supersonic> signals = new HashMap();
@@ -194,14 +193,15 @@ public abstract class EfficientWebSocketModel {
      * @param topic A topic to subscribe.
      */
     private synchronized void sendSubscribe(IdentifiableTopic topic) {
+        if (subscriptions++ == 0) {
+            queue = new HashSet();
+            connect();
+        }
+
         if (ws == null) {
             queue.add(topic);
         } else {
             sendSubscriptionToRemote(topic);
-        }
-
-        if (subscriptions++ == 0) {
-            connect();
         }
     }
 
@@ -262,7 +262,7 @@ public abstract class EfficientWebSocketModel {
             for (IdentifiableTopic command : queue) {
                 sendSubscriptionToRemote(command);
             }
-            queue.clear();
+            queue = null;
         }, client()).to(debug ? I.bundle(this::outputTestCode, this::dispatch) : this::dispatch, e -> {
             error(e);
         }, () -> {
@@ -355,12 +355,11 @@ public abstract class EfficientWebSocketModel {
 
         if (subscriptions != 0) {
             subscriptions = 0;
-            queue.clear();
 
             if (message == null) {
                 logger.error("Disconnected websocket [{}] normally.", address());
             } else {
-                logger.error("Disconnected websocket [{}] because of {}.", address(), message);
+                logger.error("Disconnected websocket [{}]  unexpectedly.  Reason: {}", address(), message);
             }
         }
     }
