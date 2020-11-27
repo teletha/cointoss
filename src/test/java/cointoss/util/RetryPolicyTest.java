@@ -45,7 +45,7 @@ class RetryPolicyTest {
     @Test
     void delayFixedDuration() {
         Result result = new Result();
-        RetryPolicy policy = RetryPolicy.with.limit(3).delay(100, MILLISECONDS).scheduler(chronus).autoReset(false);
+        RetryPolicy policy = RetryPolicy.with.limit(3).delay(100, MILLISECONDS).scheduler(chronus);
         policy.onRetry = result;
 
         I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
@@ -58,7 +58,7 @@ class RetryPolicyTest {
     @Test
     void delayLinearDuration() {
         Result result = new Result();
-        RetryPolicy policy = RetryPolicy.with.limit(5).delayLinear(Duration.ofMillis(30)).scheduler(chronus).autoReset(false);
+        RetryPolicy policy = RetryPolicy.with.limit(5).delayLinear(Duration.ofMillis(30)).scheduler(chronus);
         policy.onRetry = result;
 
         I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
@@ -74,8 +74,7 @@ class RetryPolicyTest {
         RetryPolicy policy = RetryPolicy.with.limit(5)
                 .delayLinear(Duration.ofMillis(20))
                 .delayMinimum(Duration.ofMillis(50))
-                .scheduler(chronus)
-                .autoReset(false);
+                .scheduler(chronus);
         policy.onRetry = result;
 
         I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
@@ -91,8 +90,7 @@ class RetryPolicyTest {
         RetryPolicy policy = RetryPolicy.with.limit(5)
                 .delayLinear(Duration.ofMillis(20))
                 .delayMaximum(Duration.ofMillis(50))
-                .scheduler(chronus)
-                .autoReset(false);
+                .scheduler(chronus);
         policy.onRetry = result;
 
         I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);

@@ -9,11 +9,10 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
@@ -24,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 import com.google.common.annotations.VisibleForTesting;
 
 import icy.manipulator.Icy;
-import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
@@ -41,7 +39,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     @VisibleForTesting
     boolean parking;
 
-    Disposable autoReset;
+    long latestRetryTime;
 
     @VisibleForTesting
     WiseRunnable onRetry;
@@ -139,7 +137,17 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     }
 
     /**
-     * Set the scheduler to manage the delay.
+     * Show debuggable name with the specified name.
+     * 
+     * @return
+     */
+    @Icy.Property
+    String name() {
+        return "";
+    }
+
+    /**
+     * Set the name of this policy.
      * 
      * @return
      */
@@ -149,48 +157,11 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     }
 
     /**
-     * Set the scheduler to manage the delay.
-     * 
-     * @return
-     */
-    @Icy.Property
-    boolean autoReset() {
-        return true;
-    }
-
-    /**
-     * Ignore the specified error types.
-     * 
-     * @return
-     */
-    @Icy.Property
-    List<Class<? extends Throwable>> ignore() {
-        return List.of();
-    }
-
-    /**
-     * Show debuggable message with the specified name.
-     * 
-     * @return
-     */
-    @Icy.Property
-    String debug() {
-        return "";
-    }
-
-    /**
-     * Set the current number of trials to 0.
-     */
-    public final void reset() {
-        count = 0;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
-        return "RetryPolicy[" + debug() + " @" + count + "]";
+        return "RetryPolicy[" + name() + " @" + count + "]";
     }
 
     /**
@@ -198,38 +169,19 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
      */
     @Override
     public Signal<?> APPLY(Signal<Throwable> error) throws Throwable {
-        if (limit() <= 0) {
-            return error.flatMap(e -> {
-                return I.signalError(e);
-            });
-        }
-
-        return error.flatMap(e -> {
-            if (e instanceof AssertionError) {
-                return I.signalError(e);
+        return error.flatMap(e -> limit() <= 0 || e instanceof AssertionError ? I.signalError(e) : I.signal(e)).take(limit()).delay(e -> {
+            // try to reset counting
+            long now = System.currentTimeMillis();
+            if (now - latestRetryTime > delayMaximum().toMillis() * 2) {
+                count = 0;
             }
-
-            for (Class<? extends Throwable> type : ignore()) {
-                if (type.isInstance(e)) {
-                    return I.signalError(e);
-                }
-            }
-
-            return I.signal(e);
-        }).take(limit()).delay(e -> {
-            if (autoReset()) {
-                if (autoReset != null) {
-                    autoReset.dispose();
-                }
-                autoReset = I.schedule(delayMaximum().toMillis() * 2, TimeUnit.MILLISECONDS, scheduler()).to(this::reset);
-            }
+            latestRetryTime = now;
 
             Duration duration = Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
 
-            String debug = debug();
-            if (debug != null && debug.length() != 0) {
+            String name = name();
+            if (name != null && name.length() != 0) {
                 logger.info(this + " will retry after " + Chrono.formatAsDuration(duration) + "\t: " + e);
-                e.printStackTrace();
             }
 
             return duration;

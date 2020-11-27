@@ -433,7 +433,7 @@ public abstract class MarketService implements Disposable {
                 .delayLinear(Duration.ofSeconds(2))
                 .delayMaximum(Duration.ofMinutes(2))
                 .scheduler(scheduler())
-                .debug(name == null || name.length() == 0 ? null : marketIdentity() + " : " + name);
+                .name(name == null || name.length() == 0 ? null : marketIdentity() + " : " + name);
     }
 
     /**
