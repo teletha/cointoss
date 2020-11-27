@@ -278,25 +278,10 @@ public abstract class MarketService implements Disposable {
      * @return A event stream of order state.
      */
     public final synchronized Signal<Order> ordersRealtimely() {
-        return ordersRealtimely(true);
-    }
-
-    /**
-     * Acquire the order state in realtime. This is infinitely.
-     * 
-     * @param autoReconnect Need to reconnect automatically.
-     * @return A event stream of order state.
-     */
-    public final synchronized Signal<Order> ordersRealtimely(boolean autoReconnect) {
         if (orders == null) {
-            orders = connectOrdersRealtimely().effectOnObserve(disposer::add).share();
+            orders = connectOrdersRealtimely().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "OrderRealtimely")).share();
         }
-
-        if (autoReconnect) {
-            return orders.retryWhen(retryPolicy(500, "OrderRealtimely"));
-        } else {
-            return orders;
-        }
+        return orders;
     }
 
     /**
@@ -431,7 +416,6 @@ public abstract class MarketService implements Disposable {
     public RetryPolicy retryPolicy(int max, String name) {
         return RetryPolicy.with.limit(max)
                 .delayLinear(Duration.ofSeconds(2))
-                .delayMaximum(Duration.ofMinutes(2))
                 .scheduler(scheduler())
                 .name(name == null || name.length() == 0 ? null : marketIdentity() + " : " + name);
     }

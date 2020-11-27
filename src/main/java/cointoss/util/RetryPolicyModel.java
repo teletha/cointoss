@@ -9,8 +9,6 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.*;
-
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ScheduledExecutorService;
@@ -69,7 +67,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
      */
     @Icy.Property
     LongFunction<Duration> delay() {
-        return i -> delayMinimum();
+        return i -> Duration.ZERO;
     }
 
     /**
@@ -117,26 +115,6 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     }
 
     /**
-     * Set the minimum time to delay. The default is 0 seconds.
-     * 
-     * @return
-     */
-    @Icy.Property
-    Duration delayMinimum() {
-        return Duration.ZERO;
-    }
-
-    /**
-     * Set the maximum time to delay. The default is 10 minutes.
-     * 
-     * @return
-     */
-    @Icy.Property
-    Duration delayMaximum() {
-        return Duration.of(10, MINUTES);
-    }
-
-    /**
      * Show debuggable name with the specified name.
      * 
      * @return
@@ -172,12 +150,19 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
         return error.flatMap(e -> limit() <= 0 || e instanceof AssertionError ? I.signalError(e) : I.signal(e)).take(limit()).delay(e -> {
             // try to reset counting
             long now = System.currentTimeMillis();
-            if (now - latestRetryTime > delayMaximum().toMillis() * 2) {
+            if (now - latestRetryTime > 10 * 60 * 1000) {
                 count = 0;
             }
             latestRetryTime = now;
 
-            Duration duration = Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
+            Duration duration = Duration.ZERO;
+            LongFunction<Duration> delay = delay();
+            if (delay != null) {
+                duration = delay.apply(count++);
+                if (10 < duration.toMinutes()) {
+                    duration = Duration.ofMinutes(3);
+                }
+            }
 
             String name = name();
             if (name != null && name.length() != 0) {

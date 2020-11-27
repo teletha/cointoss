@@ -197,7 +197,7 @@ public abstract class EfficientWebSocketModel {
         if (ws == null) {
             queue.add(topic);
         } else {
-            sendSubscription(topic);
+            sendSubscriptionToRemote(topic);
         }
 
         if (subscriptions++ == 0) {
@@ -210,9 +210,8 @@ public abstract class EfficientWebSocketModel {
      * 
      * @param topic A topic to subscribe.
      */
-    private void sendSubscription(IdentifiableTopic topic) {
-        if (ws != null) {
-            subscribings.add(topic);
+    private void sendSubscriptionToRemote(IdentifiableTopic topic) {
+        if (ws != null && subscribings.add(topic)) {
             topic.subscribing = I.schedule(0, 10, TimeUnit.SECONDS, true, scheduler()).to(count -> {
                 APILimiter limiter = limiter();
                 if (limiter != null) {
@@ -258,7 +257,7 @@ public abstract class EfficientWebSocketModel {
 
             this.ws = ws;
             for (IdentifiableTopic command : queue) {
-                sendSubscription(command);
+                sendSubscriptionToRemote(command);
             }
             queue.clear();
         }, client()).to(debug ? I.bundle(this::outputTestCode, this::dispatch) : this::dispatch, e -> {
@@ -298,9 +297,9 @@ public abstract class EfficientWebSocketModel {
         } else {
             for (IdentifiableTopic topic : subscribings) {
                 if (topic.verifySubscribedReply(json)) {
-                    subscribings.remove(topic);
                     topic.subscribing.dispose();
                     topic.subscribing = null;
+                    subscribings.remove(topic);
                     logger.trace("Accepted websocket subscription [{}] {}.", address(), topic.id);
 
                     Function<JSON, String> updater = updateId();

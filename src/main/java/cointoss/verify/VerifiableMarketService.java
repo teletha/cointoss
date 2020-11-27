@@ -9,7 +9,6 @@
  */
 package cointoss.verify;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -386,7 +385,7 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public RetryPolicy retryPolicy(int max, String name) {
-        return RetryPolicy.with.unlimit().delayMaximum(Duration.ZERO);
+        return RetryPolicy.with.unlimit();
     }
 
     /**

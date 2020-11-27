@@ -68,38 +68,6 @@ class RetryPolicyTest {
         assert result.checkMinimumRequiredInterval(30, 60, 90, 120);
     }
 
-    @Test
-    void delayMinimumDuration() {
-        Result result = new Result();
-        RetryPolicy policy = RetryPolicy.with.limit(5)
-                .delayLinear(Duration.ofMillis(20))
-                .delayMinimum(Duration.ofMillis(50))
-                .scheduler(chronus);
-        policy.onRetry = result;
-
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
-        chronus.await();
-        assert policy.count == 5;
-        assert result.hasOnlyError("Failed Number 1");
-        assert result.checkMinimumRequiredInterval(50, 50, 60, 80);
-    }
-
-    @Test
-    void delayMaximumDuration() {
-        Result result = new Result();
-        RetryPolicy policy = RetryPolicy.with.limit(5)
-                .delayLinear(Duration.ofMillis(20))
-                .delayMaximum(Duration.ofMillis(50))
-                .scheduler(chronus);
-        policy.onRetry = result;
-
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
-        chronus.await();
-        assert policy.count == 5;
-        assert result.hasOnlyError("Failed Number 1");
-        assert result.checkMinimumRequiredInterval(20, 40, 50, 50);
-    }
-
     /**
      * 
      */

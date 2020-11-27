@@ -91,12 +91,6 @@ public abstract class RetryPolicy extends RetryPolicyModel {
     private static final MethodHandle delayUpdater = updater("delay");
 
     /** The final property updater. */
-    private static final MethodHandle delayMinimumUpdater = updater("delayMinimum");
-
-    /** The final property updater. */
-    private static final MethodHandle delayMaximumUpdater = updater("delayMaximum");
-
-    /** The final property updater. */
     private static final MethodHandle nameUpdater = updater("name");
 
     /** The final property updater. */
@@ -107,12 +101,6 @@ public abstract class RetryPolicy extends RetryPolicyModel {
 
     /** The exposed property. */
     final LongFunction<Duration> delay;
-
-    /** The exposed property. */
-    final Duration delayMinimum;
-
-    /** The exposed property. */
-    final Duration delayMaximum;
 
     /** The exposed property. */
     final String name;
@@ -126,8 +114,6 @@ public abstract class RetryPolicy extends RetryPolicyModel {
     protected RetryPolicy() {
         this.limit = 0L;
         this.delay = super.delay();
-        this.delayMinimum = super.delayMinimum();
-        this.delayMaximum = super.delayMaximum();
         this.name = super.name();
         this.scheduler = super.scheduler();
     }
@@ -197,80 +183,6 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         }
         try {
             delayUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
-     * Set the minimum time to delay. The default is 0 seconds.
-     *  
-     *  @return
-     */
-    @Override
-    final Duration delayMinimum() {
-        return this.delayMinimum;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of delayMinimum property.
-     */
-    @SuppressWarnings("unused")
-    private final Duration getDelayMinimum() {
-        return this.delayMinimum;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of delayMinimum property to assign.
-     */
-    private final void setDelayMinimum(Duration value) {
-        if (value == null) {
-            value = super.delayMinimum();
-        }
-        try {
-            delayMinimumUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
-     * Set the maximum time to delay. The default is 10 minutes.
-     *  
-     *  @return
-     */
-    @Override
-    final Duration delayMaximum() {
-        return this.delayMaximum;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of delayMaximum property.
-     */
-    @SuppressWarnings("unused")
-    private final Duration getDelayMaximum() {
-        return this.delayMaximum;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of delayMaximum property to assign.
-     */
-    private final void setDelayMaximum(Duration value) {
-        if (value == null) {
-            value = super.delayMaximum();
-        }
-        try {
-            delayMaximumUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -358,7 +270,7 @@ public abstract class RetryPolicy extends RetryPolicyModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(limit, delay, delayMinimum, delayMaximum, name, scheduler);
+        return Objects.hash(limit, delay, name, scheduler);
     }
 
     /**
@@ -375,8 +287,6 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         RetryPolicy other = (RetryPolicy) o;
         if (limit != other.limit) return false;
         if (!Objects.equals(delay, other.delay)) return false;
-        if (!Objects.equals(delayMinimum, other.delayMinimum)) return false;
-        if (!Objects.equals(delayMaximum, other.delayMaximum)) return false;
         if (!Objects.equals(name, other.name)) return false;
         if (!Objects.equals(scheduler, other.scheduler)) return false;
         return true;
@@ -516,28 +426,6 @@ public abstract class RetryPolicy extends RetryPolicyModel {
         }
 
         /**
-         * Assign delayMinimum property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next delayMinimum(Duration value) {
-            ((RetryPolicy) this).setDelayMinimum(value);
-            return (Next) this;
-        }
-
-        /**
-         * Assign delayMaximum property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next delayMaximum(Duration value) {
-            ((RetryPolicy) this).setDelayMaximum(value);
-            return (Next) this;
-        }
-
-        /**
          * Assign name property.
          * 
          * @param value A new value to assign.
@@ -578,8 +466,6 @@ public abstract class RetryPolicy extends RetryPolicyModel {
     static final class My {
         static final String Limit = "limit";
         static final String Delay = "delay";
-        static final String DelayMinimum = "delayMinimum";
-        static final String DelayMaximum = "delayMaximum";
         static final String Name = "name";
         static final String Scheduler = "scheduler";
     }
