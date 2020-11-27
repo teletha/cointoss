@@ -9,8 +9,6 @@
  */
 package trademate;
 
-import org.apache.logging.log4j.LogManager;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
@@ -61,6 +59,14 @@ public class TradeTester extends View {
                 .contents(ui -> new TradingView(ui, service));
 
         tab.load();
+
+        MarketService service2 = BitFlyer.ETH_JPY;
+        tab = DockSystem.register(service2.marketIdentity())
+                .closable(false)
+                .text(service2.marketReadableName)
+                .contents(ui -> new TradingView(ui, service2));
+
+        tab.load();
     }
 
     /**
@@ -70,6 +76,6 @@ public class TradeTester extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application().logging(LogManager.getLogger()::error).use(Theme.Dark).icon("icon/tester.png").activate(TradeTester.class);
+        Viewtify.application().use(Theme.Dark).icon("icon/tester.png").activate(TradeTester.class);
     }
 }

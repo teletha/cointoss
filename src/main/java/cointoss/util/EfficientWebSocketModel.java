@@ -230,14 +230,17 @@ public abstract class EfficientWebSocketModel {
      */
     private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
         if (ws != null) {
-            IdentifiableTopic unsubscribe = topic.unsubscribe();
-            ws.sendText(I.write(unsubscribe), true);
-            logger.info("Sent websocket command {} to {}.", unsubscribe, address());
-        }
-
-        if (subscriptions == 0 || --subscriptions == 0) {
-            disconnect();
-            queue.clear();
+            try {
+                IdentifiableTopic unsubscribe = topic.unsubscribe();
+                ws.sendText(I.write(unsubscribe), true);
+                logger.info("Sent websocket command {} to {}.", unsubscribe, address());
+            } catch (Throwable e) {
+                // ignore
+            } finally {
+                if (subscriptions == 0 || --subscriptions == 0) {
+                    disconnect("No Subscriptions");
+                }
+            }
         }
     }
 
@@ -263,8 +266,7 @@ public abstract class EfficientWebSocketModel {
         }, client()).to(debug ? I.bundle(this::outputTestCode, this::dispatch) : this::dispatch, e -> {
             error(e);
         }, () -> {
-            logger.trace("Finished websocket [{}].", address());
-            disconnect();
+            disconnect(null);
             signals.values().forEach(signal -> signal.complete());
         });
     }
@@ -273,8 +275,7 @@ public abstract class EfficientWebSocketModel {
      * Disconnect websocket connection and send error message to all channels.
      */
     private void error(Throwable e) {
-        logger.error("Disconnected websocket [{}].", address(), cause(e));
-        disconnect();
+        disconnect(e.getMessage());
         signals.values().forEach(signal -> signal.error(e));
     }
 
@@ -341,18 +342,27 @@ public abstract class EfficientWebSocketModel {
     /**
      * Send close message to disconnect this websocket.
      */
-    private void disconnect() {
+    private void disconnect(String message) {
         if (ws != null) {
             try {
                 ws.sendClose(WebSocket.NORMAL_CLOSURE, "");
-            } catch (Throwable e) {
+            } catch (Throwable ignore) {
                 // ignore
             } finally {
                 ws = null;
             }
         }
-        subscriptions = 0;
-        queue.clear();
+
+        if (subscriptions != 0) {
+            subscriptions = 0;
+            queue.clear();
+
+            if (message == null) {
+                logger.error("Disconnected websocket [{}] normally.", address());
+            } else {
+                logger.error("Disconnected websocket [{}] because of {}.", address(), message);
+            }
+        }
     }
 
     /**
