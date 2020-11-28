@@ -21,7 +21,7 @@ public class Project extends bee.api.Project {
         require("com.pgs-soft", "HttpClientMock").atTest();
         require("org.apache.commons", "commons-lang3");
         require("org.apache.commons", "commons-math3");
-        require("commons-net", "commons-net");
+        require("commons-net", "commons-net", "3.7.2" /* version??? */);
         require("org.apache.logging.log4j", "log4j-core");
         require("com.google.guava", "guava");
         unrequire("com.google.code.findbugs", "jsr305");
@@ -32,6 +32,7 @@ public class Project extends bee.api.Project {
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
         require("ch.obermuhlner", "big-math");
+        require("com.github.vladimir-bukhtoyarov", "bucket4j-core", "4.10.0");
         require("org.decimal4j", "decimal4j").atTest();
 
         versionControlSystem("https://github.com/teletha/cointoss");

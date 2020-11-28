@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -919,9 +919,8 @@ public class ExecutionLog {
          * @return
          */
         private boolean canSwitch(Execution e) {
-            Execution first = realtime.peekFirst();
-
             // realtime buffer is empty
+            Execution first = realtime.peekFirst();
             if (first == null) {
                 return false;
             }
@@ -940,6 +939,7 @@ public class ExecutionLog {
             while (!realtime.isEmpty()) {
                 ConcurrentLinkedDeque<Execution> buffer = realtime;
                 realtime = new ConcurrentLinkedDeque();
+                latestId = -1;
                 for (Execution e : buffer) {
                     observer.accept(e);
                 }

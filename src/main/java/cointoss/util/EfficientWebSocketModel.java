@@ -12,13 +12,13 @@ package cointoss.util;
 import java.net.ConnectException;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
-import java.util.ArrayList;
+import java.time.Duration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -29,11 +29,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import icy.manipulator.Icy;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Bucket4j;
 import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
 import kiss.Observer;
 import kiss.Signal;
+import kiss.Variable;
 
 @Icy
 public abstract class EfficientWebSocketModel {
@@ -42,10 +46,9 @@ public abstract class EfficientWebSocketModel {
     private static final Logger logger = LogManager.getLogger();
 
     /** The cached connection. */
-    private WebSocket ws;
+    private final Variable<WebSocket> connection = Variable.empty();
 
-    /** Temporary buffer for commands called before the connection was established. */
-    private Set<IdentifiableTopic> queue;
+    /** The cached connection. */
 
     /** The signal tee. */
     private final Map<String, Supersonic> signals = new HashMap();
@@ -56,7 +59,15 @@ public abstract class EfficientWebSocketModel {
     /** The current subscribing topics. */
     private final Set<IdentifiableTopic> subscribings = ConcurrentHashMap.newKeySet();
 
+    /** The current subscribed topics. */
+    private final Set<IdentifiableTopic> subscribed = ConcurrentHashMap.newKeySet();
+
+    /** The limite rate. */
+    private final Bucket bucket = Bucket4j.builder().addLimit(Bandwidth.simple(1, Duration.ofMillis(250))).build();
+
     private boolean debug;
+
+    private Disposable disposer = Disposable.empty();
 
     @Icy.Property(copiable = true)
     public abstract String address();
@@ -166,16 +177,6 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
-     * Outputs a detailed log.
-     * 
-     * @return Chainable API.
-     */
-    @Icy.Property(copiable = true)
-    public cointoss.util.APILimiter limiter() {
-        return null;
-    }
-
-    /**
      * Execute command on this connection.
      * 
      * @param topic A subscription command (i.e. bean-like object).
@@ -194,33 +195,22 @@ public abstract class EfficientWebSocketModel {
      */
     private synchronized void sendSubscribe(IdentifiableTopic topic) {
         if (subscriptions++ == 0) {
-            queue = new HashSet();
             connect();
         }
 
-        if (ws == null) {
-            queue.add(topic);
-        } else {
-            sendSubscriptionToRemote(topic);
-        }
-    }
+        connection.observing().skipNull().first().to(ws -> {
+            if (subscribings.add(topic)) {
+                disposer.add(I.schedule(0, 2, TimeUnit.SECONDS, true, scheduler())
+                        .takeWhile(count -> connection.isPresent())
+                        .takeWhile(count -> !subscribed.contains(topic))
+                        .to(count -> {
+                            bucket.asScheduler().consumeUninterruptibly(1);
 
-    /**
-     * Send subscription message to this websocket.
-     * 
-     * @param topic A topic to subscribe.
-     */
-    private void sendSubscriptionToRemote(IdentifiableTopic topic) {
-        if (ws != null && subscribings.add(topic)) {
-            topic.subscribing = I.schedule(0, 10, TimeUnit.SECONDS, true, scheduler()).to(count -> {
-                APILimiter limiter = limiter();
-                if (limiter != null) {
-                    limiter.acquire();
-                }
-                ws.sendText(I.write(topic), true);
-                logger.info("Sent websocket command {} to {}. @{}", topic, address(), count);
-            });
-        }
+                            ws.sendText(I.write(topic), true);
+                            logger.info("Sent websocket command {} to {}. @{}", topic, address(), count);
+                        }));
+            }
+        });
     }
 
     /**
@@ -229,25 +219,30 @@ public abstract class EfficientWebSocketModel {
      * @param topic A topic to unsubscribe.
      */
     private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
-        if (ws != null) {
-            try {
-                IdentifiableTopic unsubscribe = topic.unsubscribe();
-                ws.sendText(I.write(unsubscribe), true);
-                logger.info("Sent websocket command {} to {}.", unsubscribe, address());
-            } catch (Throwable e) {
-                // ignore
-            } finally {
-                if (subscriptions == 0 || --subscriptions == 0) {
-                    disconnect("No Subscriptions");
-                }
-            }
-        }
+        // connection.to(ws -> {
+        // if (subscribed.contains(topic)) {
+        // bucket.asScheduler().consumeUninterruptibly(1);
+        //
+        // try {
+        // IdentifiableTopic unsubscribe = topic.unsubscribe();
+        // ws.sendText(I.write(unsubscribe), true);
+        // subscribed.remove(topic);
+        // logger.info("Sent websocket command {} to {}.", unsubscribe, address());
+        // } catch (Throwable e) {
+        // // ignore
+        // } finally {
+        // if (subscriptions == 0 || --subscriptions == 0) {
+        // disconnect("No Subscriptions", null);
+        // }
+        // }
+        // }
+        // });
     }
 
     /**
      * Connect to the server by websocket.
      */
-    private void connect() {
+    private synchronized void connect() {
         logger.trace("Starting websocket [{}].", address());
 
         I.http(address(), ws -> {
@@ -257,25 +252,49 @@ public abstract class EfficientWebSocketModel {
             if (connected != null) {
                 connected.accept(ws);
             }
-
-            this.ws = ws;
-            for (IdentifiableTopic command : queue) {
-                sendSubscriptionToRemote(command);
-            }
-            queue = null;
+            connection.set(ws);
         }, client()).to(debug ? I.bundle(this::outputTestCode, this::dispatch) : this::dispatch, e -> {
             error(e);
         }, () -> {
-            disconnect(null);
+            disconnect("User Closed", null);
             signals.values().forEach(signal -> signal.complete());
         });
+    }
+
+    /**
+     * Send close message to disconnect this websocket.
+     */
+    private synchronized void disconnect(String message, Throwable error) {
+        connection.to(ws -> {
+            // try to do disconnection
+            try {
+                ws.sendClose(WebSocket.NORMAL_CLOSURE, "");
+            } catch (Throwable ignore) {
+                // ignore
+            } finally {
+                connection.set((WebSocket) null);
+            }
+
+            // reset
+            disposer.dispose();
+            disposer = Disposable.empty();
+            subscribings.clear();
+            subscribed.clear();
+
+            if (error == null) {
+                logger.info("Disconnected websocket [{}] normally. Reason: {}", address(), message);
+            } else {
+                logger.error("Disconnected websocket [{}]  unexpectedly.  Reason: {}", address(), message);
+            }
+        });
+        subscriptions = 0;
     }
 
     /**
      * Disconnect websocket connection and send error message to all channels.
      */
     private void error(Throwable e) {
-        disconnect(e.getMessage());
+        disconnect(e.getMessage(), e);
         signals.values().forEach(signal -> signal.error(e));
     }
 
@@ -298,9 +317,7 @@ public abstract class EfficientWebSocketModel {
         } else {
             for (IdentifiableTopic topic : subscribings) {
                 if (topic.verifySubscribedReply(json)) {
-                    topic.subscribing.dispose();
-                    topic.subscribing = null;
-                    subscribings.remove(topic);
+                    subscribed.add(topic);
                     logger.trace("Accepted websocket subscription [{}] {}.", address(), topic.id);
 
                     Function<JSON, String> updater = updateId();
@@ -340,31 +357,6 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
-     * Send close message to disconnect this websocket.
-     */
-    private void disconnect(String message) {
-        if (ws != null) {
-            try {
-                ws.sendClose(WebSocket.NORMAL_CLOSURE, "");
-            } catch (Throwable ignore) {
-                // ignore
-            } finally {
-                ws = null;
-            }
-        }
-
-        if (subscriptions != 0) {
-            subscriptions = 0;
-
-            if (message == null) {
-                logger.error("Disconnected websocket [{}] normally.", address());
-            } else {
-                logger.error("Disconnected websocket [{}]  unexpectedly.  Reason: {}", address(), message);
-            }
-        }
-    }
-
-    /**
      * Get the root cause.
      * 
      * @param e
@@ -389,9 +381,6 @@ public abstract class EfficientWebSocketModel {
 
         /** The unsubscription command builder. */
         private final Consumer<T> unsubscribeCommandBuilder;
-
-        /** The subscrib process. */
-        private Disposable subscribing = Disposable.empty();
 
         /**
          * @param id
@@ -425,11 +414,32 @@ public abstract class EfficientWebSocketModel {
         }
 
         /**
-         * Make sure your channel subscription has been properly accepted.
+         * Make sure your channel (un)subscription has been properly accepted.
          * 
          * @return
          */
         protected abstract boolean verifySubscribedReply(JSON reply);
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final int hashCode() {
+            return id.hashCode();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final boolean equals(Object obj) {
+            if (obj instanceof IdentifiableTopic) {
+                IdentifiableTopic other = (IdentifiableTopic) obj;
+                return id.equals(other.id);
+            } else {
+                return false;
+            }
+        }
 
         /**
          * {@inheritDoc}
@@ -448,29 +458,17 @@ public abstract class EfficientWebSocketModel {
         /** The associated topic. */
         private IdentifiableTopic topic;
 
-        /** The number of internal listeners. */
-        private int size = 0;
-
-        /** The internal listeners. */
-        private Observer[] deployed = new Observer[0];
-
-        /** The array manipulator. */
-        private final ArrayList<Observer> observers = new ArrayList();
+        /** The managed observers. */
+        private final CopyOnWriteArrayList<Observer> managed = new CopyOnWriteArrayList();
 
         /** The exposed interface. */
         private final Signal<JSON> expose = new Signal<>((observer, disposer) -> {
-            observers.add(observer);
-            deploy();
-
-            if (size == 1) {
-                sendSubscribe(topic);
-            }
+            if (managed.size() == 0) sendSubscribe(topic);
+            managed.add(observer);
 
             return disposer.add(() -> {
-                observers.remove(observer);
-                deploy();
-
-                if (size == 0) snedUnsubscribe(topic);
+                managed.remove(observer);
+                if (managed.size() == 0) snedUnsubscribe(topic);
             });
         });
 
@@ -483,46 +481,19 @@ public abstract class EfficientWebSocketModel {
             this.topic = topic;
         }
 
-        /**
-         * Deploy observers.
-         */
-        private void deploy() {
-            deployed = observers.toArray(new Observer[observers.size()]);
-            size = deployed.length;
-        }
-
         @Override
         public void accept(JSON value) {
-            for (int i = 0; i < size; i++) {
-                deployed[i].accept(value);
-            }
+            managed.forEach(o -> o.accept(value));
         }
 
         @Override
         public void complete() {
-            for (int i = 0; i < size; i++) {
-                deployed[i].complete();
-            }
+            managed.forEach(Observer::complete);
         }
 
         @Override
         public void error(Throwable error) {
-            for (int i = 0; i < size; i++) {
-                deployed[i].error(error);
-            }
+            managed.forEach(o -> o.error(error));
         }
     }
-
-    // public static void main(String[] args) throws InterruptedException {
-    // // Thread.setDefaultUncaughtExceptionHandler((e, x) -> {
-    // // x.printStackTrace();
-    // // });
-    //
-    // Market m = new Market(Bitfinex.BTC_USDT);
-    // m.readLog(x -> x.fromToday(LogType.Fast).throttle(3, TimeUnit.SECONDS).effect(e -> {
-    // System.out.println(e);
-    // }));
-    //
-    // Thread.sleep(1000 * 220);
-    // }
 }

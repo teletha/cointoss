@@ -177,7 +177,7 @@ public abstract class MarketService implements Disposable {
      */
     public final synchronized Signal<Execution> executionsRealtimely(boolean autoReconnect) {
         if (executions == null) {
-            executions = connectExecutionRealtimely().effectOnObserve(disposer::add).share();
+            executions = connectExecutionRealtimely().effectOnObserve(disposer::add);
         }
 
         if (autoReconnect) {
@@ -279,7 +279,7 @@ public abstract class MarketService implements Disposable {
      */
     public final synchronized Signal<Order> ordersRealtimely() {
         if (orders == null) {
-            orders = connectOrdersRealtimely().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "OrderRealtimely")).share();
+            orders = connectOrdersRealtimely().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "OrderRealtimely"));
         }
         return orders;
     }
@@ -317,7 +317,7 @@ public abstract class MarketService implements Disposable {
      */
     public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely(boolean autoReconnect) {
         if (orderBooks == null) {
-            orderBooks = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add).share();
+            orderBooks = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add);
         }
 
         if (autoReconnect) {

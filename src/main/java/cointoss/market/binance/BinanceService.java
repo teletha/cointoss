@@ -42,13 +42,9 @@ public class BinanceService extends MarketService {
     /** The API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(600).refresh(Duration.ofMinutes(1));
 
-    /** The API limit. */
-    private static final APILimiter WSLimit = APILimiter.with.limit(4).refresh(Duration.ofSeconds(1));
-
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.binance.com:9443/stream")
-            .extractId(json -> json.text("stream"))
-            .limiter(WSLimit);
+            .extractId(json -> json.text("stream"));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket RealtimeFuture = Realtime.withAddress("wss://fstream.binance.com/stream");
