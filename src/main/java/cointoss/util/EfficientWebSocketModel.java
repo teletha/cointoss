@@ -15,12 +15,12 @@ import java.net.http.WebSocket;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -38,26 +38,24 @@ import kiss.JSON;
 import kiss.Observer;
 import kiss.Signal;
 import kiss.Variable;
+import viewtify.Viewtify;
 
 @Icy
 public abstract class EfficientWebSocketModel {
 
-    /** Logging utility. */
     private static final Logger logger = LogManager.getLogger();
 
-    /** The cached connection. */
+    /** The connection holder. */
     private final Variable<WebSocket> connection = Variable.empty();
-
-    /** The cached connection. */
 
     /** The signal tee. */
     private final Map<String, Supersonic> signals = new HashMap();
 
-    /** The management of subscriptions. */
-    private int subscriptions;
+    /** The connecting state. */
+    private final AtomicBoolean connecting = new AtomicBoolean();
 
     /** The current subscribing topics. */
-    private final Set<IdentifiableTopic> subscribings = ConcurrentHashMap.newKeySet();
+    private final Set<IdentifiableTopic> subscribing = ConcurrentHashMap.newKeySet();
 
     /** The current subscribed topics. */
     private final Set<IdentifiableTopic> subscribed = ConcurrentHashMap.newKeySet();
@@ -65,9 +63,19 @@ public abstract class EfficientWebSocketModel {
     /** The limite rate. */
     private final Bucket bucket = Bucket4j.builder().addLimit(Bandwidth.simple(1, Duration.ofMillis(250))).build();
 
+    /** The clean up point on disconnect. */
+    private Disposable cleanup = Disposable.empty();
+
     private boolean debug;
 
-    private Disposable disposer = Disposable.empty();
+    /**
+     * 
+     */
+    protected EfficientWebSocketModel() {
+        // At the end of the application, individually unsubscribing topics would take too much
+        // time, so we just disconnect websocket.
+        Viewtify.Terminator.add(() -> disconnect("Shutdown Application", null));
+    }
 
     @Icy.Property(copiable = true)
     public abstract String address();
@@ -183,8 +191,6 @@ public abstract class EfficientWebSocketModel {
      * @return A shared connection.
      */
     public final synchronized Signal<JSON> subscribe(IdentifiableTopic topic) {
-        Objects.requireNonNull(topic);
-
         return signals.computeIfAbsent(topic.id, id -> new Supersonic(topic)).expose;
     }
 
@@ -194,13 +200,13 @@ public abstract class EfficientWebSocketModel {
      * @param topic A topic to subscribe.
      */
     private synchronized void sendSubscribe(IdentifiableTopic topic) {
-        if (subscriptions++ == 0) {
+        if (connecting.compareAndSet(false, true)) {
             connect();
         }
 
         connection.observing().skipNull().first().to(ws -> {
-            if (subscribings.add(topic)) {
-                disposer.add(I.schedule(0, 2, TimeUnit.SECONDS, true, scheduler())
+            if (subscribing.add(topic)) {
+                cleanup.add(I.schedule(0, 2, TimeUnit.SECONDS, true, scheduler())
                         .takeWhile(count -> connection.isPresent())
                         .takeWhile(count -> !subscribed.contains(topic))
                         .to(count -> {
@@ -219,24 +225,24 @@ public abstract class EfficientWebSocketModel {
      * @param topic A topic to unsubscribe.
      */
     private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
-        // connection.to(ws -> {
-        // if (subscribed.contains(topic)) {
-        // bucket.asScheduler().consumeUninterruptibly(1);
-        //
-        // try {
-        // IdentifiableTopic unsubscribe = topic.unsubscribe();
-        // ws.sendText(I.write(unsubscribe), true);
-        // subscribed.remove(topic);
-        // logger.info("Sent websocket command {} to {}.", unsubscribe, address());
-        // } catch (Throwable e) {
-        // // ignore
-        // } finally {
-        // if (subscriptions == 0 || --subscriptions == 0) {
-        // disconnect("No Subscriptions", null);
-        // }
-        // }
-        // }
-        // });
+        connection.to(ws -> {
+            if (subscribed.contains(topic)) {
+                bucket.asScheduler().consumeUninterruptibly(1);
+
+                try {
+                    IdentifiableTopic unsubscribe = topic.unsubscribe();
+                    ws.sendText(I.write(unsubscribe), true);
+                    subscribed.remove(topic);
+                    logger.info("Sent websocket command {} to {}.", unsubscribe, address());
+                } catch (Throwable e) {
+                    // ignore
+                } finally {
+                    if (subscribed.isEmpty()) {
+                        disconnect("No Subscriptions", null);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -276,18 +282,18 @@ public abstract class EfficientWebSocketModel {
             }
 
             // reset
-            disposer.dispose();
-            disposer = Disposable.empty();
-            subscribings.clear();
+            cleanup.dispose();
+            cleanup = Disposable.empty();
+            subscribing.clear();
             subscribed.clear();
 
             if (error == null) {
-                logger.info("Disconnected websocket [{}] normally. Reason: {}", address(), message);
+                logger.info("Disconnected websocket [{}] normally because {}", address(), message);
             } else {
-                logger.error("Disconnected websocket [{}]  unexpectedly.  Reason: {}", address(), message);
+                logger.error("Disconnected websocket [{}]  unexpectedly because {}", address(), message);
             }
         });
-        subscriptions = 0;
+        connecting.set(false);
     }
 
     /**
@@ -315,7 +321,7 @@ public abstract class EfficientWebSocketModel {
         if (signaling != null) {
             signaling.accept(json);
         } else {
-            for (IdentifiableTopic topic : subscribings) {
+            for (IdentifiableTopic topic : subscribing) {
                 if (topic.verifySubscribedReply(json)) {
                     subscribed.add(topic);
                     logger.trace("Accepted websocket subscription [{}] {}.", address(), topic.id);
@@ -354,21 +360,6 @@ public abstract class EfficientWebSocketModel {
      */
     private void outputTestCode(String text) {
         System.out.println("server.sendJSON(\"" + text.replace('"', '\'') + "\");");
-    }
-
-    /**
-     * Get the root cause.
-     * 
-     * @param e
-     * @return
-     */
-    private static Throwable cause(Throwable e) {
-        Throwable cause = e.getCause();
-        while (cause != null) {
-            e = cause;
-            cause = e.getCause();
-        }
-        return e;
     }
 
     /**
@@ -473,7 +464,7 @@ public abstract class EfficientWebSocketModel {
         });
 
         /**
-         * Bind to topic.
+         * Binding topic.
          * 
          * @param topic
          */
