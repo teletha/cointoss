@@ -287,6 +287,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
         });
 
+        chart.showRealtimeUpdate.observe().take(true).to(() -> {
+            layoutCandle.requestLayout();
+            layoutCandleLatest.requestLayout();
+        });
+
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe())
@@ -789,69 +794,76 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             gc.strokeLine(x, open, x, close);
                         }
 
+                        // reduce drawing cost at initialization phase
+                        if (chart.showRealtimeUpdate.is(true)) {
+                            for (Plotter plotter : plotters) {
+                                if (registry.globalSetting(plotter.origin).visible.is(false)) {
+                                    continue;
+                                }
+
+                                for (LineChart chart : plotter.lines) {
+                                    double calculated = chart.indicator.valueAt(tick).doubleValue();
+
+                                    if (plotter.area == PlotArea.Main) {
+                                        calculated = axisY.getPositionForValue(calculated);
+                                    } else {
+                                        double max = 0 <= calculated ? calculated : -calculated;
+                                        if (plotter.lineMaxY < max) {
+                                            plotter.lineMaxY = max;
+                                        }
+                                    }
+                                    chart.valueY.add(calculated);
+                                }
+
+                                // draw candle mark
+                                for (CandleMark mark : plotter.candles) {
+                                    if (mark.indicator.valueAt(tick)) {
+                                        gc.setFill(mark.color);
+                                        gc.fillOval(x - (BarWidth / 2), high - BarWidth - 2, BarWidth, BarWidth);
+                                    }
+                                }
+                            }
+                            valueX.add(x);
+                        }
+                    });
+
+                    // reduce drawing cost at initialization phase
+                    if (chart.showRealtimeUpdate.is(true)) {
                         for (Plotter plotter : plotters) {
                             if (registry.globalSetting(plotter.origin).visible.is(false)) {
                                 continue;
                             }
 
-                            for (LineChart chart : plotter.lines) {
-                                double calculated = chart.indicator.valueAt(tick).doubleValue();
+                            double scale = plotter.scale();
 
-                                if (plotter.area == PlotArea.Main) {
-                                    calculated = axisY.getPositionForValue(calculated);
-                                } else {
-                                    double max = 0 <= calculated ? calculated : -calculated;
-                                    if (plotter.lineMaxY < max) {
-                                        plotter.lineMaxY = max;
+                            // draw horizontal line
+                            for (Horizon horizon : plotter.horizons) {
+                                double y = plotter.area != PlotArea.Main ? height - plotter.area.offset - horizon.value * scale
+                                        : horizon.value;
+
+                                gc.setLineWidth(horizon.width);
+                                gc.setStroke(horizon.color);
+                                gc.setLineDashes(horizon.dashArray);
+                                gc.strokeLine(0, y, width, y);
+                            }
+
+                            // draw line chart
+                            for (LineChart chart : plotter.lines) {
+                                if (chart.visible == false) {
+                                    continue;
+                                }
+
+                                if (plotter.area != PlotArea.Main) {
+                                    for (int i = 0; i < chart.valueY.size(); i++) {
+                                        chart.valueY.set(i, height - plotter.area.offset - chart.valueY.get(i) * scale);
                                     }
                                 }
-                                chart.valueY.add(calculated);
+
+                                gc.setLineWidth(chart.width);
+                                gc.setStroke(chart.color);
+                                gc.setLineDashes(chart.dashArray);
+                                gc.strokePolyline(valueX.asArray(), chart.valueY.asArray(), valueX.size());
                             }
-
-                            // draw candle mark
-                            for (CandleMark mark : plotter.candles) {
-                                if (mark.indicator.valueAt(tick)) {
-                                    gc.setFill(mark.color);
-                                    gc.fillOval(x - (BarWidth / 2), high - BarWidth - 2, BarWidth, BarWidth);
-                                }
-                            }
-                        }
-                        valueX.add(x);
-                    });
-
-                    for (Plotter plotter : plotters) {
-                        if (registry.globalSetting(plotter.origin).visible.is(false)) {
-                            continue;
-                        }
-
-                        double scale = plotter.scale();
-
-                        // draw horizontal line
-                        for (Horizon horizon : plotter.horizons) {
-                            double y = plotter.area != PlotArea.Main ? height - plotter.area.offset - horizon.value * scale : horizon.value;
-
-                            gc.setLineWidth(horizon.width);
-                            gc.setStroke(horizon.color);
-                            gc.setLineDashes(horizon.dashArray);
-                            gc.strokeLine(0, y, width, y);
-                        }
-
-                        // draw line chart
-                        for (LineChart chart : plotter.lines) {
-                            if (chart.visible == false) {
-                                continue;
-                            }
-
-                            if (plotter.area != PlotArea.Main) {
-                                for (int i = 0; i < chart.valueY.size(); i++) {
-                                    chart.valueY.set(i, height - plotter.area.offset - chart.valueY.get(i) * scale);
-                                }
-                            }
-
-                            gc.setLineWidth(chart.width);
-                            gc.setStroke(chart.color);
-                            gc.setLineDashes(chart.dashArray);
-                            gc.strokePolyline(valueX.asArray(), chart.valueY.asArray(), valueX.size());
                         }
                     }
                 });
@@ -860,7 +872,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         layoutCandleLatest.layout(() -> {
             chart.ticker.to(ticker -> {
-                if (ticker.ticks.isEmpty()) {
+                if (ticker.ticks.isEmpty() || chart.showRealtimeUpdate.is(false)) {
                     return;
                 }
 
