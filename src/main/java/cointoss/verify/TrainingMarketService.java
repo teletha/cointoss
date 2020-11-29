@@ -23,6 +23,7 @@ import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.arithmetic.Num;
+import cointoss.volume.PriceRangedVolumeManager;
 import kiss.I;
 import kiss.Signal;
 
@@ -31,6 +32,8 @@ public class TrainingMarketService extends MarketService {
     private final MarketService backend;
 
     private final OrderBookManager orderbooks;
+
+    private final PriceRangedVolumeManager priceVolume;
 
     final VerifiableMarketService frontend;
 
@@ -41,6 +44,7 @@ public class TrainingMarketService extends MarketService {
         super(backend.service.exchange, backend.service.marketName, backend.service.setting);
         this.backend = backend.service;
         this.orderbooks = backend.orderBook;
+        this.priceVolume = backend.priceVolume;
         this.frontend = new VerifiableMarketService(backend.service);
     }
 
@@ -68,6 +72,22 @@ public class TrainingMarketService extends MarketService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return delegateInternal(EfficientWebSocket.class, "clientRealtimely");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected OrderBookManager createOrderBookManager() {
+        return orderbooks;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PriceRangedVolumeManager createPriceRangedVolumeManager() {
+        return priceVolume;
     }
 
     /**

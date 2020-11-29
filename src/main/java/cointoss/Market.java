@@ -105,8 +105,8 @@ public class Market implements Disposable {
     public Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
-        this.orderBook = new OrderBookManager(service);
-        this.priceVolume = new PriceRangedVolumeManager(service.setting.base.minimumSize.multiply(10));
+        this.orderBook = service.createOrderBookManager();
+        this.priceVolume = service.createPriceRangedVolumeManager();
 
         // build tickers for each span
         timeline.to(e -> {
