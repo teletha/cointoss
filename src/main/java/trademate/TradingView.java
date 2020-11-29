@@ -91,7 +91,7 @@ public class TradingView extends View {
 
         Viewtify.observing(tab.selectedProperty()).to(v -> {
             chart.showRealtimeUpdate.set(v);
-            chart.showChart.set(true);
+            chart.showChart.set(v);
         });
 
         Viewtify.inWorker(() -> {
