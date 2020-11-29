@@ -220,7 +220,8 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @return A value with the least key, or {@code null} if this map is empty
      */
     default V firstValue() {
-        return isEmpty() ? null : firstEntry().getValue();
+        IntEntry<V> entry = firstEntry();
+        return entry == null ? null : entry.getValue();
     }
 
     /**
@@ -255,7 +256,8 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
      * @return A value with the greatest key, or {@code null} if this map is empty
      */
     default V lastValue() {
-        return isEmpty() ? null : lastEntry().getValue();
+        IntEntry<V> entry = lastEntry();
+        return entry == null ? null : entry.getValue();
     }
 
     /**
