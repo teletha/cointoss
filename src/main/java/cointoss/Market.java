@@ -299,13 +299,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Stop and reverse all positions.
-     */
-    public final Signal<Order> reverse() {
-        return request(Direction.BUY, 0.01, s -> s.makeBestBuyPrice()).merge(request(Direction.SELL, 0.01, s -> s.makeBestSellPrice()));
-    }
-
-    /**
      * Create new price signal.
      * 
      * @param price

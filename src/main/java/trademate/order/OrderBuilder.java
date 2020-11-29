@@ -100,9 +100,6 @@ public class OrderBuilder extends View {
     private UIButton orderCancel;
 
     /** UI */
-    private UIButton orderReverse;
-
-    /** UI */
     private TradingView view;
 
     /** UI */
@@ -140,7 +137,7 @@ public class OrderBuilder extends View {
                     form(en("Price Interval"), FormInputMin, orderPriceInterval, orderPriceIntervalAmount);
                     form(en("Threshold"), FormInputMin, optimizeThreshold);
                     form(FormButton, orderLimitShort.color(Theme.$.sell), orderLimitLong.color(Theme.$.buy));
-                    form(FormButton, orderCancel, orderReverse);
+                    form(FormButton, orderCancel);
                     form(en("Position"), FormInputMin, positionSize);
 
                     $(table, S.Catalog, () -> {
@@ -207,7 +204,6 @@ public class OrderBuilder extends View {
         });
 
         orderCancel.text(en("Cancel")).when(User.MouseClick).on(Viewtify.WorkerThread).to(() -> orders.cancelNowAll());
-        orderReverse.text(en("Reverse")).when(User.MouseClick).on(Viewtify.WorkerThread).to(() -> view.market.reverse().to(I.NoOP));
 
         if (view.market.service == BitFlyer.FX_BTC_JPY) {
             view.market.service.add(SFD.now().on(Viewtify.UIThread).to(price -> {
