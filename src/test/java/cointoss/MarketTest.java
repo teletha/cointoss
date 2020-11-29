@@ -9,11 +9,8 @@
  */
 package cointoss;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
-import cointoss.order.Order;
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
 import cointoss.verify.VerifiableMarket;
@@ -21,13 +18,6 @@ import cointoss.verify.VerifiableMarket;
 class MarketTest {
 
     private VerifiableMarket market = new VerifiableMarket();
-
-    @Test
-    void stopWithoutPosition() {
-        List<Order> orders = market.stop().toList();
-
-        assert orders.isEmpty();
-    }
 
     @Test
     void registerCallDeclare() {

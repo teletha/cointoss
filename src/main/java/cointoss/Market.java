@@ -37,10 +37,8 @@ import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import cointoss.volume.PriceRangedVolumeManager;
 import kiss.Disposable;
-import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.WiseConsumer;
 
 /**
  * Facade for the market related operations.
@@ -298,37 +296,6 @@ public class Market implements Disposable {
      */
     public final Signal<Order> cancel(Order order) {
         return orders.cancel(order);
-    }
-
-    /**
-     * Stop all positions.
-     */
-    public final Signal<Order> stop() {
-        return stop(null);
-    }
-
-    /**
-     * Stop all positions with {@link Orderable}.
-     */
-    public final Signal<Order> stop(WiseConsumer<Orderable> strategy) {
-        return I.signal();
-        // if (orders.hasNoPosition()) {
-        // return I.signal();
-        // }
-        //
-        // if (strategy == null) {
-        // strategy = I.recurse((self, s) -> {
-        // if (orders.positionPrice.v.isLessThan(orders.positionDirection(), latestPrice())) {
-        // // loss
-        // s.makeBestPrice(orders.positionDirection()).cancelAfter(2, ChronoUnit.SECONDS).take();
-        // } else {
-        // // profit
-        // s.makeBestPrice(orders.positionDirection().inverse()).cancelAfter(5,
-        // ChronoUnit.SECONDS).next(self);
-        // }
-        // });
-        // }
-        // return request(orders.positionDirection().inverse(), orders.positionSize.v, strategy);
     }
 
     /**
