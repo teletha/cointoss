@@ -50,13 +50,8 @@ public class Market implements Disposable {
     /** The empty object. */
     public static final Execution BASE = Execution.with.buy(0).date(Chrono.utc(2000, 1, 1));
 
-    private final AtomicReference<Execution> switcher = new AtomicReference<>(Market.BASE);
-
     /** The target market servicce. */
     public final MarketService service;
-
-    /** The execution observers. */
-    protected final Signaling<Execution> timelineObservers = new Signaling();
 
     /** The order manager. */
     public final OrderManager orders;
@@ -70,8 +65,13 @@ public class Market implements Disposable {
     /** The ticker manager. */
     public final TickerManager tickers;
 
-    /** The execution time line. */
+    /** The execution observers. */
+    protected final Signaling<Execution> timelineObservers = new Signaling();
+
+    /** The execution timeline. */
     public final Signal<Execution> timeline = timelineObservers.expose.skipComplete();
+
+    private final AtomicReference<Execution> switcher = new AtomicReference<>(Market.BASE);
 
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
@@ -104,8 +104,8 @@ public class Market implements Disposable {
      */
     public Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
-        this.orders = new OrderManager(service);
-        this.orderBook = createOrderboBookManager();
+        this.orders = createOrderManager();
+        this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();
         this.tickers = createTickerManager();
 
@@ -120,6 +120,18 @@ public class Market implements Disposable {
     }
 
     /**
+     * Create a new {@link OrderManager} for this {@link Market}.
+     * <p>
+     * The method is defined for smooth delegation. Therefore, it is usually not possible to call or
+     * override this method from outside the cointoss.verify package.
+     * 
+     * @return
+     */
+    protected OrderManager createOrderManager() {
+        return new OrderManager(service);
+    }
+
+    /**
      * Create a new {@link OrderBookManager} for this {@link Market}.
      * <p>
      * The method is defined for smooth delegation. Therefore, it is usually not possible to call or
@@ -127,7 +139,7 @@ public class Market implements Disposable {
      * 
      * @return
      */
-    protected OrderBookManager createOrderboBookManager() {
+    protected OrderBookManager createOrderBookManager() {
         return new OrderBookManager(service);
     }
 

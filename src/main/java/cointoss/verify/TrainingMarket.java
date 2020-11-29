@@ -35,7 +35,7 @@ public class TrainingMarket extends Market {
      * {@inheritDoc}
      */
     @Override
-    protected OrderBookManager createOrderboBookManager() {
+    protected OrderBookManager createOrderBookManager() {
         return ((TrainingMarketService) service).market.orderBook;
     }
 
