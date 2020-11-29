@@ -732,7 +732,7 @@ public final class TimeseriesStore<E> {
          * @return A first item or null.
          */
         E first() {
-            return items == null ? null : items[min];
+            return items == null || min < 0 ? null : items[min];
         }
 
         /**
@@ -741,7 +741,7 @@ public final class TimeseriesStore<E> {
          * @return A last item or null.
          */
         E last() {
-            return items == null ? null : items[max];
+            return items == null || max < 0 ? null : items[max];
         }
 
         /**

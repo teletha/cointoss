@@ -287,7 +287,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
         });
 
-        chart.showRealtimeUpdate.observe().take(true).to(() -> {
+        chart.showRealtimeUpdate.observe().take(true).on(Viewtify.UIThread).to(() -> {
             layoutCandle.requestLayout();
             layoutCandleLatest.requestLayout();
         });

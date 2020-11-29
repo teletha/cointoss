@@ -75,7 +75,7 @@ public abstract class EfficientWebSocketModel {
     public EfficientWebSocketModel() {
         // At the end of the application, individually unsubscribing topics would take too much
         // time, so we just disconnect websocket.
-        Shutdown.add(() -> disconnect("shutdown Application", null));
+        Shutdown.add(() -> disconnect("Shutdown Application", null));
     }
 
     @Icy.Property(copiable = true)
