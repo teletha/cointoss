@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -29,6 +30,10 @@ import viewtify.ui.dock.DockSystem;
 
 @Managed(value = Singleton.class)
 public class TradeTester extends View {
+
+    static {
+        Viewtify.Terminator.add(EfficientWebSocket::shutdownNow);
+    }
 
     /**
      * {@inheritDoc}

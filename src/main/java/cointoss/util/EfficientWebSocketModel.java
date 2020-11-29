@@ -38,10 +38,11 @@ import kiss.JSON;
 import kiss.Observer;
 import kiss.Signal;
 import kiss.Variable;
-import viewtify.Viewtify;
 
 @Icy
 public abstract class EfficientWebSocketModel {
+
+    private static final Disposable Shutdown = Disposable.empty();
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -71,10 +72,10 @@ public abstract class EfficientWebSocketModel {
     /**
      * 
      */
-    protected EfficientWebSocketModel() {
+    public EfficientWebSocketModel() {
         // At the end of the application, individually unsubscribing topics would take too much
         // time, so we just disconnect websocket.
-        Viewtify.Terminator.add(() -> disconnect("Shutdown Application", null));
+        Shutdown.add(() -> disconnect("shutdown Application", null));
     }
 
     @Icy.Property(copiable = true)
@@ -360,6 +361,13 @@ public abstract class EfficientWebSocketModel {
      */
     private void outputTestCode(String text) {
         System.out.println("server.sendJSON(\"" + text.replace('"', '\'') + "\");");
+    }
+
+    /**
+     * Release all websocket related resources.
+     */
+    public static final void shutdownNow() {
+        Shutdown.dispose();
     }
 
     /**

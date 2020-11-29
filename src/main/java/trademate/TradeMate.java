@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import cointoss.Market;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Signal;
@@ -35,6 +36,10 @@ import viewtify.ui.dock.DockSystem;
 
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
+
+    static {
+        Viewtify.Terminator.add(EfficientWebSocket::shutdownNow);
+    }
 
     /** The tab loading strategy. */
     private final TabLoader loader = new TabLoader();
