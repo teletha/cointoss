@@ -68,7 +68,7 @@ public class Market implements Disposable {
     public final PriceRangedVolumeManager priceVolume;
 
     /** The ticker manager. */
-    public final TickerManager tickers = new TickerManager();
+    public final TickerManager tickers;
 
     /** The execution time line. */
     public final Signal<Execution> timeline = timelineObservers.expose.skipComplete();
@@ -105,8 +105,9 @@ public class Market implements Disposable {
     public Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
-        this.orderBook = service.createOrderBookManager();
-        this.priceVolume = service.createPriceRangedVolumeManager();
+        this.orderBook = createOrderboBookManager();
+        this.priceVolume = createPriceRangedVolumeManager();
+        this.tickers = createTickerManager();
 
         // build tickers for each span
         timeline.to(e -> {
@@ -116,6 +117,42 @@ public class Market implements Disposable {
         tickers.on(Span.Day1).open.to(priceVolume::start);
 
         readOrderBook();
+    }
+
+    /**
+     * Create a new {@link OrderBookManager} for this {@link Market}.
+     * <p>
+     * The method is defined for smooth delegation. Therefore, it is usually not possible to call or
+     * override this method from outside the cointoss.verify package.
+     * 
+     * @return
+     */
+    protected OrderBookManager createOrderboBookManager() {
+        return new OrderBookManager(service);
+    }
+
+    /**
+     * Create a new {@link PriceRangedVolumeManager} for this {@link Market}.
+     * <p>
+     * The method is defined for smooth delegation. Therefore, it is usually not possible to call or
+     * override this method from outside the cointoss.verify package.
+     * 
+     * @return
+     */
+    protected PriceRangedVolumeManager createPriceRangedVolumeManager() {
+        return new PriceRangedVolumeManager(service.setting.base.minimumSize.multiply(10));
+    }
+
+    /**
+     * Create a new {@link TickerManager} for this {@link Market}.
+     * <p>
+     * The method is defined for smooth delegation. Therefore, it is usually not possible to call or
+     * override this method from outside the cointoss.verify package.
+     * 
+     * @return
+     */
+    protected TickerManager createTickerManager() {
+        return new TickerManager();
     }
 
     public synchronized Trader trader() {

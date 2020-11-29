@@ -29,6 +29,8 @@ import kiss.Signal;
 
 public class TrainingMarketService extends MarketService {
 
+    final Market market;
+
     private final MarketService backend;
 
     private final OrderBookManager orderbooks;
@@ -42,6 +44,7 @@ public class TrainingMarketService extends MarketService {
      */
     public TrainingMarketService(Market backend) {
         super(backend.service.exchange, backend.service.marketName, backend.service.setting);
+        this.market = backend;
         this.backend = backend.service;
         this.orderbooks = backend.orderBook;
         this.priceVolume = backend.priceVolume;
@@ -72,22 +75,6 @@ public class TrainingMarketService extends MarketService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return delegateInternal(EfficientWebSocket.class, "clientRealtimely");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected OrderBookManager createOrderBookManager() {
-        return orderbooks;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected PriceRangedVolumeManager createPriceRangedVolumeManager() {
-        return priceVolume;
     }
 
     /**

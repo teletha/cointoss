@@ -10,6 +10,9 @@
 package cointoss.verify;
 
 import cointoss.Market;
+import cointoss.order.OrderBookManager;
+import cointoss.ticker.TickerManager;
+import cointoss.volume.PriceRangedVolumeManager;
 
 public class TrainingMarket extends Market {
 
@@ -26,6 +29,30 @@ public class TrainingMarket extends Market {
         service.executionsRealtimely().to(e -> {
             ((TrainingMarketService) service).frontend.emulate(e, timelineObservers);
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected OrderBookManager createOrderboBookManager() {
+        return ((TrainingMarketService) service).market.orderBook;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PriceRangedVolumeManager createPriceRangedVolumeManager() {
+        return ((TrainingMarketService) service).market.priceVolume;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TickerManager createTickerManager() {
+        return ((TrainingMarketService) service).market.tickers;
     }
 
     /**

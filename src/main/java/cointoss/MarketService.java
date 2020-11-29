@@ -26,14 +26,12 @@ import cointoss.execution.ExecutionLog;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
-import cointoss.order.OrderBookManager;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.RetryPolicy;
 import cointoss.util.arithmetic.Num;
-import cointoss.volume.PriceRangedVolumeManager;
 import kiss.Decoder;
 import kiss.Disposable;
 import kiss.Encoder;
@@ -130,32 +128,6 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     protected abstract EfficientWebSocket clientRealtimely();
-
-    /**
-     * Create a new {@link OrderBookManager} for this {@link MarketService}.
-     * <p>
-     * Normally {@link Market}-related objects should not be created in {@link MarketService}, but
-     * the method is defined to facilitate delegation. Therefore, it is usually not possible to call
-     * or override this method externally.
-     * 
-     * @return
-     */
-    protected OrderBookManager createOrderBookManager() {
-        return new OrderBookManager(this);
-    }
-
-    /**
-     * Create a new {@link OrderBookManager} for this {@link MarketService}.
-     * <p>
-     * Normally {@link Market}-related objects should not be created in {@link MarketService}, but
-     * the method is defined to facilitate delegation. Therefore, it is usually not possible to call
-     * or override this method externally.
-     * 
-     * @return
-     */
-    protected PriceRangedVolumeManager createPriceRangedVolumeManager() {
-        return new PriceRangedVolumeManager(setting.base.minimumSize.multiply(10));
-    }
 
     /**
      * Estimate the curernt order delay (second).
