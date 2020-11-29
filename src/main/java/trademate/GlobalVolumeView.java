@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.Pastel10;
+import static trademate.FXColorPalettes.*;
 
 import java.text.Normalizer.Form;
 import java.util.HashMap;
@@ -33,6 +33,7 @@ import cointoss.util.Primitives;
 import cointoss.util.ring.RingBuffer;
 import cointoss.volume.GlobalVolume;
 import kiss.I;
+import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.setting.Notificator;
@@ -155,7 +156,13 @@ public class GlobalVolumeView extends View {
             colors.put(addition, color);
         }
 
-        label.text(exchange.name()).color(color);
+        // FIXME : Probably JavaFX's Bug
+        // When the CSS recalculation occurs, somehow the current value is ignored
+        // and overwritten by the CSS value (the root's value is used because color is
+        // not specified for this ui).
+        // We have no choice but to disable external recalculation by binding colors
+        // instead of specifying it.
+        label.text(exchange.name()).color(Variable.of(color));
     }
 
     static class CurrencyView extends View {
