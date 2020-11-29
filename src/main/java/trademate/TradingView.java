@@ -94,8 +94,8 @@ public class TradingView extends View {
             chart.showChart.set(true);
         });
 
-        isLoading.set(true);
         Viewtify.inWorker(() -> {
+            isLoading.set(true);
             boolean update = chart.showRealtimeUpdate.exact();
             chart.showRealtimeUpdate.set(false);
             chart.market.set(market);
@@ -103,15 +103,15 @@ public class TradingView extends View {
             chart.showRealtimeUpdate.set(update);
             isLoading.set(false);
 
-            additionalInfo();
-        });
+            updateTab();
 
-        I.make(TradeMate.class).requestLazyInitialization();
+            I.make(TradeMate.class).requestLazyInitialization();
+        });
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));
     }
 
-    private void additionalInfo() {
+    private void updateTab() {
         Disposable diposer;
 
         if (service == BitFlyer.FX_BTC_JPY) {

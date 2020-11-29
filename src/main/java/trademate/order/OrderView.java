@@ -96,13 +96,28 @@ public class OrderView extends View {
     private UIButton makerBuy;
 
     /** UI */
+    private UILabel makerBuyText;
+
+    /** UI */
+    private UILabel makerBuyPrice;
+
+    /** UI */
     private UIButton makerSell;
+
+    /** UI */
+    private UILabel makerSellText;
+
+    /** UI */
+    private UILabel makerSellPrice;
 
     /** UI */
     private UIButton cancel;
 
     /** UI */
     private UITextValue<Num> orderSize;
+
+    /** UI */
+    private UITextValue<Num> orderThresholdSize;
 
     /** UI */
     private UICheckBox history;
@@ -144,7 +159,7 @@ public class OrderView extends View {
                 });
 
                 form(en("Market"), FormStyles.FormInput, market, trainingMode);
-                form(Amount, FormStyles.FormInputMin, orderSize, history);
+                form(Amount, FormStyles.FormInputMin, orderSize, orderThresholdSize, history);
 
                 $(table, style.Root, () -> {
                     $(entryPrice, style.Wide);
@@ -208,13 +223,19 @@ public class OrderView extends View {
                     disposer = Disposable.empty();
                     disposer.add(I.signal(m.trader().scenarios()).merge(m.trader().added).to(table::addItemAtLast));
                     disposer.add(m.orderBook.longs.best.observing()
-                            .combineLatest(orderSize.observing())
+                            .combineLatest(orderSize.observing(), orderThresholdSize.observing())
                             .on(Viewtify.UIThread)
-                            .to(v -> takerSellPrice.text(m.orderBook.longs.predictTakingPrice(v.ⅱ))));
-                    disposer.add(m.orderBook.shorts.best.observing()
-                            .combineLatest(orderSize.observing())
+                            .to(v -> {
+                                takerSellPrice.text(m.orderBook.longs.predictTakingPrice(v.ⅱ));
+                                makerBuyPrice.text(m.orderBook.longs.predictMakingPrice(v.ⅲ));
+                            }));
+                    disposer.add(m.orderBook.shorts.best.observing()//
+                            .combineLatest(orderSize.observing(), orderThresholdSize.observing())
                             .on(Viewtify.UIThread)
-                            .to(v -> takerBuyPrice.text(m.orderBook.shorts.predictTakingPrice(v.ⅱ))));
+                            .to(v -> {
+                                takerBuyPrice.text(m.orderBook.shorts.predictTakingPrice(v.ⅱ));
+                                makerSellPrice.text(m.orderBook.shorts.predictMakingPrice(v.ⅲ));
+                            }));
                 });
 
         Commands.TakeSell.shortcut(Key.Q).contribute(this::takeSelling);
@@ -230,12 +251,15 @@ public class OrderView extends View {
         takerBuy.textV(takerBuyText, takerBuyPrice).color(Theme.$.buy).when(User.Action, Commands.TakeBuy);
         takerBuyText.text(en("Take Buying")).color(Theme.$.buy);
 
-        makerBuy.text(en("Make Buying")).color(Theme.$.buy).when(User.Action, Commands.MakeBuy);
         cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
-        makerSell.text(en("Make Selling")).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
+        makerSell.textV(makerSellText, makerSellPrice).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
+        makerSellText.text(en("Make Selling")).color(Theme.$.sell);
+        makerBuy.textV(makerBuyText, makerBuyPrice).color(Theme.$.buy).when(User.Action, Commands.MakeBuy);
+        makerBuyText.text(en("Make Buying")).color(Theme.$.buy);
 
         trainingMode.text(en("Demo Trade")).initialize(true);
         orderSize.value(Num.of("0.5")).normalizeInput(Form.NFKC).acceptPositiveNumberInput();
+        orderThresholdSize.value(Num.of("3")).normalizeInput(Form.NFKC).acceptPositiveNumberInput();
         history.text(en("Full History"))
                 .initialize(false)
                 .observing(all -> table.take(all ? Scenario::isNotCancelled : Scenario::isActive));
@@ -345,14 +369,17 @@ public class OrderView extends View {
 
     private void makeBuying() {
         if (current != null) {
-            current.trader().entry(Direction.BUY, estimateSize(), s -> s.make(current.orderBook.longs.computeBestPrice(Num.ONE, Num.ONE)));
+            current.trader()
+                    .entry(Direction.BUY, estimateSize(), s -> s
+                            .make(current.orderBook.longs.predictMakingPrice(orderThresholdSize.value())));
         }
     }
 
     private void makeSelling() {
         if (current != null) {
             current.trader()
-                    .entry(Direction.SELL, estimateSize(), s -> s.make(current.orderBook.shorts.computeBestPrice(Num.ONE, Num.ONE)));
+                    .entry(Direction.SELL, estimateSize(), s -> s
+                            .make(current.orderBook.shorts.predictMakingPrice(orderThresholdSize.value())));
         }
     }
 

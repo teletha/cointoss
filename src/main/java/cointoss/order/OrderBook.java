@@ -230,6 +230,16 @@ public class OrderBook {
     }
 
     /**
+     * Predict the making price.
+     * 
+     * @param size A threshold size.
+     * @return A predicted price.
+     */
+    public final Num predictMakingPrice(Num size) {
+        return computeBestPrice(size, Num.ZERO);
+    }
+
+    /**
      * Compute the best price with your conditions (diff price).
      * 
      * @param diff A difference price.
