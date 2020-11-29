@@ -222,7 +222,7 @@ public abstract class MarketServiceTester<S extends MarketService> {
      * Display debug log.
      */
     protected final void enableDebug() {
-        Configurator.setRootLevel(Level.DEBUG);
+        Configurator.setRootLevel(Level.TRACE);
     }
 
     /**

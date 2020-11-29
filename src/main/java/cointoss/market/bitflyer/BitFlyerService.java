@@ -790,6 +790,9 @@ public class BitFlyerService extends MarketService {
 
         public int id = counter.incrementAndGet();
 
+        /** The string expression to make equality checking fast. */
+        private String idText = Integer.toString(id);
+
         public String jsonrpc = "2.0";
 
         public String method = "subscribe";
@@ -809,7 +812,7 @@ public class BitFlyerService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            return id == Integer.parseInt(reply.text("id")) && Boolean.parseBoolean(reply.text("result"));
+            return reply.has("id", idText) && Boolean.parseBoolean(reply.text("result"));
         }
     }
 

@@ -337,12 +337,4 @@ public class BitMexService extends MarketService {
             return id.equals(reply.text("subscribe")) && Boolean.parseBoolean(reply.text("success"));
         }
     }
-
-    public static void main(String[] args) throws InterruptedException {
-        BitMex.XBT_USD.executionLatestAt(Long.MAX_VALUE).to(e -> {
-            System.out.println(e);
-        });
-
-        Thread.sleep(1000 * 4);
-    }
 }

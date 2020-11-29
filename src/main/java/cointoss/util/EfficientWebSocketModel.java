@@ -291,7 +291,7 @@ public abstract class EfficientWebSocketModel {
             if (error == null) {
                 logger.info("Disconnected websocket [{}] normally because {}", address(), message);
             } else {
-                logger.error("Disconnected websocket [{}]  unexpectedly because {}", address(), message);
+                logger.error("Disconnected websocket [{}]  unexpectedly because {}", address(), message, error);
             }
         });
         connecting.set(false);
@@ -462,8 +462,11 @@ public abstract class EfficientWebSocketModel {
 
         /** The exposed interface. */
         private final Signal<JSON> expose = new Signal<>((observer, disposer) -> {
-            if (managed.size() == 0) sendSubscribe(topic);
+            // First of all, you must register an observer. Because if you go ahead with the next
+            // subscription request, you won't be able to read the message if the reply comes back
+            // super fast (i.e local mocking server).
             managed.add(observer);
+            if (managed.size() == 1) sendSubscribe(topic);
 
             return disposer.add(() -> {
                 managed.remove(observer);

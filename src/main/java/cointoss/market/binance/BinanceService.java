@@ -268,6 +268,9 @@ public class BinanceService extends MarketService {
 
         public int id = counter.incrementAndGet();
 
+        /** The string expression to make equality checking fast. */
+        private String idText = Integer.toString(id);
+
         private Topic(String channel, String market) {
             super(market.toLowerCase() + "@" + channel, topic -> topic.method = "UNSUBSCRIBE");
             this.params.add(market.toLowerCase() + "@" + channel);
@@ -278,7 +281,7 @@ public class BinanceService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            return Integer.parseInt(reply.text("id")) == id;
+            return reply.has("id", idText);
         }
     }
 }
