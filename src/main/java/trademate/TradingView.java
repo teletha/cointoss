@@ -9,8 +9,6 @@
  */
 package trademate;
 
-import java.util.function.Consumer;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.LogType;
@@ -89,12 +87,15 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
+        tab.style("multiline");
+
         Viewtify.observing(tab.selectedProperty()).to(v -> {
             chart.showRealtimeUpdate.set(v);
             chart.showChart.set(true);
         });
+
+        isLoading.set(true);
         Viewtify.inWorker(() -> {
-            isLoading.set(true);
             boolean update = chart.showRealtimeUpdate.exact();
             chart.showRealtimeUpdate.set(false);
             chart.market.set(market);
@@ -102,35 +103,30 @@ public class TradingView extends View {
             chart.showRealtimeUpdate.set(update);
             isLoading.set(false);
 
-            I.make(TradeMate.class).requestLazyInitialization();
+            additionalInfo();
         });
 
-        additionalInfo();
+        I.make(TradeMate.class).requestLazyInitialization();
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));
     }
 
     private void additionalInfo() {
         Disposable diposer;
-        Consumer<Throwable> error = e -> {
-        };
-
-        tab.style("multiline");
 
         if (service == BitFlyer.FX_BTC_JPY) {
             diposer = SFD.now() //
                     .switchOff(isLoading())
                     .diff()
                     .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.marketReadableName + "\n" + e.ⅰ.price + " (" + e.ⅲ
-                            .format(Primitives.DecimalScale2) + "%) "), error);
+                    .to(e -> tab.text(service.marketReadableName + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "));
         } else {
             diposer = service.executionsRealtimely()
                     .switchOff(isLoading())
                     .startWith(service.executionLatest())
                     .diff()
                     .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.marketReadableName + "\n" + e.price), error);
+                    .to(e -> tab.text(service.marketReadableName + "\n" + e.price));
         }
         service.add(diposer);
     }
