@@ -16,7 +16,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -120,7 +119,10 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        return null;
+        ZonedDateTime start = encodeId(startId);
+        ZonedDateTime end = encodeId(endId);
+
+        return downloadHistoricalData(start).take(e -> Chrono.within(start, e.date, end));
     }
 
     /**
@@ -186,15 +188,14 @@ public class GMOService extends MarketService {
     /**
      * Download data.
      * 
-     * @param symbol
      * @param date
      * @return
      */
-    private Signal<Execution> downloadHistoricalData(String symbol, LocalDate date) {
+    private Signal<Execution> downloadHistoricalData(ZonedDateTime date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/yyyyMMdd");
 
-        return downloadHistoricalData("https://api.coin.z.com/data/trades/" + symbol + "/" + formatter
-                .format(date) + "_" + symbol + ".csv.gz");
+        return downloadHistoricalData("https://api.coin.z.com/data/trades/" + marketName + "/" + formatter
+                .format(date) + "_" + marketName + ".csv.gz");
     }
 
     /**
@@ -266,6 +267,14 @@ public class GMOService extends MarketService {
             });
         });
         return id[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long estimateAcquirableExecutionIdRange(double factor) {
+        return PaddingForID * 1000 * 60 * 60 * 24;
     }
 
     /**
@@ -392,6 +401,6 @@ public class GMOService extends MarketService {
         // System.out.println(e);
         // });
 
-        Thread.sleep(1000 * 1000);
+        Thread.sleep(1000 * 10);
     }
 }

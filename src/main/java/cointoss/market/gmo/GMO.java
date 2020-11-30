@@ -19,7 +19,7 @@ import kiss.I;
 public final class GMO extends MarketServiceProvider {
 
     /** Limitation */
-    private static final int AcquirableSize = 1000000;
+    private static final int AcquirableSize = 1000 * 1000 * 60 * 60 * 24;
 
     static final MarketService BTC = new GMOService("BTC", MarketSetting.with.target(Currency.BTC.minimumSize(0.00001))
             .base(Currency.JPY.minimumSize(1))
