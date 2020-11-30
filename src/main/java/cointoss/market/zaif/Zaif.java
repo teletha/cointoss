@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.market.gmo;
+package cointoss.market.zaif;
 
 import cointoss.Currency;
 import cointoss.MarketService;
@@ -16,12 +16,12 @@ import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
 
-public final class GMO extends MarketServiceProvider {
+public final class Zaif extends MarketServiceProvider {
 
     /** Limitation */
-    private static final int AcquirableSize = 1000000;
+    private static final int AcquirableSize = 1000;
 
-    static final MarketService BTC = new GMOService("BTC", MarketSetting.with.target(Currency.BTC.minimumSize(0.00001))
+    static final MarketService BTC_JPY = new ZaifService("btc_jpy", MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 
@@ -30,6 +30,6 @@ public final class GMO extends MarketServiceProvider {
      */
     @Override
     public MarketAccount account() {
-        return I.make(GMOAccount.class);
+        return I.make(ZaifAccount.class);
     }
 }

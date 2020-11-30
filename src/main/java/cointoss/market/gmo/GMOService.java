@@ -9,23 +9,31 @@
  */
 package cointoss.market.gmo;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.zip.GZIPInputStream;
+
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
@@ -37,11 +45,12 @@ import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
+import kiss.XML;
 
 public class GMOService extends MarketService {
 
     /** The right padding for id. */
-    private static final long PaddingForID = 100000;
+    private static final long PaddingForID = 1000;
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -50,24 +59,16 @@ public class GMOService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://www.bitmex.com/realtime")
-            .extractId(json -> json.text("table") + json.find(String.class, "data", "0", "symbol"));
-
-    /** The market id. */
-    private final int marketId;
-
-    /** The instrument tick size. */
-    private final Num instrumentTickSize;
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
+            .extractId(json -> json.text("channel") + "." + json.text("symbol"))
+            .noServerReply();
 
     /**
      * @param marketName
      * @param setting
      */
-    protected GMOService(int id, String marketName, MarketSetting setting) {
+    protected GMOService(String marketName, MarketSetting setting) {
         super(Exchange.GMO, marketName, setting);
-
-        this.marketId = id;
-        this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.base.minimumSize;
     }
 
     /**
@@ -76,6 +77,18 @@ public class GMOService extends MarketService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return Realtime;
+    }
+
+    private ZonedDateTime encodeId(long id) {
+        return Chrono.utcByMills(id / PaddingForID);
+    }
+
+    private String formatEncodedId(long id) {
+        return RealTimeFormat.format(encodeId(id));
+    }
+
+    private long decodeId(ZonedDateTime time) {
+        return time.toInstant().toEpochMilli() * PaddingForID;
     }
 
     /**
@@ -107,28 +120,7 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        startId++;
-        long startingPoint = startId % PaddingForID;
-        AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, encodeId(startId)};
-
-        return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(startId) + "&start=" + startingPoint)
-                .flatIterable(e -> e.find("*"))
-                .map(json -> {
-                    return convert(json, increment, previous);
-                });
-    }
-
-    private ZonedDateTime encodeId(long id) {
-        return Chrono.utcByMills(id / PaddingForID);
-    }
-
-    private String formatEncodedId(long id) {
-        return RealTimeFormat.format(encodeId(id));
-    }
-
-    private long decodeId(ZonedDateTime time) {
-        return time.toInstant().toEpochMilli() * PaddingForID;
+        return null;
     }
 
     /**
@@ -139,9 +131,102 @@ public class GMOService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return clientRealtimely().subscribe(new Topic("trade", marketName))
-                .flatIterable(json -> json.find("data", "*"))
-                .map(json -> convert(json, increment, previous));
+        return clientRealtimely().subscribe(new Topic("trades", marketName)).map(json -> convert(json, increment, previous));
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
+        Direction side = e.get(Direction.class, "side");
+        Num size = e.get(Num.class, "size");
+        Num price = e.get(Num.class, "price");
+        ZonedDateTime date = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat);
+
+        return convert(side, size, price, date, increment, previous);
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution convert(Direction side, Num size, Num price, ZonedDateTime date, AtomicLong increment, Object[] previous) {
+        long id;
+        int consecutive;
+
+        if (date.equals(previous[1])) {
+            id = decodeId(date) + increment.incrementAndGet();
+
+            if (side != previous[0]) {
+                consecutive = Execution.ConsecutiveDifference;
+            } else if (side == Direction.BUY) {
+                consecutive = Execution.ConsecutiveSameBuyer;
+            } else {
+                consecutive = Execution.ConsecutiveSameSeller;
+            }
+        } else {
+            id = decodeId(date);
+            increment.set(0);
+            consecutive = Execution.ConsecutiveDifference;
+        }
+
+        previous[0] = side;
+        previous[1] = date;
+
+        return Execution.with.direction(side, size).price(price).date(date).id(id).consecutive(consecutive);
+    }
+
+    /**
+     * Download data.
+     * 
+     * @param symbol
+     * @param date
+     * @return
+     */
+    private Signal<Execution> downloadHistoricalData(String symbol, LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/yyyyMMdd");
+
+        return downloadHistoricalData("https://api.coin.z.com/data/trades/" + symbol + "/" + formatter
+                .format(date) + "_" + symbol + ".csv.gz");
+    }
+
+    /**
+     * Download data.
+     * 
+     * @param uri
+     * @return
+     */
+    private Signal<Execution> downloadHistoricalData(String uri) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss.SSS");
+
+        CsvParserSettings setting = new CsvParserSettings();
+        setting.getFormat().setDelimiter(',');
+        setting.getFormat().setLineSeparator("\n");
+        setting.getFormat().setComment('無');
+        setting.setHeaderExtractionEnabled(true);
+
+        CsvParser parser = new CsvParser(setting);
+        AtomicLong increment = new AtomicLong();
+        Object[] prev = new Object[2];
+
+        return I.http(uri, byte[].class)
+                .flatIterable(bytes -> parser.iterate(new GZIPInputStream(new ByteArrayInputStream(bytes)), ISO_8859_1))
+                .effectOnComplete(parser::stopParsing)
+                .map(values -> {
+                    Direction side = Direction.parse(values[1]);
+                    Num size = Num.of(values[2]);
+                    Num price = Num.of(values[3]);
+                    ZonedDateTime time = LocalDateTime.parse(values[4], formatter).atZone(Chrono.UTC);
+
+                    return convert(side, size, price, time, increment, prev);
+                });
     }
 
     /**
@@ -150,7 +235,7 @@ public class GMOService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trades?symbol=" + marketName + "&page=1").effect(e -> System.out.println(e))
-                .flatIterable(e -> e.find("*"))
+                .flatIterable(e -> e.find("data", "list", "*"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
@@ -159,9 +244,8 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true&endTime=" + formatEncodedId(id))
-                .flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+        System.out.println(id);
+        return I.signal();
     }
 
     /**
@@ -169,7 +253,19 @@ public class GMOService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return decodeId(Chrono.utc(2020, 1, 1).minusMinutes(3));
+        long[] id = {0};
+        String uri = "https://api.coin.z.com/data/trades/" + marketName + "/";
+
+        I.http(uri, XML.class).map(x -> x.find("ul li a").first().text()).waitForTerminate().to(year -> {
+            I.http(uri + year + "/", XML.class).map(x -> x.find("ul li a").first().text()).waitForTerminate().to(month -> {
+                I.http(uri + year + "/" + month + "/", XML.class).map(x -> x.find("ul li a").first().text()).waitForTerminate().to(name -> {
+                    downloadHistoricalData(uri + year + "/" + month + "/" + name).first().waitForTerminate().to(values -> {
+                        id[0] = values.id;
+                    });
+                });
+            });
+        });
+        return id[0];
     }
 
     /**
@@ -221,20 +317,7 @@ public class GMOService extends MarketService {
      * @return
      */
     private OrderBookPageChanges convertOrderBook(List<JSON> pages) {
-        OrderBookPageChanges change = new OrderBookPageChanges();
-        for (JSON page : pages) {
-            long id = Long.parseLong(page.text("id"));
-            Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
-            JSON sizeElement = page.get("size");
-            double size = sizeElement == null ? 0 : sizeElement.as(Double.class) / price.doubleValue();
-
-            if (page.text("side").charAt(0) == 'B') {
-                change.bids.add(new OrderBookPage(price, size));
-            } else {
-                change.asks.add(new OrderBookPage(price, size));
-            }
-        }
-        return change;
+        return null;
     }
 
     /**
@@ -262,44 +345,6 @@ public class GMOService extends MarketService {
     }
 
     /**
-     * Convert to {@link Execution}.
-     * 
-     * @param json
-     * @param previous
-     * @return
-     */
-    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
-        Direction direction = Direction.parse(e.get(String.class, "side"));
-        Num size = Num.of(e.get(String.class, "homeNotional"));
-        Num price = Num.of(e.get(String.class, "price"));
-        ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
-        String tradeId = e.get(String.class, "trdMatchID");
-        long id;
-        int consecutive;
-
-        if (date.equals(previous[1])) {
-            id = decodeId(date) + increment.incrementAndGet();
-
-            if (direction != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (direction == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            id = decodeId(date);
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = direction;
-        previous[1] = date;
-
-        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive).buyer(tradeId);
-    }
-
-    /**
      * Call rest API.
      * 
      * @param method
@@ -309,7 +354,7 @@ public class GMOService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path));
 
-        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "GMO RESTCall"));
     }
 
     /**
@@ -317,17 +362,18 @@ public class GMOService extends MarketService {
      */
     static class Topic extends IdentifiableTopic<Topic> {
 
-        public String op = "subscribe";
+        public String command = "subscribe";
 
-        public List<String> args = new ArrayList();
+        public String channel;
 
-        private final String id;
+        public String symbol;
+
+        public String option = "TAKER_ONLY";
 
         private Topic(String channel, String market) {
-            super(channel + "[" + market + "]", topic -> topic.op = "unsubscribe");
-
-            this.id = channel + ":" + market;
-            this.args.add(id);
+            super(channel + "." + market, topic -> topic.command = "unsubscribe");
+            this.channel = channel;
+            this.symbol = market;
         }
 
         /**
@@ -335,15 +381,17 @@ public class GMOService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            return id.equals(reply.text("subscribe")) && Boolean.parseBoolean(reply.text("success"));
+            return false;
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        GMO.BTC.executionLatest().to(e -> {
-            System.out.println(e);
-        });
+        Market m = new Market(GMO.BTC);
+        m.readLog(v -> v.fromYestaday());
+        // GMO.BTC.executionsRealtimely().to(e -> {
+        // System.out.println(e);
+        // });
 
-        Thread.sleep(1000 * 4);
+        Thread.sleep(1000 * 1000);
     }
 }

@@ -66,6 +66,9 @@ public abstract class EfficientWebSocketModel {
     /** The limite rate. */
     private final Bucket bucket = Bucket4j.builder().addLimit(Bandwidth.simple(1, Duration.ofMillis(250))).build();
 
+    /** The server is responsible or not. */
+    private boolean noReplyMode;
+
     /** The clean up point on disconnect. */
     private Disposable cleanup = Disposable.empty();
 
@@ -180,6 +183,16 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
+     * Configure that this server never reply.
+     * 
+     * @return
+     */
+    public EfficientWebSocket noServerReply() {
+        noReplyMode = true;
+        return (EfficientWebSocket) this;
+    }
+
+    /**
      * Outputs a detailed log.
      * 
      * @return Chainable API.
@@ -229,6 +242,10 @@ public abstract class EfficientWebSocketModel {
 
                             ws.sendText(I.write(topic), true);
                             logger.info("Sent websocket command {} to {}. @{}", topic, address(), count);
+
+                            if (noReplyMode) {
+                                subscribed.add(topic);
+                            }
                         }));
             }
         });
@@ -495,7 +512,6 @@ public abstract class EfficientWebSocketModel {
             if (managed.size() == 1) sendSubscribe(topic);
 
             return disposer.add(() -> {
-                new Error().printStackTrace();
                 managed.remove(observer);
                 if (managed.size() == 0) snedUnsubscribe(topic);
             });
