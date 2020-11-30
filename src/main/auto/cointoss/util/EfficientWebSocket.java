@@ -76,6 +76,9 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     private static final MethodHandle stopRecconnectIfUpdater = updater("stopRecconnectIf");
 
     /** The final property updater. */
+    private static final MethodHandle pongIfUpdater = updater("pongIf");
+
+    /** The final property updater. */
     private static final MethodHandle whenConnectedUpdater = updater("whenConnected");
 
     /** The final property updater. */
@@ -106,6 +109,9 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     public final Predicate<JSON> stopRecconnectIf;
 
     /** The exposed property. */
+    public final Function<JSON, String> pongIf;
+
+    /** The exposed property. */
     public final Consumer<WebSocket> whenConnected;
 
     /** The exposed property. */
@@ -125,6 +131,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         this.ignoreMessageIf = super.ignoreMessageIf();
         this.recconnectIf = super.recconnectIf();
         this.stopRecconnectIf = super.stopRecconnectIf();
+        this.pongIf = super.pongIf();
         this.whenConnected = super.whenConnected();
         this.client = super.client();
         this.scheduler = super.scheduler();
@@ -395,6 +402,44 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     }
 
     /**
+     * Pong when some message match the specified criteria.
+     *  
+     *  @param condition
+     *  @return Chainable API.
+     */
+    @Override
+    public final Function<JSON, String> pongIf() {
+        return this.pongIf;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of pongIf property.
+     */
+    @SuppressWarnings("unused")
+    private final Function<JSON, String> getPongIf() {
+        return this.pongIf;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of pongIf property to assign.
+     */
+    private final void setPongIf(Function<JSON, String> value) {
+        if (value == null) {
+            value = super.pongIf();
+        }
+        try {
+            pongIfUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Invoked when connection is established.
      *  
      *  @return
@@ -520,6 +565,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         builder.append("ignoreMessageIf=").append(ignoreMessageIf).append(", ");
         builder.append("recconnectIf=").append(recconnectIf).append(", ");
         builder.append("stopRecconnectIf=").append(stopRecconnectIf).append(", ");
+        builder.append("pongIf=").append(pongIf).append(", ");
         builder.append("whenConnected=").append(whenConnected).append(", ");
         builder.append("client=").append(client).append(", ");
         builder.append("scheduler=").append(scheduler).append("]");
@@ -533,7 +579,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(address, extractId, updateId, maximumSubscriptions, ignoreMessageIf, recconnectIf, stopRecconnectIf, whenConnected, client, scheduler);
+        return Objects.hash(address, extractId, updateId, maximumSubscriptions, ignoreMessageIf, recconnectIf, stopRecconnectIf, pongIf, whenConnected, client, scheduler);
     }
 
     /**
@@ -555,6 +601,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (!Objects.equals(ignoreMessageIf, other.ignoreMessageIf)) return false;
         if (!Objects.equals(recconnectIf, other.recconnectIf)) return false;
         if (!Objects.equals(stopRecconnectIf, other.stopRecconnectIf)) return false;
+        if (!Objects.equals(pongIf, other.pongIf)) return false;
         if (!Objects.equals(whenConnected, other.whenConnected)) return false;
         if (!Objects.equals(client, other.client)) return false;
         if (!Objects.equals(scheduler, other.scheduler)) return false;
@@ -571,7 +618,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.address == value) {
             return this;
         }
-        return with.address(value).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).whenConnected(this.whenConnected).client(this.client).scheduler(this.scheduler);
+        return with.address(value).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(this.scheduler);
     }
 
     /**
@@ -584,7 +631,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.client == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).whenConnected(this.whenConnected).client(value).scheduler(this.scheduler);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(value).scheduler(this.scheduler);
     }
 
     /**
@@ -597,7 +644,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.scheduler == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).whenConnected(this.whenConnected).client(this.client).scheduler(value);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(value);
     }
 
     /** The singleton builder. */
@@ -715,6 +762,17 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         }
 
         /**
+         * Assign pongIf property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next pongIf(Function<JSON, String> value) {
+            ((EfficientWebSocket) this).setPongIf(value);
+            return (Next) this;
+        }
+
+        /**
          * Assign whenConnected property.
          * 
          * @param value A new value to assign.
@@ -771,6 +829,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         static final String IgnoreMessageIf = "ignoreMessageIf";
         static final String RecconnectIf = "recconnectIf";
         static final String StopRecconnectIf = "stopRecconnectIf";
+        static final String PongIf = "pongIf";
         static final String WhenConnected = "whenConnected";
         static final String Client = "client";
         static final String Scheduler = "scheduler";

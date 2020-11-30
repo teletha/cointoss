@@ -25,8 +25,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import icy.manipulator.Icy;
 import io.github.bucket4j.Bandwidth;
@@ -148,6 +150,17 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
+     * Pong when some message match the specified criteria.
+     * 
+     * @param condition
+     * @return Chainable API.
+     */
+    @Icy.Property
+    public Function<JSON, String> pongIf() {
+        return null;
+    }
+
+    /**
      * Invoked when connection is established.
      * 
      * @return
@@ -162,6 +175,7 @@ public abstract class EfficientWebSocketModel {
      */
     public EfficientWebSocket enableDebug() {
         this.debug = true;
+        Configurator.setRootLevel(Level.TRACE);
         return (EfficientWebSocket) this;
     }
 
@@ -337,12 +351,24 @@ public abstract class EfficientWebSocketModel {
                 }
             }
 
+            // ping - pong
+            Function<JSON, String> pong = pongIf();
+            if (pong != null) {
+                String reply = pong.apply(json);
+                if (reply != null) {
+                    connection.v.sendText(reply.replace('\'', '"'), true);
+                    return;
+                }
+            }
+
+            // reconencting
             Predicate<JSON> recconnect = recconnectIf();
             if (recconnect != null && recconnect.test(json)) {
                 error(new ConnectException("Server was terminated by some error, Try to reconnect."));
                 return;
             }
 
+            // stop reconnecting
             Predicate<JSON> stopping = stopRecconnectIf();
             if (stopping != null && stopping.test(json)) {
                 error(new ConnectException("Server was terminated by some error, Try to reconnect."));
@@ -469,6 +495,7 @@ public abstract class EfficientWebSocketModel {
             if (managed.size() == 1) sendSubscribe(topic);
 
             return disposer.add(() -> {
+                new Error().printStackTrace();
                 managed.remove(observer);
                 if (managed.size() == 0) snedUnsubscribe(topic);
             });

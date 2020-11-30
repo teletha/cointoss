@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
@@ -46,11 +48,15 @@ public class HuobiService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
+    private static final APILimiter Limit = APILimiter.with.limit(10).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api-aws.huobi.pro/ws")
-            .extractId(json -> json.text("ch"));
+            .extractId(json -> json.text("ch"))
+            .pongIf(json -> {
+                String id = json.text("ping");
+                return id == null ? null : "{'pong':" + id + "}";
+            });
 
     /** The market id. */
     private final int marketId;
@@ -139,9 +145,42 @@ public class HuobiService extends MarketService {
         Object[] previous = new Object[2];
 
         return clientRealtimely().subscribe(new Topic("trade.detail", marketName))
-                .effect(e -> System.out.println(e))
-                .flatIterable(json -> json.find("data", "*"))
+                .flatIterable(json -> json.find("tick", "data", "*"))
                 .map(json -> convert(json, increment, previous));
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
+        Direction direction = e.get(Direction.class, "direction");
+        Num size = e.get(Num.class, "amount");
+        Num price = e.get(Num.class, "price");
+        ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "ts"));
+        long id = e.get(long.class, "tradeId");
+
+        return Execution.with.direction(direction, size).id(id).price(price).date(date);
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution convert2(JSON e, AtomicLong increment, Object[] previous) {
+        Direction direction = e.get(Direction.class, "direction");
+        Num size = e.get(Num.class, "amount");
+        Num price = e.get(Num.class, "price");
+        ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "ts"));
+        long id = e.get(long.class, "trade-id");
+
+        return Execution.with.direction(direction, size).id(id).price(price).date(date);
     }
 
     /**
@@ -149,9 +188,8 @@ public class HuobiService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "trades?symbol=" + marketName + "&page=1").effect(e -> System.out.println(e))
-                .flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+        return call("GET", "market/trade?symbol=" + marketName).flatIterable(e -> e.find("tick", "data", "*"))
+                .map(json -> convert2(json, new AtomicLong(), new Object[2]));
     }
 
     /**
@@ -159,9 +197,9 @@ public class HuobiService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true&endTime=" + formatEncodedId(id))
-                .flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+        return call("GET", "market/history/trade?symbol=" + marketName + "&size=2000&page=20")
+                .flatIterable(e -> e.find("data", "*", "data", "*"))
+                .map(json -> convert2(json, new AtomicLong(), new Object[2]));
     }
 
     /**
@@ -262,44 +300,6 @@ public class HuobiService extends MarketService {
     }
 
     /**
-     * Convert to {@link Execution}.
-     * 
-     * @param json
-     * @param previous
-     * @return
-     */
-    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
-        Direction direction = Direction.parse(e.get(String.class, "side"));
-        Num size = Num.of(e.get(String.class, "homeNotional"));
-        Num price = Num.of(e.get(String.class, "price"));
-        ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
-        String tradeId = e.get(String.class, "trdMatchID");
-        long id;
-        int consecutive;
-
-        if (date.equals(previous[1])) {
-            id = decodeId(date) + increment.incrementAndGet();
-
-            if (direction != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (direction == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            id = decodeId(date);
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = direction;
-        previous[1] = date;
-
-        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive).buyer(tradeId);
-    }
-
-    /**
      * Call rest API.
      * 
      * @param method
@@ -307,9 +307,9 @@ public class HuobiService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path));
+        Builder builder = HttpRequest.newBuilder(URI.create("https://api.huobi.pro/" + path));
 
-        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Huobi RESTCall"));
     }
 
     /**
@@ -319,13 +319,16 @@ public class HuobiService extends MarketService {
 
         public String sub;
 
-        public String id;
+        public String unsub;
+
+        public String id = RandomStringUtils.randomAlphabetic(6);
 
         private Topic(String channel, String market) {
-            super("market." + market + "." + channel, topic -> topic.sub = "market." + market + "." + channel);
-
+            super("market." + market + "." + channel, topic -> {
+                topic.unsub = topic.sub;
+                topic.sub = null;
+            });
             this.sub = "market." + market + "." + channel;
-            this.id = "test";
         }
 
         /**
@@ -333,12 +336,12 @@ public class HuobiService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            return id.equals(reply.text("subscribe")) && Boolean.parseBoolean(reply.text("success"));
+            return id.equals(reply.text("id")) && "ok".equals(reply.text("status"));
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Huobi.BTC_USDT.executionsRealtimely().to(e -> {
+        Huobi.BTC_USDT.executionLatestAt(102220063887L).to(e -> {
             System.out.println(e);
         });
 
