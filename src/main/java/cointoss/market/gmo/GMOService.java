@@ -9,7 +9,7 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -243,7 +243,7 @@ public class GMOService extends MarketService {
             I.http(uri + year + "/", XML.class).plug(collect).to(month -> {
                 I.http(uri + year + "/" + month + "/", XML.class).plug(collect).to(name -> {
                     ZonedDateTime date = Chrono.utc(name.substring(0, name.indexOf("_")));
-                    log.storeFullDailyLog(date, downloadHistoricalData(date).waitForTerminate()
+                    log.storeFullDailyLog(date, downloadHistoricalData(date)
                             .effectOnComplete(() -> System.out.println("Download trade data. [" + marketName + " " + date + "]")));
                 });
             });
@@ -417,6 +417,12 @@ public class GMOService extends MarketService {
 
     public static void main(String[] args) throws InterruptedException {
         downloadAllHistoricalData();
+        // ((GMOService)
+        // GMO.BTC).downloadHistoricalData("https://api.coin.z.com/data/trades/BTC/2019/01/20190109_BTC.csv.gz")
+        // .waitForTerminate()
+        // .to(e -> {
+        // System.out.println(e);
+        // });
     }
 
     /**

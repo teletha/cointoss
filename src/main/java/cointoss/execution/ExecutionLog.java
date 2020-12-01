@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -594,7 +594,7 @@ public class ExecutionLog {
          * @return
          */
         private boolean exist() {
-            return normal.isPresent() || compact.isPresent();
+            return (normal.isPresent() && normal.size() != 0) || (compact.isPresent() && compact.size() != 0);
         }
 
         /**
