@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -276,7 +276,6 @@ public class ExecutionLog {
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
             BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
-            System.out.println("1");
 
             // If you connect to the real-time API first, two errors may occur at the same time for
             // the real-time API and the REST API (because the real-time API is asynchronous). In
@@ -289,23 +288,20 @@ public class ExecutionLog {
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
             long startId = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
-            System.out.println("2");
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
-            System.out.println("3");
             while (!disposer.isDisposed()) {
                 rests.clear();
 
                 long range = service.estimateAcquirableExecutionIdRange(coefficient.doubleValue());
                 service.executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
-                System.out.println("4");
+
                 // Since the synchronous REST API did not return an error, it can be determined that
                 // the server is operating normally, so the real-time API is also connected.
                 if (activeRealtime == false) {
                     activeRealtime = true;
                     disposer.add(service.executionsRealtimely(false).to(buffer, observer::error));
                 }
-                System.out.println("5");
                 int retrieved = rests.size();
 
                 if (retrieved != 0) {
@@ -652,7 +648,7 @@ public class ExecutionLog {
                                 .scanWith(Market.BASE, logger::decode)
                                 .effectOnComplete(parser::stopParsing)
                                 .effectOnObserve(stopwatch::start)
-                                .effectOnError(e -> System.out.println("Fail to read fast log. [" + fast + "]"))
+                                .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
                                 .effectOnComplete(() -> {
                                     log.trace("Read fast log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
@@ -662,7 +658,7 @@ public class ExecutionLog {
                                 .scanWith(Market.BASE, logger::decode)
                                 .effectOnComplete(parser::stopParsing)
                                 .effectOnObserve(stopwatch::start)
-                                .effectOnError(e -> System.out.println("Fail to read compact log. [" + compact + "]"))
+                                .effectOnError(e -> log.error("Fail to read compact log. [" + compact + "]"))
                                 .effectOnComplete(() -> {
                                     log.trace("Read compact log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
@@ -676,7 +672,7 @@ public class ExecutionLog {
                             .map(this::parse)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
-                            .effectOnError(e -> System.out.println("Fail to read normal log. [" + normal + "]"))
+                            .effectOnError(e -> log.error("Fail to read normal log. [" + normal + "]"))
                             .effectOnComplete(() -> {
                                 log.trace("Read normal log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                             });
