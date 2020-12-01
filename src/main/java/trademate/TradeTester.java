@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.gmo.GMO;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -67,7 +68,7 @@ public class TradeTester extends View {
 
         tab.load();
 
-        MarketService service2 = BitFlyer.ETH_JPY;
+        MarketService service2 = GMO.BTC;
         tab = DockSystem.register(service2.marketIdentity())
                 .closable(false)
                 .text(service2.marketReadableName)

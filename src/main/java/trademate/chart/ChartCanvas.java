@@ -506,7 +506,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         Num price = largest.rangedPrice();
                         double position = axisY.getPositionForValue(price.doubleValue());
                         orderbookDigit.clear()
-                                .strokeColor(Theme.colorBy(price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BUY : SELL))
+                                .strokeColor(Theme.colorBy(price.isLessThanOrEqual(m.tickers.latest.v.price) ? BUY : SELL))
                                 .strokeText((int) largest.size, orderbookDigit
                                         .getWidth() - largest.size * orderbookBar.scale - 15, position);
                     }
