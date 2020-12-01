@@ -9,7 +9,7 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -56,7 +57,7 @@ public class GMOService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
+    private static final APILimiter Limit = APILimiter.with.limit(3).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
@@ -123,7 +124,21 @@ public class GMOService extends MarketService {
         ZonedDateTime start = encodeId(startId);
         ZonedDateTime end = encodeId(endId);
 
-        return downloadHistoricalData(start).take(e -> Chrono.within(start, e.date, end)).effect(e -> System.out.println(e));
+        System.out.println(startId + "   " + endId + "    " + start + "     " + end);
+
+        AtomicLong increment = new AtomicLong();
+        Object[] prev = new Object[2];
+        List<Integer> page = new ArrayList();
+        for (int i = 0; i < 100; i++) {
+            page.add(i);
+        }
+
+        return I.signal(page)
+                .flatMap(i -> call("GET", "trades?symbol=" + marketName + "&page=" + i))
+                .flatIterable(json -> json.find("data", "list", "*"))
+                .map(json -> convert(json, increment, prev))
+                .takeUntil(e -> e.date.isBefore(start))
+                .reverse();
     }
 
     /**
