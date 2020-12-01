@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -276,6 +276,7 @@ public class ExecutionLog {
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
             BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
+            System.out.println("1");
 
             // If you connect to the real-time API first, two errors may occur at the same time for
             // the real-time API and the REST API (because the real-time API is asynchronous). In
@@ -288,22 +289,23 @@ public class ExecutionLog {
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
             long startId = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
+            System.out.println("2");
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
-
+            System.out.println("3");
             while (!disposer.isDisposed()) {
                 rests.clear();
 
                 long range = service.estimateAcquirableExecutionIdRange(coefficient.doubleValue());
                 service.executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
-
+                System.out.println("4");
                 // Since the synchronous REST API did not return an error, it can be determined that
                 // the server is operating normally, so the real-time API is also connected.
                 if (activeRealtime == false) {
                     activeRealtime = true;
                     disposer.add(service.executionsRealtimely(false).to(buffer, observer::error));
                 }
-
+                System.out.println("5");
                 int retrieved = rests.size();
 
                 if (retrieved != 0) {
@@ -487,6 +489,19 @@ public class ExecutionLog {
     }
 
     /**
+     * Write log from the specified source.
+     * 
+     * @param date A target date.
+     * @param source Full execution log of the specified date.
+     */
+    public final void storeFullDailyLog(ZonedDateTime date, Signal<Execution> source) {
+        Cache cache = cache(date);
+        if (!cache.exist()) {
+            cache.compact(source).to(I.NoOP);
+        }
+    }
+
+    /**
      * Read all caches.
      * 
      * @return
@@ -545,7 +560,7 @@ public class ExecutionLog {
     }
 
     /**
-     * @version 2018/05/27 10:31:20
+     * 
      */
     class Cache {
 

@@ -9,9 +9,9 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 
-import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
@@ -21,16 +21,17 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.execution.ExecutionLog;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
@@ -122,7 +123,7 @@ public class GMOService extends MarketService {
         ZonedDateTime start = encodeId(startId);
         ZonedDateTime end = encodeId(endId);
 
-        return downloadHistoricalData(start).take(e -> Chrono.within(start, e.date, end));
+        return downloadHistoricalData(start).take(e -> Chrono.within(start, e.date, end)).effect(e -> System.out.println(e));
     }
 
     /**
@@ -217,8 +218,8 @@ public class GMOService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] prev = new Object[2];
 
-        return I.http(uri, byte[].class)
-                .flatIterable(bytes -> parser.iterate(new GZIPInputStream(new ByteArrayInputStream(bytes)), ISO_8859_1))
+        return I.http(uri, InputStream.class)
+                .flatIterable(in -> parser.iterate(new GZIPInputStream(in), ISO_8859_1))
                 .effectOnComplete(parser::stopParsing)
                 .map(values -> {
                     Direction side = Direction.parse(values[1]);
@@ -228,6 +229,26 @@ public class GMOService extends MarketService {
 
                     return convert(side, size, price, time, increment, prev);
                 });
+    }
+
+    /**
+     * Download all historical trade data from GMO server.
+     */
+    private void downloadAllHistoricalDataFromServer() {
+        String uri = "https://api.coin.z.com/data/trades/" + marketName + "/";
+        ExecutionLog log = new ExecutionLog(this);
+        Function<Signal<XML>, Signal<String>> collect = s -> s.flatIterable(x -> x.find("ul li a")).map(XML::text).waitForTerminate();
+
+        I.http(uri, XML.class).plug(collect).to(year -> {
+            I.http(uri + year + "/", XML.class).plug(collect).to(month -> {
+                I.http(uri + year + "/" + month + "/", XML.class).plug(collect).to(name -> {
+                    ZonedDateTime date = Chrono.utc(name.substring(0, name.indexOf("_")));
+                    log.storeFullDailyLog(date, downloadHistoricalData(date)
+                            .effectOnComplete(() -> System.out.println("Download trade data. [" + marketName + " " + date + "]")));
+                });
+            });
+        });
+
     }
 
     /**
@@ -395,12 +416,17 @@ public class GMOService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Market m = new Market(GMO.BTC);
-        m.readLog(v -> v.fromYestaday());
-        // GMO.BTC.executionsRealtimely().to(e -> {
-        // System.out.println(e);
-        // });
+        downloadAllHistoricalData();
+    }
 
-        Thread.sleep(1000 * 10);
+    /**
+     * Utility to download all trade data.
+     */
+    static void downloadAllHistoricalData() {
+        I.signal(GMO.class.getDeclaredFields())
+                .take(f -> f.getType() == MarketService.class)
+                .map(f -> f.get(null))
+                .as(GMOService.class)
+                .to(GMOService::downloadAllHistoricalDataFromServer);
     }
 }

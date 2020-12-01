@@ -25,6 +25,14 @@ public final class GMO extends MarketServiceProvider {
             .base(Currency.JPY.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 
+    static final MarketService BTC_JPY = new GMOService("BTC_JPY", MarketSetting.with.target(Currency.BTC.minimumSize(0.00001))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
+
+    static final MarketService ETH = new GMOService("ETH", MarketSetting.with.target(Currency.ETH.minimumSize(0.00001))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
+
     /**
      * {@inheritDoc}
      */

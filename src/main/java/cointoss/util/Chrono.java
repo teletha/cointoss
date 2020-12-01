@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -211,6 +212,40 @@ public class Chrono {
      */
     public static ZonedDateTime utc(LocalDate date) {
         return utc(date.atTime(0, 0));
+    }
+
+    /**
+     * UTC {@link ZonedDateTime} at the specified date.
+     * 
+     * @param date A target {@link LocalDate}.
+     * @return
+     */
+    public static ZonedDateTime utc(String date) {
+        try {
+            return utc(LocalDate.parse(date, Date));
+        } catch (DateTimeParseException e1) {
+            try {
+                return utc(LocalDate.parse(date, DateCompact));
+            } catch (DateTimeParseException e2) {
+                try {
+                    return utc(LocalDateTime.parse(date, DateTime));
+                } catch (DateTimeParseException e3) {
+                    try {
+                        return utc(LocalDateTime.parse(date, DateTimeWithoutSec));
+                    } catch (DateTimeParseException e4) {
+                        try {
+                            return utc(LocalDateTime.parse(date, DateTimeWithT));
+                        } catch (DateTimeParseException e5) {
+                            try {
+                                return utc(LocalDateTime.parse(date, DateDayTime));
+                            } catch (DateTimeParseException e6) {
+                                throw I.quiet(e6);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
