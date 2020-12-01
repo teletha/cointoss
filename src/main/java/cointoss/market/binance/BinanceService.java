@@ -40,7 +40,7 @@ import kiss.Signal;
 public class BinanceService extends MarketService {
 
     /** The API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(600).refresh(Duration.ofMinutes(1));
+    private static final APILimiter Limit = APILimiter.with.limit(550).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.binance.com:9443/stream")

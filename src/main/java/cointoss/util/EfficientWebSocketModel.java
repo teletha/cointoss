@@ -9,10 +9,11 @@
  */
 package cointoss.util;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.net.ConnectException;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,9 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import icy.manipulator.Icy;
-import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
 import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
@@ -64,7 +63,7 @@ public abstract class EfficientWebSocketModel {
     private final Set<IdentifiableTopic> subscribed = ConcurrentHashMap.newKeySet();
 
     /** The limite rate. */
-    private final Bucket bucket = Bucket4j.builder().addLimit(Bandwidth.simple(1, Duration.ofMillis(250))).build();
+    private final Bucket bucket = RateLimit.per(1, 250, MILLISECONDS);
 
     /** The server is responsible or not. */
     private boolean noReplyMode;
@@ -175,25 +174,6 @@ public abstract class EfficientWebSocketModel {
 
     /**
      * Outputs a detailed log.
-     */
-    public EfficientWebSocket enableDebug() {
-        this.debug = true;
-        Configurator.setRootLevel(Level.TRACE);
-        return (EfficientWebSocket) this;
-    }
-
-    /**
-     * Configure that this server never reply.
-     * 
-     * @return
-     */
-    public EfficientWebSocket noServerReply() {
-        noReplyMode = true;
-        return (EfficientWebSocket) this;
-    }
-
-    /**
-     * Outputs a detailed log.
      * 
      * @return Chainable API.
      */
@@ -210,6 +190,35 @@ public abstract class EfficientWebSocketModel {
     @Icy.Property(copiable = true)
     public ScheduledExecutorService scheduler() {
         return null;
+    }
+
+    /**
+     * Configure
+     * 
+     * @return Chainable API.
+     */
+    @Icy.Property(copiable = true)
+    public Bucket limit() {
+        return bucket;
+    }
+
+    /**
+     * Outputs a detailed log.
+     */
+    public EfficientWebSocket enableDebug() {
+        this.debug = true;
+        Configurator.setRootLevel(Level.TRACE);
+        return (EfficientWebSocket) this;
+    }
+
+    /**
+     * Configure that this server never reply.
+     * 
+     * @return
+     */
+    public EfficientWebSocket noServerReply() {
+        noReplyMode = true;
+        return (EfficientWebSocket) this;
     }
 
     /**
@@ -381,14 +390,14 @@ public abstract class EfficientWebSocketModel {
             // reconencting
             Predicate<JSON> recconnect = recconnectIf();
             if (recconnect != null && recconnect.test(json)) {
-                error(new ConnectException("Server was terminated by some error, Try to reconnect."));
+                error(new ConnectException("Server was terminated by some error, Try to reconnect. " + json));
                 return;
             }
 
             // stop reconnecting
             Predicate<JSON> stopping = stopRecconnectIf();
             if (stopping != null && stopping.test(json)) {
-                error(new ConnectException("Server was terminated by some error, Try to reconnect."));
+                error(new ConnectException("Server was terminated by some error, Try to reconnect. " + json));
                 return;
             }
 

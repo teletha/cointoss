@@ -10,6 +10,7 @@
 package cointoss.market.gmo;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -19,7 +20,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
@@ -28,12 +28,14 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
+import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
@@ -41,6 +43,7 @@ import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.RateLimit;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
@@ -55,12 +58,13 @@ public class GMOService extends MarketService {
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-    /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
+    /** The API limit. */
+    private static final APILimiter Limit = APILimiter.with.limit(8).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
             .extractId(json -> json.text("channel") + "." + json.text("symbol"))
+            .limit(RateLimit.per(1, 1, SECONDS))
             .noServerReply();
 
     /**
@@ -81,10 +85,6 @@ public class GMOService extends MarketService {
 
     private ZonedDateTime encodeId(long id) {
         return Chrono.utcByMills(id / PaddingForID);
-    }
-
-    private String formatEncodedId(long id) {
-        return RealTimeFormat.format(encodeId(id));
     }
 
     private long decodeId(ZonedDateTime time) {
@@ -121,9 +121,17 @@ public class GMOService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         ZonedDateTime start = encodeId(startId);
-        ZonedDateTime end = encodeId(endId);
+        AtomicLong increment = new AtomicLong();
+        Object[] prev = new Object[2];
 
-        return downloadHistoricalData(start).take(e -> Chrono.within(start, e.date, end)).effect(e -> System.out.println(e));
+        return I.signal(1)
+                .recurse(i -> i + 1)
+                .flatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
+                .flatIterable(o -> o.find("data", "list", "*"))
+                .takeUntil(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isBefore(start))
+                .reverse()
+                .map(e -> convert(e, increment, prev))
+                .take(e -> e.date.isAfter(start));
     }
 
     /**
@@ -256,8 +264,7 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "trades?symbol=" + marketName + "&page=1").effect(e -> System.out.println(e))
-                .flatIterable(e -> e.find("data", "list", "*"))
+        return call("GET", "trades?symbol=" + marketName + "&page=1&count=1").flatIterable(e -> e.find("data", "list", "*"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
@@ -294,14 +301,6 @@ public class GMOService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public long estimateAcquirableExecutionIdRange(double factor) {
-        return PaddingForID * 1000 * 60 * 60 * 24;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<Order> orders() {
         return I.signal();
     }
@@ -327,7 +326,7 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.find("*")));
+        return call("GET", "orderbooks?symbol=" + marketName).map(e -> convertOrderBook(e.get("data")));
     }
 
     /**
@@ -335,19 +334,33 @@ public class GMOService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderBookL2", marketName))
-                .map(json -> json.find("data", "*"))
-                .map(this::convertOrderBook);
+        return clientRealtimely().subscribe(new Topic("orderbooks", marketName)).map(this::convertOrderBook);
     }
 
     /**
      * Convert json to {@link OrderBookPageChanges}.
      * 
-     * @param pages
+     * @param root
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(List<JSON> pages) {
-        return null;
+    private OrderBookPageChanges convertOrderBook(JSON root) {
+        OrderBookPageChanges changes = new OrderBookPageChanges();
+
+        JSON asks = root.get("asks");
+        JSON bids = root.get("bids");
+
+        for (JSON ask : asks.find("*")) {
+            Num price = ask.get(Num.class, "price");
+            double size = ask.get(double.class, "size");
+            changes.asks.add(new OrderBookPage(price, size));
+        }
+        for (JSON bid : bids.find("*")) {
+            Num price = bid.get(Num.class, "price");
+            double size = bid.get(double.class, "size");
+            changes.bids.add(new OrderBookPage(price, size));
+        }
+
+        return changes;
     }
 
     /**
@@ -364,14 +377,6 @@ public class GMOService extends MarketService {
     @Override
     public Signal<Num> targetCurrency() {
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean checkEquality(Execution one, Execution other) {
-        return one.buyer.equals(other.buyer);
     }
 
     /**
@@ -413,6 +418,13 @@ public class GMOService extends MarketService {
         protected boolean verifySubscribedReply(JSON reply) {
             return false;
         }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Market m = new Market(GMO.BTC);
+        m.readLog(log -> log.fromYestaday());
+
+        Thread.sleep(1000 * 600);
     }
 
     /**
