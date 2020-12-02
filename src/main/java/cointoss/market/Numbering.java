@@ -11,6 +11,8 @@ package cointoss.market;
 
 import java.time.ZonedDateTime;
 
+import cointoss.util.Chrono;
+
 public class Numbering {
 
     public final long padding;
@@ -29,10 +31,20 @@ public class Numbering {
      * Calculate epoch time from ID.
      * 
      * @param id A target ID.
-     * @return Epoch seconds.
+     * @return Epoch time.
      */
     public long decode(long id) {
         return id / padding;
+    }
+
+    /**
+     * Calculate epoch time from ID.
+     * 
+     * @param id A target ID.
+     * @return Epoch time.
+     */
+    public ZonedDateTime decodeAsDate(long id) {
+        return Chrono.utcByMills(decode(id) * (milliBase ? 1 : 1000));
     }
 
     /**
