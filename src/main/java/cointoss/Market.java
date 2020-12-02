@@ -194,6 +194,10 @@ public class Market implements Disposable {
     protected void readOrderBook() {
         // orderbook management
         service.add(service.orderBookRealtimely().to(board -> {
+            if (board.clearInside) {
+                orderBook.shorts.fix(board.asks.get(board.asks.size() - 1).price);
+                orderBook.longs.fix(board.bids.get(board.bids.size() - 1).price);
+            }
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));

@@ -9,8 +9,8 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -59,7 +59,7 @@ public class GMOService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(5).refresh(Duration.ofSeconds(1));
+    private static final APILimiter Limit = APILimiter.with.limit(10).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
@@ -346,6 +346,7 @@ public class GMOService extends MarketService {
      */
     private OrderBookPageChanges convertOrderBook(JSON root) {
         OrderBookPageChanges changes = new OrderBookPageChanges();
+        changes.clearInside = true;
 
         for (JSON ask : root.find("asks", "*")) {
             Num price = ask.get(Num.class, "price");
