@@ -22,7 +22,6 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
-import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderStrategy.Makable;
@@ -114,7 +113,8 @@ public class Market implements Disposable {
         });
         tickers.on(Span.Day1).open.to(priceVolume::start);
 
-        readOrderBook();
+        // manage disposer
+        add(orderBook);
     }
 
     /**
@@ -138,7 +138,7 @@ public class Market implements Disposable {
      * @return
      */
     protected OrderBookManager createOrderBookManager() {
-        return new OrderBookManager(service);
+        return new OrderBookManager(service, timeline.skipWhile(e -> readingLog).throttle(1, TimeUnit.SECONDS).map(Execution::price));
     }
 
     /**
@@ -186,26 +186,6 @@ public class Market implements Disposable {
             trader.initialize(this);
             this.managedTraders.add(trader);
         }
-    }
-
-    /**
-     * Start reading {@link OrderBook}.
-     */
-    protected void readOrderBook() {
-        // orderbook management
-        service.add(service.orderBookRealtimely().to(board -> {
-            if (board.clearInside) {
-                orderBook.shorts.fix(board.asks.get(board.asks.size() - 1).price);
-                orderBook.longs.fix(board.bids.get(board.bids.size() - 1).price);
-            }
-            orderBook.shorts.update(board.asks);
-            orderBook.longs.update(board.bids);
-        }));
-        service.add(timeline.skipWhile(e -> readingLog).throttle(1, TimeUnit.SECONDS).to(e -> {
-            // fix error board
-            orderBook.shorts.fix(e.price);
-            orderBook.longs.fix(e.price);
-        }));
     }
 
     /**

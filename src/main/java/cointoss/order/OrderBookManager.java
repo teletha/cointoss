@@ -9,16 +9,17 @@
  */
 package cointoss.order;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.util.arithmetic.Num;
+import kiss.Disposable;
+import kiss.Signal;
 import kiss.Variable;
 
-/**
- * @version 2018/01/23 14:12:16
- */
-public class OrderBookManager {
+public class OrderBookManager implements Disposable {
 
     /** ASK */
     public final OrderBook shorts;
@@ -30,12 +31,36 @@ public class OrderBookManager {
     public final Variable<Num> spread = Variable.of(Num.ZERO);
 
     /**
+     * Expose to test.
+     * 
+     * @param service
+     */
+    @VisibleForTesting
+    OrderBookManager(MarketService service) {
+        this(service, Signal.never());
+    }
+
+    /**
      * 
      */
-    public OrderBookManager(MarketService service) {
+    public OrderBookManager(MarketService service, Signal<Num> fixPageByPrice) {
         this.shorts = new OrderBook(service.setting, Direction.SELL);
         this.longs = new OrderBook(service.setting, Direction.BUY);
         shorts.best.observe().combineLatest(longs.best.observe()).to(v -> spread.set(v.ⅰ.price.minus(v.ⅱ.price)));
+
+        // orderbook management
+        service.add(service.orderBookRealtimely().to(board -> {
+            if (board.clearInside) {
+                shorts.fix(board.asks.get(board.asks.size() - 1).price);
+                longs.fix(board.bids.get(board.bids.size() - 1).price);
+            }
+            shorts.update(board.asks);
+            longs.update(board.bids);
+        }));
+        service.add(fixPageByPrice.to(price -> {
+            shorts.fix(price);
+            longs.fix(price);
+        }));
     }
 
     /**
@@ -100,5 +125,12 @@ public class OrderBookManager {
         OrderBookPage inShort = shorts.findLargestOrder(lowerPrice, upperPrice);
 
         return inLong.size < inShort.size ? inShort : inLong;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
     }
 }

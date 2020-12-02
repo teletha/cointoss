@@ -9,8 +9,8 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.nio.charset.StandardCharsets.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -126,7 +126,6 @@ public class GMOService extends MarketService {
 
         return I.signal(1)
                 .recurse(i -> i + 1)
-                .effect(i -> System.out.println("page " + i))
                 .flatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
                 .flatIterable(o -> o.find("data", "list", "*"))
                 .takeUntil(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isBefore(start))
@@ -388,7 +387,13 @@ public class GMOService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path));
 
-        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "GMO RESTCall"));
+        return Network.rest(builder, Limit, client()).flatMap(json -> {
+            if (json.get(int.class, "status") == 5) {
+                return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string")));
+            } else {
+                return I.signal(json);
+            }
+        }).retryWhen(retryPolicy(10, "GMO RESTCall"));
     }
 
     /**
@@ -421,9 +426,9 @@ public class GMOService extends MarketService {
 
     public static void main(String[] args) throws InterruptedException {
         Market m = new Market(GMO.BTC);
-        m.readLog(log -> log.fromYestaday());
+        m.readLog(x -> x.fromYestaday());
 
-        Thread.sleep(1000 * 600);
+        Thread.sleep(1000 * 150);
     }
 
     /**

@@ -29,9 +29,7 @@ public class Network {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) limiter.acquire();
 
-            return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client)
-                    .effectOnError(e -> System.out.println("ERROR on " + request.build().uri()))
-                    .to(observer, disposer);
+            return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client).to(observer, disposer);
         });
     }
 

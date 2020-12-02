@@ -19,6 +19,8 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
+import cointoss.order.OrderBookManager;
+import kiss.Signal;
 
 public class VerifiableMarket extends Market {
 
@@ -45,8 +47,8 @@ public class VerifiableMarket extends Market {
      * {@inheritDoc}
      */
     @Override
-    protected void readOrderBook() {
-        // do nothing
+    protected OrderBookManager createOrderBookManager() {
+        return new OrderBookManager(super.service, Signal.never());
     }
 
     /**

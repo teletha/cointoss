@@ -970,7 +970,7 @@ public class ExecutionLog {
             } else if (0 < latestId) {
                 return latestId;
             } else {
-                return latestId = service.executionLatest().map(e -> e.id).waitForTerminate().to().exact();
+                return latestId = service.executionLatest().map(e -> e.id).waitForTerminate().to().or(-1L);
             }
         }
     }
