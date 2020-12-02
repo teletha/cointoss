@@ -9,8 +9,8 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.nio.charset.StandardCharsets.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -64,7 +64,7 @@ public class GMOService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
             .extractId(json -> json.text("channel") + "." + json.text("symbol"))
-            .restrict(RateLimit.per(1, 1, SECONDS))
+            .restrict(RateLimit.per(1, 2, SECONDS))
             .noServerReply();
 
     /**
@@ -126,6 +126,7 @@ public class GMOService extends MarketService {
 
         return I.signal(1)
                 .recurse(i -> i + 1)
+                .effect(i -> System.out.println("page " + i))
                 .flatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
                 .flatIterable(o -> o.find("data", "list", "*"))
                 .takeUntil(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isBefore(start))
@@ -346,15 +347,12 @@ public class GMOService extends MarketService {
     private OrderBookPageChanges convertOrderBook(JSON root) {
         OrderBookPageChanges changes = new OrderBookPageChanges();
 
-        JSON asks = root.get("asks");
-        JSON bids = root.get("bids");
-
-        for (JSON ask : asks.find("*")) {
+        for (JSON ask : root.find("asks", "*")) {
             Num price = ask.get(Num.class, "price");
             double size = ask.get(double.class, "size");
             changes.asks.add(new OrderBookPage(price, size));
         }
-        for (JSON bid : bids.find("*")) {
+        for (JSON bid : root.find("bids", "*")) {
             Num price = bid.get(Num.class, "price");
             double size = bid.get(double.class, "size");
             changes.bids.add(new OrderBookPage(price, size));
