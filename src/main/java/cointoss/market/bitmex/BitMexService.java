@@ -24,6 +24,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
+import cointoss.market.TimestampID;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -41,7 +42,7 @@ import kiss.Signal;
 public class BitMexService extends MarketService {
 
     /** The right padding for id. */
-    private static final long PaddingForID = 100000;
+    private static final TimestampID stamp = new TimestampID(true, 100000);
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -108,9 +109,9 @@ public class BitMexService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         startId++;
-        long startingPoint = startId % PaddingForID;
+        long startingPoint = startId % stamp.padding;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, encodeId(startId)};
+        Object[] previous = new Object[] {null, stamp.decodeAsDate(startId)};
 
         return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(startId) + "&start=" + startingPoint)
                 .flatIterable(e -> e.find("*"))
@@ -119,16 +120,8 @@ public class BitMexService extends MarketService {
                 });
     }
 
-    private ZonedDateTime encodeId(long id) {
-        return Chrono.utcByMills(id / PaddingForID);
-    }
-
     private String formatEncodedId(long id) {
-        return RealTimeFormat.format(encodeId(id));
-    }
-
-    private long decodeId(ZonedDateTime time) {
-        return time.toInstant().toEpochMilli() * PaddingForID;
+        return RealTimeFormat.format(stamp.decodeAsDate(id));
     }
 
     /**
@@ -168,7 +161,7 @@ public class BitMexService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return decodeId(Chrono.utc(2020, 1, 1).minusMinutes(3));
+        return stamp.encode(Chrono.utc(2020, 1, 1).minusMinutes(3));
     }
 
     /**
@@ -277,7 +270,7 @@ public class BitMexService extends MarketService {
         int consecutive;
 
         if (date.equals(previous[1])) {
-            id = decodeId(date) + increment.incrementAndGet();
+            id = stamp.encode(date) + increment.incrementAndGet();
 
             if (direction != previous[0]) {
                 consecutive = Execution.ConsecutiveDifference;
@@ -287,7 +280,7 @@ public class BitMexService extends MarketService {
                 consecutive = Execution.ConsecutiveSameSeller;
             }
         } else {
-            id = decodeId(date);
+            id = stamp.encode(date);
             increment.set(0);
             consecutive = Execution.ConsecutiveDifference;
         }

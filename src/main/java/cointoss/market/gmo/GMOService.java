@@ -9,8 +9,8 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -34,6 +34,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.Exchange;
+import cointoss.market.TimestampID;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -52,8 +53,8 @@ import kiss.XML;
 
 public class GMOService extends MarketService {
 
-    /** The right padding for id. */
-    private static final long PaddingForID = 1000;
+    /** The ID codec. */
+    private static final TimestampID stamp = new TimestampID(true, 1000);
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -81,14 +82,6 @@ public class GMOService extends MarketService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return Realtime;
-    }
-
-    private ZonedDateTime encodeId(long id) {
-        return Chrono.utcByMills(id / PaddingForID);
-    }
-
-    private long decodeId(ZonedDateTime time) {
-        return time.toInstant().toEpochMilli() * PaddingForID;
     }
 
     /**
@@ -120,13 +113,13 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        ZonedDateTime start = encodeId(startId);
+        ZonedDateTime start = stamp.decodeAsDate(startId);
         AtomicLong increment = new AtomicLong();
         Object[] prev = new Object[2];
 
         return I.signal(1)
                 .recurse(i -> i + 1)
-                .flatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
+                .concatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
                 .flatIterable(o -> o.find("data", "list", "*"))
                 .takeUntil(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isBefore(start))
                 .reverse()
@@ -173,7 +166,7 @@ public class GMOService extends MarketService {
         int consecutive;
 
         if (date.equals(previous[1])) {
-            id = decodeId(date) + increment.incrementAndGet();
+            id = stamp.encode(date) + increment.incrementAndGet();
 
             if (side != previous[0]) {
                 consecutive = Execution.ConsecutiveDifference;
@@ -183,7 +176,7 @@ public class GMOService extends MarketService {
                 consecutive = Execution.ConsecutiveSameSeller;
             }
         } else {
-            id = decodeId(date);
+            id = stamp.encode(date);
             increment.set(0);
             consecutive = Execution.ConsecutiveDifference;
         }
@@ -386,8 +379,9 @@ public class GMOService extends MarketService {
      */
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path));
-
+        System.out.println("REST " + path);
         return Network.rest(builder, Limit, client()).flatMap(json -> {
+            System.out.println("RESTOK " + path);
             if (json.get(int.class, "status") == 5) {
                 return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string")));
             } else {

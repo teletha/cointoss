@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
 
-public class Numbering {
+public class TimestampID {
 
     public final long padding;
 
@@ -22,7 +22,7 @@ public class Numbering {
     /**
      * @param padding
      */
-    public Numbering(boolean milliBase, long padding) {
+    public TimestampID(boolean milliBase, long padding) {
         this.padding = padding;
         this.milliBase = milliBase;
     }

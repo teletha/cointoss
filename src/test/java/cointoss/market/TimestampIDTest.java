@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.util.Chrono;
 
-class NumberingTest {
+class TimestampIDTest {
 
     @Test
     void decode() {
-        Numbering numbering = new Numbering(true, 10);
+        TimestampID numbering = new TimestampID(true, 10);
 
         assert numbering.decode(100) == 10;
         assert numbering.decode(110) == 11;
@@ -25,7 +25,7 @@ class NumberingTest {
 
     @Test
     void decodeSecondBase() {
-        Numbering numbering = new Numbering(false, 10);
+        TimestampID numbering = new TimestampID(false, 10);
 
         assert numbering.decode(100) == 10;
         assert numbering.decode(110) == 11;
@@ -33,7 +33,7 @@ class NumberingTest {
 
     @Test
     void decodeAsDate() {
-        Numbering numbering = new Numbering(true, 10);
+        TimestampID numbering = new TimestampID(true, 10);
     
         assert numbering.decodeAsDate(100).equals(Chrono.utc(1970, 1, 1, 0, 0, 0, 10));
         assert numbering.decodeAsDate(12340).equals(Chrono.utc(1970, 1, 1, 0, 0, 1, 234));
@@ -41,7 +41,7 @@ class NumberingTest {
 
     @Test
     void decodeAsDateSecondBase() {
-        Numbering numbering = new Numbering(false, 10);
+        TimestampID numbering = new TimestampID(false, 10);
     
         assert numbering.decodeAsDate(100).equals(Chrono.utc(1970, 1, 1, 0, 0, 10, 0));
         assert numbering.decodeAsDate(12340).equals(Chrono.utc(1970, 1, 1, 0, 20, 34, 0));
@@ -49,7 +49,7 @@ class NumberingTest {
 
     @Test
     void encode() {
-        Numbering numbering = new Numbering(true, 10);
+        TimestampID numbering = new TimestampID(true, 10);
 
         assert numbering.encode(Chrono.utc(1970, 1, 1, 0, 0, 12, 345)) == 123450;
         assert numbering.encode(Chrono.utc(1970, 1, 1, 0, 1, 23, 456)) == 834560;
@@ -57,7 +57,7 @@ class NumberingTest {
 
     @Test
     void encodeSecondBase() {
-        Numbering numbering = new Numbering(false, 10);
+        TimestampID numbering = new TimestampID(false, 10);
 
         assert numbering.encode(Chrono.utc(1970, 1, 1, 0, 0, 12, 345)) == 120;
         assert numbering.encode(Chrono.utc(1970, 1, 1, 0, 1, 23, 456)) == 830;

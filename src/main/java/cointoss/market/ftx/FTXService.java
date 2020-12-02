@@ -25,7 +25,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.market.Numbering;
+import cointoss.market.TimestampID;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -43,7 +43,7 @@ import kiss.Signal;
 public class FTXService extends MarketService {
 
     /** The idetifier management. */
-    static final Numbering Numbering = new Numbering(false, 1000);
+    static final TimestampID Numbering = new TimestampID(false, 1000);
 
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
