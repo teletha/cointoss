@@ -58,8 +58,8 @@ public class GMOService extends MarketService {
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-    /** The API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(8).refresh(Duration.ofSeconds(1));
+    /** The bitflyer API limit. */
+    private static final APILimiter Limit = APILimiter.with.limit(5).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
