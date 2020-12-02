@@ -16,6 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -63,7 +64,7 @@ public abstract class EfficientWebSocketModel {
     private final Set<IdentifiableTopic> subscribed = ConcurrentHashMap.newKeySet();
 
     /** The limite rate. */
-    private final Bucket bucket = RateLimit.per(1, 250, MILLISECONDS);
+    private Bucket bucket = RateLimit.per(1, 250, MILLISECONDS);
 
     /** The server is responsible or not. */
     private boolean noReplyMode;
@@ -193,16 +194,6 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
-     * Configure
-     * 
-     * @return Chainable API.
-     */
-    @Icy.Property(copiable = true)
-    public Bucket limit() {
-        return bucket;
-    }
-
-    /**
      * Outputs a detailed log.
      */
     public EfficientWebSocket enableDebug() {
@@ -216,8 +207,18 @@ public abstract class EfficientWebSocketModel {
      * 
      * @return
      */
-    public EfficientWebSocket noServerReply() {
+    public final EfficientWebSocket noServerReply() {
         noReplyMode = true;
+        return (EfficientWebSocket) this;
+    }
+
+    /**
+     * Configure the network access rate.
+     * 
+     * @return
+     */
+    public final EfficientWebSocket restrict(Bucket bucket) {
+        this.bucket = Objects.requireNonNull(bucket);
         return (EfficientWebSocket) this;
     }
 

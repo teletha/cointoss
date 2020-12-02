@@ -2,7 +2,6 @@ package cointoss.util;
 
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel;
-import io.github.bucket4j.Bucket;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
@@ -88,9 +87,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     /** The final property updater. */
     private static final MethodHandle schedulerUpdater = updater("scheduler");
 
-    /** The final property updater. */
-    private static final MethodHandle limitUpdater = updater("limit");
-
     /** The exposed property. */
     public final String address;
 
@@ -124,9 +120,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     /** The exposed property. */
     public final ScheduledExecutorService scheduler;
 
-    /** The exposed property. */
-    public final Bucket limit;
-
     /**
      * HIDE CONSTRUCTOR
      */
@@ -142,7 +135,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         this.whenConnected = super.whenConnected();
         this.client = super.client();
         this.scheduler = super.scheduler();
-        this.limit = super.limit();
     }
 
     /**
@@ -559,43 +551,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
     }
 
     /**
-     * Configure
-     *  
-     *  @return Chainable API.
-     */
-    @Override
-    public final Bucket limit() {
-        return this.limit;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of limit property.
-     */
-    @SuppressWarnings("unused")
-    private final Bucket getLimit() {
-        return this.limit;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of limit property to assign.
-     */
-    private final void setLimit(Bucket value) {
-        if (value == null) {
-            value = super.limit();
-        }
-        try {
-            limitUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
      * Show all property values.
      *
      * @return All property values.
@@ -613,8 +568,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         builder.append("pongIf=").append(pongIf).append(", ");
         builder.append("whenConnected=").append(whenConnected).append(", ");
         builder.append("client=").append(client).append(", ");
-        builder.append("scheduler=").append(scheduler).append(", ");
-        builder.append("limit=").append(limit).append("]");
+        builder.append("scheduler=").append(scheduler).append("]");
         return builder.toString();
     }
 
@@ -625,7 +579,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(address, extractId, updateId, maximumSubscriptions, ignoreMessageIf, recconnectIf, stopRecconnectIf, pongIf, whenConnected, client, scheduler, limit);
+        return Objects.hash(address, extractId, updateId, maximumSubscriptions, ignoreMessageIf, recconnectIf, stopRecconnectIf, pongIf, whenConnected, client, scheduler);
     }
 
     /**
@@ -651,7 +605,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (!Objects.equals(whenConnected, other.whenConnected)) return false;
         if (!Objects.equals(client, other.client)) return false;
         if (!Objects.equals(scheduler, other.scheduler)) return false;
-        if (!Objects.equals(limit, other.limit)) return false;
         return true;
     }
 
@@ -665,7 +618,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.address == value) {
             return this;
         }
-        return with.address(value).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(this.scheduler).limit(this.limit);
+        return with.address(value).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(this.scheduler);
     }
 
     /**
@@ -678,7 +631,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.client == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(value).scheduler(this.scheduler).limit(this.limit);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(value).scheduler(this.scheduler);
     }
 
     /**
@@ -691,20 +644,7 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.scheduler == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(value).limit(this.limit);
-    }
-
-    /**
-     * Create new {@link EfficientWebSocket} with the specified property and copy other properties from this model.
-     *
-     * @param value A new value to assign.
-     * @return A created new model instance.
-     */
-    public EfficientWebSocket withLimit(Bucket value) {
-        if (this.limit == value) {
-            return this;
-        }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(this.scheduler).limit(value);
+        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(value);
     }
 
     /** The singleton builder. */
@@ -864,17 +804,6 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
             ((EfficientWebSocket) this).setScheduler(value);
             return (Next) this;
         }
-
-        /**
-         * Assign limit property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next limit(Bucket value) {
-            ((EfficientWebSocket) this).setLimit(value);
-            return (Next) this;
-        }
     }
 
     /**
@@ -904,6 +833,5 @@ public abstract class EfficientWebSocket extends EfficientWebSocketModel {
         static final String WhenConnected = "whenConnected";
         static final String Client = "client";
         static final String Scheduler = "scheduler";
-        static final String Limit = "limit";
     }
 }
