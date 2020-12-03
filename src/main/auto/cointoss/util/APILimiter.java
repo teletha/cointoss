@@ -3,6 +3,7 @@ package cointoss.util;
 import cointoss.util.APILimiter;
 import cointoss.util.APILimiterModel;
 import java.lang.Override;
+import java.lang.String;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
 import java.lang.UnsupportedOperationException;
@@ -56,6 +57,9 @@ public abstract class APILimiter extends APILimiterModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle config$823551244= invoker("config", Duration.class);
 
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle register$927011984= invoker("register", String.class);
+
     /**
      * Create special property updater.
      *
@@ -78,11 +82,17 @@ public abstract class APILimiter extends APILimiterModel {
     /** The final property updater. */
     private static final MethodHandle refreshUpdater = updater("refresh");
 
+    /** The final property updater. */
+    private static final MethodHandle persistableUpdater = updater("persistable");
+
     /** The exposed property. */
     public final int limit;
 
     /** The exposed property. */
     public final Duration refresh;
+
+    /** The exposed property. */
+    public final String persistable;
 
     /**
      * HIDE CONSTRUCTOR
@@ -90,6 +100,7 @@ public abstract class APILimiter extends APILimiterModel {
     protected APILimiter() {
         this.limit = 0;
         this.refresh = null;
+        this.persistable = super.persistable();
     }
 
     /**
@@ -164,6 +175,43 @@ public abstract class APILimiter extends APILimiterModel {
     }
 
     /**
+     * Identifiable name.
+     *  
+     *  @return
+     */
+    @Override
+    public final String persistable() {
+        return this.persistable;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of persistable property.
+     */
+    @SuppressWarnings("unused")
+    private final String getPersistable() {
+        return this.persistable;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of persistable property to assign.
+     */
+    private final void setPersistable(String value) {
+        if (value == null) {
+            value = super.persistable();
+        }
+        try {
+            persistableUpdater.invoke(this, register$927011984.invoke(this, value));
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Show all property values.
      *
      * @return All property values.
@@ -172,7 +220,8 @@ public abstract class APILimiter extends APILimiterModel {
     public String toString() {
         StringBuilder builder = new StringBuilder("APILimiter [");
         builder.append("limit=").append(limit).append(", ");
-        builder.append("refresh=").append(refresh).append("]");
+        builder.append("refresh=").append(refresh).append(", ");
+        builder.append("persistable=").append(persistable).append("]");
         return builder.toString();
     }
 
@@ -183,7 +232,7 @@ public abstract class APILimiter extends APILimiterModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(limit, refresh);
+        return Objects.hash(limit, refresh, persistable);
     }
 
     /**
@@ -200,6 +249,7 @@ public abstract class APILimiter extends APILimiterModel {
         APILimiter other = (APILimiter) o;
         if (limit != other.limit) return false;
         if (!Objects.equals(refresh, other.refresh)) return false;
+        if (!Objects.equals(persistable, other.persistable)) return false;
         return true;
     }
 
@@ -274,6 +324,17 @@ public abstract class APILimiter extends APILimiterModel {
      * Property assignment API.
      */
     public static interface ÅssignableÅrbitrary<Next extends APILimiter> {
+
+        /**
+         * Assign persistable property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next persistable(String value) {
+            ((APILimiter) this).setPersistable(value);
+            return (Next) this;
+        }
     }
 
     /**
@@ -294,5 +355,6 @@ public abstract class APILimiter extends APILimiterModel {
     static final class My {
         static final String Limit = "limit";
         static final String Refresh = "refresh";
+        static final String Persistable = "persistable";
     }
 }

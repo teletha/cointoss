@@ -9,16 +9,24 @@
  */
 package cointoss.util;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import icy.manipulator.Icy;
 import kiss.I;
+import kiss.Managed;
+import kiss.Signaling;
+import kiss.Storable;
 
 @Icy
 abstract class APILimiterModel {
 
     /** The current using permits. */
+    @Managed
     private long usingPermits = 0;
 
     /** The threshold of the overload mode. */
@@ -28,6 +36,7 @@ abstract class APILimiterModel {
     private long refillTime;
 
     /** The latest access time. */
+    @Managed
     private long lastAccessedTime;
 
     /**
@@ -70,6 +79,27 @@ abstract class APILimiterModel {
     }
 
     /**
+     * Identifiable name.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public String persistable() {
+        return null;
+    }
+
+    @Icy.Intercept("persistable")
+    private String register(String name) {
+        if (name != null) {
+            IndirectReference indirect = database.ref.computeIfAbsent(name, k -> new IndirectReference());
+            usingPermits = indirect.usingPermits;
+            lastAccessedTime = indirect.lastAccessedTime;
+            indirect.ref = this;
+        }
+        return name;
+    }
+
+    /**
      * Get access rights. If not, wait until the rights can be acquired.
      */
     public final void acquire() {
@@ -101,6 +131,7 @@ abstract class APILimiterModel {
             // allow to access
             usingPermits = nextUsingPermits;
             lastAccessedTime = now;
+            save.accept(this);
             return; // immediately
         } else {
             // wait to access
@@ -110,6 +141,78 @@ abstract class APILimiterModel {
                 throw I.quiet(e);
             }
             acquire(weight);
+        }
+    }
+
+    /** The singleton instance. */
+    private static final Persist database = new Persist();
+
+    /** The save request. */
+    private static final Signaling save = new Signaling();
+    static {
+        save.expose.throttle(10, SECONDS).to(database::store);
+    }
+
+    /**
+     * 
+     */
+    private static class Persist implements Storable<Persist> {
+
+        public Map<String, IndirectReference> ref = new HashMap();
+
+        /**
+         * Hide constructor.
+         */
+        private Persist() {
+            restore();
+        }
+    }
+
+    /**
+     * To avoid complex NPE at restoration phase.
+     */
+    static class IndirectReference {
+
+        private APILimiterModel ref;
+
+        private long usingPermits;
+
+        private long lastAccessedTime;
+
+        /**
+         * Get the usingPermits property of this {@link APILimiterModel.IndirectReference}.
+         * 
+         * @return The usingPermits property.
+         */
+        long getUsingPermits() {
+            return ref.usingPermits;
+        }
+
+        /**
+         * Set the usingPermits property of this {@link APILimiterModel.IndirectReference}.
+         * 
+         * @param usingPermits The usingPermits value to set.
+         */
+        void setUsingPermits(long usingPermits) {
+            this.usingPermits = usingPermits;
+        }
+
+        /**
+         * Get the lastAccessedTime property of this {@link APILimiterModel.IndirectReference}.
+         * 
+         * @return The lastAccessedTime property.
+         */
+        long getLastAccessedTime() {
+            return ref.lastAccessedTime;
+        }
+
+        /**
+         * Set the lastAccessedTime property of this {@link APILimiterModel.IndirectReference}.
+         * 
+         * @param lastAccessedTime The lastAccessedTime value to set.
+         */
+        void setLastAccessedTime(long lastAccessedTime) {
+            this.lastAccessedTime = lastAccessedTime;
         }
     }
 }
