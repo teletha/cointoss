@@ -64,7 +64,7 @@ public class GMOService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
             .extractId(json -> json.text("channel") + "." + json.text("symbol"))
-            .restrict(RateLimit.per(1, 2, SECONDS))
+            .restrict(RateLimit.per("GMO", 1, 2, SECONDS))
             .noServerReply();
 
     /**

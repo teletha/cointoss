@@ -60,7 +60,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.binance.Binance;
+import cointoss.market.bybit.Bybit;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -1028,10 +1028,6 @@ public class ExecutionLog {
     }
 
     public static void main1(String[] args) throws InterruptedException {
-        ExecutionLog log = new ExecutionLog(Binance.BTC_USDT);
-        Cache cache2 = log.cache(Chrono.utc(2019, 12, 18));
-        cache2.writeCompact();
-
-        Thread.sleep(1000 * 10);
+        restoreNormal(Bybit.BTC_USD, Chrono.utc(2020, 11, 28));
     }
 }

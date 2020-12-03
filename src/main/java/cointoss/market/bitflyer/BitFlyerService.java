@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.translate;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.math.RoundingMode;
@@ -68,8 +68,8 @@ public class BitFlyerService extends MarketService {
     /** The bitflyer ID date fromat. */
     private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
-    /** The API limit. */
-    private static final Bucket LIMITER = RateLimit.per(500, 5, TimeUnit.MINUTES);
+    /** The API limit. (Leave a little more than the specification "500" for safety) */
+    private static final Bucket LIMITER = RateLimit.per("BitFlyer", 45, 30, TimeUnit.SECONDS);
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
