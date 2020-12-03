@@ -9,8 +9,8 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.nio.charset.StandardCharsets.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -379,9 +379,7 @@ public class GMOService extends MarketService {
      */
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path));
-        System.out.println("REST " + path);
         return Network.rest(builder, Limit, client()).flatMap(json -> {
-            System.out.println("RESTOK " + path);
             if (json.get(int.class, "status") == 5) {
                 return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string")));
             } else {

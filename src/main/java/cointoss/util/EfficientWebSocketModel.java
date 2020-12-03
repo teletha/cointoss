@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.ConnectException;
 import java.net.http.HttpClient;
@@ -354,15 +354,15 @@ public abstract class EfficientWebSocketModel {
     private void dispatch(String text) {
         JSON json = I.json(text);
 
-        Predicate<JSON> reject = ignoreMessageIf();
-        if (reject != null && reject.test(json)) {
-            return;
-        }
-
         Supersonic signaling = signals.get(extractId().apply(json));
         if (signaling != null) {
             signaling.accept(json);
         } else {
+            Predicate<JSON> reject = ignoreMessageIf();
+            if (reject != null && reject.test(json)) {
+                return;
+            }
+
             for (IdentifiableTopic topic : subscribing) {
                 if (topic.verifySubscribedReply(json)) {
                     subscribed.add(topic);
@@ -398,7 +398,9 @@ public abstract class EfficientWebSocketModel {
             // stop reconnecting
             Predicate<JSON> stopping = stopRecconnectIf();
             if (stopping != null && stopping.test(json)) {
-                error(new ConnectException("Server was terminated by some error, Try to reconnect. " + json));
+                cleanup.dispose();
+                cleanup = Disposable.empty();
+                logger.trace("Stop reconnecting because the channel was already subscribed. {}", json);
                 return;
             }
 
