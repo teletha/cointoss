@@ -68,7 +68,7 @@ public class TradeTester extends View {
 
         tab.load();
 
-        MarketService service2 = GMO.BTC;
+        MarketService service2 = GMO.BTC_DERIVATIVE;
         tab = DockSystem.register(service2.marketIdentity())
                 .closable(false)
                 .text(service2.marketReadableName)

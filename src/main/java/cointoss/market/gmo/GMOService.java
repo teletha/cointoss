@@ -28,7 +28,6 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -121,6 +120,7 @@ public class GMOService extends MarketService {
                 .recurse(i -> i + 1)
                 .concatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
                 .flatIterable(o -> o.find("data", "list", "*"))
+                .effect(e -> System.out.println(e))
                 .takeUntil(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isBefore(start))
                 .reverse()
                 .map(e -> convert(e, increment, prev))
@@ -243,8 +243,9 @@ public class GMOService extends MarketService {
         I.http(uri, XML.class).plug(collect).to(year -> {
             I.http(uri + year + "/", XML.class).plug(collect).to(month -> {
                 I.http(uri + year + "/" + month + "/", XML.class).plug(collect).to(name -> {
+                    System.out.println(name);
                     ZonedDateTime date = Chrono.utc(name.substring(0, name.indexOf("_")));
-                    log.storeFullDailyLog(date, downloadHistoricalData(date).waitForTerminate()
+                    log.storeFullDailyLog(date, downloadHistoricalData(date)
                             .effectOnComplete(() -> System.out.println("Download trade data. [" + marketName + " " + date + "]")));
                 });
             });
@@ -380,6 +381,7 @@ public class GMOService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path));
         return Network.rest(builder, Limit, client()).flatMap(json -> {
+            System.out.println(path);
             if (json.get(int.class, "status") == 5) {
                 return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string")));
             } else {
@@ -417,10 +419,9 @@ public class GMOService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Market m = new Market(GMO.BTC);
-        m.readLog(x -> x.fromYestaday());
+        downloadAllHistoricalData();
 
-        Thread.sleep(1000 * 150);
+        Thread.sleep(1000 * 300);
     }
 
     /**
