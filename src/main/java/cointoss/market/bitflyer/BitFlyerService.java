@@ -18,7 +18,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -45,12 +44,13 @@ import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.RateLimit;
 import cointoss.util.arithmetic.Num;
+import io.github.bucket4j.Bucket;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -68,8 +68,8 @@ public class BitFlyerService extends MarketService {
     /** The bitflyer ID date fromat. */
     private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
-    /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(500).refresh(Duration.ofMinutes(5));
+    /** The API limit. */
+    private static final Bucket LIMITER = RateLimit.per(500, 5, TimeUnit.MINUTES);
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
@@ -523,6 +523,7 @@ public class BitFlyerService extends MarketService {
      * @return
      */
     private Signal<JSON> rest(String method, API api, String uri, String... bodyContents) {
+        long weight = 1;
         URI u = URI.create(api + uri);
         String bodyText = String.join("", bodyContents);
 
@@ -534,6 +535,7 @@ public class BitFlyerService extends MarketService {
             break;
 
         case Private:
+            weight = 2;
             String path = u.getPath();
             String query = u.getQuery();
             if (query != null) path = path + "?" + query;
@@ -560,7 +562,7 @@ public class BitFlyerService extends MarketService {
             builder = builder.POST(BodyPublishers.ofString(bodyText));
         }
 
-        return Network.rest(builder, Limit, client());
+        return Network.rest(builder, LIMITER, weight, client());
     }
 
     /**
@@ -607,7 +609,7 @@ public class BitFlyerService extends MarketService {
                         .POST(BodyPublishers
                                 .ofString("{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
 
-                Network.rest(builder, Limit).to(I.NoOP);
+                Network.rest(builder, LIMITER, 1).to(I.NoOP);
             });
         }
     }
