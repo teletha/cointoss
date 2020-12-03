@@ -16,7 +16,6 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 
-import io.github.bucket4j.Bucket;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -27,19 +26,15 @@ public class Network {
      * Call REST API.
      */
     public static Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, HttpClient... client) {
-        return new Signal<>((observer, disposer) -> {
-            if (limiter != null) limiter.acquire();
-
-            return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client).to(observer, disposer);
-        });
+        return rest(request, limiter, 1, client);
     }
 
     /**
      * Call REST API.
      */
-    public static Signal<JSON> rest(HttpRequest.Builder request, Bucket limiter, long weight, HttpClient... client) {
+    public static Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, int weight, HttpClient... client) {
         return new Signal<>((observer, disposer) -> {
-            if (limiter != null) limiter.asScheduler().consumeUninterruptibly(weight);
+            if (limiter != null) limiter.acquire(weight);
 
             return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client).to(observer, disposer);
         });

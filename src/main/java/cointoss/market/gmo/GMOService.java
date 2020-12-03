@@ -9,8 +9,8 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -43,7 +43,6 @@ import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
-import cointoss.util.RateLimit;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
@@ -64,7 +63,7 @@ public class GMOService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
             .extractId(json -> json.text("channel") + "." + json.text("symbol"))
-            .restrict(RateLimit.per("GMO", 1, 2, SECONDS))
+            .restrict(APILimiter.with.limit(1).refresh(2, SECONDS))
             .noServerReply();
 
     /**

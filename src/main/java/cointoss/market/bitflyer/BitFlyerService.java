@@ -9,7 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.*;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.math.RoundingMode;
@@ -44,13 +45,12 @@ import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
+import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
-import cointoss.util.RateLimit;
 import cointoss.util.arithmetic.Num;
-import io.github.bucket4j.Bucket;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -68,8 +68,8 @@ public class BitFlyerService extends MarketService {
     /** The bitflyer ID date fromat. */
     private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
-    /** The API limit. (Leave a little more than the specification "500" for safety) */
-    private static final Bucket LIMITER = RateLimit.per("BitFlyer", 45, 30, TimeUnit.SECONDS);
+    /** The API limit. */
+    private static final APILimiter LIMITER = APILimiter.with.limit(500).refresh(5, MINUTES);
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
@@ -523,7 +523,7 @@ public class BitFlyerService extends MarketService {
      * @return
      */
     private Signal<JSON> rest(String method, API api, String uri, String... bodyContents) {
-        long weight = 1;
+        int weight = 1;
         URI u = URI.create(api + uri);
         String bodyText = String.join("", bodyContents);
 

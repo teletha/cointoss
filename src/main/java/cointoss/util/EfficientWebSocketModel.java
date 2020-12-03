@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.net.ConnectException;
 import java.net.http.HttpClient;
@@ -33,7 +33,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import icy.manipulator.Icy;
-import io.github.bucket4j.Bucket;
 import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
@@ -64,7 +63,7 @@ public abstract class EfficientWebSocketModel {
     private final Set<IdentifiableTopic> subscribed = ConcurrentHashMap.newKeySet();
 
     /** The limite rate. */
-    private Bucket bucket = RateLimit.per(1, 250, MILLISECONDS);
+    private APILimiter limit = APILimiter.with.limit(1).refresh(250, MILLISECONDS);
 
     /** The server is responsible or not. */
     private boolean noReplyMode;
@@ -217,8 +216,8 @@ public abstract class EfficientWebSocketModel {
      * 
      * @return
      */
-    public final EfficientWebSocket restrict(Bucket bucket) {
-        this.bucket = Objects.requireNonNull(bucket);
+    public final EfficientWebSocket restrict(APILimiter limiter) {
+        this.limit = Objects.requireNonNull(limiter);
         return (EfficientWebSocket) this;
     }
 
@@ -248,7 +247,7 @@ public abstract class EfficientWebSocketModel {
                         .takeWhile(count -> connection.isPresent())
                         .takeWhile(count -> !subscribed.contains(topic))
                         .to(count -> {
-                            bucket.asScheduler().consumeUninterruptibly(1);
+                            limit.acquire();
 
                             ws.sendText(I.write(topic), true);
                             logger.trace("Sent websocket command {} to {}. @{}", topic, address(), count);
@@ -269,7 +268,7 @@ public abstract class EfficientWebSocketModel {
     private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
         connection.to(ws -> {
             if (subscribed.contains(topic)) {
-                bucket.asScheduler().consumeUninterruptibly(1);
+                limit.acquire();
 
                 try {
                     IdentifiableTopic unsubscribe = topic.unsubscribe();

@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.processing.Generated;
 
 /**
@@ -50,6 +51,9 @@ public abstract class APILimiter extends APILimiterModel {
     }
 
     /** The overload or intercept method invoker. */
+    private static final MethodHandle refresh$1600636201= invoker("refresh", int.class, TimeUnit.class);
+
+    /** The overload or intercept method invoker. */
     private static final MethodHandle config$823551244= invoker("config", Duration.class);
 
     /**
@@ -74,17 +78,11 @@ public abstract class APILimiter extends APILimiterModel {
     /** The final property updater. */
     private static final MethodHandle refreshUpdater = updater("refresh");
 
-    /** The final property updater. */
-    private static final MethodHandle expressUpdater = updater("express");
-
     /** The exposed property. */
     public final int limit;
 
     /** The exposed property. */
     public final Duration refresh;
-
-    /** The exposed property. */
-    public final int express;
 
     /**
      * HIDE CONSTRUCTOR
@@ -92,13 +90,12 @@ public abstract class APILimiter extends APILimiterModel {
     protected APILimiter() {
         this.limit = 0;
         this.refresh = null;
-        this.express = super.express();
     }
 
     /**
-     * Return the limit property.
-     *
-     * @return A value of limit property.
+     * Configure the access capacity.
+     *  
+     *  @return
      */
     @Override
     public final int limit() {
@@ -130,9 +127,9 @@ public abstract class APILimiter extends APILimiterModel {
     }
 
     /**
-     * Return the refresh property.
-     *
-     * @return A value of refresh property.
+     * Configure the capacity refresh time.
+     *  
+     *  @return
      */
     @Override
     public final Duration refresh() {
@@ -167,40 +164,6 @@ public abstract class APILimiter extends APILimiterModel {
     }
 
     /**
-     * Return the express property.
-     *
-     * @return A value of express property.
-     */
-    @Override
-    public final int express() {
-        return this.express;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of express property.
-     */
-    @SuppressWarnings("unused")
-    private final int getExpress() {
-        return this.express;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of express property to assign.
-     */
-    private final void setExpress(int value) {
-        try {
-            expressUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
      * Show all property values.
      *
      * @return All property values.
@@ -209,8 +172,7 @@ public abstract class APILimiter extends APILimiterModel {
     public String toString() {
         StringBuilder builder = new StringBuilder("APILimiter [");
         builder.append("limit=").append(limit).append(", ");
-        builder.append("refresh=").append(refresh).append(", ");
-        builder.append("express=").append(express).append("]");
+        builder.append("refresh=").append(refresh).append("]");
         return builder.toString();
     }
 
@@ -221,7 +183,7 @@ public abstract class APILimiter extends APILimiterModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(limit, refresh, express);
+        return Objects.hash(limit, refresh);
     }
 
     /**
@@ -238,7 +200,6 @@ public abstract class APILimiter extends APILimiterModel {
         APILimiter other = (APILimiter) o;
         if (limit != other.limit) return false;
         if (!Objects.equals(refresh, other.refresh)) return false;
-        if (express != other.express) return false;
         return true;
     }
 
@@ -294,23 +255,25 @@ public abstract class APILimiter extends APILimiterModel {
             ((APILimiter) this).setRefresh(value);
             return (Next) this;
         }
+
+        /**
+         * Configure the capacity refresh time.
+         *  
+         *  @return
+         */
+        default Next refresh(int time, TimeUnit unit) {
+            try {
+                return refresh((Duration) refresh$1600636201.invoke(this, time, unit));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+        }
     }
 
     /**
      * Property assignment API.
      */
     public static interface ÅssignableÅrbitrary<Next extends APILimiter> {
-
-        /**
-         * Assign express property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next express(int value) {
-            ((APILimiter) this).setExpress(value);
-            return (Next) this;
-        }
     }
 
     /**
@@ -331,6 +294,5 @@ public abstract class APILimiter extends APILimiterModel {
     static final class My {
         static final String Limit = "limit";
         static final String Refresh = "refresh";
-        static final String Express = "express";
     }
 }
