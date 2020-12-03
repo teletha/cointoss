@@ -251,7 +251,7 @@ public abstract class EfficientWebSocketModel {
                             bucket.asScheduler().consumeUninterruptibly(1);
 
                             ws.sendText(I.write(topic), true);
-                            logger.info("Sent websocket command {} to {}. @{}", topic, address(), count);
+                            logger.trace("Sent websocket command {} to {}. @{}", topic, address(), count);
 
                             if (noReplyMode) {
                                 subscribed.add(topic);
@@ -275,7 +275,7 @@ public abstract class EfficientWebSocketModel {
                     IdentifiableTopic unsubscribe = topic.unsubscribe();
                     ws.sendText(I.write(unsubscribe), true);
                     subscribed.remove(topic);
-                    logger.info("Sent websocket command {} to {}.", unsubscribe, address());
+                    logger.trace("Sent websocket command {} to {}.", unsubscribe, address());
                 } catch (Throwable e) {
                     // ignore
                 } finally {

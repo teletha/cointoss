@@ -39,7 +39,7 @@ import kiss.Signal;
 import psychopath.Directory;
 import psychopath.Locator;
 
-public abstract class MarketService implements Disposable {
+public abstract class MarketService implements Comparable<MarketService>, Disposable {
 
     /** The logging system. */
     protected static final Logger logger = LogManager.getLogger(MarketService.class);
@@ -427,6 +427,14 @@ public abstract class MarketService implements Disposable {
     public final void vandalize() {
         disposer.dispose();
         scheduler.shutdown();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(MarketService o) {
+        return marketIdentity().compareTo(o.marketIdentity());
     }
 
     /**

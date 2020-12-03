@@ -26,8 +26,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Delayed;
@@ -47,6 +49,7 @@ import org.apache.logging.log4j.Logger;
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.TreeMultimap;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
@@ -55,6 +58,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.binance.Binance;
 import cointoss.ticker.Span;
@@ -65,6 +69,7 @@ import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
+import kiss.Signaling;
 import psychopath.Directory;
 import psychopath.File;
 
@@ -75,6 +80,23 @@ public class ExecutionLog {
 
     /** The logging system. */
     private static final Logger log = LogManager.getLogger(ExecutionLog.class);
+
+    /** The message aggregator. */
+    private static final Signaling<MarketService> aggregateWritingLog = new Signaling();
+
+    static {
+        aggregateWritingLog.expose.debounceAll(5, TimeUnit.SECONDS).to(services -> {
+            TreeMultimap<Exchange, String> map = TreeMultimap.create();
+
+            for (MarketService service : services) {
+                map.put(service.exchange, service.marketName);
+            }
+
+            for (Entry<Exchange, Collection<String>> entry : map.asMap().entrySet()) {
+                log.info("Saved execution log for " + entry.getValue().size() + " markets in " + entry.getKey() + ". " + entry.getValue());
+            }
+        });
+    }
 
     /** NOOP TASK */
     private static final ScheduledFuture NOOP = new ScheduledFuture() {
@@ -735,7 +757,9 @@ public class ExecutionLog {
                     channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
                     writeStoredId(remaining.getLast().id);
 
-                    log.info("Write log until " + remaining.peekLast().date + " at " + service + ".");
+                    aggregateWritingLog.accept(service);
+                    // log.info("Write log until " + remaining.peekLast().date + " at " + service +
+                    // ".");
                 } catch (IOException e) {
                     e.printStackTrace();
                     throw I.quiet(e);
