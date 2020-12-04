@@ -9,14 +9,13 @@
  */
 package cointoss.market.gmo;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.time.Duration;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,7 +30,7 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionLog;
+import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampID;
 import cointoss.order.Order;
@@ -57,8 +56,8 @@ public class GMOService extends MarketService {
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-    /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(10).refresh(Duration.ofSeconds(1));
+    /** The API limit. */
+    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(150, MILLISECONDS);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
@@ -112,6 +111,7 @@ public class GMOService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         ZonedDateTime start = stamp.decodeAsDate(startId);
+
         AtomicLong increment = new AtomicLong();
         Object[] prev = new Object[2];
 
@@ -119,11 +119,12 @@ public class GMOService extends MarketService {
                 .recurse(i -> i + 1)
                 .concatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
                 .flatIterable(o -> o.find("data", "list", "*"))
-                .effect(e -> System.out.println(e))
-                .takeUntil(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isBefore(start))
+                // The GMO server returns both Taker and Maker histories
+                // alternately, so we have to remove the Maker side.
+                .skipAt(index -> index % 2 == 0)
+                .takeWhile(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isAfter(start))
                 .reverse()
-                .map(e -> convert(e, increment, prev))
-                .take(e -> e.date.isAfter(start));
+                .map(e -> convert(e, increment, prev));
     }
 
     /**
@@ -187,78 +188,13 @@ public class GMOService extends MarketService {
     }
 
     /**
-     * Download data.
-     * 
-     * @param date
-     * @return
-     */
-    private Signal<Execution> downloadHistoricalData(ZonedDateTime date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/yyyyMMdd");
-
-        return downloadHistoricalData("https://api.coin.z.com/data/trades/" + marketName + "/" + formatter
-                .format(date) + "_" + marketName + ".csv.gz");
-    }
-
-    /**
-     * Download data.
-     * 
-     * @param uri
-     * @return
-     */
-    private Signal<Execution> downloadHistoricalData(String uri) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss.SSS");
-
-        CsvParserSettings setting = new CsvParserSettings();
-        setting.getFormat().setDelimiter(',');
-        setting.getFormat().setLineSeparator("\n");
-        setting.getFormat().setComment('無');
-        setting.setHeaderExtractionEnabled(true);
-
-        CsvParser parser = new CsvParser(setting);
-        AtomicLong increment = new AtomicLong();
-        Object[] prev = new Object[2];
-
-        return I.http(uri, InputStream.class)
-                .flatIterable(in -> parser.iterate(new GZIPInputStream(in), ISO_8859_1))
-                .effectOnComplete(parser::stopParsing)
-                .map(values -> {
-                    Direction side = Direction.parse(values[1]);
-                    Num size = Num.of(values[2]);
-                    Num price = Num.of(values[3]);
-                    ZonedDateTime time = LocalDateTime.parse(values[4], formatter).atZone(Chrono.UTC);
-
-                    return convert(side, size, price, time, increment, prev);
-                });
-    }
-
-    /**
-     * Download all historical trade data from GMO server.
-     */
-    private void downloadAllHistoricalDataFromServer() {
-        String uri = "https://api.coin.z.com/data/trades/" + marketName + "/";
-        ExecutionLog log = new ExecutionLog(this);
-        Function<Signal<XML>, Signal<String>> collect = s -> s.flatIterable(x -> x.find("ul li a")).map(XML::text).waitForTerminate();
-
-        I.http(uri, XML.class).plug(collect).to(year -> {
-            I.http(uri + year + "/", XML.class).plug(collect).to(month -> {
-                I.http(uri + year + "/" + month + "/", XML.class).plug(collect).to(name -> {
-                    System.out.println(name);
-                    ZonedDateTime date = Chrono.utc(name.substring(0, name.indexOf("_")));
-                    log.storeFullDailyLog(date, downloadHistoricalData(date)
-                            .effectOnComplete(() -> System.out.println("Download trade data. [" + marketName + " " + date + "]")));
-                });
-            });
-        });
-
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trades?symbol=" + marketName + "&page=1&count=1").flatIterable(e -> e.find("data", "list", "*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+                .map(json -> convert(json, new AtomicLong(), new Object[2]))
+                .effect(s -> System.out.println(s));
     }
 
     /**
@@ -275,19 +211,9 @@ public class GMOService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        long[] id = {0};
-        String uri = "https://api.coin.z.com/data/trades/" + marketName + "/";
+        ExecutionLogRepository repo = externalRepository();
 
-        I.http(uri, XML.class).map(x -> x.find("ul li a").first().text()).waitForTerminate().to(year -> {
-            I.http(uri + year + "/", XML.class).map(x -> x.find("ul li a").first().text()).waitForTerminate().to(month -> {
-                I.http(uri + year + "/" + month + "/", XML.class).map(x -> x.find("ul li a").first().text()).waitForTerminate().to(name -> {
-                    downloadHistoricalData(uri + year + "/" + month + "/" + name).first().waitForTerminate().to(values -> {
-                        id[0] = values.id;
-                    });
-                });
-            });
-        });
-        return id[0];
+        return repo.collect().first().flatMap(repo::convert).first().map(e -> e.id).waitForTerminate().to().exact();
     }
 
     /**
@@ -371,6 +297,14 @@ public class GMOService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExecutionLogRepository externalRepository() {
+        return new OfficialRepository(this);
+    }
+
+    /**
      * Call rest API.
      * 
      * @param method
@@ -379,9 +313,8 @@ public class GMOService extends MarketService {
      */
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path));
-        return Network.rest(builder, Limit, client()).flatMap(json -> {
-            System.out.println(path);
-            if (json.get(int.class, "status") == 5) {
+        return Network.rest(builder, LIMITER, client()).flatMap(json -> {
+            if (json.get(int.class, "status") != 0) {
                 return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string")));
             } else {
                 return I.signal(json);
@@ -417,20 +350,77 @@ public class GMOService extends MarketService {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        downloadAllHistoricalData();
-
-        Thread.sleep(1000 * 300);
-    }
-
     /**
-     * Utility to download all trade data.
+     * 
      */
-    static void downloadAllHistoricalData() {
-        I.signal(GMO.class.getDeclaredFields())
-                .take(f -> f.getType() == MarketService.class)
-                .map(f -> f.get(null))
-                .as(GMOService.class)
-                .to(GMOService::downloadAllHistoricalDataFromServer);
+    private class OfficialRepository extends ExecutionLogRepository {
+
+        /**
+         * @param service
+         */
+        private OfficialRepository(MarketService service) {
+            super(service);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Signal<ZonedDateTime> collect() {
+            String uri = "https://api.coin.z.com/data/trades/" + service.marketName + "/";
+            Function<Signal<XML>, Signal<String>> collect = s -> s.flatIterable(x -> x.find("ul li a")).map(XML::text);
+
+            return I.http(uri, XML.class).plug(collect).flatMap(year -> {
+                return I.http(uri + year + "/", XML.class).plug(collect).flatMap(month -> {
+                    return I.http(uri + year + "/" + month + "/", XML.class).plug(collect).map(name -> {
+                        return Chrono.utc(name.substring(0, name.indexOf("_")));
+                    });
+                });
+            });
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Signal<Execution> convert(ZonedDateTime date) {
+            ZonedDateTime following = date.plusDays(1);
+
+            AtomicLong increment = new AtomicLong();
+            Object[] prev = new Object[2];
+            DateTimeFormatter timeFormatOnLog = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss.SSS");
+
+            return downloadAt(date).concat(downloadAt(following)).map(values -> {
+                Direction side = Direction.parse(values[1]);
+                Num size = Num.of(values[2]);
+                Num price = Num.of(values[3]);
+                ZonedDateTime time = LocalDateTime.parse(values[4], timeFormatOnLog).atZone(Chrono.UTC);
+
+                return GMOService.this.convert(side, size, price, time, increment, prev);
+            }).skipUntil(e -> e.date.isAfter(date)).takeWhile(e -> e.date.isBefore(following));
+        }
+
+        /**
+         * Download data and parse it as csv.
+         * 
+         * @param target
+         * @return
+         */
+        private Signal<String[]> downloadAt(ZonedDateTime target) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy'/'MM'/'yyyyMMdd");
+            String uri = "https://api.coin.z.com/data/trades/" + service.marketName + "/" + formatter
+                    .format(target) + "_" + service.marketName + ".csv.gz";
+
+            CsvParserSettings setting = new CsvParserSettings();
+            setting.getFormat().setDelimiter(',');
+            setting.getFormat().setLineSeparator("\n");
+            setting.setHeaderExtractionEnabled(true);
+            CsvParser parser = new CsvParser(setting);
+
+            return I.http(uri, InputStream.class)
+                    .errorResume(I.signal())
+                    .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
+                    .effectOnComplete(parser::stopParsing);
+        }
     }
 }

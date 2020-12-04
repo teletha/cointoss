@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
+import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
@@ -395,6 +396,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public ScheduledExecutorService scheduler() {
         return scheduler;
+    }
+
+    /**
+     * Get the external log repository.
+     * 
+     * @return
+     */
+    public ExecutionLogRepository externalRepository() {
+        return null;
     }
 
     /**

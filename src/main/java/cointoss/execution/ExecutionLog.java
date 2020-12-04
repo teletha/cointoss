@@ -48,6 +48,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.TreeMultimap;
 import com.univocity.parsers.csv.CsvParser;
@@ -60,7 +61,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.bybit.Bybit;
+import cointoss.market.gmo.GMO;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -240,9 +241,36 @@ public class ExecutionLog {
             }
             this.cacheFirst = start != null ? start : Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
             this.cacheLast = end != null ? end : cacheFirst;
+
+            checkExternalRepository();
+
             this.cache = new Cache(cacheFirst);
         } catch (Exception e) {
             throw I.quiet(e);
+        }
+    }
+
+    private void checkExternalRepository() {
+        ExecutionLogRepository external = service.externalRepository();
+        if (external != null) {
+            if (cacheLast == cacheFirst) {
+                external.collect().to(date -> {
+                    cache(date).compact(external.convert(date)).to(I.NoOP);
+                });
+            } else {
+                ZonedDateTime current = cacheLast;
+                ZonedDateTime today = Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
+
+                while (current.isBefore(today)) {
+                    ZonedDateTime date = current;
+                    cache(current).normal(external.convert(current))
+                            .waitForTerminate()
+                            .effectOnComplete(() -> log.info("Download execution log on {}. [{}]", service, date))
+                            .to(I.NoOP);
+                    cacheLast = current;
+                    current = current.plusDays(1);
+                }
+            }
         }
     }
 
@@ -507,19 +535,6 @@ public class ExecutionLog {
     }
 
     /**
-     * Write log from the specified source.
-     * 
-     * @param date A target date.
-     * @param source Full execution log of the specified date.
-     */
-    public final void storeFullDailyLog(ZonedDateTime date, Signal<Execution> source) {
-        Cache cache = cache(date);
-        if (!cache.exist()) {
-            cache.compact(source).to(I.NoOP);
-        }
-    }
-
-    /**
      * Read all caches.
      * 
      * @return
@@ -720,12 +735,16 @@ public class ExecutionLog {
         }
 
         /**
-         * Try to download from market server.
+         * Try to download from the external server.
          * 
          * @return
          */
         private Signal<Execution> download() {
-            return I.signal();
+            ExecutionLogRepository external = service.externalRepository();
+            if (external == null) {
+                return I.signal();
+            }
+            return normal(external.convert(date));
         }
 
         /**
@@ -811,6 +830,7 @@ public class ExecutionLog {
         /**
          * Write compact log from the specified executions.
          */
+        @VisibleForTesting
         Signal<Execution> compact(Signal<Execution> executions) {
             try {
                 compact.parent().create();
@@ -889,6 +909,13 @@ public class ExecutionLog {
                 read().to(e -> writer.writeRow(e.toString()));
                 writer.close();
             }
+        }
+
+        Signal<Execution> normal(Signal<Execution> executions) {
+            CsvWriter writer = buildCsvWriter(normal.newOutputStream());
+            return executions.effect(e -> {
+                writer.writeRow(e.toString());
+            }).effectOnComplete(writer::close);
         }
 
         /**
@@ -1028,6 +1055,8 @@ public class ExecutionLog {
     }
 
     public static void main1(String[] args) throws InterruptedException {
-        restoreNormal(Bybit.BTC_USD, Chrono.utc(2020, 11, 28));
+        restoreNormal(GMO.BTC, Chrono.utc(2020, 12, 1));
+        restoreNormal(GMO.BTC, Chrono.utc(2020, 12, 2));
+        restoreNormal(GMO.BTC, Chrono.utc(2020, 12, 3));
     }
 }
