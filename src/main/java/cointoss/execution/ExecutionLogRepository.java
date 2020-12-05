@@ -33,8 +33,8 @@ public abstract class ExecutionLogRepository {
      * 
      * @return
      */
-    public final ZonedDateTime first() {
-        return collect().first().waitForTerminate().to().exact();
+    public final Signal<ZonedDateTime> first() {
+        return collect().first();
     }
 
     /**

@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -61,7 +61,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.gmo.GMO;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -71,6 +70,7 @@ import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Storable;
 import psychopath.Directory;
 import psychopath.File;
 
@@ -179,6 +179,9 @@ public class ExecutionLog {
     /** The latest id store in local file. */
     private final File store;
 
+    /** The repository. */
+    private final Repository repository;
+
     /** The first day. */
     private ZonedDateTime cacheFirst;
 
@@ -218,6 +221,10 @@ public class ExecutionLog {
         this.store = root.file("lastID.log");
         this.logger = I.make(service.setting.executionLogger());
 
+        // ExecutionLogRepository external = service.externalRepository();
+        // this.repository = external == null ? null : new Repository(external);
+        this.repository = null;
+
         try {
             ZonedDateTime start = null;
             ZonedDateTime end = null;
@@ -242,7 +249,7 @@ public class ExecutionLog {
             this.cacheFirst = start != null ? start : Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
             this.cacheLast = end != null ? end : cacheFirst;
 
-            checkExternalRepository();
+            // checkExternalRepository();
 
             this.cache = new Cache(cacheFirst);
         } catch (Exception e) {
@@ -679,7 +686,7 @@ public class ExecutionLog {
                 CsvParser parser = new CsvParser(setting);
                 if (compact.isPresent()) {
                     if (type == LogType.Fast) {
-                        // read fast
+                        // read from fast log
                         writeFast();
                         return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
                                 .scanWith(Market.BASE, logger::decode)
@@ -690,7 +697,7 @@ public class ExecutionLog {
                                     log.trace("Read fast log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
                     } else {
-                        // read compact
+                        // read from compact log
                         return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
                                 .scanWith(Market.BASE, logger::decode)
                                 .effectOnComplete(parser::stopParsing)
@@ -700,11 +707,8 @@ public class ExecutionLog {
                                     log.trace("Read compact log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
                     }
-                } else if (normal.isAbsent()) {
-                    // no data
-                    return download();
-                } else {
-                    // read normal
+                } else if (normal.isPresent()) {
+                    // read from normal log
                     return I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
                             .map(this::parse)
                             .effectOnComplete(parser::stopParsing)
@@ -713,6 +717,17 @@ public class ExecutionLog {
                             .effectOnComplete(() -> {
                                 log.trace("Read normal log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                             });
+                } else {
+                    // read from external repository
+                    ExecutionLogRepository external = service.externalRepository();
+
+                    if (external == null) {
+                        System.out.println("No external " + date);
+                        return I.signal();
+                    } else {
+                        System.out.println("From extenal " + date);
+                        return external.convert(date);
+                    }
                 }
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -732,19 +747,6 @@ public class ExecutionLog {
                     .date(LocalDateTime.parse(values[1]).atZone(Chrono.UTC))
                     .consecutive(Integer.parseInt(values[5]))
                     .delay(Integer.parseInt(values[6]));
-        }
-
-        /**
-         * Try to download from the external server.
-         * 
-         * @return
-         */
-        private Signal<Execution> download() {
-            ExecutionLogRepository external = service.externalRepository();
-            if (external == null) {
-                return I.signal();
-            }
-            return normal(external.convert(date));
         }
 
         /**
@@ -1027,6 +1029,33 @@ public class ExecutionLog {
     }
 
     /**
+     * External repository related info.
+     */
+    private class Repository implements Storable<Repository> {
+
+        private final ExecutionLogRepository external;
+
+        /**
+         * Initialize.
+         * 
+         * @param external
+         */
+        private Repository(ExecutionLogRepository external) {
+            this.external = external;
+
+            restore();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String locate() {
+            return root.file("repository.json").toString();
+        }
+    }
+
+    /**
      * Restore normal log of the specified market and date.
      * 
      * @param service
@@ -1052,11 +1081,5 @@ public class ExecutionLog {
 
     public static void main3(String[] args) {
         clearFastLog();
-    }
-
-    public static void main1(String[] args) throws InterruptedException {
-        restoreNormal(GMO.BTC, Chrono.utc(2020, 12, 1));
-        restoreNormal(GMO.BTC, Chrono.utc(2020, 12, 2));
-        restoreNormal(GMO.BTC, Chrono.utc(2020, 12, 3));
     }
 }

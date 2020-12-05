@@ -193,8 +193,7 @@ public class GMOService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trades?symbol=" + marketName + "&page=1&count=1").flatIterable(e -> e.find("data", "list", "*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]))
-                .effect(s -> System.out.println(s));
+                .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
     /**
@@ -417,10 +416,11 @@ public class GMOService extends MarketService {
             setting.setHeaderExtractionEnabled(true);
             CsvParser parser = new CsvParser(setting);
 
+            LIMITER.acquire();
+
             return I.http(uri, InputStream.class)
-                    .errorResume(I.signal())
                     .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
-                    .effectOnComplete(parser::stopParsing);
+                    .effectOnTerminate(parser::stopParsing);
         }
     }
 }
