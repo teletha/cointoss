@@ -47,8 +47,11 @@ public class BitbankService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bitbank.cc")
-            .extractId(json -> json.text("room_name"));
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with
+            .address("wss://stream.bitbank.cc/socket.io/?EIO=3&transport=websocket")
+            .extractId(json -> json.text("room_name"))
+            .enableSocketIO()
+            .enableDebug();
 
     /**
      * @param marketName
@@ -144,7 +147,7 @@ public class BitbankService extends MarketService {
         AtomicLong counter = new AtomicLong(-1);
         Object[] previous = new Object[2];
 
-        return clientRealtimely().subscribe(new Topic("trade", marketName)).flatIterable(json -> json.find("data", "*")).map(e -> {
+        return clientRealtimely().subscribe(new Topic("depth_diff", marketName)).flatIterable(json -> json.find("data", "*")).map(e -> {
             long id = counter.updateAndGet(now -> now == -1 ? requestId(e) : now + 1);
             Direction side = e.get(Direction.class, "side");
             Num price = e.get(Num.class, "price");
@@ -344,16 +347,17 @@ public class BitbankService extends MarketService {
      */
     static class Topic extends IdentifiableTopic<Topic> {
 
-        public String op = "subscribe";
-
         public List<String> args = new ArrayList();
 
         /**
+         * 42["join-room","transactions_btc_jpy"]
+         * 
          * @param channel
          * @param market
          */
         private Topic(String channel, String market) {
-            super(channel + "." + market, topic -> topic.op = "unsubscribe");
+            super(channel + "_" + market, topic -> {
+            });
             args.add(channel + "." + market);
         }
 
@@ -362,15 +366,6 @@ public class BitbankService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            if (reply.text("success").equals("true")) {
-                JSON req = reply.get("request");
-                if (req.text("op").equals("subscribe")) {
-                    List<JSON> channel = req.find("args", "0");
-                    if (channel.size() == 1) {
-                        return channel.get(0).as(String.class).equals(args.get(0));
-                    }
-                }
-            }
             return false;
         }
     }
@@ -380,6 +375,6 @@ public class BitbankService extends MarketService {
             System.out.println(e);
         });
 
-        Thread.sleep(1000 * 10);
+        Thread.sleep(1000 * 100);
     }
 }

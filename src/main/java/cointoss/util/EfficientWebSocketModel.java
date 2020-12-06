@@ -73,6 +73,8 @@ public abstract class EfficientWebSocketModel {
 
     private boolean debug;
 
+    private boolean socketIO;
+
     /**
      * 
      */
@@ -202,6 +204,14 @@ public abstract class EfficientWebSocketModel {
     }
 
     /**
+     * Outputs a detailed log.
+     */
+    public EfficientWebSocket enableSocketIO() {
+        this.socketIO = true;
+        return (EfficientWebSocket) this;
+    }
+
+    /**
      * Configure that this server never reply.
      * 
      * @return
@@ -249,7 +259,12 @@ public abstract class EfficientWebSocketModel {
                         .to(count -> {
                             limit.acquire();
 
-                            ws.sendText(I.write(topic), true);
+                            if (socketIO) {
+                                // 42["join-room","transactions_btc_jpy"]
+                                ws.sendText("42[\"join-room\",\"" + topic.id + "\"]", true);
+                            } else {
+                                ws.sendText(I.write(topic), true);
+                            }
                             logger.trace("Sent websocket command {} to {}. @{}", topic, address(), count);
 
                             if (noReplyMode) {
@@ -351,6 +366,16 @@ public abstract class EfficientWebSocketModel {
      * @param text
      */
     private void dispatch(String text) {
+        if (socketIO) {
+            int start = text.indexOf('{');
+            if (start == -1) {
+                return;
+            }
+            int end = text.lastIndexOf('}') + 1;
+
+            text = text.substring(start, end);
+            System.out.println(text);
+        }
         JSON json = I.json(text);
 
         Supersonic signaling = signals.get(extractId().apply(json));
