@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.*;
+import static trademate.FXColorPalettes.Pastel10;
 
 import java.text.Normalizer.Form;
 import java.util.HashMap;
@@ -84,6 +84,8 @@ public class GlobalVolumeView extends View {
 
     private UILabel ftx;
 
+    private UILabel gmo;
+
     private UILabel huobi;
 
     class view extends ViewDSL {
@@ -100,6 +102,7 @@ public class GlobalVolumeView extends View {
                         $(bitmex, style.name);
                         $(bybit, style.name);
                         $(ftx, style.name);
+                        $(gmo, style.name);
                         $(huobi, style.name);
                     });
                     $(vbox, charts);
@@ -128,7 +131,8 @@ public class GlobalVolumeView extends View {
         drawSample(bitmex, Exchange.BitMEX, Pastel10[4]);
         drawSample(bybit, Exchange.Bybit, Pastel10[5]);
         drawSample(ftx, Exchange.FTX, Pastel10[6]);
-        drawSample(huobi, Exchange.Huobi, Pastel10[7]);
+        drawSample(gmo, Exchange.GMO, Pastel10[7]);
+        drawSample(huobi, Exchange.Huobi, Pastel10[8]);
 
         List<Currency> currencies = List.of(Currency.BTC, Currency.ETH, Currency.XRP, Currency.EOS, Currency.COMP, Currency.SRM);
         for (Currency currency : currencies) {

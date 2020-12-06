@@ -25,19 +25,17 @@ public final class GMO extends MarketServiceProvider {
             .base(Currency.JPY.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 
-    // static final MarketService BTC_DERIVATIVE = new GMOService("BTC_JPY",
-    // MarketSetting.with.target(Currency.BTC.minimumSize(0.01))
-    // .base(Currency.JPY.minimumSize(1))
-    // .acquirableExecutionSize(AcquirableSize));
+    public static final MarketService BTC_DERIVATIVE = new GMOService("BTC_JPY", MarketSetting.with.target(Currency.BTC.minimumSize(0.01))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService ETH = new GMOService("ETH", MarketSetting.with.target(Currency.ETH.minimumSize(0.01))
             .base(Currency.JPY.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 
-    // static final MarketService ETH_DERIVATIVE = new GMOService("ETH_JPY",
-    // MarketSetting.with.target(Currency.ETH.minimumSize(0.1))
-    // .base(Currency.JPY.minimumSize(1))
-    // .acquirableExecutionSize(AcquirableSize));
+    public static final MarketService ETH_DERIVATIVE = new GMOService("ETH_JPY", MarketSetting.with.target(Currency.ETH.minimumSize(0.1))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
     //
     // static final MarketService LTC = new GMOService("LTC",
     // MarketSetting.with.target(Currency.LTC.minimumSize(0.1))

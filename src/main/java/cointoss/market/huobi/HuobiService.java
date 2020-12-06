@@ -69,7 +69,7 @@ public class HuobiService extends MarketService {
      * @param setting
      */
     protected HuobiService(int id, String marketName, MarketSetting setting) {
-        super(Exchange.GMO, marketName, setting);
+        super(Exchange.Huobi, marketName, setting);
 
         this.marketId = id;
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.base.minimumSize;

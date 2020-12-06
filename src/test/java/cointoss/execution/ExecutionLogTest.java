@@ -85,6 +85,6 @@ class ExecutionLogTest {
      * @param date A target date.
      */
     private List<Execution> writeCompactExecutionLog(ZonedDateTime date) {
-        return log.cache(date).compact(I.signal(Executions.random(10))).toList();
+        return log.cache(date).writeCompact(I.signal(Executions.random(10))).toList();
     }
 }

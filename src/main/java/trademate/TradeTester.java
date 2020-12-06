@@ -59,21 +59,21 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = GMO.BTC;
+        MarketService service = GMO.BTC_DERIVATIVE;
         UITab tab = DockSystem.register(service.marketIdentity())
                 .closable(false)
                 .text(service.marketReadableName)
                 .contents(ui -> new TradingView(ui, service));
 
         tab.load();
-        //
-        // MarketService service2 = GMO.BTC;
-        // tab = DockSystem.register(service2.marketIdentity())
-        // .closable(false)
-        // .text(service2.marketReadableName)
-        // .contents(ui -> new TradingView(ui, service2));
-        //
-        // tab.load();
+
+        MarketService service2 = GMO.ETH_DERIVATIVE;
+        tab = DockSystem.register(service2.marketIdentity())
+                .closable(false)
+                .text(service2.marketReadableName)
+                .contents(ui -> new TradingView(ui, service2));
+
+        tab.load();
     }
 
     /**

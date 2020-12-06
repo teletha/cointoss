@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -62,6 +62,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.gmo.GMO;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -223,65 +224,10 @@ public class ExecutionLog {
         this.logger = I.make(service.setting.executionLogger());
         this.repository = new Repository(service.externalRepository());
 
-        try {
-            ZonedDateTime start = null;
-            ZonedDateTime end = null;
+        this.cacheFirst = repository.firstZDT();
+        this.cacheLast = repository.lastZDT();
 
-            for (File file : root.walkFile("execution*.*og").toList()) {
-                String name = file.name();
-                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), FileNamePattern).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
-
-                if (start == null || end == null) {
-                    start = date;
-                    end = date;
-                } else {
-                    if (start.isAfter(date)) {
-                        start = date;
-                    }
-
-                    if (end.isBefore(date)) {
-                        end = date;
-                    }
-                }
-            }
-            this.cacheFirst = start != null ? start : Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
-            this.cacheLast = end != null ? end : cacheFirst;
-
-            // checkExternalRepository();
-
-            this.cache = new Cache(cacheFirst);
-        } catch (Exception e) {
-            throw I.quiet(e);
-        }
-    }
-
-    private Signal<ZonedDateTime> collectLocalRepository() {
-        return root.walkFile("execution*.*og")
-                .map(file -> LocalDate.parse(file.name().subSequence(9, 17), FileNamePattern).atTime(0, 0).atZone(Chrono.UTC));
-    }
-
-    private void checkExternalRepository() {
-        ExecutionLogRepository external = service.externalRepository();
-        if (external != null) {
-            if (cacheLast == cacheFirst) {
-                external.collect().to(date -> {
-                    cache(date).compact(external.convert(date)).to(I.NoOP);
-                });
-            } else {
-                ZonedDateTime current = cacheLast;
-                ZonedDateTime today = Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
-
-                while (current.isBefore(today)) {
-                    ZonedDateTime date = current;
-                    cache(current).normal(external.convert(current))
-                            .waitForTerminate()
-                            .effectOnComplete(() -> log.info("Download execution log on {}. [{}]", service, date))
-                            .to(I.NoOP);
-                    cacheLast = current;
-                    current = current.plusDays(1);
-                }
-            }
-        }
+        this.cache = new Cache(cacheFirst);
     }
 
     /**
@@ -316,8 +262,8 @@ public class ExecutionLog {
      * @return
      */
     public final synchronized Signal<Execution> from(ZonedDateTime start, LogType... type) {
-        ZonedDateTime startDay = Chrono.between(cacheFirst, start, cacheLast).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDay = service.externalRepository() == null ? cacheLast : Chrono.utcNow().truncatedTo(ChronoUnit.DAYS).minusDays(1);
+        ZonedDateTime endDay = repository.lastZDT();
+        ZonedDateTime startDay = Chrono.between(repository.firstZDT(), start, endDay).truncatedTo(ChronoUnit.DAYS);
 
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
@@ -442,7 +388,7 @@ public class ExecutionLog {
 
             if (!cache.date.isEqual(e.date.toLocalDate())) {
                 cache.disableAutoSave();
-                cache.writeCompact();
+                cache.convertNormalToCompactAsync();
                 cache = new Cache(e.date).enableAutoSave();
             }
             cache.queue.add(e);
@@ -642,7 +588,25 @@ public class ExecutionLog {
          * @return
          */
         private boolean exist() {
-            return (normal.isPresent() && normal.size() != 0) || (compact.isPresent() && compact.size() != 0);
+            return existNormal() || existCompact();
+        }
+
+        /**
+         * Check whether the cache file exist or not.
+         * 
+         * @return
+         */
+        private boolean existNormal() {
+            return normal.isPresent() && normal.size() != 0;
+        }
+
+        /**
+         * Check whether the cache file exist or not.
+         * 
+         * @return
+         */
+        private boolean existCompact() {
+            return compact.isPresent() && compact.size() != 0;
         }
 
         /**
@@ -688,7 +652,7 @@ public class ExecutionLog {
                 setting.getFormat().setComment('無');
 
                 CsvParser parser = new CsvParser(setting);
-                if (compact.isPresent()) {
+                if (existCompact()) {
                     if (type == LogType.Fast) {
                         // read from fast log
                         writeFast();
@@ -711,7 +675,7 @@ public class ExecutionLog {
                                     log.trace("Read compact log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
                     }
-                } else if (normal.isPresent()) {
+                } else if (existNormal()) {
                     // read from normal log
                     return I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
                             .map(this::parse)
@@ -726,13 +690,11 @@ public class ExecutionLog {
                     ExecutionLogRepository external = service.externalRepository();
 
                     if (external == null) {
-                        System.out.println("No external " + date);
                         return I.signal();
                     } else {
-                        Signal<Execution> source = external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
+                        return writeNormal(external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
                             log.info("Donwload external log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
-                        });
-                        return date.isBefore(LocalDate.now().minusDays(1)) ? compact(source) : normal(source);
+                        }));
                     }
                 }
             } catch (IOException e) {
@@ -785,8 +747,7 @@ public class ExecutionLog {
                     writeStoredId(remaining.getLast().id);
 
                     aggregateWritingLog.accept(service);
-                    // log.info("Write log until " + remaining.peekLast().date + " at " + service +
-                    // ".");
+                    repository.updateLocal(date);
                 } catch (IOException e) {
                     e.printStackTrace();
                     throw I.quiet(e);
@@ -825,29 +786,37 @@ public class ExecutionLog {
         }
 
         /**
-         * Convert normal log to compact log asynchronously.
+         * Write normal log.
+         * 
+         * @param executions
+         * @return
          */
-        private void writeCompact() {
-            if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
-                I.schedule(5, SECONDS).to(() -> {
-                    compact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
-                });
-            }
+        private Signal<Execution> writeNormal(Signal<Execution> executions) {
+            CsvWriter writer = buildCsvWriter(normal.newOutputStream());
+
+            return executions.effect(e -> {
+                writer.writeRow(e.toString());
+            }).effectOnComplete(() -> {
+                writer.close();
+                repository.updateLocal(date);
+            });
         }
 
         /**
          * Write compact log from the specified executions.
          */
         @VisibleForTesting
-        Signal<Execution> compact(Signal<Execution> executions) {
+        Signal<Execution> writeCompact(Signal<Execution> executions) {
             try {
-                compact.parent().create();
-
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));
+
                 return executions.maps(Market.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
                     return e;
-                }).effectOnComplete(writer::close);
+                }).effectOnComplete(() -> {
+                    writer.close();
+                    repository.updateLocal(date);
+                });
             } catch (IOException e) {
                 throw I.quiet(e);
             }
@@ -909,24 +878,6 @@ public class ExecutionLog {
         }
 
         /**
-         * Convert compact log to normal log.
-         */
-        private void writeNormal() {
-            if (normal.isAbsent() && compact.isPresent()) {
-                CsvWriter writer = buildCsvWriter(normal.newOutputStream());
-                read().to(e -> writer.writeRow(e.toString()));
-                writer.close();
-            }
-        }
-
-        Signal<Execution> normal(Signal<Execution> executions) {
-            CsvWriter writer = buildCsvWriter(normal.newOutputStream());
-            return executions.effect(e -> {
-                writer.writeRow(e.toString());
-            }).effectOnComplete(writer::close);
-        }
-
-        /**
          * Create new CSV writer.
          * 
          * @param out
@@ -937,6 +888,28 @@ public class ExecutionLog {
             setting.getFormat().setDelimiter(' ');
             setting.getFormat().setComment('無');
             return new CsvWriter(out, ISO_8859_1, setting);
+        }
+
+        /**
+         * Convert normal log to compact log asynchronously.
+         */
+        private void convertNormalToCompactAsync() {
+            if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
+                I.schedule(5, SECONDS).to(() -> {
+                    writeCompact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
+                });
+            }
+        }
+
+        /**
+         * Convert compact log to normal log.
+         */
+        private void convertCompactToNormal() {
+            if (normal.isAbsent() && compact.isPresent()) {
+                CsvWriter writer = buildCsvWriter(normal.newOutputStream());
+                read().to(e -> writer.writeRow(e.toString()));
+                writer.close();
+            }
         }
     }
 
@@ -1041,8 +1014,8 @@ public class ExecutionLog {
 
         private final ExecutionLogRepository external;
 
-        /** The latest search date-time in local repository. */
-        public LocalDate localSearchable = LocalDate.of(1970, 1, 1);
+        /** The last scan date-time in local repository. */
+        public LocalDate localScanLatest = LocalDate.of(1970, 1, 1);
 
         /** The oldest cache. */
         public LocalDate localFirst;
@@ -1050,8 +1023,8 @@ public class ExecutionLog {
         /** The latest cache. */
         public LocalDate localLast;
 
-        /** The latest search date-time in external repository. */
-        public LocalDate externalSearchable = LocalDate.of(1970, 1, 1);
+        /** The last scan date-time in external repository. */
+        public LocalDate externalScanLatest = LocalDate.of(1970, 1, 1);
 
         /** The oldest cache. */
         public LocalDate externalFirst;
@@ -1069,17 +1042,17 @@ public class ExecutionLog {
 
             restore();
 
-            seachLocalRepository();
-            seachExternalRepository();
+            scanLocalRepository();
+            scanExternalRepository();
         }
 
         /**
-         * Search logs in the local repository.
+         * Scan logs in the local repository.
          */
-        private void seachLocalRepository() {
+        private void scanLocalRepository() {
             LocalDate now = LocalDate.now(Chrono.UTC);
 
-            if (now.isAfter(localSearchable)) {
+            if (now.isAfter(localScanLatest)) {
                 LocalDate[] dates = new LocalDate[2];
 
                 root.walkFile("execution*.*og")
@@ -1099,29 +1072,29 @@ public class ExecutionLog {
                         }, () -> {
                             localFirst = dates[0];
                             localLast = dates[1];
-                            localSearchable = now.plusDays(1);
+                            localScanLatest = now;
                             store();
                         });
             }
         }
 
         /**
-         * Search logs in the external repository.
+         * Scan logs in the external repository.
          */
-        private void seachExternalRepository() {
+        private void scanExternalRepository() {
             if (external == null) {
                 return;
             }
 
             LocalDate now = LocalDate.now(Chrono.UTC);
 
-            if (now.isAfter(externalSearchable)) {
+            if (now.isAfter(externalScanLatest)) {
                 LocalDate[] dates = new LocalDate[2];
 
                 external.collect().map(ZonedDateTime::toLocalDate).effectOnce(date -> {
                     dates[0] = date;
                     dates[1] = date;
-                }).to(date -> {
+                }).waitForTerminate().to(date -> {
                     if (date.isBefore(dates[0])) {
                         dates[0] = date;
                     } else if (date.isAfter(dates[1])) {
@@ -1132,7 +1105,7 @@ public class ExecutionLog {
                 }, () -> {
                     externalFirst = dates[0];
                     externalLast = dates[1];
-                    externalSearchable = now.plusDays(1);
+                    externalScanLatest = now;
                     store();
                 });
             }
@@ -1144,7 +1117,7 @@ public class ExecutionLog {
          * @return
          */
         private LocalDate first() {
-            return ObjectUtils.min(localFirst, externalFirst);
+            return ObjectUtils.min(localFirst, externalFirst, LocalDate.now(Chrono.UTC));
         }
 
         /**
@@ -1153,7 +1126,40 @@ public class ExecutionLog {
          * @return
          */
         private LocalDate last() {
-            return ObjectUtils.max(localLast, externalLast);
+            return ObjectUtils.max(localLast, externalLast, first());
+        }
+
+        /**
+         * Compute the first cache.
+         * 
+         * @return
+         */
+        private ZonedDateTime firstZDT() {
+            return first().atTime(0, 0).atZone(Chrono.UTC);
+        }
+
+        /**
+         * Compute the last cache.
+         * 
+         * @return
+         */
+        private ZonedDateTime lastZDT() {
+            return last().atTime(0, 0).atZone(Chrono.UTC);
+        }
+
+        /**
+         * Update the local resource.
+         * 
+         * @param date
+         */
+        private void updateLocal(LocalDate date) {
+            if (localFirst == null || date.isBefore(localFirst)) {
+                localFirst = date;
+                store();
+            } else if (localLast == null || date.isAfter(localLast)) {
+                localLast = date;
+                store();
+            }
         }
 
         /**
@@ -1174,7 +1180,7 @@ public class ExecutionLog {
     public static void restoreNormal(MarketService service, ZonedDateTime date) {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
-        cache.writeNormal();
+        cache.convertCompactToNormal();
     }
 
     /**
@@ -1189,7 +1195,7 @@ public class ExecutionLog {
         });
     }
 
-    public static void main3(String[] args) {
-        clearFastLog();
+    public static void main(String[] args) {
+        restoreNormal(GMO.BTC_DERIVATIVE, Chrono.utc(2020, 12, 5));
     }
 }

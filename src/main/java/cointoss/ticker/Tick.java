@@ -257,19 +257,21 @@ public final class Tick {
      * 
      * @return
      */
-    void freeze() {
-        ticker.spreadStats.add(spreadDouble());
-        ticker.buyVolumeStats.add(longVolume());
-        ticker.sellVolumeStats.add(shortVolume());
-        ticker.typicalStats.add(typicalDoublePrice());
-        trend = new TrendDetector(this).detect();
+    synchronized void freeze() {
+        if (ticker != null) {
+            ticker.spreadStats.add(spreadDouble());
+            ticker.buyVolumeStats.add(longVolume());
+            ticker.sellVolumeStats.add(shortVolume());
+            ticker.typicalStats.add(typicalDoublePrice());
+            trend = new TrendDetector(this).detect();
 
-        closePrice = closePrice();
-        longVolume = longVolume();
-        longLosscutVolume = longLosscutVolume();
-        shortVolume = shortVolume();
-        shortLosscutVolume = shortLosscutVolume();
-        ticker = null;
+            closePrice = closePrice();
+            longVolume = longVolume();
+            longLosscutVolume = longLosscutVolume();
+            shortVolume = shortVolume();
+            shortLosscutVolume = shortLosscutVolume();
+            ticker = null;
+        }
     }
 
     /**
