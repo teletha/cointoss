@@ -59,7 +59,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = GMO.BTC_DERIVATIVE;
+        MarketService service = GMO.XRP;
         UITab tab = DockSystem.register(service.marketIdentity())
                 .closable(false)
                 .text(service.marketReadableName)
@@ -67,7 +67,7 @@ public class TradeTester extends View {
 
         tab.load();
 
-        MarketService service2 = GMO.ETH_DERIVATIVE;
+        MarketService service2 = GMO.XRP_DERIVATIVE;
         tab = DockSystem.register(service2.marketIdentity())
                 .closable(false)
                 .text(service2.marketReadableName)

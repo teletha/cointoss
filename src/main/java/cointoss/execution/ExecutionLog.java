@@ -1195,7 +1195,7 @@ public class ExecutionLog {
         });
     }
 
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
         restoreNormal(GMO.BTC_DERIVATIVE, Chrono.utc(2020, 12, 5));
     }
 }
