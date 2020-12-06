@@ -14,10 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -40,9 +37,6 @@ import kiss.Signal;
 
 public class BitbankService extends MarketService {
 
-    /** The realtime data format */
-    private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]X");
-
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
 
@@ -50,6 +44,7 @@ public class BitbankService extends MarketService {
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with
             .address("wss://stream.bitbank.cc/socket.io/?EIO=3&transport=websocket")
             .extractId(json -> json.text("room_name"))
+            .noServerReply()
             .enableSocketIO()
             .enableDebug();
 
@@ -106,6 +101,18 @@ public class BitbankService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<Execution> connectExecutionRealtimely() {
+        Object[] previous = new Object[2];
+
+        return clientRealtimely().subscribe(new Topic("transactions", marketName))
+                .flatIterable(json -> json.find("message", "data", "transactions", "*"))
+                .map(e -> convert(e, previous));
+    }
+
+    /**
      * Convert to {@link Execution}.
      * 
      * @param e
@@ -113,7 +120,6 @@ public class BitbankService extends MarketService {
      * @return
      */
     private Execution convert(JSON e, Object[] previous) {
-        System.out.println(e);
         Direction side = e.get(Direction.class, "side");
         Num price = e.get(Num.class, "price");
         Num size = e.get(Num.class, "amount");
@@ -137,77 +143,6 @@ public class BitbankService extends MarketService {
         previous[1] = date;
 
         return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<Execution> connectExecutionRealtimely() {
-        AtomicLong counter = new AtomicLong(-1);
-        Object[] previous = new Object[2];
-
-        return clientRealtimely().subscribe(new Topic("depth_diff", marketName)).flatIterable(json -> json.find("data", "*")).map(e -> {
-            long id = counter.updateAndGet(now -> now == -1 ? requestId(e) : now + 1);
-            Direction side = e.get(Direction.class, "side");
-            Num price = e.get(Num.class, "price");
-            Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
-            ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("trade_time_ms")));
-
-            int consecutive;
-            if (date.equals(previous[1])) {
-                if (side != previous[0]) {
-                    consecutive = Execution.ConsecutiveDifference;
-                } else if (side == Direction.BUY) {
-                    consecutive = Execution.ConsecutiveSameBuyer;
-                } else {
-                    consecutive = Execution.ConsecutiveSameSeller;
-                }
-            } else {
-                consecutive = Execution.ConsecutiveDifference;
-            }
-            previous[0] = side;
-            previous[1] = date;
-
-            return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
-        });
-    }
-
-    /**
-     * Request the actual execution id.
-     * 
-     * @param exe The target execution data.
-     * @return An actual id.
-     */
-    private synchronized long requestId(JSON exe) {
-        String side = exe.text("side");
-        String size = exe.text("size");
-        String price = exe.text("price");
-        long time = Long.parseLong(exe.text("trade_time_ms"));
-
-        List<JSON> list = call("GET", "trading-records?symbol=" + marketName + "&limit=1000").waitForTerminate()
-                .flatIterable(e -> e.find("result", "*"))
-                .toList();
-
-        for (JSON item : list) {
-            if (!item.text("side").equals(side)) {
-                continue;
-            }
-
-            if (!item.text("qty").equals(size)) {
-                continue;
-            }
-
-            if (!item.text("price").equals(price)) {
-                continue;
-            }
-
-            if (ZonedDateTime.parse(item.text("time"), TimeFormat).toInstant().toEpochMilli() != time) {
-                continue;
-            }
-            return Long.parseLong(item.text("id"));
-        }
-        return Long.parseLong(list.get(0).text("id")) + 1;
     }
 
     /**
@@ -347,18 +282,13 @@ public class BitbankService extends MarketService {
      */
     static class Topic extends IdentifiableTopic<Topic> {
 
-        public List<String> args = new ArrayList();
-
         /**
-         * 42["join-room","transactions_btc_jpy"]
-         * 
          * @param channel
          * @param market
          */
         private Topic(String channel, String market) {
             super(channel + "_" + market, topic -> {
             });
-            args.add(channel + "." + market);
         }
 
         /**
@@ -375,6 +305,6 @@ public class BitbankService extends MarketService {
             System.out.println(e);
         });
 
-        Thread.sleep(1000 * 100);
+        Thread.sleep(1000 * 500);
     }
 }

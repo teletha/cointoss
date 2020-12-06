@@ -368,14 +368,12 @@ public abstract class EfficientWebSocketModel {
     private void dispatch(String text) {
         if (socketIO) {
             int start = text.indexOf('{');
-            if (start == -1) {
-                return;
-            }
+            if (start == -1) return;
             int end = text.lastIndexOf('}') + 1;
 
             text = text.substring(start, end);
-            System.out.println(text);
         }
+
         JSON json = I.json(text);
 
         Supersonic signaling = signals.get(extractId().apply(json));
@@ -408,6 +406,16 @@ public abstract class EfficientWebSocketModel {
                 String reply = pong.apply(json);
                 if (reply != null) {
                     connection.v.sendText(reply.replace('\'', '"'), true);
+                    return;
+                }
+            }
+
+            // ping in Socket.IO
+            if (socketIO) {
+                String value = json.text("pingInterval");
+                if (value != null) {
+                    long interval = Long.parseLong(value) - 1000; // safety
+                    cleanup.add(I.schedule(interval, interval, MILLISECONDS, true).to(() -> connection.v.sendText("2", true)));
                     return;
                 }
             }
