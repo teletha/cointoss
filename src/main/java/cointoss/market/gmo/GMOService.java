@@ -59,6 +59,9 @@ public class GMOService extends MarketService {
     /** The API limit. */
     private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(150, MILLISECONDS);
 
+    /** The API limit. */
+    private static final APILimiter REPOSITORY_LIMITER = APILimiter.with.limit(2).refresh(100, MILLISECONDS);
+
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
             .extractId(json -> json.text("channel") + "." + json.text("symbol"))
@@ -416,11 +419,12 @@ public class GMOService extends MarketService {
             setting.setHeaderExtractionEnabled(true);
             CsvParser parser = new CsvParser(setting);
 
-            LIMITER.acquire();
+            REPOSITORY_LIMITER.acquire();
 
             return I.http(uri, InputStream.class)
+                    .errorResume(I.signal())
                     .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
-                    .effectOnTerminate(parser::stopParsing);
+                    .effectOnComplete(parser::stopParsing);
         }
     }
 }

@@ -9,6 +9,9 @@
  */
 package cointoss.market.gmo;
 
+import cointoss.Currency;
+import cointoss.MarketService;
+import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
@@ -18,20 +21,18 @@ public final class GMO extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 10000;
 
-    // public static final MarketService BTC = new GMOService("BTC",
-    // MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
-    // .base(Currency.JPY.minimumSize(1))
-    // .acquirableExecutionSize(AcquirableSize));
+    public static final MarketService BTC = new GMOService("BTC", MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
 
     // static final MarketService BTC_DERIVATIVE = new GMOService("BTC_JPY",
     // MarketSetting.with.target(Currency.BTC.minimumSize(0.01))
     // .base(Currency.JPY.minimumSize(1))
     // .acquirableExecutionSize(AcquirableSize));
 
-    // public static final MarketService ETH = new GMOService("ETH",
-    // MarketSetting.with.target(Currency.ETH.minimumSize(0.01))
-    // .base(Currency.JPY.minimumSize(1))
-    // .acquirableExecutionSize(AcquirableSize));
+    public static final MarketService ETH = new GMOService("ETH", MarketSetting.with.target(Currency.ETH.minimumSize(0.01))
+            .base(Currency.JPY.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
 
     // static final MarketService ETH_DERIVATIVE = new GMOService("ETH_JPY",
     // MarketSetting.with.target(Currency.ETH.minimumSize(0.1))

@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,6 +42,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -168,7 +169,7 @@ public class ExecutionLog {
     });
 
     /** The file data format */
-    private static final DateTimeFormatter fileName = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter FileNamePattern = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /** The market provider. */
     private final MarketService service;
@@ -220,10 +221,7 @@ public class ExecutionLog {
         this.root = Objects.requireNonNull(root);
         this.store = root.file("lastID.log");
         this.logger = I.make(service.setting.executionLogger());
-
-        // ExecutionLogRepository external = service.externalRepository();
-        // this.repository = external == null ? null : new Repository(external);
-        this.repository = null;
+        this.repository = new Repository(service.externalRepository());
 
         try {
             ZonedDateTime start = null;
@@ -231,7 +229,7 @@ public class ExecutionLog {
 
             for (File file : root.walkFile("execution*.*og").toList()) {
                 String name = file.name();
-                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fileName).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
+                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), FileNamePattern).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
 
                 if (start == null || end == null) {
                     start = date;
@@ -255,6 +253,11 @@ public class ExecutionLog {
         } catch (Exception e) {
             throw I.quiet(e);
         }
+    }
+
+    private Signal<ZonedDateTime> collectLocalRepository() {
+        return root.walkFile("execution*.*og")
+                .map(file -> LocalDate.parse(file.name().subSequence(9, 17), FileNamePattern).atTime(0, 0).atZone(Chrono.UTC));
     }
 
     private void checkExternalRepository() {
@@ -314,11 +317,12 @@ public class ExecutionLog {
      */
     public final synchronized Signal<Execution> from(ZonedDateTime start, LogType... type) {
         ZonedDateTime startDay = Chrono.between(cacheFirst, start, cacheLast).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime endDay = service.externalRepository() == null ? cacheLast : Chrono.utcNow().truncatedTo(ChronoUnit.DAYS).minusDays(1);
 
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
-                .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
-                .flatMap(day -> new Cache(day).read(type))
+                .takeWhile(day -> day.isBefore(endDay) || day.isEqual(endDay))
+                .concatMap(day -> new Cache(day).read(type))
                 .effect(e -> cacheId = e.id)
                 .take(e -> e.isAfter(start))
                 .effectOnComplete(() -> storedId = cacheId)
@@ -725,8 +729,10 @@ public class ExecutionLog {
                         System.out.println("No external " + date);
                         return I.signal();
                     } else {
-                        System.out.println("From extenal " + date);
-                        return external.convert(date);
+                        Signal<Execution> source = external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
+                            log.info("Donwload external log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
+                        });
+                        return date.isBefore(LocalDate.now().minusDays(1)) ? compact(source) : normal(source);
                     }
                 }
             } catch (IOException e) {
@@ -1029,11 +1035,29 @@ public class ExecutionLog {
     }
 
     /**
-     * External repository related info.
+     * Store for reepository related info.
      */
     private class Repository implements Storable<Repository> {
 
         private final ExecutionLogRepository external;
+
+        /** The latest search date-time in local repository. */
+        public LocalDate localSearchable = LocalDate.of(1970, 1, 1);
+
+        /** The oldest cache. */
+        public LocalDate localFirst;
+
+        /** The latest cache. */
+        public LocalDate localLast;
+
+        /** The latest search date-time in external repository. */
+        public LocalDate externalSearchable = LocalDate.of(1970, 1, 1);
+
+        /** The oldest cache. */
+        public LocalDate externalFirst;
+
+        /** The latest cache. */
+        public LocalDate externalLast;
 
         /**
          * Initialize.
@@ -1044,6 +1068,92 @@ public class ExecutionLog {
             this.external = external;
 
             restore();
+
+            seachLocalRepository();
+            seachExternalRepository();
+        }
+
+        /**
+         * Search logs in the local repository.
+         */
+        private void seachLocalRepository() {
+            LocalDate now = LocalDate.now(Chrono.UTC);
+
+            if (now.isAfter(localSearchable)) {
+                LocalDate[] dates = new LocalDate[2];
+
+                root.walkFile("execution*.*og")
+                        .map(file -> LocalDate.parse(file.name().subSequence(9, 17), FileNamePattern))
+                        .effectOnce(date -> {
+                            dates[0] = date;
+                            dates[1] = date;
+                        })
+                        .to(date -> {
+                            if (date.isBefore(dates[0])) {
+                                dates[0] = date;
+                            } else if (date.isAfter(dates[1])) {
+                                dates[1] = date;
+                            }
+                        }, e -> {
+                            // ignore
+                        }, () -> {
+                            localFirst = dates[0];
+                            localLast = dates[1];
+                            localSearchable = now.plusDays(1);
+                            store();
+                        });
+            }
+        }
+
+        /**
+         * Search logs in the external repository.
+         */
+        private void seachExternalRepository() {
+            if (external == null) {
+                return;
+            }
+
+            LocalDate now = LocalDate.now(Chrono.UTC);
+
+            if (now.isAfter(externalSearchable)) {
+                LocalDate[] dates = new LocalDate[2];
+
+                external.collect().map(ZonedDateTime::toLocalDate).effectOnce(date -> {
+                    dates[0] = date;
+                    dates[1] = date;
+                }).to(date -> {
+                    if (date.isBefore(dates[0])) {
+                        dates[0] = date;
+                    } else if (date.isAfter(dates[1])) {
+                        dates[1] = date;
+                    }
+                }, e -> {
+                    // ignore
+                }, () -> {
+                    externalFirst = dates[0];
+                    externalLast = dates[1];
+                    externalSearchable = now.plusDays(1);
+                    store();
+                });
+            }
+        }
+
+        /**
+         * Compute the first cache.
+         * 
+         * @return
+         */
+        private LocalDate first() {
+            return ObjectUtils.min(localFirst, externalFirst);
+        }
+
+        /**
+         * Compute the last cache.
+         * 
+         * @return
+         */
+        private LocalDate last() {
+            return ObjectUtils.max(localLast, externalLast);
         }
 
         /**
