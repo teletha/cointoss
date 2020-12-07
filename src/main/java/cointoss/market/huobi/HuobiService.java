@@ -111,9 +111,7 @@ public class HuobiService extends MarketService {
 
         return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(startId) + "&start=" + startingPoint)
                 .flatIterable(e -> e.find("*"))
-                .map(json -> {
-                    return convert(json, increment, previous);
-                });
+                .map(json -> convert(json, increment, previous));
     }
 
     private ZonedDateTime encodeId(long id) {
@@ -149,13 +147,29 @@ public class HuobiService extends MarketService {
      * @return
      */
     private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
-        Direction direction = e.get(Direction.class, "direction");
+        Direction side = e.get(Direction.class, "direction");
         Num size = e.get(Num.class, "amount");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "ts"));
         long id = e.get(long.class, "tradeId");
+        int consecutive;
 
-        return Execution.with.direction(direction, size).id(id).price(price).date(date);
+        if (date.equals(previous[1])) {
+            if (side != previous[0]) {
+                consecutive = Execution.ConsecutiveDifference;
+            } else if (side == Direction.BUY) {
+                consecutive = Execution.ConsecutiveSameBuyer;
+            } else {
+                consecutive = Execution.ConsecutiveSameSeller;
+            }
+        } else {
+            consecutive = Execution.ConsecutiveDifference;
+        }
+
+        previous[0] = side;
+        previous[1] = date;
+
+        return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
     }
 
     /**
@@ -166,13 +180,29 @@ public class HuobiService extends MarketService {
      * @return
      */
     private Execution convert2(JSON e, AtomicLong increment, Object[] previous) {
-        Direction direction = e.get(Direction.class, "direction");
+        Direction side = e.get(Direction.class, "direction");
         Num size = e.get(Num.class, "amount");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "ts"));
         long id = e.get(long.class, "trade-id");
+        int consecutive;
 
-        return Execution.with.direction(direction, size).id(id).price(price).date(date);
+        if (date.equals(previous[1])) {
+            if (side != previous[0]) {
+                consecutive = Execution.ConsecutiveDifference;
+            } else if (side == Direction.BUY) {
+                consecutive = Execution.ConsecutiveSameBuyer;
+            } else {
+                consecutive = Execution.ConsecutiveSameSeller;
+            }
+        } else {
+            consecutive = Execution.ConsecutiveDifference;
+        }
+
+        previous[0] = side;
+        previous[1] = date;
+
+        return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
     }
 
     /**
@@ -333,7 +363,7 @@ public class HuobiService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Huobi.BTC_USDT.executionLatestAt(102220063887L).to(e -> {
+        Huobi.BTC_USDT.executionLatestAt(10101010).to(e -> {
             System.out.println(e);
         });
 
