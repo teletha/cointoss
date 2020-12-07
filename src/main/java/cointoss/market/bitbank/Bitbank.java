@@ -33,6 +33,9 @@ public final class Bitbank extends MarketServiceProvider {
     public static final MarketService XLM_JPY = new BitbankService("xlm_jpy", MarketSetting.with.target(Currency.XLM.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(0.001)));
 
+    public static final MarketService XRP_JPY = new BitbankService("xrp_jpy", MarketSetting.with.target(Currency.XRP.minimumSize(0.0001))
+            .base(Currency.JPY.minimumSize(0.001)));
+
     /**
      * {@inheritDoc}
      */
