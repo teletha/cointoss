@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -320,10 +319,17 @@ public class BitbankService extends MarketService {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Market m = new Market(Bitbank.BTC_JPY);
-        m.readLog(x -> x.fromYestaday());
+    private void candle() {
+        call("GET", marketName + "/candlestick/1min/20201207").flatIterable(e -> e.find("data", "candlestick", "0", "ohlcv", "*")).to(e -> {
+            System.out.println(e);
+        });
+    }
 
-        Thread.sleep(1000 * 500);
+    public static void main(String[] args) throws InterruptedException {
+        ((BitbankService) Bitbank.BTC_JPY).executionsAt(Chrono.utc(2020, 12, 7)).to(e -> {
+            System.out.println(e);
+        });
+
+        Thread.sleep(1000 * 10);
     }
 }
