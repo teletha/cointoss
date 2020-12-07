@@ -128,14 +128,6 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Integer> delay() {
-        return I.signal(0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected Signal<Order> connectOrdersRealtimely() {
         return orderUpdateRealtimely.expose;
     }

@@ -84,14 +84,6 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Integer> delay() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<String> request(Order order) {
         return null;
     }

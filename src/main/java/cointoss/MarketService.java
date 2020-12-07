@@ -131,13 +131,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     protected abstract EfficientWebSocket clientRealtimely();
 
     /**
-     * Estimate the curernt order delay (second).
-     * 
-     * @return
-     */
-    public abstract Signal<Integer> delay();
-
-    /**
      * Request order actually.
      * 
      * @param order A order to request.

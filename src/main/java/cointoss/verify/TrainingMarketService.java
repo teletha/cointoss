@@ -81,14 +81,6 @@ public class TrainingMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Integer> delay() {
-        return backend.delay();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<String> request(Order order) {
         System.out.println("request " + order);
         if (order.type.isTaker()) {

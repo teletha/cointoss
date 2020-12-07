@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -65,14 +64,6 @@ public class BybitService extends MarketService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return Realtime;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Integer> delay() {
-        return null;
     }
 
     /**

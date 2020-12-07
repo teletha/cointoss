@@ -14,16 +14,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
@@ -77,14 +76,6 @@ public class BitbankService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Integer> delay() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<String> request(Order order) {
         return null;
     }
@@ -102,11 +93,7 @@ public class BitbankService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        Object[] previous = new Object[2];
-
-        return call("GET", "trading-records?symbol=" + marketName + "&from=" + startId + "&limit=" + (endId - startId))
-                .flatIterable(e -> e.find("result", "*"))
-                .map(e -> convert(e, previous));
+        return I.signal();
     }
 
     /**
@@ -129,7 +116,6 @@ public class BitbankService extends MarketService {
      * @return
      */
     private Execution convert(JSON e, Object[] previous) {
-        System.out.println(e);
         Direction side = e.get(Direction.class, "side");
         Num price = e.get(Num.class, "price");
         Num size = e.get(Num.class, "amount");
@@ -160,7 +146,8 @@ public class BitbankService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", marketName + "/transactions/2020120700").flatIterable(e -> e.find("data", "transactions", "*"))
+        return call("GET", marketName + "/transactions").flatIterable(e -> e.find("data", "transactions", "*"))
+                .first()
                 .map(json -> convert(json, new Object[2]));
     }
 
@@ -169,8 +156,7 @@ public class BitbankService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", marketName + "/transactions").flatIterable(e -> e.find("data", "transactions", "*"))
-                .map(json -> convert(json, new Object[2]));
+        throw new Error("No support.");
     }
 
     /**
@@ -178,11 +164,7 @@ public class BitbankService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return call("GET", "trading-records?symbol=" + marketName + "&from=1&limit=1").flatIterable(e -> e.find("result", "*"))
-                .first()
-                .waitForTerminate()
-                .map(json -> Long.parseLong(json.text("id")))
-                .to().v;
+        throw new Error("No support.");
     }
 
     private Signal<Execution> executionsAt(ZonedDateTime date) {
@@ -222,11 +204,7 @@ public class BitbankService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderBook/L2?symbol=" + marketName).map(pages -> {
-            OrderBookPageChanges change = new OrderBookPageChanges();
-            pages.find("result", "*").forEach(e -> convertOrderBook(change, e));
-            return change;
-        });
+        return I.signal();
     }
 
     /**
@@ -234,35 +212,7 @@ public class BitbankService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderBook_200.100ms", marketName)).map(pages -> {
-            OrderBookPageChanges change = new OrderBookPageChanges();
-
-            String type = pages.text("type");
-            if (type.equals("snapshot")) {
-                pages.find("data", "*").forEach(e -> convertOrderBook(change, e));
-            } else {
-                pages.find("data", "delete", "*").forEach(e -> convertOrderBook(change, e));
-                pages.find("data", "update", "*").forEach(e -> convertOrderBook(change, e));
-                pages.find("data", "insert", "*").forEach(e -> convertOrderBook(change, e));
-            }
-
-            return change;
-        });
-    }
-
-    /**
-     * Convert to {@link OrderBookPage}.
-     * 
-     * @param changes
-     * @param e
-     */
-    private void convertOrderBook(OrderBookPageChanges changes, JSON e) {
-        Num price = e.get(Num.class, "price");
-        String sizeValue = e.text("size");
-        double size = sizeValue == null ? 0 : Double.parseDouble(sizeValue) / price.doubleValue();
-
-        List<OrderBookPage> books = e.text("side").charAt(0) == 'B' ? changes.bids : changes.asks;
-        books.add(new OrderBookPage(price, size));
+        return I.signal();
     }
 
     /**
@@ -349,10 +299,9 @@ public class BitbankService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Bitbank.BTC_JPY.executionLatest().to(e -> {
-            System.out.println(e);
-        });
+        Market m = new Market(Bitbank.BTC_JPY);
+        m.readLog(x -> x.fromYestaday());
 
-        Thread.sleep(1000 * 10);
+        Thread.sleep(1000 * 500);
     }
 }

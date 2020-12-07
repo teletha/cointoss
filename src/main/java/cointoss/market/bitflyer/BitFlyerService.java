@@ -209,14 +209,6 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Integer> delay() {
-        return Signal.never();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected Signal<Execution> connectExecutionRealtimely() {
         String[] previous = new String[] {"", ""};
 

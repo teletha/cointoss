@@ -74,14 +74,6 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Integer> delay() {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<String> request(Order order) {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
