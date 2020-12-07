@@ -20,6 +20,7 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
@@ -62,6 +63,14 @@ public class BitbankService extends MarketService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return Realtime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExecutionLogRepository externalRepository() {
+        return new OfficialRepository(this);
     }
 
     /**
@@ -150,8 +159,8 @@ public class BitbankService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", marketName + "/transactions").flatIterable(e -> e.find("data", "transactions", "*"))
-                .first()
+        return call("GET", marketName + "/transactions/" + Chrono.DateCompact.format(Chrono.utcNow().minusYears(2)))
+                .flatIterable(e -> e.find("data", "transactions", "*"))
                 .map(json -> convert(json, new Object[2]));
     }
 
@@ -174,6 +183,14 @@ public class BitbankService extends MarketService {
                 .waitForTerminate()
                 .map(json -> Long.parseLong(json.text("id")))
                 .to().v;
+    }
+
+    private Signal<Execution> executionsAt(ZonedDateTime date) {
+        Object[] previous = new Object[2];
+
+        return call("GET", marketName + "/transactions/" + Chrono.DateCompact.format(date))
+                .flatIterable(e -> e.find("data", "transactions", "*"))
+                .map(e -> convert(e, previous));
     }
 
     /**
@@ -273,7 +290,7 @@ public class BitbankService extends MarketService {
      */
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://public.bitbank.cc/" + path));
-
+        System.out.println(builder.build());
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Bybit RESTCall"));
     }
 
@@ -300,11 +317,40 @@ public class BitbankService extends MarketService {
         }
     }
 
+    /**
+     * 
+     */
+    private class OfficialRepository extends ExecutionLogRepository {
+
+        /**
+         * @param service
+         */
+        private OfficialRepository(MarketService service) {
+            super(service);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Signal<ZonedDateTime> collect() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Signal<Execution> convert(ZonedDateTime date) {
+            return executionsAt(date);
+        }
+    }
+
     public static void main(String[] args) throws InterruptedException {
-        Bitbank.BTC_JPY.executionsRealtimely().to(e -> {
+        Bitbank.BTC_JPY.executionLatest().to(e -> {
             System.out.println(e);
         });
 
-        Thread.sleep(1000 * 500);
+        Thread.sleep(1000 * 10);
     }
 }
