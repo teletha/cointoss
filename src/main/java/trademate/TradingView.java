@@ -105,7 +105,7 @@ public class TradingView extends View {
 
             updateTab();
 
-            I.make(TradeMate.class).requestLazyInitialization();
+            I.make(TradeMate.class).finishLoading(service, tab);
         });
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));

@@ -113,6 +113,7 @@ public class GMOService extends MarketService {
         return I.signal(1)
                 .recurse(i -> i + 1)
                 .concatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
+                // .effect(() -> new Error(this + " page " + page).printStackTrace()))
                 .flatIterable(o -> o.find("data", "list", "*"))
                 // The GMO server returns both Taker and Maker histories
                 // alternately, so we have to remove the Maker side.

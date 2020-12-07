@@ -12,10 +12,13 @@ package trademate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
+import cointoss.MarketService;
+import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -40,9 +43,6 @@ public class TradeMate extends View {
     static {
         Viewtify.Terminator.add(EfficientWebSocket::shutdownNow);
     }
-
-    /** The tab loading strategy. */
-    private final TabLoader loader = new TabLoader();
 
     /**
      * {@inheritDoc}
@@ -75,7 +75,7 @@ public class TradeMate extends View {
                     .text(service.marketReadableName)
                     .contents(ui -> new TradingView(ui, service));
 
-            loader.add(tab);
+            requestLoading(service, tab);
         });
 
         // ========================================================
@@ -86,44 +86,53 @@ public class TradeMate extends View {
         });
     }
 
+    /** Load in parallel for each {@link Exchange}. */
+    private final ConcurrentHashMap<Exchange, LoadingQueue> loadings = new ConcurrentHashMap();
+
     /**
-     * {@link TradeMate} will automatically initialize in the background if any tab has not been
-     * activated yet.
+     * Register the specified market in the loading queue.
+     * 
+     * @param service
+     * @param tab
      */
-    public final void requestLazyInitialization() {
-        loader.tryLoad();
+    private final void requestLoading(MarketService service, UITab tab) {
+        LoadingQueue queue = loadings.computeIfAbsent(service.exchange, key -> new LoadingQueue());
+        queue.tabs.add(tab);
+        queue.tryLoading();
     }
 
-    private static class TabLoader {
+    /**
+     * Unregister the specified market from the loading queue.
+     * 
+     * @param service
+     */
+    public final void finishLoading(MarketService service, UITab tab) {
+        LoadingQueue queue = loadings.get(service.exchange);
+        queue.tabs.remove(tab);
 
-        /** The queue for loading tabs. */
-        private final LinkedList<UITab> queue = new LinkedList();
+        if (queue.loading == tab) {
+            queue.loading = null;
+            queue.tryLoading();
+        }
+    }
 
-        /** The current processing tab. */
-        private UITab current;
+    /**
+     * Load in parallel for each exchange.
+     */
+    private static class LoadingQueue {
+
+        private final LinkedList<UITab> tabs = new LinkedList();
+
+        private UITab loading;
 
         /**
-         * Add tab to loading queue.
-         * 
-         * @param tab
+         * {@link TradeMate} will automatically initialize in the background if any tab has not been
+         * activated yet.
          */
-        private void add(UITab tab) {
-            queue.add(tab);
-        }
-
-        private synchronized void tryLoad() {
-            if (current == null || current.isLoaded()) {
-                current = queue.pollFirst();
-
-                if (current != null) {
-                    if (current.isLoaded()) {
-                        tryLoad();
-                    } else {
-                        Viewtify.inUI(() -> {
-                            current.load();
-                        });
-                    }
-                }
+        private final synchronized void tryLoading() {
+            if (loading == null && !tabs.isEmpty()) {
+                loading = tabs.remove(0);
+                Viewtify.inUI(loading::load);
             }
         }
     }
