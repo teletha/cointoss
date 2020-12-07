@@ -129,6 +129,7 @@ public class BitbankService extends MarketService {
      * @return
      */
     private Execution convert(JSON e, Object[] previous) {
+        System.out.println(e);
         Direction side = e.get(Direction.class, "side");
         Num price = e.get(Num.class, "price");
         Num size = e.get(Num.class, "amount");
@@ -159,8 +160,7 @@ public class BitbankService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", marketName + "/transactions/" + Chrono.DateCompact.format(Chrono.utcNow().minusYears(2)))
-                .flatIterable(e -> e.find("data", "transactions", "*"))
+        return call("GET", marketName + "/transactions/2020120700").flatIterable(e -> e.find("data", "transactions", "*"))
                 .map(json -> convert(json, new Object[2]));
     }
 
@@ -334,7 +334,9 @@ public class BitbankService extends MarketService {
          */
         @Override
         public Signal<ZonedDateTime> collect() {
-            return null;
+            ZonedDateTime today = Chrono.utcToday();
+
+            return I.signal(Chrono.utc(2018, 1, 1)).recurse(day -> day.plusDays(1)).takeWhile(day -> !day.isEqual(today));
         }
 
         /**

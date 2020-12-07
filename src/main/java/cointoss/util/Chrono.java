@@ -139,6 +139,15 @@ public class Chrono {
     }
 
     /**
+     * UTC {@link ZonedDateTime}.
+     * 
+     * @return
+     */
+    public static ZonedDateTime utcToday() {
+        return utcNow().truncatedTo(ChronoUnit.DAYS);
+    }
+
+    /**
      * UTC {@link ZonedDateTime} from epoch mills.
      * 
      * @param mills
