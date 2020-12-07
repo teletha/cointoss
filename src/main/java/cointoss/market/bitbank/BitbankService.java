@@ -23,6 +23,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
+import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
@@ -41,12 +42,9 @@ public class BitbankService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = EfficientWebSocket.with
-            .address("wss://stream.bitbank.cc/socket.io/?EIO=3&transport=websocket")
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bitbank.cc/socket.io/")
             .extractId(json -> json.text("room_name"))
-            .noServerReply()
-            .enableSocketIO()
-            .enableDebug();
+            .enableSocketIO();
 
     /**
      * @param marketName
@@ -204,7 +202,19 @@ public class BitbankService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return I.signal();
+        return call("GET", marketName + "/depth").map(root -> {
+            JSON data = root.get("data");
+
+            OrderBookPageChanges change = new OrderBookPageChanges();
+            for (JSON ask : data.find("asks", "*")) {
+                change.asks.add(new OrderBookPage(ask.get(Num.class, "0"), ask.get(Double.class, "1")));
+            }
+
+            for (JSON bid : data.find("bids", "*")) {
+                change.bids.add(new OrderBookPage(bid.get(Num.class, "0"), bid.get(Double.class, "1")));
+            }
+            return change;
+        });
     }
 
     /**
@@ -212,7 +222,19 @@ public class BitbankService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return I.signal();
+        return clientRealtimely().subscribe(new Topic("depth_diff", marketName)).map(root -> {
+            JSON data = root.get("message").get("data");
+
+            OrderBookPageChanges change = new OrderBookPageChanges();
+            for (JSON ask : data.find("a", "*")) {
+                change.asks.add(new OrderBookPage(ask.get(Num.class, "0"), ask.get(Double.class, "1")));
+            }
+
+            for (JSON bid : data.find("b", "*")) {
+                change.bids.add(new OrderBookPage(bid.get(Num.class, "0"), bid.get(Double.class, "1")));
+            }
+            return change;
+        });
     }
 
     /**

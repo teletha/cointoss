@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.gmo.GMO;
+import cointoss.market.bitbank.Bitbank;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -59,7 +59,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = GMO.XRP;
+        MarketService service = Bitbank.BTC_JPY;
         UITab tab = DockSystem.register(service.marketIdentity())
                 .closable(false)
                 .text(service.marketReadableName)
@@ -67,7 +67,7 @@ public class TradeTester extends View {
 
         tab.load();
 
-        MarketService service2 = GMO.XRP_DERIVATIVE;
+        MarketService service2 = Bitbank.ETH_JPY;
         tab = DockSystem.register(service2.marketIdentity())
                 .closable(false)
                 .text(service2.marketReadableName)

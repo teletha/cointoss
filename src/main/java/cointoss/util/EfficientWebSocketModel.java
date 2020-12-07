@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.ConnectException;
 import java.net.http.HttpClient;
@@ -208,6 +208,7 @@ public abstract class EfficientWebSocketModel {
      */
     public EfficientWebSocket enableSocketIO() {
         this.socketIO = true;
+        this.noReplyMode = true;
         return (EfficientWebSocket) this;
     }
 
@@ -307,7 +308,7 @@ public abstract class EfficientWebSocketModel {
     private synchronized void connect() {
         logger.trace("Starting websocket [{}].", address());
 
-        I.http(address(), ws -> {
+        I.http(address() + (socketIO ? "?EIO=3&transport=websocket" : ""), ws -> {
             logger.trace("Connected websocket [{}].", address());
 
             Consumer<WebSocket> connected = whenConnected();
