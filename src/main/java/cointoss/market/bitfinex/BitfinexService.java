@@ -24,7 +24,6 @@ import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
-import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -148,30 +147,6 @@ public class BitfinexService extends MarketService {
                 .waitForTerminate()
                 .to()
                 .exact() * PaddingForID;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> orders() {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> orders(OrderState state) {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<Order> connectOrdersRealtimely() {
-        return I.signal();
     }
 
     /**

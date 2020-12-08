@@ -23,13 +23,11 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
-import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
-import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -119,30 +117,6 @@ public class ZaifService extends MarketService {
     @Override
     public long estimateInitialExecutionId() {
         return -1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> orders() {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> orders(OrderState state) {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<Order> connectOrdersRealtimely() {
-        return I.signal();
     }
 
     /**

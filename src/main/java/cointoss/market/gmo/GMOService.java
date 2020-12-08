@@ -36,7 +36,6 @@ import cointoss.market.TimestampID;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
-import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -209,30 +208,6 @@ public class GMOService extends MarketService {
         ExecutionLogRepository repo = externalRepository();
 
         return repo.collect().first().flatMap(repo::convert).first().map(e -> e.id).waitForTerminate().to().exact();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> orders() {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> orders(OrderState state) {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<Order> connectOrdersRealtimely() {
-        return I.signal();
     }
 
     /**

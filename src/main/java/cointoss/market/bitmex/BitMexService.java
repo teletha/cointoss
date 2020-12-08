@@ -28,14 +28,12 @@ import cointoss.market.TimestampID;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
-import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
-import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -155,30 +153,6 @@ public class BitMexService extends MarketService {
     @Override
     public long estimateInitialExecutionId() {
         return stamp.encode(Chrono.utc(2020, 1, 1).minusMinutes(3));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> orders() {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> orders(OrderState state) {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<Order> connectOrdersRealtimely() {
-        return I.signal();
     }
 
     /**

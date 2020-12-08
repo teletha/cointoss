@@ -36,6 +36,7 @@ import cointoss.util.arithmetic.Num;
 import kiss.Decoder;
 import kiss.Disposable;
 import kiss.Encoder;
+import kiss.I;
 import kiss.Signal;
 import psychopath.Directory;
 import psychopath.Locator;
@@ -257,14 +258,18 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return
      */
-    public abstract Signal<Order> orders();
+    public Signal<Order> orders() {
+        return I.signal();
+    }
 
     /**
      * Request all orders with the specified state.
      * 
      * @return
      */
-    public abstract Signal<Order> orders(OrderState state);
+    public Signal<Order> orders(OrderState state) {
+        return I.signal();
+    }
 
     /**
      * Acquire the order state in realtime. This is infinitely.
@@ -283,7 +288,9 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return
      */
-    protected abstract Signal<Order> connectOrdersRealtimely();
+    protected Signal<Order> connectOrdersRealtimely() {
+        return I.signal();
+    }
 
     /**
      * <p>
