@@ -22,7 +22,6 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketService;
-import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -67,22 +66,6 @@ public class BitbankService extends TimestampBasedMarketService {
     @Override
     public ExecutionLogRepository externalRepository() {
         return new OfficialRepository(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<String> request(Order order) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> cancel(Order order) {
-        return null;
     }
 
     /**

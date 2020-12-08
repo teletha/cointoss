@@ -25,7 +25,6 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -79,22 +78,6 @@ public class HuobiService extends MarketService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return Realtime;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<String> request(Order order) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> cancel(Order order) {
-        return null;
     }
 
     /**

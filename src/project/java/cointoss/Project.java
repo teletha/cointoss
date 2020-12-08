@@ -21,7 +21,7 @@ public class Project extends bee.api.Project {
         require("com.pgs-soft", "HttpClientMock").atTest();
         require("org.apache.commons", "commons-lang3");
         require("org.apache.commons", "commons-math3");
-        require("commons-net", "commons-net");
+        require("commons-net", "commons-net", "3.7.2");
         require("org.apache.logging.log4j", "log4j-core");
         require("com.google.guava", "guava");
         unrequire("com.google.code.findbugs", "jsr305");

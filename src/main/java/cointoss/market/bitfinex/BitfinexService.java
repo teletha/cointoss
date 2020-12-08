@@ -21,7 +21,6 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -66,26 +65,6 @@ public class BitfinexService extends MarketService {
     @Override
     protected EfficientWebSocket clientRealtimely() {
         return Realtime;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<String> request(Order order) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> cancel(Order order) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
     }
 
     /**

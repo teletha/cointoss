@@ -132,22 +132,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     protected abstract EfficientWebSocket clientRealtimely();
 
     /**
-     * Request order actually.
-     * 
-     * @param order A order to request.
-     * @return A requested order.
-     */
-    public abstract Signal<String> request(Order order);
-
-    /**
-     * Request canceling order actually.
-     * 
-     * @param order A order to cancel.
-     * @return A cancelled order result (state, remainingSize, executedSize).
-     */
-    public abstract Signal<Order> cancel(Order order);
-
-    /**
      * Acquire the execution log between start (exclusive) and end (exclusive) key.
      * 
      * @param key An execution sequencial key (i.e. ID, datetime etc).
@@ -254,6 +238,26 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Request order actually.
+     * 
+     * @param order A order to request.
+     * @return A requested order.
+     */
+    public Signal<String> request(Order order) {
+        return I.signal();
+    }
+
+    /**
+     * Request canceling order actually.
+     * 
+     * @param order A order to cancel.
+     * @return A cancelled order result (state, remainingSize, executedSize).
+     */
+    public Signal<Order> cancel(Order order) {
+        return I.signal();
+    }
+
+    /**
      * Request all orders.
      * 
      * @return
@@ -293,9 +297,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * <p>
      * Get amount of the base and target currency.
-     * </p>
      * 
      * @return
      */
