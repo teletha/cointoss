@@ -48,14 +48,6 @@ public abstract class TimestampBasedMarketService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long estimateAcquirableExecutionIdRange(double factor) {
-        return super.estimateAcquirableExecutionIdRange(factor) * padding;
-    }
-
-    /**
      * Convert from ID to epoch millis.
      * 
      * @param id A target ID.

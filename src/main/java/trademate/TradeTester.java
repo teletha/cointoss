@@ -59,7 +59,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = Bitbank.BTC_JPY;
+        MarketService service = Bitbank.ETH_JPY;
         UITab tab = DockSystem.register(service.marketIdentity())
                 .closable(false)
                 .text(service.marketReadableName)

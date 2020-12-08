@@ -18,22 +18,22 @@ import kiss.I;
 
 public final class Bitbank extends MarketServiceProvider {
 
-    static final MarketService BTC_JPY = new BitbankService("btc_jpy", MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
+    public static final MarketService BTC_JPY = new BitbankService("btc_jpy", MarketSetting.with.target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(1)));
 
-    static final MarketService ETH_JPY = new BitbankService("eth_jpy", MarketSetting.with.target(Currency.ETH.minimumSize(0.0001))
+    public static final MarketService ETH_JPY = new BitbankService("eth_jpy", MarketSetting.with.target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(1)));
 
-    static final MarketService LTC_JPY = new BitbankService("ltc_jpy", MarketSetting.with.target(Currency.LTC.minimumSize(0.0001))
+    public static final MarketService LTC_JPY = new BitbankService("ltc_jpy", MarketSetting.with.target(Currency.LTC.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(0.1)));
 
-    static final MarketService MONA_JPY = new BitbankService("mona_jpy", MarketSetting.with.target(Currency.MONA.minimumSize(0.0001))
+    public static final MarketService MONA_JPY = new BitbankService("mona_jpy", MarketSetting.with.target(Currency.MONA.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(0.001)));
 
-    static final MarketService XLM_JPY = new BitbankService("xlm_jpy", MarketSetting.with.target(Currency.XLM.minimumSize(0.0001))
+    public static final MarketService XLM_JPY = new BitbankService("xlm_jpy", MarketSetting.with.target(Currency.XLM.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(0.001)));
 
-    static final MarketService XRP_JPY = new BitbankService("xrp_jpy", MarketSetting.with.target(Currency.XRP.minimumSize(0.0001))
+    public static final MarketService XRP_JPY = new BitbankService("xrp_jpy", MarketSetting.with.target(Currency.XRP.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(0.001)));
 
     /**

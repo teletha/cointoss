@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -92,18 +91,14 @@ public class BitbankService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        System.out.println(computeDateTime(startId) + "    " + computeDateTime(endId));
         long startMillis = computeMillis(startId);
-        long endMillis = computeMillis(endId);
         ZonedDateTime today = Chrono.utcNow().minusMinutes(10).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime startDay = computeDateTime(startId).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDay = computeDateTime(endId).truncatedTo(ChronoUnit.DAYS);
 
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
                 .takeWhile(day -> day.isBefore(today) || day.isEqual(today))
                 .concatMap(day -> {
-                    System.out.println(day + "  " + today);
                     if (day.isEqual(today)) {
                         return candleAt(day);
                     } else {
@@ -111,8 +106,7 @@ public class BitbankService extends TimestampBasedMarketService {
                     }
                 })
                 .skipWhile(e -> e.mills < startMillis)
-                .take(1024)
-                .effect(e -> System.out.println(e));
+                .take(10000);
     }
 
     /**
@@ -268,7 +262,7 @@ public class BitbankService extends TimestampBasedMarketService {
     }
 
     /**
-     * Call rest API.
+     * Call REST API.
      * 
      * @param method
      * @param path
@@ -332,12 +326,5 @@ public class BitbankService extends TimestampBasedMarketService {
         public Signal<Execution> convert(ZonedDateTime date) {
             return executionsAt(date);
         }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Market m = new Market(Bitbank.BTC_JPY);
-        m.readLog(x -> x.fromLast(5));
-
-        Thread.sleep(1000 * 5);
     }
 }
