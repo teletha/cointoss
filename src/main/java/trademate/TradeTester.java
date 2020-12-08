@@ -67,13 +67,13 @@ public class TradeTester extends View {
 
         tab.load();
 
-        MarketService service2 = Bitbank.ETH_JPY;
-        tab = DockSystem.register(service2.marketIdentity())
-                .closable(false)
-                .text(service2.marketReadableName)
-                .contents(ui -> new TradingView(ui, service2));
-
-        tab.load();
+        // MarketService service2 = Bitbank.ETH_JPY;
+        // tab = DockSystem.register(service2.marketIdentity())
+        // .closable(false)
+        // .text(service2.marketReadableName)
+        // .contents(ui -> new TradingView(ui, service2));
+        //
+        // tab.load();
     }
 
     /**

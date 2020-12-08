@@ -14,13 +14,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
-import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
+import cointoss.market.TimestampBasedMarketService;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -35,7 +37,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
-public class BitbankService extends MarketService {
+public class BitbankService extends TimestampBasedMarketService {
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
@@ -90,7 +92,27 @@ public class BitbankService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        return I.signal();
+        System.out.println(computeDateTime(startId) + "    " + computeDateTime(endId));
+        long startMillis = computeMillis(startId);
+        long endMillis = computeMillis(endId);
+        ZonedDateTime today = Chrono.utcNow().minusMinutes(10).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startDay = computeDateTime(startId).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime endDay = computeDateTime(endId).truncatedTo(ChronoUnit.DAYS);
+
+        return I.signal(startDay)
+                .recurse(day -> day.plusDays(1))
+                .takeWhile(day -> day.isBefore(today) || day.isEqual(today))
+                .concatMap(day -> {
+                    System.out.println(day + "  " + today);
+                    if (day.isEqual(today)) {
+                        return candleAt(day);
+                    } else {
+                        return executionsAt(day);
+                    }
+                })
+                .skipWhile(e -> e.mills < startMillis)
+                .take(1024)
+                .effect(e -> System.out.println(e));
     }
 
     /**
@@ -98,7 +120,7 @@ public class BitbankService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        Object[] previous = new Object[2];
+        long[] previous = new long[3];
 
         return clientRealtimely().subscribe(new Topic("transactions", marketName))
                 .flatIterable(json -> json.find("message", "data", "transactions", "*"))
@@ -106,36 +128,14 @@ public class BitbankService extends MarketService {
     }
 
     /**
-     * Convert to {@link Execution}.
+     * Convert JSON to {@link Execution}.
      * 
-     * @param e
-     * @param previous
+     * @param json
+     * @param context
      * @return
      */
-    private Execution convert(JSON e, Object[] previous) {
-        Direction side = e.get(Direction.class, "side");
-        Num price = e.get(Num.class, "price");
-        Num size = e.get(Num.class, "amount");
-        ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("executed_at")));
-        long id = Long.parseLong(e.text("transaction_id"));
-        int consecutive;
-
-        if (date.equals(previous[1])) {
-            if (side != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (side == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = side;
-        previous[1] = date;
-
-        return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
+    private Execution convert(JSON json, long[] context) {
+        return createExecution(json, "side", "amount", "price", "executed_at", context);
     }
 
     /**
@@ -145,7 +145,7 @@ public class BitbankService extends MarketService {
     public Signal<Execution> executionLatest() {
         return call("GET", marketName + "/transactions").flatIterable(e -> e.find("data", "transactions", "*"))
                 .first()
-                .map(json -> convert(json, new Object[2]));
+                .map(json -> convert(json, new long[3]));
     }
 
     /**
@@ -165,11 +165,26 @@ public class BitbankService extends MarketService {
     }
 
     private Signal<Execution> executionsAt(ZonedDateTime date) {
-        Object[] previous = new Object[2];
+        long[] previous = new long[3];
 
         return call("GET", marketName + "/transactions/" + Chrono.DateCompact.format(date))
                 .flatIterable(e -> e.find("data", "transactions", "*"))
                 .map(e -> convert(e, previous));
+    }
+
+    private Signal<Execution> candleAt(ZonedDateTime date) {
+        return call("GET", marketName + "/candlestick/1min/" + Chrono.DateCompact.format(date))
+                .flatIterable(e -> e.find("data", "candlestick", "0", "ohlcv", "*"))
+                .flatIterable(e -> {
+                    Num open = e.get(Num.class, "0");
+                    Num high = e.get(Num.class, "1");
+                    Num low = e.get(Num.class, "2");
+                    Num close = e.get(Num.class, "3");
+                    Num volume = e.get(Num.class, "4");
+                    long epochMillis = e.get(long.class, "5");
+
+                    return createExecutions(open, high, low, close, volume, epochMillis);
+                });
     }
 
     /**
@@ -319,17 +334,10 @@ public class BitbankService extends MarketService {
         }
     }
 
-    private void candle() {
-        call("GET", marketName + "/candlestick/1min/20201207").flatIterable(e -> e.find("data", "candlestick", "0", "ohlcv", "*")).to(e -> {
-            System.out.println(e);
-        });
-    }
-
     public static void main(String[] args) throws InterruptedException {
-        ((BitbankService) Bitbank.BTC_JPY).executionsAt(Chrono.utc(2020, 12, 7)).to(e -> {
-            System.out.println(e);
-        });
+        Market m = new Market(Bitbank.BTC_JPY);
+        m.readLog(x -> x.fromLast(5));
 
-        Thread.sleep(1000 * 10);
+        Thread.sleep(1000 * 5);
     }
 }
