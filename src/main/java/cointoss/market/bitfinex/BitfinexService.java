@@ -17,10 +17,10 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
-import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
+import cointoss.market.TimestampBasedMarketService;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -32,10 +32,7 @@ import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 import kiss.Signal;
 
-public class BitfinexService extends MarketService {
-
-    /** The right padding for id. */
-    private static final long PaddingForID = 10000;
+public class BitfinexService extends TimestampBasedMarketService {
 
     /** The API limit. */
     private static final APILimiter LimitForTradeHistory = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
@@ -55,7 +52,7 @@ public class BitfinexService extends MarketService {
      * @param setting
      */
     protected BitfinexService(String marketName, MarketSetting setting) {
-        super(Exchange.Bitfinex, marketName, setting);
+        super(Exchange.Bitfinex, marketName, setting, 10000);
     }
 
     /**
@@ -71,10 +68,10 @@ public class BitfinexService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        long startTime = (startId / PaddingForID) + 1;
-        long startingPoint = startId % PaddingForID;
+        long startTime = computeMillis(startId) + 1;
+        long startingPoint = startId % padding;;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, encodeId(startId)};
+        Object[] previous = new Object[] {null, computeDateTime(startId)};
 
         return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=10000&start=" + startTime, LimitForTradeHistory)
                 .flatIterable(e -> e.find("*"))
@@ -108,7 +105,7 @@ public class BitfinexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        long startTime = (id / PaddingForID) + 1;
+        long startTime = computeMillis(id) + 1;
 
         return call("GET", "trades/t" + marketName + "/hist?limit=1&start=" + startTime + "&sort=1", LimitForTradeHistory)
                 .flatIterable(e -> e.find("*"))
@@ -177,7 +174,7 @@ public class BitfinexService extends MarketService {
         int consecutive;
 
         if (date.equals(previous[1])) {
-            id = decodeId(date) + increment.incrementAndGet();
+            id = computeID(date) + increment.incrementAndGet();
 
             if (direction != previous[0]) {
                 consecutive = Execution.ConsecutiveDifference;
@@ -187,7 +184,7 @@ public class BitfinexService extends MarketService {
                 consecutive = Execution.ConsecutiveSameSeller;
             }
         } else {
-            id = decodeId(date);
+            id = computeID(date);
             increment.set(0);
             consecutive = Execution.ConsecutiveDifference;
         }
@@ -196,14 +193,6 @@ public class BitfinexService extends MarketService {
         previous[1] = date;
 
         return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive);
-    }
-
-    private ZonedDateTime encodeId(long id) {
-        return Chrono.utcByMills(id / PaddingForID);
-    }
-
-    private long decodeId(ZonedDateTime time) {
-        return time.toInstant().toEpochMilli() * PaddingForID;
     }
 
     /**

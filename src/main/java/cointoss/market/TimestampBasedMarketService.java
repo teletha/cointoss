@@ -36,7 +36,7 @@ import kiss.JSON;
 public abstract class TimestampBasedMarketService extends MarketService {
 
     /** The padding to avoid equating multiple trades occurring at the same time. */
-    private final long padding;
+    protected final long padding;
 
     /**
      * @param exchange
