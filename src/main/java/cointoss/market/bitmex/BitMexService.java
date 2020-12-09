@@ -20,11 +20,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
-import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.market.TimestampID;
+import cointoss.market.TimestampBasedMarketService;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -36,10 +35,7 @@ import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 import kiss.Signal;
 
-public class BitMexService extends MarketService {
-
-    /** The right padding for id. */
-    private static final TimestampID stamp = new TimestampID(true, 100000);
+public class BitMexService extends TimestampBasedMarketService {
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -63,7 +59,7 @@ public class BitMexService extends MarketService {
      * @param setting
      */
     protected BitMexService(int id, String marketName, MarketSetting setting) {
-        super(Exchange.BitMEX, marketName, setting);
+        super(Exchange.BitMEX, marketName, setting, 100000);
 
         this.marketId = id;
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.base.minimumSize;
@@ -83,9 +79,9 @@ public class BitMexService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         startId++;
-        long startingPoint = startId % stamp.padding;
+        long startingPoint = startId % padding;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, stamp.decodeAsDate(startId)};
+        Object[] previous = new Object[] {null, computeDateTime(startId)};
 
         return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(startId) + "&start=" + startingPoint)
                 .flatIterable(e -> e.find("*"))
@@ -95,7 +91,7 @@ public class BitMexService extends MarketService {
     }
 
     private String formatEncodedId(long id) {
-        return RealTimeFormat.format(stamp.decodeAsDate(id));
+        return RealTimeFormat.format(computeDateTime(id));
     }
 
     /**
@@ -196,7 +192,7 @@ public class BitMexService extends MarketService {
         int consecutive;
 
         if (date.equals(previous[1])) {
-            id = stamp.encode(date) + increment.incrementAndGet();
+            id = computeID(date) + increment.incrementAndGet();
 
             if (direction != previous[0]) {
                 consecutive = Execution.ConsecutiveDifference;
@@ -206,7 +202,7 @@ public class BitMexService extends MarketService {
                 consecutive = Execution.ConsecutiveSameSeller;
             }
         } else {
-            id = stamp.encode(date);
+            id = computeID(date);
             increment.set(0);
             consecutive = Execution.ConsecutiveDifference;
         }
