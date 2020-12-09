@@ -83,11 +83,11 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     protected MarketService(Exchange exchange, String marketName, MarketSetting setting) {
         this.exchange = Objects.requireNonNull(exchange);
         this.marketName = Objects.requireNonNull(marketName);
-        this.marketReadableName = marketIdentity().replaceAll("_", "");
+        this.marketReadableName = id().replaceAll("_", "");
         this.setting = setting;
         this.scheduler = new ScheduledThreadPoolExecutor(2, task -> {
             Thread thread = new Thread(task);
-            thread.setName(marketIdentity() + " Scheduler");
+            thread.setName(id() + " Scheduler");
             thread.setDaemon(true);
             return thread;
         });
@@ -102,7 +102,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return A market identity.
      */
-    public final String marketIdentity() {
+    public final String id() {
         return exchange + " " + marketName;
     }
 
@@ -394,7 +394,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         return RetryPolicy.with.limit(max)
                 .delayLinear(Duration.ofSeconds(2))
                 .scheduler(scheduler())
-                .name(name == null || name.length() == 0 ? null : marketIdentity() + " : " + name);
+                .name(name == null || name.length() == 0 ? null : id() + " : " + name);
     }
 
     /**
@@ -411,7 +411,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     @Override
     public final int compareTo(MarketService o) {
-        return marketIdentity().compareTo(o.marketIdentity());
+        return id().compareTo(o.id());
     }
 
     /**
@@ -419,7 +419,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     @Override
     public final String toString() {
-        return marketIdentity();
+        return id();
     }
 
     /**

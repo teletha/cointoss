@@ -663,7 +663,7 @@ public class ExecutionLog {
                                 .effectOnObserve(stopwatch::start)
                                 .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
                                 .effectOnComplete(() -> {
-                                    log.trace("Read fast log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
+                                    log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                                 });
                     } else {
                         // read from compact log
@@ -673,7 +673,7 @@ public class ExecutionLog {
                                 .effectOnObserve(stopwatch::start)
                                 .effectOnError(e -> log.error("Fail to read compact log. [" + compact + "]"))
                                 .effectOnComplete(() -> {
-                                    log.trace("Read compact log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
+                                    log.trace("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                                 });
                     }
                 } else if (existNormal()) {
@@ -684,7 +684,7 @@ public class ExecutionLog {
                             .effectOnObserve(stopwatch::start)
                             .effectOnError(e -> log.error("Fail to read normal log. [" + normal + "]"))
                             .effectOnComplete(() -> {
-                                log.trace("Read normal log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
+                                log.trace("Read normal log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                             });
                 } else {
                     // read from external repository
@@ -694,7 +694,7 @@ public class ExecutionLog {
                         return I.signal();
                     } else {
                         return writeNormal(external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
-                            log.info("Donwload external log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
+                            log.info("Donwload external log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                         }));
                     }
                 }
@@ -978,7 +978,7 @@ public class ExecutionLog {
          * @param observer
          */
         private void switchToRealtime(long currentId, Observer<? super Execution> observer) {
-            log.info(service.marketIdentity() + " switch to Realtime API.");
+            log.info(service.id() + " switch to Realtime API.");
 
             while (!realtime.isEmpty()) {
                 ConcurrentLinkedDeque<Execution> buffer = realtime;

@@ -57,7 +57,7 @@ public class Console extends View {
     @Override
     protected void initialize() {
         // create logger
-        String name = view.service.marketIdentity();
+        String name = view.service.id();
         logger = LogManager.getLogger(name);
         ConsoleAppender.consoles.put(name, this);
 

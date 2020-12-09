@@ -81,7 +81,7 @@ public abstract class MarketServiceProvider implements Extensible {
      * @return
      */
     public static final Variable<MarketService> by(String identity) {
-        return availableMarketServices().take(service -> service.marketIdentity().equals(identity)).to();
+        return availableMarketServices().take(service -> service.id().equals(identity)).to();
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class MarketServiceProvider implements Extensible {
          */
         @Override
         public String encode(MarketService value) {
-            return value.marketIdentity();
+            return value.id();
         }
 
         /**
