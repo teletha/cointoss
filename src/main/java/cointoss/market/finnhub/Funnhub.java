@@ -21,7 +21,7 @@ public final class Funnhub extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 1000;
 
-    static final MarketService BTC_USDT = new FinnhubService(88, "BINANCE:BTCUSDT", MarketSetting.with
+    static final MarketService BTC_USDT = new FinnhubService("BINANCE:BTCUSDT", MarketSetting.with
             .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));

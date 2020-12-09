@@ -73,7 +73,7 @@ public class BinanceService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (startId + 1)).flatIterable(e -> e.find("*"))
-                .map(this::convert);
+                .map(this::createExecution);
     }
 
     /**
@@ -81,7 +81,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        return clientRealtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> convert(json.get("data")));
+        return clientRealtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> createExecution(json.get("data")));
     }
 
     /**
@@ -89,7 +89,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("*")).map(this::convert);
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("*")).map(this::createExecution);
     }
 
     /**
@@ -97,7 +97,28 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1&fromId=" + id).flatIterable(e -> e.find("*")).map(this::convert);
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1&fromId=" + id).flatIterable(e -> e.find("*")).map(this::createExecution);
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param e
+     * @return
+     */
+    private Execution createExecution(JSON e) {
+        long id = Long.parseLong(e.text("a"));
+        Direction side = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
+        Num size = e.get(Num.class, "q");
+        Num price = e.get(Num.class, "p");
+        ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
+    
+        return Execution.with.direction(side, size)
+                .id(id)
+                .price(price)
+                .date(date)
+                .consecutive(Execution.ConsecutiveDifference)
+                .delay(Execution.DelayInestimable);
     }
 
     /**
@@ -106,7 +127,7 @@ public class BinanceService extends MarketService {
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "depth?symbol=" + marketName + "&limit=" + (isFutures ? "1000" : "5000"))
-                .map(e -> convertOrderBook(e, "bids", "asks"));
+                .map(e -> createOrderBook(e, "bids", "asks"));
     }
 
     /**
@@ -114,7 +135,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("depth", marketName)).map(json -> convertOrderBook(json.get("data"), "b", "a"));
+        return clientRealtimely().subscribe(new Topic("depth", marketName)).map(json -> createOrderBook(json.get("data"), "b", "a"));
     }
 
     /**
@@ -123,7 +144,7 @@ public class BinanceService extends MarketService {
      * @param array
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(JSON pages, String bidName, String askName) {
+    private OrderBookPageChanges createOrderBook(JSON pages, String bidName, String askName) {
         OrderBookPageChanges change = new OrderBookPageChanges();
 
         for (JSON bid : pages.find(bidName, "*")) {
@@ -140,27 +161,6 @@ public class BinanceService extends MarketService {
             change.asks.add(new OrderBookPage(price, size));
         }
         return change;
-    }
-
-    /**
-     * Convert to {@link Execution}.
-     * 
-     * @param e
-     * @return
-     */
-    private Execution convert(JSON e) {
-        long id = Long.parseLong(e.text("a"));
-        Direction side = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
-        Num size = e.get(Num.class, "q");
-        Num price = e.get(Num.class, "p");
-        ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
-
-        return Execution.with.direction(side, size)
-                .id(id)
-                .price(price)
-                .date(date)
-                .consecutive(Execution.ConsecutiveDifference)
-                .delay(Execution.DelayInestimable);
     }
 
     /**

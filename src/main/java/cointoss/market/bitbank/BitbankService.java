@@ -49,7 +49,7 @@ public class BitbankService extends TimestampBasedMarketService {
      * @param setting
      */
     protected BitbankService(String marketName, MarketSetting setting) {
-        super(Exchange.BitBank, marketName, setting);
+        super(Exchange.BitBank, marketName, setting, 10000);
     }
 
     /**

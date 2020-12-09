@@ -15,7 +15,6 @@ import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -25,7 +24,6 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
@@ -33,6 +31,7 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -55,21 +54,12 @@ public class HuobiService extends MarketService {
                 return id == null ? null : "{'pong':" + id + "}";
             });
 
-    /** The market id. */
-    private final int marketId;
-
-    /** The instrument tick size. */
-    private final Num instrumentTickSize;
-
     /**
      * @param marketName
      * @param setting
      */
-    protected HuobiService(int id, String marketName, MarketSetting setting) {
+    protected HuobiService(String marketName, MarketSetting setting) {
         super(Exchange.Huobi, marketName, setting);
-
-        this.marketId = id;
-        this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.base.minimumSize;
     }
 
     /**
@@ -210,7 +200,7 @@ public class HuobiService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.find("*")));
+        return I.signal();
     }
 
     /**
@@ -218,32 +208,7 @@ public class HuobiService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderBookL2", marketName))
-                .map(json -> json.find("data", "*"))
-                .map(this::convertOrderBook);
-    }
-
-    /**
-     * Convert json to {@link OrderBookPageChanges}.
-     * 
-     * @param pages
-     * @return
-     */
-    private OrderBookPageChanges convertOrderBook(List<JSON> pages) {
-        OrderBookPageChanges change = new OrderBookPageChanges();
-        for (JSON page : pages) {
-            long id = Long.parseLong(page.text("id"));
-            Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
-            JSON sizeElement = page.get("size");
-            double size = sizeElement == null ? 0 : sizeElement.as(Double.class) / price.doubleValue();
-
-            if (page.text("side").charAt(0) == 'B') {
-                change.bids.add(new OrderBookPage(price, size));
-            } else {
-                change.asks.add(new OrderBookPage(price, size));
-            }
-        }
-        return change;
+        return I.signal();
     }
 
     /**
