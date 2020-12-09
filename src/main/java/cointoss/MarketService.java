@@ -229,15 +229,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * Return {@link ExecutionLog} of this market.
-     * 
-     * @return
-     */
-    public final ExecutionLog log() {
-        return log;
-    }
-
-    /**
      * Request order actually.
      * 
      * @param order A order to request.
