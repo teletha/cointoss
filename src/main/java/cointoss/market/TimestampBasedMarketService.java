@@ -55,7 +55,7 @@ public abstract class TimestampBasedMarketService extends MarketService {
      * @param id A target ID.
      * @return Epoch time.
      */
-    protected final long computeMillis(long id) {
+    protected final long computeMilli(long id) {
         return id / padding;
     }
 
@@ -65,7 +65,7 @@ public abstract class TimestampBasedMarketService extends MarketService {
      * @param id A target ID.
      * @return Epoch time.
      */
-    protected final long computeSecs(long id) {
+    protected final long computeSec(long id) {
         return id / (padding * 1000);
     }
 
@@ -76,7 +76,7 @@ public abstract class TimestampBasedMarketService extends MarketService {
      * @return Epoch time.
      */
     protected final ZonedDateTime computeDateTime(long id) {
-        return Chrono.utcByMills(computeMillis(id));
+        return Chrono.utcByMills(computeMilli(id));
     }
 
     /**

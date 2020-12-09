@@ -73,7 +73,7 @@ public class BitbankService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        long startMillis = computeMillis(startId);
+        long startMillis = computeMilli(startId);
         ZonedDateTime today = Chrono.utcNow().minusMinutes(10).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime startDay = computeDateTime(startId).truncatedTo(ChronoUnit.DAYS);
 

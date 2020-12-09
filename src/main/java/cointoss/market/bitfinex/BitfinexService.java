@@ -68,7 +68,7 @@ public class BitfinexService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        long startTime = computeMillis(startId) + 1;
+        long startTime = computeMilli(startId) + 1;
         long startingPoint = startId % padding;;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
         Object[] previous = new Object[] {null, computeDateTime(startId)};
@@ -105,7 +105,7 @@ public class BitfinexService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        long startTime = computeMillis(id) + 1;
+        long startTime = computeMilli(id) + 1;
 
         return call("GET", "trades/t" + marketName + "/hist?limit=1&start=" + startTime + "&sort=1", LimitForTradeHistory)
                 .flatIterable(e -> e.find("*"))
