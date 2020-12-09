@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -325,7 +325,6 @@ public class ExecutionLog {
                         log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
 
                         for (Execution execution : rests) {
-                            System.out.println(execution);
                             if (!buffer.canSwitch(execution)) {
                                 observer.accept(execution);
                             } else {
