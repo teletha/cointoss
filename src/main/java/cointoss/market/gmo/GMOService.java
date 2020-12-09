@@ -32,7 +32,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
-import cointoss.market.TimestampID;
+import cointoss.market.TimestampBasedMarketService;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -46,10 +46,7 @@ import kiss.JSON;
 import kiss.Signal;
 import kiss.XML;
 
-public class GMOService extends MarketService {
-
-    /** The ID codec. */
-    private static final TimestampID stamp = new TimestampID(true, 1000);
+public class GMOService extends TimestampBasedMarketService {
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -71,7 +68,7 @@ public class GMOService extends MarketService {
      * @param setting
      */
     protected GMOService(String marketName, MarketSetting setting) {
-        super(Exchange.GMO, marketName, setting);
+        super(Exchange.GMO, marketName, setting, 1000);
     }
 
     /**
@@ -87,7 +84,7 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        ZonedDateTime start = stamp.decodeAsDate(startId);
+        ZonedDateTime start = computeDateTime(startId);
 
         AtomicLong increment = new AtomicLong();
         Object[] prev = new Object[2];
@@ -102,7 +99,7 @@ public class GMOService extends MarketService {
                 .skipAt(index -> index % 2 == 0)
                 .takeWhile(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isAfter(start))
                 .reverse()
-                .map(e -> convert(e, increment, prev));
+                .map(e -> createExecution(e, increment, prev));
     }
 
     /**
@@ -113,56 +110,7 @@ public class GMOService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return clientRealtimely().subscribe(new Topic("trades", marketName)).map(json -> convert(json, increment, previous));
-    }
-
-    /**
-     * Convert to {@link Execution}.
-     * 
-     * @param json
-     * @param previous
-     * @return
-     */
-    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
-        Direction side = e.get(Direction.class, "side");
-        Num size = e.get(Num.class, "size");
-        Num price = e.get(Num.class, "price");
-        ZonedDateTime date = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat);
-
-        return convert(side, size, price, date, increment, previous);
-    }
-
-    /**
-     * Convert to {@link Execution}.
-     * 
-     * @param json
-     * @param previous
-     * @return
-     */
-    private Execution convert(Direction side, Num size, Num price, ZonedDateTime date, AtomicLong increment, Object[] previous) {
-        long id;
-        int consecutive;
-
-        if (date.equals(previous[1])) {
-            id = stamp.encode(date) + increment.incrementAndGet();
-
-            if (side != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (side == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            id = stamp.encode(date);
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = side;
-        previous[1] = date;
-
-        return Execution.with.direction(side, size).price(price).date(date).id(id).consecutive(consecutive);
+        return clientRealtimely().subscribe(new Topic("trades", marketName)).map(json -> createExecution(json, increment, previous));
     }
 
     /**
@@ -171,7 +119,7 @@ public class GMOService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trades?symbol=" + marketName + "&page=1&count=1").flatIterable(e -> e.find("data", "list", "*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+                .map(json -> createExecution(json, new AtomicLong(), new Object[2]));
     }
 
     /**
@@ -179,10 +127,59 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        ZonedDateTime date = stamp.decodeAsDate(id);
+        ZonedDateTime date = computeDateTime(id);
         ExecutionLogRepository repo = externalRepository();
 
         return repo.convert(date).takeUntil(e -> id <= e.id).waitForTerminate().effect(e -> System.out.println(e));
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution createExecution(JSON e, AtomicLong increment, Object[] previous) {
+        Direction side = e.get(Direction.class, "side");
+        Num size = e.get(Num.class, "size");
+        Num price = e.get(Num.class, "price");
+        ZonedDateTime date = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat);
+    
+        return createExecution(side, size, price, date, increment, previous);
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution createExecution(Direction side, Num size, Num price, ZonedDateTime date, AtomicLong increment, Object[] previous) {
+        long id;
+        int consecutive;
+    
+        if (date.equals(previous[1])) {
+            id = computeID(date) + increment.incrementAndGet();
+    
+            if (side != previous[0]) {
+                consecutive = Execution.ConsecutiveDifference;
+            } else if (side == Direction.BUY) {
+                consecutive = Execution.ConsecutiveSameBuyer;
+            } else {
+                consecutive = Execution.ConsecutiveSameSeller;
+            }
+        } else {
+            id = computeID(date);
+            increment.set(0);
+            consecutive = Execution.ConsecutiveDifference;
+        }
+    
+        previous[0] = side;
+        previous[1] = date;
+    
+        return Execution.with.direction(side, size).price(price).date(date).id(id).consecutive(consecutive);
     }
 
     /**
@@ -190,7 +187,7 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderbooks?symbol=" + marketName).map(e -> convertOrderBook(e.get("data")));
+        return call("GET", "orderbooks?symbol=" + marketName).map(e -> createOrderBook(e.get("data")));
     }
 
     /**
@@ -198,7 +195,7 @@ public class GMOService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderbooks", marketName)).map(this::convertOrderBook);
+        return clientRealtimely().subscribe(new Topic("orderbooks", marketName)).map(this::createOrderBook);
     }
 
     /**
@@ -207,7 +204,7 @@ public class GMOService extends MarketService {
      * @param root
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(JSON root) {
+    private OrderBookPageChanges createOrderBook(JSON root) {
         OrderBookPageChanges changes = new OrderBookPageChanges();
         changes.clearInside = true;
 
@@ -226,14 +223,6 @@ public class GMOService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ExecutionLogRepository externalRepository() {
-        return new OfficialRepository(this);
-    }
-
-    /**
      * Call rest API.
      * 
      * @param method
@@ -249,6 +238,14 @@ public class GMOService extends MarketService {
                 return I.signal(json);
             }
         }).retryWhen(retryPolicy(10, "GMO RESTCall"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExecutionLogRepository externalRepository() {
+        return new OfficialRepository(this);
     }
 
     /**
@@ -325,7 +322,7 @@ public class GMOService extends MarketService {
                 Num price = Num.of(values[3]);
                 ZonedDateTime time = LocalDateTime.parse(values[4], timeFormatOnLog).atZone(Chrono.UTC);
 
-                return GMOService.this.convert(side, size, price, time, increment, prev);
+                return GMOService.this.createExecution(side, size, price, time, increment, prev);
             }).skipUntil(e -> e.date.isAfter(date)).takeWhile(e -> e.date.isBefore(following));
         }
 
