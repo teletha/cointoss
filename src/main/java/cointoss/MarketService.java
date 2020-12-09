@@ -329,32 +329,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
 
     /**
-     * Calculate human-readable price for display.
-     * 
-     * @param price A target price.
-     * @return
-     */
-    public String calculateReadablePrice(double price) {
-        return Num.of(price).scale(setting.base.scale).toString();
-    }
-
-    /**
-     * Calculate human-readable data-time for display.
-     * 
-     * @param seconds A target time. (second)
-     * @return
-     */
-    public String calculateReadableTime(double seconds) {
-        ZonedDateTime time = Chrono.systemBySeconds((long) seconds);
-
-        if (time.getMinute() == 0 && time.getHour() % 6 == 0) {
-            return time.format(Chrono.DateTimeWithoutSec);
-        } else {
-            return time.format(Chrono.TimeWithoutSec);
-        }
-    }
-
-    /**
      * Get amount of the base currency.
      */
     public abstract Signal<Num> baseCurrency();
@@ -365,12 +339,12 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     public abstract Signal<Num> targetCurrency();
 
     /**
-     * Get the current time.
+     * Get the external log repository.
      * 
-     * @return The current time.
+     * @return
      */
-    public ZonedDateTime now() {
-        return Chrono.utcNow();
+    public ExecutionLogRepository externalRepository() {
+        return null;
     }
 
     /**
@@ -383,21 +357,21 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Get the current time.
+     * 
+     * @return The current time.
+     */
+    public ZonedDateTime now() {
+        return Chrono.utcNow();
+    }
+
+    /**
      * Get the market scheduler.
      * 
      * @return A scheduler.
      */
     public ScheduledExecutorService scheduler() {
         return scheduler;
-    }
-
-    /**
-     * Get the external log repository.
-     * 
-     * @return
-     */
-    public ExecutionLogRepository externalRepository() {
-        return null;
     }
 
     /**
@@ -436,7 +410,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * {@inheritDoc}
      */
     @Override
-    public int compareTo(MarketService o) {
+    public final int compareTo(MarketService o) {
         return marketIdentity().compareTo(o.marketIdentity());
     }
 
@@ -444,7 +418,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
+    public final String toString() {
         return marketIdentity();
     }
 

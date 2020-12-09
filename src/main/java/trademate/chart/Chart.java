@@ -9,7 +9,9 @@
  */
 package trademate.chart;
 
+import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
+import java.util.function.DoubleFunction;
 
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -20,6 +22,7 @@ import javafx.scene.layout.Region;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
@@ -74,8 +77,19 @@ public class Chart extends Region {
 
         // configure axis label
         chart.market.observe().to(m -> {
-            axisX.tickLabelFormatter.set(m.service::calculateReadableTime);
-            axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
+            DoubleFunction<String> readablePrice = p -> Num.of(p).scale(m.service.setting.base.scale).toString();
+            DoubleFunction<String> readableTime = seconds -> {
+                ZonedDateTime time = Chrono.systemBySeconds((long) seconds);
+
+                if (time.getMinute() == 0 && time.getHour() % 6 == 0) {
+                    return time.format(Chrono.DateTimeWithoutSec);
+                } else {
+                    return time.format(Chrono.TimeWithoutSec);
+                }
+            };
+
+            axisX.tickLabelFormatter.set(readableTime);
+            axisY.tickLabelFormatter.set(readablePrice);
         });
 
         getChildren().addAll(canvas, axisX, axisY);
