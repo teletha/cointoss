@@ -87,8 +87,8 @@ public class BitbankService extends TimestampBasedMarketService {
                         return executionsAt(day);
                     }
                 })
-                .skipWhile(e -> e.mills < startMillis)
-                .take(10000);
+                .skipUntil(e -> startMillis < e.mills)
+                .take(1000);
     }
 
     /**

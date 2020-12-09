@@ -322,7 +322,7 @@ public class ExecutionLog {
                                 .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
                         continue;
                     } else {
-                        log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
+                        log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, retrieved, coefficient);
 
                         for (Execution execution : rests) {
                             if (!buffer.canSwitch(execution)) {
