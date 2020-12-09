@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +29,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -295,7 +296,7 @@ public class ExecutionLog {
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
-            long startId = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
+            long startId = cacheId != 0 ? cacheId : estimateInitialExecutionId();
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
             while (!disposer.isDisposed()) {
@@ -376,6 +377,39 @@ public class ExecutionLog {
             }
             return disposer;
         }).effectOnError(e -> e.printStackTrace()).retryWhen(service.retryPolicy(500, "ExecutionLog"));
+    }
+
+    /**
+     * Estimate the inital execution id of the {@link Market}.
+     * 
+     * @return
+     */
+    private long estimateInitialExecutionId() {
+        long start = 0;
+        long end = service.executionLatest().waitForTerminate().to().exact().id;
+        long middle = (start + end) / 2;
+        long previousEnd = end;
+
+        while (true) {
+            List<Execution> result = service.executionLatestAt(middle).skipError().waitForTerminate().toList();
+            if (result.isEmpty()) {
+                start = middle;
+                middle = (start + end) / 2;
+            } else {
+                long id = result.get(0).id;
+                if (id == previousEnd) {
+                    return id;
+                } else {
+                    previousEnd = id;
+                }
+                end = result.get(0).id + 1;
+                middle = (start + end) / 2;
+            }
+
+            if (end - start <= 10) {
+                return start;
+            }
+        }
     }
 
     /**

@@ -98,14 +98,6 @@ public class ZaifService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public long estimateInitialExecutionId() {
-        return -1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.find("*")));
     }

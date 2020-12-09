@@ -140,14 +140,6 @@ public class FinnhubService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public long estimateInitialExecutionId() {
-        return decodeId(Chrono.utc(2020, 1, 1).minusMinutes(3));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.find("*")));
     }

@@ -179,18 +179,10 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        System.out.println(id);
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long estimateInitialExecutionId() {
+        ZonedDateTime date = stamp.decodeAsDate(id);
         ExecutionLogRepository repo = externalRepository();
 
-        return repo.collect().first().flatMap(repo::convert).first().map(e -> e.id).waitForTerminate().to().exact();
+        return repo.convert(date).takeUntil(e -> id <= e.id).waitForTerminate().effect(e -> System.out.println(e));
     }
 
     /**

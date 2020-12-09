@@ -201,18 +201,6 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public long estimateInitialExecutionId() {
-        return call("GET", "trading-records?symbol=" + marketName + "&from=1&limit=1").flatIterable(e -> e.find("result", "*"))
-                .first()
-                .waitForTerminate()
-                .map(json -> Long.parseLong(json.text("id")))
-                .to().v;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "orderBook/L2?symbol=" + marketName).map(pages -> {
             OrderBookPageChanges change = new OrderBookPageChanges();

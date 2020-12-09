@@ -120,18 +120,6 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public long estimateInitialExecutionId() {
-        return call("GET", "trades/t" + marketName + "/hist?limit=1&sort=1", LimitForTradeHistory)
-                .flatIterable(e -> e.find(Long.class, "0", "1"))
-                .waitForTerminate()
-                .to()
-                .exact() * PaddingForID;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "book/t" + marketName + "/P1?len=100", LimitForBook).map(json -> {
             OrderBookPageChanges change = new OrderBookPageChanges();

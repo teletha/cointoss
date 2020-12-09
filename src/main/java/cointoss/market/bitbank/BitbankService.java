@@ -132,14 +132,6 @@ public class BitbankService extends TimestampBasedMarketService {
         throw new Error("No support.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long estimateInitialExecutionId() {
-        throw new Error("No support.");
-    }
-
     private Signal<Execution> executionsAt(ZonedDateTime date) {
         long[] previous = new long[3];
 

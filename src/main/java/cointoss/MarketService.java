@@ -12,7 +12,6 @@ package cointoss;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -200,32 +199,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
 
     public long estimateAcquirableExecutionIdRange(double factor) {
         return setting.acquirableExecutionSize;
-    }
-
-    /**
-     * Estimate the inital execution id of the {@link Market}.
-     * 
-     * @return
-     */
-    public long estimateInitialExecutionId() {
-        long start = 0;
-        long end = executionLatest().waitForTerminate().to().exact().id;
-        long middle = (start + end) / 2;
-
-        while (true) {
-            List<Execution> result = executionLatestAt(middle).skipError().waitForTerminate().toList();
-            if (result.isEmpty()) {
-                start = middle;
-                middle = (start + end) / 2;
-            } else {
-                end = result.get(0).id + 1;
-                middle = (start + end) / 2;
-            }
-
-            if (end - start <= 10) {
-                return start;
-            }
-        }
     }
 
     /**
