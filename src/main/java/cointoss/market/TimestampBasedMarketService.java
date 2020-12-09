@@ -20,6 +20,7 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.market.ftx.FTX;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.JSON;
@@ -207,5 +208,18 @@ public abstract class TimestampBasedMarketService extends MarketService {
                     .consecutive(Execution.ConsecutivePseudoDifference));
         }
         return list;
+    }
+
+    public static void main(String[] args) {
+        FTX.BTC_PERP.log.at(2020, 12, 1).to(e -> {
+            System.out.println(e);
+
+            Execution changed = Execution.with.direction(e.direction, e.size)
+                    .price(e.price)
+                    .date(e.date)
+                    .consecutive(e.consecutive)
+                    .id(e.id);
+            System.out.println(changed);
+        });
     }
 }
