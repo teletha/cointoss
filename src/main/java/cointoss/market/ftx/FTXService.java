@@ -98,7 +98,7 @@ public class FTXService extends MarketService {
                     break;
                 } else {
                     latestSize = size;
-                    endTime[0] = Numbering.decode(Numbering.encode(parseTime(executions.get(size - 1).text("time"))));
+                    endTime[0] = parseTime(executions.get(size - 1).text("time")).toEpochSecond();
                 }
             }
 

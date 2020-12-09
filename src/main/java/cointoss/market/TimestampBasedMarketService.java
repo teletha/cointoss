@@ -60,6 +60,16 @@ public abstract class TimestampBasedMarketService extends MarketService {
     }
 
     /**
+     * Convert from ID to epoch millis.
+     * 
+     * @param id A target ID.
+     * @return Epoch time.
+     */
+    protected final long computeSecs(long id) {
+        return id / (padding * 1000);
+    }
+
+    /**
      * Convert from id to {@link ZonedDateTime}.
      * 
      * @param id A target ID.
