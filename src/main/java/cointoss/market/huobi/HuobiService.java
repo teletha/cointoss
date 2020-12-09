@@ -250,22 +250,6 @@ public class HuobiService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Num> baseCurrency() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> targetCurrency() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean checkEquality(Execution one, Execution other) {
         return one.buyer.equals(other.buyer);
     }

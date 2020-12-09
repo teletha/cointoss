@@ -304,12 +304,16 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     /**
      * Get amount of the base currency.
      */
-    public abstract Signal<Num> baseCurrency();
+    public Signal<Num> baseCurrency() {
+        return I.signal(Num.ZERO);
+    }
 
     /**
      * Get amount of the target currency.
      */
-    public abstract Signal<Num> targetCurrency();
+    public Signal<Num> targetCurrency() {
+        return I.signal(Num.ZERO);
+    }
 
     /**
      * Get the external log repository.

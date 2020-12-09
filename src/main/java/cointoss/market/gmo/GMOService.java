@@ -229,22 +229,6 @@ public class GMOService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Num> baseCurrency() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> targetCurrency() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ExecutionLogRepository externalRepository() {
         return new OfficialRepository(this);
     }

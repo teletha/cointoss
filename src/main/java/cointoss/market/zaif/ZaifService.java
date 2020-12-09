@@ -26,7 +26,6 @@ import cointoss.util.APILimiter;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
-import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -119,22 +118,6 @@ public class ZaifService extends MarketService {
      * @return
      */
     private OrderBookPageChanges convertOrderBook(List<JSON> pages) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> baseCurrency() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> targetCurrency() {
         return null;
     }
 

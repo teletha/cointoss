@@ -31,7 +31,6 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
-import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -141,22 +140,6 @@ public class BinanceService extends MarketService {
             change.asks.add(new OrderBookPage(price, size));
         }
         return change;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> baseCurrency() {
-        return I.signal(Num.ZERO);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> targetCurrency() {
-        return I.signal(Num.ZERO);
     }
 
     /**

@@ -29,7 +29,6 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
-import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -158,22 +157,6 @@ public class BitfinexService extends MarketService {
             return change;
         });
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> baseCurrency() {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> targetCurrency() {
-        return I.signal();
     }
 
     /**

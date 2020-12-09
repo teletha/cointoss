@@ -196,22 +196,6 @@ public class BitbankService extends TimestampBasedMarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> baseCurrency() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> targetCurrency() {
-        return null;
-    }
-
-    /**
      * Call REST API.
      * 
      * @param method

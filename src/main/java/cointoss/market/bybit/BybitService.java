@@ -246,22 +246,6 @@ public class BybitService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> baseCurrency() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> targetCurrency() {
-        return null;
-    }
-
-    /**
      * Call rest API.
      * 
      * @param method

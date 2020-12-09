@@ -203,22 +203,6 @@ public class FTXService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> baseCurrency() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Num> targetCurrency() {
-        return null;
-    }
-
-    /**
      * Convert to {@link Execution}.
      * 
      * @param json
