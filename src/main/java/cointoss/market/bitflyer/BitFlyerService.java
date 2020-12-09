@@ -294,14 +294,6 @@ public class BitFlyerService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long estimateAcquirableExecutionIdRange(double factor) {
-        return Math.round(setting.acquirableExecutionSize * factor);
-    }
-
-    /**
      * Convert to {@link Execution}.
      * 
      * @param json Message represents executed trade.

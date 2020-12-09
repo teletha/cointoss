@@ -302,7 +302,7 @@ public class ExecutionLog {
             while (!disposer.isDisposed()) {
                 rests.clear();
 
-                long range = service.estimateAcquirableExecutionIdRange(coefficient.doubleValue());
+                long range = Math.round(service.setting.acquirableExecutionSize * coefficient.doubleValue());
                 service.executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
 
                 // Since the synchronous REST API did not return an error, it can be determined that
@@ -325,6 +325,7 @@ public class ExecutionLog {
                         log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
 
                         for (Execution execution : rests) {
+                            System.out.println(execution);
                             if (!buffer.canSwitch(execution)) {
                                 observer.accept(execution);
                             } else {

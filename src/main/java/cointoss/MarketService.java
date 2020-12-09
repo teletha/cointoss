@@ -97,40 +97,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * Returns the identity of market.
-     * 
-     * @return A market identity.
-     */
-    public final String id() {
-        return exchange + " " + marketName;
-    }
-
-    /**
-     * Returns the root directory of this service.
-     * 
-     * @return
-     */
-    public final Directory directory() {
-        return Locator.directory(".log").directory(exchange.name()).directory(marketName.replace(':', '-'));
-    }
-
-    /**
-     * Return the http communicator.
-     * 
-     * @return
-     */
-    protected HttpClient client() {
-        return null;
-    }
-
-    /**
-     * Return the realtime communicator.
-     * 
-     * @return
-     */
-    protected abstract EfficientWebSocket clientRealtimely();
-
-    /**
      * Acquire the execution log between start (exclusive) and end (exclusive) key.
      * 
      * @param key An execution sequencial key (i.e. ID, datetime etc).
@@ -195,10 +161,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public boolean checkEquality(Execution one, Execution other) {
         return one.id == other.id;
-    }
-
-    public long estimateAcquirableExecutionIdRange(double factor) {
-        return setting.acquirableExecutionSize;
     }
 
     /**
@@ -325,12 +287,37 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * Get the current nano-time.
+     * Return the http communicator.
      * 
-     * @return The current time.
+     * @return
      */
-    public long nano() {
-        return System.nanoTime();
+    protected HttpClient client() {
+        return null;
+    }
+
+    /**
+     * Return the realtime communicator.
+     * 
+     * @return
+     */
+    protected abstract EfficientWebSocket clientRealtimely();
+
+    /**
+     * Returns the root directory of this service.
+     * 
+     * @return
+     */
+    public final Directory directory() {
+        return Locator.directory(".log").directory(exchange.name()).directory(marketName.replace(':', '-'));
+    }
+
+    /**
+     * Returns the identity of market.
+     * 
+     * @return A market identity.
+     */
+    public final String id() {
+        return exchange + " " + marketName;
     }
 
     /**

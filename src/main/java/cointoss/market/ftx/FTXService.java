@@ -149,14 +149,6 @@ public class FTXService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public long estimateAcquirableExecutionIdRange(double factor) {
-        return Math.round(factor) * Numbering.padding;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean checkEquality(Execution one, Execution other) {
         return one.buyer.equals(other.buyer);
     }
