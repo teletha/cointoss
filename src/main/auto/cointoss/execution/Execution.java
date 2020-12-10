@@ -136,10 +136,7 @@ public abstract class Execution extends ExecutionModel {
     private static final MethodHandle delayUpdater = updater("delay");
 
     /** The final property updater. */
-    private static final MethodHandle buyerUpdater = updater("buyer");
-
-    /** The final property updater. */
-    private static final MethodHandle sellerUpdater = updater("seller");
+    private static final MethodHandle infoUpdater = updater("info");
 
     /** The exposed property. */
     public final Direction direction;
@@ -169,10 +166,7 @@ public abstract class Execution extends ExecutionModel {
     public final int delay;
 
     /** The exposed property. */
-    public final String buyer;
-
-    /** The exposed property. */
-    public final String seller;
+    public final String info;
 
     /**
      * HIDE CONSTRUCTOR
@@ -187,8 +181,7 @@ public abstract class Execution extends ExecutionModel {
         this.mills = super.mills();
         this.consecutive = super.consecutive();
         this.delay = super.delay();
-        this.buyer = super.buyer();
-        this.seller = super.seller();
+        this.info = super.info();
     }
 
     /**
@@ -554,73 +547,36 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #buyer}.
+     * Accessor for {@link Execution} related info.
      *  
      *  @return
      */
     @Override
-    public final String buyer() {
-        return this.buyer;
+    public final String info() {
+        return this.info;
     }
 
     /**
      * Provide classic getter API.
      *
-     * @return A value of buyer property.
+     * @return A value of info property.
      */
     @SuppressWarnings("unused")
-    private final String getBuyer() {
-        return this.buyer;
+    private final String getInfo() {
+        return this.info;
     }
 
     /**
      * Provide classic setter API.
      *
-     * @paran value A new value of buyer property to assign.
+     * @paran value A new value of info property to assign.
      */
-    private final void setBuyer(String value) {
+    private final void setInfo(String value) {
         if (value == null) {
-            value = super.buyer();
+            value = super.info();
         }
         try {
-            buyerUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
-     * Accessor for {@link #seller}.
-     *  
-     *  @return
-     */
-    @Override
-    public final String seller() {
-        return this.seller;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of seller property.
-     */
-    @SuppressWarnings("unused")
-    private final String getSeller() {
-        return this.seller;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of seller property to assign.
-     */
-    private final void setSeller(String value) {
-        if (value == null) {
-            value = super.seller();
-        }
-        try {
-            sellerUpdater.invoke(this, value);
+            infoUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -634,7 +590,7 @@ public abstract class Execution extends ExecutionModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(direction, size, id, price, accumulative, date, mills, consecutive, delay, buyer, seller);
+        return Objects.hash(direction, size, id, price, accumulative, date, mills, consecutive, delay, info);
     }
 
     /**
@@ -658,8 +614,7 @@ public abstract class Execution extends ExecutionModel {
         if (mills != other.mills) return false;
         if (consecutive != other.consecutive) return false;
         if (delay != other.delay) return false;
-        if (!Objects.equals(buyer, other.buyer)) return false;
-        if (!Objects.equals(seller, other.seller)) return false;
+        if (!Objects.equals(info, other.info)) return false;
         return true;
     }
 
@@ -1192,24 +1147,13 @@ public abstract class Execution extends ExecutionModel {
         }
 
         /**
-         * Assign buyer property.
+         * Assign info property.
          * 
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next buyer(String value) {
-            ((Execution) this).setBuyer(value);
-            return (Next) this;
-        }
-
-        /**
-         * Assign seller property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next seller(String value) {
-            ((Execution) this).setSeller(value);
+        default Next info(String value) {
+            ((Execution) this).setInfo(value);
             return (Next) this;
         }
     }
@@ -1239,7 +1183,6 @@ public abstract class Execution extends ExecutionModel {
         static final String Mills = "mills";
         static final String Consecutive = "consecutive";
         static final String Delay = "delay";
-        static final String Buyer = "buyer";
-        static final String Seller = "seller";
+        static final String Info = "info";
     }
 }

@@ -79,7 +79,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert e.price.is(9540.5);
         assert e.size.is(0.0004);
         assert e.date.isEqual(Chrono.utc(2020, 7, 23, 0, 46, 1, 638, 901));
-        assert e.buyer.equals("67425812");
+        assert e.info.equals("67425812");
         assert e.delay == Execution.DelayInestimable;
         assert e.consecutive == Execution.ConsecutiveDifference;
 
@@ -88,7 +88,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert e.price.is(9540);
         assert e.size.is(0.001);
         assert e.date.isEqual(Chrono.utc(2020, 7, 23, 0, 46, 17, 838, 284));
-        assert e.buyer.equals("67425873");
+        assert e.info.equals("67425873");
         assert e.delay == Execution.DelayInestimable;
         assert e.consecutive == Execution.ConsecutiveDifference;
     }
@@ -121,7 +121,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert e.price.is(11910);
         assert e.size.is(0.0004);
         assert e.date.isEqual(Chrono.utc(2020, 8, 15, 7, 48, 11, 91, 799));
-        assert e.buyer.equals("85015816");
+        assert e.info.equals("85015816");
         assert e.delay == Execution.DelayInestimable;
         assert e.consecutive == Execution.ConsecutiveDifference;
     }
@@ -149,7 +149,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.0062);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 7, 51, 16, 518, 762));
         assert exe.consecutive == Execution.ConsecutiveDifference;
-        assert exe.buyer.equals("85016992");
+        assert exe.info.equals("85016992");
 
         exe = list.get(7);
         assert exe.id == 1597477880000L;
@@ -158,7 +158,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.004);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 7, 51, 20, 147, 541));
         assert exe.consecutive == Execution.ConsecutiveDifference;
-        assert exe.buyer.equals("85017029");
+        assert exe.info.equals("85017029");
     }
 
     /**
@@ -183,7 +183,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.2);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 8, 2, 27, 515, 786));
         assert exe.consecutive == Execution.ConsecutiveDifference;
-        assert exe.buyer.equals("85022383");
+        assert exe.info.equals("85022383");
 
         exe = list.get(1);
         assert exe.id == 1597478547001L;
@@ -192,7 +192,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.0028);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 8, 2, 27, 515, 786));
         assert exe.consecutive == Execution.ConsecutiveSameBuyer;
-        assert exe.buyer.equals("85022384");
+        assert exe.info.equals("85022384");
 
         exe = list.get(2);
         assert exe.id == 1597478547002L;
@@ -201,7 +201,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.0019);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 8, 2, 27, 515, 786));
         assert exe.consecutive == Execution.ConsecutiveSameBuyer;
-        assert exe.buyer.equals("85022385");
+        assert exe.info.equals("85022385");
     }
 
     /**
@@ -226,7 +226,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.0062);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 7, 51, 16, 518, 762));
         assert exe.consecutive == Execution.ConsecutiveDifference;
-        assert exe.buyer.equals("85016992");
+        assert exe.info.equals("85016992");
 
         exe = list.get(1);
         assert exe.id == 1597477876001L;
@@ -235,7 +235,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.0022);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 7, 51, 16, 518, 762));
         assert exe.consecutive == Execution.ConsecutiveSameSeller;
-        assert exe.buyer.equals("85016993");
+        assert exe.info.equals("85016993");
 
         exe = list.get(2);
         assert exe.id == 1597477876002L;
@@ -244,7 +244,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.001);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 7, 51, 16, 518, 762));
         assert exe.consecutive == Execution.ConsecutiveSameSeller;
-        assert exe.buyer.equals("85016994");
+        assert exe.info.equals("85016994");
     }
 
     /**
@@ -270,7 +270,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.0062);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 7, 51, 16, 518, 762));
         assert exe.consecutive == Execution.ConsecutiveDifference;
-        assert exe.buyer.equals("85016992");
+        assert exe.info.equals("85016992");
 
         exe = list.get(5);
         assert exe.id == 1597477880000L;
@@ -279,6 +279,6 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
         assert exe.size.is(0.004);
         assert exe.date.isEqual(Chrono.utc(2020, 8, 15, 7, 51, 20, 147, 541));
         assert exe.consecutive == Execution.ConsecutiveDifference;
-        assert exe.buyer.equals("85017029");
+        assert exe.info.equals("85017029");
     }
 }

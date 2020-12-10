@@ -39,7 +39,7 @@ import kiss.Signal;
 
 public class FTXService extends MarketService {
 
-    static final TimestampBasedMarketServiceSupporter support = new TimestampBasedMarketServiceSupporter(1000, false);
+    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter(1000, false);
 
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
@@ -78,8 +78,8 @@ public class FTXService extends MarketService {
         AtomicLong increment = new AtomicLong();
         long[] previous = new long[3];
 
-        long startTime = support.computeEpochTime(startId) + 1;
-        long[] endTime = {support.computeEpochTime(endId)};
+        long startTime = Support.computeEpochTime(startId) + 1;
+        long[] endTime = {Support.computeEpochTime(endId)};
 
         return new Signal<JSON>((observer, disposer) -> {
             int latestSize = 0;
@@ -109,7 +109,7 @@ public class FTXService extends MarketService {
             observer.complete();
 
             return disposer;
-        }).map(json -> convert(json, increment, previous));
+        }).map(json -> createExecution(json, increment, previous));
     }
 
     /**
@@ -122,7 +122,7 @@ public class FTXService extends MarketService {
 
         return clientRealtimely().subscribe(new Topic("trades", marketName))
                 .flatIterable(json -> json.find("data", "*"))
-                .map(json -> convert(json, increment, previous));
+                .map(json -> createExecution(json, increment, previous));
     }
 
     /**
@@ -131,7 +131,7 @@ public class FTXService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "markets/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("result", "*"))
-                .map(json -> convert(json, new AtomicLong(), new long[3]));
+                .map(json -> createExecution(json, new AtomicLong(), new long[3]));
     }
 
     /**
@@ -139,9 +139,9 @@ public class FTXService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "markets/" + marketName + "/trades?limit=1&end_time=" + support.computeEpochTime(id))
+        return call("GET", "markets/" + marketName + "/trades?limit=1&end_time=" + Support.computeEpochTime(id))
                 .flatIterable(e -> e.find("result", "*"))
-                .map(json -> convert(json, new AtomicLong(), new long[3]));
+                .map(json -> createExecution(json, new AtomicLong(), new long[3]));
     }
 
     /**
@@ -149,48 +149,7 @@ public class FTXService extends MarketService {
      */
     @Override
     public boolean checkEquality(Execution one, Execution other) {
-        return one.buyer.equals(other.buyer);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "markets/" + marketName + "/orderbook?depth=100").map(json -> json.get("result")).map(this::convertOrderBook);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderbook", marketName)).map(json -> convertOrderBook(json.get("data")));
-    }
-
-    /**
-     * Convert JSON to {@link OrderBookPageChanges}.
-     * 
-     * @param array
-     * @return
-     */
-    private OrderBookPageChanges convertOrderBook(JSON pages) {
-        OrderBookPageChanges change = new OrderBookPageChanges();
-
-        for (JSON bid : pages.find("bids", "*")) {
-            Num price = bid.get(Num.class, "0");
-            double size = Double.parseDouble(bid.text("1"));
-
-            change.bids.add(new OrderBookPage(price, size));
-        }
-
-        for (JSON ask : pages.find("asks", "*")) {
-            Num price = ask.get(Num.class, "0");
-            double size = Double.parseDouble(ask.text("1"));
-
-            change.asks.add(new OrderBookPage(price, size));
-        }
-        return change;
+        return one.info.equals(other.info);
     }
 
     /**
@@ -200,13 +159,13 @@ public class FTXService extends MarketService {
      * @param context
      * @return
      */
-    private Execution convert(JSON e, AtomicLong increment, long[] context) {
+    private Execution createExecution(JSON e, AtomicLong increment, long[] context) {
         Direction side = e.get(Direction.class, "side");
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = parseTime(e.text("time"));
         int delay = e.get(Boolean.class, "liquidation") ? Execution.DelayHuge : Execution.DelayInestimable;
-        long[] result = support.computeIDAndConsecutive(side, date, context);
+        long[] result = Support.computeIDAndConsecutive(side, date, context);
 
         return Execution.with.direction(side, size)
                 .price(price)
@@ -214,7 +173,7 @@ public class FTXService extends MarketService {
                 .id(result[0])
                 .consecutive((int) result[1])
                 .delay(delay)
-                .buyer(e.text("id"));
+                .info(e.text("id"));
     }
 
     /**
@@ -237,6 +196,47 @@ public class FTXService extends MarketService {
             throw new IllegalArgumentException("Unexpected value: " + time);
         }
         return LocalDateTime.parse(time, TimeFormat).atZone(Chrono.UTC);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<OrderBookPageChanges> orderBook() {
+        return call("GET", "markets/" + marketName + "/orderbook?depth=100").map(json -> json.get("result")).map(this::createOrderBook);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+        return clientRealtimely().subscribe(new Topic("orderbook", marketName)).map(json -> createOrderBook(json.get("data")));
+    }
+
+    /**
+     * Convert JSON to {@link OrderBookPageChanges}.
+     * 
+     * @param array
+     * @return
+     */
+    private OrderBookPageChanges createOrderBook(JSON pages) {
+        OrderBookPageChanges change = new OrderBookPageChanges();
+
+        for (JSON bid : pages.find("bids", "*")) {
+            Num price = bid.get(Num.class, "0");
+            double size = Double.parseDouble(bid.text("1"));
+
+            change.bids.add(new OrderBookPage(price, size));
+        }
+
+        for (JSON ask : pages.find("asks", "*")) {
+            Num price = ask.get(Num.class, "0");
+            double size = Double.parseDouble(ask.text("1"));
+
+            change.asks.add(new OrderBookPage(price, size));
+        }
+        return change;
     }
 
     /**

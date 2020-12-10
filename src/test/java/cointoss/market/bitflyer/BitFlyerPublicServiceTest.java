@@ -65,8 +65,6 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         assert e.price.is(999224);
         assert e.size.is(0.1);
         assert e.date.isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
-        assert e.buyer.equals("JRF20200713-074142-266150");
-        assert e.seller.equals("JRF20200713-074142-809298");
         assert e.consecutive == Execution.ConsecutiveDifference;
 
         e = list.get(1);
@@ -75,9 +73,6 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         assert e.price.is(999231);
         assert e.size.is(0.01);
         assert e.date.isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
-        assert e.buyer.equals("JRF20200713-074142-266150");
-        assert e.seller.equals("JRF20200713-074142-697549");
-        assert e.consecutive == Execution.ConsecutiveSameBuyer;
     }
 
     /**
@@ -106,8 +101,6 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         assert e.price.is(999262);
         assert e.size.is(0.03954578);
         assert e.date.isEqual(Chrono.utc(2020, 7, 13, 6, 24, 54, 157));
-        assert e.buyer.equals("JRF20200713-062454-244956");
-        assert e.seller.equals("JRF20200713-062452-031817");
         assert e.consecutive == Execution.ConsecutiveDifference;
     }
 
@@ -134,8 +127,6 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         assert exe.size.is(0.01);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 307));
         assert exe.consecutive == Execution.ConsecutiveDifference;
-        assert exe.buyer.equals("JRF20200712-061604-686433");
-        assert exe.seller.equals("JRF20200712-061604-026331");
 
         exe = list.get(1);
         assert exe.id == 1826991348L;
@@ -144,8 +135,6 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         assert exe.size.is(0.1);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 324));
         assert exe.consecutive == Execution.ConsecutiveDifference;
-        assert exe.buyer.equals("JRF20200712-061603-372561");
-        assert exe.seller.equals("JRF20200712-061604-575165");
     }
 
     /**

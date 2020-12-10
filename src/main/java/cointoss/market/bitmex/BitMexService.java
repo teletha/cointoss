@@ -172,7 +172,7 @@ public class BitMexService extends TimestampBasedMarketService {
      */
     @Override
     public boolean checkEquality(Execution one, Execution other) {
-        return one.buyer.equals(other.buyer);
+        return one.info.equals(other.info);
     }
 
     /**
@@ -210,7 +210,7 @@ public class BitMexService extends TimestampBasedMarketService {
         previous[0] = direction;
         previous[1] = date;
 
-        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive).buyer(tradeId);
+        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive).info(tradeId);
     }
 
     /**

@@ -212,14 +212,6 @@ public class HuobiService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean checkEquality(Execution one, Execution other) {
-        return one.buyer.equals(other.buyer);
-    }
-
-    /**
      * Call rest API.
      * 
      * @param method

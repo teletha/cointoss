@@ -320,14 +320,7 @@ public class BitFlyerService extends MarketService {
         previous[0] = buyer;
         previous[1] = seller;
 
-        return Execution.with.direction(direction, size)
-                .id(id)
-                .price(price)
-                .date(date)
-                .consecutive(consecutiveType)
-                .delay(delay)
-                .buyer(buyer)
-                .seller(seller);
+        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutiveType).delay(delay);
     }
 
     /**
