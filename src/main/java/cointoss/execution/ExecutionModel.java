@@ -126,7 +126,7 @@ abstract class ExecutionModel implements Directional {
      * 
      * @return
      */
-    @Icy.Property(mutable = true)
+    @Icy.Property
     public long id() {
         return counter.getAndIncrement();
     }
@@ -253,7 +253,7 @@ abstract class ExecutionModel implements Directional {
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(mutable = true)
     public int delay() {
         return DelayInestimable;
     }
@@ -263,7 +263,7 @@ abstract class ExecutionModel implements Directional {
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(mutable = true)
     public String info() {
         return null;
     }

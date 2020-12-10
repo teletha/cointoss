@@ -17,8 +17,9 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.IntUnaryOperator;
 import java.util.function.LongConsumer;
-import java.util.function.LongUnaryOperator;
+import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
 
 /**
@@ -269,28 +270,6 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
-     * Assign the new value of id property.
-     *
-     * @paran value The new id property value to assign.
-     * @return Chainable API.
-     */
-    public final Execution assignId(long value) {
-        setId(value);
-        return this;
-    }
-
-    /**
-     * Assign the new value of id property.
-     *
-     * @paran value The id property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final Execution assignId(LongUnaryOperator value) {
-        setId(value.applyAsLong(this.id));
-        return this;
-    }
-
-    /**
      * Provide classic getter API.
      *
      * @return A value of id property.
@@ -523,6 +502,28 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
+     * Assign the new value of delay property.
+     *
+     * @paran value The new delay property value to assign.
+     * @return Chainable API.
+     */
+    public final Execution assignDelay(int value) {
+        setDelay(value);
+        return this;
+    }
+
+    /**
+     * Assign the new value of delay property.
+     *
+     * @paran value The delay property assigner which accepts the current value and returns new value.
+     * @return Chainable API.
+     */
+    public final Execution assignDelay(IntUnaryOperator value) {
+        setDelay(value.applyAsInt(this.delay));
+        return this;
+    }
+
+    /**
      * Provide classic getter API.
      *
      * @return A value of delay property.
@@ -554,6 +555,28 @@ public abstract class Execution extends ExecutionModel {
     @Override
     public final String info() {
         return this.info;
+    }
+
+    /**
+     * Assign the new value of info property.
+     *
+     * @paran value The new info property value to assign.
+     * @return Chainable API.
+     */
+    public final Execution assignInfo(String value) {
+        setInfo(value);
+        return this;
+    }
+
+    /**
+     * Assign the new value of info property.
+     *
+     * @paran value The info property assigner which accepts the current value and returns new value.
+     * @return Chainable API.
+     */
+    public final Execution assignInfo(UnaryOperator<String> value) {
+        setInfo(value.apply(this.info));
+        return this;
     }
 
     /**

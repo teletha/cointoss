@@ -160,60 +160,46 @@ public class TimestampBasedMarketServiceSupporter {
      * @param side A side of execution.
      * @param size A size of execution.
      * @param price A price of execution.
+     * @param date A time of execution.
+     * @param threeLength The context data which must be 3 length long array.
+     * @return
+     */
+    public final Execution createExecution(Direction side, Num size, Num price, ZonedDateTime date, long[] threeLength) {
+        return createExecution(side, size, price, date.toInstant().toEpochMilli(), threeLength);
+    }
+
+    /**
+     * Create {@link Execution} with context.
+     * 
+     * @param side A side of execution.
+     * @param size A size of execution.
+     * @param price A price of execution.
      * @param epochMillis A time of execution.
      * @param threeLength The context data which must be 3 length long array.
      * @return
      */
     public final Execution createExecution(Direction side, Num size, Num price, long epochMillis, long[] threeLength) {
-        long[] result = computeIDAndConsecutive(side, epochMillis, threeLength);
-
-        return Execution.with.direction(side, size)
-                .id(result[0])
-                .price(price)
-                .date(Chrono.utcByMills(epochMillis))
-                .consecutive((int) result[1]);
-    }
-
-    /**
-     * Create {@link Execution} with context.
-     * 
-     * @param side A side of execution.
-     * @param date A time of execution.
-     * @param threeLength The context data which must be 3 length long array.
-     * @return
-     */
-    public final long[] computeIDAndConsecutive(Direction side, ZonedDateTime date, long[] threeLength) {
-        return computeIDAndConsecutive(side, date.toInstant().toEpochMilli(), threeLength);
-    }
-
-    /**
-     * Create {@link Execution} with context.
-     * 
-     * @param side A side of execution.
-     * @param epochMillis A time of execution.
-     * @param threeLength The context data which must be 3 length long array.
-     * @return
-     */
-    public final long[] computeIDAndConsecutive(Direction side, long epochMillis, long[] threeLength) {
         long sideType = side.ordinal();
-        long[] result = new long[2];
+        long id;
+        int consecutive;
 
         if (epochMillis != threeLength[0]) {
-            result[0] = computeID(epochMillis);
-            result[1] = Execution.ConsecutiveDifference;
+            id = computeID(epochMillis);
+            consecutive = Execution.ConsecutiveDifference;
 
             threeLength[0] = epochMillis;
             threeLength[1] = sideType;
             threeLength[2] = 0;
         } else {
-            result[0] = computeID(epochMillis) + ++threeLength[2];
-            result[1] = sideType != threeLength[1] ? Execution.ConsecutiveDifference
+            id = computeID(epochMillis) + ++threeLength[2];
+            consecutive = sideType != threeLength[1] ? Execution.ConsecutiveDifference
                     : side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
 
             threeLength[0] = epochMillis;
             threeLength[1] = sideType;
         }
-        return result;
+
+        return Execution.with.direction(side, size).id(id).price(price).date(Chrono.utcByMills(epochMillis)).consecutive(consecutive);
     }
 
     /**

@@ -164,16 +164,10 @@ public class FTXService extends MarketService {
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = parseTime(e.text("time"));
-        int delay = e.get(Boolean.class, "liquidation") ? Execution.DelayHuge : Execution.DelayInestimable;
-        long[] result = Support.computeIDAndConsecutive(side, date, context);
 
-        return Execution.with.direction(side, size)
-                .price(price)
-                .date(date)
-                .id(result[0])
-                .consecutive((int) result[1])
-                .delay(delay)
-                .info(e.text("id"));
+        return Support.createExecution(side, size, price, date, context)
+                .assignDelay(e.get(Boolean.class, "liquidation") ? Execution.DelayHuge : Execution.DelayInestimable)
+                .assignInfo(e.text("id"));
     }
 
     /**
