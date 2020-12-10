@@ -25,7 +25,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.market.TimestampID;
+import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -39,8 +39,7 @@ import kiss.Signal;
 
 public class FTXService extends MarketService {
 
-    /** The idetifier management. */
-    static final TimestampID Numbering = new TimestampID(false, 1000);
+    static final TimestampBasedMarketServiceSupporter support = new TimestampBasedMarketServiceSupporter(false, 1000);
 
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
@@ -79,8 +78,8 @@ public class FTXService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        long startTime = Numbering.decode(startId) + 1;
-        long[] endTime = {Numbering.decode(endId)};
+        long startTime = support.computeEpochTime(startId) + 1;
+        long[] endTime = {support.computeEpochTime(endId)};
 
         return new Signal<JSON>((observer, disposer) -> {
             int latestSize = 0;
@@ -140,7 +139,7 @@ public class FTXService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "markets/" + marketName + "/trades?limit=1&end_time=" + Numbering.decode(id))
+        return call("GET", "markets/" + marketName + "/trades?limit=1&end_time=" + support.computeEpochTime(id))
                 .flatIterable(e -> e.find("result", "*"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
@@ -206,12 +205,15 @@ public class FTXService extends MarketService {
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = parseTime(e.text("time"));
+
+        support.createExecution(side, size, price, date.toEpochSecond());
+
         boolean liquidation = e.get(Boolean.class, "liquidation");
         long id;
         int consecutive;
 
         if (date.equals(previous[1])) {
-            id = Numbering.encode(date) + increment.incrementAndGet();
+            id = support.computeID(date) + increment.incrementAndGet();
 
             if (side != previous[0]) {
                 consecutive = Execution.ConsecutiveDifference;
@@ -221,7 +223,7 @@ public class FTXService extends MarketService {
                 consecutive = Execution.ConsecutiveSameSeller;
             }
         } else {
-            id = Numbering.encode(date);
+            id = support.computeID(date);
             increment.set(0);
             consecutive = Execution.ConsecutiveDifference;
         }
