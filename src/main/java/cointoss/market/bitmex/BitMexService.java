@@ -17,13 +17,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
+import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.market.TimestampBasedMarketService;
+import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -35,7 +35,9 @@ import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 import kiss.Signal;
 
-public class BitMexService extends TimestampBasedMarketService {
+public class BitMexService extends MarketService {
+
+    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter(100000);
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -59,7 +61,7 @@ public class BitMexService extends TimestampBasedMarketService {
      * @param setting
      */
     protected BitMexService(int id, String marketName, MarketSetting setting) {
-        super(Exchange.BitMEX, marketName, setting, 100000);
+        super(Exchange.BitMEX, marketName, setting);
 
         this.marketId = id;
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.base.minimumSize;
@@ -79,19 +81,14 @@ public class BitMexService extends TimestampBasedMarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         startId++;
-        long startingPoint = startId % padding;
-        AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, computeDateTime(startId)};
+        long startingPoint = startId % Support.padding;
+        long[] previous = new long[] {0, 0, startingPoint - 1};
 
         return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(startId) + "&start=" + startingPoint)
                 .flatIterable(e -> e.find("*"))
                 .map(json -> {
-                    return convert(json, increment, previous);
+                    return convert(json, previous);
                 });
-    }
-
-    private String formatEncodedId(long id) {
-        return RealTimeFormat.format(computeDateTime(id));
     }
 
     /**
@@ -99,12 +96,11 @@ public class BitMexService extends TimestampBasedMarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        AtomicLong increment = new AtomicLong();
-        Object[] previous = new Object[2];
+        long[] previous = new long[3];
 
         return clientRealtimely().subscribe(new Topic("trade", marketName))
                 .flatIterable(json -> json.find("data", "*"))
-                .map(json -> convert(json, increment, previous));
+                .map(json -> convert(json, previous));
     }
 
     /**
@@ -113,7 +109,7 @@ public class BitMexService extends TimestampBasedMarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true").flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+                .map(json -> convert(json, new long[3]));
     }
 
     /**
@@ -123,7 +119,36 @@ public class BitMexService extends TimestampBasedMarketService {
     public Signal<Execution> executionLatestAt(long id) {
         return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true&endTime=" + formatEncodedId(id))
                 .flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+                .map(json -> convert(json, new long[3]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean checkEquality(Execution one, Execution other) {
+        return one.info.equals(other.info);
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution convert(JSON e, long[] previous) {
+        Direction direction = Direction.parse(e.get(String.class, "side"));
+        Num size = Num.of(e.get(String.class, "homeNotional"));
+        Num price = Num.of(e.get(String.class, "price"));
+        ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
+        String internalId = e.get(String.class, "trdMatchID");
+
+        return Support.createExecution(direction, size, price, date, previous).assignInfo(internalId);
+    }
+
+    private String formatEncodedId(long id) {
+        return RealTimeFormat.format(Support.computeDateTime(id));
     }
 
     /**
@@ -165,52 +190,6 @@ public class BitMexService extends TimestampBasedMarketService {
             }
         }
         return change;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean checkEquality(Execution one, Execution other) {
-        return one.info.equals(other.info);
-    }
-
-    /**
-     * Convert to {@link Execution}.
-     * 
-     * @param json
-     * @param previous
-     * @return
-     */
-    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
-        Direction direction = Direction.parse(e.get(String.class, "side"));
-        Num size = Num.of(e.get(String.class, "homeNotional"));
-        Num price = Num.of(e.get(String.class, "price"));
-        ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
-        String tradeId = e.get(String.class, "trdMatchID");
-        long id;
-        int consecutive;
-
-        if (date.equals(previous[1])) {
-            id = computeID(date) + increment.incrementAndGet();
-
-            if (direction != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (direction == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            id = computeID(date);
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = direction;
-        previous[1] = date;
-
-        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive).info(tradeId);
     }
 
     /**
