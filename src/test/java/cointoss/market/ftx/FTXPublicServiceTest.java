@@ -116,6 +116,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
                 """);
 
         Execution e = service.executionLatest().to().exact();
+        assert e.id == 1597477691000L;
         assert e.direction == Direction.SELL;
         assert e.price.is(11910);
         assert e.size.is(0.0004);

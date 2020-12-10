@@ -39,7 +39,7 @@ import kiss.Signal;
 
 public class FTXService extends MarketService {
 
-    static final TimestampBasedMarketServiceSupporter support = new TimestampBasedMarketServiceSupporter(false, 1000);
+    static final TimestampBasedMarketServiceSupporter support = new TimestampBasedMarketServiceSupporter(1000, false);
 
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
@@ -76,7 +76,7 @@ public class FTXService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         AtomicLong increment = new AtomicLong();
-        Object[] previous = new Object[2];
+        long[] previous = new long[3];
 
         long startTime = support.computeEpochTime(startId) + 1;
         long[] endTime = {support.computeEpochTime(endId)};
@@ -118,7 +118,7 @@ public class FTXService extends MarketService {
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
         AtomicLong increment = new AtomicLong();
-        Object[] previous = new Object[2];
+        long[] previous = new long[3];
 
         return clientRealtimely().subscribe(new Topic("trades", marketName))
                 .flatIterable(json -> json.find("data", "*"))
@@ -131,7 +131,7 @@ public class FTXService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "markets/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("result", "*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+                .map(json -> convert(json, new AtomicLong(), new long[3]));
     }
 
     /**
@@ -141,7 +141,7 @@ public class FTXService extends MarketService {
     public Signal<Execution> executionLatestAt(long id) {
         return call("GET", "markets/" + marketName + "/trades?limit=1&end_time=" + support.computeEpochTime(id))
                 .flatIterable(e -> e.find("result", "*"))
-                .map(json -> convert(json, new AtomicLong(), new Object[2]));
+                .map(json -> convert(json, new AtomicLong(), new long[3]));
     }
 
     /**
@@ -197,46 +197,23 @@ public class FTXService extends MarketService {
      * Convert to {@link Execution}.
      * 
      * @param json
-     * @param previous
+     * @param context
      * @return
      */
-    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
+    private Execution convert(JSON e, AtomicLong increment, long[] context) {
         Direction side = e.get(Direction.class, "side");
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = parseTime(e.text("time"));
-
-        support.createExecution(side, size, price, date.toEpochSecond());
-
-        boolean liquidation = e.get(Boolean.class, "liquidation");
-        long id;
-        int consecutive;
-
-        if (date.equals(previous[1])) {
-            id = support.computeID(date) + increment.incrementAndGet();
-
-            if (side != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (side == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            id = support.computeID(date);
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = side;
-        previous[1] = date;
+        int delay = e.get(Boolean.class, "liquidation") ? Execution.DelayHuge : Execution.DelayInestimable;
+        long[] result = support.computeIDAndConsecutive(side, date, context);
 
         return Execution.with.direction(side, size)
-                .id(id)
                 .price(price)
                 .date(date)
-                .consecutive(consecutive)
-                .delay(liquidation ? Execution.DelayHuge : Execution.DelayInestimable)
+                .id(result[0])
+                .consecutive((int) result[1])
+                .delay(delay)
                 .buyer(e.text("id"));
     }
 

@@ -163,7 +163,7 @@ public abstract class TimestampBasedMarketService extends MarketService {
             threeLength[1] = sideType;
             threeLength[2] = 0;
         } else {
-            id = computeID(epochMillis) + threeLength[2]++;
+            id = computeID(epochMillis) + ++threeLength[2];
             consecutive = sideType != threeLength[1] ? Execution.ConsecutiveDifference
                     : side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
 

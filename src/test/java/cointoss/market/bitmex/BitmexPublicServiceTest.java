@@ -170,8 +170,22 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
 
         List<Execution> list = service.executionsRealtimely().toList();
         assert list.size() == 2;
-        assert list.get(0).consecutive == Execution.ConsecutiveDifference;
-        assert list.get(1).consecutive == Execution.ConsecutiveSameBuyer;
+
+        Execution exe = list.get(0);
+        assert exe.id == 159543580344000000L;
+        assert exe.direction == Direction.BUY;
+        assert exe.price.is(9344.5);
+        assert exe.size.is(0.01091502);
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
+        assert exe.consecutive == Execution.ConsecutiveDifference;
+
+        exe = list.get(1);
+        assert exe.id == 159543580344000001L;
+        assert exe.direction == Direction.BUY;
+        assert exe.price.is(9344.5);
+        assert exe.size.is(0.53505);
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
+        assert exe.consecutive == Execution.ConsecutiveSameBuyer;
     }
 
     /**
@@ -189,8 +203,22 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
 
         List<Execution> list = service.executionsRealtimely().toList();
         assert list.size() == 2;
-        assert list.get(0).consecutive == Execution.ConsecutiveDifference;
-        assert list.get(1).consecutive == Execution.ConsecutiveSameSeller;
+
+        Execution exe = list.get(0);
+        assert exe.id == 159543580344000000L;
+        assert exe.direction == Direction.SELL;
+        assert exe.price.is(9344.5);
+        assert exe.size.is(0.01091502);
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
+        assert exe.consecutive == Execution.ConsecutiveDifference;
+
+        exe = list.get(1);
+        assert exe.id == 159543580344000001L;
+        assert exe.direction == Direction.SELL;
+        assert exe.price.is(9344.5);
+        assert exe.size.is(0.53505);
+        assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
+        assert exe.consecutive == Execution.ConsecutiveSameSeller;
     }
 
     /**

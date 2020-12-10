@@ -39,9 +39,32 @@ public class TimestampBasedMarketServiceSupporter {
     private final boolean milliBase;
 
     /**
-     * @param padding
+     * Construct with millisecond based padding (10000).
      */
-    public TimestampBasedMarketServiceSupporter(boolean milliBase, long padding) {
+    public TimestampBasedMarketServiceSupporter() {
+        this(10000);
+    }
+
+    /**
+     * Construct with millisecond based padding.
+     * 
+     * @param padding A padding size.
+     */
+    public TimestampBasedMarketServiceSupporter(long padding) {
+        this(padding, true);
+    }
+
+    /**
+     * Construct with your padding.
+     * 
+     * @param padding A padding size.
+     * @param milliBase A timestamp base.
+     */
+    public TimestampBasedMarketServiceSupporter(long padding, boolean milliBase) {
+        if (padding <= 0) {
+            throw new IllegalArgumentException("Padding size must be positive.");
+        }
+
         this.padding = padding;
         this.milliBase = milliBase;
     }
@@ -80,11 +103,15 @@ public class TimestampBasedMarketServiceSupporter {
     /**
      * Convert from epoch time to id.
      * 
-     * @param date A target date-time.
+     * @param epochMilli A target date-time.
      * @return The computed ID.
      */
-    public final long computeID(long epoch) {
-        return epoch * padding;
+    public final long computeID(long epochMilli) {
+        if (milliBase) {
+            return epochMilli * padding;
+        } else {
+            return ((long) (epochMilli * 0.001)) * padding;
+        }
     }
 
     /**
@@ -138,27 +165,55 @@ public class TimestampBasedMarketServiceSupporter {
      * @return
      */
     public final Execution createExecution(Direction side, Num size, Num price, long epochMillis, long[] threeLength) {
+        long[] result = computeIDAndConsecutive(side, epochMillis, threeLength);
+
+        return Execution.with.direction(side, size)
+                .id(result[0])
+                .price(price)
+                .date(Chrono.utcByMills(epochMillis))
+                .consecutive((int) result[1]);
+    }
+
+    /**
+     * Create {@link Execution} with context.
+     * 
+     * @param side A side of execution.
+     * @param date A time of execution.
+     * @param threeLength The context data which must be 3 length long array.
+     * @return
+     */
+    public final long[] computeIDAndConsecutive(Direction side, ZonedDateTime date, long[] threeLength) {
+        return computeIDAndConsecutive(side, date.toInstant().toEpochMilli(), threeLength);
+    }
+
+    /**
+     * Create {@link Execution} with context.
+     * 
+     * @param side A side of execution.
+     * @param epochMillis A time of execution.
+     * @param threeLength The context data which must be 3 length long array.
+     * @return
+     */
+    public final long[] computeIDAndConsecutive(Direction side, long epochMillis, long[] threeLength) {
         long sideType = side.ordinal();
-        long id;
-        int consecutive;
+        long[] result = new long[2];
 
         if (epochMillis != threeLength[0]) {
-            id = computeID(epochMillis);
-            consecutive = Execution.ConsecutiveDifference;
+            result[0] = computeID(epochMillis);
+            result[1] = Execution.ConsecutiveDifference;
 
             threeLength[0] = epochMillis;
             threeLength[1] = sideType;
             threeLength[2] = 0;
         } else {
-            id = computeID(epochMillis) + threeLength[2]++;
-            consecutive = sideType != threeLength[1] ? Execution.ConsecutiveDifference
+            result[0] = computeID(epochMillis) + ++threeLength[2];
+            result[1] = sideType != threeLength[1] ? Execution.ConsecutiveDifference
                     : side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
 
             threeLength[0] = epochMillis;
             threeLength[1] = sideType;
         }
-
-        return Execution.with.direction(side, size).id(id).price(price).date(Chrono.utcByMills(epochMillis)).consecutive(consecutive);
+        return result;
     }
 
     /**

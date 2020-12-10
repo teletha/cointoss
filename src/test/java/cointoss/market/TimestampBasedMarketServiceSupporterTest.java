@@ -17,7 +17,7 @@ class TimestampBasedMarketServiceSupporterTest {
 
     @Test
     void computeEpochTime() {
-        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(true, 10);
+        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(10, true);
 
         assert numbering.computeEpochTime(100) == 10;
         assert numbering.computeEpochTime(110) == 11;
@@ -25,7 +25,7 @@ class TimestampBasedMarketServiceSupporterTest {
 
     @Test
     void computeEpochTimeSecondBase() {
-        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(false, 10);
+        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(10, false);
 
         assert numbering.computeEpochTime(100) == 10;
         assert numbering.computeEpochTime(110) == 11;
@@ -33,7 +33,7 @@ class TimestampBasedMarketServiceSupporterTest {
 
     @Test
     void computeDateTime() {
-        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(true, 10);
+        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(10, true);
 
         assert numbering.computeDateTime(100).equals(Chrono.utc(1970, 1, 1, 0, 0, 0, 10));
         assert numbering.computeDateTime(12340).equals(Chrono.utc(1970, 1, 1, 0, 0, 1, 234));
@@ -41,7 +41,7 @@ class TimestampBasedMarketServiceSupporterTest {
 
     @Test
     void computeDateTimeSecondBase() {
-        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(false, 10);
+        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(10, false);
 
         assert numbering.computeDateTime(100).equals(Chrono.utc(1970, 1, 1, 0, 0, 10, 0));
         assert numbering.computeDateTime(12340).equals(Chrono.utc(1970, 1, 1, 0, 20, 34, 0));
@@ -49,7 +49,7 @@ class TimestampBasedMarketServiceSupporterTest {
 
     @Test
     void computeID() {
-        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(true, 10);
+        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(10, true);
 
         assert numbering.computeID(Chrono.utc(1970, 1, 1, 0, 0, 12, 345)) == 123450;
         assert numbering.computeID(Chrono.utc(1970, 1, 1, 0, 1, 23, 456)) == 834560;
@@ -57,7 +57,7 @@ class TimestampBasedMarketServiceSupporterTest {
 
     @Test
     void computeIDSecondBase() {
-        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(false, 10);
+        TimestampBasedMarketServiceSupporter numbering = new TimestampBasedMarketServiceSupporter(10, false);
 
         assert numbering.computeID(Chrono.utc(1970, 1, 1, 0, 0, 12, 345)) == 120;
         assert numbering.computeID(Chrono.utc(1970, 1, 1, 0, 1, 23, 456)) == 830;
