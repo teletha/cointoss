@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
@@ -32,7 +31,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
-import cointoss.market.TimestampBasedMarketService;
+import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -46,7 +45,9 @@ import kiss.JSON;
 import kiss.Signal;
 import kiss.XML;
 
-public class GMOService extends TimestampBasedMarketService {
+public class GMOService extends MarketService {
+
+    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter(1000);
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -68,7 +69,7 @@ public class GMOService extends TimestampBasedMarketService {
      * @param setting
      */
     protected GMOService(String marketName, MarketSetting setting) {
-        super(Exchange.GMO, marketName, setting, 1000);
+        super(Exchange.GMO, marketName, setting);
     }
 
     /**
@@ -84,10 +85,8 @@ public class GMOService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        ZonedDateTime start = computeDateTime(startId);
-
-        AtomicLong increment = new AtomicLong();
-        Object[] prev = new Object[2];
+        ZonedDateTime start = Support.computeDateTime(startId);
+        long[] prev = new long[3];
 
         return I.signal(1)
                 .recurse(i -> i + 1)
@@ -99,7 +98,7 @@ public class GMOService extends TimestampBasedMarketService {
                 .skipAt(index -> index % 2 == 0)
                 .takeWhile(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isAfter(start))
                 .reverse()
-                .map(e -> createExecution(e, increment, prev));
+                .map(e -> createExecution(e, prev));
     }
 
     /**
@@ -107,10 +106,9 @@ public class GMOService extends TimestampBasedMarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        AtomicLong increment = new AtomicLong();
-        Object[] previous = new Object[2];
+        long[] previous = new long[3];
 
-        return clientRealtimely().subscribe(new Topic("trades", marketName)).map(json -> createExecution(json, increment, previous));
+        return clientRealtimely().subscribe(new Topic("trades", marketName)).map(json -> createExecution(json, previous));
     }
 
     /**
@@ -119,7 +117,7 @@ public class GMOService extends TimestampBasedMarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trades?symbol=" + marketName + "&page=1&count=1").flatIterable(e -> e.find("data", "list", "*"))
-                .map(json -> createExecution(json, new AtomicLong(), new Object[2]));
+                .map(json -> createExecution(json, new long[3]));
     }
 
     /**
@@ -127,7 +125,7 @@ public class GMOService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        ZonedDateTime date = computeDateTime(id);
+        ZonedDateTime date = Support.computeDateTime(id);
         ExecutionLogRepository repo = externalRepository();
 
         return repo.convert(date).takeUntil(e -> id <= e.id).waitForTerminate().effect(e -> System.out.println(e));
@@ -140,46 +138,13 @@ public class GMOService extends TimestampBasedMarketService {
      * @param previous
      * @return
      */
-    private Execution createExecution(JSON e, AtomicLong increment, Object[] previous) {
+    private Execution createExecution(JSON e, long[] previous) {
         Direction side = e.get(Direction.class, "side");
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat);
-    
-        return createExecution(side, size, price, date, increment, previous);
-    }
 
-    /**
-     * Convert to {@link Execution}.
-     * 
-     * @param json
-     * @param previous
-     * @return
-     */
-    private Execution createExecution(Direction side, Num size, Num price, ZonedDateTime date, AtomicLong increment, Object[] previous) {
-        long id;
-        int consecutive;
-    
-        if (date.equals(previous[1])) {
-            id = computeID(date) + increment.incrementAndGet();
-    
-            if (side != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (side == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            id = computeID(date);
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-    
-        previous[0] = side;
-        previous[1] = date;
-    
-        return Execution.with.direction(side, size).price(price).date(date).id(id).consecutive(consecutive);
+        return Support.createExecution(side, size, price, date, previous);
     }
 
     /**
@@ -194,7 +159,7 @@ public class GMOService extends TimestampBasedMarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderbooks", marketName)).map(this::createOrderBook);
     }
 
@@ -312,8 +277,7 @@ public class GMOService extends TimestampBasedMarketService {
         public Signal<Execution> convert(ZonedDateTime date) {
             ZonedDateTime following = date.plusDays(1);
 
-            AtomicLong increment = new AtomicLong();
-            Object[] prev = new Object[2];
+            long[] prev = new long[3];
             DateTimeFormatter timeFormatOnLog = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss.SSS");
 
             return downloadAt(date).concat(downloadAt(following)).map(values -> {
@@ -322,7 +286,7 @@ public class GMOService extends TimestampBasedMarketService {
                 Num price = Num.of(values[3]);
                 ZonedDateTime time = LocalDateTime.parse(values[4], timeFormatOnLog).atZone(Chrono.UTC);
 
-                return GMOService.this.createExecution(side, size, price, time, increment, prev);
+                return Support.createExecution(side, size, price, time, prev);
             }).skipUntil(e -> e.date.isAfter(date)).takeWhile(e -> e.date.isBefore(following));
         }
 

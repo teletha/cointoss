@@ -14,13 +14,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
+import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.market.TimestampBasedMarketService;
+import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -32,7 +32,9 @@ import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 import kiss.Signal;
 
-public class BitfinexService extends TimestampBasedMarketService {
+public class BitfinexService extends MarketService {
+
+    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The API limit. */
     private static final APILimiter LimitForTradeHistory = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
@@ -52,7 +54,7 @@ public class BitfinexService extends TimestampBasedMarketService {
      * @param setting
      */
     protected BitfinexService(String marketName, MarketSetting setting) {
-        super(Exchange.Bitfinex, marketName, setting, 10000);
+        super(Exchange.Bitfinex, marketName, setting);
     }
 
     /**
@@ -68,14 +70,13 @@ public class BitfinexService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        long startTime = computeMilli(startId) + 1;
-        long startingPoint = startId % padding;;
-        AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, computeDateTime(startId)};
+        long startTime = Support.computeEpochTime(startId) + 1;
+        long startingPoint = startId % Support.padding;
+        long[] previous = new long[] {0, 0, startingPoint - 1};
 
         return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=10000&start=" + startTime, LimitForTradeHistory)
                 .flatIterable(e -> e.find("*"))
-                .map(e -> convert(e, increment, previous));
+                .map(e -> createExecution(e, previous));
     }
 
     /**
@@ -83,12 +84,11 @@ public class BitfinexService extends TimestampBasedMarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        AtomicLong increment = new AtomicLong();
-        Object[] previous = new Object[2];
+        long[] previous = new long[3];
 
         return clientRealtimely().subscribe(new Topic("trades", marketName))
                 .take(e -> e.has("1", "te"))
-                .map(e -> convert(e.get("2"), increment, previous));
+                .map(e -> createExecution(e.get("2"), previous));
     }
 
     /**
@@ -97,7 +97,7 @@ public class BitfinexService extends TimestampBasedMarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trades/t" + marketName + "/hist?limit=1", LimitForTradeHistory).flatIterable(e -> e.find("*"))
-                .map(e -> convert(e, new AtomicLong(), new Object[2]));
+                .map(e -> createExecution(e, new long[3]));
     }
 
     /**
@@ -105,11 +105,33 @@ public class BitfinexService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        long startTime = computeMilli(id) + 1;
+        long startTime = Support.computeEpochTime(id) + 1;
 
         return call("GET", "trades/t" + marketName + "/hist?limit=1&start=" + startTime + "&sort=1", LimitForTradeHistory)
                 .flatIterable(e -> e.find("*"))
-                .map(e -> convert(e, new AtomicLong(), new Object[2]));
+                .map(e -> createExecution(e, new long[3]));
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution createExecution(JSON array, long[] previous) {
+        ZonedDateTime date = Chrono.utcByMills(array.get(long.class, "1"));
+        Num size = array.get(Num.class, "2");
+        Num price = array.get(Num.class, "3");
+        Direction side;
+        if (size.isPositive()) {
+            side = Direction.BUY;
+        } else {
+            side = Direction.SELL;
+            size = size.negate();
+        }
+
+        return Support.createExecution(side, size, price, date, previous);
     }
 
     /**
@@ -138,7 +160,7 @@ public class BitfinexService extends TimestampBasedMarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("book", marketName)).skip(1).map(json -> {
             OrderBookPageChanges change = new OrderBookPageChanges();
             JSON data = json.get("1");
@@ -154,45 +176,6 @@ public class BitfinexService extends TimestampBasedMarketService {
             return change;
         });
 
-    }
-
-    /**
-     * Convert to {@link Execution}.
-     * 
-     * @param json
-     * @param previous
-     * @return
-     */
-    private Execution convert(JSON array, AtomicLong increment, Object[] previous) {
-        ZonedDateTime date = Chrono.utcByMills(array.get(Long.class, "1"));
-        double size = array.get(Double.class, "2");
-        Num price = array.get(Num.class, "3");
-        Direction direction = 0 < size ? Direction.BUY : Direction.SELL;
-        if (direction == Direction.SELL) size *= -1;
-
-        long id;
-        int consecutive;
-
-        if (date.equals(previous[1])) {
-            id = computeID(date) + increment.incrementAndGet();
-
-            if (direction != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (direction == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            id = computeID(date);
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = direction;
-        previous[1] = date;
-
-        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive);
     }
 
     /**

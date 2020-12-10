@@ -207,7 +207,7 @@ public class HuobiService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
         return I.signal();
     }
 

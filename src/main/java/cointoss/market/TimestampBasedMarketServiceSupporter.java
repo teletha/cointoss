@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Nameless Production Committee
+ * Copyright (C) 2020 Nameless Production Committee
  *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,12 +205,12 @@ public class TimestampBasedMarketServiceSupporter {
     /**
      * Create pseudo {@link Execution}s from OHLCV candle.
      * 
-     * @param open
-     * @param high
-     * @param low
-     * @param close
-     * @param volume
-     * @param epochMillis
+     * @param open The open price.
+     * @param high The highest price.
+     * @param low The lowest price.
+     * @param close The close price.
+     * @param volume A spaned valume.
+     * @param epochMillis A starting time.
      * @return
      */
     public final List<Execution> createExecutions(Num open, Num high, Num low, Num close, Num volume, long epochMillis) {

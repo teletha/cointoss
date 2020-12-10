@@ -21,7 +21,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
-import cointoss.market.TimestampBasedMarketService;
+import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -34,7 +34,9 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
-public class BitbankService extends TimestampBasedMarketService {
+public class BitbankService extends MarketService {
+
+    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
@@ -49,7 +51,7 @@ public class BitbankService extends TimestampBasedMarketService {
      * @param setting
      */
     protected BitbankService(String marketName, MarketSetting setting) {
-        super(Exchange.BitBank, marketName, setting, 10000);
+        super(Exchange.BitBank, marketName, setting);
     }
 
     /**
@@ -73,9 +75,9 @@ public class BitbankService extends TimestampBasedMarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        long startMillis = computeMilli(startId);
+        long startMillis = Support.computeEpochTime(startId);
         ZonedDateTime today = Chrono.utcNow().minusMinutes(10).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime startDay = computeDateTime(startId).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startDay = Support.computeDateTime(startId).truncatedTo(ChronoUnit.DAYS);
 
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
@@ -100,18 +102,7 @@ public class BitbankService extends TimestampBasedMarketService {
 
         return clientRealtimely().subscribe(new Topic("transactions", marketName))
                 .flatIterable(json -> json.find("message", "data", "transactions", "*"))
-                .map(e -> convert(e, previous));
-    }
-
-    /**
-     * Convert JSON to {@link Execution}.
-     * 
-     * @param json
-     * @param context
-     * @return
-     */
-    private Execution convert(JSON json, long[] context) {
-        return createExecution(json, "side", "amount", "price", "executed_at", context);
+                .map(e -> createExecution(e, previous));
     }
 
     /**
@@ -121,7 +112,7 @@ public class BitbankService extends TimestampBasedMarketService {
     public Signal<Execution> executionLatest() {
         return call("GET", marketName + "/transactions").flatIterable(e -> e.find("data", "transactions", "*"))
                 .first()
-                .map(json -> convert(json, new long[3]));
+                .map(json -> createExecution(json, new long[3]));
     }
 
     /**
@@ -132,12 +123,23 @@ public class BitbankService extends TimestampBasedMarketService {
         throw new Error("No support.");
     }
 
+    /**
+     * Convert JSON to {@link Execution}.
+     * 
+     * @param json
+     * @param context
+     * @return
+     */
+    private Execution createExecution(JSON json, long[] context) {
+        return Support.createExecution(json, "side", "amount", "price", "executed_at", context);
+    }
+
     private Signal<Execution> executionsAt(ZonedDateTime date) {
         long[] previous = new long[3];
 
         return call("GET", marketName + "/transactions/" + Chrono.DateCompact.format(date))
                 .flatIterable(e -> e.find("data", "transactions", "*"))
-                .map(e -> convert(e, previous));
+                .map(e -> createExecution(e, previous));
     }
 
     private Signal<Execution> candleAt(ZonedDateTime date) {
@@ -151,7 +153,7 @@ public class BitbankService extends TimestampBasedMarketService {
                     Num volume = e.get(Num.class, "4");
                     long epochMillis = e.get(long.class, "5");
 
-                    return createExecutions(open, high, low, close, volume, epochMillis);
+                    return Support.createExecutions(open, high, low, close, volume, epochMillis);
                 });
     }
 
@@ -179,7 +181,7 @@ public class BitbankService extends TimestampBasedMarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("depth_diff", marketName)).map(root -> {
             JSON data = root.get("message").get("data");
 

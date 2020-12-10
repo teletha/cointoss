@@ -246,7 +246,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely(boolean autoReconnect) {
         if (orderBooks == null) {
-            orderBooks = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add);
+            orderBooks = orderBook().concat(createOrderBookRealtimely()).effectOnObserve(disposer::add);
         }
 
         if (autoReconnect) {
@@ -261,7 +261,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return A realtime order books.
      */
-    protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
+    protected abstract Signal<OrderBookPageChanges> createOrderBookRealtimely();
 
     /**
      * Get amount of the base currency.
