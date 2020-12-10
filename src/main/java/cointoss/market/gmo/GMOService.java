@@ -43,6 +43,7 @@ import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
+import kiss.Variable;
 import kiss.XML;
 
 public class GMOService extends MarketService {
@@ -53,7 +54,7 @@ public class GMOService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(150, MILLISECONDS);
+    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(100, MILLISECONDS);
 
     /** The API limit. */
     private static final APILimiter REPOSITORY_LIMITER = APILimiter.with.limit(2).refresh(100, MILLISECONDS);
@@ -86,11 +87,12 @@ public class GMOService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         ZonedDateTime start = Support.computeDateTime(startId);
+        Variable<Long> counter = Variable.of(1L);
         long[] prev = new long[3];
 
-        return I.signal(1)
-                .recurse(i -> i + 1)
+        return counter.observing()
                 .concatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
+                .effect(() -> counter.set(v -> v + 1))
                 .flatIterable(o -> o.find("data", "list", "*"))
                 // The GMO server returns both Taker and Maker histories
                 // alternately, so we have to remove the Maker side.

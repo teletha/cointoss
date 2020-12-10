@@ -82,7 +82,7 @@ public class BitbankService extends MarketService {
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
                 .takeWhile(day -> day.isBefore(today) || day.isEqual(today))
-                .concatMap(day -> {
+                .sequenceMap(day -> {
                     if (day.isEqual(today)) {
                         return candleAt(day);
                     } else {

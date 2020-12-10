@@ -9,8 +9,6 @@
  */
 package cointoss.market.bybit;
 
-import static java.util.concurrent.TimeUnit.*;
-
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -20,7 +18,6 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
@@ -29,6 +26,7 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -46,6 +44,7 @@ import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
+import kiss.Variable;
 import kiss.XML;
 
 public class BybitService extends MarketService {
@@ -57,9 +56,6 @@ public class BybitService extends MarketService {
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
-
-    /** The API limit. */
-    private static final APILimiter REPOSITORY_LIMITER = APILimiter.with.limit(2).refresh(100, MILLISECONDS);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bybit.com/realtime")
@@ -87,48 +83,37 @@ public class BybitService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         ZonedDateTime start = Support.computeDateTime(startId);
-        LinkedList<List<JSON>> pages = new LinkedList();
-        long id = 0;
 
-        for (int i = 0; i < 1000; i++) {
-            List<JSON> page;
+        long[] id = {0};
+        long[] context = new long[3];
+        Variable<Long> page = Variable.of(1L);
 
-            if (i == 0) {
-                page = call("GET", "trading-records?symbol=" + marketName + "&limit=1000").waitForTerminate()
-                        .flatIterable(e -> e.find("result", "*"))
-                        .reverse()
-                        .toList();
-            } else {
-                page = call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + (id - 1000)).waitForTerminate()
-                        .flatIterable(e -> e.find("result", "*"))
-                        .toList();
-            }
+        return page.observing() //
+                .concatMap(i -> {
+                    if (i == 1) {
+                        return call("GET", "trading-records?symbol=" + marketName + "&limit=1000") //
+                                .flatIterable(e -> e.find("result", "*"))
+                                .effectOnce(e -> {
+                                    id[0] = e.get(long.class, "id");
+                                    page.set(v -> v + 1);
+                                });
+                    } else {
+                        return call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + (id[0] - 1000 * i))
+                                .effect(() -> page.set(v -> v + 1))
+                                .flatIterable(e -> e.find("result", "*"))
+                                .reverse();
+                    }
+                })
+                .takeWhile(e -> ZonedDateTime.parse(e.text("time"), TimeFormat).isAfter(start))
+                .reverse()
+                .map(e -> {
+                    Direction side = e.get(Direction.class, "side");
+                    Num price = e.get(Num.class, "price");
+                    Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
+                    ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
 
-            if (page.isEmpty()) {
-                throw new Error("Plese Implement!");
-            } else {
-                pages.addFirst(page);
-
-                JSON first = page.get(0);
-                ZonedDateTime time = ZonedDateTime.parse(first.text("time"), TimeFormat);
-                if (time.isBefore(start)) {
-                    break;
-                }
-                id = first.get(long.class, "id");
-            }
-        }
-
-        long[] previous = new long[3];
-        return I.signal(pages).flatIterable(page -> page).map(e -> createExecution(e, previous)).skipWhile(e -> e.isBefore(start));
-    }
-
-    private Execution createExecution(JSON e, long[] context) {
-        Direction side = e.get(Direction.class, "side");
-        Num price = e.get(Num.class, "price");
-        Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
-
-        return Support.createExecution(side, size, price, date, context);
+                    return Support.createExecution(side, size, price, date, context);
+                });
     }
 
     /**
@@ -362,8 +347,6 @@ public class BybitService extends MarketService {
 
             long[] context = new long[3];
 
-            REPOSITORY_LIMITER.acquire();
-
             return I.http(uri, InputStream.class)
                     .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
                     .effectOnComplete(parser::stopParsing)
@@ -415,11 +398,11 @@ public class BybitService extends MarketService {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Bybit.BTC_USD.executions(16075853955710000L, 16075583991560023L).to(e -> {
-            System.out.println(e);
-        });
-        Thread.sleep(1000 * 20);
+    public static void main2(String[] args) throws InterruptedException {
+        Market m = new Market(Bybit.BTC_USD);
+        m.readLog(e -> e.fromYestaday());
+
+        Thread.sleep(1000 * 250);
     }
 
     /**
