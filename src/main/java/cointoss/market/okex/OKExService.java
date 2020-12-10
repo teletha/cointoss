@@ -23,7 +23,6 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
@@ -33,14 +32,11 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
-import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 import kiss.Variable;
 
 public class OKExService extends MarketService {
-
-    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter(1000);
 
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
@@ -111,7 +107,7 @@ public class OKExService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "fills?instrument_id=" + marketName + "&limit=1").flatIterable(e -> e.find("*"))
+        return call("GET", "instruments/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("*"))
                 .map(json -> createExecution(json, new long[3]));
     }
 
@@ -120,10 +116,11 @@ public class OKExService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatestAt(long id) {
-        ZonedDateTime date = Support.computeDateTime(id);
-        ExecutionLogRepository repo = externalRepository();
+        long[] context = new long[3];
 
-        return repo.convert(date).takeUntil(e -> id <= e.id).waitForTerminate().effect(e -> System.out.println(e));
+        return call("GET", "instruments/" + marketName + "/trades?before=" + 20).flatIterable(e -> e.find("*"))
+                .reverse()
+                .map(json -> createExecution(json, context));
     }
 
     /**
@@ -134,13 +131,14 @@ public class OKExService extends MarketService {
      * @return
      */
     private Execution createExecution(JSON e, long[] previous) {
-        System.out.println(e);
+        long id = e.get(long.class, "trade_id");
         Direction side = e.get(Direction.class, "side");
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat);
+        int consecutive = TimestampBasedMarketServiceSupporter.computeConsecutive(side, date.toInstant().toEpochMilli(), previous);
 
-        return Support.createExecution(side, size, price, date, previous);
+        return Execution.with.direction(side, size).price(price).id(id).date(date).consecutive(consecutive);
     }
 
     /**
@@ -191,14 +189,9 @@ public class OKExService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Builder builder = HttpRequest.newBuilder(URI.create("https://www.okex.com/api/spot/v3/" + path));
-        return Network.rest(builder, LIMITER, client()).flatMap(json -> {
-            if (json.get(int.class, "status") != 0) {
-                return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string")));
-            } else {
-                return I.signal(json);
-            }
-        }).retryWhen(retryPolicy(10, "GMO RESTCall"));
+        Builder builder = HttpRequest.newBuilder(URI.create("https://www.okex.com/api/spot/v3/" + path)).header("OK-BEFORE", "20");
+
+        return Network.rest(builder, LIMITER, client()).retryWhen(retryPolicy(10, "OKEx RESTCall"));
     }
 
     /**
@@ -225,7 +218,7 @@ public class OKExService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        OKEx.BTCUSDT.executionLatest().to(e -> {
+        OKEx.BTCUSDT.executionLatestAt(129524381).to(e -> {
             System.out.println(e);
         });
 

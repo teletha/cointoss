@@ -203,6 +203,33 @@ public class TimestampBasedMarketServiceSupporter {
     }
 
     /**
+     * Helper method to calculate consecutive type.
+     * 
+     * @param side
+     * @param epochMillis
+     * @param threeLength
+     * @return
+     */
+    public static int computeConsecutive(Direction side, long epochMillis, long[] threeLength) {
+        long sideType = side.ordinal();
+        int consecutive;
+
+        if (epochMillis != threeLength[0]) {
+            consecutive = Execution.ConsecutiveDifference;
+
+            threeLength[0] = epochMillis;
+            threeLength[1] = sideType;
+        } else {
+            consecutive = sideType != threeLength[1] ? Execution.ConsecutiveDifference
+                    : side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
+
+            threeLength[0] = epochMillis;
+            threeLength[1] = sideType;
+        }
+        return consecutive;
+    }
+
+    /**
      * Create pseudo {@link Execution}s from OHLCV candle.
      * 
      * @param open The open price.
