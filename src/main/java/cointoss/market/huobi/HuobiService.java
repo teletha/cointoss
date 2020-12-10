@@ -253,7 +253,7 @@ public class HuobiService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Huobi.BTC_USDT.executionLatestAt(10101010).to(e -> {
+        Huobi.BTC_USDT.executionsRealtimely().to(e -> {
             System.out.println(e);
         });
 

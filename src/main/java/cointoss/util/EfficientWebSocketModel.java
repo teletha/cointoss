@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.net.ConnectException;
 import java.net.http.HttpClient;
@@ -464,7 +464,7 @@ public abstract class EfficientWebSocketModel {
     public static abstract class IdentifiableTopic<T extends IdentifiableTopic> implements Cloneable {
 
         /** The identifier. */
-        private final String id;
+        protected final String id;
 
         /** The unsubscription command builder. */
         private final Consumer<T> unsubscribeCommandBuilder;
