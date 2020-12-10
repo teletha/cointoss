@@ -9,21 +9,32 @@
  */
 package cointoss.market.bybit;
 
+import static java.util.concurrent.TimeUnit.*;
+
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.zip.GZIPInputStream;
+
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
+import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -32,16 +43,23 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
+import kiss.XML;
 
 public class BybitService extends MarketService {
+
+    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The realtime data format */
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]X");
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
+
+    /** The API limit. */
+    private static final APILimiter REPOSITORY_LIMITER = APILimiter.with.limit(2).refresh(100, MILLISECONDS);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bybit.com/realtime")
@@ -68,11 +86,49 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        Object[] previous = new Object[2];
+        ZonedDateTime start = Support.computeDateTime(startId);
+        LinkedList<List<JSON>> pages = new LinkedList();
+        long id = 0;
 
-        return call("GET", "trading-records?symbol=" + marketName + "&from=" + startId + "&limit=" + (endId - startId))
-                .flatIterable(e -> e.find("result", "*"))
-                .map(e -> convert(e, previous));
+        for (int i = 0; i < 1000; i++) {
+            List<JSON> page;
+
+            if (i == 0) {
+                page = call("GET", "trading-records?symbol=" + marketName + "&limit=1000").waitForTerminate()
+                        .flatIterable(e -> e.find("result", "*"))
+                        .reverse()
+                        .toList();
+            } else {
+                page = call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + (id - 1000)).waitForTerminate()
+                        .flatIterable(e -> e.find("result", "*"))
+                        .toList();
+            }
+
+            if (page.isEmpty()) {
+                throw new Error("Plese Implement!");
+            } else {
+                pages.addFirst(page);
+
+                JSON first = page.get(0);
+                ZonedDateTime time = ZonedDateTime.parse(first.text("time"), TimeFormat);
+                if (time.isBefore(start)) {
+                    break;
+                }
+                id = first.get(long.class, "id");
+            }
+        }
+
+        long[] previous = new long[3];
+        return I.signal(pages).flatIterable(page -> page).map(e -> createExecution(e, previous)).skipWhile(e -> e.isBefore(start));
+    }
+
+    private Execution createExecution(JSON e, long[] context) {
+        Direction side = e.get(Direction.class, "side");
+        Num price = e.get(Num.class, "price");
+        Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
+        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
+
+        return Support.createExecution(side, size, price, date, context);
     }
 
     /**
@@ -256,6 +312,114 @@ public class BybitService extends MarketService {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.bybit.com/v2/public/" + path));
 
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Bybit RESTCall"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExecutionLogRepository externalRepository() {
+        return new OfficialRepository(this);
+    }
+
+    /**
+     * 
+     */
+    private static class OfficialRepository extends ExecutionLogRepository {
+
+        /**
+         * @param service
+         */
+        private OfficialRepository(MarketService service) {
+            super(service);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Signal<ZonedDateTime> collect() {
+            String uri = "https://public.bybit.com/trading/" + service.marketName + "/";
+
+            return I.http(uri, XML.class).flatIterable(o -> o.find("li a")).map(XML::text).map(name -> {
+                return Chrono.utc(name.substring(service.marketName.length(), name.indexOf(".")));
+            });
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Signal<Execution> convert(ZonedDateTime date) {
+            String uri = "https://public.bybit.com/trading/" + service.marketName + "/" + service.marketName + Chrono.Date
+                    .format(date) + ".csv.gz";
+
+            CsvParserSettings setting = new CsvParserSettings();
+            setting.getFormat().setDelimiter(',');
+            setting.getFormat().setLineSeparator("\n");
+            setting.setHeaderExtractionEnabled(true);
+            CsvParser parser = new CsvParser(setting);
+
+            long[] context = new long[3];
+
+            REPOSITORY_LIMITER.acquire();
+
+            return I.http(uri, InputStream.class)
+                    .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
+                    .effectOnComplete(parser::stopParsing)
+                    .reverse()
+                    .map(values -> {
+                        ZonedDateTime time = parseTime(values[0]);
+                        Direction side = Direction.parse(values[2]);
+                        Num size = Num.of(values[9]);
+                        Num price = Num.of(values[4]);
+
+                        return Support.createExecution(side, size, price, time, context);
+                    });
+        }
+
+        /**
+         * Parse date-time expression.
+         * 
+         * @param dateTime
+         * @return
+         */
+        private ZonedDateTime parseTime(String dateTime) {
+            dateTime = dateTime.replace(".", "");
+
+            long modifier;
+            switch (16 - dateTime.length()) {
+            case 1:
+                modifier = 10;
+                break;
+            case 2:
+                modifier = 100;
+                break;
+            case 3:
+                modifier = 1000;
+                break;
+            case 4:
+                modifier = 10000;
+                break;
+            case 5:
+                modifier = 100000;
+                break;
+            case 6:
+                modifier = 1000000;
+                break;
+            default:
+                modifier = 1;
+                break;
+            }
+            return Chrono.utcByMicros(Long.parseLong(dateTime) * modifier);
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Bybit.BTC_USD.executions(16075853955710000L, 16075583991560023L).to(e -> {
+            System.out.println(e);
+        });
+        Thread.sleep(1000 * 20);
     }
 
     /**

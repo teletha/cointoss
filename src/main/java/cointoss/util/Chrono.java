@@ -148,6 +148,16 @@ public class Chrono {
     }
 
     /**
+     * UTC {@link ZonedDateTime} from epoch micros.
+     * 
+     * @param mills
+     * @return
+     */
+    public static ZonedDateTime utcByMicros(long micros) {
+        return Instant.EPOCH.plus(micros, ChronoUnit.MICROS).atZone(UTC);
+    }
+
+    /**
      * UTC {@link ZonedDateTime} from epoch mills.
      * 
      * @param mills
