@@ -7,12 +7,12 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.market.okex;
+package cointoss.market.coinbase;
 
 import cointoss.market.MarketAccount;
 import kiss.Variable;
 
-public class OKExAccount extends MarketAccount<OKExAccount> {
+public class CoinbaseAccount extends MarketAccount<CoinbaseAccount> {
 
     /** The API key. */
     public final Variable<String> apiKey = Variable.empty();
@@ -23,7 +23,7 @@ public class OKExAccount extends MarketAccount<OKExAccount> {
     /**
      * Hide constructor.
      */
-    private OKExAccount() {
+    private CoinbaseAccount() {
         restore().auto();
     }
 

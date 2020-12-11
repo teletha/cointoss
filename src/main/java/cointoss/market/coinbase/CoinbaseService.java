@@ -7,9 +7,9 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.market.okex;
+package cointoss.market.coinbase;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -34,31 +35,25 @@ import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 import kiss.Signal;
-import kiss.Variable;
 
-public class OKExService extends MarketService {
+public class CoinbaseService extends MarketService {
 
-    private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    private static final DateTimeFormatter TimeFormat = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]X");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(100, MILLISECONDS);
+    private static final APILimiter LIMITER = APILimiter.with.limit(6).refresh(500, MILLISECONDS);
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://real.okex.com:8443/ws/v3").extractId(json -> {
-        List<String> result = json.find(String.class, "data", "0", "instrument_id");
-        if (result.isEmpty()) {
-            return "";
-        } else {
-            return json.text("table") + ":" + result.get(0);
-        }
-    }).enableDebug();
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws-feed.pro.coinbase.com")
+            .extractId(json -> json.text("type") + ":" + json.text("product_id"));
 
     /**
      * @param marketName
      * @param setting
      */
-    protected OKExService(String marketName, MarketSetting setting) {
-        super(Exchange.OKEx, marketName, setting);
+    protected CoinbaseService(String marketName, MarketSetting setting) {
+        super(Exchange.Coinbase, marketName, setting);
     }
 
     /**
@@ -74,20 +69,11 @@ public class OKExService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        ZonedDateTime start = Support.computeDateTime(startId);
-        Variable<Long> counter = Variable.of(1L);
-        long[] prev = new long[3];
+        long[] context = new long[3];
 
-        return counter.observing()
-                .concatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
-                .effect(() -> counter.set(v -> v + 1))
-                .flatIterable(o -> o.find("data", "list", "*"))
-                // The GMO server returns both Taker and Maker histories
-                // alternately, so we have to remove the Maker side.
-                .skipAt(index -> index % 2 == 0)
-                .takeWhile(o -> ZonedDateTime.parse(o.text("timestamp"), RealTimeFormat).isAfter(start))
+        return call("GET", "products/" + marketName + "/trades?before=" + startId + "&after=" + (endId + 1)).flatIterable(e -> e.find("*"))
                 .reverse()
-                .map(e -> createExecution(e, prev));
+                .map(json -> createExecution(json, "size", context));
     }
 
     /**
@@ -97,9 +83,7 @@ public class OKExService extends MarketService {
     protected Signal<Execution> connectExecutionRealtimely() {
         long[] previous = new long[3];
 
-        return clientRealtimely().subscribe(new Topic("spot/trade", marketName))
-                .flatIterable(e -> e.find("data", "*"))
-                .map(json -> createExecution(json, previous));
+        return clientRealtimely().subscribe(new Topic("ticker", marketName)).map(json -> createExecution(json, "last_size", previous));
     }
 
     /**
@@ -107,8 +91,8 @@ public class OKExService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "instruments/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("*"))
-                .map(json -> createExecution(json, new long[3]));
+        return call("GET", "products/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("*"))
+                .map(json -> createExecution(json, "size", new long[3]));
     }
 
     /**
@@ -118,9 +102,9 @@ public class OKExService extends MarketService {
     public Signal<Execution> executionLatestAt(long id) {
         long[] context = new long[3];
 
-        return call("GET", "instruments/" + marketName + "/trades?before=" + 20).flatIterable(e -> e.find("*"))
+        return call("GET", "products/" + marketName + "/trades?after=" + id).flatIterable(e -> e.find("*"))
                 .reverse()
-                .map(json -> createExecution(json, context));
+                .map(json -> createExecution(json, "size", context));
     }
 
     /**
@@ -130,12 +114,12 @@ public class OKExService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution createExecution(JSON e, long[] previous) {
+    private Execution createExecution(JSON e, String sizeName, long[] previous) {
         long id = e.get(long.class, "trade_id");
         Direction side = e.get(Direction.class, "side");
-        Num size = e.get(Num.class, "size");
+        Num size = e.get(Num.class, sizeName);
         Num price = e.get(Num.class, "price");
-        ZonedDateTime date = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat);
+        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
         int consecutive = TimestampBasedMarketServiceSupporter.computeConsecutive(side, date.toInstant().toEpochMilli(), previous);
 
         return Execution.with.direction(side, size).price(price).id(id).date(date).consecutive(consecutive);
@@ -189,9 +173,9 @@ public class OKExService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Builder builder = HttpRequest.newBuilder(URI.create("https://www.okex.com/api/spot/v3/" + path)).header("OK-BEFORE", "20");
+        Builder builder = HttpRequest.newBuilder(URI.create("https://api.pro.coinbase.com/" + path));
 
-        return Network.rest(builder, LIMITER, client()).retryWhen(retryPolicy(10, "OKEx RESTCall"));
+        return Network.rest(builder, LIMITER, client()).retryWhen(retryPolicy(10, exchange + " RESTCall"));
     }
 
     /**
@@ -199,13 +183,17 @@ public class OKExService extends MarketService {
      */
     static class Topic extends IdentifiableTopic<Topic> {
 
-        public String op = "subscribe";
+        public String type = "subscribe";
 
-        public List<String> args = new ArrayList();
+        public List<String> product_ids = new ArrayList();
+
+        public List<String> channels = new ArrayList();
 
         private Topic(String channel, String market) {
-            super(channel + ":" + market, topic -> topic.op = "unsubscribe");
-            this.args.add(id);
+            super(channel + ":" + market, topic -> topic.type = "unsubscribe");
+
+            product_ids.add(market);
+            channels.add(channel);
         }
 
         /**
@@ -213,18 +201,17 @@ public class OKExService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            return reply.text("event").equals("subscribe") && reply.text("channel").equals(id);
+            return reply.text("type").equals("subscriptions") && reply.find(String.class, "channels", "*", "name")
+                    .contains(channels.get(0));
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        OKEx.BTCUSDT.executionLatestAt(129524381).to(e -> {
-            System.out.println(e);
-        });
-
-        OKEx.BTCUSDT.executionsRealtimely().to(e -> {
-            System.out.println(e);
-        });
+        Market m = new Market(Coinbase.BTCUSD);
+        m.readLog(x -> x.fromYestaday());
+        // Coinbase.BTCUSD.executions(1, 100).to(e -> {
+        // System.out.println(e);
+        // });
 
         Thread.sleep(1000 * 55);
     }
