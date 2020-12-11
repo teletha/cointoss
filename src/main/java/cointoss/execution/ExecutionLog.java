@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -63,7 +63,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.gmo.GMO;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -274,15 +273,16 @@ public class ExecutionLog {
                 .effect(e -> cacheId = e.id)
                 .take(e -> e.isAfter(start))
                 .effectOnComplete(() -> storedId = cacheId)
-                .concat(network().effect(this::cache));
+                .concat(network(-1).effect(this::cache));
     }
 
     /**
      * Read date from merket server.
      * 
+     * @param fromId A starting id.
      * @return
      */
-    private Signal<Execution> network() {
+    private Signal<Execution> network(long fromId) {
         return new Signal<Execution>((observer, disposer) -> {
             BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
 
@@ -296,7 +296,7 @@ public class ExecutionLog {
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
-            long startId = cacheId != 0 ? cacheId : estimateInitialExecutionId();
+            long startId = fromId != -1 ? fromId : cacheId != 0 ? cacheId : estimateInitialExecutionId();
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
             while (!disposer.isDisposed()) {
@@ -460,6 +460,15 @@ public class ExecutionLog {
      */
     public final Signal<Execution> at(ZonedDateTime date, LogType... type) {
         return new Cache(date).read(type);
+    }
+
+    /**
+     * Read log from the specified id.
+     * 
+     * @param id
+     */
+    public final Signal<Execution> fromId(long id) {
+        return network(id).effect(this::cache);
     }
 
     /**
@@ -724,17 +733,55 @@ public class ExecutionLog {
                     // read from external repository
                     ExecutionLogRepository external = service.externalRepository();
 
-                    if (external == null) {
-                        return I.signal();
-                    } else {
+                    if (external != null) {
                         return writeNormal(external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
                             log.info("Donwload external log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                         }));
+                    } else {
+                        // find the nearest id
+                        estimateNearest(Chrono.utc(date)).to(e -> {
+                            System.out.println(e);
+                        });
+                        return I.signal();
                     }
                 }
             } catch (IOException e) {
                 throw I.quiet(e);
             }
+        }
+
+        /**
+         * Estimate the nearest {@link Execution} at the specified time.
+         * 
+         * @param target
+         * @return
+         */
+        private Signal<Execution> estimateNearest(ZonedDateTime target) {
+            return service.executionLatest().flatMap(latest -> estimateNearest(target, latest));
+        }
+
+        /**
+         * Estimate the nearest {@link Execution} at the specified time.
+         * 
+         * @param target
+         * @param latest
+         * @return
+         */
+        private Signal<Execution> estimateNearest(ZonedDateTime target, Execution latest) {
+            return service.executionLatestAt(latest.id - service.setting.acquirableExecutionSize).concatMap(previous -> {
+                long timeDistance = latest.mills - previous.mills;
+                long idDistance = latest.id - previous.id;
+                long targetDistance = latest.mills - Chrono.utc(date).toInstant().toEpochMilli();
+                long estimatedTargetId = latest.id - idDistance * (targetDistance / timeDistance);
+
+                return service.executionLatestAt(estimatedTargetId).concatMap(estimated -> {
+                    if (estimated.isBefore(target) && estimated.isAfter(target.minusMinutes(30))) {
+                        return I.signal(estimated);
+                    } else {
+                        return estimateNearest(target, estimated);
+                    }
+                });
+            }).first();
         }
 
         /**
@@ -1228,9 +1275,5 @@ public class ExecutionLog {
             ExecutionLog log = new ExecutionLog(service);
             log.clearFastCache();
         });
-    }
-
-    public static void main3(String[] args) {
-        restoreNormal(GMO.BTC_DERIVATIVE, Chrono.utc(2020, 12, 5));
     }
 }

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -73,7 +72,7 @@ public class CoinbaseService extends MarketService {
 
         return call("GET", "products/" + marketName + "/trades?before=" + startId + "&after=" + (endId + 1)).flatIterable(e -> e.find("*"))
                 .reverse()
-                .map(json -> createExecution(json, "size", context));
+                .map(json -> createExecution(json, false, context));
     }
 
     /**
@@ -83,7 +82,7 @@ public class CoinbaseService extends MarketService {
     protected Signal<Execution> connectExecutionRealtimely() {
         long[] previous = new long[3];
 
-        return clientRealtimely().subscribe(new Topic("ticker", marketName)).map(json -> createExecution(json, "last_size", previous));
+        return clientRealtimely().subscribe(new Topic("ticker", marketName)).map(json -> createExecution(json, true, previous));
     }
 
     /**
@@ -92,7 +91,7 @@ public class CoinbaseService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "products/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("*"))
-                .map(json -> createExecution(json, "size", new long[3]));
+                .map(json -> createExecution(json, false, new long[3]));
     }
 
     /**
@@ -104,7 +103,7 @@ public class CoinbaseService extends MarketService {
 
         return call("GET", "products/" + marketName + "/trades?after=" + id).flatIterable(e -> e.find("*"))
                 .reverse()
-                .map(json -> createExecution(json, "size", context));
+                .map(json -> createExecution(json, false, context));
     }
 
     /**
@@ -114,10 +113,11 @@ public class CoinbaseService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution createExecution(JSON e, String sizeName, long[] previous) {
+    private Execution createExecution(JSON e, boolean realtime, long[] previous) {
         long id = e.get(long.class, "trade_id");
         Direction side = e.get(Direction.class, "side");
-        Num size = e.get(Num.class, sizeName);
+        if (!realtime) side = side.inverse();
+        Num size = e.get(Num.class, realtime ? "last_size" : "size");
         Num price = e.get(Num.class, "price");
         ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
         int consecutive = TimestampBasedMarketServiceSupporter.computeConsecutive(side, date.toInstant().toEpochMilli(), previous);
@@ -207,12 +207,12 @@ public class CoinbaseService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Market m = new Market(Coinbase.BTCUSD);
-        m.readLog(x -> x.fromYestaday());
-        // Coinbase.BTCUSD.executions(1, 100).to(e -> {
-        // System.out.println(e);
+        // Coinbase.BTCUSD.log.fromId(111489317).to(e -> {
         // });
 
-        Thread.sleep(1000 * 55);
+        Coinbase.BTCUSD.log.at(2020, 11, 1).to(e -> {
+        });
+
+        Thread.sleep(1000 * 15);
     }
 }
