@@ -552,6 +552,15 @@ public class ExecutionLog {
      * 
      * @param date
      */
+    final Cache cache(LocalDate date) {
+        return new Cache(Chrono.utc(date));
+    }
+
+    /**
+     * Create the specified date cache for TEST.
+     * 
+     * @param date
+     */
     final Cache cache(ZonedDateTime date) {
         return new Cache(date);
     }
@@ -737,13 +746,24 @@ public class ExecutionLog {
                         return writeNormal(external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
                             log.info("Donwload external log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                         }));
-                    } else {
-                        // find the nearest id
-                        estimateNearest(Chrono.utc(date)).to(e -> {
-                            System.out.println(e);
-                        });
-                        return I.signal();
                     }
+
+                    // read from server
+                    ZonedDateTime start = Chrono.utc(date);
+                    ZonedDateTime end = start.plusDays(1);
+
+                    return service.executionLatest()
+                            .flatMap(latest -> findNearest(start, latest))
+                            .flatMap(e -> network(e.id))
+                            .skipWhile(e -> e.isBefore(start))
+                            .takeWhile(e -> e.isBefore(end))
+                            .effectOnComplete(executions -> {
+                                if (end.isBefore(Chrono.utcToday())) {
+                                    writeCompact(I.signal(executions)).to();
+                                } else {
+                                    writeNormal(I.signal(executions)).to();
+                                }
+                            });
                 }
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -754,20 +774,10 @@ public class ExecutionLog {
          * Estimate the nearest {@link Execution} at the specified time.
          * 
          * @param target
-         * @return
-         */
-        private Signal<Execution> estimateNearest(ZonedDateTime target) {
-            return service.executionLatest().flatMap(latest -> estimateNearest(target, latest));
-        }
-
-        /**
-         * Estimate the nearest {@link Execution} at the specified time.
-         * 
-         * @param target
          * @param latest
          * @return
          */
-        private Signal<Execution> estimateNearest(ZonedDateTime target, Execution latest) {
+        private Signal<Execution> findNearest(ZonedDateTime target, Execution latest) {
             return service.executionLatestAt(latest.id - service.setting.acquirableExecutionSize).concatMap(previous -> {
                 long timeDistance = latest.mills - previous.mills;
                 long idDistance = latest.id - previous.id;
@@ -778,7 +788,7 @@ public class ExecutionLog {
                     if (estimated.isBefore(target) && estimated.isAfter(target.minusMinutes(30))) {
                         return I.signal(estimated);
                     } else {
-                        return estimateNearest(target, estimated);
+                        return findNearest(target, estimated);
                     }
                 });
             }).first();
