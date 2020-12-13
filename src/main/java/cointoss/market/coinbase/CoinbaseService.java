@@ -209,7 +209,7 @@ public class CoinbaseService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        I.signal(Chrono.range(2020, 11)).concatMap(day -> Coinbase.BTCUSD.log.at(day)).waitForTerminate().to(e -> {
+        I.signal(Chrono.utc(2020, 10, 28)).concatMap(day -> Coinbase.BTCUSD.log.at(day)).waitForTerminate().to(e -> {
         });
     }
 }
