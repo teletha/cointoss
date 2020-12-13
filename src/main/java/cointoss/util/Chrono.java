@@ -21,6 +21,8 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
@@ -350,6 +352,25 @@ public class Chrono {
             return target;
         }
         return max;
+    }
+
+    /**
+     * List up all days at the specified month.
+     * 
+     * @param year
+     * @param month
+     * @return
+     */
+    public static List<ZonedDateTime> range(int year, int month) {
+        ZonedDateTime current = utc(year, month, 1);
+        ZonedDateTime end = current.plusMonths(1);
+
+        List<ZonedDateTime> dates = new ArrayList();
+        while (current.isBefore(end)) {
+            dates.add(current);
+            current = current.plusDays(1);
+        }
+        return dates;
     }
 
     /**

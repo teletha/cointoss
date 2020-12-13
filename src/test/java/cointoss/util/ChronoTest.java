@@ -110,4 +110,14 @@ class ChronoTest {
         assert Chrono.systemBySeconds(1).withZoneSameInstant(Chrono.UTC).format(Chrono.DateTime).equals("1970-01-01 00:00:01");
         assert Chrono.systemBySeconds(1557030696L).withZoneSameInstant(Chrono.UTC).format(Chrono.DateTime).equals("2019-05-05 04:31:36");
     }
+
+    @Test
+    void range() {
+        assert Chrono.range(2020, 11).size() == 30;
+        assert Chrono.range(2020, 12).size() == 31;
+        assert Chrono.range(2021, 1).size() == 31;
+        assert Chrono.range(2021, 2).size() == 28;
+        assert Chrono.range(2021, 3).size() == 31;
+        assert Chrono.range(2021, 4).size() == 30;
+    }
 }

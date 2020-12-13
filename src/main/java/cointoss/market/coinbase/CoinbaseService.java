@@ -9,7 +9,7 @@
  */
 package cointoss.market.coinbase;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -33,9 +33,9 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import kiss.Variable;
 
 public class CoinbaseService extends MarketService {
 
@@ -209,18 +209,7 @@ public class CoinbaseService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        // Coinbase.BTCUSD.log.fromId(111489317).to(e -> {
-        // });
-
-        Variable<ZonedDateTime> holder = Variable.of(Chrono.utc(2020, 11, 2));
-
-        holder.observing().effect(e -> System.out.println(e)).flatMap(e -> Coinbase.BTCUSD.log.at(e).effectOnComplete(() -> {
-            System.out.println("Complete");
-            holder.set(v -> v.plusDays(1));
-        })).to(e -> {
-            System.out.println(e);
+        I.signal(Chrono.range(2020, 11)).concatMap(day -> Coinbase.BTCUSD.log.at(day)).waitForTerminate().to(e -> {
         });
-
-        Thread.sleep(1000 * 3500);
     }
 }
