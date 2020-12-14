@@ -9,7 +9,7 @@
  */
 package cointoss.market.coinbase;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -28,12 +28,10 @@ import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
-import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
-import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -209,7 +207,6 @@ public class CoinbaseService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        I.signal(Chrono.utc(2020, 10, 28)).concatMap(day -> Coinbase.BTCUSD.log.at(day)).waitForTerminate().to(e -> {
-        });
+        Coinbase.BTCUSD.log.checkup();
     }
 }

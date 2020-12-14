@@ -232,6 +232,13 @@ public class ExecutionLog {
     }
 
     /**
+     * Get a physical checkup on logs.
+     */
+    public final void checkup() {
+        repository.repairMissingLog();
+    }
+
+    /**
      * Return the first cached date.
      * 
      * @return
@@ -749,27 +756,29 @@ public class ExecutionLog {
                     }
 
                     return I.signal();
-
-                    // read from server
-                    // ZonedDateTime start = Chrono.utc(date);
-                    // ZonedDateTime end = start.plusDays(1);
-                    //
-                    // return service.executionLatest()
-                    // .flatMap(latest -> findNearest(start, latest))
-                    // .flatMap(e -> network(e.id))
-                    // .skipWhile(e -> e.isBefore(start))
-                    // .takeWhile(e -> e.isBefore(end))
-                    // .effectOnComplete(executions -> {
-                    // if (end.isBefore(Chrono.utcToday())) {
-                    // writeCompact(I.signal(executions)).to();
-                    // } else {
-                    // writeNormal(I.signal(executions)).to();
-                    // }
-                    // });
                 }
             } catch (IOException e) {
                 throw I.quiet(e);
             }
+        }
+
+        private Signal<Execution> readFromServer() {
+            // read from server
+            ZonedDateTime start = Chrono.utc(date);
+            ZonedDateTime end = start.plusDays(1);
+
+            return service.executionLatest()
+                    .flatMap(latest -> findNearest(start, latest))
+                    .flatMap(e -> network(e.id))
+                    .skipWhile(e -> e.isBefore(start))
+                    .takeWhile(e -> e.isBefore(end))
+                    .effectOnComplete(executions -> {
+                        if (end.isBefore(Chrono.utcToday())) {
+                            writeCompact(I.signal(executions)).to();
+                        } else {
+                            writeNormal(I.signal(executions)).to();
+                        }
+                    });
         }
 
         /**
@@ -1004,6 +1013,14 @@ public class ExecutionLog {
                 read().to(e -> writer.writeRow(e.toString()));
                 writer.close();
             }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return service + " Log[" + date + "]";
         }
     }
 
@@ -1253,6 +1270,21 @@ public class ExecutionLog {
             } else if (localLast == null || date.isAfter(localLast)) {
                 localLast = date;
                 store();
+            }
+        }
+
+        /**
+         * Read the missing logs from the server and repair them.
+         */
+        private void repairMissingLog() {
+            LocalDate date = localLast.isEqual(LocalDate.now(Chrono.UTC)) ? localLast.minusDays(1) : localLast;
+            while (date.isAfter(localFirst)) {
+                Cache cache = cache(date);
+
+                if (!cache.exist()) {
+                    cache.readFromServer().waitForTerminate().to(I.NoOP);
+                }
+                date = date.minusDays(1);
             }
         }
 
