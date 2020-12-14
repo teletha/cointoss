@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -748,22 +748,24 @@ public class ExecutionLog {
                         }));
                     }
 
-                    // read from server
-                    ZonedDateTime start = Chrono.utc(date);
-                    ZonedDateTime end = start.plusDays(1);
+                    return I.signal();
 
-                    return service.executionLatest()
-                            .flatMap(latest -> findNearest(start, latest))
-                            .flatMap(e -> network(e.id))
-                            .skipWhile(e -> e.isBefore(start))
-                            .takeWhile(e -> e.isBefore(end))
-                            .effectOnComplete(executions -> {
-                                if (end.isBefore(Chrono.utcToday())) {
-                                    writeCompact(I.signal(executions)).to();
-                                } else {
-                                    writeNormal(I.signal(executions)).to();
-                                }
-                            });
+                    // read from server
+                    // ZonedDateTime start = Chrono.utc(date);
+                    // ZonedDateTime end = start.plusDays(1);
+                    //
+                    // return service.executionLatest()
+                    // .flatMap(latest -> findNearest(start, latest))
+                    // .flatMap(e -> network(e.id))
+                    // .skipWhile(e -> e.isBefore(start))
+                    // .takeWhile(e -> e.isBefore(end))
+                    // .effectOnComplete(executions -> {
+                    // if (end.isBefore(Chrono.utcToday())) {
+                    // writeCompact(I.signal(executions)).to();
+                    // } else {
+                    // writeNormal(I.signal(executions)).to();
+                    // }
+                    // });
                 }
             } catch (IOException e) {
                 throw I.quiet(e);
