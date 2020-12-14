@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -272,6 +272,7 @@ public class ExecutionLog {
     public final synchronized Signal<Execution> from(ZonedDateTime start, LogType... type) {
         ZonedDateTime endDay = repository.lastZDT();
         ZonedDateTime startDay = Chrono.between(repository.firstZDT(), start, endDay).truncatedTo(ChronoUnit.DAYS);
+        System.out.println(startDay + "   " + endDay);
 
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
@@ -392,7 +393,7 @@ public class ExecutionLog {
      * @return
      */
     private long estimateInitialExecutionId() {
-        long start = 0;
+        long start = 1;
         long end = service.executionLatest().waitForTerminate().to().exact().id;
         long middle = (start + end) / 2;
         long previousEnd = end;

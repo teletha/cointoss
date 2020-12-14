@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.bybit.Bybit;
+import cointoss.market.coinbase.Coinbase;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -59,7 +59,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = Bybit.BTC_USD;
+        MarketService service = Coinbase.ETHUSD;
         UITab tab = DockSystem.register(service.id())
                 .closable(false)
                 .text(service.marketReadableName)

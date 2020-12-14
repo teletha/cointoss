@@ -996,8 +996,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             chart.market.to(m -> {
                 m.priceVolume.past().to(volumes -> {
-                    PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
-                    bar.drawOn(priceRangedVolume);
+                    if (volumes[0] != null) {
+                        PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
+                        bar.drawOn(priceRangedVolume);
+                    }
                 });
             });
         });
@@ -1006,8 +1008,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             priceRangedVolumeLatest.clear();
 
             chart.market.map(m -> m.priceVolume.latest()).to(volumes -> {
-                PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
-                bar.drawOn(priceRangedVolumeLatest);
+                if (volumes[0] != null) {
+                    PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
+                    bar.drawOn(priceRangedVolumeLatest);
+                }
             });
         });
     }

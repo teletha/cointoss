@@ -9,7 +9,7 @@
  */
 package cointoss.market.coinbase;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -41,7 +41,7 @@ public class CoinbaseService extends MarketService {
             .ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]X");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(6).refresh(500, MILLISECONDS);
+    private static final APILimiter LIMITER = APILimiter.with.limit(8).refresh(500, MILLISECONDS);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws-feed.pro.coinbase.com")
