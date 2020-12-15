@@ -131,8 +131,8 @@ public class TrainingMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
-        return backend.executionLatestAt(id);
+    public Signal<Execution> executionsBefore(long id) {
+        return backend.executionsBefore(id);
     }
 
     /**

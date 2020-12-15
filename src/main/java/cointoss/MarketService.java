@@ -146,11 +146,18 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     public abstract Signal<Execution> executionLatest();
 
     /**
-     * Acquier the latest execution log.
+     * Retrieves the execution history before the specified ID. (The specified ID is excluded)
      * 
-     * @return A latest execution log.
+     * @return A execution log.
      */
-    public abstract Signal<Execution> executionLatestAt(long id);
+    public abstract Signal<Execution> executionsBefore(long id);
+
+    // /**
+    // * Retrieves the execution history after the specified ID. (The specified ID is excluded)
+    // *
+    // * @return A execution log.
+    // */
+    // public abstract Signal<Execution> executionsAfter(long id);
 
     /**
      * Checks whether the specified {@link Execution}s are the same.

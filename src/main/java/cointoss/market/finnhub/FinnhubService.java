@@ -84,7 +84,7 @@ public class FinnhubService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         return I.signal();
     }
 

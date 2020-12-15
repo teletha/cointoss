@@ -104,7 +104,7 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         long startTime = Support.computeEpochTime(id) + 1;
 
         return call("GET", "trades/t" + marketName + "/hist?limit=1&start=" + startTime + "&sort=1", LimitForTradeHistory)

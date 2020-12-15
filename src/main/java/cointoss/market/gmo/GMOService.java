@@ -125,7 +125,7 @@ public class GMOService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         ZonedDateTime date = Support.computeDateTime(id);
         ExecutionLogRepository repo = externalRepository();
 

@@ -189,7 +189,7 @@ public class HuobiService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         return call("GET", "market/history/trade?symbol=" + marketName + "&size=2000&page=20")
                 .flatIterable(e -> e.find("data", "*", "data", "*"))
                 .map(json -> convert2(json, new AtomicLong(), new Object[2]));

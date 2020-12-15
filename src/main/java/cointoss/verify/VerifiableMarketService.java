@@ -266,7 +266,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error();

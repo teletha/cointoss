@@ -98,7 +98,7 @@ public class CoinbaseService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         long[] context = new long[3];
 
         return call("GET", "products/" + marketName + "/trades?after=" + id).flatIterable(e -> e.find("*"))

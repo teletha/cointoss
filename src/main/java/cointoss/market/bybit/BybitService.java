@@ -233,7 +233,7 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         return call("GET", "trading-records?symbol=" + marketName + "&from=" + id).flatIterable(e -> e.find("result", "*"))
                 .map(json -> convert(json, new Object[2]));
     }

@@ -116,7 +116,7 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true&endTime=" + formatEncodedId(id))
                 .flatIterable(e -> e.find("*"))
                 .map(json -> convert(json, new long[3]));

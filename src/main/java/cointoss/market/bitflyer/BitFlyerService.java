@@ -286,7 +286,7 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         String[] previous = new String[] {"", ""};
 
         return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=1").flatIterable(e -> e.find("*"))

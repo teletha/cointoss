@@ -119,7 +119,7 @@ public class BitbankService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
+    public Signal<Execution> executionsBefore(long id) {
         throw new Error("No support.");
     }
 

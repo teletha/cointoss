@@ -96,8 +96,9 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionLatestAt(long id) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1&fromId=" + id).flatIterable(e -> e.find("*")).map(this::createExecution);
+    public Signal<Execution> executionsBefore(long id) {
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1&fromId=" + id).flatIterable(e -> e.find("*"))
+                .map(this::createExecution);
     }
 
     /**
@@ -112,7 +113,7 @@ public class BinanceService extends MarketService {
         Num size = e.get(Num.class, "q");
         Num price = e.get(Num.class, "p");
         ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
-    
+
         return Execution.with.direction(side, size)
                 .id(id)
                 .price(price)

@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -399,7 +399,7 @@ public class ExecutionLog {
         long previousEnd = end;
 
         while (true) {
-            List<Execution> result = service.executionLatestAt(middle).skipError().waitForTerminate().toList();
+            List<Execution> result = service.executionsBefore(middle).skipError().waitForTerminate().toList();
             if (result.isEmpty()) {
                 start = middle;
                 middle = (start + end) / 2;
@@ -790,14 +790,15 @@ public class ExecutionLog {
          * @return
          */
         private Signal<Execution> findNearest(ZonedDateTime target, Execution latest) {
-            return service.executionLatestAt(latest.id - service.setting.acquirableExecutionSize).concatMap(previous -> {
+            System.out.println(latest);
+            return service.executionsBefore(latest.id - service.setting.acquirableExecutionSize).first().concatMap(previous -> {
                 long timeDistance = latest.mills - previous.mills;
                 long idDistance = latest.id - previous.id;
                 long targetDistance = latest.mills - Chrono.utc(date).toInstant().toEpochMilli();
                 long estimatedTargetId = latest.id - idDistance * (targetDistance / timeDistance);
 
-                return service.executionLatestAt(estimatedTargetId).concatMap(estimated -> {
-                    if (estimated.isBefore(target) && estimated.isAfter(target.minusMinutes(30))) {
+                return service.executionsBefore(estimatedTargetId).concatMap(estimated -> {
+                    if (estimated.isBefore(target) && estimated.isAfter(target.minusMinutes(60))) {
                         return I.signal(estimated);
                     } else {
                         return findNearest(target, estimated);
