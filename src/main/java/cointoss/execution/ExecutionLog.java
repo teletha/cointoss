@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -62,7 +62,6 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
-import cointoss.market.MarketServiceProvider;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
@@ -1310,18 +1309,6 @@ public class ExecutionLog {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.convertCompactToNormal();
-    }
-
-    /**
-     * Helper method to clear all fast log.
-     */
-    public static void clearFastLog() {
-        I.load(Market.class);
-
-        MarketServiceProvider.availableMarketServices().to(service -> {
-            ExecutionLog log = new ExecutionLog(service);
-            log.clearFastCache();
-        });
     }
 
     public static void main(String[] args) {
