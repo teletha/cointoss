@@ -791,7 +791,7 @@ public class ExecutionLog {
          */
         private Signal<Execution> findNearest(ZonedDateTime target, Execution latest) {
             System.out.println(latest);
-            return service.executionsBefore(latest.id - service.setting.acquirableExecutionSize).first().concatMap(previous -> {
+            return service.executionsBefore(latest.id - service.setting.acquirableExecutionSize).concatMap(previous -> {
                 long timeDistance = latest.mills - previous.mills;
                 long idDistance = latest.id - previous.id;
                 long targetDistance = latest.mills - Chrono.utc(date).toInstant().toEpochMilli();
