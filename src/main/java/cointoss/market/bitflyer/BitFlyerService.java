@@ -264,11 +264,10 @@ public class BitFlyerService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         String[] previous = new String[] {"", ""};
 
-        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&after=" + startId + "&before=" + endId) //
-                        .flatIterable(e -> e.find("*"))
-                        .reverse()
-                        .map(e -> convertExecution(e, previous));
+        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + setting.acquirableExecutionSize + "&after=" + startId + "&before=" + endId) //
+                .flatIterable(e -> e.find("*"))
+                .reverse()
+                .map(e -> convertExecution(e, previous));
     }
 
     /**
@@ -289,7 +288,8 @@ public class BitFlyerService extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         String[] previous = new String[] {"", ""};
 
-        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=1").flatIterable(e -> e.find("*"))
+        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + setting.acquirableExecutionSize + "&before=" + id)
+                .flatIterable(e -> e.find("*"))
                 .map(e -> convertExecution(e, previous));
     }
 

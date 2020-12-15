@@ -97,8 +97,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1&fromId=" + id).flatIterable(e -> e.find("*"))
-                .map(this::createExecution);
+        return call("GET", "aggTrades?symbol=" + marketName + "&fromId=" + id).flatIterable(e -> e.find("*")).map(this::createExecution);
     }
 
     /**

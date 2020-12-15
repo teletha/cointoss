@@ -97,12 +97,26 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Acquier the latest execution log.
+     * 
+     * @return A latest execution log.
+     */
+    public abstract Signal<Execution> executionLatest();
+
+    /**
      * Acquire the execution log between start (exclusive) and end (exclusive) key.
      * 
      * @param key An execution sequencial key (i.e. ID, datetime etc).
      * @return This {@link Signal} will be completed immediately.
      */
     public abstract Signal<Execution> executions(long startId, long endId);
+
+    /**
+     * Retrieves the execution log before the specified ID. (The specified ID is excluded)
+     * 
+     * @return A single execution log.
+     */
+    public abstract Signal<Execution> executionsBefore(long id);
 
     /**
      * Acquire execution log in realtime. This is infinitely.
@@ -137,27 +151,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A realtime execution logs.
      */
     protected abstract Signal<Execution> connectExecutionRealtimely();
-
-    /**
-     * Acquier the latest execution log.
-     * 
-     * @return A latest execution log.
-     */
-    public abstract Signal<Execution> executionLatest();
-
-    /**
-     * Retrieves the execution history before the specified ID. (The specified ID is excluded)
-     * 
-     * @return A execution log.
-     */
-    public abstract Signal<Execution> executionsBefore(long id);
-
-    // /**
-    // * Retrieves the execution history after the specified ID. (The specified ID is excluded)
-    // *
-    // * @return A execution log.
-    // */
-    // public abstract Signal<Execution> executionsAfter(long id);
 
     /**
      * Checks whether the specified {@link Execution}s are the same.

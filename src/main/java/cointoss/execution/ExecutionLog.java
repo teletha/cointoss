@@ -63,6 +63,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -769,7 +770,7 @@ public class ExecutionLog {
             ZonedDateTime end = start.plusDays(1);
 
             return service.executionLatest()
-                    .flatMap(latest -> findNearest(start, latest))
+                    .flatMap(latest -> findNearest(start, latest, 0))
                     .flatMap(e -> network(e.id))
                     .skipWhile(e -> e.isBefore(start))
                     .takeWhile(e -> e.isBefore(end))
@@ -789,7 +790,7 @@ public class ExecutionLog {
          * @param latest
          * @return
          */
-        private Signal<Execution> findNearest(ZonedDateTime target, Execution latest) {
+        private Signal<Execution> findNearest(ZonedDateTime target, Execution latest, int count) {
             System.out.println(latest);
             return service.executionsBefore(latest.id - service.setting.acquirableExecutionSize).concatMap(previous -> {
                 long timeDistance = latest.mills - previous.mills;
@@ -798,10 +799,10 @@ public class ExecutionLog {
                 long estimatedTargetId = latest.id - idDistance * (targetDistance / timeDistance);
 
                 return service.executionsBefore(estimatedTargetId).concatMap(estimated -> {
-                    if (estimated.isBefore(target) && estimated.isAfter(target.minusMinutes(60))) {
+                    if (estimated.isBefore(target) && (estimated.isAfter(target.minusMinutes(60)) || 10 < count)) {
                         return I.signal(estimated);
                     } else {
-                        return findNearest(target, estimated);
+                        return findNearest(target, estimated, count + 1);
                     }
                 });
             }).first();
@@ -1320,6 +1321,11 @@ public class ExecutionLog {
         MarketServiceProvider.availableMarketServices().to(service -> {
             ExecutionLog log = new ExecutionLog(service);
             log.clearFastCache();
+        });
+    }
+
+    public static void main(String[] args) {
+        BitFlyer.FX_BTC_JPY.log.cache(Chrono.utc(2020, 11, 25)).readFromServer().waitForTerminate().to(e -> {
         });
     }
 }

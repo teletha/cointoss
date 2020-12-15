@@ -139,7 +139,7 @@ public class FTXService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        return call("GET", "markets/" + marketName + "/trades?limit=1&end_time=" + Support.computeEpochTime(id))
+        return call("GET", "markets/" + marketName + "/trades?end_time=" + Support.computeEpochTime(id))
                 .flatIterable(e -> e.find("result", "*"))
                 .map(json -> createExecution(json, new AtomicLong(), new long[3]));
     }

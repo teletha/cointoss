@@ -129,7 +129,7 @@ public class GMOService extends MarketService {
         ZonedDateTime date = Support.computeDateTime(id);
         ExecutionLogRepository repo = externalRepository();
 
-        return repo.convert(date).takeUntil(e -> id <= e.id).waitForTerminate().effect(e -> System.out.println(e));
+        return repo.convert(date).takeUntil(e -> id <= e.id).waitForTerminate();
     }
 
     /**
