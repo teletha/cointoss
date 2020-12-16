@@ -9,6 +9,7 @@
  */
 package cointoss.execution;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ import antibug.CleanRoom;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
+import kiss.I;
+import kiss.Signal;
 import psychopath.Locator;
 
 class CacheTest {
@@ -120,6 +123,33 @@ class CacheTest {
         assert executions.size() == 2;
         assert executions.get(0).equals(c1);
         assert executions.get(1).equals(c2);
+    }
+
+    @Test
+    void readExternalRepository() {
+        Execution e1 = Execution.with.buy(1).price(10);
+        Execution e2 = Execution.with.buy(1).price(12);
+
+        ExecutionLogRepository external = new ExecutionLogRepository(market.service) {
+
+            @Override
+            public Signal<Execution> convert(ZonedDateTime date) {
+                return I.signal(e1, e2);
+            }
+
+            @Override
+            public Signal<ZonedDateTime> collect() {
+                return I.signal(Chrono.utc(2020, 12, 15));
+            }
+        };
+
+        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        List<Execution> executions = cache.readExternalRepository(external).toList();
+        assert executions.size() == 2;
+        assert executions.get(0).equals(e1);
+        assert executions.get(1).equals(e2);
+        assert cache.existNormal();
+        assert cache.existCompact() == false;
     }
 
     @Test
