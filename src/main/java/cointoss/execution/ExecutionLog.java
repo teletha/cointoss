@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -604,6 +604,44 @@ public class ExecutionLog {
     }
 
     /**
+     * Get the ID around the specified date and time.
+     * 
+     * @param target
+     * @return
+     */
+    private Signal<Long> searchNearestId(ZonedDateTime target) {
+        return service.executionLatest().flatMap(latest -> searchNearest(target, latest, 0)).first().map(e -> e.id);
+    }
+
+    /**
+     * INTERNAL: Estimate the nearest {@link Execution} at the specified time.
+     * 
+     * @param target
+     * @param current
+     * @return
+     */
+    private Signal<Execution> searchNearest(ZonedDateTime target, Execution current, int count) {
+        log.info("{} searches for the execution log closest to {}. [{}]", service, target.toLocalDate(), current.date.toLocalDateTime());
+
+        return service.executionsBefore(current.id - service.setting.acquirableExecutionSize).concatMap(previous -> {
+            long timeDistance = current.mills - previous.mills;
+            long idDistance = current.id - previous.id;
+            long targetDistance = current.mills - target.toInstant().toEpochMilli();
+            long estimatedTargetId = current.id - idDistance * (targetDistance / timeDistance);
+
+            return service.executionsBefore(estimatedTargetId).concatMap(estimated -> {
+                if (estimated.isBefore(target) && (estimated.isAfter(target.minusMinutes(15)) //
+                        || (10 < count) && estimated.isAfter(target.minusHours(1)) //
+                        || (20 < count) && estimated.isAfter(target.minusHours(6)))) {
+                    return I.signal(estimated);
+                } else {
+                    return searchNearest(target, estimated, count + 1);
+                }
+            });
+        }).first();
+    }
+
+    /**
      * 
      */
     public enum LogType {
@@ -768,9 +806,7 @@ public class ExecutionLog {
             ZonedDateTime start = Chrono.utc(date);
             ZonedDateTime end = start.plusDays(1);
 
-            return service.executionLatest()
-                    .flatMap(latest -> findNearest(start, latest, 0))
-                    .flatMap(e -> network(e.id))
+            return searchNearestId(start).flatMap(id -> network(id))
                     .skipWhile(e -> e.isBefore(start))
                     .takeWhile(e -> e.isBefore(end))
                     .effectOnComplete(executions -> {
@@ -780,31 +816,6 @@ public class ExecutionLog {
                             writeNormal(I.signal(executions)).to();
                         }
                     });
-        }
-
-        /**
-         * Estimate the nearest {@link Execution} at the specified time.
-         * 
-         * @param target
-         * @param latest
-         * @return
-         */
-        private Signal<Execution> findNearest(ZonedDateTime target, Execution latest, int count) {
-            System.out.println(latest);
-            return service.executionsBefore(latest.id - service.setting.acquirableExecutionSize).concatMap(previous -> {
-                long timeDistance = latest.mills - previous.mills;
-                long idDistance = latest.id - previous.id;
-                long targetDistance = latest.mills - Chrono.utc(date).toInstant().toEpochMilli();
-                long estimatedTargetId = latest.id - idDistance * (targetDistance / timeDistance);
-
-                return service.executionsBefore(estimatedTargetId).concatMap(estimated -> {
-                    if (estimated.isBefore(target) && (estimated.isAfter(target.minusMinutes(60)) || 10 < count)) {
-                        return I.signal(estimated);
-                    } else {
-                        return findNearest(target, estimated, count + 1);
-                    }
-                });
-            }).first();
         }
 
         /**
@@ -1311,7 +1322,7 @@ public class ExecutionLog {
         cache.convertCompactToNormal();
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         BitFlyer.FX_BTC_JPY.log.cache(Chrono.utc(2020, 11, 25)).readFromServer().waitForTerminate().to(e -> {
         });
     }
