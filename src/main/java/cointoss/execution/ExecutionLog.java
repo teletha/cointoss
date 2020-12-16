@@ -644,13 +644,6 @@ public class ExecutionLog {
     /**
      * 
      */
-    public enum LogType {
-        Normal, Fast;
-    }
-
-    /**
-     * 
-     */
     class Cache {
 
         /** The end date */

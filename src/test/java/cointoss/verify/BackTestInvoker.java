@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import cointoss.execution.ExecutionLog.LogType;
+import cointoss.execution.LogType;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.trading.LazyBear;
 

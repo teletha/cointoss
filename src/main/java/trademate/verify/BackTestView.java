@@ -20,7 +20,7 @@ import cointoss.analyze.Analyzer;
 import cointoss.analyze.NumStats;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.ExecutionLog;
-import cointoss.execution.ExecutionLog.LogType;
+import cointoss.execution.LogType;
 import cointoss.market.MarketServiceProvider;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;

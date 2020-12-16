@@ -11,7 +11,7 @@ package trademate;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.execution.ExecutionLog.LogType;
+import cointoss.execution.LogType;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.util.Primitives;
