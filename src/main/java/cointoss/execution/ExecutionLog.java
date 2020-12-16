@@ -22,7 +22,6 @@ import java.nio.channels.OverlappingFileLockException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayDeque;
@@ -43,7 +42,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,7 +70,6 @@ import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Storable;
 import psychopath.Directory;
 import psychopath.File;
 
@@ -169,26 +166,17 @@ public class ExecutionLog {
         return thread;
     });
 
-    /** The file data format */
-    private static final DateTimeFormatter FileNamePattern = DateTimeFormatter.ofPattern("yyyyMMdd");
-
     /** The market provider. */
     private final MarketService service;
 
     /** The root directory of logs. */
     private final Directory root;
 
-    /** The latest id store in local file. */
-    private final File store;
-
     /** The repository. */
     private final Repository repository;
 
-    /** The first day. */
-    private ZonedDateTime cacheFirst;
-
-    /** The last day. */
-    private ZonedDateTime cacheLast;
+    /** The latest id store in local file. */
+    private final File store;
 
     /** The active cache. */
     private Cache cache;
@@ -223,19 +211,28 @@ public class ExecutionLog {
         this.root = Objects.requireNonNull(root);
         this.store = root.file("lastID.log");
         this.logger = I.make(service.setting.executionLogger());
-        this.repository = new Repository(service.externalRepository());
+        this.repository = new Repository(root, service.externalRepository());
 
-        this.cacheFirst = repository.firstZDT();
-        this.cacheLast = repository.lastZDT();
-
-        this.cache = new Cache(cacheFirst);
+        this.cache = new Cache(repository.firstZDT());
     }
 
     /**
      * Get a physical checkup on logs.
      */
     public final void checkup() {
-        repository.repairMissingLog();
+        repairMissingLog();
+    }
+
+    /**
+     * Read the missing logs from the server and repair them.
+     */
+    private void repairMissingLog() {
+        repository.collectLocals(false, false)
+                .map(this::cache)
+                .skip(Cache::exist)
+                .concatMap(Cache::readFromServer)
+                .waitForTerminate()
+                .to(I.NoOP);
     }
 
     /**
@@ -244,7 +241,7 @@ public class ExecutionLog {
      * @return
      */
     public final ZonedDateTime firstCacheDate() {
-        return cacheFirst;
+        return repository.firstZDT();
     }
 
     /**
@@ -253,7 +250,7 @@ public class ExecutionLog {
      * @return
      */
     public final ZonedDateTime lastCacheDate() {
-        return cacheLast;
+        return repository.lastZDT();
     }
 
     /**
@@ -272,7 +269,6 @@ public class ExecutionLog {
     public final synchronized Signal<Execution> from(ZonedDateTime start, LogType... type) {
         ZonedDateTime endDay = repository.lastZDT();
         ZonedDateTime startDay = Chrono.between(repository.firstZDT(), start, endDay).truncatedTo(ChronoUnit.DAYS);
-        System.out.println(startDay + "   " + endDay);
 
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
@@ -517,7 +513,7 @@ public class ExecutionLog {
      * @return
      */
     public final Signal<Execution> rangeAll(LogType... type) {
-        return range(cacheFirst, cacheLast, type);
+        return range(repository.firstZDT(), repository.lastZDT(), type);
     }
 
     /**
@@ -538,9 +534,10 @@ public class ExecutionLog {
      * @return
      */
     public final Signal<Execution> rangeRandom(int days, LogType... type) {
-        long range = ChronoUnit.DAYS.between(cacheFirst, cacheLast.minusDays(days + 1));
+        ZonedDateTime first = repository.firstZDT();
+        long range = ChronoUnit.DAYS.between(first, repository.lastZDT().minusDays(days + 1));
         long offset = RandomUtils.nextLong(0, range);
-        return range(cacheFirst.plusDays(offset), cacheFirst.plusDays(offset + days), type);
+        return range(first.plusDays(offset), first.plusDays(offset + days), type);
     }
 
     /**
@@ -549,10 +546,10 @@ public class ExecutionLog {
      * @return
      */
     final Signal<Cache> caches() {
-        return I.signal(cacheFirst)
-                .recurse(day -> day.plusDays(1))
-                .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
-                .map(Cache::new);
+        ZonedDateTime first = repository.firstZDT();
+        ZonedDateTime last = repository.lastZDT();
+
+        return I.signal(first).recurse(day -> day.plusDays(1)).takeWhile(day -> day.isBefore(last) || day.isEqual(last)).map(Cache::new);
     }
 
     /**
@@ -1121,185 +1118,6 @@ public class ExecutionLog {
             } else {
                 return latestId = service.executionLatest().map(e -> e.id).waitForTerminate().to().or(-1L);
             }
-        }
-    }
-
-    /**
-     * Store for reepository related info.
-     */
-    private class Repository implements Storable<Repository> {
-
-        private final ExecutionLogRepository external;
-
-        /** The last scan date-time in local repository. */
-        public LocalDate localScanLatest = LocalDate.of(1970, 1, 1);
-
-        /** The oldest cache. */
-        public LocalDate localFirst;
-
-        /** The latest cache. */
-        public LocalDate localLast;
-
-        /** The last scan date-time in external repository. */
-        public LocalDate externalScanLatest = LocalDate.of(1970, 1, 1);
-
-        /** The oldest cache. */
-        public LocalDate externalFirst;
-
-        /** The latest cache. */
-        public LocalDate externalLast;
-
-        /**
-         * Initialize.
-         * 
-         * @param external
-         */
-        private Repository(ExecutionLogRepository external) {
-            this.external = external;
-
-            restore();
-
-            scanLocalRepository();
-            scanExternalRepository();
-        }
-
-        /**
-         * Scan logs in the local repository.
-         */
-        private void scanLocalRepository() {
-            LocalDate now = LocalDate.now(Chrono.UTC);
-
-            if (now.isAfter(localScanLatest)) {
-                LocalDate[] dates = new LocalDate[2];
-
-                root.walkFile("execution*.*og")
-                        .map(file -> LocalDate.parse(file.name().subSequence(9, 17), FileNamePattern))
-                        .effectOnce(date -> {
-                            dates[0] = date;
-                            dates[1] = date;
-                        })
-                        .to(date -> {
-                            if (date.isBefore(dates[0])) {
-                                dates[0] = date;
-                            } else if (date.isAfter(dates[1])) {
-                                dates[1] = date;
-                            }
-                        }, e -> {
-                            // ignore
-                        }, () -> {
-                            localFirst = dates[0];
-                            localLast = dates[1];
-                            localScanLatest = now;
-                            store();
-                        });
-            }
-        }
-
-        /**
-         * Scan logs in the external repository.
-         */
-        private void scanExternalRepository() {
-            if (external == null) {
-                return;
-            }
-
-            LocalDate now = LocalDate.now(Chrono.UTC);
-
-            if (now.isAfter(externalScanLatest)) {
-                LocalDate[] dates = new LocalDate[2];
-
-                external.collect().map(ZonedDateTime::toLocalDate).effectOnce(date -> {
-                    dates[0] = date;
-                    dates[1] = date;
-                }).waitForTerminate().to(date -> {
-                    if (date.isBefore(dates[0])) {
-                        dates[0] = date;
-                    } else if (date.isAfter(dates[1])) {
-                        dates[1] = date;
-                    }
-                }, e -> {
-                    // ignore
-                }, () -> {
-                    externalFirst = dates[0];
-                    externalLast = dates[1];
-                    externalScanLatest = now;
-                    store();
-                });
-            }
-        }
-
-        /**
-         * Compute the first cache.
-         * 
-         * @return
-         */
-        private LocalDate first() {
-            return ObjectUtils.min(localFirst, externalFirst, LocalDate.now(Chrono.UTC));
-        }
-
-        /**
-         * Compute the last cache.
-         * 
-         * @return
-         */
-        private LocalDate last() {
-            return ObjectUtils.max(localLast, externalLast, first());
-        }
-
-        /**
-         * Compute the first cache.
-         * 
-         * @return
-         */
-        private ZonedDateTime firstZDT() {
-            return first().atTime(0, 0).atZone(Chrono.UTC);
-        }
-
-        /**
-         * Compute the last cache.
-         * 
-         * @return
-         */
-        private ZonedDateTime lastZDT() {
-            return last().atTime(0, 0).atZone(Chrono.UTC);
-        }
-
-        /**
-         * Update the local resource.
-         * 
-         * @param date
-         */
-        private void updateLocal(LocalDate date) {
-            if (localFirst == null || date.isBefore(localFirst)) {
-                localFirst = date;
-                store();
-            } else if (localLast == null || date.isAfter(localLast)) {
-                localLast = date;
-                store();
-            }
-        }
-
-        /**
-         * Read the missing logs from the server and repair them.
-         */
-        private void repairMissingLog() {
-            LocalDate date = localLast.isEqual(LocalDate.now(Chrono.UTC)) ? localLast.minusDays(1) : localLast;
-            while (date.isAfter(localFirst)) {
-                Cache cache = cache(date);
-
-                if (!cache.exist()) {
-                    cache.readFromServer().waitForTerminate().to(I.NoOP);
-                }
-                date = date.minusDays(1);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String locate() {
-            return root.file("repository.json").toString();
         }
     }
 
