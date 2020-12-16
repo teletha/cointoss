@@ -17,21 +17,21 @@ import java.nio.file.Path;
 import kiss.I;
 import psychopath.File;
 
-class NormalLogFile implements AutoCloseable {
+class NormalLogReader implements AutoCloseable {
 
     private final RandomAccessFile file;
 
     /**
      * 
      */
-    NormalLogFile(File file) {
+    NormalLogReader(File file) {
         this(file.asJavaPath());
     }
 
     /**
      * 
      */
-    NormalLogFile(Path file) {
+    NormalLogReader(Path file) {
         try {
             this.file = new RandomAccessFile(file.toFile(), "rw");
         } catch (FileNotFoundException e) {
@@ -48,6 +48,56 @@ class NormalLogFile implements AutoCloseable {
     }
 
     /**
+     * Retrieve ID of the first item.
+     * 
+     * @return
+     */
+    long firstID() {
+        // normalize
+        repair();
+
+        try {
+            // no data
+            if (file.length() == 0) {
+                return -1;
+            }
+
+            // read value at head
+            file.seek(0);
+            return Long.parseLong(readColumn());
+        } catch (NumberFormatException e) {
+            return -1;
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
+     * Retrieve ID of the last item.
+     * 
+     * @return
+     */
+    long lastID() {
+        // normalize
+        repair();
+
+        try {
+            // no data
+            if (file.length() == 0) {
+                return -1;
+            }
+
+            // read value at tail
+            moveToLineHead();
+            return Long.parseLong(readColumn());
+        } catch (NumberFormatException e) {
+            return -1;
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
      * Check to see if this file is corrupt.
      * 
      * @return A result.
@@ -56,11 +106,16 @@ class NormalLogFile implements AutoCloseable {
         try {
             long length = file.length();
 
-            if (length <= 2) {
+            if (length == 0) {
+                return false;
+            } else if (length <= 10) {
                 return true;
             }
 
+            // move to tail
             file.seek(length);
+
+            // tail must be '\r\n'
             byte[] bytes = readBack(2);
             return bytes[0] != 0x00D || bytes[1] != 0x00A;
         } catch (IOException e) {
@@ -74,7 +129,7 @@ class NormalLogFile implements AutoCloseable {
     void repair() {
         if (isCorrupted()) {
             try {
-                backToLineStart();
+                moveToLineHead();
                 file.setLength(file.getFilePointer());
                 file.seek(file.length() - 2);
             } catch (IOException e) {
@@ -83,36 +138,13 @@ class NormalLogFile implements AutoCloseable {
         }
     }
 
-    long readLastId() {
-        repair();
-        moveToEnd();
-        String line = readLastLine();
-    }
-
-    private String readLastLine() {
-        try {
-            repair();
-
-            byte[] bytes = readBack(128);
-            for (int i = bytes.length - 2; 0 <= i; i--) {
-                if (bytes[i] == 0x00D && bytes[i + 1] == 0x00A) {
-                    file.seek(file.getFilePointer() + i + 2);
-                    return;
-                }
-            }
-
-        } catch (IOException e) {
-            throw I.quiet(e);
-        }
-    }
-
     /**
-     * Read data and step position back.
+     * Move pointer to the head of the current line.
      * 
      * @param size
      * @return
      */
-    private void backToLineStart() throws IOException {
+    private void moveToLineHead() throws IOException {
         byte[] bytes = readBack(128);
         for (int i = bytes.length - 2; 0 <= i; i--) {
             if (bytes[i] == 0x00D && bytes[i + 1] == 0x00A) {
@@ -123,28 +155,38 @@ class NormalLogFile implements AutoCloseable {
     }
 
     /**
-     * Move the pointer to end of file.
-     */
-    private void moveToEnd() {
-        try {
-            file.seek(file.length());
-        } catch (IOException e) {
-            throw I.quiet(e);
-        }
-    }
-
-    /**
      * Read data and step position back.
      * 
      * @param size
      * @return
      */
     private byte[] readBack(int size) throws IOException {
-        byte[] bytes = new byte[size];
-        long pos = Math.max(0, file.getFilePointer() - size);
-        file.seek(pos);
+        long end = file.getFilePointer();
+        long start = Math.max(0, end - size);
+        byte[] bytes = new byte[(int) (end - start)];
+        file.seek(start);
         file.read(bytes);
-        file.seek(pos);
+        file.seek(start);
         return bytes;
+    }
+
+    /**
+     * Read then next column data.
+     * 
+     * @return
+     * @throws IOException
+     */
+    private String readColumn() throws IOException {
+        // The longest date and time item can be read if it has 26 bytes.
+        byte[] bytes = new byte[32];
+        long pos = file.getFilePointer();
+        int read = file.read(bytes);
+        for (int i = 0; i < read; i++) {
+            if (bytes[i] == 0x20) {
+                file.seek(pos + i);
+                return new String(bytes, 0, i);
+            }
+        }
+        return "";
     }
 }

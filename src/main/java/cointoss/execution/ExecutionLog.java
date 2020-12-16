@@ -700,8 +700,8 @@ public class ExecutionLog {
                 return false;
             }
 
-            try (NormalLogFile log = new NormalLogFile(normal)) {
-                log.readLastId();
+            try (NormalLogReader log = new NormalLogReader(normal)) {
+                log.lastID();
                 if (log.isCorrupted()) {
                     return false;
                 }
