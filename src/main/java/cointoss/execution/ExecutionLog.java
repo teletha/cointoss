@@ -762,7 +762,7 @@ public class ExecutionLog {
                 if (existCompact()) {
                     if (type == LogType.Fast) {
                         // read from fast log
-                        writeFast();
+                        convertCompactToFast();
                         return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
                                 .scanWith(Market.BASE, logger::decode)
                                 .effectOnComplete(parser::stopParsing)
@@ -920,17 +920,8 @@ public class ExecutionLog {
         /**
          * Write the execution log to the normal log.
          * 
-         * @param executions A list of executions to write.
-         */
-        void writeNormal(List<Execution> executions) {
-            writeNormal(I.signal(executions)).to(I.NoOP);
-        }
-
-        /**
-         * Write normal log.
-         * 
-         * @param executions
-         * @return
+         * @param executions A stream of executions to write.
+         * @return Wrapped {@link Signal}.
          */
         Signal<Execution> writeNormal(Signal<Execution> executions) {
             int[] count = {1};
@@ -950,7 +941,19 @@ public class ExecutionLog {
         }
 
         /**
-         * Write compact log from the specified executions.
+         * Write the execution log to the compact log.
+         * 
+         * @param executions A list of executions to write.
+         */
+        void writeCompact(Execution... executions) {
+            writeCompact(I.signal(executions)).to(I.NoOP);
+        }
+
+        /**
+         * Write the execution log to the compact log.
+         * 
+         * @param executions A stream of executions to write.
+         * @return Wrapped {@link Signal}.
          */
         Signal<Execution> writeCompact(Signal<Execution> executions) {
             try {
@@ -969,9 +972,70 @@ public class ExecutionLog {
         }
 
         /**
+         * Create new CSV writer.
+         * 
+         * @param out
+         * @return
+         */
+        private CsvParser buildCsvParser() {
+            CsvParserSettings setting = new CsvParserSettings();
+            setting.getFormat().setDelimiter(' ');
+            setting.getFormat().setComment('無');
+            return new CsvParser(setting);
+        }
+
+        /**
+         * Create new CSV writer.
+         * 
+         * @param out
+         * @return
+         */
+        private CsvWriter buildCsvWriter(OutputStream out) {
+            CsvWriterSettings setting = new CsvWriterSettings();
+            setting.getFormat().setDelimiter(' ');
+            setting.getFormat().setComment('無');
+            return new CsvWriter(out, ISO_8859_1, setting);
+        }
+
+        /**
+         * Convert normal log to compact log.
+         */
+        void convertNormalToCompact() {
+            if (normal.isPresent() && compact.isAbsent()) {
+                writeCompact(read()).to(I.NoOP, e -> {
+                    log.error("{} fails to compact the normal log. [{}]", service, date, e);
+                }, () -> {
+                    normal.delete();
+                });
+            }
+        }
+
+        /**
+         * Convert normal log to compact log asynchronously.
+         */
+        void convertNormalToCompactAsync() {
+            if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
+                I.schedule(5, SECONDS).to(() -> {
+                    writeCompact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
+                });
+            }
+        }
+
+        /**
+         * Convert compact log to normal log.
+         */
+        void convertCompactToNormal() {
+            if (normal.isAbsent() && compact.isPresent()) {
+                CsvWriter writer = buildCsvWriter(normal.newOutputStream());
+                read().to(e -> writer.writeRow(e.toString()));
+                writer.close();
+            }
+        }
+
+        /**
          * Convert compact log to fast log synchronously.
          */
-        private void writeFast() {
+        void convertCompactToFast() {
             if (fast.isAbsent() && compact.isPresent()) {
                 try {
                     int scale = service.setting.target.scale;
@@ -1020,54 +1084,6 @@ public class ExecutionLog {
                 } catch (Throwable e) {
                     throw new Error("Failed writing the fast log. [" + fast + "]", e);
                 }
-            }
-        }
-
-        /**
-         * Create new CSV writer.
-         * 
-         * @param out
-         * @return
-         */
-        private CsvParser buildCsvParser() {
-            CsvParserSettings setting = new CsvParserSettings();
-            setting.getFormat().setDelimiter(' ');
-            setting.getFormat().setComment('無');
-            return new CsvParser(setting);
-        }
-
-        /**
-         * Create new CSV writer.
-         * 
-         * @param out
-         * @return
-         */
-        private CsvWriter buildCsvWriter(OutputStream out) {
-            CsvWriterSettings setting = new CsvWriterSettings();
-            setting.getFormat().setDelimiter(' ');
-            setting.getFormat().setComment('無');
-            return new CsvWriter(out, ISO_8859_1, setting);
-        }
-
-        /**
-         * Convert normal log to compact log asynchronously.
-         */
-        private void convertNormalToCompactAsync() {
-            if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
-                I.schedule(5, SECONDS).to(() -> {
-                    writeCompact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
-                });
-            }
-        }
-
-        /**
-         * Convert compact log to normal log.
-         */
-        private void convertCompactToNormal() {
-            if (normal.isAbsent() && compact.isPresent()) {
-                CsvWriter writer = buildCsvWriter(normal.newOutputStream());
-                read().to(e -> writer.writeRow(e.toString()));
-                writer.close();
             }
         }
 
