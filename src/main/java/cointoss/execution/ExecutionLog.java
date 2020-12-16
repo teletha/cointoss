@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,7 +48,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.TreeMultimap;
 import com.univocity.parsers.csv.CsvParser;
@@ -645,16 +644,16 @@ public class ExecutionLog {
     class Cache {
 
         /** The end date */
-        private final LocalDate date;
+        final LocalDate date;
 
         /** The log file. */
-        private final File normal;
+        final File normal;
 
         /** The compact log file. */
-        private final File compact;
+        final File compact;
 
         /** The fast log file. */
-        private final File fast;
+        final File fast;
 
         /** The log writing task. */
         private ScheduledFuture task = NOOP;
@@ -677,7 +676,7 @@ public class ExecutionLog {
          * 
          * @return
          */
-        private boolean exist() {
+        boolean exist() {
             return existNormal() || existCompact();
         }
 
@@ -686,7 +685,7 @@ public class ExecutionLog {
          * 
          * @return
          */
-        private boolean existNormal() {
+        boolean existNormal() {
             return normal.isPresent() && normal.size() != 0;
         }
 
@@ -695,7 +694,7 @@ public class ExecutionLog {
          * 
          * @return
          */
-        private boolean existNormalCompletely() {
+        boolean existNormalCompletely() {
             if (normal.isAbsent() && normal.size() == 0) {
                 return false;
             }
@@ -716,7 +715,7 @@ public class ExecutionLog {
          * 
          * @return
          */
-        private boolean existCompact() {
+        boolean existCompact() {
             return compact.isPresent() && compact.size() != 0;
         }
 
@@ -753,7 +752,7 @@ public class ExecutionLog {
          * @return
          */
         @SuppressWarnings("resource")
-        private Signal<Execution> read(LogType... types) {
+        Signal<Execution> read(LogType... types) {
             LogType type = types == null || types.length == 0 ? LogType.Normal : types[0];
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
@@ -910,12 +909,30 @@ public class ExecutionLog {
         }
 
         /**
+         * Write the execution log to the normal log.
+         * 
+         * @param executions A list of executions to write.
+         */
+        void writeNormal(Execution... executions) {
+            writeNormal(I.signal(executions)).to(I.NoOP);
+        }
+
+        /**
+         * Write the execution log to the normal log.
+         * 
+         * @param executions A list of executions to write.
+         */
+        void writeNormal(List<Execution> executions) {
+            writeNormal(I.signal(executions)).to(I.NoOP);
+        }
+
+        /**
          * Write normal log.
          * 
          * @param executions
          * @return
          */
-        private Signal<Execution> writeNormal(Signal<Execution> executions) {
+        Signal<Execution> writeNormal(Signal<Execution> executions) {
             int[] count = {1};
             CsvWriter writer = buildCsvWriter(normal.newOutputStream());
 
@@ -935,7 +952,6 @@ public class ExecutionLog {
         /**
          * Write compact log from the specified executions.
          */
-        @VisibleForTesting
         Signal<Execution> writeCompact(Signal<Execution> executions) {
             try {
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));

@@ -16,6 +16,7 @@ import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
+import kiss.I;
 
 @Icy
 interface MarketSettingModel {
@@ -77,5 +78,14 @@ interface MarketSettingModel {
     @Icy.Property
     default Class<? extends ExecutionLogger> executionLogger() {
         return ExecutionDeltaLogger.class;
+    }
+
+    /**
+     * Create new {@link ExecutionLogger}.
+     * 
+     * @return
+     */
+    public default ExecutionLogger createExecutionLogger() {
+        return I.make(executionLogger());
     }
 }
