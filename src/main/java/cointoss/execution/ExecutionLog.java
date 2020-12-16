@@ -861,9 +861,12 @@ public class ExecutionLog {
         Signal<Execution> readExternalRepository(ExecutionLogRepository external) {
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
-            return writeNormal(external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
-                log.info("Donwload external log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
-            }));
+            return writeNormal(external.convert(date)
+                    .effectOnError(e -> log.error("Fail to download external log {} [{}].", service, date))
+                    .effectOnObserve(stopwatch::start)
+                    .effectOnComplete(() -> {
+                        log.info("Donwload external log {} [{}] {}", service, date, stopwatch.stop().elapsed());
+                    }));
         }
 
         private Signal<Execution> readFromServer() {

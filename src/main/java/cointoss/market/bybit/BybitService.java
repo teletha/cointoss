@@ -26,7 +26,6 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -396,13 +395,6 @@ public class BybitService extends MarketService {
             }
             return Chrono.utcByMicros(Long.parseLong(dateTime) * modifier);
         }
-    }
-
-    public static void main2(String[] args) throws InterruptedException {
-        Market m = new Market(Bybit.BTC_USD);
-        m.readLog(e -> e.fromYestaday());
-
-        Thread.sleep(1000 * 250);
     }
 
     /**
