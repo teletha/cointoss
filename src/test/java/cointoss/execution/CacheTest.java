@@ -42,6 +42,12 @@ class CacheTest {
     }
 
     @Test
+    void fastLog() {
+        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        assert cache.fast.name().equals("execution20201215.flog");
+    }
+
+    @Test
     void writeNormal() {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
@@ -66,7 +72,7 @@ class CacheTest {
     }
 
     @Test
-    void readFromNormal() {
+    void readNormal() {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
@@ -75,14 +81,14 @@ class CacheTest {
         cache.writeNormal(e1, e2);
 
         // read
-        List<Execution> executions = cache.read().toList();
+        List<Execution> executions = cache.readNormal().toList();
         assert executions.size() == 2;
         assert executions.get(0).equals(e1);
         assert executions.get(1).equals(e2);
     }
 
     @Test
-    void readFromCompact() {
+    void readCompact() {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
@@ -91,7 +97,7 @@ class CacheTest {
         cache.writeCompact(e1, e2);
 
         // read
-        List<Execution> executions = cache.read().toList();
+        List<Execution> executions = cache.readCompact().toList();
         assert executions.size() == 2;
         assert executions.get(0).equals(e1);
         assert executions.get(1).equals(e2);
@@ -137,5 +143,49 @@ class CacheTest {
         assert executions.size() == 2;
         assert executions.get(0).equals(e1);
         assert executions.get(1).equals(e2);
+    }
+
+    @Test
+    void convertCompactToNormal() {
+        Execution e1 = Execution.with.buy(1).price(10);
+        Execution e2 = Execution.with.buy(1).price(12);
+
+        // write
+        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        cache.writeCompact(e1, e2);
+        assert cache.existNormal() == false;
+        assert cache.existCompact();
+
+        // convert
+        cache.convertCompactToNormal();
+        assert cache.existNormal();
+        assert cache.existCompact();
+
+        // read from normal
+        List<Execution> executions = cache.readNormal().toList();
+        assert executions.size() == 2;
+        assert executions.get(0).equals(e1);
+        assert executions.get(1).equals(e2);
+    }
+
+    @Test
+    void convertCompactToFast() {
+        Execution e1 = Execution.with.buy(1).price(10);
+        Execution e2 = Execution.with.buy(1).price(12);
+
+        // write
+        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        cache.writeCompact(e1, e2);
+        assert cache.existCompact();
+        assert cache.existFast() == false;
+
+        // convert
+        cache.convertCompactToFast();
+        assert cache.existCompact();
+        assert cache.existFast();
+
+        // read from fast
+        List<Execution> executions = cache.readFast().toList();
+        assert executions.size() == 4;
     }
 }

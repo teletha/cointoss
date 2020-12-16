@@ -720,6 +720,15 @@ public class ExecutionLog {
         }
 
         /**
+         * Check whether the cache file exist or not.
+         * 
+         * @return
+         */
+        boolean existFast() {
+            return fast.isPresent() && fast.size() != 0;
+        }
+
+        /**
          * Start writing log automatically.
          * 
          * @return Chainable API
@@ -751,62 +760,110 @@ public class ExecutionLog {
          * @param types
          * @return
          */
-        @SuppressWarnings("resource")
         Signal<Execution> read(LogType... types) {
             LogType type = types == null || types.length == 0 ? LogType.Normal : types[0];
+
+            if (existCompact()) {
+                if (type == LogType.Fast) {
+                    convertCompactToFast();
+                    return readFast();
+                } else {
+                    return readCompact();
+                }
+            } else if (existNormal()) {
+                return readNormal();
+            } else {
+                ExecutionLogRepository external = service.externalRepository();
+
+                if (external != null) {
+                    return readExternalRepository(external);
+                }
+
+                return I.signal();
+            }
+        }
+
+        /**
+         * Read normal log.
+         * 
+         * @return
+         */
+        Signal<Execution> readNormal() {
+            CsvParser parser = buildCsvParser();
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
+
+            return I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
+                    .map(values -> (Execution) Execution.with.direction(Direction.parse(values[2]), Num.of(values[4]))
+                            .price(Num.of(values[3]))
+                            .id(Long.parseLong(values[0]))
+                            .date(LocalDateTime.parse(values[1]).atZone(Chrono.UTC))
+                            .consecutive(Integer.parseInt(values[5]))
+                            .delay(Integer.parseInt(values[6])))
+                    .effectOnComplete(parser::stopParsing)
+                    .effectOnObserve(stopwatch::start)
+                    .effectOnError(e -> log.error("Fail to read normal log. [" + normal + "]"))
+                    .effectOnComplete(() -> {
+                        log.trace("Read normal log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                    });
+        }
+
+        /**
+         * Read compact log.
+         * 
+         * @return
+         */
+        Signal<Execution> readCompact() {
+            CsvParser parser = buildCsvParser();
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
             try {
-                CsvParser parser = buildCsvParser();
-
-                if (existCompact()) {
-                    if (type == LogType.Fast) {
-                        // read from fast log
-                        convertCompactToFast();
-                        return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
-                                .scanWith(Market.BASE, logger::decode)
-                                .effectOnComplete(parser::stopParsing)
-                                .effectOnObserve(stopwatch::start)
-                                .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
-                                .effectOnComplete(() -> {
-                                    log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
-                                });
-                    } else {
-                        // read from compact log
-                        return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                                .scanWith(Market.BASE, logger::decode)
-                                .effectOnComplete(parser::stopParsing)
-                                .effectOnObserve(stopwatch::start)
-                                .effectOnError(e -> log.error("Fail to read compact log. [" + compact + "]"))
-                                .effectOnComplete(() -> {
-                                    log.trace("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
-                                });
-                    }
-                } else if (existNormal()) {
-                    // read from normal log
-                    return I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
-                            .map(this::parse)
-                            .effectOnComplete(parser::stopParsing)
-                            .effectOnObserve(stopwatch::start)
-                            .effectOnError(e -> log.error("Fail to read normal log. [" + normal + "]"))
-                            .effectOnComplete(() -> {
-                                log.trace("Read normal log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
-                            });
-                } else {
-                    // read from external repository
-                    ExecutionLogRepository external = service.externalRepository();
-
-                    if (external != null) {
-                        return writeNormal(external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
-                            log.info("Donwload external log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
-                        }));
-                    }
-
-                    return I.signal();
-                }
+                return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
+                        .scanWith(Market.BASE, logger::decode)
+                        .effectOnComplete(parser::stopParsing)
+                        .effectOnObserve(stopwatch::start)
+                        .effectOnError(e -> log.error("Fail to read compact log. [" + compact + "]"))
+                        .effectOnComplete(() -> {
+                            log.trace("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                        });
             } catch (IOException e) {
                 throw I.quiet(e);
             }
+        }
+
+        /**
+         * Read fast log.
+         * 
+         * @return
+         */
+        Signal<Execution> readFast() {
+            CsvParser parser = buildCsvParser();
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
+
+            try {
+                return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
+                        .scanWith(Market.BASE, logger::decode)
+                        .effectOnComplete(parser::stopParsing)
+                        .effectOnObserve(stopwatch::start)
+                        .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
+                        .effectOnComplete(() -> {
+                            log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                        });
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * Read log from the external repository.
+         * 
+         * @return
+         */
+        Signal<Execution> readExternalRepository(ExecutionLogRepository external) {
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
+
+            return writeNormal(external.convert(date).effectOnObserve(stopwatch::start).effectOnComplete(() -> {
+                log.info("Donwload external log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+            }));
         }
 
         private Signal<Execution> readFromServer() {
@@ -823,21 +880,6 @@ public class ExecutionLog {
             // writeNormal(I.signal(executions)).to();
             // }
             // });
-        }
-
-        /**
-         * Parse execution data.
-         * 
-         * @param values
-         * @return
-         */
-        private Execution parse(String[] values) {
-            return Execution.with.direction(Direction.parse(values[2]), Num.of(values[4]))
-                    .price(Num.of(values[3]))
-                    .id(Long.parseLong(values[0]))
-                    .date(LocalDateTime.parse(values[1]).atZone(Chrono.UTC))
-                    .consecutive(Integer.parseInt(values[5]))
-                    .delay(Integer.parseInt(values[6]));
         }
 
         /**
