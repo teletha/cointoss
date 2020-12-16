@@ -229,7 +229,8 @@ public class ExecutionLog {
     private void repairMissingLog() {
         repository.collectLocals(false, false)
                 .map(this::cache)
-                .skip(Cache::exist)
+                .skip(Cache::existCompact)
+                .skip(Cache::existNormalCompletely)
                 .concatMap(Cache::readFromServer)
                 .waitForTerminate()
                 .to(I.NoOP);
@@ -694,6 +695,27 @@ public class ExecutionLog {
          * 
          * @return
          */
+        private boolean existNormalCompletely() {
+            if (normal.isAbsent() && normal.size() == 0) {
+                return false;
+            }
+
+            try (NormalLogFile log = new NormalLogFile(normal)) {
+                log.readLastId();
+                if (log.isCorrupted()) {
+                    return false;
+                }
+                return !log.isCorrupted();
+            } catch (Exception e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * Check whether the cache file exist or not.
+         * 
+         * @return
+         */
         private boolean existCompact() {
             return compact.isPresent() && compact.size() != 0;
         }
@@ -736,11 +758,8 @@ public class ExecutionLog {
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
             try {
-                CsvParserSettings setting = new CsvParserSettings();
-                setting.getFormat().setDelimiter(' ');
-                setting.getFormat().setComment('無');
+                CsvParser parser = buildCsvParser();
 
-                CsvParser parser = new CsvParser(setting);
                 if (existCompact()) {
                     if (type == LogType.Fast) {
                         // read from fast log
@@ -792,20 +811,19 @@ public class ExecutionLog {
         }
 
         private Signal<Execution> readFromServer() {
-            // read from server
             ZonedDateTime start = Chrono.utc(date);
             ZonedDateTime end = start.plusDays(1);
 
-            return searchNearestId(start).flatMap(id -> network(id))
+            return writeNormal(searchNearestId(start).flatMap(id -> network(id))
                     .skipWhile(e -> e.isBefore(start))
-                    .takeWhile(e -> e.isBefore(end))
-                    .effectOnComplete(executions -> {
-                        if (end.isBefore(Chrono.utcToday())) {
-                            writeCompact(I.signal(executions)).to();
-                        } else {
-                            writeNormal(I.signal(executions)).to();
-                        }
-                    });
+                    .takeWhile(e -> e.isBefore(end)));
+            // .effectOnComplete(executions -> {
+            // if (end.isBefore(Chrono.utcToday())) {
+            // writeCompact(I.signal(executions)).to();
+            // } else {
+            // writeNormal(I.signal(executions)).to();
+            // }
+            // });
         }
 
         /**
@@ -898,10 +916,16 @@ public class ExecutionLog {
          * @return
          */
         private Signal<Execution> writeNormal(Signal<Execution> executions) {
+            int[] count = {1};
             CsvWriter writer = buildCsvWriter(normal.newOutputStream());
 
             return executions.effect(e -> {
                 writer.writeRow(e.toString());
+
+                // write out constantly
+                if (count[0]++ % 2000 == 0) {
+                    writer.flush();
+                }
             }).effectOnComplete(() -> {
                 writer.close();
                 repository.updateLocal(date);
@@ -981,6 +1005,19 @@ public class ExecutionLog {
                     throw new Error("Failed writing the fast log. [" + fast + "]", e);
                 }
             }
+        }
+
+        /**
+         * Create new CSV writer.
+         * 
+         * @param out
+         * @return
+         */
+        private CsvParser buildCsvParser() {
+            CsvParserSettings setting = new CsvParserSettings();
+            setting.getFormat().setDelimiter(' ');
+            setting.getFormat().setComment('無');
+            return new CsvParser(setting);
         }
 
         /**
