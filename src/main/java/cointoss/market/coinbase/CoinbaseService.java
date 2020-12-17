@@ -130,7 +130,22 @@ public class CoinbaseService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderbooks?symbol=" + marketName).map(e -> createOrderBook(e.get("data")));
+        return call("GET", "products/" + marketName + "/book?level=2").map(root -> {
+            OrderBookPageChanges changes = new OrderBookPageChanges();
+
+            for (JSON ask : root.find("asks", "*")) {
+                Num price = ask.get(Num.class, "0");
+                double size = ask.get(double.class, "1");
+                changes.asks.add(new OrderBookPage(price, size));
+            }
+            for (JSON bid : root.find("bids", "*")) {
+                Num price = bid.get(Num.class, "0");
+                double size = bid.get(double.class, "1");
+                changes.bids.add(new OrderBookPage(price, size));
+            }
+
+            return changes;
+        });
     }
 
     /**
@@ -138,31 +153,22 @@ public class CoinbaseService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderbooks", marketName)).map(this::createOrderBook);
-    }
+        return clientRealtimely().subscribe(new Topic("level2", marketName)).map(root -> {
+            OrderBookPageChanges changes = new OrderBookPageChanges();
 
-    /**
-     * Convert json to {@link OrderBookPageChanges}.
-     * 
-     * @param root
-     * @return
-     */
-    private OrderBookPageChanges createOrderBook(JSON root) {
-        OrderBookPageChanges changes = new OrderBookPageChanges();
-        changes.clearInside = true;
+            for (JSON ask : root.find("changes", "*")) {
+                Direction side = ask.get(Direction.class, "0");
+                Num price = ask.get(Num.class, "1");
+                double size = ask.get(double.class, "2");
+                if (side == Direction.BUY) {
+                    changes.bids.add(new OrderBookPage(price, size));
+                } else {
+                    changes.asks.add(new OrderBookPage(price, size));
+                }
+            }
 
-        for (JSON ask : root.find("asks", "*")) {
-            Num price = ask.get(Num.class, "price");
-            double size = ask.get(double.class, "size");
-            changes.asks.add(new OrderBookPage(price, size));
-        }
-        for (JSON bid : root.find("bids", "*")) {
-            Num price = bid.get(Num.class, "price");
-            double size = bid.get(double.class, "size");
-            changes.bids.add(new OrderBookPage(price, size));
-        }
-
-        return changes;
+            return changes;
+        });
     }
 
     /**
@@ -190,7 +196,7 @@ public class CoinbaseService extends MarketService {
         public List<String> channels = new ArrayList();
 
         private Topic(String channel, String market) {
-            super(channel + ":" + market, topic -> topic.type = "unsubscribe");
+            super((channel.equals("level2") ? "l2update" : channel) + ":" + market, topic -> topic.type = "unsubscribe");
 
             product_ids.add(market);
             channels.add(channel);
@@ -204,9 +210,5 @@ public class CoinbaseService extends MarketService {
             return reply.text("type").equals("subscriptions") && reply.find(String.class, "channels", "*", "name")
                     .contains(channels.get(0));
         }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Coinbase.BTCUSD.log.checkup();
     }
 }
