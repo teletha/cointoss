@@ -59,6 +59,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
+import cointoss.market.coinbase.Coinbase;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -224,7 +225,7 @@ public class ExecutionLog {
         repository.collectLocals(false, false)
                 .map(this::cache)
                 .skip(Cache::existCompact)
-                .skip(Cache::existNormalCompletely)
+                .skip(Cache::existNormal)
                 .concatMap(Cache::readFromServer)
                 .waitForTerminate()
                 .to(I.NoOP);
@@ -689,17 +690,14 @@ public class ExecutionLog {
          * 
          * @return
          */
-        boolean existNormalCompletely() {
+        boolean existCompletedNormal() {
             if (normal.isAbsent() && normal.size() == 0) {
                 return false;
             }
 
             try (NormalLogReader log = new NormalLogReader(normal)) {
-                log.lastID();
-                if (log.isCorrupted()) {
-                    return false;
-                }
-                return !log.isCorrupted();
+                long lastID = log.lastID();
+                return service.executions(lastID, lastID + 1).first().waitForTerminate().to().exact().date.toLocalDate().isAfter(date);
             } catch (Exception e) {
                 throw I.quiet(e);
             }
@@ -1236,5 +1234,9 @@ public class ExecutionLog {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.convertCompactToNormal();
+    }
+
+    public static void main(String[] args) {
+        Coinbase.BTCUSD.log.checkup();
     }
 }

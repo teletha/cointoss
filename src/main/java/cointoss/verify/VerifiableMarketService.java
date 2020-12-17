@@ -272,14 +272,33 @@ public class VerifiableMarketService extends MarketService {
         throw new Error();
     }
 
+    /** The response store. */
+    private List<Execution> nextExecutions;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        if (nextExecutions == null) {
+            return I.signal();
+        } else {
+            return I.signal(nextExecutions).effectOnTerminate(nextExecutions::clear);
+        }
+    }
+
+    /**
+     * Mock the next call of {@link #executions(long, long)}.
+     * 
+     * @param executions
+     */
+    public void executionsWillResponse(Execution... executions) {
+        if (nextExecutions == null) {
+            nextExecutions = new ArrayList();
+        }
+        for (Execution execution : executions) {
+            nextExecutions.add(execution);
+        }
     }
 
     /**
