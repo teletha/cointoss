@@ -74,46 +74,27 @@ public class BybitService extends MarketService {
         return Realtime;
     }
 
-    public static void main2(String... aa) throws InterruptedException {
-        long start = 16072739833390013L;
-        long diff = 10 * 1000 * Support.padding;
-        Bybit.BTC_USD.executions(start, start + diff).waitForTerminate().to(e -> {
-            System.out.println(e);
-        });
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        return new Signal<Execution>((observer, disposer) -> {
-            long id = search(Support.computeDateTime(startId)).map(e -> e.get(long.class, "id")).waitForTerminate().to().exact();
-            int i = 0;
-            long[] context = new long[3];
+        long[] context = new long[3];
 
-            while (!disposer.isDisposed()) {
-                List<Execution> list = call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + (id + i++ * 1000))
-                        .flatIterable(e -> e.find("result", "*"))
-                        .map(e -> {
-                            Direction side = e.get(Direction.class, "side");
-                            Num price = e.get(Num.class, "price");
-                            Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-                            ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
+        return this.search(Support.computeDateTime(startId))
+                .map(e -> e.get(long.class, "id"))
+                .flatMap(v -> I.signal(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).map(index -> v + 1000 * index))
+                .concatMap(id -> call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + id))
+                .takeWhile(e -> e.find("result", "0").size() != 0)
+                .flatIterable(e -> e.find("result", "*"))
+                .map(e -> {
+                    Direction side = e.get(Direction.class, "side");
+                    Num price = e.get(Num.class, "price");
+                    Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
+                    ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
 
-                            return Support.createExecution(side, size, price, date, context);
-                        })
-                        .effect(observer::accept)
-                        .waitForTerminate()
-                        .toList();
-
-                if (list.isEmpty() || 10 <= i) {
-                    observer.complete();
-                    break;
-                }
-            }
-            return disposer;
-        });
+                    return Support.createExecution(side, size, price, date, context);
+                });
     }
 
     /**

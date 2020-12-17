@@ -59,7 +59,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = Bybit.ETH_USD;
+        MarketService service = Bybit.BTC_USD;
         UITab tab = DockSystem.register(service.id())
                 .closable(false)
                 .text(service.marketReadableName)
