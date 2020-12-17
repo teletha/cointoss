@@ -19,7 +19,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
 
 import com.univocity.parsers.csv.CsvParser;
@@ -43,7 +42,6 @@ import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import kiss.Variable;
 import kiss.XML;
 
 public class BybitService extends MarketService {
@@ -76,76 +74,108 @@ public class BybitService extends MarketService {
         return Realtime;
     }
 
+    public static void main2(String... aa) throws InterruptedException {
+        long start = 16072739833390013L;
+        long diff = 10 * 1000 * Support.padding;
+        Bybit.BTC_USD.executions(start, start + diff).waitForTerminate().to(e -> {
+            System.out.println(e);
+        });
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        ZonedDateTime start = Support.computeDateTime(startId);
+        return new Signal<Execution>((observer, disposer) -> {
+            long id = search(Support.computeDateTime(startId)).map(e -> e.get(long.class, "id")).waitForTerminate().to().exact();
+            int i = 0;
+            long[] context = new long[3];
 
-        long[] id = {0};
-        long[] context = new long[3];
-        Variable<Long> page = Variable.of(1L);
+            while (!disposer.isDisposed()) {
+                List<Execution> list = call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + (id + i++ * 1000))
+                        .flatIterable(e -> e.find("result", "*"))
+                        .map(e -> {
+                            Direction side = e.get(Direction.class, "side");
+                            Num price = e.get(Num.class, "price");
+                            Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
+                            ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
 
-        return page.observing() //
-                .concatMap(i -> {
-                    if (i == 1) {
-                        return call("GET", "trading-records?symbol=" + marketName + "&limit=1000") //
-                                .flatIterable(e -> e.find("result", "*"))
-                                .effectOnce(e -> {
-                                    id[0] = e.get(long.class, "id");
-                                    page.set(v -> v + 1);
-                                });
-                    } else {
-                        return call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + (id[0] - 1000 * i))
-                                .effect(() -> page.set(v -> v + 1))
-                                .flatIterable(e -> e.find("result", "*"))
-                                .reverse();
-                    }
-                })
-                .takeWhile(e -> ZonedDateTime.parse(e.text("time"), TimeFormat).isAfter(start))
-                .reverse()
-                .map(e -> {
-                    Direction side = e.get(Direction.class, "side");
-                    Num price = e.get(Num.class, "price");
-                    Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-                    ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
+                            return Support.createExecution(side, size, price, date, context);
+                        })
+                        .effect(observer::accept)
+                        .waitForTerminate()
+                        .toList();
 
-                    return Support.createExecution(side, size, price, date, context);
+                if (list.isEmpty() || 10 <= i) {
+                    observer.complete();
+                    break;
+                }
+            }
+            return disposer;
+        });
+    }
+
+    /**
+     * Search by server ID.
+     * 
+     * @param target
+     * @return
+     */
+    private Signal<JSON> search(ZonedDateTime target) {
+        return call("GET", "trading-records?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("result", "*"))
+                .concatMap(latest -> {
+                    long id = latest.get(long.class, "id");
+                    long time = time(latest);
+                    return search(target.toInstant().toEpochMilli(), time, id, id - 1000);
                 });
     }
 
     /**
-     * Convert to {@link Execution}.
+     * Search by server ID.
      * 
-     * @param e
-     * @param previous
+     * @param targetTime
+     * @param currentID
+     * @param count
      * @return
      */
-    private Execution convert(JSON e, Object[] previous) {
-        Direction side = e.get(Direction.class, "side");
-        Num price = e.get(Num.class, "price");
-        Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
-        long id = Long.parseLong(e.text("id"));
-        int consecutive;
+    private Signal<JSON> search(long targetTime, long baseTime, long baseID, long currentID) {
+        return call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + currentID).concatMap(root -> {
+            List<JSON> executions = root.find("result", "*");
 
-        if (date.equals(previous[1])) {
-            if (side != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (side == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
+            if (executions.isEmpty()) {
+                return I.signal();
             }
-        } else {
-            consecutive = Execution.ConsecutiveDifference;
-        }
 
-        previous[0] = side;
-        previous[1] = date;
+            JSON first = executions.get(0);
+            long firstTime = time(first);
+            JSON last = executions.get(executions.size() - 1);
+            long lastTime = time(last);
 
-        return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
+            if (firstTime <= targetTime && targetTime <= lastTime) {
+                return I.signal(executions).skip(e -> time(e) < targetTime).first();
+            } else {
+                long firstID = first.get(long.class, "id");
+                double timeDistance = baseTime - firstTime; // use double to avoid auto rounding
+                long idDistance = baseID - firstID;
+                double targetDistance = firstTime - targetTime; // use double to avoid auto rounding
+                double mod = targetDistance / timeDistance;
+                long diff = Math.round(idDistance * mod);
+                long estimatedTargetID = diff != 0 ? firstID - diff : firstTime < targetTime ? firstID + 1000 : firstID - 1000;
+
+                return search(targetTime, firstTime, firstID, estimatedTargetID);
+            }
+        }).first();
+    }
+
+    /**
+     * Parse date-time.
+     * 
+     * @param json
+     * @return
+     */
+    private long time(JSON json) {
+        return ZonedDateTime.parse(json.text("time"), TimeFormat).toInstant().toEpochMilli();
     }
 
     /**
@@ -153,70 +183,16 @@ public class BybitService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        AtomicLong counter = new AtomicLong(-1);
-        Object[] previous = new Object[2];
+        long[] context = new long[3];
 
         return clientRealtimely().subscribe(new Topic("trade", marketName)).flatIterable(json -> json.find("data", "*")).map(e -> {
-            long id = counter.updateAndGet(now -> now == -1 ? requestId(e) : now + 1);
             Direction side = e.get(Direction.class, "side");
             Num price = e.get(Num.class, "price");
             Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
             ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("trade_time_ms")));
 
-            int consecutive;
-            if (date.equals(previous[1])) {
-                if (side != previous[0]) {
-                    consecutive = Execution.ConsecutiveDifference;
-                } else if (side == Direction.BUY) {
-                    consecutive = Execution.ConsecutiveSameBuyer;
-                } else {
-                    consecutive = Execution.ConsecutiveSameSeller;
-                }
-            } else {
-                consecutive = Execution.ConsecutiveDifference;
-            }
-            previous[0] = side;
-            previous[1] = date;
-
-            return Execution.with.direction(side, size).id(id).price(price).date(date).consecutive(consecutive);
+            return Support.createExecution(side, size, price, date, context);
         });
-    }
-
-    /**
-     * Request the actual execution id.
-     * 
-     * @param exe The target execution data.
-     * @return An actual id.
-     */
-    private synchronized long requestId(JSON exe) {
-        String side = exe.text("side");
-        String size = exe.text("size");
-        String price = exe.text("price");
-        long time = Long.parseLong(exe.text("trade_time_ms"));
-
-        List<JSON> list = call("GET", "trading-records?symbol=" + marketName + "&limit=1000").waitForTerminate()
-                .flatIterable(e -> e.find("result", "*"))
-                .toList();
-
-        for (JSON item : list) {
-            if (!item.text("side").equals(side)) {
-                continue;
-            }
-
-            if (!item.text("qty").equals(size)) {
-                continue;
-            }
-
-            if (!item.text("price").equals(price)) {
-                continue;
-            }
-
-            if (ZonedDateTime.parse(item.text("time"), TimeFormat).toInstant().toEpochMilli() != time) {
-                continue;
-            }
-            return Long.parseLong(item.text("id"));
-        }
-        return Long.parseLong(list.get(0).text("id")) + 1;
     }
 
     /**
@@ -225,7 +201,7 @@ public class BybitService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trading-records?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("result", "*"))
-                .map(json -> convert(json, new Object[2]));
+                .map(json -> convert(json, new long[3]));
     }
 
     /**
@@ -234,7 +210,31 @@ public class BybitService extends MarketService {
     @Override
     public Signal<Execution> executionsBefore(long id) {
         return call("GET", "trading-records?symbol=" + marketName + "&from=" + id).flatIterable(e -> e.find("result", "*"))
-                .map(json -> convert(json, new Object[2]));
+                .map(json -> convert(json, new long[3]));
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param e
+     * @param context
+     * @return
+     */
+    private Execution convert(JSON e, long[] context) {
+        Direction side = e.get(Direction.class, "side");
+        Num price = e.get(Num.class, "price");
+        Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
+        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
+
+        return Support.createExecution(side, size, price, date, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean checkEquality(Execution one, Execution other) {
+        return other.id <= one.id;
     }
 
     /**
