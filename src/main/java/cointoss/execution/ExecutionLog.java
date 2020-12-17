@@ -59,7 +59,6 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -174,16 +173,13 @@ public class ExecutionLog {
     /** The repository. */
     private final Repository repository;
 
-    /** The latest id store in local file. */
-    private final File store;
-
     /** The active cache. */
     private Cache cache;
 
     /** The latest cached id. */
     private long cacheId;
 
-    /** The latest stored id in local cache file. */
+    /** The latest stored id. */
     private long storedId;
 
     /** The log parser. */
@@ -208,7 +204,6 @@ public class ExecutionLog {
     ExecutionLog(MarketService service, Directory root) {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
-        this.store = root.file("lastID.log");
         this.logger = I.make(service.setting.executionLogger());
         this.repository = new Repository(root, service.externalRepository());
 
@@ -912,7 +907,7 @@ public class ExecutionLog {
                 // write normal log
                 try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
                     channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
-                    writeStoredId(remaining.getLast().id);
+                    storedId = remaining.getLast().id;
 
                     aggregateWritingLog.accept(service);
                     repository.updateLocal(date);
@@ -939,18 +934,14 @@ public class ExecutionLog {
          * Read the latest stored id.
          */
         private void readStoredId() {
-            try {
-                storedId = Long.parseLong(store.text().trim());
-            } catch (NumberFormatException e) {
-                // do nothing
+            try (NormalLogReader reader = new NormalLogReader(normal)) {
+                long id = reader.lastID();
+                if (0 <= id) {
+                    storedId = id;
+                }
+            } catch (Exception e) {
+                throw I.quiet(e);
             }
-        }
-
-        /**
-         * Write the latest stored id.
-         */
-        private void writeStoredId(long id) {
-            store.text(Long.toString(storedId = id));
         }
 
         /**
@@ -1245,10 +1236,5 @@ public class ExecutionLog {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.convertCompactToNormal();
-    }
-
-    public static void main2(String[] args) {
-        BitFlyer.FX_BTC_JPY.log.cache(Chrono.utc(2020, 11, 25)).readFromServer().waitForTerminate().to(e -> {
-        });
     }
 }
