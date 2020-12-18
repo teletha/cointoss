@@ -19,12 +19,12 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import antibug.CleanRoom;
 import kiss.I;
 
-class NormalLogReaderTest {
+class NormalLogTest {
 
     @RegisterExtension
     CleanRoom room = new CleanRoom();
 
-    private NormalLogReader write(Object... lines) {
+    private NormalLog write(Object... lines) {
         Path file = room.locateFile("test.log");
 
         StringBuilder builder = new StringBuilder();
@@ -42,7 +42,7 @@ class NormalLogReaderTest {
             throw I.quiet(e);
         }
 
-        return new NormalLogReader(file);
+        return new NormalLog(file);
     }
 
     @Test
@@ -50,7 +50,7 @@ class NormalLogReaderTest {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
-        NormalLogReader file = write(e1);
+        NormalLog file = write(e1);
         assert file.firstID() == e1.id;
 
         file = write(e1, e2);
@@ -59,7 +59,7 @@ class NormalLogReaderTest {
 
     @Test
     void firstIdOnEmptyFile() {
-        NormalLogReader file = write();
+        NormalLog file = write();
         assert file.firstID() == -1;
     }
 
@@ -68,7 +68,7 @@ class NormalLogReaderTest {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
-        NormalLogReader file = write(e1, e2);
+        NormalLog file = write(e1, e2);
         assert file.lastID() == e2.id;
 
         file = write(e1, e2, "3 corrupted");
@@ -77,7 +77,7 @@ class NormalLogReaderTest {
 
     @Test
     void lastIDOnEmptyFile() {
-        NormalLogReader file = write();
+        NormalLog file = write();
         assert file.lastID() == -1;
     }
 
@@ -86,7 +86,7 @@ class NormalLogReaderTest {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
-        NormalLogReader file = write(e1);
+        NormalLog file = write(e1);
         assert file.isCorrupted() == false;
 
         file = write(e1, e2);
@@ -98,7 +98,7 @@ class NormalLogReaderTest {
 
     @Test
     void isCorruptedOnEmptyFile() {
-        NormalLogReader file = write();
+        NormalLog file = write();
         assert file.isCorrupted() == false;
     }
 
@@ -107,14 +107,14 @@ class NormalLogReaderTest {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
-        NormalLogReader file = write(e1, e2, "3 corrupted line");
+        NormalLog file = write(e1, e2, "3 corrupted line");
         file.repair();
         assert file.isCorrupted() == false;
     }
 
     @Test
     void repairOnEmptyFile() {
-        NormalLogReader file = write();
+        NormalLog file = write();
         file.repair();
         assert file.isCorrupted() == false;
     }

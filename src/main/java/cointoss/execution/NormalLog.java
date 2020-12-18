@@ -12,26 +12,27 @@ package cointoss.execution;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import kiss.I;
 import psychopath.File;
 
-class NormalLogReader implements AutoCloseable {
+class NormalLog implements AutoCloseable {
 
     private final RandomAccessFile file;
 
     /**
      * 
      */
-    NormalLogReader(File file) {
+    NormalLog(File file) {
         this(file.asJavaPath());
     }
 
     /**
      * 
      */
-    NormalLogReader(Path file) {
+    NormalLog(Path file) {
         try {
             this.file = new RandomAccessFile(file.toFile(), "rw");
         } catch (FileNotFoundException e) {
@@ -139,6 +140,17 @@ class NormalLogReader implements AutoCloseable {
     }
 
     /**
+     * Write the specified text at tail.
+     * 
+     * @param text
+     * @throws IOException
+     */
+    void append(String text) throws IOException {
+        file.seek(file.length());
+        file.write(text.getBytes(StandardCharsets.ISO_8859_1));
+    }
+
+    /**
      * Move pointer to the head of the current line.
      * 
      * @param size
@@ -197,7 +209,7 @@ class NormalLogReader implements AutoCloseable {
      * @return
      */
     static long readLastID(File file) {
-        try (NormalLogReader reader = new NormalLogReader(file)) {
+        try (NormalLog reader = new NormalLog(file)) {
             return reader.lastID();
         } catch (Exception e) {
             throw I.quiet(e);

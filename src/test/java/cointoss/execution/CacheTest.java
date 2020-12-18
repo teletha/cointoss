@@ -354,7 +354,100 @@ class CacheTest {
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.repair();
-        assert cache.existCompact();
+        assert checkCompact(cache, e1, e2, r1, r2);
         assert cache.existNormal() == false;
+    }
+
+    @Test
+    void flushOnNoFile() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Cache cache = log.cache(date);
+        cache.flush(List.of(e1, e2));
+        assert cache.existNormal();
+        assert checkNormal(cache, e1, e2);
+    }
+
+    @Test
+    void flushOnImcompleted() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(11).date(date);
+        Execution e3 = Execution.with.buy(1).price(12).date(date);
+        Execution e4 = Execution.with.buy(1).price(13).date(date);
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert checkNormal(cache, e1, e2);
+
+        cache.flush(List.of(e3, e4));
+        assert cache.existNormal();
+        assert checkNormal(cache, e1, e2, e3, e4);
+    }
+
+    @Test
+    void flushAlreadyWrittenExecutions() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(11).date(date);
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert checkNormal(cache, e1, e2);
+
+        cache.flush(List.of(e1, e2));
+        assert cache.existNormal();
+        assert checkNormal(cache, e1, e2);
+    }
+
+    @Test
+    void flushExecutionsOnDifferentDay() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(11).date(date);
+        Execution next = Execution.with.buy(1).price(10).date(date.plusDays(1));
+        Execution previous = Execution.with.buy(1).price(11).date(date.minusDays(1));
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert checkNormal(cache, e1, e2);
+
+        cache.flush(List.of(next, previous));
+        assert cache.existNormal();
+        assert checkNormal(cache, e1, e2);
+    }
+
+    /**
+     * Assert log.
+     * 
+     * @param cache
+     * @param executions
+     * @return
+     */
+    private boolean checkNormal(Cache cache, Execution... executions) {
+        List<Execution> list = cache.readNormal().toList();
+        assert list.size() == executions.length;
+        for (int i = 0; i < executions.length; i++) {
+            assert list.get(i).equals(executions[i]);
+        }
+        return true;
+    }
+
+    /**
+     * Assert log.
+     * 
+     * @param cache
+     * @param executions
+     * @return
+     */
+    private boolean checkCompact(Cache cache, Execution... executions) {
+        List<Execution> list = cache.readCompact().toList();
+        assert list.size() == executions.length;
+        for (int i = 0; i < executions.length; i++) {
+            assert list.get(i).equals(executions[i]);
+        }
+        return true;
     }
 }

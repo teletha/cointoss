@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,8 +24,8 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -664,7 +664,7 @@ public class ExecutionLog {
                 return false;
             }
 
-            try (NormalLogReader log = new NormalLogReader(normal)) {
+            try (NormalLog log = new NormalLog(normal)) {
                 long lastID = log.lastID();
                 return service.executions(lastID, lastID + 1).first().waitForTerminate().to().exact().date.toLocalDate().isAfter(date);
             } catch (Exception e) {
@@ -898,7 +898,7 @@ public class ExecutionLog {
          * Read the latest stored id.
          */
         private long readStoredId() {
-            try (NormalLogReader reader = new NormalLogReader(normal)) {
+            try (NormalLog reader = new NormalLog(normal)) {
                 long id = reader.lastID();
                 if (0 <= id) {
                     storedId = id;
@@ -1123,27 +1123,75 @@ public class ExecutionLog {
                 return true;
             }
 
-            long[] id = {NormalLogReader.readLastID(normal)};
-            long end = Chrono.utc(date.plusDays(1)).toInstant().toEpochMilli();
-            Deque<Execution> store = new ArrayDeque(service.setting.acquirableExecutionSize);
+            try (NormalLog log = new NormalLog(normal)) {
+                boolean completed = false;
+                long id = log.lastID();
+                long startTime = Chrono.utc(date).toInstant().toEpochMilli();
+                long endTime = startTime + 24 * 60 * 60 * 1000;
+                List<Execution> executions = new ArrayList(service.setting.acquirableExecutionSize);
 
-            while (true) {
-                service.executions(id[0], id[0] + service.setting.acquirableExecutionSize)
-                        .skipWhile(e -> e.id <= id[0])
-                        .takeWhile(e -> e.mills < end)
-                        .waitForTerminate()
-                        .toCollection(store);
+                root: while (true) {
+                    // retrive the execution log from server
+                    service.executions(id, id + service.setting.acquirableExecutionSize).waitForTerminate().toCollection(executions);
 
-                if (store.isEmpty()) {
-                    break;
+                    // Since the execution log after the specified ID does not exist on the server,
+                    // it is not possible to create the completed normal log.
+                    if (executions.isEmpty()) {
+                        return false;
+                    }
+
+                    int startIndex = 0;
+                    int endIndex = executions.size();
+                    for (int i = 0; i < executions.size(); i++) {
+                        Execution e = executions.get(i);
+
+                        // Ignore any execution log that has an ID earlier than the current last ID.
+                        if (e.id <= id) {
+                            startIndex++;
+                            continue;
+                        }
+
+                        // Ignore any execution log that has a date earlier than the date of this
+                        // cache.
+                        if (e.mills < startTime) {
+                            startIndex++;
+                            continue;
+                        }
+
+                        // If there is an execution log with a date later than the date of this
+                        // cache, it is considered that a complete log has been obtained,
+                        // so we should create it.
+                        if (endTime <= e.mills) {
+                            endIndex = i;
+                            completed = true;
+                            break root;
+                        }
+                    }
+
+                    // Expand all valid log in memory for batch writing.
+                    StringBuilder text = new StringBuilder();
+                    List<Execution> valids = executions.subList(startIndex, endIndex);
+                    for (Execution e : valids) {
+                        text.append(e).append("\r\n");
+                    }
+                    log.append(text.toString());
+
+                    // update the last ID
+                    id = valids.get(valids.size() - 1).id;
+
+                    // clear all data to reuse the container
+                    executions.clear();
                 }
 
-                id[0] = flush(store);
-                store.clear();
+                if (completed) {
+                    convertNormalToCompact();
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                throw I.quiet(e);
             }
-            convertNormalToCompact();
-            return true;
-
         }
 
         /**
@@ -1154,25 +1202,27 @@ public class ExecutionLog {
          * @param executions
          * @return
          */
-        private long flush(Deque<Execution> executions) {
-            long endTime = date..toEpochDay() * 24 * 60 * 60 * 1000;
-            long latestID = NormalLogReader.readLastID(normal);
+        long flush(Iterable<Execution> executions) {
+            long start = Chrono.utc(date).toInstant().toEpochMilli();
+            long end = start + 24 * 60 * 60 * 1000;
 
-            // Expand all log in memory for batch writing.
-            StringBuilder text = new StringBuilder();
-            for (Execution e : executions) {
-                if (latestID < e.id) {
-                    text.append(e).append("\r\n");
+            try (NormalLog log = new NormalLog(normal)) {
+                long id = log.lastID();
+
+                // Expand all log in memory for batch writing.
+                StringBuilder text = new StringBuilder();
+                for (Execution e : executions) {
+                    if (id < e.id && start <= e.mills && e.mills < end) {
+                        id = e.id;
+                        text.append(e).append("\r\n");
+                    }
                 }
-            }
+                log.append(text.toString());
 
-            // Batch write in append mode.
-            try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
-                channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
-            } catch (IOException e) {
+                return id;
+            } catch (Exception e) {
                 throw I.quiet(e);
             }
-            return executions.peekLast().id;
         }
 
         /**
