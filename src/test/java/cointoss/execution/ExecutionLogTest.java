@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -75,7 +75,7 @@ class ExecutionLogTest {
      */
     private List<Execution> writeExecutionLog(ZonedDateTime date) {
         List<Execution> list = Executions.random(10);
-        log.locateLog(date).text(I.signal(list).map(Execution::toString).toList());
+        log.cache(date).normal.text(I.signal(list).map(Execution::toString).toList());
         return list;
     }
 

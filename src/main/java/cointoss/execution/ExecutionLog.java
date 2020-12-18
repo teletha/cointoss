@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,9 +23,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -215,20 +215,7 @@ public class ExecutionLog {
      * Get a physical checkup on logs.
      */
     public final void checkup() {
-        repairMissingLog();
-    }
-
-    /**
-     * Read the missing logs from the server and repair them.
-     */
-    private void repairMissingLog() {
-        repository.collectLocals(false, false)
-                .map(this::cache)
-                .skip(Cache::existCompact)
-                .skip(Cache::existNormal)
-                .concatMap(Cache::readFromServer)
-                .waitForTerminate()
-                .to(I.NoOP);
+        repository.collectLocals(false, false).map(this::cache).to(Cache::repair);
     }
 
     /**
@@ -567,36 +554,6 @@ public class ExecutionLog {
     }
 
     /**
-     * Locate execution log.
-     * 
-     * @param date A date time.
-     * @return A file location.
-     */
-    final File locateLog(TemporalAccessor date) {
-        return root.file("execution" + Chrono.DateCompact.format(date) + ".log");
-    }
-
-    /**
-     * Locate compressed execution log.
-     * 
-     * @param date A date time.
-     * @return A file location.
-     */
-    final File locateCompactLog(TemporalAccessor date) {
-        return root.file("execution" + Chrono.DateCompact.format(date) + ".clog");
-    }
-
-    /**
-     * Locate fast execution log.
-     * 
-     * @param date A date time.
-     * @return A file location.
-     */
-    final File locateFastLog(TemporalAccessor date) {
-        return root.file("execution" + Chrono.DateCompact.format(date) + ".flog");
-    }
-
-    /**
      * Get the ID around the specified date and time.
      * 
      * @param target
@@ -645,12 +602,6 @@ public class ExecutionLog {
         /** The log file. */
         final File normal;
 
-        /** The compact log file. */
-        final File compact;
-
-        /** The fast log file. */
-        final File fast;
-
         /** The log writing task. */
         private ScheduledFuture task = NOOP;
 
@@ -662,9 +613,27 @@ public class ExecutionLog {
          */
         private Cache(ZonedDateTime date) {
             this.date = date.toLocalDate();
-            this.normal = locateLog(date);
-            this.compact = locateCompactLog(date);
-            this.fast = locateFastLog(date);
+            this.normal = root.file("execution" + Chrono.DateCompact.format(date) + ".log");
+        }
+
+        /**
+         * Locate compressed execution log.
+         * 
+         * @param date A date time.
+         * @return A file location.
+         */
+        final File compactLog() {
+            return normal.extension("clog");
+        }
+
+        /**
+         * Locate fast execution log.
+         * 
+         * @param date A date time.
+         * @return A file location.
+         */
+        final File fastLog() {
+            return normal.extension("flog");
         }
 
         /**
@@ -709,6 +678,7 @@ public class ExecutionLog {
          * @return
          */
         boolean existCompact() {
+            File compact = compactLog();
             return compact.isPresent() && compact.size() != 0;
         }
 
@@ -718,6 +688,7 @@ public class ExecutionLog {
          * @return
          */
         boolean existFast() {
+            File fast = fastLog();
             return fast.isPresent() && fast.size() != 0;
         }
 
@@ -808,6 +779,7 @@ public class ExecutionLog {
         Signal<Execution> readCompact() {
             CsvParser parser = buildCsvParser();
             Stopwatch stopwatch = Stopwatch.createUnstarted();
+            File compact = compactLog();
 
             try {
                 return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
@@ -831,6 +803,7 @@ public class ExecutionLog {
         Signal<Execution> readFast() {
             CsvParser parser = buildCsvParser();
             Stopwatch stopwatch = Stopwatch.createUnstarted();
+            File fast = fastLog();
 
             try {
                 return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
@@ -869,13 +842,6 @@ public class ExecutionLog {
             return writeNormal(searchNearestId(start).flatMap(id -> network(id))
                     .skipWhile(e -> e.isBefore(start))
                     .takeWhile(e -> e.isBefore(end)));
-            // .effectOnComplete(executions -> {
-            // if (end.isBefore(Chrono.utcToday())) {
-            // writeCompact(I.signal(executions)).to();
-            // } else {
-            // writeNormal(I.signal(executions)).to();
-            // }
-            // });
         }
 
         /**
@@ -928,15 +894,36 @@ public class ExecutionLog {
             });
         }
 
+        private long flush(Deque<Execution> executions) {
+            long storedId = readStoredId();
+
+            // build text
+            StringBuilder text = new StringBuilder();
+            for (Execution e : executions) {
+                if (storedId < e.id) {
+                    text.append(e).append("\r\n");
+                }
+            }
+
+            // write the normal log
+            try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
+                channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
+                return executions.peekLast().id;
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
         /**
          * Read the latest stored id.
          */
-        private void readStoredId() {
+        private long readStoredId() {
             try (NormalLogReader reader = new NormalLogReader(normal)) {
                 long id = reader.lastID();
                 if (0 <= id) {
                     storedId = id;
                 }
+                return id;
             } catch (Exception e) {
                 throw I.quiet(e);
             }
@@ -990,6 +977,8 @@ public class ExecutionLog {
          * @return Wrapped {@link Signal}.
          */
         Signal<Execution> writeCompact(Signal<Execution> executions) {
+            File compact = compactLog();
+
             try {
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));
 
@@ -1035,10 +1024,13 @@ public class ExecutionLog {
          * Convert normal log to compact log.
          */
         void convertNormalToCompact() {
+            File compact = compactLog();
+
             if (normal.isPresent() && compact.isAbsent()) {
-                writeCompact(read()).to(I.NoOP, e -> {
+                writeCompact(readNormal()).to(I.NoOP, e -> {
                     log.error("{} fails to compact the normal log. [{}]", service, date, e);
                 }, () -> {
+                    log.error("Try to delete normal " + date);
                     normal.delete();
                 });
             }
@@ -1048,9 +1040,11 @@ public class ExecutionLog {
          * Convert normal log to compact log asynchronously.
          */
         void convertNormalToCompactAsync() {
+            File compact = compactLog();
+
             if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
                 I.schedule(5, SECONDS).to(() -> {
-                    writeCompact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
+                    writeCompact(readNormal()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
                 });
             }
         }
@@ -1059,9 +1053,11 @@ public class ExecutionLog {
          * Convert compact log to normal log.
          */
         void convertCompactToNormal() {
+            File compact = compactLog();
+
             if (normal.isAbsent() && compact.isPresent()) {
                 CsvWriter writer = buildCsvWriter(normal.newOutputStream());
-                read().to(e -> writer.writeRow(e.toString()));
+                readCompact().to(e -> writer.writeRow(e.toString()));
                 writer.close();
             }
         }
@@ -1070,12 +1066,15 @@ public class ExecutionLog {
          * Convert compact log to fast log synchronously.
          */
         void convertCompactToFast() {
+            File compact = compactLog();
+            File fast = fastLog();
+
             if (fast.isAbsent() && compact.isPresent()) {
                 try {
                     int scale = service.setting.target.scale;
                     AtomicLong fastID = new AtomicLong();
                     TickerManager manager = new TickerManager().disableMemorySaving();
-                    read().effect(e -> fastID.set(e.id)).to(manager::update);
+                    readCompact().effect(e -> fastID.set(e.id)).to(manager::update);
                     fastID.updateAndGet(v -> v - 69120 /* 4x12x60x24 */);
                     Ticker ticker = manager.on(Span.Second5);
                     Execution[] prev = {Market.BASE};
@@ -1118,6 +1117,57 @@ public class ExecutionLog {
                 } catch (Throwable e) {
                     throw new Error("Failed writing the fast log. [" + fast + "]", e);
                 }
+            }
+        }
+
+        /**
+         * Attempt to create a complete compact log by any means necessary.
+         * 
+         * @return true if the compact log exists, false otherwise.
+         */
+        boolean repair() {
+            // confirm the completed compact log
+            if (existCompact()) {
+                return true;
+            }
+
+            // comfirm the completed normal log
+            if (existCompletedNormal()) {
+                convertNormalToCompact();
+                return true;
+            }
+
+            // imcompleted or no normal log
+            ExecutionLogRepository external = service.externalRepository();
+            if (external != null && external.has(date)) {
+                readExternalRepository(external).waitForTerminate().to(I.NoOP, log::error, this::convertNormalToCompact);
+                return true;
+            }
+
+            try (NormalLogReader reader = new NormalLogReader(normal)) {
+                long[] id = {reader.lastID()};
+
+                long end = Chrono.utc(date.plusDays(1)).toInstant().toEpochMilli();
+                Deque<Execution> store = new ArrayDeque(service.setting.acquirableExecutionSize);
+
+                while (true) {
+                    service.executions(id[0], id[0] + service.setting.acquirableExecutionSize)
+                            .skipWhile(e -> e.id <= id[0])
+                            .takeWhile(e -> e.mills < end)
+                            .waitForTerminate()
+                            .toCollection(store);
+
+                    if (store.isEmpty()) {
+                        break;
+                    }
+
+                    id[0] = flush(store);
+                    store.clear();
+                }
+                convertNormalToCompact();
+                return true;
+            } catch (Exception e) {
+                throw I.quiet(e);
             }
         }
 
@@ -1236,7 +1286,7 @@ public class ExecutionLog {
         cache.convertCompactToNormal();
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         Coinbase.BTCUSD.log.checkup();
     }
 }

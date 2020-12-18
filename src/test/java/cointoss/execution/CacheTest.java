@@ -11,6 +11,7 @@ package cointoss.execution;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -41,13 +42,13 @@ class CacheTest {
     @Test
     void compactLog() {
         Cache cache = log.cache(Chrono.utc(2020, 12, 15));
-        assert cache.compact.name().equals("execution20201215.clog");
+        assert cache.compactLog().name().equals("execution20201215.clog");
     }
 
     @Test
     void fastLog() {
         Cache cache = log.cache(Chrono.utc(2020, 12, 15));
-        assert cache.fast.name().equals("execution20201215.flog");
+        assert cache.fastLog().name().equals("execution20201215.flog");
     }
 
     @Test
@@ -245,5 +246,115 @@ class CacheTest {
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.existCompletedNormal() == false;
+    }
+
+    @Test
+    void repairWithCompactLog() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Cache cache = log.cache(date);
+        cache.writeCompact(e1, e2);
+        assert cache.repair();
+        assert cache.existCompact();
+        assert cache.existNormal() == false;
+    }
+
+    @Test
+    void repairWithComletedNormalLog() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Execution r1 = Execution.with.buy(1).price(14).date(date.plusDays(1));
+        market.service.executionsWillResponse(r1);
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert cache.repair();
+        assert cache.existCompact();
+        assert cache.existNormal() == false;
+    }
+
+    @Test
+    void repairWithIncomletedNormalLogAndExternalRepository() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Execution r1 = Execution.with.buy(1).price(14).date(date);
+        market.service.executionsWillResponse(r1);
+        market.service.external = useExternalRepository(date);
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert cache.repair();
+        assert cache.existCompact();
+        assert cache.existNormal() == false;
+    }
+
+    @Test
+    void repairWithNoNormalLogAndExternalRepository() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+
+        Execution r1 = Execution.with.buy(1).price(14).date(date);
+        market.service.executionsWillResponse(r1);
+        market.service.external = useExternalRepository(date);
+
+        Cache cache = log.cache(date);
+        assert cache.repair();
+        assert cache.existCompact();
+        assert cache.existNormal() == false;
+    }
+
+    /**
+     * Helper to create {@link ExecutionLogRepository} which has the completed log at the specified
+     * date.
+     * 
+     * @return
+     */
+    private ExecutionLogRepository useExternalRepository(ZonedDateTime target) {
+        Objects.requireNonNull(target);
+
+        return new ExecutionLogRepository(market.service) {
+
+            @Override
+            public Signal<Execution> convert(ZonedDateTime date) {
+                if (target.isEqual(date)) {
+                    Execution e1 = Execution.with.buy(1).price(10).date(date);
+                    Execution e2 = Execution.with.buy(1).price(12).date(date);
+                    Execution e3 = Execution.with.sell(1).price(12).date(date);
+
+                    return I.signal(e1, e2, e3);
+                } else {
+                    return I.signal();
+                }
+            }
+
+            @Override
+            public Signal<ZonedDateTime> collect() {
+                return I.signal(target);
+            }
+        };
+    }
+
+    @Test
+    void repairWithIncomletedNormalLog() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Execution r1 = Execution.with.buy(1).price(13).date(date);
+        Execution r2 = Execution.with.sell(1).price(14).date(date);
+        Execution r3 = Execution.with.buy(1).price(15).date(date.plusDays(1));
+        market.service.executionsWillResponse(r1);
+        market.service.executionsWillResponse(e2, r1, r2, r3);
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert cache.repair();
+        assert cache.existCompact();
+        assert cache.existNormal() == false;
     }
 }

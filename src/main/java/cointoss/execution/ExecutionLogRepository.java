@@ -46,13 +46,33 @@ public abstract class ExecutionLogRepository {
     public abstract Signal<ZonedDateTime> collect();
 
     /**
+     * Check if the log for the specified date exists.
+     * 
+     * @param date
+     * @return
+     */
+    public final boolean has(LocalDate date) {
+        return has(Chrono.utc(date));
+    }
+
+    /**
+     * Check if the log for the specified date exists.
+     * 
+     * @param date
+     * @return
+     */
+    public final boolean has(ZonedDateTime date) {
+        return collect().any(v -> v.isEqual(date)).waitForTerminate().to().exact();
+    }
+
+    /**
      * Convert data.
      * 
      * @param url
      * @return
      */
     public final Signal<Execution> convert(LocalDate date) {
-        return convert(date.atTime(0, 0).atZone(Chrono.UTC));
+        return convert(Chrono.utc(date));
     }
 
     /**

@@ -32,6 +32,7 @@ import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
@@ -83,6 +84,9 @@ public class VerifiableMarketService extends MarketService {
     /** The task queue. */
     private final PriorityQueue<Task> tasks = new PriorityQueue();
 
+    /** The external repository. */
+    public ExecutionLogRepository external;
+
     /** The emulation for lag. */
     public Latency latency = Latency.zero();
 
@@ -100,6 +104,14 @@ public class VerifiableMarketService extends MarketService {
      */
     public VerifiableMarketService(MarketService delegation) {
         super(delegation.exchange, delegation.marketName, delegation.setting);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExecutionLogRepository externalRepository() {
+        return external;
     }
 
     /**
@@ -273,7 +285,7 @@ public class VerifiableMarketService extends MarketService {
     }
 
     /** The response store. */
-    private List<Execution> nextExecutions;
+    private LinkedList<List<Execution>> nextExecutions;
 
     /**
      * {@inheritDoc}
@@ -283,7 +295,7 @@ public class VerifiableMarketService extends MarketService {
         if (nextExecutions == null) {
             return I.signal();
         } else {
-            return I.signal(nextExecutions).effectOnTerminate(nextExecutions::clear);
+            return I.signal(nextExecutions.pollFirst());
         }
     }
 
@@ -294,11 +306,9 @@ public class VerifiableMarketService extends MarketService {
      */
     public void executionsWillResponse(Execution... executions) {
         if (nextExecutions == null) {
-            nextExecutions = new ArrayList();
+            nextExecutions = new LinkedList();
         }
-        for (Execution execution : executions) {
-            nextExecutions.add(execution);
-        }
+        nextExecutions.add(List.of(executions));
     }
 
     /**

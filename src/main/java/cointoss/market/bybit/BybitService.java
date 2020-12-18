@@ -239,12 +239,10 @@ public class BybitService extends MarketService {
             OrderBookPageChanges change = new OrderBookPageChanges();
 
             String type = pages.text("type");
-            if (type.equals("snapshot")) {
+            if (type.charAt(0) == 's') {
                 pages.find("data", "*").forEach(e -> convertOrderBook(change, e));
             } else {
-                pages.find("data", "delete", "*").forEach(e -> convertOrderBook(change, e));
-                pages.find("data", "update", "*").forEach(e -> convertOrderBook(change, e));
-                pages.find("data", "insert", "*").forEach(e -> convertOrderBook(change, e));
+                pages.find("data", "*", "*").forEach(e -> convertOrderBook(change, e));
             }
 
             return change;
