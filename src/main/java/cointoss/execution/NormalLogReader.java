@@ -189,4 +189,18 @@ class NormalLogReader implements AutoCloseable {
         }
         return "";
     }
+
+    /**
+     * Utility to read the last ID simply.
+     * 
+     * @param file
+     * @return
+     */
+    static long readLastID(File file) {
+        try (NormalLogReader reader = new NormalLogReader(file)) {
+            return reader.lastID();
+        } catch (Exception e) {
+            throw I.quiet(e);
+        }
+    }
 }

@@ -168,6 +168,15 @@ class Repository implements Storable<Repository> {
      * 
      * @param date
      */
+    void updateLocal(ZonedDateTime date) {
+        updateLocal(date.toLocalDate());
+    }
+
+    /**
+     * Update the local resource.
+     * 
+     * @param date
+     */
     void updateLocal(LocalDate date) {
         if (localFirst == null || date.isBefore(localFirst)) {
             localFirst = date;

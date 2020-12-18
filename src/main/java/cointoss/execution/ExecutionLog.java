@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -894,26 +894,6 @@ public class ExecutionLog {
             });
         }
 
-        private long flush(Deque<Execution> executions) {
-            long storedId = readStoredId();
-
-            // build text
-            StringBuilder text = new StringBuilder();
-            for (Execution e : executions) {
-                if (storedId < e.id) {
-                    text.append(e).append("\r\n");
-                }
-            }
-
-            // write the normal log
-            try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
-                channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
-                return executions.peekLast().id;
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        }
-
         /**
          * Read the latest stored id.
          */
@@ -1030,7 +1010,6 @@ public class ExecutionLog {
                 writeCompact(readNormal()).to(I.NoOP, e -> {
                     log.error("{} fails to compact the normal log. [{}]", service, date, e);
                 }, () -> {
-                    log.error("Try to delete normal " + date);
                     normal.delete();
                 });
             }
@@ -1144,31 +1123,56 @@ public class ExecutionLog {
                 return true;
             }
 
-            try (NormalLogReader reader = new NormalLogReader(normal)) {
-                long[] id = {reader.lastID()};
+            long[] id = {NormalLogReader.readLastID(normal)};
+            long end = Chrono.utc(date.plusDays(1)).toInstant().toEpochMilli();
+            Deque<Execution> store = new ArrayDeque(service.setting.acquirableExecutionSize);
 
-                long end = Chrono.utc(date.plusDays(1)).toInstant().toEpochMilli();
-                Deque<Execution> store = new ArrayDeque(service.setting.acquirableExecutionSize);
+            while (true) {
+                service.executions(id[0], id[0] + service.setting.acquirableExecutionSize)
+                        .skipWhile(e -> e.id <= id[0])
+                        .takeWhile(e -> e.mills < end)
+                        .waitForTerminate()
+                        .toCollection(store);
 
-                while (true) {
-                    service.executions(id[0], id[0] + service.setting.acquirableExecutionSize)
-                            .skipWhile(e -> e.id <= id[0])
-                            .takeWhile(e -> e.mills < end)
-                            .waitForTerminate()
-                            .toCollection(store);
-
-                    if (store.isEmpty()) {
-                        break;
-                    }
-
-                    id[0] = flush(store);
-                    store.clear();
+                if (store.isEmpty()) {
+                    break;
                 }
-                convertNormalToCompact();
-                return true;
-            } catch (Exception e) {
+
+                id[0] = flush(store);
+                store.clear();
+            }
+            convertNormalToCompact();
+            return true;
+
+        }
+
+        /**
+         * Writes the specified execution log to the normal log of this Cache. It will not write the
+         * log that is older than the history that has already been written. Also, it will not write
+         * the log that does not correspond to the date of this Cache.
+         * 
+         * @param executions
+         * @return
+         */
+        private long flush(Deque<Execution> executions) {
+            long endTime = date..toEpochDay() * 24 * 60 * 60 * 1000;
+            long latestID = NormalLogReader.readLastID(normal);
+
+            // Expand all log in memory for batch writing.
+            StringBuilder text = new StringBuilder();
+            for (Execution e : executions) {
+                if (latestID < e.id) {
+                    text.append(e).append("\r\n");
+                }
+            }
+
+            // Batch write in append mode.
+            try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
+                channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
+            } catch (IOException e) {
                 throw I.quiet(e);
             }
+            return executions.peekLast().id;
         }
 
         /**
