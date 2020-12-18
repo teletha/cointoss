@@ -18,7 +18,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -75,7 +74,6 @@ public class FTXService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        AtomicLong increment = new AtomicLong();
         long[] previous = new long[3];
 
         long startTime = Support.computeEpochTime(startId) + 1;
@@ -87,7 +85,7 @@ public class FTXService extends MarketService {
 
             // Retrieve the execution history between the specified dates and times in small chunks.
             while (!disposer.isDisposed()) {
-                call("GET", "markets/" + marketName + "/trades?limit=200&start_time=" + startTime + "&end_time=" + endTime[0])
+                call("GET", "markets/" + marketName + "/trades?start_time=" + startTime + "&end_time=" + endTime[0])
                         .flatIterable(e -> e.find("result", "*"))
                         .waitForTerminate()
                         .toCollection(executions);
@@ -109,7 +107,7 @@ public class FTXService extends MarketService {
             observer.complete();
 
             return disposer;
-        }).map(json -> createExecution(json, increment, previous));
+        }).map(json -> createExecution(json, previous));
     }
 
     /**
@@ -117,12 +115,11 @@ public class FTXService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        AtomicLong increment = new AtomicLong();
         long[] previous = new long[3];
 
         return clientRealtimely().subscribe(new Topic("trades", marketName))
                 .flatIterable(json -> json.find("data", "*"))
-                .map(json -> createExecution(json, increment, previous));
+                .map(json -> createExecution(json, previous));
     }
 
     /**
@@ -131,7 +128,7 @@ public class FTXService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "markets/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("result", "*"))
-                .map(json -> createExecution(json, new AtomicLong(), new long[3]));
+                .map(json -> createExecution(json, new long[3]));
     }
 
     /**
@@ -141,7 +138,7 @@ public class FTXService extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         return call("GET", "markets/" + marketName + "/trades?end_time=" + Support.computeEpochTime(id))
                 .flatIterable(e -> e.find("result", "*"))
-                .map(json -> createExecution(json, new AtomicLong(), new long[3]));
+                .map(json -> createExecution(json, new long[3]));
     }
 
     /**
@@ -159,7 +156,7 @@ public class FTXService extends MarketService {
      * @param context
      * @return
      */
-    private Execution createExecution(JSON e, AtomicLong increment, long[] context) {
+    private Execution createExecution(JSON e, long[] context) {
         Direction side = e.get(Direction.class, "side");
         Num size = e.get(Num.class, "size");
         Num price = e.get(Num.class, "price");

@@ -70,8 +70,8 @@ public class CoinbaseService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         long[] context = new long[3];
 
-        return call("GET", "products/" + marketName + "/trades?before=" + startId + "&after=" + (endId + 1)).flatIterable(e -> e.find("*"))
-                .reverse()
+        return call("GET", "products/" + marketName + "/trades?before=" + startId + "&after=" + (startId + 101))
+                .flatIterable(e -> e.find("$"))
                 .map(json -> createExecution(json, false, context));
     }
 
@@ -101,8 +101,7 @@ public class CoinbaseService extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         long[] context = new long[3];
 
-        return call("GET", "products/" + marketName + "/trades?after=" + id).flatIterable(e -> e.find("*"))
-                .reverse()
+        return call("GET", "products/" + marketName + "/trades?after=" + id).flatIterable(e -> e.find("$"))
                 .map(json -> createExecution(json, false, context));
     }
 

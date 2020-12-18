@@ -249,7 +249,7 @@ class CacheTest {
     }
 
     @Test
-    void repairWithCompactLog() {
+    void repairCompactLog() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
         Execution e1 = Execution.with.buy(1).price(10).date(date);
         Execution e2 = Execution.with.buy(1).price(12).date(date);
@@ -262,7 +262,7 @@ class CacheTest {
     }
 
     @Test
-    void repairWithComletedNormalLog() {
+    void repairComletedNormalLog() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
         Execution e1 = Execution.with.buy(1).price(10).date(date);
         Execution e2 = Execution.with.buy(1).price(12).date(date);
@@ -278,7 +278,7 @@ class CacheTest {
     }
 
     @Test
-    void repairWithIncomletedNormalLogAndExternalRepository() {
+    void repairIncomletedNormalLogAndExternalRepository() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
         Execution e1 = Execution.with.buy(1).price(10).date(date);
         Execution e2 = Execution.with.buy(1).price(12).date(date);
@@ -295,7 +295,7 @@ class CacheTest {
     }
 
     @Test
-    void repairWithNoNormalLogAndExternalRepository() {
+    void repairNoNormalLogAndExternalRepository() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
 
         Execution r1 = Execution.with.buy(1).price(14).date(date);
@@ -340,7 +340,7 @@ class CacheTest {
     }
 
     @Test
-    void repairWithIncomletedNormalLog() {
+    void repairIncomletedNormalLogAndCompletableServerData() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
         Execution e1 = Execution.with.buy(1).price(10).date(date);
         Execution e2 = Execution.with.buy(1).price(12).date(date);
@@ -348,75 +348,96 @@ class CacheTest {
         Execution r1 = Execution.with.buy(1).price(13).date(date);
         Execution r2 = Execution.with.sell(1).price(14).date(date);
         Execution r3 = Execution.with.buy(1).price(15).date(date.plusDays(1));
-        market.service.executionsWillResponse(r1);
-        market.service.executionsWillResponse(e2, r1, r2, r3);
+        market.service.executionsWillResponse(r1, r2, r3);
 
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
+
         assert cache.repair();
         assert checkCompact(cache, e1, e2, r1, r2);
         assert cache.existNormal() == false;
     }
 
     @Test
-    void flushOnNoFile() {
+    void repairIncomletedNormalLogAndCompletableServerDataWithAlreadyWrittenExecutions() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
         Execution e1 = Execution.with.buy(1).price(10).date(date);
         Execution e2 = Execution.with.buy(1).price(12).date(date);
 
+        Execution r1 = Execution.with.buy(1).price(13).date(date);
+        Execution r2 = Execution.with.sell(1).price(14).date(date);
+        Execution r3 = Execution.with.buy(1).price(15).date(date.plusDays(1));
+        market.service.executionsWillResponse(e1, e2, r1, r2, r3);
+
         Cache cache = log.cache(date);
-        cache.flush(List.of(e1, e2));
-        assert cache.existNormal();
+        cache.writeNormal(e1, e2);
+
+        assert cache.repair();
+        assert checkCompact(cache, e1, e2, r1, r2);
+        assert cache.existNormal() == false;
+    }
+
+    @Test
+    void repairIncomletedNormalLogAndIncompletableServerData() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Execution r1 = Execution.with.buy(1).price(13).date(date);
+        Execution r2 = Execution.with.sell(1).price(14).date(date);
+        Execution r3 = Execution.with.buy(1).price(15).date(date);
+        market.service.executionsWillResponse(r1, r2, r3);
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert cache.repair() == false;
+        assert checkNormal(cache, e1, e2, r1, r2, r3);
+    }
+
+    @Test
+    void repairIncomletedNormalLogAndIncompletableServerDataWithAlreadyWrittenExecutions() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Execution r1 = Execution.with.buy(1).price(13).date(date);
+        Execution r2 = Execution.with.sell(1).price(14).date(date);
+        Execution r3 = Execution.with.buy(1).price(15).date(date);
+        market.service.executionsWillResponse(e1, e2, r1, r2, r3);
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert cache.repair() == false;
+        assert checkNormal(cache, e1, e2, r1, r2, r3);
+    }
+
+    @Test
+    void repairWithoutNormalLog() {
+        ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(10).date(date);
+        market.service.executionsWillResponse(e1, e2);
+        market.service.searchNearestIdWillResponse(e1.id - 1);
+
+        Cache cache = log.cache(date);
+        assert cache.repair() == false;
         assert checkNormal(cache, e1, e2);
     }
 
     @Test
-    void flushOnImcompleted() {
+    void repairIncomletedNormalLogAndIncompletableServerDataWithExecutionsOnDifferentDay() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
         Execution e1 = Execution.with.buy(1).price(10).date(date);
-        Execution e2 = Execution.with.buy(1).price(11).date(date);
-        Execution e3 = Execution.with.buy(1).price(12).date(date);
-        Execution e4 = Execution.with.buy(1).price(13).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Execution r1 = Execution.with.buy(1).price(13).date(date.minusDays(1));
+        Execution r2 = Execution.with.sell(1).price(14).date(date.plusDays(1));
+        market.service.executionsWillResponse(r1, r2);
 
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
-        assert checkNormal(cache, e1, e2);
-
-        cache.flush(List.of(e3, e4));
-        assert cache.existNormal();
-        assert checkNormal(cache, e1, e2, e3, e4);
-    }
-
-    @Test
-    void flushAlreadyWrittenExecutions() {
-        ZonedDateTime date = Chrono.utc(2020, 12, 15);
-        Execution e1 = Execution.with.buy(1).price(10).date(date);
-        Execution e2 = Execution.with.buy(1).price(11).date(date);
-
-        Cache cache = log.cache(date);
-        cache.writeNormal(e1, e2);
-        assert checkNormal(cache, e1, e2);
-
-        cache.flush(List.of(e1, e2));
-        assert cache.existNormal();
-        assert checkNormal(cache, e1, e2);
-    }
-
-    @Test
-    void flushExecutionsOnDifferentDay() {
-        ZonedDateTime date = Chrono.utc(2020, 12, 15);
-        Execution e1 = Execution.with.buy(1).price(10).date(date);
-        Execution e2 = Execution.with.buy(1).price(11).date(date);
-        Execution next = Execution.with.buy(1).price(10).date(date.plusDays(1));
-        Execution previous = Execution.with.buy(1).price(11).date(date.minusDays(1));
-
-        Cache cache = log.cache(date);
-        cache.writeNormal(e1, e2);
-        assert checkNormal(cache, e1, e2);
-
-        cache.flush(List.of(next, previous));
-        assert cache.existNormal();
-        assert checkNormal(cache, e1, e2);
+        assert cache.repair();
+        assert checkCompact(cache, e1, e2);
     }
 
     /**

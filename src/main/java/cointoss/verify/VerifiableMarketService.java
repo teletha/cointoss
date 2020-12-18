@@ -311,6 +311,29 @@ public class VerifiableMarketService extends MarketService {
         nextExecutions.add(List.of(executions));
     }
 
+    private long nextNearestID = -1;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Long> searchNearestId(ZonedDateTime target) {
+        try {
+            return I.signal(nextNearestID);
+        } finally {
+            nextNearestID = -1;
+        }
+    }
+
+    /**
+     * Mock the next call of
+     * 
+     * @param executions
+     */
+    public void searchNearestIdWillResponse(long id) {
+        this.nextNearestID = id;
+    }
+
     /**
      * {@inheritDoc}
      */

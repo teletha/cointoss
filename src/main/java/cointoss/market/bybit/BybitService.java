@@ -81,7 +81,7 @@ public class BybitService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         long[] context = new long[3];
 
-        return this.search(Support.computeDateTime(startId))
+        return this.searchServerID(Support.computeDateTime(startId))
                 .map(e -> e.get(long.class, "id"))
                 .flatMap(v -> I.signal(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).map(index -> v + 1000 * index))
                 .concatMap(id -> call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + id))
@@ -103,12 +103,12 @@ public class BybitService extends MarketService {
      * @param target
      * @return
      */
-    private Signal<JSON> search(ZonedDateTime target) {
+    private Signal<JSON> searchServerID(ZonedDateTime target) {
         return call("GET", "trading-records?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("result", "*"))
                 .concatMap(latest -> {
                     long id = latest.get(long.class, "id");
                     long time = time(latest);
-                    return search(target.toInstant().toEpochMilli(), time, id, id - 1000);
+                    return searchServerID(target.toInstant().toEpochMilli(), time, id, id - 1000);
                 });
     }
 
@@ -120,7 +120,7 @@ public class BybitService extends MarketService {
      * @param count
      * @return
      */
-    private Signal<JSON> search(long targetTime, long baseTime, long baseID, long currentID) {
+    private Signal<JSON> searchServerID(long targetTime, long baseTime, long baseID, long currentID) {
         return call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + currentID).concatMap(root -> {
             List<JSON> executions = root.find("result", "*");
 
@@ -144,7 +144,7 @@ public class BybitService extends MarketService {
                 long diff = Math.round(idDistance * mod);
                 long estimatedTargetID = diff != 0 ? firstID - diff : firstTime < targetTime ? firstID + 1000 : firstID - 1000;
 
-                return search(targetTime, firstTime, firstID, estimatedTargetID);
+                return searchServerID(targetTime, firstTime, firstID, estimatedTargetID);
             }
         }).first();
     }

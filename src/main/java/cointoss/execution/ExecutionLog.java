@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -554,44 +554,6 @@ public class ExecutionLog {
     }
 
     /**
-     * Get the ID around the specified date and time.
-     * 
-     * @param target
-     * @return
-     */
-    private Signal<Long> searchNearestId(ZonedDateTime target) {
-        return service.executionLatest().flatMap(latest -> searchNearest(target, latest, 0)).first().map(e -> e.id);
-    }
-
-    /**
-     * INTERNAL: Estimate the nearest {@link Execution} at the specified time.
-     * 
-     * @param target
-     * @param current
-     * @return
-     */
-    private Signal<Execution> searchNearest(ZonedDateTime target, Execution current, int count) {
-        log.info("{} searches for the execution log closest to {}. [{}]", service, target.toLocalDate(), current.date.toLocalDateTime());
-
-        return service.executionsBefore(current.id - service.setting.acquirableExecutionSize).concatMap(previous -> {
-            long timeDistance = current.mills - previous.mills;
-            long idDistance = current.id - previous.id;
-            long targetDistance = current.mills - target.toInstant().toEpochMilli();
-            long estimatedTargetId = current.id - idDistance * (targetDistance / timeDistance);
-
-            return service.executionsBefore(estimatedTargetId).concatMap(estimated -> {
-                if (estimated.isBefore(target) && (estimated.isAfter(target.minusMinutes(15)) //
-                        || (10 < count) && estimated.isAfter(target.minusHours(1)) //
-                        || (20 < count) && estimated.isAfter(target.minusHours(6)))) {
-                    return I.signal(estimated);
-                } else {
-                    return searchNearest(target, estimated, count + 1);
-                }
-            });
-        }).first();
-    }
-
-    /**
      * 
      */
     class Cache {
@@ -833,15 +795,6 @@ public class ExecutionLog {
                     .effectOnComplete(() -> {
                         log.info("Donwload external log {} [{}] {}", service, date, stopwatch.stop().elapsed());
                     }));
-        }
-
-        private Signal<Execution> readFromServer() {
-            ZonedDateTime start = Chrono.utc(date);
-            ZonedDateTime end = start.plusDays(1);
-
-            return writeNormal(searchNearestId(start).flatMap(id -> network(id))
-                    .skipWhile(e -> e.isBefore(start))
-                    .takeWhile(e -> e.isBefore(end)));
         }
 
         /**
@@ -1101,6 +1054,10 @@ public class ExecutionLog {
 
         /**
          * Attempt to create a complete compact log by any means necessary.
+         * <p>
+         * Writes the specified execution log to the normal log of this Cache. It will not write the
+         * log that is older than the history that has already been written. Also, it will not write
+         * the log that does not correspond to the date of this Cache.
          * 
          * @return true if the compact log exists, false otherwise.
          */
@@ -1110,11 +1067,11 @@ public class ExecutionLog {
                 return true;
             }
 
-            // comfirm the completed normal log
-            if (existCompletedNormal()) {
-                convertNormalToCompact();
-                return true;
-            }
+            // // comfirm the completed normal log
+            // if (existCompletedNormal()) {
+            // convertNormalToCompact();
+            // return true;
+            // }
 
             // imcompleted or no normal log
             ExecutionLogRepository external = service.externalRepository();
@@ -1123,14 +1080,19 @@ public class ExecutionLog {
                 return true;
             }
 
-            try (NormalLog log = new NormalLog(normal)) {
-                boolean completed = false;
-                long id = log.lastID();
+            int coefficient = 1;
+            boolean completed = false;
+            try (NormalLog normalLog = new NormalLog(normal)) {
+                long id = normalLog.lastID();
+                if (id == -1) {
+                    id = service.searchNearestId(Chrono.utc(date)).waitForTerminate().to().exact();
+                }
+
                 long startTime = Chrono.utc(date).toInstant().toEpochMilli();
                 long endTime = startTime + 24 * 60 * 60 * 1000;
                 List<Execution> executions = new ArrayList(service.setting.acquirableExecutionSize);
 
-                root: while (true) {
+                while (!completed) {
                     // retrive the execution log from server
                     service.executions(id, id + service.setting.acquirableExecutionSize).waitForTerminate().toCollection(executions);
 
@@ -1147,14 +1109,14 @@ public class ExecutionLog {
 
                         // Ignore any execution log that has an ID earlier than the current last ID.
                         if (e.id <= id) {
-                            startIndex++;
+                            startIndex = i + 1;
                             continue;
                         }
 
                         // Ignore any execution log that has a date earlier than the date of this
                         // cache.
                         if (e.mills < startTime) {
-                            startIndex++;
+                            startIndex = i + 1;
                             continue;
                         }
 
@@ -1164,64 +1126,37 @@ public class ExecutionLog {
                         if (endTime <= e.mills) {
                             endIndex = i;
                             completed = true;
-                            break root;
+                            break;
                         }
                     }
 
-                    // Expand all valid log in memory for batch writing.
-                    StringBuilder text = new StringBuilder();
                     List<Execution> valids = executions.subList(startIndex, endIndex);
-                    for (Execution e : valids) {
-                        text.append(e).append("\r\n");
-                    }
-                    log.append(text.toString());
+                    if (!valids.isEmpty()) {
+                        // Expand all valid log in memory for batch writing.
+                        StringBuilder text = new StringBuilder();
+                        for (Execution e : valids) {
+                            text.append(e).append("\r\n");
+                        }
+                        normalLog.append(text.toString());
 
-                    // update the last ID
-                    id = valids.get(valids.size() - 1).id;
+                        // update the last ID
+                        id = valids.get(valids.size() - 1).id;
+
+                        log.info("REST write on " + service + " from {}.  size {} ({})", valids.get(0).date, valids.size(), coefficient);
+                    }
 
                     // clear all data to reuse the container
                     executions.clear();
                 }
-
-                if (completed) {
-                    convertNormalToCompact();
-                    return true;
-                } else {
-                    return false;
-                }
             } catch (Exception e) {
                 throw I.quiet(e);
             }
-        }
 
-        /**
-         * Writes the specified execution log to the normal log of this Cache. It will not write the
-         * log that is older than the history that has already been written. Also, it will not write
-         * the log that does not correspond to the date of this Cache.
-         * 
-         * @param executions
-         * @return
-         */
-        long flush(Iterable<Execution> executions) {
-            long start = Chrono.utc(date).toInstant().toEpochMilli();
-            long end = start + 24 * 60 * 60 * 1000;
-
-            try (NormalLog log = new NormalLog(normal)) {
-                long id = log.lastID();
-
-                // Expand all log in memory for batch writing.
-                StringBuilder text = new StringBuilder();
-                for (Execution e : executions) {
-                    if (id < e.id && start <= e.mills && e.mills < end) {
-                        id = e.id;
-                        text.append(e).append("\r\n");
-                    }
-                }
-                log.append(text.toString());
-
-                return id;
-            } catch (Exception e) {
-                throw I.quiet(e);
+            if (completed) {
+                convertNormalToCompact();
+                return true;
+            } else {
+                return false;
             }
         }
 
@@ -1340,7 +1275,7 @@ public class ExecutionLog {
         cache.convertCompactToNormal();
     }
 
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         Coinbase.BTCUSD.log.checkup();
     }
 }

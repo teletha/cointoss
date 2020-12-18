@@ -164,6 +164,44 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Get the ID around the specified date and time.
+     * 
+     * @param target
+     * @return
+     */
+    public Signal<Long> searchNearestId(ZonedDateTime target) {
+        return executionLatest().flatMap(latest -> searchNearest(target, latest, 0)).first().map(e -> e.id);
+    }
+
+    /**
+     * INTERNAL: Estimate the nearest {@link Execution} at the specified time.
+     * 
+     * @param target
+     * @param current
+     * @return
+     */
+    private Signal<Execution> searchNearest(ZonedDateTime target, Execution current, int count) {
+        logger.info("{} searches for the execution log closest to {}. [{}]", this, target.toLocalDate(), current.date.toLocalDateTime());
+
+        return executionsBefore(current.id - setting.acquirableExecutionSize).concatMap(previous -> {
+            long timeDistance = current.mills - previous.mills;
+            long idDistance = current.id - previous.id;
+            long targetDistance = current.mills - target.toInstant().toEpochMilli();
+            long estimatedTargetId = current.id - idDistance * (targetDistance / timeDistance);
+
+            return executionsBefore(estimatedTargetId).concatMap(estimated -> {
+                if (estimated.isBefore(target) && (estimated.isAfter(target.minusMinutes(15)) //
+                        || (10 < count) && estimated.isAfter(target.minusHours(1)) //
+                        || (20 < count) && estimated.isAfter(target.minusHours(6)))) {
+                    return I.signal(estimated);
+                } else {
+                    return searchNearest(target, estimated, count + 1);
+                }
+            });
+        }).first();
+    }
+
+    /**
      * Request order actually.
      * 
      * @param order A order to request.
