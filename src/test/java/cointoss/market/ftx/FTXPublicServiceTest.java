@@ -23,7 +23,6 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
 
     private void stopExecutionLogCollection() {
         httpClient.onGet("https://ftx.com/api/markets/BTC-PERP/trades")
-                .withParameter("limit", "200")
                 .withParameter("start_time", "1")
                 .withParameter("end_time", Matchers.not("2"))
                 .doReturn("""
@@ -49,7 +48,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
     @Override
     @Test
     public void executions() {
-        httpClient.onGet("https://ftx.com/api/markets/BTC-PERP/trades?limit=200&start_time=1&end_time=2").doReturnJSON("""
+        httpClient.onGet("https://ftx.com/api/markets/BTC-PERP/trades?start_time=1&end_time=2").doReturnJSON("""
                 {
                   "result": [
                     {
