@@ -182,12 +182,13 @@ public class TimestampBasedMarketServiceSupporter {
         long sideType = side.ordinal();
         long id;
         int consecutive;
+        long time = milliBase ? epochMillis : (long) (epochMillis * 0.001);
 
-        if (epochMillis != threeLength[0]) {
+        if (time != threeLength[0]) {
             id = computeID(epochMillis);
             consecutive = Execution.ConsecutiveDifference;
 
-            threeLength[0] = epochMillis;
+            threeLength[0] = time;
             threeLength[1] = sideType;
             threeLength[2] = 0;
         } else {
@@ -195,7 +196,7 @@ public class TimestampBasedMarketServiceSupporter {
             consecutive = sideType != threeLength[1] ? Execution.ConsecutiveDifference
                     : side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
 
-            threeLength[0] = epochMillis;
+            threeLength[0] = time;
             threeLength[1] = sideType;
         }
 

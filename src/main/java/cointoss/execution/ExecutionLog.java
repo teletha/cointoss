@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,7 +59,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
-import cointoss.market.coinbase.Coinbase;
+import cointoss.market.binance.Binance;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -595,7 +595,7 @@ public class ExecutionLog {
          * @return A file location.
          */
         final File fastLog() {
-            return normal.extension("flog");
+            return normal.parent().directory("flog").file(normal.base() + ".flog");
         }
 
         /**
@@ -957,9 +957,7 @@ public class ExecutionLog {
          * Convert normal log to compact log.
          */
         void convertNormalToCompact() {
-            File compact = compactLog();
-
-            if (normal.isPresent() && compact.isAbsent()) {
+            if (existNormal() && !existCompact()) {
                 writeCompact(readNormal()).to(I.NoOP, e -> {
                     log.error("{} fails to compact the normal log. [{}]", service, date, e);
                 }, () -> {
@@ -972,9 +970,7 @@ public class ExecutionLog {
          * Convert normal log to compact log asynchronously.
          */
         void convertNormalToCompactAsync() {
-            File compact = compactLog();
-
-            if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
+            if (!existCompact() && (!queue.isEmpty() || normal.isPresent())) {
                 I.schedule(5, SECONDS).to(() -> {
                     writeCompact(readNormal()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
                 });
@@ -985,9 +981,7 @@ public class ExecutionLog {
          * Convert compact log to normal log.
          */
         void convertCompactToNormal() {
-            File compact = compactLog();
-
-            if (normal.isAbsent() && compact.isPresent()) {
+            if (!existNormal() && existCompact()) {
                 CsvWriter writer = buildCsvWriter(normal.newOutputStream());
                 readCompact().to(e -> writer.writeRow(e.toString()));
                 writer.close();
@@ -998,10 +992,9 @@ public class ExecutionLog {
          * Convert compact log to fast log synchronously.
          */
         void convertCompactToFast() {
-            File compact = compactLog();
             File fast = fastLog();
 
-            if (fast.isAbsent() && compact.isPresent()) {
+            if (!existFast() && existCompact()) {
                 try {
                     int scale = service.setting.target.scale;
                     AtomicLong fastID = new AtomicLong();
@@ -1064,6 +1057,7 @@ public class ExecutionLog {
         boolean repair() {
             // confirm the completed compact log
             if (existCompact()) {
+                normal.delete();
                 return true;
             }
 
@@ -1085,7 +1079,10 @@ public class ExecutionLog {
             try (NormalLog normalLog = new NormalLog(normal)) {
                 long id = normalLog.lastID();
                 if (id == -1) {
-                    id = service.searchNearestId(Chrono.utc(date)).waitForTerminate().to().exact();
+                    id = service.searchNearestId(Chrono.utc(date)).waitForTerminate().to().or(-1L);
+                    if (id == -1) {
+                        return false;
+                    }
                 }
 
                 long startTime = Chrono.utc(date).toInstant().toEpochMilli();
@@ -1276,6 +1273,9 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        Coinbase.BTCUSD.log.checkup();
+        // FTX.ATOM_PERP.log.checkup();
+        Binance.SRM_USDT.log.checkup();
+        // restoreNormal(Binance.SRM_USDT, Chrono.utc(2020, 12, 4));
+        // restoreNormal(FTX.ATOM_PERP, Chrono.utc(2020, 12, 4));
     }
 }
