@@ -11,7 +11,6 @@ package cointoss.market.ftx;
 
 import java.util.List;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
@@ -20,19 +19,6 @@ import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 
 class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
-
-    private void stopExecutionLogCollection() {
-        httpClient.onGet("https://ftx.com/api/markets/BTC-PERP/trades")
-                .withParameter("start_time", "1")
-                .withParameter("end_time", Matchers.not("2"))
-                .doReturn("""
-                        {
-                          "result": [
-                          ],
-                          "success": true
-                        }
-                        """);
-    }
 
     /**
      * {@inheritDoc}
@@ -48,7 +34,7 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
     @Override
     @Test
     public void executions() {
-        httpClient.onGet("https://ftx.com/api/markets/BTC-PERP/trades?start_time=1&end_time=2").doReturnJSON("""
+        httpClient.onGet("https://ftx.com/api/markets/BTC-PERP/trades?start_time=1&end_time=7201").doReturnJSON("""
                 {
                   "result": [
                     {
@@ -70,7 +56,6 @@ class FTXPublicServiceTest extends PublicServiceTestTemplate<FTXService> {
                   ]
                 }
                 """);
-        stopExecutionLogCollection();
 
         List<Execution> list = service.executions(1, 2000).toList();
         Execution e = list.get(0);
