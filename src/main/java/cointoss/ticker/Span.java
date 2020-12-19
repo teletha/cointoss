@@ -43,11 +43,11 @@ public enum Span {
 
     Hour12(12, HOUR_OF_DAY, 1, EPOCH_DAY, 480, 1), // 2 * 480 = 960
 
-    Day1(1, EPOCH_DAY, 365, EPOCH_DAY, 1, 1, 2),
+    Day1(1, EPOCH_DAY, 365, EPOCH_DAY, 3, 1, 2),
 
-    Day3(3, EPOCH_DAY, 366 /* 3x122 */, EPOCH_DAY, 2),
+    Day3(3, EPOCH_DAY, 366 /* 3x122 */, EPOCH_DAY, 6),
 
-    Day7(7, EPOCH_DAY, 364 /* 7x52 */, EPOCH_DAY, 3);
+    Day7(7, EPOCH_DAY, 364 /* 7x52 */, EPOCH_DAY, 12);
 
     /** The duration of this {@link Span}. */
     public final Duration duration;
