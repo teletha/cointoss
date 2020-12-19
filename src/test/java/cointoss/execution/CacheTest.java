@@ -9,12 +9,17 @@
  */
 package cointoss.execution;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 
 import antibug.CleanRoom;
 import cointoss.execution.ExecutionLog.Cache;
@@ -470,5 +475,31 @@ class CacheTest {
             assert list.get(i).equals(executions[i]);
         }
         return true;
+    }
+
+    @Test
+    void codec() throws IOException {
+        int size = 1000;
+        Execution[] executions = Executions.random(size).toArray(new Execution[size]);
+
+        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        cache.writeNormal(executions);
+        HashCode hashOriginal = Files.asByteSource(cache.normal.asJavaFile()).hash(Hashing.sha256());
+
+        // encode and decode
+        cache.convertNormalToCompact();
+        cache.normal.delete();
+        cache.convertCompactToNormal();
+
+        // check hash
+        HashCode hashRestored = Files.asByteSource(cache.normal.asJavaFile()).hash(Hashing.sha256());
+        assert hashOriginal.equals(hashRestored);
+
+        // check object
+        List<Execution> restored = cache.readNormal().toList();
+        assert restored.size() == executions.length;
+        for (int i = 0; i < executions.length; i++) {
+            assert executions[i].toString().equals(restored.get(i).toString());
+        }
     }
 }
