@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import cointoss.Direction;
@@ -76,33 +78,49 @@ public class FTXService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         long[] previous = new long[3];
 
-        long startTime = Support.computeEpochTime(startId) + 1;
-        long[] endTime = {Support.computeEpochTime(endId)};
-
         return new Signal<JSON>((observer, disposer) -> {
-            int latestSize = 0;
-            List<JSON> executions = new ArrayList(setting.acquirableExecutionSize);
+            long slidingTime = 2 * 60 * 60;
+            long startTime = Support.computeEpochTime(startId) + 1;
+            long endTime = startTime + slidingTime;
+            LinkedList<List<JSON>> jsons = new LinkedList();
 
             // Retrieve the execution history between the specified dates and times in small chunks.
             while (!disposer.isDisposed()) {
-                call("GET", "markets/" + marketName + "/trades?start_time=" + startTime + "&end_time=" + endTime[0])
+                List<JSON> executions = new ArrayList(1024);
+                jsons.add(executions);
+
+                call("GET", "markets/" + marketName + "/trades?start_time=" + startTime + "&end_time=" + endTime)
                         .flatIterable(e -> e.find("result", "*"))
                         .waitForTerminate()
-                        .toCollection(executions);
+                        .to(executions::add, observer::error);
 
                 int size = executions.size();
-                if (latestSize == size) {
+                if (size == 0) {
+                    // slide to the next duration
+                    startTime += slidingTime;
+                    endTime += slidingTime;
+
+                    if (Chrono.utcNow().toEpochSecond() <= startTime) {
+                        // no data
+                        break;
+                    }
+                } else if (size < 5000) {
+                    // complete log in this duration
                     break;
                 } else {
-                    latestSize = size;
-                    endTime[0] = parseTime(executions.get(size - 1).text("time")).toEpochSecond();
+                    // overflowed, slide to the previous duration
+                    endTime = parseTime(executions.get(size - 1).text("time")).toEpochSecond();
                 }
             }
 
             // Since the first one is the most recent value, it is sent in chronological order,
             // starting with the last one.
-            for (int i = latestSize - 1; 0 <= i; i--) {
-                observer.accept(executions.get(i));
+            Iterator<List<JSON>> iterator = jsons.descendingIterator();
+            while (iterator.hasNext()) {
+                List<JSON> list = iterator.next();
+                for (int i = list.size() - 1; 0 <= i; i--) {
+                    observer.accept(list.get(i));
+                }
             }
             observer.complete();
 

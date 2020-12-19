@@ -59,7 +59,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
-import cointoss.market.binance.Binance;
+import cointoss.market.ftx.FTX;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -1045,6 +1045,23 @@ public class ExecutionLog {
             }
         }
 
+        long estimateFirstID() {
+            if (existCompact()) {
+                return readCompact().first().to().v.id;
+            }
+
+            if (existNormal()) {
+                return readNormal().first().to().v.id;
+            }
+
+            Cache yesterday = cache(date.minusDays(1));
+
+            if (yesterday.existCompact()) {
+                return yesterday.readCompact().last().to().v.id;
+            }
+            return service.searchNearestId(Chrono.utc(date)).waitForTerminate().to().or(-1L);
+        }
+
         /**
          * Attempt to create a complete compact log by any means necessary.
          * <p>
@@ -1079,7 +1096,7 @@ public class ExecutionLog {
             try (NormalLog normalLog = new NormalLog(normal)) {
                 long id = normalLog.lastID();
                 if (id == -1) {
-                    id = service.searchNearestId(Chrono.utc(date)).waitForTerminate().to().or(-1L);
+                    id = estimateFirstID();
                     if (id == -1) {
                         return false;
                     }
@@ -1273,9 +1290,7 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        // FTX.ATOM_PERP.log.checkup();
-        Binance.SRM_USDT.log.checkup();
-        // restoreNormal(Binance.SRM_USDT, Chrono.utc(2020, 12, 4));
-        // restoreNormal(FTX.ATOM_PERP, Chrono.utc(2020, 12, 4));
+        FTX.ATOM_PERP.log.checkup();
+        restoreNormal(FTX.ATOM_PERP, Chrono.utc(2020, 8, 27));
     }
 }
