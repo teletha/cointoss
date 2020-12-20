@@ -251,12 +251,4 @@ public class HuobiService extends MarketService {
             return id.equals(reply.text("id")) && "ok".equals(reply.text("status"));
         }
     }
-
-    public static void main(String[] args) throws InterruptedException {
-        Huobi.BTC_USDT.executionsRealtimely().to(e -> {
-            System.out.println(e);
-        });
-
-        Thread.sleep(1000 * 10);
-    }
 }

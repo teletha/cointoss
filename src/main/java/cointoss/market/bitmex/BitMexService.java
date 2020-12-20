@@ -117,8 +117,10 @@ public class BitMexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        return call("GET", "trade?symbol=" + marketName + "&reverse=true&endTime=" + formatEncodedId(id)).flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, new long[3]));
+        long[] context = new long[3];
+        return call("GET", "trade?symbol=" + marketName + "&reverse=true&count=1000&endTime=" + formatEncodedId(id))
+                .flatIterable(e -> e.find("$"))
+                .map(json -> convert(json, context));
     }
 
     /**

@@ -317,7 +317,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Long> searchNearestId(ZonedDateTime target) {
+    public Signal<Long> searchNearestID(ZonedDateTime target) {
         try {
             return I.signal(nextNearestID);
         } finally {

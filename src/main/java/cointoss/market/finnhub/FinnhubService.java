@@ -140,11 +140,4 @@ public class FinnhubService extends MarketService {
             return true;
         }
     }
-
-    public static void main(String[] args) throws InterruptedException {
-        Funnhub.BTC_USDT.executionsRealtimely().to(e -> {
-        });
-
-        Thread.sleep(1000 * 60 * 5);
-    }
 }

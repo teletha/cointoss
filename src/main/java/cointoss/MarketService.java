@@ -12,6 +12,7 @@ package cointoss;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -164,13 +165,47 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Retrieve the initial {@link Execution}.
+     * 
+     * @return
+     */
+    public Signal<Execution> searchInitialExecution() {
+        long earliest = 1;
+        Execution current = executionLatest().waitForTerminate().to().exact();
+        long middle = (earliest + current.id) / 2;
+
+        while (true) {
+            List<Execution> earliers = executionsBefore(middle).buffer().skipError().waitForTerminate().to().or(List.of());
+            int size = earliers.size();
+            if (size == 0) {
+                // Since there is no log prior to the middle ID, we can assume that
+                // the initial execution exists between middle and current.
+                earliest = middle;
+                middle = (earliest + current.id) / 2;
+            } else if (setting.acquirableExecutionSize <= size) {
+                // Since it is equal to the maximum number of execution log that can be
+                // retrieved at one time, there is a possibility that old log still exists.
+                current = earliers.get(1);
+                middle = (earliest + current.id) / 2;
+            } else {
+                // Since there are fewer execution log than can be retrieved at one time,
+                // the oldest of these is determined to be the first log.
+                return I.signal(earliers.get(0));
+            }
+        }
+    }
+
+    /**
      * Get the ID around the specified date and time.
      * 
      * @param target
      * @return
      */
-    public Signal<Long> searchNearestId(ZonedDateTime target) {
-        return executionLatest().flatMap(latest -> searchNearest(target, latest, 0)).first().map(e -> e.id);
+    public Signal<Long> searchNearestID(ZonedDateTime target) {
+        return executionLatest().concatMap(latest -> executionsBefore(latest.id))
+                .buffer()
+                .flatMap(list -> searchNearest(target, list.get(0), list.get(list.size() - 1), 0))
+                .map(e -> e.id);
     }
 
     /**
@@ -180,25 +215,36 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @param current
      * @return
      */
-    private Signal<Execution> searchNearest(ZonedDateTime target, Execution current, int count) {
-        logger.info("{} searches for the execution log closest to {}. [{}]", this, target.toLocalDate(), current.date.toLocalDateTime());
+    private Signal<Execution> searchNearest(ZonedDateTime target, Execution sampleStart, Execution sampleEnd, int count) {
+        logger.info("{} searches for the execution log closest to {}. [{} ~ {}]", this, target.toLocalDate(), sampleStart.date
+                .toLocalDateTime(), sampleEnd.date.toLocalDateTime());
 
-        return executionsBefore(current.id - setting.acquirableExecutionSize).concatMap(previous -> {
-            long timeDistance = current.mills - previous.mills;
-            long idDistance = current.id - previous.id;
-            long targetDistance = current.mills - target.toInstant().toEpochMilli();
-            long estimatedTargetId = current.id - idDistance * (targetDistance / timeDistance);
+        double timeDistance = sampleEnd.mills - sampleStart.mills;
+        double idDistance = sampleEnd.id - sampleStart.id;
+        double targetDistance = sampleEnd.mills - target.toInstant().toEpochMilli();
+        long estimatedTargetId = Math.round(sampleEnd.id - idDistance * (targetDistance / timeDistance));
 
-            return executionsBefore(estimatedTargetId).concatMap(estimated -> {
-                if (estimated.isBefore(target) && (estimated.isAfter(target.minusMinutes(15)) //
-                        || (10 < count) && estimated.isAfter(target.minusHours(1)) //
-                        || (20 < count) && estimated.isAfter(target.minusHours(6)))) {
-                    return I.signal(estimated);
-                } else {
-                    return searchNearest(target, estimated, count + 1);
+        return executionsBefore(estimatedTargetId).effect(x -> System.out.println("OK")).buffer().flatMap(candidates -> {
+            Execution first = candidates.get(0);
+            Execution last = candidates.get(candidates.size() - 1);
+
+            if (target.isBefore(first.date)) {
+                return searchNearest(target, first, last, count);
+            } else if (last.date.isBefore(target)) {
+                return searchNearest(target, first, last, count);
+            } else {
+                for (int i = 0; i < candidates.size(); i++) {
+                    if (!candidates.get(i).date.isBefore(target)) {
+                        System.out.println(candidates.get(i - 1));
+                        return I.signal(candidates.get(i - 1));
+                    }
                 }
-            });
-        }).first();
+                // If this exception will be thrown, it is bug of this program. So we must
+                // rethrow
+                // the wrapped error in here.
+                throw new Error("Here is unreachable.");
+            }
+        });
     }
 
     /**

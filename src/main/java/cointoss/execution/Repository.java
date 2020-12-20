@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import cointoss.MarketService;
 import cointoss.util.Chrono;
 import kiss.Signal;
 import kiss.Storable;
@@ -27,7 +28,7 @@ class Repository implements Storable<Repository> {
     /** The root directory of local repository. */
     private final Directory root;
 
-    private final ExecutionLogRepository external;
+    private final MarketService service;
 
     /** The last scan date-time in local repository. */
     public LocalDate localScanLatest = LocalDate.of(1970, 1, 1);
@@ -52,9 +53,9 @@ class Repository implements Storable<Repository> {
      * 
      * @param external
      */
-    Repository(Directory root, ExecutionLogRepository external) {
+    Repository(Directory root, MarketService service) {
         this.root = root;
-        this.external = external;
+        this.service = service;
 
         restore();
 
@@ -98,6 +99,8 @@ class Repository implements Storable<Repository> {
      * Scan logs in the external repository.
      */
     private void scanExternalRepository() {
+        ExecutionLogRepository external = service.externalRepository();
+
         if (external == null) {
             return;
         }

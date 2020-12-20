@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -206,7 +206,7 @@ public class ExecutionLog {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
         this.logger = I.make(service.setting.executionLogger());
-        this.repository = new Repository(root, service.externalRepository());
+        this.repository = new Repository(root, service);
 
         this.cache = new Cache(repository.firstZDT());
     }
@@ -1059,7 +1059,7 @@ public class ExecutionLog {
             if (yesterday.existCompact()) {
                 return yesterday.readCompact().last().to().v.id;
             }
-            return service.searchNearestId(Chrono.utc(date)).waitForTerminate().to().or(-1L);
+            return service.searchNearestID(Chrono.utc(date)).waitForTerminate().to().or(-1L);
         }
 
         /**
@@ -1290,7 +1290,7 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        FTX.ATOM_PERP.log.checkup();
-        restoreNormal(FTX.ATOM_PERP, Chrono.utc(2020, 8, 27));
+        FTX.BNB_PERP.log.checkup();
+        // restoreNormal(FTX.ATOM_PERP, Chrono.utc(2020, 8, 27));
     }
 }
