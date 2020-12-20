@@ -190,8 +190,7 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        return call("GET", "trading-records?symbol=" + marketName + "&from=" + id).flatIterable(e -> e.find("result", "*"))
-                .map(json -> convert(json, new long[3]));
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -326,6 +325,7 @@ public class BybitService extends MarketService {
             long[] context = new long[3];
 
             return I.http(uri, InputStream.class)
+                    .effectOnError(e -> e.printStackTrace())
                     .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
                     .effectOnComplete(parser::stopParsing)
                     .reverse()

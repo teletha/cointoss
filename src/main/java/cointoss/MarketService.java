@@ -170,29 +170,39 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     public Signal<Execution> searchInitialExecution() {
-        long earliest = 1;
-        Execution current = executionLatest().waitForTerminate().to().exact();
-        long middle = (earliest + current.id) / 2;
+        ExecutionLogRepository external = externalRepository();
+        if (external == null) {
+            return executionLatest().flatMap(latest -> searchInitialExecution(1, latest));
+        } else {
+            return external.first().flatMap(day -> external.convert(day)).first();
+        }
+    }
 
-        while (true) {
-            List<Execution> earliers = executionsBefore(middle).buffer().skipError().waitForTerminate().to().or(List.of());
-            int size = earliers.size();
+    /**
+     * Retrieve the initial {@link Execution}.
+     * 
+     * @return
+     */
+    private Signal<Execution> searchInitialExecution(long start, Execution end) {
+        long middle = (start + end.id) / 2;
+        // System.out.println(start + " " + middle + " " + end);
+
+        return executionsBefore(middle).buffer().skipError().or(List.of()).flatMap(result -> {
+            int size = result.size();
             if (size == 0) {
                 // Since there is no log prior to the middle ID, we can assume that
-                // the initial execution exists between middle and current.
-                earliest = middle;
-                middle = (earliest + current.id) / 2;
+                // the initial execution exists between middle and latest.
+                return searchInitialExecution(middle, end);
             } else if (setting.acquirableExecutionSize <= size) {
                 // Since it is equal to the maximum number of execution log that can be
                 // retrieved at one time, there is a possibility that old log still exists.
-                current = earliers.get(1);
-                middle = (earliest + current.id) / 2;
+                return searchInitialExecution(start, result.get(0));
             } else {
                 // Since there are fewer execution log than can be retrieved at one time,
                 // the oldest of these is determined to be the first log.
-                return I.signal(earliers.get(0));
+                return I.signal(result.get(0));
             }
-        }
+        });
     }
 
     /**

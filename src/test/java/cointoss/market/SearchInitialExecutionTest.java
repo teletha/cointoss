@@ -11,14 +11,30 @@ package cointoss.market;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.execution.Execution;
+import cointoss.market.binance.Binance;
 import cointoss.market.bitmex.BitMex;
+import cointoss.market.bybit.Bybit;
+import cointoss.market.coinbase.Coinbase;
 
 class SearchInitialExecutionTest {
 
     @Test
     void bitmex() {
-        Execution initial = BitMex.XBT_USD.searchInitialExecution().waitForTerminate().to().exact();
-        assert initial.id == 144318446570600000L;
+        assert BitMex.XBT_USD.searchInitialExecution().waitForTerminate().to().exact().id == 144318446570600000L;
+    }
+
+    @Test
+    void coinbase() {
+        assert Coinbase.BTCUSD.searchInitialExecution().waitForTerminate().to().exact().id == 1;
+    }
+
+    @Test
+    void binance() {
+        assert Binance.BTC_USDT.searchInitialExecution().waitForTerminate().to().exact().id == 0;
+    }
+
+    @Test
+    void bybit() {
+        assert Bybit.BTC_USD.searchInitialExecution().waitForTerminate().to().exact().id == 15698880007190000L;
     }
 }

@@ -97,7 +97,19 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&fromId=" + id).flatIterable(e -> e.find("*")).map(this::createExecution);
+        // Since the Binance API only provides a fromID parameter, subtract the ID by the maximum
+        // number of acquisitions. If that makes the specified ID a negative number, emulate the API
+        // by setting the ID to 0 and reduce the number of acquisitions.
+        long limit = setting.acquirableExecutionSize;
+        long fromId = id - limit;
+        if (fromId < 0) {
+            limit += fromId;
+            fromId = 0;
+        }
+
+        return this.call("GET", "aggTrades?symbol=" + marketName + "&fromId=" + fromId + "&limit=" + limit)
+                .flatIterable(e -> e.find("*"))
+                .map(this::createExecution);
     }
 
     /**
