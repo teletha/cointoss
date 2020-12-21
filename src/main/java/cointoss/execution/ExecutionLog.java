@@ -283,7 +283,8 @@ public class ExecutionLog {
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
-            long startId = fromId != -1 ? fromId : cacheId != 0 ? cacheId : estimateInitialExecutionId();
+            long startId = fromId != -1 ? fromId
+                    : cacheId != 0 ? cacheId : service.searchInitialExecution().map(e -> e.id).waitForTerminate().to().exact();
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
             while (!disposer.isDisposed()) {
@@ -364,39 +365,6 @@ public class ExecutionLog {
             }
             return disposer;
         }).effectOnError(e -> e.printStackTrace()).retryWhen(service.retryPolicy(500, "ExecutionLog"));
-    }
-
-    /**
-     * Estimate the inital execution id of the {@link Market}.
-     * 
-     * @return
-     */
-    private long estimateInitialExecutionId() {
-        long start = 1;
-        long end = service.executionLatest().waitForTerminate().to().exact().id;
-        long middle = (start + end) / 2;
-        long previousEnd = end;
-
-        while (true) {
-            List<Execution> result = service.executionsBefore(middle).skipError().waitForTerminate().toList();
-            if (result.isEmpty()) {
-                start = middle;
-                middle = (start + end) / 2;
-            } else {
-                long id = result.get(0).id;
-                if (id == previousEnd) {
-                    return id;
-                } else {
-                    previousEnd = id;
-                }
-                end = result.get(0).id + 1;
-                middle = (start + end) / 2;
-            }
-
-            if (end - start <= 10) {
-                return start;
-            }
-        }
     }
 
     /**
