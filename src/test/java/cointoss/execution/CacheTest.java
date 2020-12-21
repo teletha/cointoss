@@ -419,10 +419,11 @@ class CacheTest {
     @Test
     void repairWithoutNormalLog() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
+        Execution p0 = Execution.with.buy(1).price(10).date(date.minusDays(1));
         Execution e1 = Execution.with.buy(1).price(10).date(date);
         Execution e2 = Execution.with.buy(1).price(10).date(date);
         market.service.executionsWillResponse(e1, e2);
-        market.service.searchNearestIdWillResponse(e1.id - 1);
+        market.service.searchNearestIdWillResponse(p0);
 
         Cache cache = log.cache(date);
         assert cache.repair() == false;
