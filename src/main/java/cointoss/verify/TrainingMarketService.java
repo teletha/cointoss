@@ -171,7 +171,7 @@ public class TrainingMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return delegateInternal(Signal.class, "connectOrderBookRealtimely");
     }
 

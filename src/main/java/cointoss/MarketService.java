@@ -67,15 +67,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     /** The market specific scheduler. */
     private final ScheduledThreadPoolExecutor scheduler;
 
-    /** The shared real-time execution log. */
-    private Signal<Execution> executions;
-
-    /** The shared real-time order. */
-    private Signal<Order> orders;
-
-    /** The shared real-time order book. */
-    private Signal<OrderBookPageChanges> orderBooks;
-
     /**
      * @param exchange
      * @param marketName
@@ -135,15 +126,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A shared realtime execution logs.
      */
     public final synchronized Signal<Execution> executionsRealtimely(boolean autoReconnect) {
-        if (executions == null) {
-            executions = connectExecutionRealtimely().effectOnObserve(disposer::add);
-        }
-
-        if (autoReconnect) {
-            return executions.retryWhen(retryPolicy(500, "ExecutionRealtimely"));
-        } else {
-            return executions;
-        }
+        return connectExecutionRealtimely().effectOnObserve(disposer::add)
+                .retryWhen(autoReconnect ? retryPolicy(500, "ExecutionRealtimely") : null);
     }
 
     /**
@@ -174,7 +158,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         if (external == null) {
             return executionLatest().flatMap(latest -> searchInitialExecution(1, latest));
         } else {
-            return external.first().flatMap(day -> external.convert(day)).first();
+            return external.first().flatMap(external::convert).first();
         }
     }
 
@@ -301,10 +285,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A event stream of order state.
      */
     public final synchronized Signal<Order> ordersRealtimely() {
-        if (orders == null) {
-            orders = connectOrdersRealtimely().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "OrderRealtimely"));
-        }
-        return orders;
+        return connectOrdersRealtimely().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "OrderRealtimely"));
     }
 
     /**
@@ -339,15 +320,9 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A shared realtime order books.
      */
     public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely(boolean autoReconnect) {
-        if (orderBooks == null) {
-            orderBooks = orderBook().concat(createOrderBookRealtimely()).effectOnObserve(disposer::add);
-        }
-
-        if (autoReconnect) {
-            return orderBooks.retryWhen(retryPolicy(500, "OrderBookRealtimely"));
-        } else {
-            return orderBooks;
-        }
+        return orderBook().concat(connectOrderBookRealtimely())
+                .effectOnObserve(disposer::add)
+                .retryWhen(autoReconnect ? retryPolicy(500, "OrderBookRealtimely") : null);
     }
 
     /**
@@ -355,7 +330,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return A realtime order books.
      */
-    protected abstract Signal<OrderBookPageChanges> createOrderBookRealtimely();
+    protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
 
     /**
      * Get amount of the base currency.

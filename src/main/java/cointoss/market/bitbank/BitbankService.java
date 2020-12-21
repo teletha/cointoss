@@ -181,7 +181,7 @@ public class BitbankService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("depth_diff", marketName)).map(root -> {
             JSON data = root.get("message").get("data");
 

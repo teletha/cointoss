@@ -160,7 +160,7 @@ public class GMOService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderbooks", marketName)).map(this::createOrderBook);
     }
 

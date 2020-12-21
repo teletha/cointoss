@@ -233,7 +233,7 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderBook_200.100ms", marketName)).map(pages -> {
             OrderBookPageChanges change = new OrderBookPageChanges();
 

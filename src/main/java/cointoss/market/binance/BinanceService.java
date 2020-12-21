@@ -146,7 +146,7 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("depth", marketName)).map(json -> createOrderBook(json.get("data"), "b", "a"));
     }
 

@@ -160,7 +160,7 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("book", marketName)).skip(1).map(json -> {
             OrderBookPageChanges change = new OrderBookPageChanges();
             JSON data = json.get("1");

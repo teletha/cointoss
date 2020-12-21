@@ -151,7 +151,7 @@ public class CoinbaseService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("level2", marketName)).map(root -> {
             OrderBookPageChanges changes = new OrderBookPageChanges();
 

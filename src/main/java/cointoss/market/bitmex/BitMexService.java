@@ -164,7 +164,7 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> createOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderBookL2", marketName))
                 .map(json -> json.find("data", "*"))
                 .map(this::convertOrderBook);
