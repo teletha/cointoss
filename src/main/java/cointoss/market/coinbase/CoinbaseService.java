@@ -41,7 +41,7 @@ public class CoinbaseService extends MarketService {
             .ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]X");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(8).refresh(500, MILLISECONDS);
+    private static final APILimiter LIMITER = APILimiter.with.limit(3).refresh(500, MILLISECONDS);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws-feed.pro.coinbase.com")

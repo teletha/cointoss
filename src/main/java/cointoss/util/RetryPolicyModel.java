@@ -166,7 +166,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
 
             String name = name();
             if (name != null && name.length() != 0) {
-                logger.trace(this + " will retry after " + Chrono.formatAsDuration(duration) + "\t: " + e);
+                logger.info(this + " will retry after " + Chrono.formatAsDuration(duration) + "\t: " + e);
             }
 
             return duration;

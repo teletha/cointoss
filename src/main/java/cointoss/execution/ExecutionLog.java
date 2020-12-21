@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,7 +59,6 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
-import cointoss.market.ftx.FTX;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -284,7 +283,8 @@ public class ExecutionLog {
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
             long startId = fromId != -1 ? fromId
-                    : cacheId != 0 ? cacheId : service.searchInitialExecution().map(e -> e.id).waitForTerminate().to().exact();
+                    : cacheId != 0 ? cacheId
+                            : service.searchNearestExecution(Chrono.utcNow().minusDays(7)).map(e -> e.id).waitForTerminate().to().exact();
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
             while (!disposer.isDisposed()) {
@@ -1257,7 +1257,6 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        FTX.ETH_PERP.log.checkup();
-        // restoreNormal(FTX.ATOM_PERP, Chrono.utc(2020, 8, 27));
+
     }
 }
