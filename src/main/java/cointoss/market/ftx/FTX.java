@@ -19,7 +19,7 @@ import kiss.I;
 public final class FTX extends MarketServiceProvider {
 
     /** Limitation */
-    private static final int AcquirableSize = 5000;
+    private static final int AcquirableSize = 100;
 
     public static final MarketService ADA_PERP = new FTXService("ADA-PERP", MarketSetting.with.target(Currency.ADA.minimumSize(1))
             .base(Currency.USD.minimumSize(0.000005))

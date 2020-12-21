@@ -107,8 +107,8 @@ public class BitfinexService extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         long startTime = Support.computeEpochTime(id) + 1;
 
-        return call("GET", "trades/t" + marketName + "/hist?start=" + startTime + "&sort=1", LimitForTradeHistory)
-                .flatIterable(e -> e.find("*"))
+        return call("GET", "trades/t" + marketName + "/hist?end=" + startTime + "&limit=" + setting.acquirableExecutionSize, LimitForTradeHistory)
+                .flatIterable(e -> e.find("$"))
                 .map(e -> createExecution(e, new long[3]));
     }
 
