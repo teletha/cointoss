@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1059,7 +1059,7 @@ public class ExecutionLog {
             if (yesterday.existCompact()) {
                 return yesterday.readCompact().last().to().v.id;
             }
-            return service.searchNearestID(Chrono.utc(date)).waitForTerminate().to().or(-1L);
+            return service.searchNearestExecution(Chrono.utc(date)).waitForTerminate().map(Execution::id).to().or(-1L);
         }
 
         /**

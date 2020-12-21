@@ -195,11 +195,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @param target
      * @return
      */
-    public Signal<Long> searchNearestID(ZonedDateTime target) {
-        return executionLatest().concatMap(latest -> executionsBefore(latest.id))
-                .buffer()
-                .flatMap(list -> searchNearest(target, list.get(0), list.get(list.size() - 1), 0))
-                .map(e -> e.id);
+    public Signal<Execution> searchNearestExecution(ZonedDateTime target) {
+        ExecutionLogRepository external = externalRepository();
+        if (external == null) {
+            return executionLatest().concatMap(latest -> executionsBefore(latest.id))
+                    .buffer()
+                    .flatMap(list -> searchNearestExecution(target, list.get(0), list.get(list.size() - 1), 0));
+        } else {
+            return external.convert(target).first();
+        }
     }
 
     /**
@@ -209,7 +213,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @param current
      * @return
      */
-    private Signal<Execution> searchNearest(ZonedDateTime target, Execution sampleStart, Execution sampleEnd, int count) {
+    private Signal<Execution> searchNearestExecution(ZonedDateTime target, Execution sampleStart, Execution sampleEnd, int count) {
         logger.info("{} searches for the execution log closest to {}. [{} ~ {}]", this, target.toLocalDate(), sampleStart.date
                 .toLocalDateTime(), sampleEnd.date.toLocalDateTime());
 
@@ -218,18 +222,21 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         double targetDistance = sampleEnd.mills - target.toInstant().toEpochMilli();
         long estimatedTargetId = Math.round(sampleEnd.id - idDistance * (targetDistance / timeDistance));
 
-        return executionsBefore(estimatedTargetId).effect(x -> System.out.println("OK")).buffer().flatMap(candidates -> {
+        return executionsBefore(estimatedTargetId).buffer().or(List.of()).flatMap(candidates -> {
             Execution first = candidates.get(0);
             Execution last = candidates.get(candidates.size() - 1);
 
             if (target.isBefore(first.date)) {
-                return searchNearest(target, first, last, count);
+                return searchNearestExecution(target, first, last, count);
             } else if (last.date.isBefore(target)) {
-                return searchNearest(target, first, last, count);
+                if (last.equals(sampleEnd)) {
+                    return executions(last.id - 1, last.id + setting.acquirableExecutionSize).takeWhile(e -> e.date.isBefore(target));
+                } else {
+                    return searchNearestExecution(target, first, last, count);
+                }
             } else {
                 for (int i = 0; i < candidates.size(); i++) {
                     if (!candidates.get(i).date.isBefore(target)) {
-                        System.out.println(candidates.get(i - 1));
                         return I.signal(candidates.get(i - 1));
                     }
                 }
