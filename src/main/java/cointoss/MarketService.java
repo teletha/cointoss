@@ -169,7 +169,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     private Signal<Execution> searchInitialExecution(long start, Execution end) {
         long middle = (start + end.id) / 2;
-        // System.out.println(start + " " + middle + " " + end);
+        logger.info("{} searches for the initial execution log. [{} ~ {} ~ {}]", this, start, middle, end.date);
 
         return executionsBefore(middle).buffer().skipError().or(List.of()).flatMap(result -> {
             int size = result.size();
@@ -229,7 +229,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
             if (target.isBefore(first.date)) {
                 return searchNearestExecution(target, first, last, count);
             } else if (last.date.isBefore(target)) {
-                if (last.equals(sampleEnd)) {
+                if (last.equals(sampleEnd) || Duration.between(last.date, target).toMinutes() < 1) {
                     return executions(last.id - 1, last.id + setting.acquirableExecutionSize).takeWhile(e -> e.date.isBefore(target));
                 } else {
                     return searchNearestExecution(target, first, last, count);
@@ -241,8 +241,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                     }
                 }
                 // If this exception will be thrown, it is bug of this program. So we must
-                // rethrow
-                // the wrapped error in here.
+                // rethrow the wrapped error in here.
                 throw new Error("Here is unreachable.");
             }
         });

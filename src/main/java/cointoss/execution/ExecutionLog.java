@@ -1059,7 +1059,6 @@ public class ExecutionLog {
                 return true;
             }
 
-            int coefficient = 1;
             boolean completed = false;
             try (NormalLog normalLog = new NormalLog(normal)) {
                 long id = normalLog.lastID();
@@ -1124,7 +1123,7 @@ public class ExecutionLog {
                         // update the last ID
                         id = valids.get(valids.size() - 1).id;
 
-                        log.info("REST write on " + service + " from {}.  size {} ({})", valids.get(0).date, valids.size(), coefficient);
+                        log.info("{} acquires the execution log from {} ({}).", service, valids.get(0).date, valids.size());
                     }
 
                     // clear all data to reuse the container
@@ -1258,7 +1257,7 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        FTX.BNB_PERP.log.checkup();
+        FTX.ETH_PERP.log.checkup();
         // restoreNormal(FTX.ATOM_PERP, Chrono.utc(2020, 8, 27));
     }
 }
