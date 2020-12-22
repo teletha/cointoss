@@ -26,6 +26,7 @@ import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.OpenInterest;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
@@ -337,6 +338,22 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A realtime order books.
      */
     protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
+
+    /**
+     * Connect to the realtime order book stream.
+     * 
+     * @return A realtime order books.
+     */
+    protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
+
+    /**
+     * Get the open interests data.
+     * 
+     * @return
+     */
+    public Signal<OpenInterest> openInterests() {
+        return I.signal();
+    }
 
     /**
      * Get amount of the base currency.

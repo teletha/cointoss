@@ -11,7 +11,9 @@ package cointoss.market.binance;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
+import cointoss.market.OpenInterest;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
@@ -31,6 +34,7 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -137,6 +141,44 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<OpenInterest> openInterests() {
+        return call("POST", "https://www.binance.com/gateway-api/v1/public/future/data/open-interest-stats", new MiscRequest(5))
+                .flatIterable(e -> {
+                    List<Long> times = e.find(Long.class, "data", "xAxis", "*");
+                    List<Double> dataset = e.find(Double.class, "data", "series", "0", "data", "*");
+                    List<OpenInterest> oi = new ArrayList(times.size());
+                    for (int i = 0; i < times.size(); i++) {
+                        oi.add(OpenInterest.with.date(Chrono.utcByMills(times.get(i))).size(dataset.get(i)));
+                    }
+                    return oi;
+                });
+    }
+
+    private class MiscRequest {
+
+        public String name = marketName;
+
+        public long periodMinutes;
+
+        /**
+         * @param periodMinutes
+         */
+        private MiscRequest(long periodMinutes) {
+            this.periodMinutes = periodMinutes;
+        }
+
+    }
+
+    public static void main(String[] args) {
+        Binance.BTC_USDT.openInterests().waitForTerminate().to(e -> {
+            System.out.println(e);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "depth?symbol=" + marketName + "&limit=" + (isFutures ? "1000" : "5000"))
                 .map(e -> createOrderBook(e, "bids", "asks"));
@@ -182,12 +224,17 @@ public class BinanceService extends MarketService {
      * @param path
      * @return
      */
-    private Signal<JSON> call(String method, String path) {
+    private Signal<JSON> call(String method, String path, Object... posting) {
         String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
-        Builder builder = HttpRequest.newBuilder(URI.create(uri + path));
+        Builder builder = HttpRequest.newBuilder(URI.create(path.startsWith("http") ? path : uri + path));
 
         switch (method) {
         case "GET":
+            break;
+
+        case "POST":
+            builder = builder.POST(BodyPublishers.ofString(I.write(posting[0]), StandardCharsets.US_ASCII))
+                    .header("content-type", "application/json");
             break;
 
         default:

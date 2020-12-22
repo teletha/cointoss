@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -105,11 +106,11 @@ public class CoincheckService extends MarketService {
     }
 
     public static final void main(String[] a) throws InterruptedException {
-        // Market m = new Market(Coincheck.BTC_JPY);
-        // m.readLog(x -> x.fromYestaday());
-        Coincheck.BTC_JPY.executionsBefore(100000).waitForTerminate().to(e -> {
-            System.out.println(e);
-        });
+        Market m = new Market(Coincheck.BTC_JPY);
+        m.readLog(x -> x.fromYestaday());
+        // Coincheck.BTC_JPY.executionsBefore(1000000000).waitForTerminate().to(e -> {
+        // System.out.println(e);
+        // });
     }
 
     /**
@@ -120,8 +121,8 @@ public class CoincheckService extends MarketService {
         long[] context = new long[3];
 
         Signal<JSON> multiples = I.signal();
-        for (int i = 0; i < 10; i++) {
-            multiples = multiples.concat(call("PRIVATE", "orders/completes?pair=" + marketName + "&last_id=" + (id + 1 + 50 * i))
+        for (int i = 4; 0 <= i; i--) {
+            multiples = multiples.concat(call("PRIVATE", "orders/completes?pair=" + marketName + "&last_id=" + (id - 50 * i))
                     .flatIterable(e -> e.find("completes", "$")));
         }
 

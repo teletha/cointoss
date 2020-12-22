@@ -284,7 +284,7 @@ public class ExecutionLog {
             int size = service.setting.acquirableExecutionSize();
             long startId = fromId != -1 ? fromId
                     : cacheId != 0 ? cacheId
-                            : service.searchNearestExecution(Chrono.utcNow().minusDays(7)).map(e -> e.id).waitForTerminate().to().exact();
+                            : service.searchNearestExecution(Chrono.utcNow().minusDays(2)).map(e -> e.id).waitForTerminate().to().exact();
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
             while (!disposer.isDisposed()) {
