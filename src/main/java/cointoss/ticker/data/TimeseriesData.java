@@ -19,4 +19,13 @@ public interface TimeseriesData {
      * @return
      */
     ZonedDateTime date();
+
+    /**
+     * The date and time.
+     * 
+     * @return
+     */
+    default long epochSeconds() {
+        return date().toEpochSecond();
+    }
 }

@@ -30,6 +30,9 @@ import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickerManager;
+import cointoss.ticker.TimeseriesStore;
+import cointoss.ticker.data.OpenInterest;
+import cointoss.ticker.data.TimeseriesData;
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
@@ -61,6 +64,9 @@ public class Market implements Disposable {
 
     /** The ticker manager. */
     public final TickerManager tickers;
+
+    /** The open interest store. */
+    public final TimeseriesStore<OpenInterest> openInterest;
 
     /** The execution observers. */
     protected final Signaling<Execution> timelineObservers = new Signaling();
@@ -105,6 +111,8 @@ public class Market implements Disposable {
         this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();
         this.tickers = createTickerManager();
+        this.openInterest = new TimeseriesStore<OpenInterest>(Span.Minute5, TimeseriesData::epochSeconds)
+                .enableDiskStore(service.directory().directory("oi"), OpenInterest.class);
 
         // build tickers for each span
         timeline.to(e -> {

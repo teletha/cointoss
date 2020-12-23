@@ -129,6 +129,17 @@ public final class TimeseriesStore<E> {
      * @param type A type of items.
      * @return Chainable API.
      */
+    public synchronized TimeseriesStore<E> enableDiskStore(Directory directory, Class<E> type) {
+        return enableDiskStore(directory.asJavaPath(), type);
+    }
+
+    /**
+     * Enable the transparent disk persistence using property-based encoder and decoder.
+     * 
+     * @param directory A root directory to store data.
+     * @param type A type of items.
+     * @return Chainable API.
+     */
     public synchronized TimeseriesStore<E> enableDiskStore(Path directory, Class<E> type) {
         if (type != null) {
             Model<E> model = Model.of(type);

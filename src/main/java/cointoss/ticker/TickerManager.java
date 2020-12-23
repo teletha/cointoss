@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.execution.Execution;
-import cointoss.ticker.data.OpenInterest;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -95,15 +94,6 @@ public final class TickerManager implements Disposable {
      */
     public double openInterestAt(ZonedDateTime date) {
         return 0;
-    }
-
-    /**
-     * Update {@link OpenInterest}.
-     * 
-     * @param oi
-     */
-    public void update(OpenInterest oi) {
-
     }
 
     /**
