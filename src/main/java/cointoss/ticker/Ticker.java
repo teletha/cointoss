@@ -56,25 +56,25 @@ public final class Ticker implements Disposable {
     public final OnlineStats typicalStats = new OnlineStats();
 
     /** The realtime data holder. */
-    final TickerManager realtime;
+    final TickerManager manager;
 
     /**
      * Create {@link Ticker}.
      * 
      * @param span An associated span.
      */
-    Ticker(Span span, TickerManager realtime) {
+    Ticker(Span span, TickerManager manager) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
         this.ticks = new TimeseriesStore<Tick>(span, tick -> tick.openTime);
-        this.realtime = realtime;
+        this.manager = manager;
     }
 
     /**
      * Initialize {@link Ticker}.
      * 
      * @param execution The latest {@link Execution}.
-     * @param realtime The realtime execution statistic.
+     * @param manager The realtime execution statistic.
      */
     final void init(Execution execution) {
         current = new Tick(span.calculateStartTime(execution.date).toEpochSecond(), execution.price, this);
@@ -87,7 +87,7 @@ public final class Ticker implements Disposable {
      * Add the new {@link Tick} if needed.
      * 
      * @param execution The latest {@link Execution}.
-     * @param realtime The realtime execution statistic.
+     * @param manager The realtime execution statistic.
      * @return When the new {@link Tick} was added, this method will return <code>true</code>.
      */
     final boolean createTick(Execution execution) {

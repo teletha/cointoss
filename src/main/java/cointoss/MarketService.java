@@ -26,10 +26,10 @@ import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.OpenInterest;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
+import cointoss.ticker.data.OpenInterest;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.RetryPolicy;
@@ -340,18 +340,9 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
 
     /**
-     * Connect to the realtime order book stream.
-     * 
-     * @return A realtime order books.
+     * Provide the market specific tick related data if needed.
      */
-    protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
-
-    /**
-     * Get the open interests data.
-     * 
-     * @return
-     */
-    public Signal<OpenInterest> openInterests() {
+    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
         return I.signal();
     }
 

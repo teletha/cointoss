@@ -52,7 +52,6 @@ import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.ticker.Trend;
 import cointoss.util.Chrono;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
@@ -780,11 +779,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
                         gc.setLineWidth(1);
-                        Trend trend = tick.trend();
-                        if (trend == null) {
-                            gc.setStroke(trend == Trend.Range ? Color.DARKGREY : trend == Trend.Buy ? Color.GREEN : Color.DARKRED);
-                            gc.strokeLine(x, 0, x, height);
-                        }
                         gc.setStroke(chart.candleType.value().coordinator.apply(tick));
                         gc.strokeLine(x, high, x, low);
                         if (needDrawingOpenAndClose) {

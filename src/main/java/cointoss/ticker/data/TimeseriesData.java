@@ -7,20 +7,16 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.market;
+package cointoss.ticker.data;
 
 import java.time.ZonedDateTime;
 
-import cointoss.ticker.TimeseriesData;
-import icy.manipulator.Icy;
+public interface TimeseriesData {
 
-@Icy
-interface OpenInterestModel extends TimeseriesData {
-
-    @Override
-    @Icy.Property
+    /**
+     * The date and time.
+     * 
+     * @return
+     */
     ZonedDateTime date();
-
-    @Icy.Property
-    double size();
 }

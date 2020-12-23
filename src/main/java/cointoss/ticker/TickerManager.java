@@ -9,9 +9,12 @@
  */
 package cointoss.ticker;
 
+import java.time.ZonedDateTime;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.execution.Execution;
+import cointoss.ticker.data.OpenInterest;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -82,6 +85,25 @@ public final class TickerManager implements Disposable {
 
     public RealtimeTicker realtime(int seconds) {
         return new RealtimeTicker(this, seconds / 5);
+    }
+
+    /**
+     * Retrieve the open interest at the specified date.
+     * 
+     * @param date
+     * @return
+     */
+    public double openInterestAt(ZonedDateTime date) {
+        return 0;
+    }
+
+    /**
+     * Update {@link OpenInterest}.
+     * 
+     * @param oi
+     */
+    public void update(OpenInterest oi) {
+
     }
 
     /**

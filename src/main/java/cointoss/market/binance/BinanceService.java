@@ -25,9 +25,9 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.market.OpenInterest;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -141,44 +141,6 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OpenInterest> openInterests() {
-        return call("POST", "https://www.binance.com/gateway-api/v1/public/future/data/open-interest-stats", new MiscRequest(5))
-                .flatIterable(e -> {
-                    List<Long> times = e.find(Long.class, "data", "xAxis", "*");
-                    List<Double> dataset = e.find(Double.class, "data", "series", "0", "data", "*");
-                    List<OpenInterest> oi = new ArrayList(times.size());
-                    for (int i = 0; i < times.size(); i++) {
-                        oi.add(OpenInterest.with.date(Chrono.utcByMills(times.get(i))).size(dataset.get(i)));
-                    }
-                    return oi;
-                });
-    }
-
-    private class MiscRequest {
-
-        public String name = marketName;
-
-        public long periodMinutes;
-
-        /**
-         * @param periodMinutes
-         */
-        private MiscRequest(long periodMinutes) {
-            this.periodMinutes = periodMinutes;
-        }
-
-    }
-
-    public static void main(String[] args) {
-        Binance.BTC_USDT.openInterests().waitForTerminate().to(e -> {
-            System.out.println(e);
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "depth?symbol=" + marketName + "&limit=" + (isFutures ? "1000" : "5000"))
                 .map(e -> createOrderBook(e, "bids", "asks"));
@@ -215,6 +177,37 @@ public class BinanceService extends MarketService {
             change.asks.add(new OrderBookPage(price, size));
         }
         return change;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
+        if (!isFutures) {
+            return I.signal();
+        }
+
+        startExcluded = Chrono.between(Chrono.utcNow().minusDays(30), startExcluded, startExcluded);
+
+        long start = startExcluded.plusMinutes(5).toInstant().toEpochMilli();
+        long end = startExcluded.plusMinutes(5 * 500).toInstant().toEpochMilli();
+
+        return call("GET", "https://fapi.binance.com/futures/data/openInterestHist?symbol=" + marketName + "&period=5m&limit=500&startTime=" + start + "&endTime=" + end)
+                .flatIterable(e -> e.find("*"))
+                .map(e -> {
+                    ZonedDateTime time = Chrono.utcByMills(e.get(long.class, "timestamp"));
+                    double size = e.get(double.class, "sumOpenInterest");
+                    double value = e.get(double.class, "sumOpenInterestValue");
+
+                    return OpenInterest.with.date(time).size(size).value(value);
+                });
+    }
+
+    public static void main(String[] args) {
+        Binance.FUTURE_BTC_USDT.provideOpenInterest(Chrono.utc(2020, 10, 18, 2, 30, 0, 0)).waitForTerminate().to(e -> {
+            System.out.println(e);
+        });
     }
 
     /**

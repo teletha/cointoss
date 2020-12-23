@@ -11,7 +11,6 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 
-import cointoss.analyze.OnlineStats;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 
@@ -19,6 +18,9 @@ public final class Tick {
 
     /** The empty dummy. */
     static final Tick EMPTY = new Tick();
+
+    /** The source ticker. */
+    final Ticker ticker;
 
     /** Begin time of this tick (epoch second). */
     public final long openTime;
@@ -47,18 +49,13 @@ public final class Tick {
     /** Snapshot of short losscut volume at tick initialization. */
     double shortLosscutVolume;
 
-    /** The trend type. */
-    Trend trend;
-
-    /** The source ticker. */
-    Ticker ticker;
-
     /**
      * Empty Dummt Tick.
      */
     private Tick() {
         this.openTime = 0;
         this.openPrice = closePrice = highPrice = lowPrice = Num.ZERO;
+        this.ticker = null;
     }
 
     /**
@@ -73,10 +70,10 @@ public final class Tick {
         this.openPrice = this.highPrice = this.lowPrice = open;
 
         this.ticker = ticker;
-        this.longVolume = ticker.realtime.longVolume;
-        this.longLosscutVolume = ticker.realtime.longLosscutVolume;
-        this.shortVolume = ticker.realtime.shortVolume;
-        this.shortLosscutVolume = ticker.realtime.shortLosscutVolume;
+        this.longVolume = ticker.manager.longVolume;
+        this.longLosscutVolume = ticker.manager.longLosscutVolume;
+        this.shortVolume = ticker.manager.shortVolume;
+        this.shortLosscutVolume = ticker.manager.shortLosscutVolume;
     }
 
     /**
@@ -103,7 +100,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num closePrice() {
-        return ticker == null ? closePrice : ticker.realtime.latest.v.price;
+        return ticker == null ? closePrice : ticker.manager.latest.v.price;
     }
 
     /**
@@ -199,14 +196,14 @@ public final class Tick {
      * @return The tick related value.
      */
     public double longVolume() {
-        return ticker == null ? longVolume : ticker.realtime.longVolume - longVolume;
+        return ticker == null ? longVolume : ticker.manager.longVolume - longVolume;
     }
 
     /**
      * Retrieve the tick related value.
      */
     public double longLosscutVolume() {
-        return ticker == null ? longLosscutVolume : ticker.realtime.longLosscutVolume - longLosscutVolume;
+        return ticker == null ? longLosscutVolume : ticker.manager.longLosscutVolume - longLosscutVolume;
     }
 
     /**
@@ -215,14 +212,14 @@ public final class Tick {
      * @return The tick related value.
      */
     public double shortVolume() {
-        return ticker == null ? shortVolume : ticker.realtime.shortVolume - shortVolume;
+        return ticker == null ? shortVolume : ticker.manager.shortVolume - shortVolume;
     }
 
     /**
      * Retrieve the tick related value.
      */
     public double shortLosscutVolume() {
-        return ticker == null ? shortLosscutVolume : ticker.realtime.shortLosscutVolume - shortLosscutVolume;
+        return ticker == null ? shortLosscutVolume : ticker.manager.shortLosscutVolume - shortLosscutVolume;
     }
 
     /**
@@ -244,15 +241,6 @@ public final class Tick {
     }
 
     /**
-     * Detect the trend type at this {@link Tick}.
-     * 
-     * @return
-     */
-    public Trend trend() {
-        return ticker == null ? trend : new TrendDetector(this).detect();
-    }
-
-    /**
      * Make this {@link Tick}'s related values fixed.
      * 
      * @return
@@ -263,14 +251,12 @@ public final class Tick {
             ticker.buyVolumeStats.add(longVolume());
             ticker.sellVolumeStats.add(shortVolume());
             ticker.typicalStats.add(typicalDoublePrice());
-            trend = new TrendDetector(this).detect();
 
             closePrice = closePrice();
             longVolume = longVolume();
             longLosscutVolume = longLosscutVolume();
             shortVolume = shortVolume();
             shortLosscutVolume = shortLosscutVolume();
-            ticker = null;
         }
     }
 
@@ -290,6 +276,15 @@ public final class Tick {
      */
     public boolean isBear() {
         return openPrice.isGreaterThan(closePrice());
+    }
+
+    /**
+     * Compute the open interest at this time.
+     * 
+     * @return
+     */
+    public double openInterest() {
+        return ticker.manager.openInterestAt(openTime());
     }
 
     /**
@@ -334,138 +329,5 @@ public final class Tick {
 
         Tick other = (Tick) obj;
         return openTime == other.openTime;
-    }
-
-    /**
-     * Estimate trend type from {@link Tick}.
-     */
-    static class TrendDetector {
-
-        private int rangeOrTrend;
-
-        private int buyOrSell;
-
-        private final Tick tick;
-
-        private final Tick prev;
-
-        private final OnlineStats buyVolumes;
-
-        private final OnlineStats sellVolumes;
-
-        private final OnlineStats spreds;
-
-        private final OnlineStats typicals;
-
-        /**
-         * @param tick
-         */
-        TrendDetector(Tick tick) {
-            this.tick = tick;
-            this.prev = tick.ticker.ticks.before(tick);
-            this.buyVolumes = tick.ticker.buyVolumeStats;
-            this.sellVolumes = tick.ticker.sellVolumeStats;
-            this.spreds = tick.ticker.spreadStats;
-            this.typicals = tick.ticker.typicalStats;
-
-            if (prev != null) {
-                volumeSizeOutlier();
-                volumeAction();
-                volatilityOutlier();
-                priceAction();
-            }
-        }
-
-        /**
-         * Check abnormal volume size.
-         */
-        private void volumeSizeOutlier() {
-            if (buyVolumes.calculateSigma(tick.longVolume()) <= 1) {
-                rangeOrTrend++;
-            } else {
-                rangeOrTrend--;
-                buyOrSell++;
-            }
-
-            if (sellVolumes.calculateSigma(tick.shortVolume()) <= 1) {
-                rangeOrTrend++;
-            } else {
-                rangeOrTrend--;
-                buyOrSell--;
-            }
-        }
-
-        private void volumeAction() {
-            double delta = tick.longVolume() - prev.longVolume();
-            if (buyVolumes.getStdDev() < Math.abs(delta)) {
-                buyOrSell++;
-
-                if (0 < delta) {
-                    rangeOrTrend--;
-                } else {
-                    rangeOrTrend++;
-                }
-            }
-
-            delta = tick.shortVolume() - prev.shortVolume();
-            if (sellVolumes.getStdDev() < Math.abs(delta)) {
-                buyOrSell--;
-
-                if (0 < delta) {
-                    rangeOrTrend--;
-                } else {
-                    rangeOrTrend++;
-                }
-            }
-        }
-
-        /**
-         * Check abnormal volatility.
-         */
-        private void volatilityOutlier() {
-            if (spreds.calculateSigma(tick.spreadDouble()) <= 1) {
-                rangeOrTrend++;
-            } else {
-                rangeOrTrend--;
-            }
-        }
-
-        private void priceAction() {
-            comparePrice(prev.highPrice, tick.highPrice);
-            comparePrice(prev.lowPrice, tick.lowPrice);
-            comparePrice(prev.upperPrice(), tick.upperPrice());
-            comparePrice(prev.lowerPrice(), tick.lowerPrice());
-        }
-
-        private void comparePrice(Num prev, Num now) {
-            double typical = 0;
-            double prevPrice = prev.doubleValue();
-            double nowPrice = now.doubleValue();
-
-            if (typical < nowPrice - prevPrice) {
-                rangeOrTrend--;
-                buyOrSell++;
-            } else if (prevPrice - nowPrice > typical) {
-                rangeOrTrend--;
-                buyOrSell--;
-            } else {
-                rangeOrTrend++;
-            }
-        }
-
-        private Trend detect() {
-            if (prev != null) {
-                if (1 <= rangeOrTrend) {
-                    return Trend.Range;
-                } else if (rangeOrTrend <= -2) {
-                    if (1 <= buyOrSell) {
-                        return Trend.Buy;
-                    } else if (buyOrSell <= -1) {
-                        return Trend.Sell;
-                    }
-                }
-            }
-            return Trend.Unknown;
-        }
     }
 }
