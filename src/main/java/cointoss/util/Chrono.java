@@ -122,6 +122,35 @@ public class Chrono {
     }
 
     /**
+     * Gets a stream that returns the current time every the specified minute.
+     * 
+     * @param minute Specify time (0 ~ 59).
+     * @return
+     */
+    public static Signal<ZonedDateTime> minuteAt(int minute) {
+        return minutes().take(time -> time.getMinute() == minute);
+    }
+
+    /**
+     * Gets a stream that returns the current time every hour.
+     * 
+     * @return
+     */
+    public static Signal<ZonedDateTime> hours() {
+        return seconds().takeAt(i -> i % 3600 == 0);
+    }
+
+    /**
+     * Gets a stream that returns the current time every hour.
+     * 
+     * @param hour Specify time (0 ~ 23).
+     * @return
+     */
+    public static Signal<ZonedDateTime> hourAt(int hour) {
+        return hours().take(time -> time.getHour() == hour);
+    }
+
+    /**
      * Obtains the exact current time, corrected for the difference between the NTP server and local
      * PC time.
      * 
