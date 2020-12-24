@@ -87,16 +87,6 @@ public final class TickerManager implements Disposable {
     }
 
     /**
-     * Retrieve the open interest at the specified date.
-     * 
-     * @param date
-     * @return
-     */
-    public double openInterestAt(ZonedDateTime date) {
-        return 0;
-    }
-
-    /**
      * Retrieve all {@link Ticker}s.
      * 
      * @return

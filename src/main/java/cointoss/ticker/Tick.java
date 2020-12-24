@@ -19,9 +19,6 @@ public final class Tick {
     /** The empty dummy. */
     static final Tick EMPTY = new Tick();
 
-    /** The source ticker. */
-    final Ticker ticker;
-
     /** Begin time of this tick (epoch second). */
     public final long openTime;
 
@@ -49,13 +46,15 @@ public final class Tick {
     /** Snapshot of short losscut volume at tick initialization. */
     double shortLosscutVolume;
 
+    /** The source ticker. */
+    private Ticker ticker;
+
     /**
      * Empty Dummt Tick.
      */
     private Tick() {
         this.openTime = 0;
         this.openPrice = closePrice = highPrice = lowPrice = Num.ZERO;
-        this.ticker = null;
     }
 
     /**
@@ -257,6 +256,7 @@ public final class Tick {
             longLosscutVolume = longLosscutVolume();
             shortVolume = shortVolume();
             shortLosscutVolume = shortLosscutVolume();
+            ticker = null;
         }
     }
 
@@ -276,15 +276,6 @@ public final class Tick {
      */
     public boolean isBear() {
         return openPrice.isGreaterThan(closePrice());
-    }
-
-    /**
-     * Compute the open interest at this time.
-     * 
-     * @return
-     */
-    public double openInterest() {
-        return ticker.manager.openInterestAt(openTime());
     }
 
     /**

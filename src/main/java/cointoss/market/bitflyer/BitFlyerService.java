@@ -69,7 +69,7 @@ public class BitFlyerService extends MarketService {
     private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(500).refresh(5, MINUTES);
+    private static final APILimiter LIMITER = APILimiter.with.limit(100).refresh(1, MINUTES);
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")

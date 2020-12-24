@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -239,7 +239,7 @@ public class ExecutionLog {
      * Clear all fast log.
      */
     public final void clearFastCache() {
-        root.delete("*.flog");
+        root.directory("flog").delete();
     }
 
     /**
@@ -563,7 +563,7 @@ public class ExecutionLog {
          * @return A file location.
          */
         final File fastLog() {
-            return normal.parent().directory("flog").file(normal.base() + ".flog");
+            return normal.extension("flog");
         }
 
         /**
@@ -669,7 +669,7 @@ public class ExecutionLog {
             } else {
                 ExecutionLogRepository external = service.externalRepository();
 
-                if (external != null) {
+                if (external != null && Chrono.within(repository.externalFirst, date, repository.externalLast)) {
                     return readExternalRepository(external);
                 }
 
