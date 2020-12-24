@@ -110,7 +110,7 @@ public class Market implements Disposable {
         this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();
         this.tickers = createTickerManager();
-        this.openInterest = TimeseriesStore.create(OpenInterest.class, Span.Minute5).enableDiskStore(service.directory().directory("oi"));
+        this.openInterest = createOpenIntrest();
 
         // build tickers for each span
         timeline.to(e -> {
@@ -169,6 +169,28 @@ public class Market implements Disposable {
      */
     protected TickerManager createTickerManager() {
         return new TickerManager();
+    }
+
+    /**
+     * Create {@link OpenInterest} data store.
+     * <p>
+     * The method is defined for smooth delegation. Therefore, it is usually not possible to call or
+     * override this method from outside the cointoss.verify package.
+     * 
+     */
+    protected TimeseriesStore<OpenInterest> createOpenIntrest() {
+        TimeseriesStore<OpenInterest> open = TimeseriesStore.create(OpenInterest.class, Span.Minute5)
+                .enableDiskStore(service.directory().directory("oi"));
+
+        Chrono.minutes().take(time -> time.getMinute() % 1 == 0).to(() -> {
+            OpenInterest last = open.last();
+            service.provideOpenInterest(last != null ? last.date : Chrono.utc(2015, 1, 1)).effectOnComplete(open::persist).to(oi -> {
+                System.out.println(oi);
+                open.store(oi);
+            });
+        });
+
+        return open;
     }
 
     public synchronized Trader trader() {

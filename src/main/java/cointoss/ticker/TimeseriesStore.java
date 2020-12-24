@@ -182,7 +182,7 @@ public final class TimeseriesStore<E> {
                 List<Property> properties = model.properties();
                 String[] values = new String[properties.size()];
                 for (int i = 0; i < values.length; i++) {
-                    values[i] = I.find(Encoder.class, properties.get(i).model.type).encode(item);
+                    values[i] = I.find(Encoder.class, properties.get(i).model.type).encode(model.get(item, properties.get(i)));
                 }
                 return values;
             }, values -> {
@@ -879,7 +879,7 @@ public final class TimeseriesStore<E> {
             this.decoder = decoder;
 
             // read all caches
-            root.walkFile("*.cache").to(file -> {
+            root.walkFile("*.log").to(file -> {
 
             });
         }
@@ -942,7 +942,7 @@ public final class TimeseriesStore<E> {
          * @return
          */
         private File name(long time) {
-            return root.directory(span.name()).file(FileName.format(Chrono.utcBySeconds(time)) + ".cache");
+            return root.directory(span.name()).file(FileName.format(Chrono.utcBySeconds(time)) + ".log");
         }
     }
 }

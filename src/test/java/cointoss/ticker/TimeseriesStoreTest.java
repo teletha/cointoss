@@ -456,7 +456,7 @@ class TimeseriesStoreTest {
     void persist() {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(dir);
-        File cache = dir.file("Second5/1970010100.cache");
+        File cache = dir.file("Second5/1970010100.log");
         assert cache.isAbsent();
 
         store.store(0L);
@@ -468,7 +468,7 @@ class TimeseriesStoreTest {
     void persistOnlyModified() {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(dir);
-        File cache = dir.file("Second5/1970010100.cache");
+        File cache = dir.file("Second5/1970010100.log");
 
         store.store(0L);
         store.persist();
