@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -196,7 +197,7 @@ public class GMOService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path));
+        Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path)).timeout(Duration.ofSeconds(60));
         return Network.rest(builder, LIMITER, client()).flatMap(json -> {
             if (json.get(int.class, "status") != 0) {
                 return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string")));
