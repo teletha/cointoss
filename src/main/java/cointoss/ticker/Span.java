@@ -33,11 +33,9 @@ public enum Span {
 
     Minute15(15, MINUTE_OF_HOUR, 1, DAYS, 12, 1), // 4 * 24 * 12 = 1152
 
-    Minute30(30, MINUTE_OF_HOUR, 1, DAYS, 24, 1), // 2 * 24 * 24 = 1152
+    Minute30(30, MINUTE_OF_HOUR, 2, DAYS, 10, 1), // 2 * 48 * 10 = 960
 
-    Hour1(1, HOUR_OF_DAY, 2, DAYS, 16, 1), // 24 * 2 * 16 = 768
-
-    Hour2(2, HOUR_OF_DAY, 5, DAYS, 10, 1, 2), // 12 * 5 * 10 =600
+    Hour1(1, HOUR_OF_DAY, 3, DAYS, 12, 1, 2), // 24 * 3 * 10 = 720
 
     Hour4(4, HOUR_OF_DAY, 10, DAYS, 10), // 6 * 10 * 10 = 600
 
@@ -74,10 +72,6 @@ public enum Span {
 
     /** The unit name. */
     private final Variable<String> unitName;
-
-    public static void main(String[] args) {
-        System.out.println(Span.Minute1.duration.getSeconds());
-    }
 
     /**
      * @param amount

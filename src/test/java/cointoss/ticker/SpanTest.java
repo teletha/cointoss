@@ -75,7 +75,6 @@ class SpanTest {
         assert Span.Hour12.ticksPerDay() == 2;
         assert Span.Hour6.ticksPerDay() == 4;
         assert Span.Hour4.ticksPerDay() == 6;
-        assert Span.Hour2.ticksPerDay() == 12;
         assert Span.Hour1.ticksPerDay() == 24;
         assert Span.Minute30.ticksPerDay() == 48;
         assert Span.Minute15.ticksPerDay() == 96;
