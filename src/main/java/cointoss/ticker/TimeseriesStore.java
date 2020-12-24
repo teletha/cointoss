@@ -30,6 +30,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
@@ -49,6 +50,9 @@ public final class TimeseriesStore<E> {
 
     /** Reusable format. yyyyMMdd'T'HHmmss */
     private static final DateTimeFormatter FileName = DateTimeFormatter.ofPattern("yyyyMMddHH");
+
+    /** The item type. */
+    private final Model<E> model;
 
     /** The span. */
     private final Span span;
@@ -93,11 +97,37 @@ public final class TimeseriesStore<E> {
     private LongFunction<Signal<E>> supplier;
 
     /**
+     * Create the store for timeseries data.
+     * 
+     * @param <E>
+     * @param type
+     * @param span
+     * @return
+     */
+    public static <E extends TimeseriesData> TimeseriesStore<E> create(Class<E> type, Span span) {
+        return create(type, E::epochSeconds, span);
+    }
+
+    /**
+     * Create the store for timeseries data.
+     * 
+     * @param <E>
+     * @param type
+     * @param timestampExtractor
+     * @param span
+     * @return
+     */
+    public static <E> TimeseriesStore<E> create(Class<E> type, ToLongFunction<E> timestampExtractor, Span span) {
+        return new TimeseriesStore(span, type, timestampExtractor);
+    }
+
+    /**
      * 
      */
-    public TimeseriesStore(Span span, ToLongFunction<E> timestampExtractor) {
+    private TimeseriesStore(Span span, Class<E> type, ToLongFunction<E> timestampExtractor) {
+        this.model = Model.of(type);
         this.span = Objects.requireNonNull(span);
-        this.length = (int) (span.segment / span.seconds);
+        this.length = (int) (span.segmentSeconds / span.seconds);
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
     }
 
@@ -129,8 +159,8 @@ public final class TimeseriesStore<E> {
      * @param type A type of items.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Directory directory, Class<E> type) {
-        return enableDiskStore(directory.asJavaPath(), type);
+    public synchronized TimeseriesStore<E> enableDiskStore(Directory directory) {
+        return enableDiskStore(directory.asJavaPath());
     }
 
     /**
@@ -140,33 +170,29 @@ public final class TimeseriesStore<E> {
      * @param type A type of items.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Path directory, Class<E> type) {
-        if (type != null) {
-            Model<E> model = Model.of(type);
-
-            if (model.atomic) {
-                enableDiskStore(directory, item -> {
-                    return new String[] {I.find(Encoder.class, model.type).encode(item)};
-                }, values -> {
-                    return (E) I.find(Decoder.class, model.type).decode(values[0]);
-                });
-            } else {
-                enableDiskStore(directory, item -> {
-                    List<Property> properties = model.properties();
-                    String[] values = new String[properties.size()];
-                    for (int i = 0; i < values.length; i++) {
-                        values[i] = I.find(Encoder.class, properties.get(i).model.type).encode(item);
-                    }
-                    return values;
-                }, values -> {
-                    E item = I.make(type);
-                    for (int i = 0; i < values.length; i++) {
-                        Property property = model.properties().get(i);
-                        model.set(item, property, I.find(Decoder.class, property.model.type).decode(values[i]));
-                    }
-                    return item;
-                });
-            }
+    public synchronized TimeseriesStore<E> enableDiskStore(Path directory) {
+        if (model.atomic) {
+            enableDiskStore(directory, item -> {
+                return new String[] {I.find(Encoder.class, model.type).encode(item)};
+            }, values -> {
+                return (E) I.find(Decoder.class, model.type).decode(values[0]);
+            });
+        } else {
+            enableDiskStore(directory, item -> {
+                List<Property> properties = model.properties();
+                String[] values = new String[properties.size()];
+                for (int i = 0; i < values.length; i++) {
+                    values[i] = I.find(Encoder.class, properties.get(i).model.type).encode(item);
+                }
+                return values;
+            }, values -> {
+                E item = I.make(model.type);
+                for (int i = 0; i < values.length; i++) {
+                    Property property = model.properties().get(i);
+                    model.set(item, property, I.find(Decoder.class, property.model.type).decode(values[i]));
+                }
+                return item;
+            });
         }
         return this;
     }
@@ -224,7 +250,7 @@ public final class TimeseriesStore<E> {
      */
     @VisibleForTesting
     long[] index(long timestamp) {
-        long remainder = timestamp % span.segment;
+        long remainder = timestamp % span.segmentSeconds;
         return new long[] {timestamp - remainder, remainder / span.seconds};
     }
 
@@ -281,6 +307,18 @@ public final class TimeseriesStore<E> {
     public void store(E... items) {
         for (E item : items) {
             store(item);
+        }
+    }
+
+    /**
+     * Forcibly saves all data that currently exists on the heap to disk. All data on disk will be
+     * overwritten. If the disk store is not enabled, nothing will happen.
+     */
+    public void storeToDisk() {
+        if (disk != null) {
+            for (Entry<Long, TimeseriesStore<E>.OnHeap> entry : stats.entrySet()) {
+                disk.store(entry.getKey(), entry.getValue());
+            }
         }
     }
 
@@ -600,7 +638,7 @@ public final class TimeseriesStore<E> {
 
         while (items.size() < maximumSize) {
             if (--segmentIndex == -1) {
-                timeIndex -= span.segment;
+                timeIndex -= span.segmentSeconds;
                 segment = supply(timeIndex);
 
                 if (segment == null) {
@@ -648,7 +686,7 @@ public final class TimeseriesStore<E> {
         if (supplier != null) {
             Signal<E> supply = supplier.apply(startTime);
             if (supply != null) {
-                long endTime = startTime + span.segment;
+                long endTime = startTime + span.segmentSeconds;
 
                 OnHeap heap = new OnHeap();
                 indexed.put(startTime, heap);

@@ -55,10 +55,10 @@ public enum Span {
     /** The actual duration (seconds). */
     public final long seconds;
 
-    /** The duration (seconds) of this {@link Span}'s segment. */
-    final long segment;
+    /** The duration (seconds) of the segment. */
+    final long segmentSeconds;
 
-    /** The maximum size of this {@link Span}'s segment. */
+    /** The maximum size of the segment. */
     final int segmentSize;
 
     /** The indexes of associated upper tickers. */
@@ -81,8 +81,8 @@ public enum Span {
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());
-        this.seconds = duration.getSeconds();
-        this.segment = Duration.of(segment, segmentUnit).toSeconds();
+        this.seconds = duration.toSeconds();
+        this.segmentSeconds = Duration.of(segment, segmentUnit).toSeconds();
         this.segmentSize = maximumSegmentSize;
         this.uppers = new int[uppers.length];
         this.unitName = unit();

@@ -39,7 +39,6 @@ public class SMAIndicator extends PlotScript {
         line(market.tickers.on(Minute15), shortDays, base, style.SMA15M);
         line(market.tickers.on(Minute30), shortDays, base, style.SMA30M);
         line(market.tickers.on(Hour1), shortDays, base, style.SMA1H);
-        line(market.tickers.on(Hour2), shortDays, base, style.SMA2H);
         line(market.tickers.on(Hour4), shortDays, base, style.SMA4H);
         line(market.tickers.on(Hour6), shortDays, base, style.SMA6H);
         line(ticker, longDays, base, style.longSMA);
@@ -85,10 +84,6 @@ public class SMAIndicator extends PlotScript {
 
         Style SMA1H = () -> {
             stroke.color(Color.rgb(17, 132, 66, alpha));
-        };
-
-        Style SMA2H = () -> {
-            stroke.color(Color.rgb(17, 132, 206, alpha));
         };
 
         Style SMA4H = () -> {

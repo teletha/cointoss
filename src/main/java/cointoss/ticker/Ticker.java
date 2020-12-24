@@ -66,7 +66,7 @@ public final class Ticker implements Disposable {
     Ticker(Span span, TickerManager manager) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
-        this.ticks = new TimeseriesStore<Tick>(span, tick -> tick.openTime);
+        this.ticks = TimeseriesStore.create(Tick.class, tick -> tick.openTime, span);
         this.manager = manager;
     }
 

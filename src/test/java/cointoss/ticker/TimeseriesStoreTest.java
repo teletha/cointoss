@@ -26,7 +26,7 @@ class TimeseriesStoreTest {
 
     @Test
     void isEmpty() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Minute1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Minute1);
         assert store.isEmpty();
 
         store.store(1);
@@ -35,7 +35,7 @@ class TimeseriesStoreTest {
 
     @Test
     void isNotEmpty() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Minute1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Minute1);
         assert store.isNotEmpty() == false;
 
         store.store(1);
@@ -44,7 +44,7 @@ class TimeseriesStoreTest {
 
     @Test
     void add() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(0);
         assert store.at(0) == 0;
         assert store.at(5) == null;
@@ -77,7 +77,7 @@ class TimeseriesStoreTest {
 
     @Test
     void getByTime() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(0, 5, 10);
         assert store.at(0) == 0;
         assert store.at(3) == 0;
@@ -89,7 +89,7 @@ class TimeseriesStoreTest {
 
     @Test
     void getByTimeOverTime() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
         assert store.at(0) == 0;
         assert store.at(days - 1) == 0;
@@ -102,7 +102,7 @@ class TimeseriesStoreTest {
 
     @Test
     void first() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(25);
         assert store.first() == 25;
 
@@ -124,14 +124,14 @@ class TimeseriesStoreTest {
 
     @Test
     void firstOverDays() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
         assert store.first() == 0;
     }
 
     @Test
     void last() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(5);
         assert store.last() == 5;
 
@@ -153,14 +153,14 @@ class TimeseriesStoreTest {
 
     @Test
     void lastOverDays() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
         assert store.last() == 4 * days;
     }
 
     @Test
     void size() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         assert store.size() == 0;
 
         store.store(5);
@@ -178,7 +178,7 @@ class TimeseriesStoreTest {
 
     @Test
     void sizeOverDays() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
         assert store.size() == 5;
     }
@@ -186,7 +186,7 @@ class TimeseriesStoreTest {
     @Test
     void each() {
         // padding right
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(0, 5, 10, 15, 20, 25, 30);
 
         List<Integer> list = new ArrayList();
@@ -194,7 +194,7 @@ class TimeseriesStoreTest {
         assertIterableEquals(List.of(0, 5, 10, 15, 20, 25, 30), list);
 
         // padding both sides
-        store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(15, 20, 25, 30);
 
         list = new ArrayList();
@@ -202,7 +202,7 @@ class TimeseriesStoreTest {
         assertIterableEquals(List.of(15, 20, 25, 30), list);
 
         // padding left side
-        store = new TimeseriesStore<>(Span.Hour4, Integer::longValue);
+        store = TimeseriesStore.create(int.class, Integer::longValue, Span.Hour4);
         store.store(3600 * 12, 3600 * 16, 3600 * 20);
 
         list = new ArrayList();
@@ -212,7 +212,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachOverDays() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
 
         List<Integer> list = new ArrayList();
@@ -222,7 +222,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachByTime() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(5, 10, 15, 20, 25, 30, 35, 40);
 
         List<Integer> list = new ArrayList();
@@ -248,7 +248,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachByTimeOverDays() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
 
         List<Integer> list = new ArrayList();
@@ -266,7 +266,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachByItem() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(0, 5, 10, 15, 20, 25, 30);
 
         List<Integer> items = store.each(store.at(0), store.at(15)).toList();
@@ -280,7 +280,7 @@ class TimeseriesStoreTest {
     @Test
     void eachLatest() {
         // padding right
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(0, 5, 10, 15, 20, 25, 30);
 
         List<Integer> list = store.eachLatest().toList();
@@ -292,7 +292,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachLatestOverDays() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
 
         List<Integer> list = store.eachLatest().toList();
@@ -305,7 +305,7 @@ class TimeseriesStoreTest {
 
     @Test
     void calculateStartTimeAndRemainderEpochSeconds() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Minute1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Minute1);
 
         // 2019-12-12 02:16:30
         Assertions.assertArrayEquals(new long[] {1576108800, 136}, store.index(1576116990));
@@ -319,7 +319,7 @@ class TimeseriesStoreTest {
 
     @Test
     void before() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(0, 5, 10, 15);
         assert store.before(0) == null;
         assert store.before(3) == null;
@@ -334,7 +334,7 @@ class TimeseriesStoreTest {
 
     @Test
     void beforeOverTime() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
         assert store.before(0) == null;
         assert store.before(days - 1) == null;
@@ -347,7 +347,7 @@ class TimeseriesStoreTest {
 
     @Test
     void befores() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(0, 5, 10, 15);
         assert store.beforeUntil(0, 1).isEmpty();
         assert store.beforeUntil(3, 2).isEmpty();
@@ -362,7 +362,7 @@ class TimeseriesStoreTest {
 
     @Test
     void beforesOverTime() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
         assert store.beforeUntil(0, 1).isEmpty();
         assert store.beforeUntil(days - 1, 2).isEmpty();
@@ -376,7 +376,7 @@ class TimeseriesStoreTest {
 
     @Test
     void beforeWith() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Second5, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Second5);
         store.store(0, 5, 10, 15);
         assert store.beforeUntilWith(0, 1).equals(List.of(0));
         assert store.beforeUntilWith(3, 2).equals(List.of(0));
@@ -391,7 +391,7 @@ class TimeseriesStoreTest {
 
     @Test
     void beforeWithOverTime() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(Span.Day1, Integer::longValue);
+        TimeseriesStore<Integer> store = TimeseriesStore.create(int.class, Integer::longValue, Span.Day1);
         store.store(0, days, 2 * days, 3 * days, 4 * days);
         assert store.beforeUntilWith(0, 1).equals(List.of(0));
         assert store.beforeUntilWith(days - 1, 2).equals(List.of(0));
@@ -408,9 +408,9 @@ class TimeseriesStoreTest {
 
     @Test
     void diskCache() {
-        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v).enableDiskStore(room.locateRadom(), long.class);
+        TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(room.locateRadom());
 
-        long base = Span.Second5.segment;
+        long base = Span.Second5.segmentSeconds;
 
         for (int i = 1; i <= 20; i++) {
             store.store(base * i);
@@ -431,12 +431,16 @@ class TimeseriesStoreTest {
     }
 
     @Test
+    void storeToDisk() {
+    }
+
+    @Test
     void dataSupply() {
-        TimeseriesStore<Long> store = new TimeseriesStore<Long>(Span.Second5, v -> v).enableDataSupplier(time -> {
+        TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDataSupplier(time -> {
             return I.signal(time);
         });
 
-        long base = Span.Second5.segment;
+        long base = Span.Second5.segmentSeconds;
         assert store.existOnHeap(base * 1) == false;
         assert store.existOnHeap(base * 2) == false;
         assert store.existOnHeap(base * 3) == false;
