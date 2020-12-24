@@ -9,7 +9,7 @@
  */
 package cointoss.ticker;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
 import kiss.I;
+import psychopath.Directory;
+import psychopath.File;
+import psychopath.Locator;
 
 class TimeseriesStoreTest {
     int days = 60 * 60 * 24;
@@ -431,10 +434,6 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void storeToDisk() {
-    }
-
-    @Test
     void dataSupply() {
         TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDataSupplier(time -> {
             return I.signal(time);
@@ -451,5 +450,51 @@ class TimeseriesStoreTest {
         assert store.at(base * 2) == base * 2;
         assert store.at(base * 3) == base * 3;
         assert store.at(base * 4) == base * 4;
+    }
+
+    @Test
+    void persist() {
+        Directory dir = Locator.directory(room.locateRadom());
+        TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(dir);
+        File cache = dir.file("Second5/1970010100.cache");
+        assert cache.isAbsent();
+
+        store.store(0L);
+        store.persist();
+        assert cache.isPresent();
+    }
+
+    @Test
+    void persistOnlyModified() {
+        Directory dir = Locator.directory(room.locateRadom());
+        TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(dir);
+        File cache = dir.file("Second5/1970010100.cache");
+
+        store.store(0L);
+        store.persist();
+        assert cache.isPresent();
+
+        // no modification
+        long modified = cache.lastModified();
+        store.persist();
+        assert modified == cache.lastModified();
+
+        // modified
+        store.store(1L);
+        store.persist();
+        assert modified != cache.lastModified();
+    }
+
+    @Test
+    void readDataFromDiskCache() {
+        Directory dir = Locator.directory(room.locateRadom());
+        TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(dir);
+
+        store.store(0L);
+        store.persist();
+        store.clear();
+        assert store.existOnHeap(0L) == false;
+        assert store.at(0) == 0L;
+        assert store.at(5) == null;
     }
 }

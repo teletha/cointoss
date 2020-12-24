@@ -311,18 +311,6 @@ public final class TimeseriesStore<E> {
     }
 
     /**
-     * Forcibly saves all data that currently exists on the heap to disk. All data on disk will be
-     * overwritten. If the disk store is not enabled, nothing will happen.
-     */
-    public void storeToDisk() {
-        if (disk != null) {
-            for (Entry<Long, TimeseriesStore<E>.OnHeap> entry : stats.entrySet()) {
-                disk.store(entry.getKey(), entry.getValue());
-            }
-        }
-    }
-
-    /**
      * Get the item for the specified timestamp (epoch seconds).
      * 
      * @param timestamp A time stamp.
@@ -511,7 +499,7 @@ public final class TimeseriesStore<E> {
     }
 
     /**
-     * Clear all items.
+     * Clear all items from heap.
      */
     public void clear() {
         for (OnHeap segment : indexed.values()) {
@@ -706,6 +694,18 @@ public final class TimeseriesStore<E> {
     }
 
     /**
+     * Forcibly saves all data that currently exists on the heap to disk immediately. All data on
+     * disk will be overwritten. If the disk store is not enabled, nothing will happen.
+     */
+    public void persist() {
+        if (disk != null) {
+            for (Entry<Long, TimeseriesStore<E>.OnHeap> entry : stats.entrySet()) {
+                disk.store(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    /**
      * For test.
      * 
      * @param item
@@ -734,6 +734,9 @@ public final class TimeseriesStore<E> {
 
         /** The last item index. */
         private int max = Integer.MIN_VALUE;
+
+        /** Flag whether the data is in sync with disk. */
+        private boolean sync;
 
         /**
          * Return the size of this {@link OnHeap}.
@@ -766,6 +769,8 @@ public final class TimeseriesStore<E> {
             // FAILSAFE : update min and max index after inserting item
             min = Math.min(min, index);
             max = Math.max(max, index);
+
+            sync = false;
         }
 
         /**
@@ -773,6 +778,7 @@ public final class TimeseriesStore<E> {
          */
         void clear() {
             items = null;
+            sync = false;
         }
 
         /**
@@ -885,9 +891,9 @@ public final class TimeseriesStore<E> {
          * @param segment
          */
         private void store(long time, OnHeap segment) {
-            File file = name(time);
+            if (!segment.sync) {
+                File file = name(time);
 
-            if (file.isAbsent()) {
                 CsvWriterSettings setting = new CsvWriterSettings();
                 setting.getFormat().setDelimiter(' ');
                 setting.getFormat().setComment('無');
@@ -897,6 +903,7 @@ public final class TimeseriesStore<E> {
                     writer.writeRow(encoder.apply(item));
                 });
                 writer.close();
+                segment.sync = true;
             }
         }
 
@@ -924,6 +931,7 @@ public final class TimeseriesStore<E> {
                 heap.set((int) index(timestampExtractor.applyAsLong(item))[1], item);
             });
 
+            heap.sync = true;
             return heap;
         }
 
