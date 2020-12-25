@@ -24,7 +24,7 @@ import kiss.JSON;
  * Generated model for {@link EfficientWebSocketModel}.
  */
 @Generated("Icy Manipulator")
-public abstract class EfficientWebSocket extends EfficientWebSocketModel {
+public class EfficientWebSocket extends EfficientWebSocketModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

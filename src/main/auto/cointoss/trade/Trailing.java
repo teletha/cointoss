@@ -22,7 +22,7 @@ import kiss.Signal;
  * Generated model for {@link TrailingModel}.
  */
 @Generated("Icy Manipulator")
-public abstract class Trailing extends TrailingModel {
+public class Trailing extends TrailingModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

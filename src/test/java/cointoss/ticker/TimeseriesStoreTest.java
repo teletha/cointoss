@@ -9,7 +9,7 @@
  */
 package cointoss.ticker;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
+import cointoss.ticker.data.OpenInterest;
+import cointoss.util.Chrono;
 import kiss.I;
 import psychopath.Directory;
 import psychopath.File;
@@ -456,7 +458,7 @@ class TimeseriesStoreTest {
     void persist() {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(dir);
-        File cache = dir.file("Second5/1970010100.log");
+        File cache = dir.file("Second5/1970-01-01 00.log");
         assert cache.isAbsent();
 
         store.store(0L);
@@ -468,7 +470,7 @@ class TimeseriesStoreTest {
     void persistOnlyModified() {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(dir);
-        File cache = dir.file("Second5/1970010100.log");
+        File cache = dir.file("Second5/1970-01-01 00.log");
 
         store.store(0L);
         store.persist();
@@ -496,5 +498,17 @@ class TimeseriesStoreTest {
         assert store.existOnHeap(0L) == false;
         assert store.at(0) == 0L;
         assert store.at(5) == null;
+    }
+
+    @Test
+    void model() {
+        Directory dir = Locator.directory(room.locateRadom());
+        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Second5).enableDiskStore(dir);
+        OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
+        store.store(oi);
+        store.persist();
+        store.clear();
+
+        assert store.at(oi.epochSeconds()).size == 10;
     }
 }

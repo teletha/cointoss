@@ -57,7 +57,7 @@ public class Chrono {
     /** Reusable format. yyyy-MM-dd(E) HH:mm:ss */
     public static final DateTimeFormatter DateDayTime = DateTimeFormatter.ofPattern("yyyy-MM-dd(E) HH:mm:ss");
 
-    /** Reusable format. yyyy-MM-dd'T'HH:mm:ss */
+    /** Reusable format. yyyy-MM-dd HH:mm */
     public static final DateTimeFormatter DateTimeWithoutSec = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     /** Reusable format. yyyy-MM-dd'T'HH:mm:ss */

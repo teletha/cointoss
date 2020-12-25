@@ -20,7 +20,7 @@ import javax.annotation.processing.Generated;
  * Generated model for {@link APILimiterModel}.
  */
 @Generated("Icy Manipulator")
-public abstract class APILimiter extends APILimiterModel {
+public class APILimiter extends APILimiterModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

@@ -9,7 +9,6 @@
  */
 package cointoss.execution;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.DoubleConsumer;
@@ -20,10 +19,6 @@ import cointoss.Directional;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
-import kiss.Decoder;
-import kiss.Encoder;
-import kiss.Managed;
-import kiss.Singleton;
 
 @Icy(grouping = 2)
 abstract class ExecutionModel implements Directional {
@@ -336,28 +331,4 @@ abstract class ExecutionModel implements Directional {
         return id() + " " + date().toLocalDateTime() + " " + direction()
                 .mark() + " " + price() + " " + size() + " " + consecutive() + " " + delay();
     }
-
-    /**
-     * 
-     */
-    @Managed(value = Singleton.class)
-    private static class Codec implements Decoder<ZonedDateTime>, Encoder<ZonedDateTime> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String encode(ZonedDateTime value) {
-            return value.toLocalDate().toString();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ZonedDateTime decode(String value) {
-            return LocalDateTime.parse(value).atZone(Chrono.UTC);
-        }
-    }
-
 }

@@ -48,8 +48,7 @@ import psychopath.Locator;
 
 public final class TimeseriesStore<E> {
 
-    /** Reusable format. yyyyMMdd'T'HHmmss */
-    private static final DateTimeFormatter FileName = DateTimeFormatter.ofPattern("yyyyMMddHH");
+    private static final DateTimeFormatter FileName = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
 
     /** The item type. */
     private final Model<E> model;

@@ -176,7 +176,6 @@ public class Market implements Disposable {
      * <p>
      * The method is defined for smooth delegation. Therefore, it is usually not possible to call or
      * override this method from outside the cointoss.verify package.
-     * 
      */
     protected TimeseriesStore<OpenInterest> createOpenIntrest() {
         TimeseriesStore<OpenInterest> open = TimeseriesStore.create(OpenInterest.class, Span.Minute5)
@@ -184,10 +183,9 @@ public class Market implements Disposable {
 
         Chrono.minutes().take(time -> time.getMinute() % 1 == 0).to(() -> {
             OpenInterest last = open.last();
-            service.provideOpenInterest(last != null ? last.date : Chrono.utc(2015, 1, 1)).effectOnComplete(open::persist).to(oi -> {
-                System.out.println(oi);
-                open.store(oi);
-            });
+            service.provideOpenInterest(last != null ? last.date : Chrono.utc(2015, 1, 1))
+                    .effectOnComplete(open::persist)
+                    .to(oi -> open.store(oi));
         });
 
         return open;
