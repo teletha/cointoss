@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import com.univocity.parsers.csv.CsvParser;
@@ -33,6 +34,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -261,6 +263,22 @@ public class BybitService extends MarketService {
 
         List<OrderBookPage> books = e.text("side").charAt(0) == 'B' ? changes.bids : changes.asks;
         books.add(new OrderBookPage(price, size));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
+        return call("GET", "open-interest?symbol=" + marketName + "&period=5min&limit=200").flatIterable(e -> e.find("result", "$"))
+                .map(e -> {
+                    double size = e.get(double.class, "open_interest");
+                    ZonedDateTime date = Chrono.utcBySeconds(e.get(long.class, "timestamp"));
+
+                    return OpenInterest.with.date(date).size(size);
+                })
+                .as(OpenInterest.class)
+                .take((Predicate<OpenInterest>) e -> e.date.isAfter(startExcluded));
     }
 
     /**

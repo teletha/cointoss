@@ -29,6 +29,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -249,6 +250,23 @@ public class FTXService extends MarketService {
             change.asks.add(new OrderBookPage(price, size));
         }
         return change;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
+        return call("GET", "options/historical_open_interest/" + "BTC" + "?limit=200&start_time=1559881511").map(e -> {
+            System.out.println(e);
+            return null;
+        });
+    }
+
+    public static void main(String[] args) {
+        FTX.BTC_PERP.provideOpenInterest(Chrono.utc(2020, 12, 20)).waitForTerminate().to(e -> {
+            System.out.println(e);
+        });
     }
 
     /**

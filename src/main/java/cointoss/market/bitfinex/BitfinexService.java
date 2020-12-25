@@ -175,7 +175,23 @@ public class BitfinexService extends MarketService {
             }
             return change;
         });
+    }
 
+    // /**
+    // * {@inheritDoc}
+    // */
+    // @Override
+    // public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
+    // return call("GET", "status/deriv?keys=" + marketName, LimitForTradeHistory).map(e -> {
+    // System.out.println(e);
+    // return null;
+    // });
+    // }
+
+    public static void main(String[] args) {
+        Bitfinex.BTC_USD.provideOpenInterest(Chrono.utc(2020, 12, 20)).waitForTerminate().to(e -> {
+            System.out.println(e);
+        });
     }
 
     /**
