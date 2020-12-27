@@ -23,6 +23,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.data.Liquidation;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -177,21 +178,30 @@ public class BitfinexService extends MarketService {
         });
     }
 
-    // /**
-    // * {@inheritDoc}
-    // */
-    // @Override
-    // public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
-    // return call("GET", "status/deriv?keys=" + marketName, LimitForTradeHistory).map(e -> {
-    // System.out.println(e);
-    // return null;
-    // });
-    // }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<Liquidation> connectLiquidation() {
+        return clientRealtimely().subscribe(new Topic("status", marketName, "liq:global"))
+                .skip(e -> e.text("1").equals("hb"))
+                .flatIterable(e -> e.find("1", "*"))
+                .take(e -> e.text("4").contains(marketName) && e.has("8", 1))
+                .map(e -> {
+                    Num basePrice = e.get(Num.class, "6");
+                    Num liquidatedPrice = e.get(Num.class, "11");
+                    return Liquidation.with.date(Chrono.utcByMills(e.get(long.class, "2")))
+                            .side(basePrice.isLessThan(liquidatedPrice) ? Direction.BUY : Direction.SELL)
+                            .size(Math.abs(e.get(double.class, "5")))
+                            .price(liquidatedPrice);
+                });
+    }
 
-    public static void main(String[] args) {
-        Bitfinex.BTC_USD.provideOpenInterest(Chrono.utc(2020, 12, 20)).waitForTerminate().to(e -> {
+    public static void main(String[] args) throws InterruptedException {
+        Bitfinex.BTC_USD.liquidationRealtimely().to(e -> {
             System.out.println(e);
         });
+        Thread.sleep(1000 * 60 * 30);
     }
 
     /**
@@ -218,10 +228,17 @@ public class BitfinexService extends MarketService {
 
         public String symbol;
 
+        public String key;
+
         private Topic(String channel, String symbol) {
+            this(channel, symbol, channel);
+        }
+
+        private Topic(String channel, String symbol, String key) {
             super(channel + symbol, topic -> topic.event = "unsubscribe");
             this.channel = channel;
             this.symbol = symbol;
+            this.key = key;
         }
 
         /**
@@ -229,7 +246,8 @@ public class BitfinexService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            return "subscribed".equals(reply.text("event")) && channel.equals(reply.text("channel")) && symbol.equals(reply.text("pair"));
+            return "subscribed".equals(reply.text("event")) && channel
+                    .equals(reply.text("channel")) && (symbol.equals(reply.text("pair")) || key.equals(reply.text("key")));
         }
     }
 }

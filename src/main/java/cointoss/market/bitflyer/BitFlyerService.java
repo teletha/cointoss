@@ -9,8 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
-import static java.util.concurrent.TimeUnit.*;
-import static kiss.I.*;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.math.RoundingMode;
@@ -45,6 +45,7 @@ import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
+import cointoss.ticker.data.Liquidation;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -488,6 +489,23 @@ public class BitFlyerService extends MarketService {
             }
             return change;
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<Liquidation> connectLiquidation() {
+        return this.connectExecutionRealtimely()
+                .take(e -> e.delay == Execution.DelayHuge)
+                .map(e -> Liquidation.with.date(e.date).side(e.direction.inverse()).size(e.size.doubleValue()).price(e.price));
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        BitFlyer.FX_BTC_JPY.liquidationRealtimely().to(e -> {
+            System.out.println(e);
+        });
+        Thread.sleep(1000 * 60 * 30);
     }
 
     /**

@@ -26,6 +26,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.data.Liquidation;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -191,6 +192,25 @@ public class BitMexService extends MarketService {
             }
         }
         return change;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<Liquidation> connectLiquidation() {
+        return clientRealtimely().subscribe(new Topic("liquidation", marketName))
+                .take(e -> e.has("action", "insert"))
+                .flatIterable(e -> e.find("data", "*"))
+                .map(e -> {
+                    double size = e.get(double.class, "leavesQty");
+                    Num price = e.get(Num.class, "price");
+
+                    return Liquidation.with.date(Chrono.utcNow())
+                            .side(e.get(Direction.class, "side").inverse())
+                            .size(price.divide(size).scale(setting.target.scale).doubleValue())
+                            .price(price);
+                });
     }
 
     /**

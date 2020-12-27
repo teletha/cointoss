@@ -29,6 +29,7 @@ import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
+import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -338,6 +339,25 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A realtime order books.
      */
     protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
+
+    /**
+     * Acquire order book in realtime. This is infinitely.
+     * 
+     * @param autoReconnect Need to reconnect automatically.
+     * @return A shared realtime order books.
+     */
+    public final synchronized Signal<Liquidation> liquidationRealtimely() {
+        return this.connectLiquidation().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "Liquidation"));
+    }
+
+    /**
+     * Connect to the realtime order book stream.
+     * 
+     * @return A realtime order books.
+     */
+    protected Signal<Liquidation> connectLiquidation() {
+        return I.signal();
+    }
 
     /**
      * Provide the market specific tick related data if needed.

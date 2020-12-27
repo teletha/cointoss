@@ -29,6 +29,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.data.Liquidation;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -224,6 +225,23 @@ public class FTXService extends MarketService {
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderbook", marketName)).map(json -> createOrderBook(json.get("data")));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<Liquidation> connectLiquidation() {
+        return this.connectExecutionRealtimely()
+                .take(e -> e.delay == Execution.DelayHuge)
+                .map(e -> Liquidation.with.date(e.date).side(e.direction.inverse()).size(e.size.doubleValue()).price(e.price));
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        FTX.BTC_PERP.liquidationRealtimely().to(e -> {
+            System.out.println(e);
+        });
+        Thread.sleep(1000 * 60 * 30);
     }
 
     /**

@@ -27,6 +27,7 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
@@ -204,10 +205,29 @@ public class BinanceService extends MarketService {
                 });
     }
 
-    public static void main(String[] args) {
-        Binance.FUTURE_BTC_USDT.provideOpenInterest(Chrono.utc(2020, 10, 18, 2, 30, 0, 0)).waitForTerminate().to(e -> {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<Liquidation> connectLiquidation() {
+        if (!isFutures) {
+            return I.signal();
+        }
+
+        return clientRealtimely().subscribe(new Topic("forceOrder", marketName)).map(e -> {
+            JSON json = e.get("data").get("o");
+            return Liquidation.with.date(Chrono.utcByMills(json.get(long.class, "T")))
+                    .side(json.get(Direction.class, "S").inverse())
+                    .size(json.get(double.class, "q"))
+                    .price(json.get(Num.class, "ap"));
+        });
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Binance.FUTURE_BTC_USDT.liquidationRealtimely().to(e -> {
             System.out.println(e);
         });
+        Thread.sleep(1000 * 60 * 30);
     }
 
     /**

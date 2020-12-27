@@ -302,6 +302,12 @@ public class BybitService extends MarketService {
         return new OfficialRepository(this);
     }
 
+    public static void main(String[] args) {
+        ((BybitService) Bybit.BTC_USD).call("GET", "tickers").flatIterable(e -> e.find("result", "*")).waitForTerminate().to(e -> {
+            System.out.println(e);
+        });
+    }
+
     /**
      * 
      */
