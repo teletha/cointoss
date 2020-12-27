@@ -12,11 +12,12 @@ package cointoss.ticker.data;
 import java.time.ZonedDateTime;
 
 import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 
 @Icy
-interface LiquidationModel extends TimeseriesData {
+interface LiquidationModel extends TimeseriesData, Directional {
 
     /**
      * {@inheritDoc}
@@ -25,8 +26,9 @@ interface LiquidationModel extends TimeseriesData {
     @Icy.Property
     ZonedDateTime date();
 
+    @Override
     @Icy.Property
-    Direction side();
+    Direction direction();
 
     @Icy.Property
     double size();

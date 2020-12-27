@@ -11,9 +11,7 @@ package cointoss.market.binance;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -209,6 +207,29 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Liquidation> liquidations(ZonedDateTime startExcluded, ZonedDateTime endExcluded) {
+        if (!isFutures) {
+            return I.signal();
+        }
+
+        return call("GET", "allForceOrders?symbol=" + marketName + "&limit=1000&endTime=" + endExcluded.toInstant().toEpochMilli(), 20)
+                .flatIterable(e -> e.find("*"))
+                .map(e -> {
+                    System.out.println(e);
+                    return null;
+                });
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Binance.FUTURE_BTC_USDT.liquidations(Chrono.utc(2020, 12, 25), Chrono.utc(2020, 12, 26)).waitForTerminate().to(e -> {
+            System.out.println(e);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Signal<Liquidation> connectLiquidation() {
         if (!isFutures) {
             return I.signal();
@@ -217,17 +238,10 @@ public class BinanceService extends MarketService {
         return clientRealtimely().subscribe(new Topic("forceOrder", marketName)).map(e -> {
             JSON json = e.get("data").get("o");
             return Liquidation.with.date(Chrono.utcByMills(json.get(long.class, "T")))
-                    .side(json.get(Direction.class, "S").inverse())
+                    .direction(json.get(Direction.class, "S").inverse())
                     .size(json.get(double.class, "q"))
                     .price(json.get(Num.class, "ap"));
         });
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Binance.FUTURE_BTC_USDT.liquidationRealtimely().to(e -> {
-            System.out.println(e);
-        });
-        Thread.sleep(1000 * 60 * 30);
     }
 
     /**
@@ -237,23 +251,22 @@ public class BinanceService extends MarketService {
      * @param path
      * @return
      */
-    private Signal<JSON> call(String method, String path, Object... posting) {
+    private Signal<JSON> call(String method, String path) {
+        return call(method, path, 1);
+    }
+
+    /**
+     * Call rest API.
+     * 
+     * @param method
+     * @param path
+     * @return
+     */
+    private Signal<JSON> call(String method, String path, int weight) {
         String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
         Builder builder = HttpRequest.newBuilder(URI.create(path.startsWith("http") ? path : uri + path));
 
-        switch (method) {
-        case "GET":
-            break;
-
-        case "POST":
-            builder = builder.POST(BodyPublishers.ofString(I.write(posting[0]), StandardCharsets.US_ASCII))
-                    .header("content-type", "application/json");
-            break;
-
-        default:
-            throw new IllegalArgumentException("Unexpected value: " + method);
-        }
-        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Binance RESTCall"));
+        return Network.rest(builder, Limit, weight, client()).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
 
     /**

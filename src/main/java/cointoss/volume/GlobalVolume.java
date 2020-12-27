@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
+import cointoss.ticker.data.Liquidation;
 import cointoss.util.arithmetic.Num;
 
 public class GlobalVolume {
@@ -28,6 +29,12 @@ public class GlobalVolume {
 
     /** The directional volume. */
     private double shorts = 0;
+
+    /** The directional volume. */
+    private double liquidatedLongs = 0;
+
+    /** The directional volume. */
+    private double liquidatedShorts = 0;
 
     /**
      * Add volume.
@@ -58,7 +65,7 @@ public class GlobalVolume {
      * @param volume The volume to add.
      */
     public final void add(MarketService service, Directional side, double volume) {
-        double[] volumes = services.computeIfAbsent(service, key -> new double[2]);
+        double[] volumes = services.computeIfAbsent(service, key -> new double[4]);
 
         if (side.isBuy()) {
             volumes[0] += volume;
@@ -66,6 +73,24 @@ public class GlobalVolume {
         } else {
             volumes[1] += volume;
             shorts += volume;
+        }
+    }
+
+    /**
+     * Add volume.
+     * 
+     * @param service A market service of the additional volume.
+     * @param e An {@link Execution} of the additional volume.
+     */
+    public final void add(MarketService service, Liquidation e) {
+        double[] volumes = services.computeIfAbsent(service, key -> new double[4]);
+
+        if (e.isBuy()) {
+            volumes[2] += e.size;
+            liquidatedLongs += e.size;
+        } else {
+            volumes[3] += e.size;
+            liquidatedShorts += e.size;
         }
     }
 
@@ -102,6 +127,38 @@ public class GlobalVolume {
     }
 
     /**
+     * Retrieve the volume of the specified {@link MarketService}.
+     * 
+     * @param service A target service.
+     * @return A total volume on long side.
+     */
+    public final double liquidatedLongVolumeAt(MarketService service) {
+        double[] volumes = services.get(service);
+
+        if (volumes == null) {
+            return 0;
+        } else {
+            return volumes[2];
+        }
+    }
+
+    /**
+     * Retrieve the volume of the specified {@link MarketService}.
+     * 
+     * @param service A target service.
+     * @return A total volume on short side.
+     */
+    public final double liquidatedShortVolumeAt(MarketService service) {
+        double[] volumes = services.get(service);
+
+        if (volumes == null) {
+            return 0;
+        } else {
+            return volumes[3];
+        }
+    }
+
+    /**
      * Retrieve the total volume on all {@link MarketService}.
      * 
      * @return A total volume on long side.
@@ -117,6 +174,24 @@ public class GlobalVolume {
      */
     public final double shortVolume() {
         return shorts;
+    }
+
+    /**
+     * Retrieve the total volume on all {@link MarketService}.
+     * 
+     * @return A total volume on long side.
+     */
+    public final double liquidatedLongVolume() {
+        return liquidatedLongs;
+    }
+
+    /**
+     * Retrieve the total volume on all {@link MarketService}.
+     * 
+     * @return A total volume on short side.
+     */
+    public final double liquidatedShortVolume() {
+        return liquidatedShorts;
     }
 
     /**

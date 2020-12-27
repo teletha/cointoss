@@ -234,7 +234,7 @@ public class FTXService extends MarketService {
     protected Signal<Liquidation> connectLiquidation() {
         return this.connectExecutionRealtimely()
                 .take(e -> e.delay == Execution.DelayHuge)
-                .map(e -> Liquidation.with.date(e.date).side(e.direction.inverse()).size(e.size.doubleValue()).price(e.price));
+                .map(e -> Liquidation.with.date(e.date).direction(e.direction.inverse()).size(e.size.doubleValue()).price(e.price));
     }
 
     public static void main(String[] args) throws InterruptedException {

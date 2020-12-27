@@ -340,6 +340,10 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
 
+    public Signal<Liquidation> liquidations(ZonedDateTime startExcluded, ZonedDateTime endExcluded) {
+        return I.signal();
+    }
+
     /**
      * Acquire order book in realtime. This is infinitely.
      * 

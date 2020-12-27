@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.FXColorPalettes.*;
+import static trademate.FXColorPalettes.Pastel10;
 
 import java.text.Normalizer.Form;
 import java.util.HashMap;
@@ -24,6 +24,7 @@ import javafx.css.Styleable;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 import cointoss.Currency;
 import cointoss.MarketService;
@@ -307,6 +308,10 @@ public class GlobalVolumeView extends View {
                 service.executionsRealtimely().to(e -> {
                     volumes.latest().add(service, e);
                 });
+
+                // service.liquidationRealtimely().to(e -> {
+                // volumes.latest().add(service, e);
+                // });
             });
         }
 
@@ -338,6 +343,8 @@ public class GlobalVolumeView extends View {
             final double ratio = Math.min(1, maxHeight / maxVolume);
 
             GraphicsContext context = canvas.getGraphicsContext2D();
+            Paint textColor = context.getStroke();
+            Paint liquidatedColor = Color.web("#ddaa99");
             context.strokeLine(0, maxHeight + padding, BarWidth * MaxSpan, maxHeight + padding);
 
             double[] x = {BarWidth * MaxSpan};
@@ -369,16 +376,32 @@ public class GlobalVolumeView extends View {
                         String text = Primitives.roundString(volume.longVolume(), 0);
                         context.strokeText(text, x[0] + coordinate(text), buyerY - 3);
                         canDisplayVolume[0] = false;
+                        buyerY -= 15;
                     } else {
                         canDisplayVolume[0] = true;
+                    }
+
+                    if (volume.liquidatedLongVolume() != 0) {
+                        String text = Primitives.roundString(volume.liquidatedLongVolume(), 1);
+                        context.setStroke(liquidatedColor);
+                        context.strokeText(text, x[0] + coordinate(text), buyerY - 3);
+                        context.setStroke(textColor);
                     }
 
                     if (canDisplayVolume[1] && 0 < maxs[1] && maxs[1] * 0.6 <= volume.shortVolume()) {
                         String text = Primitives.roundString(volume.shortVolume(), 0);
                         context.strokeText(text, x[0] + coordinate(text), sellerY + 3 + 6);
                         canDisplayVolume[1] = false;
+                        sellerY += 15;
                     } else {
                         canDisplayVolume[1] = true;
+                    }
+
+                    if (volume.liquidatedShortVolume() != 0) {
+                        String text = Primitives.roundString(volume.liquidatedShortVolume(), 1);
+                        context.setStroke(liquidatedColor);
+                        context.strokeText(text, x[0] + coordinate(text), sellerY + 3 + 6);
+                        context.setStroke(textColor);
                     }
                 }
             });
