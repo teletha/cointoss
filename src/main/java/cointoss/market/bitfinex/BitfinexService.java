@@ -183,10 +183,10 @@ public class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<Liquidation> connectLiquidation() {
-        return clientRealtimely().subscribe(new Topic("status", marketName, "liq:global"))
-                .skip(e -> e.text("1").equals("hb"))
+        return clientRealtimely().subscribe(new Topic("status", "liq:global"))
+                .skip(e -> e.text("1").equals("hb")) // ignore heartbeat
                 .flatIterable(e -> e.find("1", "*"))
-                .take(e -> e.text("4").contains(marketName) && e.has("8", 1))
+                .take(e -> e.text("4").contains(setting.target.currency.code) && e.has("8", 1))
                 .map(e -> {
                     Num basePrice = e.get(Num.class, "6");
                     Num liquidatedPrice = e.get(Num.class, "11");
@@ -237,14 +237,10 @@ public class BitfinexService extends MarketService {
         public String len = "250";
 
         private Topic(String channel, String symbol) {
-            this(channel, symbol, channel);
-        }
-
-        private Topic(String channel, String symbol, String key) {
             super(channel + symbol, topic -> topic.event = "unsubscribe");
             this.channel = channel;
             this.symbol = symbol;
-            this.key = key;
+            this.key = symbol;
         }
 
         /**
