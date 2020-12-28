@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.binance.Binance;
+import cointoss.market.bitfinex.Bitfinex;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -55,11 +56,12 @@ public class TradeTester extends View {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
         DockSystem.register("Order").contents(OrderView.class).closable(false);
+        DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = Binance.FUTURE_BTC_USDT;
+        MarketService service = Bitfinex.BTC_USD;
         UITab tab = DockSystem.register(service.id())
                 .closable(false)
                 .text(service.marketReadableName)
@@ -67,13 +69,13 @@ public class TradeTester extends View {
 
         tab.load();
 
-        // MarketService service2 = Bitbank.ETH_JPY;
-        // tab = DockSystem.register(service2.id())
-        // .closable(false)
-        // .text(service2.marketReadableName)
-        // .contents(ui -> new TradingView(ui, service2));
-        //
-        // tab.load();
+        MarketService service2 = Binance.FUTURE_BTC_USDT;
+        tab = DockSystem.register(service2.id())
+                .closable(false)
+                .text(service2.marketReadableName)
+                .contents(ui -> new TradingView(ui, service2));
+
+        tab.load();
         //
         // MarketService service3 = Bitbank.LTC_JPY;
         // tab = DockSystem.register(service3.id())

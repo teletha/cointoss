@@ -309,9 +309,9 @@ public class GlobalVolumeView extends View {
                     volumes.latest().add(service, e);
                 });
 
-                // service.liquidationRealtimely().to(e -> {
-                // volumes.latest().add(service, e);
-                // });
+                service.liquidationRealtimely().to(e -> {
+                    volumes.latest().add(service, e);
+                });
             });
         }
 
@@ -344,7 +344,7 @@ public class GlobalVolumeView extends View {
 
             GraphicsContext context = canvas.getGraphicsContext2D();
             Paint textColor = context.getStroke();
-            Paint liquidatedColor = Color.web("#ddaa99");
+            Paint liquidatedColor = Color.web("#dfdfdf");
             context.strokeLine(0, maxHeight + padding, BarWidth * MaxSpan, maxHeight + padding);
 
             double[] x = {BarWidth * MaxSpan};
@@ -376,15 +376,14 @@ public class GlobalVolumeView extends View {
                         String text = Primitives.roundString(volume.longVolume(), 0);
                         context.strokeText(text, x[0] + coordinate(text), buyerY - 3);
                         canDisplayVolume[0] = false;
-                        buyerY -= 15;
                     } else {
                         canDisplayVolume[0] = true;
                     }
 
-                    if (volume.liquidatedLongVolume() != 0) {
-                        String text = Primitives.roundString(volume.liquidatedLongVolume(), 1);
+                    if (0 <= volume.liquidatedLongVolume()) {
+                        String text = Primitives.roundString(volume.liquidatedLongVolume(), 0);
                         context.setStroke(liquidatedColor);
-                        context.strokeText(text, x[0] + coordinate(text), buyerY - 3);
+                        context.strokeText(text, x[0] + coordinate(text), 10);
                         context.setStroke(textColor);
                     }
 
@@ -392,15 +391,14 @@ public class GlobalVolumeView extends View {
                         String text = Primitives.roundString(volume.shortVolume(), 0);
                         context.strokeText(text, x[0] + coordinate(text), sellerY + 3 + 6);
                         canDisplayVolume[1] = false;
-                        sellerY += 15;
                     } else {
                         canDisplayVolume[1] = true;
                     }
 
-                    if (volume.liquidatedShortVolume() != 0) {
-                        String text = Primitives.roundString(volume.liquidatedShortVolume(), 1);
+                    if (0 <= volume.liquidatedShortVolume()) {
+                        String text = Primitives.roundString(volume.liquidatedShortVolume(), 0);
                         context.setStroke(liquidatedColor);
-                        context.strokeText(text, x[0] + coordinate(text), sellerY + 3 + 6);
+                        context.strokeText(text, x[0] + coordinate(text), padding + maxHeight * 2);
                         context.setStroke(textColor);
                     }
                 }
