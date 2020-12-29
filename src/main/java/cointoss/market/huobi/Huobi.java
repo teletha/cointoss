@@ -21,7 +21,8 @@ public final class Huobi extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 1000;
 
-    static final MarketService BTC_USDT = new HuobiService("btcusdt", MarketSetting.with.target(Currency.BTC.minimumSize(0.000001))
+    static final MarketService BTC_USDT = new HuobiService("btcusdt", MarketSetting.with.derivative()
+            .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 

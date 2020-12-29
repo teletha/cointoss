@@ -21,7 +21,8 @@ public final class Coincheck extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 50;
 
-    static final MarketService BTC_JPY = new CoincheckService("btc_jpy", MarketSetting.with.target(Currency.BTC.minimumSize(0.001))
+    static final MarketService BTC_JPY = new CoincheckService("btc_jpy", MarketSetting.with.spot()
+            .target(Currency.BTC.minimumSize(0.001))
             .base(Currency.JPY.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 

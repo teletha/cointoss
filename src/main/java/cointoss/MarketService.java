@@ -371,6 +371,24 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Provide the market specific tick related data infinitely.
+     * 
+     * @return A shared realtime stream.
+     */
+    public final synchronized Signal<OpenInterest> openInterestRealtimely() {
+        return this.connectOpenInterest().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "OpenInterest"));
+    }
+
+    /**
+     * Provide the market specific tick related data infinitely.
+     * 
+     * @return A shared realtime stream.
+     */
+    protected Signal<OpenInterest> connectOpenInterest() {
+        return I.signal();
+    }
+
+    /**
      * Get amount of the base currency.
      */
     public Signal<Num> baseCurrency() {

@@ -3,6 +3,7 @@ package cointoss;
 import cointoss.CurrencySetting;
 import cointoss.MarketSetting;
 import cointoss.MarketSettingModel;
+import cointoss.MarketType;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.arithmetic.Num;
 import java.lang.Class;
@@ -52,6 +53,9 @@ public class MarketSetting implements MarketSettingModel {
     }
 
     /** The final property updater. */
+    private static final MethodHandle typeUpdater = updater("type");
+
+    /** The final property updater. */
     private static final MethodHandle targetUpdater = updater("target");
 
     /** The final property updater. */
@@ -68,6 +72,9 @@ public class MarketSetting implements MarketSettingModel {
 
     /** The final property updater. */
     private static final MethodHandle executionLoggerUpdater = updater("executionLogger");
+
+    /** The exposed property. */
+    public final MarketType type;
 
     /** The exposed property. */
     public final CurrencySetting target;
@@ -91,12 +98,50 @@ public class MarketSetting implements MarketSettingModel {
      * HIDE CONSTRUCTOR
      */
     protected MarketSetting() {
+        this.type = null;
         this.target = null;
         this.base = null;
         this.targetCurrencyBidSizes = MarketSettingModel.super.targetCurrencyBidSizes();
         this.priceRangeModifier = MarketSettingModel.super.priceRangeModifier();
         this.acquirableExecutionSize = MarketSettingModel.super.acquirableExecutionSize();
         this.executionLogger = MarketSettingModel.super.executionLogger();
+    }
+
+    /**
+     * Sepcify the market type.
+     *  
+     *  @return
+     */
+    @Override
+    public final MarketType type() {
+        return this.type;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of type property.
+     */
+    @SuppressWarnings("unused")
+    private final MarketType getType() {
+        return this.type;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of type property to assign.
+     */
+    private final void setType(MarketType value) {
+        if (value == null) {
+            throw new IllegalArgumentException("The type property requires non-null value.");
+        }
+        try {
+            typeUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -315,6 +360,7 @@ public class MarketSetting implements MarketSettingModel {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("MarketSetting [");
+        builder.append("type=").append(type).append(", ");
         builder.append("target=").append(target).append(", ");
         builder.append("base=").append(base).append(", ");
         builder.append("targetCurrencyBidSizes=").append(targetCurrencyBidSizes).append(", ");
@@ -331,7 +377,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(target, base, targetCurrencyBidSizes, priceRangeModifier, acquirableExecutionSize, executionLogger);
+        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, acquirableExecutionSize, executionLogger);
     }
 
     /**
@@ -346,6 +392,7 @@ public class MarketSetting implements MarketSettingModel {
         }
 
         MarketSetting other = (MarketSetting) o;
+        if (!Objects.equals(type, other.type)) return false;
         if (!Objects.equals(target, other.target)) return false;
         if (!Objects.equals(base, other.base)) return false;
         if (!Objects.equals(targetCurrencyBidSizes, other.targetCurrencyBidSizes)) return false;
@@ -364,14 +411,71 @@ public class MarketSetting implements MarketSettingModel {
     public static class Ìnstantiator<Self extends MarketSetting & ÅssignableÅrbitrary<Self>> {
 
         /**
-         * Create new {@link MarketSetting} with the specified target property.
+         * Create new {@link MarketSetting} with the specified type property.
          * 
          * @return The next assignable model.
          */
-        public ÅssignableBase<Self> target(CurrencySetting target) {
+        public ÅssignableTarget<ÅssignableBase<Self>> type(MarketType type) {
             Åssignable o = new Åssignable();
-            o.target(target);
+            o.type(type);
             return o;
+        }
+
+        /**
+         * Create new {@link MarketSetting} with the specified type property.
+         * 
+         * @return The next assignable model.
+         */
+        public ÅssignableTarget<ÅssignableBase<Self>> derivative() {
+            Åssignable o = new Åssignable();
+            o.derivative();
+            return o;
+        }
+
+        /**
+         * Create new {@link MarketSetting} with the specified type property.
+         * 
+         * @return The next assignable model.
+         */
+        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
+            Åssignable o = new Åssignable();
+            o.spot();
+            return o;
+        }
+    }
+
+    /**
+     * Property assignment API.
+     */
+    public static interface ÅssignableType<Next> {
+
+        /**
+         * Assign type property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next type(MarketType value) {
+            ((MarketSetting) this).setType(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next derivative() {
+            return type(MarketType.DERIVATIVE);
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next spot() {
+            return type(MarketType.SPOT);
         }
     }
 
@@ -471,7 +575,7 @@ public class MarketSetting implements MarketSettingModel {
     /**
      * Internal aggregated API.
      */
-    protected static interface ÅssignableAll extends ÅssignableTarget, ÅssignableBase {
+    protected static interface ÅssignableAll extends ÅssignableType, ÅssignableTarget, ÅssignableBase {
     }
 
     /**
@@ -484,6 +588,7 @@ public class MarketSetting implements MarketSettingModel {
      * The identifier for properties.
      */
     static final class My {
+        static final String Type = "type";
         static final String Target = "target";
         static final String Base = "base";
         static final String TargetCurrencyBidSizes = "targetCurrencyBidSizes";

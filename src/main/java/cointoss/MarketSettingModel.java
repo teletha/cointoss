@@ -22,6 +22,14 @@ import kiss.I;
 interface MarketSettingModel {
 
     /**
+     * Sepcify the market type.
+     * 
+     * @return
+     */
+    @Icy.Property
+    MarketType type();
+
+    /**
      * Specify the target currency.
      * 
      * @return

@@ -24,6 +24,7 @@ import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.ticker.data.Liquidation;
+import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -197,11 +198,21 @@ public class BitfinexService extends MarketService {
                 });
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Bitfinex.BTC_USD.liquidationRealtimely().to(e -> {
-            System.out.println(e);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<OpenInterest> connectOpenInterest() {
+        return clientRealtimely().subscribe(new Topic("status", "deriv:tBTCF0:USTF0")).map(root -> {
+            JSON e = root.get("1");
+
+            System.out.println(Chrono.utcByMills(e.get(long.class, "0")) + "   " + e.get(Num.class, "17") + "  " + e);
+            return null;
         });
-        Bitfinex.ETH_USD.liquidationRealtimely().to(e -> {
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Bitfinex.BTC_USD.openInterestRealtimely().to(e -> {
             System.out.println(e);
         });
         Thread.sleep(1000 * 60 * 30);

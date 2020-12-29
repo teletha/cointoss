@@ -22,57 +22,57 @@ public final class Binance extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 1000;
 
-    public static final MarketService BTC_USDT = new BinanceService("BTCUSDT", false, MarketSetting.with
+    public static final MarketService BTC_USDT = new BinanceService("BTCUSDT", false, MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService EOS_USDT = new BinanceService("EOSUSDT", false, MarketSetting.with
+    public static final MarketService EOS_USDT = new BinanceService("EOSUSDT", false, MarketSetting.with.spot()
             .target(Currency.EOS.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService ETH_USDT = new BinanceService("ETHUSDT", false, MarketSetting.with
+    public static final MarketService ETH_USDT = new BinanceService("ETHUSDT", false, MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.00001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService LINK_USDT = new BinanceService("LINKUSDT", false, MarketSetting.with
+    public static final MarketService LINK_USDT = new BinanceService("LINKUSDT", false, MarketSetting.with.spot()
             .target(Currency.LINK.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService SRM_USDT = new BinanceService("SRMUSDT", false, MarketSetting.with
+    public static final MarketService SRM_USDT = new BinanceService("SRMUSDT", false, MarketSetting.with.spot()
             .target(Currency.SRM.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService XRP_USDT = new BinanceService("XRPUSDT", false, MarketSetting.with
+    public static final MarketService XRP_USDT = new BinanceService("XRPUSDT", false, MarketSetting.with.spot()
             .target(Currency.XRP.minimumSize(0.1))
             .base(Currency.USDT.minimumSize(0.00001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService FUTURE_BTC_USDT = new BinanceService("BTCUSDT", true, MarketSetting.with
+    public static final MarketService FUTURE_BTC_USDT = new BinanceService("BTCUSDT", true, MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService FUTURE_EHT_USDT = new BinanceService("ETHUSDT", true, MarketSetting.with
+    public static final MarketService FUTURE_EHT_USDT = new BinanceService("ETHUSDT", true, MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService FUTURE_COMP_USDT = new BinanceService("COMPUSDT", true, MarketSetting.with
+    public static final MarketService FUTURE_COMP_USDT = new BinanceService("COMPUSDT", true, MarketSetting.with.derivative()
             .target(Currency.COMP.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService FUTURE_MKR_USDT = new BinanceService("MKRUSDT", true, MarketSetting.with
+    public static final MarketService FUTURE_MKR_USDT = new BinanceService("MKRUSDT", true, MarketSetting.with.derivative()
             .target(Currency.MKR.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService FUTURE_UNI_USDT = new BinanceService("UNIUSDT", true, MarketSetting.with
+    public static final MarketService FUTURE_UNI_USDT = new BinanceService("UNIUSDT", true, MarketSetting.with.derivative()
             .target(Currency.UNI.minimumSize(1))
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
