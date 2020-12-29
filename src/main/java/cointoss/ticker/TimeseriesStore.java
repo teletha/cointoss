@@ -149,7 +149,10 @@ public final class TimeseriesStore<E> {
      */
     public synchronized TimeseriesStore<E> enableDataSupplier(Signal<E> supplier, Disposable disposer) {
         if (disposer != null && supplier != null) {
-            disposer.add(supplier.effectOnTerminate(this::persist).to(e -> store(e)));
+            disposer.add(supplier.effectOnDispose(this::persist).to(e -> {
+                store(e);
+                System.out.println("store data " + e);
+            }));
         }
         return this;
     }
