@@ -15,6 +15,7 @@ import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -219,16 +220,24 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
+        return super.provideOpenInterest(startExcluded);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Signal<OpenInterest> connectOpenInterest() {
         return clientRealtimely().subscribe(new Topic("instrument", marketName))
                 .take(e -> e.has("action", "update"))
                 .flatIterable(e -> e.find("data", "*"))
                 .take(e -> e.has("openInterest"))
                 .map(e -> {
+                    ZonedDateTime time = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat).truncatedTo(ChronoUnit.SECONDS);
                     double size = e.get(double.class, "openInterest");
                     double value = e.get(double.class, "openValue");
-
-                    return OpenInterest.with.date(Chrono.utcNow()).size(value / size);
+                    return OpenInterest.with.date(time).size(value / size);
                 });
     }
 

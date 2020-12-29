@@ -22,9 +22,4 @@ interface OpenInterestModel extends TimeseriesData {
 
     @Icy.Property
     double size();
-
-    @Icy.Property
-    default double value() {
-        return 0;
-    }
 }

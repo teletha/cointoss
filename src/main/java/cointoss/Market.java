@@ -178,17 +178,9 @@ public class Market implements Disposable {
      * override this method from outside the cointoss.verify package.
      */
     protected TimeseriesStore<OpenInterest> createOpenIntrest() {
-        TimeseriesStore<OpenInterest> open = TimeseriesStore.create(OpenInterest.class, Span.Minute5)
-                .enableDiskStore(service.directory().directory("oi"));
-
-        Chrono.minutes().take(time -> time.getMinute() % 1 == 0).to(() -> {
-            OpenInterest last = open.last();
-            service.provideOpenInterest(last != null ? last.date : Chrono.utc(2015, 1, 1))
-                    .effectOnComplete(open::persist)
-                    .to(oi -> open.store(oi));
-        });
-
-        return open;
+        return TimeseriesStore.create(OpenInterest.class, Span.Second5)
+                .enableDiskStore(service.directory("oi"))
+                .enableDataSupplier(service.openInterestRealtimely(), this);
     }
 
     public synchronized Trader trader() {

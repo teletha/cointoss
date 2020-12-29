@@ -437,6 +437,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Returns the sub directory of this service.
+     * 
+     * @return
+     */
+    public final Directory directory(String name) {
+        return directory().directory(name);
+    }
+
+    /**
      * Returns the identity of market.
      * 
      * @return A market identity.

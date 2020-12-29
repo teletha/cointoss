@@ -142,6 +142,19 @@ public final class TimeseriesStore<E> {
     }
 
     /**
+     * Enable the data suppliance.
+     * 
+     * @param supplier
+     * @return Chainable API.
+     */
+    public synchronized TimeseriesStore<E> enableDataSupplier(Signal<E> supplier, Disposable disposer) {
+        if (disposer != null && supplier != null) {
+            disposer.add(supplier.effectOnTerminate(this::persist).to(e -> store(e)));
+        }
+        return this;
+    }
+
+    /**
      * Disable the data suppliance.
      * 
      * @return Chainable API.
@@ -899,7 +912,9 @@ public final class TimeseriesStore<E> {
 
                 CsvWriter writer = new CsvWriter(file.newOutputStream(), StandardCharsets.ISO_8859_1, setting);
                 segment.each(item -> {
-                    writer.writeRow(encoder.apply(item));
+                    if (item != null) {
+                        writer.writeRow(encoder.apply(item));
+                    }
                 });
                 writer.close();
                 segment.sync = true;

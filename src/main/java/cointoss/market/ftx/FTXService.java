@@ -260,6 +260,21 @@ public class FTXService extends MarketService {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<OpenInterest> connectOpenInterest() {
+        if (setting.type.isSpot()) {
+            return I.signal();
+        }
+
+        return Chrono.seconds()
+                .takeAt(i -> i % 10 == 0)
+                .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
+                .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(double.class, "openInterest")));
+    }
+
     public static void main(String[] args) throws InterruptedException {
         double[] volume = new double[3];
         double[] previousOISize = {0};
@@ -284,7 +299,7 @@ public class FTXService extends MarketService {
                     double entry = total + deltaOI / 2d;
                     double exit = total - deltaOI / 2d;
 
-                    System.out.println(e + "  B:" + Primitives.roundString(volume[0], 6) + "   S:" + Primitives
+                    System.out.println(Chrono.utcNow() + "    " + e + "  B:" + Primitives.roundString(volume[0], 6) + "   S:" + Primitives
                             .roundString(volume[1], 6) + "   Total:" + Primitives
                                     .roundString(volume[0] + volume[1], 6) + "   AvePrice:" + Primitives
                                             .roundString(volume[2] / total, 2) + "  Entry:" + Primitives

@@ -20,6 +20,9 @@ import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderBookManager;
+import cointoss.ticker.Span;
+import cointoss.ticker.TimeseriesStore;
+import cointoss.ticker.data.OpenInterest;
 import kiss.Signal;
 
 public class VerifiableMarket extends Market {
@@ -49,6 +52,14 @@ public class VerifiableMarket extends Market {
     @Override
     protected OrderBookManager createOrderBookManager() {
         return new OrderBookManager(super.service, Signal.never());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TimeseriesStore<OpenInterest> createOpenIntrest() {
+        return TimeseriesStore.create(OpenInterest.class, Span.Hour1);
     }
 
     /**

@@ -194,8 +194,30 @@ public class BinanceService extends MarketService {
                     double size = e.get(double.class, "sumOpenInterest");
                     double value = e.get(double.class, "sumOpenInterestValue");
 
-                    return OpenInterest.with.date(time).size(size).value(value);
+                    return OpenInterest.with.date(time).size(size);
                 });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<OpenInterest> connectOpenInterest() {
+        if (setting.type.isSpot()) {
+            return I.signal();
+        }
+
+        return Chrono.minutes()
+                .takeAt(i -> i % 5 == 0)
+                .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
+                .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(double.class, "openInterest")));
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Binance.FUTURE_BTC_USDT.openInterestRealtimely().to(e -> {
+            System.out.println(e);
+        });
+        Thread.sleep(1000 * 60 * 15);
     }
 
     /**

@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.net.ConnectException;
 import java.net.http.HttpClient;
