@@ -36,14 +36,19 @@ public final class Bitfinex extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.01).scale(8))
             .acquirableExecutionSize(AcquirableSize));
 
-    static final MarketService XRP_USD = new BitfinexService("XRPUSD", MarketSetting.with.spot()
+    public static final MarketService XRP_USD = new BitfinexService("XRPUSD", MarketSetting.with.spot()
             .target(Currency.XRP.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.00001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService BTC_PERP = new BitfinexService("tBTCF0:USTF0", MarketSetting.with.derivative()
+    public static final MarketService BTC_PERP = new BitfinexService("BTCF0:USTF0", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USDT.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService ETH_PERP = new BitfinexService("ETHF0:USTF0", MarketSetting.with.derivative()
+            .target(Currency.ETH.minimumSize(0.0001))
+            .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
     /**

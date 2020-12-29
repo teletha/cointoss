@@ -475,9 +475,13 @@ public enum Currency {
 
     XAF("XAF", "CFA Franc BEAC"),
 
+    XAG("XAG", "Tether Silver"),
+
     XAS("XAS", "Asch"),
 
     XAUR("XAUR", "Xaurum"),
+
+    XAUT("XAUT", "Tether Gold"),
 
     XCD("XCD", "East Caribbean Dollar"),
 

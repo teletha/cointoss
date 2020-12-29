@@ -49,17 +49,12 @@ public class BinanceService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket RealtimeFuture = Realtime.withAddress("wss://fstream.binance.com/stream");
 
-    /** The market type. */
-    private final boolean isFutures;
-
     /**
      * @param marketName
      * @param setting
      */
-    protected BinanceService(String marketName, boolean isFutures, MarketSetting setting) {
-        super(isFutures ? Exchange.BinanceF : Exchange.Binance, marketName, setting);
-
-        this.isFutures = isFutures;
+    protected BinanceService(String marketName, MarketSetting setting) {
+        super(setting.type.isDerivative() ? Exchange.BinanceF : Exchange.Binance, marketName, setting);
     }
 
     /**
@@ -67,7 +62,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected EfficientWebSocket clientRealtimely() {
-        return isFutures ? RealtimeFuture : Realtime;
+        return setting.type.isDerivative() ? RealtimeFuture : Realtime;
     }
 
     /**
@@ -141,7 +136,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "depth?symbol=" + marketName + "&limit=" + (isFutures ? "1000" : "5000"))
+        return call("GET", "depth?symbol=" + marketName + "&limit=" + (setting.type.isDerivative() ? "1000" : "5000"))
                 .map(e -> createOrderBook(e, "bids", "asks"));
     }
 
@@ -183,7 +178,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
-        if (!isFutures) {
+        if (setting.type.isSpot()) {
             return I.signal();
         }
 
@@ -208,7 +203,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Liquidation> liquidations(ZonedDateTime startExcluded, ZonedDateTime endExcluded) {
-        if (!isFutures) {
+        if (setting.type.isSpot()) {
             return I.signal();
         }
 
@@ -245,7 +240,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Liquidation> connectLiquidation() {
-        if (!isFutures) {
+        if (setting.type.isSpot()) {
             return I.signal();
         }
 
@@ -277,7 +272,7 @@ public class BinanceService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path, int weight) {
-        String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
+        String uri = setting.type.isDerivative() ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
         Builder builder = HttpRequest.newBuilder(URI.create(path.startsWith("http") ? path : uri + path));
 
         return Network.rest(builder, Limit, weight, client()).retryWhen(retryPolicy(10, "Binance RESTCall"));

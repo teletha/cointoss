@@ -10,5 +10,23 @@
 package cointoss;
 
 public enum MarketType {
-    SPOT, DERIVATIVE
+    SPOT, DERIVATIVE;
+
+    /**
+     * Type detection helper.
+     * 
+     * @return
+     */
+    public boolean isSpot() {
+        return this == SPOT;
+    }
+
+    /**
+     * Type detection helper.
+     * 
+     * @return
+     */
+    public boolean isDerivative() {
+        return this == DERIVATIVE;
+    }
 }

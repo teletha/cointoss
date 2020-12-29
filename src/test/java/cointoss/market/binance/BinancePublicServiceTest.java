@@ -25,7 +25,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
      */
     @Override
     protected BinanceService constructMarketService() {
-        return construct(BinanceService::new, Binance.BTC_USDT.marketName, false, Binance.BTC_USDT.setting);
+        return construct(BinanceService::new, Binance.BTC_USDT.marketName, Binance.BTC_USDT.setting);
     }
 
     /**

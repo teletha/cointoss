@@ -31,6 +31,7 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -184,6 +185,10 @@ public class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<Liquidation> connectLiquidation() {
+        if (setting.type.isSpot()) {
+            return I.signal();
+        }
+
         return clientRealtimely().subscribe(new Topic("status", "liq:global"))
                 .skip(e -> e.text("1").equals("hb")) // ignore heartbeat
                 .flatIterable(e -> e.find("1", "*"))
@@ -203,19 +208,14 @@ public class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<OpenInterest> connectOpenInterest() {
-        return clientRealtimely().subscribe(new Topic("status", "deriv:tBTCF0:USTF0")).map(root -> {
+        if (setting.type.isSpot()) {
+            return I.signal();
+        }
+
+        return clientRealtimely().subscribe(new Topic("status", "deriv:t" + marketName)).map(root -> {
             JSON e = root.get("1");
-
-            System.out.println(Chrono.utcByMills(e.get(long.class, "0")) + "   " + e.get(Num.class, "17") + "  " + e);
-            return null;
+            return OpenInterest.with.date(Chrono.utcNow()).size(e.get(double.class, "17"));
         });
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Bitfinex.BTC_USD.openInterestRealtimely().to(e -> {
-            System.out.println(e);
-        });
-        Thread.sleep(1000 * 60 * 30);
     }
 
     /**
