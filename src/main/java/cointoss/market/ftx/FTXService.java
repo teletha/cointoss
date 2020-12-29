@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -30,12 +31,15 @@ import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.ticker.data.Liquidation;
+import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -232,16 +236,65 @@ public class FTXService extends MarketService {
      */
     @Override
     protected Signal<Liquidation> connectLiquidation() {
+        if (setting.type.isSpot()) {
+            return I.signal();
+        }
+
         return this.connectExecutionRealtimely()
                 .take(e -> e.delay == Execution.DelayHuge)
                 .map(e -> Liquidation.with.date(e.date).direction(e.direction.inverse()).size(e.size.doubleValue()).price(e.price));
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        FTX.BTC_PERP.liquidationRealtimely().to(e -> {
-            System.out.println(e);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
+        if (setting.type.isSpot()) {
+            return I.signal();
+        }
+
+        return call("GET", "futures/" + marketName + "/stats").map(root -> {
+            JSON e = root.get("result");
+            return OpenInterest.with.date(Chrono.utcNow()).size(e.get(double.class, "openInterest"));
         });
-        Thread.sleep(1000 * 60 * 30);
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        double[] volume = new double[3];
+        double[] previousOISize = {0};
+
+        FTX.BTC_PERP.executionsRealtimely().to(e -> {
+            if (e.isBuy()) {
+                volume[0] += e.size.doubleValue();
+                volume[2] += e.size.doubleValue() * e.price.doubleValue();
+            } else {
+                volume[1] += e.size.doubleValue();
+                volume[2] += e.size.doubleValue() * e.price.doubleValue();
+            }
+        });
+        I.schedule(1, 1, TimeUnit.SECONDS, true)
+                .take(360 * 5)
+                .waitForTerminate()
+                .concatMap(x -> FTX.BTC_PERP.provideOpenInterest(Chrono.utcNow().minusMinutes(10)))
+                .diff((p, n) -> p.size == n.size)
+                .to(e -> {
+                    double deltaOI = e.size - previousOISize[0];
+                    double total = volume[0] + volume[1];
+                    double entry = total + deltaOI / 2d;
+                    double exit = total - deltaOI / 2d;
+
+                    System.out.println(e + "  B:" + Primitives.roundString(volume[0], 6) + "   S:" + Primitives
+                            .roundString(volume[1], 6) + "   Total:" + Primitives
+                                    .roundString(volume[0] + volume[1], 6) + "   AvePrice:" + Primitives
+                                            .roundString(volume[2] / total, 2) + "  Entry:" + Primitives
+                                                    .roundString(entry, 2) + "    Exit:" + Primitives.roundString(exit, 2));
+                    volume[0] = 0;
+                    volume[1] = 0;
+                    volume[2] = 0;
+                    previousOISize[0] = e.size;
+                });
+
     }
 
     /**

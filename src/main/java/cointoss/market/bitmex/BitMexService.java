@@ -27,11 +27,13 @@ import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.ticker.data.Liquidation;
+import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 import kiss.Signal;
@@ -211,6 +213,58 @@ public class BitMexService extends MarketService {
                             .size(price.divide(size).scale(setting.target.scale).doubleValue())
                             .price(price);
                 });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<OpenInterest> connectOpenInterest() {
+        return clientRealtimely().subscribe(new Topic("instrument", marketName))
+                .take(e -> e.has("action", "update"))
+                .flatIterable(e -> e.find("data", "*"))
+                .take(e -> e.has("openInterest"))
+                .map(e -> {
+                    double size = e.get(double.class, "openInterest");
+                    double value = e.get(double.class, "openValue");
+
+                    return OpenInterest.with.date(Chrono.utcNow()).size(value / size);
+                });
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        double[] volume = new double[3];
+        double[] previousOISize = {0};
+
+        BitMex.XBT_USD.executionsRealtimely().to(e -> {
+            if (e.isBuy()) {
+                volume[0] += e.size.doubleValue();
+                volume[2] += e.size.doubleValue() * e.price.doubleValue();
+            } else {
+                volume[1] += e.size.doubleValue();
+                volume[2] += e.size.doubleValue() * e.price.doubleValue();
+            }
+        });
+
+        BitMex.XBT_USD.openInterestRealtimely().to(e -> {
+            double deltaOI = e.size - previousOISize[0];
+            double total = volume[0] + volume[1];
+            double entry = total + deltaOI / 2d;
+            double exit = total - deltaOI / 2d;
+
+            System.out.println(e + "  B:" + Primitives.roundString(volume[0], 6) + "   S:" + Primitives
+                    .roundString(volume[1], 6) + "   Total:" + Primitives
+                            .roundString(volume[0] + volume[1], 6) + "   AvePrice:" + Primitives
+                                    .roundString(volume[2] / total, 2) + "  Entry:" + Primitives
+                                            .roundString(entry, 2) + "    Exit:" + Primitives.roundString(exit, 2));
+            volume[0] = 0;
+            volume[1] = 0;
+            volume[2] = 0;
+            previousOISize[0] = e.size;
+        });
+
+        Thread.sleep(1000 * 60 * 10);
+
     }
 
     /**

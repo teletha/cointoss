@@ -40,6 +40,7 @@ import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.JSON;
@@ -282,6 +283,32 @@ public class BybitService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<OpenInterest> connectOpenInterest() {
+        double[] price = {0};
+
+        return clientRealtimely().subscribe(new Topic("instrument_info.100ms", marketName))
+                .effectOnce(e -> price[0] = e.get("data").get(double.class, "last_price_e4"))
+                .flatIterable(e -> e.find("data", "update", "*"))
+                .effect(e -> {
+                    Double d = e.get(Double.class, "last_price_e4");
+                    if (d != null) price[0] = d / 1000;
+                })
+                .take(e -> e.has("open_interest"))
+                .map(e -> OpenInterest.with.date(Chrono.utcNow())
+                        .size(Primitives.roundDecimal(e.get(double.class, "open_interest") / price[0], 2)));
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Bybit.BTC_USD.openInterestRealtimely().to(e -> {
+            System.out.println(e);
+        });
+        Thread.sleep(1000 * 60 * 10);
+    }
+
+    /**
      * Call rest API.
      * 
      * @param method
@@ -300,12 +327,6 @@ public class BybitService extends MarketService {
     @Override
     public ExecutionLogRepository externalRepository() {
         return new OfficialRepository(this);
-    }
-
-    public static void main(String[] args) {
-        ((BybitService) Bybit.BTC_USD).call("GET", "tickers").flatIterable(e -> e.find("result", "*")).waitForTerminate().to(e -> {
-            System.out.println(e);
-        });
     }
 
     /**

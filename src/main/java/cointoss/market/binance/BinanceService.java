@@ -215,26 +215,6 @@ public class BinanceService extends MarketService {
                 });
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Binance.FUTURE_BTC_USDT.liquidations(Chrono.utc(2020, 12, 25), Chrono.utc(2020, 12, 26)).waitForTerminate().to(e -> {
-            System.out.println(e);
-        });
-    }
-
-    // private static final HttpClient client;
-    //
-    // static {
-    // client = HttpClient.newBuilder().version(Version.HTTP_1_1).build();
-    // }
-    //
-    // /**
-    // * {@inheritDoc}
-    // */
-    // @Override
-    // protected HttpClient client() {
-    // return client;
-    // }
-
     /**
      * {@inheritDoc}
      */
