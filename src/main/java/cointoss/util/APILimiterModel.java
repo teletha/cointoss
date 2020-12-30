@@ -131,7 +131,7 @@ abstract class APILimiterModel {
             // allow to access
             usingPermits = nextUsingPermits;
             lastAccessedTime = now;
-            save.accept(this);
+            if (persistable() != null) save.accept(this);
             return; // immediately
         } else {
             // wait to access

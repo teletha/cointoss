@@ -9,7 +9,7 @@
  */
 package cointoss.ticker;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -498,6 +498,17 @@ class TimeseriesStoreTest {
         assert store.existOnHeap(0L) == false;
         assert store.at(0) == 0L;
         assert store.at(5) == null;
+    }
+
+    @Test
+    void atomicModel() {
+        Directory dir = Locator.directory(room.locateRadom());
+        TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDiskStore(dir);
+        store.store(1L);
+        store.persist();
+        store.clear();
+
+        assert store.at(0) == 1L;
     }
 
     @Test

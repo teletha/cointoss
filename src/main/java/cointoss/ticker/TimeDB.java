@@ -7,63 +7,60 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.db;
+package cointoss.ticker;
 
+import static java.nio.file.StandardOpenOption.*;
+
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.ToLongFunction;
 import java.util.stream.IntStream;
 
-import cointoss.ticker.Span;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
+import kiss.Signal;
 import kiss.model.Model;
 import kiss.model.Property;
 
-public class FeatherDefinition<T> {
+/**
+ * Featherweight (less-memory) timeserise database.
+ */
+public class TimeDB<T> {
 
-    final Span span;
+    /** The time interval. */
+    private final Span span;
 
-    final long duration;
+    /** The local database file. */
+    private final Path dir;
 
-    final Model<T> model;
+    private final long duration;
 
-    final ToLongFunction<T> timestamper;
+    private final Model<T> model;
 
-    final int[] width;
+    private final int[] width;
 
-    final int widthTotal;
+    private final int widthTotal;
 
-    /** The best size while item reading. */
-    int readerSize;
+    private final BiConsumer<T, ByteBuffer>[] readers;
 
-    /** The best size while item writing. */
-    int writerSize;
-
-    /** The best size while item writing. */
-    int fileSize;
-
-    final BiConsumer<T, ByteBuffer>[] readers;
-
-    final BiConsumer<T, ByteBuffer>[] writers;
+    private final BiConsumer<T, ByteBuffer>[] writers;
 
     /**
-     * Define database.
-     * 
-     * @param type
-     * @param timestamper
+     * @param definition
      */
-    FeatherDefinition(Span span, Class<T> type, ToLongFunction<T> timestamper) {
+    TimeDB(Span span, Class<T> type, Path root) {
         this.span = span;
-        this.duration = span.seconds * 100000;
+        this.dir = root;
+        this.duration = span.segmentSeconds;
         this.model = Model.of(type);
-        this.timestamper = Objects.requireNonNull(timestamper);
 
         List<Property> properties = model.properties();
         this.width = new int[properties.size()];
-        this.readers = new BiConsumer[properties.size()];
-        this.writers = new BiConsumer[properties.size()];
+        this.readers = new BiConsumer[width.length];
+        this.writers = new BiConsumer[width.length];
 
         for (int i = 0; i < width.length; i++) {
             Property property = properties.get(i);
@@ -119,61 +116,80 @@ public class FeatherDefinition<T> {
                 width[i] = 4;
                 readers[i] = (o, b) -> model.set(o, property, Num.of(b.getFloat()));
                 writers[i] = (o, b) -> b.putFloat(((Num) model.get(o, property)).floatValue());
+            } else {
+                throw new IllegalArgumentException("Unspported property type [" + c.getName() + "] on " + type.getName() + ".");
             }
         }
         this.widthTotal = IntStream.of(width).sum();
-
-        maxDataFileSize(512);
-        maxReaderMemorySize(8);
-        maxWriterMemorySize(32);
     }
 
     /**
-     * Configure time span.
+     * Insert items.
      * 
-     * @param span
-     * @return
+     * @param items A list of items to insert.
+     * @return Chainable API.
      */
-    public FeatherDefinition<T> maxDataFileSize(int mb) {
-        if (0 < mb) {
-            this.fileSize = mb * 1024 * 1024 / widthTotal;
+    public void write(long timestamp, T item) {
+        long remaining = timestamp % duration;
+        long index = timestamp - remaining;
+        long height = remaining / span.seconds;
+
+        ByteBuffer writer = ByteBuffer.allocate(widthTotal);
+        for (int i = 0; i < width.length; i++) {
+            writers[i].accept(item, writer);
         }
-        return this;
-    }
 
-    /**
-     * Configure time span.
-     * 
-     * @param span
-     * @return
-     */
-    public FeatherDefinition<T> maxReaderMemorySize(int mb) {
-        if (0 < mb) {
-            this.readerSize = mb * 1024 * 1024 / widthTotal;
+        try (FileChannel channel = FileChannel.open(dir.resolve(index + ".db"), WRITE, CREATE)) {
+            channel.position(height * widthTotal);
+            channel.write(writer.flip());
+        } catch (IOException e) {
+            throw I.quiet(e);
         }
-        return this;
+    }
+
+    public T read(long timestamp) {
+        return read(timestamp, 1).to().exact();
+    }
+
+    public Signal<T> read(long timestamp, int size) {
+        return new Signal<T>((observer, disposer) -> {
+            long remaining = timestamp % duration;
+            long index = timestamp - remaining;
+            long height = remaining / span.seconds;
+
+            try (FileChannel ch = FileChannel.open(dir.resolve(index + ".db"), READ)) {
+                ByteBuffer buffer = ByteBuffer.allocate(widthTotal);
+
+                for (int i = 0; i < size; i++) {
+                    ch.position((height + i) * widthTotal);
+                    ch.read(buffer);
+                    buffer.flip();
+
+                    T item = I.make(model.type);
+                    for (int k = 0; k < width.length; k++) {
+                        readers[k].accept(item, buffer);
+                    }
+                    observer.accept(item);
+                    buffer.flip();
+                }
+                observer.complete();
+            } catch (IOException e) {
+                observer.error(e);
+            }
+            return disposer;
+        });
     }
 
     /**
-     * Configure time span.
+     * Define database.
      * 
+     * @param <T>
      * @param span
+     * @param modelType
+     * @param timestamp
      * @return
      */
-    public FeatherDefinition<T> maxWriterMemorySize(int mb) {
-        if (0 < mb) {
-            this.writerSize = mb * 1024 * 1024 / widthTotal;
-        }
-        return this;
-    }
-
-    /**
-     * Build database.
-     * 
-     * @param name
-     * @return
-     */
-    public FeatherDB<T> createTable(String name) {
-        return new FeatherDB(name, this);
+    public static <T> TimeDB<T> define(Span span, Class<T> modelType, Path root) {
+        return new TimeDB(span, modelType, root);
     }
 }

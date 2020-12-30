@@ -9,35 +9,37 @@
  */
 package cointoss.ticker;
 
-import java.nio.charset.StandardCharsets;
+import static java.nio.file.StandardOpenOption.*;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 import java.util.function.ToLongFunction;
+import java.util.stream.IntStream;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
-import com.univocity.parsers.csv.CsvWriter;
-import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
+import cointoss.util.arithmetic.Num;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
 import cointoss.util.map.LongMap.LongEntry;
-import kiss.Decoder;
 import kiss.Disposable;
-import kiss.Encoder;
 import kiss.I;
 import kiss.Signal;
 import kiss.model.Model;
@@ -49,6 +51,8 @@ import psychopath.Locator;
 public final class TimeseriesStore<E> {
 
     private static final DateTimeFormatter FileName = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
+
+    private static final Map<Model, Definition> definitions = new HashMap();
 
     /** The item type. */
     private final Model<E> model;
@@ -179,50 +183,14 @@ public final class TimeseriesStore<E> {
     }
 
     /**
-     * Enable the transparent disk persistence using property-based encoder and decoder.
-     * 
-     * @param directory A root directory to store data.
-     * @param type A type of items.
-     * @return Chainable API.
-     */
-    public synchronized TimeseriesStore<E> enableDiskStore(Path directory) {
-        if (model.atomic) {
-            enableDiskStore(directory, item -> {
-                return new String[] {I.find(Encoder.class, model.type).encode(item)};
-            }, values -> {
-                return (E) I.find(Decoder.class, model.type).decode(values[0]);
-            });
-        } else {
-            enableDiskStore(directory, item -> {
-                List<Property> properties = model.properties();
-                String[] values = new String[properties.size()];
-                for (int i = 0; i < values.length; i++) {
-                    values[i] = I.find(Encoder.class, properties.get(i).model.type).encode(model.get(item, properties.get(i)));
-                }
-                return values;
-            }, values -> {
-                E item = I.make(model.type);
-                for (int i = 0; i < values.length; i++) {
-                    Property property = model.properties().get(i);
-                    model.set(item, property, I.find(Decoder.class, property.model.type).decode(values[i]));
-                }
-                return item;
-            });
-        }
-        return this;
-    }
-
-    /**
      * Enable the transparent disk persistence.
      * 
      * @param directory A root directory to store data.
-     * @param encoder A date serializer.
-     * @param decoder A date deserializer.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Path directory, Function<E, String[]> encoder, Function<String[], E> decoder) {
-        if (directory != null && this.disk == null && encoder != null && decoder != null) {
-            this.disk = new OnDisk(Locator.directory(directory), encoder, decoder);
+    public synchronized TimeseriesStore<E> enableDiskStore(Path directory) {
+        if (directory != null && this.disk == null) {
+            this.disk = new OnDisk(Locator.directory(directory));
         }
         return this;
     }
@@ -887,26 +855,17 @@ public final class TimeseriesStore<E> {
         /** The disk store. */
         private final Directory root;
 
-        /** The data serializer. */
-        private final Function<E, String[]> encoder;
-
-        /** The data deserializer. */
-        private final Function<String[], E> decoder;
+        /** The table definition. */
+        private final Definition<E> definition = definitions.computeIfAbsent(model, Definition::new);
 
         /**
          * @param root
          * @param encoder
          * @param decoder
          */
-        private OnDisk(Directory root, Function<E, String[]> encoder, Function<String[], E> decoder) {
+        private OnDisk(Directory root) {
             this.root = root;
-            this.encoder = encoder;
-            this.decoder = decoder;
 
-            // read all caches
-            root.walkFile("*.log").to(file -> {
-
-            });
         }
 
         /**
@@ -918,18 +877,27 @@ public final class TimeseriesStore<E> {
         private void store(long time, OnHeap segment) {
             if (!segment.sync) {
                 File file = name(time);
+                file.parent().create();
 
-                CsvWriterSettings setting = new CsvWriterSettings();
-                setting.getFormat().setDelimiter(' ');
-                setting.getFormat().setComment('無');
+                try (FileChannel ch = FileChannel.open(file.asJavaPath(), CREATE, WRITE)) {
+                    ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                    for (int i = 0; i < length; i++) {
+                        E item = segment.items[i];
+                        if (item != null) {
+                            ch.position(i * definition.widthTotal);
 
-                CsvWriter writer = new CsvWriter(file.newOutputStream(), StandardCharsets.ISO_8859_1, setting);
-                segment.each(item -> {
-                    if (item != null) {
-                        writer.writeRow(encoder.apply(item));
+                            for (int k = 0; k < definition.width.length; k++) {
+                                definition.writers[k].accept(item, buffer);
+                            }
+                            buffer.flip();
+                            ch.write(buffer);
+                            buffer.flip();
+                        }
                     }
-                });
-                writer.close();
+                } catch (IOException e) {
+                    throw I.quiet(e);
+                }
+
                 segment.sync = true;
             }
         }
@@ -949,14 +917,23 @@ public final class TimeseriesStore<E> {
 
             OnHeap heap = new OnHeap();
 
-            CsvParserSettings setting = new CsvParserSettings();
-            setting.getFormat().setDelimiter(' ');
-            setting.getFormat().setComment('無');
-            CsvParser reader = new CsvParser(setting);
-            reader.iterate(file.newInputStream(), StandardCharsets.ISO_8859_1).forEach(values -> {
-                E item = decoder.apply(values);
-                heap.set((int) index(timestampExtractor.applyAsLong(item))[1], item);
-            });
+            try (FileChannel ch = FileChannel.open(file.asJavaPath(), READ)) {
+                ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                for (int i = 0; i < length; i++) {
+                    ch.read(buffer);
+                    buffer.flip();
+                    if (buffer.limit() != 0) {
+                        E item = I.make(model.type);
+                        for (int k = 0; k < definition.width.length; k++) {
+                            definition.readers[k].accept(item, buffer);
+                        }
+                        heap.items[i] = item;
+                        buffer.flip();
+                    }
+                }
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
 
             heap.sync = true;
             return heap;
@@ -970,6 +947,97 @@ public final class TimeseriesStore<E> {
          */
         private File name(long time) {
             return root.directory(span.name()).file(FileName.format(Chrono.utcBySeconds(time)) + ".log");
+        }
+    }
+
+    /**
+     * 
+     */
+    private static class Definition<E> {
+
+        private final int[] width;
+
+        private final int widthTotal;
+
+        private final BiConsumer<E, ByteBuffer>[] readers;
+
+        private final BiConsumer<E, ByteBuffer>[] writers;
+
+        private Definition(Model<E> model) {
+            List<Property> properties = model.properties();
+            this.width = new int[properties.size()];
+            this.readers = new BiConsumer[width.length];
+            this.writers = new BiConsumer[width.length];
+
+            for (int i = 0; i < width.length; i++) {
+                Property property = properties.get(i);
+                Class c = property.model.type;
+                if (c == boolean.class) {
+                    width[i] = 1;
+                    readers[i] = (o, b) -> model.set(o, property, b.get() == 0 ? Boolean.FALSE : Boolean.TRUE);
+                    writers[i] = (o, b) -> b.put((byte) (model.get(o, property) == Boolean.FALSE ? 0 : 1));
+                } else if (c == byte.class) {
+                    width[i] = 1;
+                    readers[i] = (o, b) -> model.set(o, property, b.get());
+                    writers[i] = (o, b) -> b.put((byte) model.get(o, property));
+                } else if (c == short.class) {
+                    width[i] = 2;
+                    readers[i] = (o, b) -> model.set(o, property, b.getShort());
+                    writers[i] = (o, b) -> b.putShort((short) model.get(o, property));
+                } else if (c == char.class) {
+                    width[i] = 2;
+                    readers[i] = (o, b) -> model.set(o, property, b.getChar());
+                    writers[i] = (o, b) -> b.putChar((char) model.get(o, property));
+                } else if (c == int.class) {
+                    width[i] = 4;
+                    readers[i] = (o, b) -> model.set(o, property, b.getInt());
+                    writers[i] = (o, b) -> b.putInt((int) model.get(o, property));
+                } else if (c == float.class) {
+                    width[i] = 4;
+                    readers[i] = (o, b) -> model.set(o, property, b.getFloat());
+                    writers[i] = (o, b) -> b.putFloat((float) model.get(o, property));
+                } else if (c == long.class) {
+                    width[i] = 8;
+                    readers[i] = (o, b) -> model.set(o, property, b.getLong());
+                    writers[i] = (o, b) -> b.putLong((long) model.get(o, property));
+                } else if (c == double.class) {
+                    width[i] = 8;
+                    readers[i] = (o, b) -> model.set(o, property, b.getDouble());
+                    writers[i] = (o, b) -> b.putDouble((double) model.get(o, property));
+                } else if (c.isEnum()) {
+                    int size = c.getEnumConstants().length;
+                    if (size < 8) {
+                        width[i] = 1;
+                        readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.get()]);
+                        writers[i] = (o, b) -> b.put((byte) ((Enum) model.get(o, property)).ordinal());
+                    } else if (size < 128) {
+                        width[i] = 2;
+                        readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.getShort()]);
+                        writers[i] = (o, b) -> b.putShort((short) ((Enum) model.get(o, property)).ordinal());
+                    } else {
+                        width[i] = 4;
+                        readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.getInt()]);
+                        writers[i] = (o, b) -> b.putInt(((Enum) model.get(o, property)).ordinal());
+                    }
+                } else if (Num.class.isAssignableFrom(c)) {
+                    width[i] = 4;
+                    readers[i] = (o, b) -> model.set(o, property, Num.of(b.getFloat()));
+                    writers[i] = (o, b) -> b.putFloat(((Num) model.get(o, property)).floatValue());
+                } else if (ZonedDateTime.class.isAssignableFrom(c)) {
+                    width[i] = 8;
+                    readers[i] = (o, b) -> {
+                        long time = b.getLong();
+                        model.set(o, property, time == -1 ? null : Chrono.utcByMills(time));
+                    };
+                    writers[i] = (o, b) -> {
+                        ZonedDateTime time = (ZonedDateTime) model.get(o, property);
+                        b.putLong(time == null ? -1 : time.toInstant().toEpochMilli());
+                    };
+                } else {
+                    throw new IllegalArgumentException("Unspported property type [" + c.getName() + "] on " + model.type.getName() + ".");
+                }
+            }
+            this.widthTotal = IntStream.of(width).sum();
         }
     }
 }
