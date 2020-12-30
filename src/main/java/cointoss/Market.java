@@ -180,7 +180,7 @@ public class Market implements Disposable {
     protected TimeseriesStore<OpenInterest> createOpenIntrest() {
         return TimeseriesStore.create(OpenInterest.class, Span.Second5)
                 .enableDiskStore(service.directory("oi"))
-                .enableDataSupplier(service.openInterestRealtimely(), this);
+                .enablePassiveDataSupplier(service.openInterestRealtimely(), this);
     }
 
     public synchronized Trader trader() {

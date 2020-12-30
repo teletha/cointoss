@@ -136,7 +136,7 @@ public final class TimeseriesStore<E> {
      * @param supplier
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDataSupplier(LongFunction<Signal<E>> supplier) {
+    public synchronized TimeseriesStore<E> enableActiveDataSupplier(LongFunction<Signal<E>> supplier) {
         this.supplier = supplier;
         return this;
     }
@@ -147,7 +147,7 @@ public final class TimeseriesStore<E> {
      * @param supplier
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDataSupplier(Signal<E> supplier, Disposable disposer) {
+    public synchronized TimeseriesStore<E> enablePassiveDataSupplier(Signal<E> supplier, Disposable disposer) {
         if (disposer != null && supplier != null) {
             disposer.add(supplier.effectOnDispose(this::persist).to(e -> {
                 store(e);
@@ -162,7 +162,7 @@ public final class TimeseriesStore<E> {
      * 
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> disableDataSupplier() {
+    public synchronized TimeseriesStore<E> disableActiveDataSupplier() {
         this.supplier = null;
         return this;
     }
@@ -753,6 +753,8 @@ public final class TimeseriesStore<E> {
         /** Flag whether the data is in sync with disk. */
         private boolean sync;
 
+        private int modified = -1;
+
         /**
          * Return the size of this {@link OnHeap}.
          * 
@@ -782,6 +784,14 @@ public final class TimeseriesStore<E> {
             items[index] = item;
 
             // FAILSAFE : update min and max index after inserting item
+            if (index < min) {
+                min = index;
+                modified = Math.min(modified, index);
+            } else if (max < index) {
+                max = index;
+            } else {
+
+            }
             min = Math.min(min, index);
             max = Math.max(max, index);
 

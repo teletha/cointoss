@@ -437,7 +437,7 @@ class TimeseriesStoreTest {
 
     @Test
     void dataSupply() {
-        TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableDataSupplier(time -> {
+        TimeseriesStore<Long> store = TimeseriesStore.create(long.class, v -> v, Span.Second5).enableActiveDataSupplier(time -> {
             return I.signal(time);
         });
 
