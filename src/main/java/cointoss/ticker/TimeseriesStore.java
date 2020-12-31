@@ -108,20 +108,7 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public static <E extends TimeseriesData> TimeseriesStore<E> create(Class<E> type, Span span) {
-        return create(type, E::epochSeconds, span);
-    }
-
-    /**
-     * Create the store for timeseries data.
-     * 
-     * @param <E>
-     * @param type
-     * @param timestampExtractor
-     * @param span
-     * @return
-     */
-    public static <E> TimeseriesStore<E> create(Class<E> type, ToLongFunction<E> timestampExtractor, Span span) {
-        return new TimeseriesStore(span, type, timestampExtractor);
+        return new TimeseriesStore<E>(span, type, E::epochSeconds);
     }
 
     /**
@@ -291,6 +278,26 @@ public final class TimeseriesStore<E> {
         for (E item : items) {
             store(item);
         }
+    }
+
+    /**
+     * Stores the specified time series items.
+     * 
+     * @param items Time series items to store.
+     */
+    public void store(List<E> items) {
+        for (E item : items) {
+            store(item);
+        }
+    }
+
+    /**
+     * Stores the specified time series items.
+     * 
+     * @param items Time series items to store.
+     */
+    public void store(Signal<E> items) {
+        items.to(e -> store(e));
     }
 
     /**
