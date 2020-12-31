@@ -508,7 +508,7 @@ class TimeseriesStoreTest {
     void persist() {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir);
-        File cache = dir.file("Second5/1970-01-01 00.log");
+        File cache = dir.file("Second5/1970-01-01 00.db");
         assert cache.isAbsent();
 
         store.store(value(0));
@@ -520,7 +520,7 @@ class TimeseriesStoreTest {
     void persistOnlyModified() {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir);
-        File cache = dir.file("Second5/1970-01-01 00.log");
+        File cache = dir.file("Second5/1970-01-01 00.db");
 
         store.store(value(0));
         store.persist();
@@ -551,7 +551,7 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void model() {
+    void zonedDateTime() {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Second5).enableDiskStore(dir);
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
@@ -559,6 +559,6 @@ class TimeseriesStoreTest {
         store.persist();
         store.clear();
 
-        assert store.at(oi.epochSeconds()).size == 10;
+        assert store.at(oi.epochSeconds()).equals(oi);
     }
 }

@@ -14,6 +14,7 @@ import static java.nio.file.StandardOpenOption.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,8 +46,6 @@ import kiss.Signal;
 import kiss.model.Model;
 import kiss.model.Property;
 import psychopath.Directory;
-import psychopath.File;
-import psychopath.Locator;
 
 public final class TimeseriesStore<E> {
 
@@ -74,6 +73,9 @@ public final class TimeseriesStore<E> {
 
     /** The disk store. */
     private OnDisk disk;
+
+    /** The disk synchronous mode. */
+    private boolean autoDiskSync;
 
     @SuppressWarnings("serial")
     private final Map<Long, OnHeap> stats = new LinkedHashMap<>(8, 0.75f, true) {
@@ -159,10 +161,9 @@ public final class TimeseriesStore<E> {
     }
 
     /**
-     * Enable the transparent disk persistence using property-based encoder and decoder.
+     * Enable the transparent disk persistence.
      * 
      * @param directory A root directory to store data.
-     * @param type A type of items.
      * @return Chainable API.
      */
     public synchronized TimeseriesStore<E> enableDiskStore(Directory directory) {
@@ -175,9 +176,30 @@ public final class TimeseriesStore<E> {
      * @param directory A root directory to store data.
      * @return Chainable API.
      */
+    public synchronized TimeseriesStore<E> enableDiskStore(Directory directory, boolean autoSync) {
+        return enableDiskStore(directory.asJavaPath(), autoSync);
+    }
+
+    /**
+     * Enable the transparent disk persistence.
+     * 
+     * @param directory A root directory to store data.
+     * @return Chainable API.
+     */
     public synchronized TimeseriesStore<E> enableDiskStore(Path directory) {
+        return enableDiskStore(directory, false);
+    }
+
+    /**
+     * Enable the transparent disk persistence.
+     * 
+     * @param directory A root directory to store data.
+     * @return Chainable API.
+     */
+    public synchronized TimeseriesStore<E> enableDiskStore(Path directory, boolean autoSync) {
         if (directory != null && this.disk == null) {
-            this.disk = new OnDisk(Locator.directory(directory));
+            this.disk = new OnDisk(directory);
+            this.autoDiskSync = autoSync;
         }
         return this;
     }
@@ -262,7 +284,7 @@ public final class TimeseriesStore<E> {
         OnHeap segment = supply(index[0]);
 
         if (segment == null) {
-            segment = new OnHeap();
+            segment = new OnHeap(index[0]);
             indexed.put(index[0], segment);
             stats.put(index[0], segment);
         }
@@ -666,7 +688,7 @@ public final class TimeseriesStore<E> {
             if (supply != null) {
                 long endTime = startTime + span.segmentSeconds;
 
-                OnHeap heap = new OnHeap();
+                OnHeap heap = new OnHeap(startTime);
                 indexed.put(startTime, heap);
                 stats.put(startTime, heap);
                 supply.to(item -> {
@@ -716,6 +738,9 @@ public final class TimeseriesStore<E> {
      */
     private class OnHeap {
 
+        /** The starting time (epoch seconds). */
+        private final long startTime;
+
         /** The managed items. */
         private E[] items = (E[]) new Object[length];
 
@@ -728,7 +753,12 @@ public final class TimeseriesStore<E> {
         /** Flag whether the data is in sync with disk. */
         private boolean sync;
 
-        private int modified = -1;
+        /**
+         * @param startTime The starting time (epoch seconds).
+         */
+        private OnHeap(long startTime) {
+            this.startTime = startTime;
+        }
 
         /**
          * Return the size of this {@link OnHeap}.
@@ -759,18 +789,14 @@ public final class TimeseriesStore<E> {
             items[index] = item;
 
             // FAILSAFE : update min and max index after inserting item
-            if (index < min) {
-                min = index;
-                modified = Math.min(modified, index);
-            } else if (max < index) {
-                max = index;
+            if (index < min) min = index;
+            if (max < index) max = index;
+
+            if (autoDiskSync) {
+                disk.store(startTime, index, item);
             } else {
-
+                sync = false;
             }
-            min = Math.min(min, index);
-            max = Math.max(max, index);
-
-            sync = false;
         }
 
         /**
@@ -860,19 +886,45 @@ public final class TimeseriesStore<E> {
     private class OnDisk {
 
         /** The disk store. */
-        private final Directory root;
+        private final Path directory;
 
         /** The table definition. */
         private final Definition<E> definition = definitions.computeIfAbsent(model, Definition::new);
 
         /**
          * @param root
-         * @param encoder
-         * @param decoder
          */
-        private OnDisk(Directory root) {
-            this.root = root;
+        private OnDisk(Path root) {
+            try {
+                this.directory = root.resolve(span.name());
+                Files.createDirectories(directory);
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
 
+        /**
+         * Store data to disk cache.
+         * 
+         * @param time
+         * @param segment
+         */
+        private void store(long time, int index, E item) {
+            if (item == null) {
+                return;
+            }
+
+            try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE)) {
+                ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                ch.position(index * definition.widthTotal);
+
+                for (int k = 0; k < definition.width.length; k++) {
+                    definition.writers[k].accept(item, buffer);
+                }
+                ch.write(buffer.flip());
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
         }
 
         /**
@@ -883,10 +935,7 @@ public final class TimeseriesStore<E> {
          */
         private void store(long time, OnHeap segment) {
             if (!segment.sync) {
-                File file = name(time);
-                file.parent().create();
-
-                try (FileChannel ch = FileChannel.open(file.asJavaPath(), CREATE, WRITE)) {
+                try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE)) {
                     ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
                     for (int i = 0; i < length; i++) {
                         E item = segment.items[i];
@@ -916,15 +965,15 @@ public final class TimeseriesStore<E> {
          * @return
          */
         private OnHeap restore(long time) {
-            File file = name(time);
+            Path file = file(time);
 
-            if (file.isAbsent()) {
+            if (!Files.exists(file)) {
                 return null;
             }
 
-            OnHeap heap = new OnHeap();
+            OnHeap heap = new OnHeap(time);
 
-            try (FileChannel ch = FileChannel.open(file.asJavaPath(), READ)) {
+            try (FileChannel ch = FileChannel.open(file, READ)) {
                 ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
                 for (int i = 0; i < length; i++) {
                     ch.read(buffer);
@@ -952,8 +1001,8 @@ public final class TimeseriesStore<E> {
          * @param time
          * @return
          */
-        private File name(long time) {
-            return root.directory(span.name()).file(FileName.format(Chrono.utcBySeconds(time)) + ".log");
+        private Path file(long time) {
+            return directory.resolve(FileName.format(Chrono.utcBySeconds(time)) + ".db");
         }
     }
 
