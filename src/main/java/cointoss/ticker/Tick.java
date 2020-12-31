@@ -11,10 +11,11 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 
+import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 
-public final class Tick {
+public final class Tick implements TimeseriesData {
 
     /** The empty dummy. */
     static final Tick EMPTY = new Tick();
@@ -76,12 +77,19 @@ public final class Tick {
     }
 
     /**
-     * Retrieve the start time of this {@link Tick}.
-     * 
-     * @return The start time.
+     * {@inheritDoc}
      */
-    public ZonedDateTime openTime() {
+    @Override
+    public ZonedDateTime date() {
         return Chrono.utcByMills(openTime * 1000);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long epochSeconds() {
+        return openTime;
     }
 
     /**
@@ -284,7 +292,7 @@ public final class Tick {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("TICK ").append(" ")
-                .append(Chrono.format(openTime()))
+                .append(Chrono.format(date()))
                 .append(" ")
                 .append(openPrice)
                 .append(" ")

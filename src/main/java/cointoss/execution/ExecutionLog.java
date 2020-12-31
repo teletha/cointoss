@@ -715,7 +715,10 @@ public class ExecutionLog {
                         .scanWith(Market.BASE, logger::decode)
                         .effectOnComplete(parser::stopParsing)
                         .effectOnObserve(stopwatch::start)
-                        .effectOnError(e -> log.error("Fail to read compact log. [" + compact + "]"))
+                        .effectOnError(e -> {
+                            log.error("Fail to read compact log and delete it. [" + compact + "]");
+                            compact.delete();
+                        })
                         .effectOnComplete(() -> {
                             log.trace("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                         });
@@ -997,7 +1000,7 @@ public class ExecutionLog {
                             Execution e = Execution.with.direction(sides[i], sizes[i])
                                     .price(prices[i])
                                     .id(fastID.getAndIncrement())
-                                    .date(tick.openTime().plusSeconds(i))
+                                    .date(tick.date().plusSeconds(i))
                                     .consecutive(Execution.ConsecutiveDifference)
                                     .delay(Execution.DelayInestimable);
 
