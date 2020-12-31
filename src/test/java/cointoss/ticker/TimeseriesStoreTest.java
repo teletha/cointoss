@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
+import cointoss.Currency;
+import cointoss.MarketType;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
@@ -551,10 +553,9 @@ class TimeseriesStoreTest {
     @Test
     void readDataFromDiskCache() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir, true);
 
         store.store(value(0));
-        store.persist();
         store.clear();
         assert store.existOnHeap(value(0)) == false;
         assert store.at(0).value == 0;
@@ -562,14 +563,106 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void zonedDateTime() {
+    void supportPrimitiveTypes() {
+        Primitive primitive = new Primitive();
+        primitive.intValue = 1;
+        primitive.longValue = -2;
+        primitive.floatValue = 3.3f;
+        primitive.doubleValue = -0.4;
+        primitive.booleanValue = true;
+        primitive.charValue = 'c';
+        primitive.byteValue = 2;
+        primitive.shortValue = 3;
+
+        TimeseriesStore<Primitive> store = TimeseriesStore.create(Primitive.class, Span.Second5).enableDiskStore(room.locateRadom(), true);
+        store.store(primitive);
+        store.clear();
+
+        Primitive restored = store.at(primitive.intValue);
+        assert restored != null;
+        assert restored.intValue == primitive.intValue;
+        assert restored.longValue == primitive.longValue;
+        assert restored.floatValue == primitive.floatValue;
+        assert restored.doubleValue == primitive.doubleValue;
+        assert restored.booleanValue == primitive.booleanValue;
+        assert restored.charValue == primitive.charValue;
+        assert restored.byteValue == primitive.byteValue;
+        assert restored.shortValue == primitive.shortValue;
+    }
+
+    private static class Primitive implements TimeseriesData {
+        public int intValue;
+
+        public long longValue;
+
+        public float floatValue;
+
+        public double doubleValue;
+
+        public boolean booleanValue;
+
+        public char charValue;
+
+        public short shortValue;
+
+        public byte byteValue;
+
+        @Override
+        public ZonedDateTime date() {
+            return Chrono.utcBySeconds(intValue);
+        }
+    }
+
+    @Test
+    void supportEnum() {
+        Enums e = new Enums();
+        e.type = MarketType.DERIVATIVE;
+        e.currency = Currency.BTC;
+
+        TimeseriesStore<Enums> store = TimeseriesStore.create(Enums.class, Span.Second5).enableDiskStore(room.locateRadom(), true);
+        store.store(e);
+        store.clear();
+
+        Enums restored = store.at(e.epochSeconds());
+        assert restored != null;
+        assert restored.type == e.type;
+        assert restored.currency == e.currency;
+    }
+
+    private static class Enums implements TimeseriesData {
+        public MarketType type;
+
+        public Currency currency;
+
+        @Override
+        public ZonedDateTime date() {
+            return Chrono.utc(2020, 1, 1);
+        }
+    }
+
+    @Test
+    void supportZonedDateTime() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Second5).enableDiskStore(dir);
+        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Second5).enableDiskStore(dir, true);
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
-        store.persist();
         store.clear();
 
         assert store.at(oi.epochSeconds()).equals(oi);
+    }
+
+    @Test
+    void storeSparsedDisk() {
+        Directory dir = Locator.directory(room.locateRadom());
+        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Day1).enableDiskStore(dir, true);
+        OpenInterest oi1 = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
+        OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
+        OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);
+        store.store(oi1, oi2, oi3);
+        store.clear();
+
+        assert store.at(oi1.epochSeconds()).equals(oi1);
+        assert store.at(oi2.epochSeconds()).equals(oi2);
+        assert store.at(oi3.epochSeconds()).equals(oi3);
     }
 }

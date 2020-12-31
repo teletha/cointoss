@@ -20,12 +20,12 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
@@ -52,7 +52,8 @@ public final class TimeseriesStore<E> {
 
     private static final DateTimeFormatter FileName = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
 
-    private static final Map<Model, Definition> definitions = new HashMap();
+    /** The table definitions. */
+    private static final Map<Model, Definition> definitions = new ConcurrentHashMap();
 
     /** The item type. */
     private final Model<E> model;
@@ -977,7 +978,7 @@ public final class TimeseriesStore<E> {
 
             OnHeap heap = new OnHeap(time);
 
-            try (FileChannel ch = FileChannel.open(file, READ); FileLock lock = ch.tryLock()) {
+            try (FileChannel ch = FileChannel.open(file, READ, WRITE); FileLock lock = ch.tryLock()) {
                 if (lock != null) {
                     ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
                     for (int i = 0; i < length; i++) {
