@@ -14,6 +14,7 @@ import static java.nio.file.StandardOpenOption.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -914,14 +915,16 @@ public final class TimeseriesStore<E> {
                 return;
             }
 
-            try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE)) {
-                ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
-                ch.position(index * definition.widthTotal);
+            try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE); FileLock lock = ch.tryLock()) {
+                if (lock != null) {
+                    ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                    ch.position(index * definition.widthTotal);
 
-                for (int k = 0; k < definition.width.length; k++) {
-                    definition.writers[k].accept(item, buffer);
+                    for (int k = 0; k < definition.width.length; k++) {
+                        definition.writers[k].accept(item, buffer);
+                    }
+                    ch.write(buffer.flip());
                 }
-                ch.write(buffer.flip());
             } catch (IOException e) {
                 throw I.quiet(e);
             }
@@ -935,26 +938,27 @@ public final class TimeseriesStore<E> {
          */
         private void store(long time, OnHeap segment) {
             if (!segment.sync) {
-                try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE)) {
-                    ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
-                    for (int i = 0; i < length; i++) {
-                        E item = segment.items[i];
-                        if (item != null) {
-                            ch.position(i * definition.widthTotal);
+                try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE); FileLock lock = ch.tryLock()) {
+                    if (lock != null) {
+                        ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                        for (int i = 0; i < length; i++) {
+                            E item = segment.items[i];
+                            if (item != null) {
+                                ch.position(i * definition.widthTotal);
 
-                            for (int k = 0; k < definition.width.length; k++) {
-                                definition.writers[k].accept(item, buffer);
+                                for (int k = 0; k < definition.width.length; k++) {
+                                    definition.writers[k].accept(item, buffer);
+                                }
+                                buffer.flip();
+                                ch.write(buffer);
+                                buffer.flip();
                             }
-                            buffer.flip();
-                            ch.write(buffer);
-                            buffer.flip();
                         }
+                        segment.sync = true;
                     }
                 } catch (IOException e) {
                     throw I.quiet(e);
                 }
-
-                segment.sync = true;
             }
         }
 
@@ -973,25 +977,26 @@ public final class TimeseriesStore<E> {
 
             OnHeap heap = new OnHeap(time);
 
-            try (FileChannel ch = FileChannel.open(file, READ)) {
-                ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
-                for (int i = 0; i < length; i++) {
-                    ch.read(buffer);
-                    buffer.flip();
-                    if (buffer.limit() != 0) {
-                        E item = I.make(model.type);
-                        for (int k = 0; k < definition.width.length; k++) {
-                            definition.readers[k].accept(item, buffer);
-                        }
-                        heap.items[i] = item;
+            try (FileChannel ch = FileChannel.open(file, READ); FileLock lock = ch.tryLock()) {
+                if (lock != null) {
+                    ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                    for (int i = 0; i < length; i++) {
+                        ch.read(buffer);
                         buffer.flip();
+                        if (buffer.limit() != 0) {
+                            E item = I.make(model.type);
+                            for (int k = 0; k < definition.width.length; k++) {
+                                definition.readers[k].accept(item, buffer);
+                            }
+                            heap.items[i] = item;
+                            buffer.flip();
+                        }
                     }
+                    heap.sync = true;
                 }
             } catch (IOException e) {
                 throw I.quiet(e);
             }
-
-            heap.sync = true;
             return heap;
         }
 

@@ -509,10 +509,21 @@ class TimeseriesStoreTest {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir);
         File cache = dir.file("Second5/1970-01-01 00.db");
+
+        store.store(value(0));
+        assert cache.isAbsent();
+        store.persist();
+        assert cache.isPresent();
+    }
+
+    @Test
+    void persistAutoSync() {
+        Directory dir = Locator.directory(room.locateRadom());
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir, true);
+        File cache = dir.file("Second5/1970-01-01 00.db");
         assert cache.isAbsent();
 
         store.store(value(0));
-        store.persist();
         assert cache.isPresent();
     }
 
