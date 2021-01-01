@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -655,7 +655,6 @@ public class ExecutionLog {
 
             if (existCompact()) {
                 if (type == LogType.Fast) {
-                    convertCompactToFast();
                     return readFast();
                 } else {
                     return readCompact();
@@ -735,14 +734,23 @@ public class ExecutionLog {
             File fast = fastLog();
 
             try {
-                return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
-                        .scanWith(Market.BASE, logger::decode)
-                        .effectOnComplete(parser::stopParsing)
-                        .effectOnObserve(stopwatch::start)
-                        .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
-                        .effectOnComplete(() -> {
-                            log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
-                        });
+                if (!existFast()) {
+                    return this.writeFast(readCompact().plug(new FastLog(service.setting.target.scale)))
+                            .effectOnObserve(stopwatch::start)
+                            .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
+                            .effectOnComplete(() -> {
+                                log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                            });
+                } else {
+                    return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
+                            .scanWith(Market.BASE, logger::decode)
+                            .effectOnComplete(parser::stopParsing)
+                            .effectOnObserve(stopwatch::start)
+                            .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
+                            .effectOnComplete(() -> {
+                                log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                            });
+                }
             } catch (IOException e) {
                 throw I.quiet(e);
             }
@@ -888,6 +896,29 @@ public class ExecutionLog {
                 }).effectOnComplete(() -> {
                     writer.close();
                     repository.updateLocal(date);
+                });
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * Write the execution log to the fast log.
+         * 
+         * @param executions A stream of executions to write.
+         * @return Wrapped {@link Signal}.
+         */
+        Signal<Execution> writeFast(Signal<Execution> executions) {
+            File fast = fastLog();
+
+            try {
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
+
+                return executions.maps(Market.BASE, (prev, e) -> {
+                    writer.writeRow(logger.encode(prev, e));
+                    return e;
+                }).effectOnComplete(() -> {
+                    writer.close();
                 });
             } catch (IOException e) {
                 throw I.quiet(e);
