@@ -359,7 +359,6 @@ public abstract class EfficientWebSocketModel {
      * Disconnect websocket connection and send error message to all channels.
      */
     private void error(Throwable e) {
-        System.out.println("Erorr da " + e);
         disconnect(e.getMessage(), e);
         signals.values().forEach(signal -> signal.error(e));
     }
@@ -414,12 +413,12 @@ public abstract class EfficientWebSocketModel {
                 }
             }
 
-            // ping in Socket.IO
+            // ping -pong in Socket.IO
             if (socketIO) {
                 String value = json.text("pingInterval");
                 if (value != null) {
-                    long interval = Long.parseLong(value) - 1000; // safety
-                    cleanup.add(I.schedule(interval, interval, MILLISECONDS, true).to(() -> connection.v.sendText("2", true)));
+                    cleanup.add(I.schedule(10000, Long.parseLong(value) - 7000 /* Safety */, MILLISECONDS, true)
+                            .to(() -> connection.v.sendText("2", true)));
                     return;
                 }
             }

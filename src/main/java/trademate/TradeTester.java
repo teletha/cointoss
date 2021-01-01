@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.gmo.GMO;
+import cointoss.market.bitbank.Bitbank;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -60,7 +60,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = GMO.BTC;
+        MarketService service = Bitbank.BTC_JPY;
         UITab tab = DockSystem.register(service.id())
                 .closable(false)
                 .text(service.marketReadableName)
@@ -68,29 +68,29 @@ public class TradeTester extends View {
 
         tab.load();
 
-        MarketService service2 = GMO.ETH;
-        tab = DockSystem.register(service2.id())
-                .closable(false)
-                .text(service2.marketReadableName)
-                .contents(ui -> new TradingView(ui, service2));
-
-        tab.load();
-
-        MarketService service3 = GMO.LTC;
-        tab = DockSystem.register(service3.id())
-                .closable(false)
-                .text(service3.marketReadableName)
-                .contents(ui -> new TradingView(ui, service3));
-
-        tab.load();
-
-        MarketService service4 = GMO.XRP;
-        tab = DockSystem.register(service4.id())
-                .closable(false)
-                .text(service4.marketReadableName)
-                .contents(ui -> new TradingView(ui, service4));
-
-        tab.load();
+        // MarketService service2 = GMO.ETH;
+        // tab = DockSystem.register(service2.id())
+        // .closable(false)
+        // .text(service2.marketReadableName)
+        // .contents(ui -> new TradingView(ui, service2));
+        //
+        // tab.load();
+        //
+        // MarketService service3 = GMO.LTC;
+        // tab = DockSystem.register(service3.id())
+        // .closable(false)
+        // .text(service3.marketReadableName)
+        // .contents(ui -> new TradingView(ui, service3));
+        //
+        // tab.load();
+        //
+        // MarketService service4 = GMO.XRP;
+        // tab = DockSystem.register(service4.id())
+        // .closable(false)
+        // .text(service4.marketReadableName)
+        // .contents(ui -> new TradingView(ui, service4));
+        //
+        // tab.load();
         //
         // MarketService service5 = Bitbank.XLM_JPY;
         // tab = DockSystem.register(service5.id())
