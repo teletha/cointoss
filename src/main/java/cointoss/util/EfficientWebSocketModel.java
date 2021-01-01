@@ -199,7 +199,7 @@ public abstract class EfficientWebSocketModel {
      */
     public EfficientWebSocket enableDebug() {
         this.debug = true;
-        Configurator.setRootLevel(Level.TRACE);
+        Configurator.setLevel(logger.getName(), Level.TRACE);
         return (EfficientWebSocket) this;
     }
 
@@ -262,11 +262,13 @@ public abstract class EfficientWebSocketModel {
 
                             if (socketIO) {
                                 // 42["join-room","transactions_btc_jpy"]
-                                ws.sendText("42[\"join-room\",\"" + topic.id + "\"]", true);
+                                String command = "42[\"join-room\",\"" + topic.id + "\"]";
+                                ws.sendText(command, true);
+                                logger.trace("Sent websocket command {} to {}. @{}", command, address(), count);
                             } else {
                                 ws.sendText(I.write(topic), true);
+                                logger.trace("Sent websocket command {} to {}. @{}", topic, address(), count);
                             }
-                            logger.trace("Sent websocket command {} to {}. @{}", topic, address(), count);
 
                             if (noReplyMode) {
                                 subscribed.add(topic);
@@ -357,6 +359,7 @@ public abstract class EfficientWebSocketModel {
      * Disconnect websocket connection and send error message to all channels.
      */
     private void error(Throwable e) {
+        System.out.println("Erorr da " + e);
         disconnect(e.getMessage(), e);
         signals.values().forEach(signal -> signal.error(e));
     }

@@ -9,7 +9,7 @@
  */
 package cointoss.market.gmo;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -55,7 +55,7 @@ public class GMOService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(100, MILLISECONDS);
+    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(250, MILLISECONDS);
 
     /** The API limit. */
     private static final APILimiter REPOSITORY_LIMITER = APILimiter.with.limit(2).refresh(100, MILLISECONDS);
@@ -63,7 +63,7 @@ public class GMOService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
             .extractId(json -> json.text("channel") + "." + json.text("symbol"))
-            .restrict(APILimiter.with.limit(1).refresh(2, SECONDS))
+            .restrict(APILimiter.with.limit(1).refresh(1250, MILLISECONDS))
             .noServerReply();
 
     /**
@@ -200,7 +200,7 @@ public class GMOService extends MarketService {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path)).timeout(Duration.ofSeconds(60));
         return Network.rest(builder, LIMITER, client()).flatMap(json -> {
             if (json.get(int.class, "status") != 0) {
-                return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string")));
+                return I.signalError(new IllegalAccessError(json.get("messages").get("0").text("message_string") + " [" + path + "]"));
             } else {
                 return I.signal(json);
             }
