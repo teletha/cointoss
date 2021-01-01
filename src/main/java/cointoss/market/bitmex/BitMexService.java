@@ -140,7 +140,17 @@ public class BitMexService extends MarketService {
      */
     @Override
     public Signal<Execution> searchInitialExecution() {
-        return call("GET", "trade?symbol=" + marketName + "&reverse=false&count=1").flatIterable(e -> e.find("*"))
+        return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=false").flatIterable(e -> e.find("*"))
+                .map(json -> convert(json, new long[3]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> searchNearestExecution(ZonedDateTime target) {
+        return call("GET", "trade?symbol=" + marketName + "&reverse=true&count=1&endTime=" + RealTimeFormat.format(target))
+                .flatIterable(e -> e.find("$"))
                 .map(json -> convert(json, new long[3]));
     }
 
@@ -250,7 +260,7 @@ public class BitMexService extends MarketService {
                 });
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void mai2n(String[] args) throws InterruptedException {
         double[] volume = new double[3];
         double[] previousOISize = {0};
 
