@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -254,26 +253,26 @@ public abstract class EfficientWebSocketModel {
 
         connection.observing().skipNull().first().to(ws -> {
             if (subscribing.add(topic)) {
-                cleanup.add(I.schedule(0, 2, TimeUnit.SECONDS, true, scheduler())
-                        .takeWhile(count -> connection.isPresent())
-                        .takeWhile(count -> !subscribed.contains(topic))
-                        .to(count -> {
-                            limit.acquire();
+                // cleanup.add(I.schedule(0, 15, TimeUnit.SECONDS, true, scheduler())
+                // .takeWhile(count -> connection.isPresent())
+                // .takeWhile(count -> !subscribed.contains(topic))
+                // .to(count -> {
+                limit.acquire();
 
-                            if (socketIO) {
-                                // 42["join-room","transactions_btc_jpy"]
-                                String command = "42[\"join-room\",\"" + topic.id + "\"]";
-                                ws.sendText(command, true);
-                                logger.trace("Sent websocket command {} to {}. @{}", command, address(), count);
-                            } else {
-                                ws.sendText(I.write(topic), true);
-                                logger.trace("Sent websocket command {} to {}. @{}", topic, address(), count);
-                            }
+                if (socketIO) {
+                    // 42["join-room","transactions_btc_jpy"]
+                    String command = "42[\"join-room\",\"" + topic.id + "\"]";
+                    ws.sendText(command, true);
+                    logger.trace("Sent websocket command {} to {}. @{}", command, address());
+                } else {
+                    ws.sendText(I.write(topic), true);
+                    logger.info("Sent websocket command {} to {}. @{}", topic, address());
+                }
 
-                            if (noReplyMode) {
-                                subscribed.add(topic);
-                            }
-                        }));
+                if (noReplyMode) {
+                    subscribed.add(topic);
+                }
+                // }));
             }
         });
     }

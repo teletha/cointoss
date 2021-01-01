@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.bitbank.Bitbank;
+import cointoss.market.bitmex.BitMex;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -60,7 +60,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = Bitbank.BTC_JPY;
+        MarketService service = BitMex.XBT_USD;
         UITab tab = DockSystem.register(service.id())
                 .closable(false)
                 .text(service.marketReadableName)

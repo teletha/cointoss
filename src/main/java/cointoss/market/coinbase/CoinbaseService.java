@@ -45,7 +45,8 @@ public class CoinbaseService extends MarketService {
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws-feed.pro.coinbase.com")
-            .extractId(json -> json.text("type") + ":" + json.text("product_id"));
+            .extractId(json -> json.text("type") + ":" + json.text("product_id"))
+            .ignoreMessageIf(json -> json.has("type", "snapshot"));
 
     /**
      * @param marketName

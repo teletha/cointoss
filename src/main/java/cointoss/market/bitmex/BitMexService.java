@@ -52,7 +52,8 @@ public class BitMexService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://www.bitmex.com/realtime")
             .extractId(json -> json.text("table") + json.find(String.class, "data", "0", "symbol"))
-            .ignoreMessageIf(json -> json.has("info", "Welcome to the BitMEX Realtime API."));
+            .ignoreMessageIf(json -> json.has("info", "Welcome to the BitMEX Realtime API.") //
+                    || (json.has("table", "liquidation") && json.has("action", "partial")));
 
     /** The market id. */
     private final int marketId;
