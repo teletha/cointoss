@@ -9,8 +9,6 @@
  */
 package cointoss.ticker;
 
-import java.time.ZonedDateTime;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.execution.Execution;
@@ -59,18 +57,6 @@ public final class TickerManager implements Disposable {
                 ticker.uppers[index++] = this.tickers[upper];
             }
         }
-    }
-
-    /**
-     * Disable the automatic memory saving.
-     * 
-     * @return Chainable API.
-     */
-    public TickerManager disableMemorySaving() {
-        for (Ticker ticker : tickers) {
-            ticker.ticks.disableMemorySaving();
-        }
-        return this;
     }
 
     /**
