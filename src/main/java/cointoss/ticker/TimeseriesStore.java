@@ -12,6 +12,7 @@ package cointoss.ticker;
 import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -24,13 +25,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
-import java.util.function.ToLongFunction;
 import java.util.stream.IntStream;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -48,7 +47,7 @@ import kiss.model.Model;
 import kiss.model.Property;
 import psychopath.Directory;
 
-public final class TimeseriesStore<E> {
+public final class TimeseriesStore<E extends TimeseriesData> {
 
     private static final DateTimeFormatter FileName = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
 
@@ -58,14 +57,17 @@ public final class TimeseriesStore<E> {
     /** The item type. */
     private final Model<E> model;
 
-    /** The span. */
-    private final Span span;
+    /** The duration of item. */
+    private final long itemDuration;
 
-    /** The item length. */
-    private final int length;
+    /** The size of item. */
+    private final int itemSize;
 
-    /** The key extractor. */
-    private final ToLongFunction<E> timestampExtractor;
+    /** The duration of segmenet. */
+    private final long segmentDuration;
+
+    /** The size of segment. */
+    private final int segmentSize;
 
     /** The completed data manager. */
     private final ConcurrentNavigableLongMap<OnHeap> indexed = LongMap.createSortedMap();
@@ -84,7 +86,7 @@ public final class TimeseriesStore<E> {
 
         @Override
         protected boolean removeEldestEntry(Entry<Long, OnHeap> eldest) {
-            if (shrink && span.segmentSize < size()) {
+            if (shrink && segmentSize < size()) {
                 long time = eldest.getKey();
                 OnHeap segment = eldest.getValue();
 
@@ -112,17 +114,30 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public static <E extends TimeseriesData> TimeseriesStore<E> create(Class<E> type, Span span) {
-        return new TimeseriesStore<E>(span, type, E::epochSeconds);
+        return new TimeseriesStore<E>(type, span.seconds, (int) (span.segmentSeconds / span.seconds), span.segmentSize);
+    }
+    
+    /**
+     * Create the store for timeseries data.
+     * 
+     * @param <E>
+     * @param type
+     * @param span
+     * @return
+     */
+    public static <E extends TimeseriesData> TimeseriesStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
+        return new TimeseriesStore<E>(type, itemDuration, itemSize, segmentSize);
     }
 
     /**
      * 
      */
-    private TimeseriesStore(Span span, Class<E> type, ToLongFunction<E> timestampExtractor) {
+    private TimeseriesStore(Class<E> type, long itemDuration, int itemSize, int SegmentSize) {
         this.model = Model.of(type);
-        this.span = Objects.requireNonNull(span);
-        this.length = (int) (span.segmentSeconds / span.seconds);
-        this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
+        this.itemDuration = itemDuration;
+        this.itemSize = itemSize;
+        this.segmentDuration = itemDuration * itemSize;
+        this.segmentSize = SegmentSize;
     }
 
     /**
@@ -244,8 +259,8 @@ public final class TimeseriesStore<E> {
      */
     @VisibleForTesting
     long[] index(long timestamp) {
-        long remainder = timestamp % span.segmentSeconds;
-        return new long[] {timestamp - remainder, remainder / span.seconds};
+        long remainder = timestamp % segmentDuration;
+        return new long[] {timestamp - remainder, remainder / itemDuration};
     }
 
     /**
@@ -281,7 +296,7 @@ public final class TimeseriesStore<E> {
      * @param item Time series items to store.
      */
     public void store(E item) {
-        long[] index = index(timestampExtractor.applyAsLong(item));
+        long[] index = index(item.epochSeconds());
 
         OnHeap segment = supply(index[0]);
 
@@ -388,7 +403,7 @@ public final class TimeseriesStore<E> {
      * @param each An item processor.
      */
     public void each(E start, E end, Consumer<? super E> each) {
-        each(timestampExtractor.applyAsLong(start), timestampExtractor.applyAsLong(end), each);
+        each(start.epochSeconds(), end.epochSeconds(), each);
     }
 
     /**
@@ -417,7 +432,7 @@ public final class TimeseriesStore<E> {
                 if (disposer.isDisposed()) {
                     break;
                 }
-                segment.each(0, length, observer, disposer);
+                segment.each(0, itemSize, observer, disposer);
             }
             observer.complete();
             return disposer;
@@ -438,7 +453,7 @@ public final class TimeseriesStore<E> {
                 if (disposer.isDisposed()) {
                     break;
                 }
-                segment.eachLatest(length, 0, observer, disposer);
+                segment.eachLatest(itemSize, 0, observer, disposer);
             }
             observer.complete();
             return disposer;
@@ -454,7 +469,7 @@ public final class TimeseriesStore<E> {
      * @return An item stream.
      */
     public Signal<E> each(E start, E end) {
-        return each(timestampExtractor.applyAsLong(start), timestampExtractor.applyAsLong(end));
+        return each(start.epochSeconds(), end.epochSeconds());
     }
 
     /**
@@ -466,7 +481,7 @@ public final class TimeseriesStore<E> {
      * @return An item stream.
      */
     public Signal<E> eachInside(E start, E end) {
-        return each(timestampExtractor.applyAsLong(start) + span.seconds, timestampExtractor.applyAsLong(end) - span.seconds);
+        return each(start.epochSeconds() + itemDuration, end.epochSeconds() - itemDuration);
     }
 
     /**
@@ -494,7 +509,7 @@ public final class TimeseriesStore<E> {
                     }
                     long time = entry.getLongKey();
                     int startItemIndex = 0;
-                    int endItemIndex = length;
+                    int endItemIndex = itemSize;
 
                     if (time == startIndex[0]) {
                         startItemIndex = (int) startIndex[1];
@@ -529,7 +544,7 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public E before(E item) {
-        return before(timestampExtractor.applyAsLong(item));
+        return before(item.epochSeconds());
     }
 
     /**
@@ -539,7 +554,7 @@ public final class TimeseriesStore<E> {
      * @return A matched item or null.
      */
     public E before(E item, Predicate<E> condition) {
-        return before(timestampExtractor.applyAsLong(item), condition);
+        return before(item.epochSeconds(), condition);
     }
 
     /**
@@ -549,7 +564,7 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public E before(long timestamp) {
-        return at(timestamp - span.seconds);
+        return at(timestamp - itemDuration);
     }
 
     /**
@@ -560,7 +575,7 @@ public final class TimeseriesStore<E> {
      */
     public E before(long timestamp, Predicate<E> condition) {
         for (int i = 1; i < Integer.MAX_VALUE; i++) {
-            E item = at(timestamp - span.seconds * i);
+            E item = at(timestamp - itemDuration * i);
 
             if (item == null) {
                 break;
@@ -580,7 +595,7 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public List<E> beforeUntil(E item, int maximumSize) {
-        return beforeUntil(timestampExtractor.applyAsLong(item), maximumSize);
+        return beforeUntil(item.epochSeconds(), maximumSize);
     }
 
     /**
@@ -600,7 +615,7 @@ public final class TimeseriesStore<E> {
      * @return
      */
     public List<E> beforeUntilWith(E item, int maximumSize) {
-        return beforeUntilWith(timestampExtractor.applyAsLong(item), maximumSize);
+        return beforeUntilWith(item.epochSeconds(), maximumSize);
     }
 
     /**
@@ -640,13 +655,13 @@ public final class TimeseriesStore<E> {
 
         while (items.size() < maximumSize) {
             if (--segmentIndex == -1) {
-                timeIndex -= span.segmentSeconds;
+                timeIndex -= segmentDuration;
                 segment = supply(timeIndex);
 
                 if (segment == null) {
                     break;
                 } else {
-                    segmentIndex = length - 1;
+                    segmentIndex = itemSize - 1;
                 }
             }
 
@@ -688,13 +703,13 @@ public final class TimeseriesStore<E> {
         if (supplier != null) {
             Signal<E> supply = supplier.apply(startTime);
             if (supply != null) {
-                long endTime = startTime + span.segmentSeconds;
+                long endTime = startTime + segmentDuration;
 
                 OnHeap heap = new OnHeap(startTime);
                 indexed.put(startTime, heap);
                 stats.put(startTime, heap);
                 supply.to(item -> {
-                    long timestamp = timestampExtractor.applyAsLong(item);
+                    long timestamp = item.epochSeconds();
                     if (startTime <= timestamp && timestamp < endTime) {
                         heap.set((int) index(timestamp)[1], item);
                     }
@@ -727,7 +742,7 @@ public final class TimeseriesStore<E> {
      */
     @VisibleForTesting
     boolean existOnHeap(E item) {
-        long[] index = index(timestampExtractor.applyAsLong(item));
+        long[] index = index(item.epochSeconds());
         OnHeap segment = indexed.get(index[0]);
         if (segment == null) {
             return false;
@@ -744,7 +759,7 @@ public final class TimeseriesStore<E> {
         private final long startTime;
 
         /** The managed items. */
-        private E[] items = (E[]) new Object[length];
+        private E[] items = (E[]) Array.newInstance(model.type, itemSize);
 
         /** The first item index. */
         private int min = Integer.MAX_VALUE;
@@ -898,7 +913,7 @@ public final class TimeseriesStore<E> {
          */
         private OnDisk(Path root) {
             try {
-                this.directory = root.resolve(span.name());
+                this.directory = root.resolve(itemDuration + "s");
                 Files.createDirectories(directory);
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -942,7 +957,7 @@ public final class TimeseriesStore<E> {
                 try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE); FileLock lock = ch.tryLock()) {
                     if (lock != null) {
                         ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
-                        for (int i = 0; i < length; i++) {
+                        for (int i = 0; i < itemSize; i++) {
                             E item = segment.items[i];
                             if (item != null) {
                                 ch.position(i * definition.widthTotal);
@@ -981,7 +996,7 @@ public final class TimeseriesStore<E> {
             try (FileChannel ch = FileChannel.open(file, READ, WRITE); FileLock lock = ch.tryLock()) {
                 if (lock != null) {
                     ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
-                    for (int i = 0; i < length; i++) {
+                    for (int i = 0; i < itemSize; i++) {
                         ch.read(buffer);
                         buffer.flip();
                         if (buffer.limit() != 0) {

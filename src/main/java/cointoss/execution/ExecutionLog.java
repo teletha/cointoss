@@ -59,6 +59,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
+import cointoss.market.MarketServiceProvider;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -1259,6 +1260,9 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-
+        I.load(Market.class);
+        MarketServiceProvider.availableMarketServices().to(e -> {
+            e.log.clearFastCache();
+        });
     }
 }
