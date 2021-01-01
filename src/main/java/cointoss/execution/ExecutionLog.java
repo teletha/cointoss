@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,7 +39,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -60,9 +59,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
-import cointoss.ticker.Span;
-import cointoss.ticker.Ticker;
-import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
@@ -967,47 +963,11 @@ public class ExecutionLog {
 
             if (!existFast() && existCompact()) {
                 try {
-                    int scale = service.setting.target.scale;
-                    AtomicLong fastID = new AtomicLong();
-                    TickerManager manager = new TickerManager().disableMemorySaving();
-                    readCompact().effect(e -> fastID.set(e.id)).to(manager::update);
-                    fastID.updateAndGet(v -> v - 69120 /* 4x12x60x24 */);
-                    Ticker ticker = manager.on(Span.Second5);
                     Execution[] prev = {Market.BASE};
-
                     CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
-                    ticker.ticks.each(tick -> {
-                        Num buy = Num.of(tick.longVolume()).scale(scale).divide(2);
-                        Num sell = Num.of(tick.shortVolume()).scale(scale).divide(2);
-                        Direction buySide = Direction.BUY;
-                        Direction sellSide = Direction.SELL;
-
-                        if (buy.isZero()) {
-                            if (sell.isZero()) return;
-                            buy = sell = sell.divide(2);
-                            buySide = sellSide;
-                        } else if (sell.isZero()) {
-                            buy = sell = buy.divide(2);
-                            sellSide = buySide;
-                        }
-
-                        Direction[] sides = tick.isBull() ? new Direction[] {sellSide, buySide, sellSide, buySide}
-                                : new Direction[] {buySide, sellSide, buySide, sellSide};
-                        Num[] sizes = tick.isBull() ? new Num[] {sell, buy, sell, buy} : new Num[] {buy, sell, buy, sell};
-                        Num[] prices = tick.isBull() ? new Num[] {tick.openPrice, tick.lowPrice(), tick.highPrice(), tick.closePrice()}
-                                : new Num[] {tick.openPrice, tick.highPrice(), tick.lowPrice(), tick.closePrice()};
-
-                        for (int i = 0; i < prices.length; i++) {
-                            Execution e = Execution.with.direction(sides[i], sizes[i])
-                                    .price(prices[i])
-                                    .id(fastID.getAndIncrement())
-                                    .date(tick.date().plusSeconds(i))
-                                    .consecutive(Execution.ConsecutiveDifference)
-                                    .delay(Execution.DelayInestimable);
-
-                            writer.writeRow(logger.encode(prev[0], e));
-                            prev[0] = e;
-                        }
+                    readCompact().plug(new FastLog(service.setting.target.scale)).to(e -> {
+                        writer.writeRow(logger.encode(prev[0], e));
+                        prev[0] = e;
                     });
                     writer.close();
                 } catch (Throwable e) {
@@ -1259,7 +1219,7 @@ public class ExecutionLog {
         cache.convertCompactToNormal();
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         I.load(Market.class);
         MarketServiceProvider.availableMarketServices().to(e -> {
             e.log.clearFastCache();
