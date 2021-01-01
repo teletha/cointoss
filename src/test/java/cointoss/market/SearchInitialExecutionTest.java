@@ -10,6 +10,8 @@
 package cointoss.market;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import cointoss.market.binance.Binance;
 import cointoss.market.bitfinex.Bitfinex;
@@ -18,6 +20,7 @@ import cointoss.market.bybit.Bybit;
 import cointoss.market.coinbase.Coinbase;
 import cointoss.market.ftx.FTX;
 
+@Execution(ExecutionMode.SAME_THREAD)
 class SearchInitialExecutionTest {
 
     @Test

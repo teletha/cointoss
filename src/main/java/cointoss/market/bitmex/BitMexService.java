@@ -136,6 +136,15 @@ public class BitMexService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> searchInitialExecution() {
+        return call("GET", "trade?symbol=" + marketName + "&reverse=false&count=1").flatIterable(e -> e.find("*"))
+                .map(json -> convert(json, new long[3]));
+    }
+
+    /**
      * Convert to {@link Execution}.
      * 
      * @param json

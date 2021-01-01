@@ -106,6 +106,15 @@ public class CoinbaseService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> searchInitialExecution() {
+        return call("GET", "products/" + marketName + "/trades?after=2").flatIterable(e -> e.find("*"))
+                .map(json -> createExecution(json, false, new long[3]));
+    }
+
+    /**
      * Convert to {@link Execution}.
      * 
      * @param json
