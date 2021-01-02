@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.ConnectException;
 import java.net.http.HttpClient;
@@ -253,26 +253,26 @@ public abstract class EfficientWebSocketModel {
 
         connection.observing().skipNull().first().to(ws -> {
             if (subscribing.add(topic)) {
-                // cleanup.add(I.schedule(0, 15, TimeUnit.SECONDS, true, scheduler())
-                // .takeWhile(count -> connection.isPresent())
-                // .takeWhile(count -> !subscribed.contains(topic))
-                // .to(count -> {
-                limit.acquire();
+                cleanup.add(I.schedule(0, 10, SECONDS, true, scheduler())
+                        .takeWhile(count -> connection.isPresent())
+                        .takeWhile(count -> !subscribed.contains(topic))
+                        .to(count -> {
+                            limit.acquire();
 
-                if (socketIO) {
-                    // 42["join-room","transactions_btc_jpy"]
-                    String command = "42[\"join-room\",\"" + topic.id + "\"]";
-                    ws.sendText(command, true);
-                    logger.trace("Sent websocket command {} to {}. @{}", command, address());
-                } else {
-                    ws.sendText(I.write(topic), true);
-                    logger.info("Sent websocket command {} to {}. @{}", topic, address());
-                }
+                            if (socketIO) {
+                                // 42["join-room","transactions_btc_jpy"]
+                                String command = "42[\"join-room\",\"" + topic.id + "\"]";
+                                ws.sendText(command, true);
+                                logger.trace("Sent websocket command {} to {}. @{}", command, address(), count);
+                            } else {
+                                ws.sendText(I.write(topic), true);
+                                logger.trace("Sent websocket command {} to {}. @{}", topic, address(), count);
+                            }
 
-                if (noReplyMode) {
-                    subscribed.add(topic);
-                }
-                // }));
+                            if (noReplyMode) {
+                                subscribed.add(topic);
+                            }
+                        }));
             }
         });
     }
@@ -390,6 +390,7 @@ public abstract class EfficientWebSocketModel {
             for (IdentifiableTopic topic : subscribing) {
                 if (topic.verifySubscribedReply(json)) {
                     subscribed.add(topic);
+                    subscribing.remove(topic);
                     logger.trace("Accepted websocket subscription [{}] {}.", address(), topic.id);
 
                     Function<JSON, String> updater = updateId();

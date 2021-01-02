@@ -9,7 +9,7 @@
  */
 package cointoss.market.coinbase;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -216,8 +216,14 @@ public class CoinbaseService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            return reply.text("type").equals("subscriptions") && reply.find(String.class, "channels", "*", "name")
-                    .contains(channels.get(0));
+            if (reply.text("type").equals("subscriptions")) {
+                for (JSON channel : reply.find("channels", "*")) {
+                    if (channel.text("name").equals(channels.get(0))) {
+                        return channel.find(String.class, "product_ids", "*").contains(product_ids.get(0));
+                    }
+                }
+            }
+            return false;
         }
     }
 }

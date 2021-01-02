@@ -162,7 +162,7 @@ interface BackTestModel {
         Loggings.requestTradingLoggerReset();
 
         VerifiableMarket market = new VerifiableMarket(service());
-        market.tickers.disableMemorySaving();
+        market.tickers.tickers().to(e -> e.ticks.disableMemorySaving());
         market.service.baseCurrency = initialBaseCurrency();
         market.service.targetCurrency = initialTargetCurrency();
 

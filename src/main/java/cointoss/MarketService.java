@@ -328,8 +328,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A shared realtime order books.
      */
     public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely(boolean autoReconnect) {
-        return orderBook().effectOnError(e -> System.out.println("rest errorr"))
-                .concat(connectOrderBookRealtimely().effectOnError(e -> System.out.println("ws error")))
+        return orderBook().concat(connectOrderBookRealtimely())
                 .effectOnObserve(disposer::add)
                 .retryWhen(autoReconnect ? retryPolicy(500, "OrderBookRealtimely") : null);
     }
