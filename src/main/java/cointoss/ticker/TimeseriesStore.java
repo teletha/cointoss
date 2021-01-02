@@ -116,7 +116,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     public static <E extends TimeseriesData> TimeseriesStore<E> create(Class<E> type, Span span) {
         return new TimeseriesStore<E>(type, span.seconds, (int) (span.segmentSeconds / span.seconds), span.segmentSize);
     }
-    
+
     /**
      * Create the store for timeseries data.
      * 
@@ -913,7 +913,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          */
         private OnDisk(Path root) {
             try {
-                this.directory = root.resolve(itemDuration + "s");
+                this.directory = root;
                 Files.createDirectories(directory);
             } catch (IOException e) {
                 throw I.quiet(e);
