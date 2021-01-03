@@ -27,6 +27,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.TimeseriesStore;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
@@ -60,6 +61,8 @@ public class BitMexService extends MarketService {
 
     /** The instrument tick size. */
     private final Num instrumentTickSize;
+
+    private final TimeseriesStore<OpenInterest> openInterests = TimeseriesStore.create(OpenInterest.class, 10, 6 * 60 * 4, 3);
 
     /**
      * @param marketName
@@ -321,7 +324,7 @@ public class BitMexService extends MarketService {
         private final String id;
 
         private Topic(String channel, String market) {
-            super(channel + "[" + market + "]", topic -> topic.op = "unsubscribe");
+            super(channel + "[" + market + "]");
 
             this.id = channel + ":" + market;
             this.args.add(id);
@@ -333,6 +336,14 @@ public class BitMexService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return id.equals(reply.text("subscribe")) && Boolean.parseBoolean(reply.text("success"));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.op = "unsubscribe";
         }
     }
 }

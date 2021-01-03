@@ -435,7 +435,7 @@ public class BybitService extends MarketService {
          * @param market
          */
         private Topic(String channel, String market) {
-            super(channel + "." + market, topic -> topic.op = "unsubscribe");
+            super(channel + "." + market);
             args.add(channel + "." + market);
         }
 
@@ -454,6 +454,14 @@ public class BybitService extends MarketService {
                 }
             }
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.op = "unsubscribe";
         }
     }
 }

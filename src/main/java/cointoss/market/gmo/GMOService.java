@@ -9,7 +9,7 @@
  */
 package cointoss.market.gmo;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -229,7 +229,7 @@ public class GMOService extends MarketService {
         public String option = "TAKER_ONLY";
 
         private Topic(String channel, String market) {
-            super(channel + "." + market, topic -> topic.command = "unsubscribe");
+            super(channel + "." + market);
             this.channel = channel;
             this.symbol = market;
         }
@@ -240,6 +240,14 @@ public class GMOService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.command = "unsubscribe";
         }
     }
 

@@ -395,9 +395,9 @@ public abstract class EfficientWebSocketModel {
 
                     Function<JSON, String> updater = updateId();
                     if (updater != null) {
-                        String newId = updater.apply(json);
-                        signals.put(newId, signals.get(topic.id));
-                        logger.trace("Update websocket [{}] subscription id from '{}' to '{}'.", address(), topic.id, newId);
+                        topic.updatedId = updater.apply(json);
+                        signals.put(topic.updatedId, signals.get(topic.id));
+                        logger.trace("Update websocket [{}] subscription id from '{}' to '{}'.", address(), topic.id, topic.updatedId);
                     }
                     return;
                 }
@@ -468,23 +468,18 @@ public abstract class EfficientWebSocketModel {
         /** The identifier. */
         protected final String id;
 
-        /** The unsubscription command builder. */
-        private final Consumer<T> unsubscribeCommandBuilder;
+        /** The updated id holder. */
+        protected String updatedId;
 
         /**
          * @param id
          * @param unsubscribeCommandBuilder
          */
-        protected IdentifiableTopic(String id, Consumer<T> unsubscribeCommandBuilder) {
+        protected IdentifiableTopic(String id) {
             if (id == null || id.isEmpty()) {
                 throw new IllegalArgumentException("ID must be non-empty value.");
             }
-
-            if (unsubscribeCommandBuilder == null) {
-                throw new IllegalArgumentException("Can't unsubscribe command.");
-            }
             this.id = id;
-            this.unsubscribeCommandBuilder = unsubscribeCommandBuilder;
         }
 
         /**
@@ -495,7 +490,7 @@ public abstract class EfficientWebSocketModel {
         private IdentifiableTopic unsubscribe() {
             try {
                 T cloned = (T) clone();
-                unsubscribeCommandBuilder.accept(cloned);
+                buildUnsubscribeMessage(cloned);
                 return cloned;
             } catch (Exception e) {
                 throw I.quiet(e);
@@ -508,6 +503,13 @@ public abstract class EfficientWebSocketModel {
          * @return
          */
         protected abstract boolean verifySubscribedReply(JSON reply);
+
+        /**
+         * Build the unsubscription message for this topic.
+         * 
+         * @param topic
+         */
+        protected abstract void buildUnsubscribeMessage(T topic);
 
         /**
          * {@inheritDoc}

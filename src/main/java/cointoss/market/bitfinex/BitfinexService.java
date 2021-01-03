@@ -249,6 +249,8 @@ public class BitfinexService extends MarketService {
 
         public String channel;
 
+        public int chanId;
+
         public String symbol;
 
         public String key;
@@ -257,7 +259,7 @@ public class BitfinexService extends MarketService {
         public String len = "250";
 
         private Topic(String channel, String symbol) {
-            super(channel + symbol, topic -> topic.event = "unsubscribe");
+            super(channel + symbol);
             this.channel = channel;
             this.symbol = symbol;
             this.key = symbol;
@@ -270,6 +272,15 @@ public class BitfinexService extends MarketService {
         protected boolean verifySubscribedReply(JSON reply) {
             return "subscribed".equals(reply.text("event")) && channel
                     .equals(reply.text("channel")) && (symbol.equals(reply.text("pair")) || key.equals(reply.text("key")));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.event = "unsubscribe";
+            topic.chanId = Integer.parseInt(updatedId);
         }
     }
 }

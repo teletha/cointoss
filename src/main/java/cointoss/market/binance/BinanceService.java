@@ -297,7 +297,7 @@ public class BinanceService extends MarketService {
         private String idText = Integer.toString(id);
 
         private Topic(String channel, String market) {
-            super(market.toLowerCase() + "@" + channel, topic -> topic.method = "UNSUBSCRIBE");
+            super(market.toLowerCase() + "@" + channel);
             this.params.add(market.toLowerCase() + "@" + channel);
         }
 
@@ -307,6 +307,14 @@ public class BinanceService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return reply.has("id", idText);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.method = "UNSUBSCRIBE";
         }
     }
 }

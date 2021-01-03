@@ -127,7 +127,7 @@ public class FinnhubService extends MarketService {
         public String symbol;
 
         private Topic(String symbol, String market) {
-            super(market, topic -> topic.type = "unsubscribe");
+            super(market);
 
             this.symbol = market;
         }
@@ -138,6 +138,14 @@ public class FinnhubService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.type = "unsubscribe";
         }
     }
 }

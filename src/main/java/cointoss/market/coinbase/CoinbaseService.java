@@ -205,7 +205,7 @@ public class CoinbaseService extends MarketService {
         public List<String> channels = new ArrayList();
 
         private Topic(String channel, String market) {
-            super((channel.equals("level2") ? "l2update" : channel) + ":" + market, topic -> topic.type = "unsubscribe");
+            super((channel.equals("level2") ? "l2update" : channel) + ":" + market);
 
             product_ids.add(market);
             channels.add(channel);
@@ -224,6 +224,14 @@ public class CoinbaseService extends MarketService {
                 }
             }
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.type = "unsubscribe";
         }
     }
 }

@@ -30,8 +30,6 @@ import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickerManager;
-import cointoss.ticker.TimeseriesStore;
-import cointoss.ticker.data.OpenInterest;
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
@@ -63,9 +61,6 @@ public class Market implements Disposable {
 
     /** The ticker manager. */
     public final TickerManager tickers;
-
-    /** The open interest store. */
-    public final TimeseriesStore<OpenInterest> openInterest;
 
     /** The execution observers. */
     protected final Signaling<Execution> timelineObservers = new Signaling();
@@ -110,7 +105,6 @@ public class Market implements Disposable {
         this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();
         this.tickers = createTickerManager();
-        this.openInterest = createOpenIntrest();
 
         // build tickers for each span
         timeline.to(e -> {
@@ -169,19 +163,6 @@ public class Market implements Disposable {
      */
     protected TickerManager createTickerManager() {
         return new TickerManager();
-    }
-
-    /**
-     * Create {@link OpenInterest} data store.
-     * <p>
-     * The method is defined for smooth delegation. Therefore, it is usually not possible to call or
-     * override this method from outside the cointoss.verify package.
-     */
-    protected TimeseriesStore<OpenInterest> createOpenIntrest() {
-        return TimeseriesStore.create(OpenInterest.class, Span.Second5);
-        // return TimeseriesStore.create(OpenInterest.class, Span.Second5)
-        // .enableDiskStore(service.directory("oi"))
-        // .enablePassiveDataSupplier(service.openInterestRealtimely(), this);
     }
 
     public synchronized Trader trader() {

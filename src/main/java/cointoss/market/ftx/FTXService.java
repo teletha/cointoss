@@ -378,7 +378,7 @@ public class FTXService extends MarketService {
          * @param market
          */
         private Topic(String channel, String market) {
-            super(channel + "@" + market, topic -> topic.op = "unsubscribe");
+            super(channel + "@" + market);
 
             this.channel = channel;
             this.market = market;
@@ -390,6 +390,14 @@ public class FTXService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return "subscribed".equals(reply.text("type")) && channel.equals(reply.text("channel")) && market.equals(reply.text("market"));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.op = "unsubscribe";
         }
     }
 }

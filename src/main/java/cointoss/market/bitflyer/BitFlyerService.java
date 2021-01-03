@@ -9,8 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static kiss.I.translate;
+import static java.util.concurrent.TimeUnit.*;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.math.RoundingMode;
@@ -800,7 +800,7 @@ public class BitFlyerService extends MarketService {
          * @param id
          */
         public Topic(String channel, String marketName) {
-            super("[" + channel + marketName + "]", topic -> topic.method = "unsubscribe");
+            super("[" + channel + marketName + "]");
             params.put("channel", channel + marketName);
         }
 
@@ -810,6 +810,14 @@ public class BitFlyerService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return reply.has("id", idText) && Boolean.parseBoolean(reply.text("result"));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.method = "unsubscribe";
         }
     }
 

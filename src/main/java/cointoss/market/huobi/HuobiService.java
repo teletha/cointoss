@@ -236,10 +236,8 @@ public class HuobiService extends MarketService {
         public String id = RandomStringUtils.randomAlphabetic(6);
 
         private Topic(String channel, String market) {
-            super("market." + market + "." + channel, topic -> {
-                topic.unsub = topic.sub;
-                topic.sub = null;
-            });
+            super("market." + market + "." + channel);
+
             this.sub = "market." + market + "." + channel;
         }
 
@@ -249,6 +247,15 @@ public class HuobiService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return id.equals(reply.text("id")) && "ok".equals(reply.text("status"));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.unsub = topic.sub;
+            topic.sub = null;
         }
     }
 }

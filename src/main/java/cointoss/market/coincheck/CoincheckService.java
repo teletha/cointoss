@@ -219,7 +219,7 @@ public class CoincheckService extends MarketService {
          * @param market
          */
         private Topic(String channel, String market) {
-            super(channel + "-" + market, topic -> topic.type = "unsubscribe");
+            super(channel + "-" + market);
 
             this.channel = market + "-" + channel;
         }
@@ -230,6 +230,14 @@ public class CoincheckService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
+            topic.type = "unsubscribe";
         }
     }
 }

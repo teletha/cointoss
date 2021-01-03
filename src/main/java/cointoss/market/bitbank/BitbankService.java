@@ -220,8 +220,7 @@ public class BitbankService extends MarketService {
          * @param market
          */
         private Topic(String channel, String market) {
-            super(channel + "_" + market, topic -> {
-            });
+            super(channel + "_" + market);
         }
 
         /**
@@ -230,6 +229,13 @@ public class BitbankService extends MarketService {
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void buildUnsubscribeMessage(Topic topic) {
         }
     }
 
