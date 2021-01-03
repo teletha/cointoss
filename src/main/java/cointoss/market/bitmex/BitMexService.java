@@ -264,7 +264,7 @@ public class BitMexService extends MarketService {
                 });
     }
 
-    public static void mai2n(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         double[] volume = new double[3];
         double[] previousOISize = {0};
 
