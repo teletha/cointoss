@@ -301,7 +301,7 @@ public class BybitService extends MarketService {
                         .size(Primitives.roundDecimal(e.get(double.class, "open_interest") / price[0], 2)));
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void mai2n(String[] args) throws InterruptedException {
         Bybit.BTC_USD.openInterestRealtimely().to(e -> {
             System.out.println(e);
         });

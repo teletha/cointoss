@@ -9,8 +9,14 @@
  */
 package cointoss.order;
 
+import static java.util.Collections.*;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import cointoss.util.arithmetic.Num;
+import kiss.JSON;
 
 public class OrderBookPageChanges {
 
@@ -21,10 +27,28 @@ public class OrderBookPageChanges {
     public boolean clearInside = false;
 
     /** The list of long orders. */
-    public List<OrderBookPage> bids = new ArrayList();
+    public final List<OrderBookPage> bids;
 
     /** The list of short orders. */
-    public List<OrderBookPage> asks = new ArrayList();
+    public final List<OrderBookPage> asks;
+
+    /**
+     *  
+     */
+    public OrderBookPageChanges() {
+        this(new ArrayList(4), new ArrayList(4));
+    }
+
+    /**
+     * Initialization.
+     * 
+     * @param bids
+     * @param asks
+     */
+    private OrderBookPageChanges(List<OrderBookPage> bids, List<OrderBookPage> asks) {
+        this.bids = bids;
+        this.asks = asks;
+    }
 
     /**
      * {@inheritDoc}
@@ -32,5 +56,63 @@ public class OrderBookPageChanges {
     @Override
     public String toString() {
         return "OrderBookChange [bids=" + bids + ", asks=" + asks + "]";
+    }
+
+    /**
+     * Helper method to build the optimized {@link OrderBookPageChanges} from simple JSON data set.
+     * 
+     * @param bids A bid data.
+     * @param asks An ask data.
+     * @param priceKey The price key on json.
+     * @param sizeKey The size key on json.
+     * @return
+     */
+    public static OrderBookPageChanges byJSON(List<JSON> bids, List<JSON> asks, String priceKey, String sizeKey) {
+        int bidSize = bids.size();
+        int askSize = asks.size();
+
+        OrderBookPageChanges changes = byHint(bidSize, askSize);
+        for (int i = 0; i < bidSize; i++) {
+            JSON e = bids.get(i);
+            changes.bids.add(new OrderBookPage(e.get(Num.class, priceKey), Double.parseDouble(e.text(sizeKey))));
+        }
+        for (int i = 0; i < askSize; i++) {
+            JSON e = asks.get(i);
+            changes.asks.add(new OrderBookPage(e.get(Num.class, priceKey), Double.parseDouble(e.text(sizeKey))));
+        }
+        return changes;
+    }
+
+    /**
+     * Build the optimized {@link OrderBookPageChanges}.
+     * 
+     * @param bids An amount of bids.
+     * @param asks An amount of asks.
+     * @return
+     */
+    public static OrderBookPageChanges byHint(int bids, int asks) {
+        return new OrderBookPageChanges(bids == 0 ? EMPTY_LIST : new ArrayList(bids), asks == 0 ? EMPTY_LIST : new ArrayList(asks));
+    }
+
+    /**
+     * Build the optimized {@link OrderBookPageChanges} for bid.
+     * 
+     * @param price A requested price.
+     * @param size A requested size.
+     * @return
+     */
+    public static OrderBookPageChanges singleBuy(Num price, double size) {
+        return new OrderBookPageChanges(Collections.singletonList(new OrderBookPage(price, size)), EMPTY_LIST);
+    }
+
+    /**
+     * Build the optimized {@link OrderBookPageChanges} for bid.
+     * 
+     * @param price A requested price.
+     * @param size A requested size.
+     * @return
+     */
+    public static OrderBookPageChanges singleSell(Num price, double size) {
+        return new OrderBookPageChanges(EMPTY_LIST, Collections.singletonList(new OrderBookPage(price, size)));
     }
 }

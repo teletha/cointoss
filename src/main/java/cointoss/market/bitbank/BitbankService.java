@@ -22,7 +22,6 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
@@ -163,17 +162,8 @@ public class BitbankService extends MarketService {
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", marketName + "/depth").map(root -> {
-            JSON data = root.get("data");
-
-            OrderBookPageChanges change = new OrderBookPageChanges();
-            for (JSON ask : data.find("asks", "*")) {
-                change.asks.add(new OrderBookPage(ask.get(Num.class, "0"), ask.get(Double.class, "1")));
-            }
-
-            for (JSON bid : data.find("bids", "*")) {
-                change.bids.add(new OrderBookPage(bid.get(Num.class, "0"), bid.get(Double.class, "1")));
-            }
-            return change;
+            JSON e = root.get("data");
+            return OrderBookPageChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "0", "1");
         });
     }
 
@@ -183,17 +173,8 @@ public class BitbankService extends MarketService {
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("depth_diff", marketName)).map(root -> {
-            JSON data = root.get("message").get("data");
-
-            OrderBookPageChanges change = new OrderBookPageChanges();
-            for (JSON ask : data.find("a", "*")) {
-                change.asks.add(new OrderBookPage(ask.get(Num.class, "0"), ask.get(Double.class, "1")));
-            }
-
-            for (JSON bid : data.find("b", "*")) {
-                change.bids.add(new OrderBookPage(bid.get(Num.class, "0"), bid.get(Double.class, "1")));
-            }
-            return change;
+            JSON e = root.get("message").get("data");
+            return OrderBookPageChanges.byJSON(e.find("b", "*"), e.find("a", "*"), "0", "1");
         });
     }
 

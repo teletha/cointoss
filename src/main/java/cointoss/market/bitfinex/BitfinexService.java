@@ -173,20 +173,20 @@ public class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("book", marketName)).skip(1).map(json -> {
-            OrderBookPageChanges change = new OrderBookPageChanges();
-            JSON data = json.get("1");
+        return clientRealtimely().subscribe(new Topic("book", marketName))
+                .skip(1) // skip snapshot
+                .skip(e -> e.has("1", "hb")) // skip heartbeat
+                .map(json -> {
+                    JSON data = json.get("1");
+                    Num price = data.get(Num.class, "0");
+                    double size = Double.parseDouble(data.text("2"));
 
-            Num price = data.get(Num.class, "0");
-            double size = Double.parseDouble(data.text("2"));
-
-            if (0 < size) {
-                change.bids.add(new OrderBookPage(price, size));
-            } else {
-                change.asks.add(new OrderBookPage(price, -size));
-            }
-            return change;
-        });
+                    if (0 < size) {
+                        return OrderBookPageChanges.singleBuy(price, size);
+                    } else {
+                        return OrderBookPageChanges.singleSell(price, size);
+                    }
+                });
     }
 
     /**

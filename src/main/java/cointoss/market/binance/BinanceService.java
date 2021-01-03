@@ -23,7 +23,6 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
@@ -155,22 +154,7 @@ public class BinanceService extends MarketService {
      * @return
      */
     private OrderBookPageChanges createOrderBook(JSON pages, String bidName, String askName) {
-        OrderBookPageChanges change = new OrderBookPageChanges();
-
-        for (JSON bid : pages.find(bidName, "*")) {
-            Num price = bid.get(Num.class, "0");
-            double size = Double.parseDouble(bid.text("1"));
-
-            change.bids.add(new OrderBookPage(price, size));
-        }
-
-        for (JSON ask : pages.find(askName, "*")) {
-            Num price = ask.get(Num.class, "0");
-            double size = Double.parseDouble(ask.text("1"));
-
-            change.asks.add(new OrderBookPage(price, size));
-        }
-        return change;
+        return OrderBookPageChanges.byJSON(pages.find(bidName, "*"), pages.find(askName, "*"), "0", "1");
     }
 
     /**

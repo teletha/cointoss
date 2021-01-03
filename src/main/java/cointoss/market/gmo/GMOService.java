@@ -33,7 +33,6 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
@@ -172,20 +171,8 @@ public class GMOService extends MarketService {
      * @return
      */
     private OrderBookPageChanges createOrderBook(JSON root) {
-        OrderBookPageChanges changes = new OrderBookPageChanges();
+        OrderBookPageChanges changes = OrderBookPageChanges.byJSON(root.find("bids", "*"), root.find("asks", "*"), "price", "size");
         changes.clearInside = true;
-
-        for (JSON ask : root.find("asks", "*")) {
-            Num price = ask.get(Num.class, "price");
-            double size = ask.get(double.class, "size");
-            changes.asks.add(new OrderBookPage(price, size));
-        }
-        for (JSON bid : root.find("bids", "*")) {
-            Num price = bid.get(Num.class, "price");
-            double size = bid.get(double.class, "size");
-            changes.bids.add(new OrderBookPage(price, size));
-        }
-
         return changes;
     }
 

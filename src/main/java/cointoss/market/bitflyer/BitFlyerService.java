@@ -40,7 +40,6 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
@@ -468,7 +467,8 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return rest("GET", API.Public, "/v1/board?product_code=" + marketName).map(json -> json.as(OrderBookPageChanges.class));
+        return rest("GET", API.Public, "/v1/board?product_code=" + marketName)
+                .map(e -> OrderBookPageChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "price", "size"));
     }
 
     /**
@@ -479,15 +479,7 @@ public class BitFlyerService extends MarketService {
         return clientRealtimely().subscribe(new Topic("lightning_board_", marketName)).map(root -> {
             JSON e = root.get("params").get("message");
 
-            OrderBookPageChanges change = new OrderBookPageChanges();
-            for (JSON ask : e.find("asks", "*")) {
-                change.asks.add(new OrderBookPage(ask.get(Num.class, "price"), ask.get(Double.class, "size")));
-            }
-
-            for (JSON bid : e.find("bids", "*")) {
-                change.bids.add(new OrderBookPage(bid.get(Num.class, "price"), bid.get(Double.class, "size")));
-            }
-            return change;
+            return OrderBookPageChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "price", "size");
         });
     }
 
@@ -499,13 +491,6 @@ public class BitFlyerService extends MarketService {
         return this.connectExecutionRealtimely()
                 .take(e -> e.delay == Execution.DelayHuge)
                 .map(e -> Liquidation.with.date(e.date).direction(e.direction.inverse()).size(e.size.doubleValue()).price(e.price));
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        BitFlyer.FX_BTC_JPY.liquidationRealtimely().to(e -> {
-            System.out.println(e);
-        });
-        Thread.sleep(1000 * 60 * 30);
     }
 
     /**
