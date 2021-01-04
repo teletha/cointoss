@@ -118,6 +118,8 @@ public class SpecializedCodeGenerator {
 
         Long(true, "long", "Long", "Long", "0L"),
 
+        Float(true, "float", "Float", "Float", "0f"),
+
         Double(true, "double", "Double", "Double", "0d");
 
         private final boolean numeric;
@@ -186,8 +188,8 @@ public class SpecializedCodeGenerator {
      */
     public static void main(String[] args) {
         // Array
-        SpecializedCodeGenerator.write(WrapperRingBuffer.class);
-        SpecializedCodeGenerator.write(WrapperList.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(WrapperRingBuffer.class, Type.Int, Type.Long, Type.Double);
+        SpecializedCodeGenerator.write(WrapperList.class, Type.Int, Type.Long, Type.Float, Type.Double);
 
         // Set
         SpecializedCodeGenerator.write(WrapperSet.class, Type.Int, Type.Long, Type.Double);

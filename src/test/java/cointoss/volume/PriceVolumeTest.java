@@ -35,7 +35,7 @@ class PriceVolumeTest {
         }
 
         for (int i = 0; i < 4000; i++) {
-            assert volume.volumeAt(i * 0.0001) == 10;
+            assert volume.volumeAt(i * 0.0001F) == 10;
         }
     }
 }

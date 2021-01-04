@@ -150,7 +150,7 @@ public class Market implements Disposable {
      * @return
      */
     protected PriceRangedVolumeManager createPriceRangedVolumeManager() {
-        return new PriceRangedVolumeManager(service.setting.base.minimumSize.multiply(10));
+        return new PriceRangedVolumeManager(service.setting.recommendedPriceRange());
     }
 
     /**

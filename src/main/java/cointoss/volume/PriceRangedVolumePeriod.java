@@ -10,7 +10,7 @@
 package cointoss.volume;
 
 import cointoss.util.arithmetic.Num;
-import cointoss.util.array.DoubleList;
+import cointoss.util.array.FloatList;
 
 public class PriceRangedVolumePeriod {
 
@@ -27,16 +27,16 @@ public class PriceRangedVolumePeriod {
 
     private final int tens;
 
-    private final DoubleList upper = new DoubleList();
+    private final FloatList upper = new FloatList();
 
-    private final DoubleList lower = new DoubleList();
+    private final FloatList lower = new FloatList();
 
     PriceRangedVolumePeriod(long startTime, Num startPrice, Num priceRange) {
         this.startTime = startTime;
         this.scale = Math.max(0, priceRange.scale());
         this.tens = (int) Math.pow(10, scale);
-        this.startPrice = (int) Math.round(startPrice.doubleValue() * tens);
-        this.priceRange = (int) Math.round(priceRange.doubleValue() * tens);
+        this.startPrice = Math.round(startPrice.floatValue() * tens);
+        this.priceRange = Math.round(priceRange.floatValue() * tens);
     }
 
     /**
@@ -45,7 +45,7 @@ public class PriceRangedVolumePeriod {
      * @param price A target price.
      * @param volume A target volume.
      */
-    final void update(Num price, double volume) {
+    final void update(Num price, float volume) {
         int diff = price.decuple(scale).intValue() - startPrice;
 
         if (0 <= diff) {
@@ -70,7 +70,7 @@ public class PriceRangedVolumePeriod {
      *            automatically.
      * @return A price ranged valume.
      */
-    public double volumeAt(double price) {
+    public double volumeAt(float price) {
         int diff = (int) (price * tens) - startPrice;
 
         if (0 <= diff) {
@@ -96,18 +96,18 @@ public class PriceRangedVolumePeriod {
      */
     public GroupedVolumes aggregateBySize(int groupSize) {
         int size = (upper.size() + lower.size()) / groupSize + 1;
-        DoubleList prices = new DoubleList(size);
-        DoubleList volumes = new DoubleList(size);
-        double max = 0;
-        double half = priceRange / tens / 2;
+        FloatList prices = new FloatList(size);
+        FloatList volumes = new FloatList(size);
+        float max = 0;
+        float half = priceRange / tens / 2;
 
         int now = 0;
-        double volume = 0;
+        float volume = 0;
         for (int i = 0, end = lower.size(); i < end; i++) {
             volume += lower.get(i);
 
             if (++now == groupSize) {
-                prices.add((startPrice - i * priceRange) / (double) tens - half);
+                prices.add((startPrice - i * priceRange) / (float) tens - half);
                 volumes.add(volume);
                 max = Math.max(max, volume);
                 volume = 0;
@@ -118,7 +118,7 @@ public class PriceRangedVolumePeriod {
             volume += upper.get(i);
 
             if (++now == groupSize) {
-                prices.add((startPrice + i * priceRange) / (double) tens + half);
+                prices.add((startPrice + i * priceRange) / (float) tens + half);
                 volumes.add(volume);
                 max = Math.max(max, volume);
                 volume = 0;
@@ -147,15 +147,15 @@ public class PriceRangedVolumePeriod {
         public final long startTime;
 
         /** The max volume in this period. */
-        public final double maxVolume;
+        public final float maxVolume;
 
         /** The price list. */
-        public final DoubleList prices;
+        public final FloatList prices;
 
         /** The volume list. */
-        public final DoubleList volumes;
+        public final FloatList volumes;
 
-        private GroupedVolumes(long startTime, double maxVolume, DoubleList prices, DoubleList volumes) {
+        private GroupedVolumes(long startTime, float maxVolume, FloatList prices, FloatList volumes) {
             this.startTime = startTime;
             this.maxVolume = maxVolume;
             this.prices = prices;

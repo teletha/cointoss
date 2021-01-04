@@ -68,9 +68,9 @@ public class PriceRangedVolumeManager {
      */
     public void update(Execution e) {
         if (e.direction == Direction.BUY) {
-            buyer.update(e.price, e.size.doubleValue());
+            buyer.update(e.price, e.size.floatValue());
         } else {
-            seller.update(e.price, e.size.doubleValue());
+            seller.update(e.price, e.size.floatValue());
         }
     }
 
