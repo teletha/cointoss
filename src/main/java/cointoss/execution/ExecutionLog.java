@@ -307,7 +307,7 @@ public class ExecutionLog {
                                 .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
                         continue;
                     } else {
-                        log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, retrieved, coefficient);
+                        log.info("{} \t{} size {}({})", service, rests.getFirst().date, retrieved, coefficient);
 
                         for (Execution execution : rests) {
                             if (!buffer.canSwitch(execution)) {
@@ -1209,8 +1209,6 @@ public class ExecutionLog {
          * @param observer
          */
         private void switchToRealtime(long currentId, Observer<? super Execution> observer) {
-            log.info(service.id() + " switch to Realtime API.");
-
             while (!realtime.isEmpty()) {
                 ConcurrentLinkedDeque<Execution> buffer = realtime;
                 realtime = new ConcurrentLinkedDeque();
@@ -1218,7 +1216,7 @@ public class ExecutionLog {
                 for (Execution e : buffer) {
                     observer.accept(e);
                 }
-                log.info("Realtime buffer write from {} to {}.  size {}", buffer.peek().date, buffer.peekLast().date, buffer.size());
+                log.info("{} \t{} size {} (WS)", service, buffer.peek().date, buffer.size());
             }
             destination = observer;
         }
