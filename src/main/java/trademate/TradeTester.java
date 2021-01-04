@@ -60,7 +60,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = Binance.BTC_USDT;
+        MarketService service = Binance.FUTURE_BTC_USDT;
         UITab tab = DockSystem.register(service.id())
                 .closable(false)
                 .text(service.marketReadableName)

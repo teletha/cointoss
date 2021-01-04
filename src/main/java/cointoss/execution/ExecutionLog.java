@@ -9,9 +9,10 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
-import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;

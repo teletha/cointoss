@@ -39,7 +39,7 @@ import kiss.Signal;
 public class BinanceService extends MarketService {
 
     /** The API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(550).refresh(Duration.ofMinutes(1));
+    private static final APILimiter Limit = APILimiter.with.limit(2400).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.binance.com:9443/stream")
@@ -69,7 +69,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (startId + 1)).flatIterable(e -> e.find("*"))
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (startId + 1), 20).flatIterable(e -> e.find("*"))
                 .map(this::createExecution);
     }
 
@@ -86,7 +86,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("*")).map(this::createExecution);
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1", 20).flatIterable(e -> e.find("*")).map(this::createExecution);
     }
 
     /**
@@ -104,7 +104,7 @@ public class BinanceService extends MarketService {
             fromId = 0;
         }
 
-        return this.call("GET", "aggTrades?symbol=" + marketName + "&fromId=" + fromId + "&limit=" + limit)
+        return this.call("GET", "aggTrades?symbol=" + marketName + "&fromId=" + fromId + "&limit=" + limit, 20)
                 .flatIterable(e -> e.find("*"))
                 .map(this::createExecution);
     }

@@ -25,7 +25,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
 
     private long end;
 
-    private long id;
+    private long latestId;
 
     private double open;
 
@@ -67,6 +67,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
         start = e.mills - e.mills % 5000;
         end = start + 5000;
         open = highest = lowest = close = e.price.doubleValue();
+        latestId = e.id;
         if (e.isBuy()) {
             buys = e.size.doubleValue();
             sells = 0;
@@ -86,6 +87,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
             lowest = price;
         }
         close = price;
+        latestId = e.id;
 
         if (e.isBuy()) {
             buys += e.size.doubleValue();
@@ -108,7 +110,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
                     if (sell.isZero()) {
                         return disposer;
                     } else if (open == close && open == highest && open == lowest) {
-                        observer.accept(Execution.with.sell(sells).price(open).id(id++).date(Chrono.utcByMills(start)));
+                        observer.accept(Execution.with.sell(sells).price(open).id(latestId).date(Chrono.utcByMills(start)));
                         return disposer;
                     }
 
@@ -116,7 +118,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
                     buySide = sellSide;
                 } else if (sell.isZero()) {
                     if (open == close && open == highest && open == lowest) {
-                        observer.accept(Execution.with.buy(buys).price(open).id(id++).date(Chrono.utcByMills(start)));
+                        observer.accept(Execution.with.buy(buys).price(open).id(latestId).date(Chrono.utcByMills(start)));
                         return disposer;
                     }
 
@@ -134,7 +136,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
                 for (int i = 0; i < prices.length; i++) {
                     observer.accept(Execution.with.direction(sides[i], sizes[i])
                             .price(prices[i])
-                            .id(id++)
+                            .id(latestId - 3 + i)
                             .date(Chrono.utcByMills(start + 1000 * i)));
                 }
 
