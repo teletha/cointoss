@@ -24,11 +24,13 @@ public final class Coinbase extends MarketServiceProvider {
     public static final MarketService BTCUSD = new CoinbaseService("BTC-USD", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.1))
+            .priceRangeModifier(50)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService ETHUSD = new CoinbaseService("ETH-USD", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.01))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
     /**

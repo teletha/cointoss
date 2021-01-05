@@ -20,11 +20,13 @@ public final class Bitbank extends MarketServiceProvider {
 
     public static final MarketService BTC_JPY = new BitbankService("btc_jpy", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.0001))
-            .base(Currency.JPY.minimumSize(1)));
+            .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(500));
 
     public static final MarketService ETH_JPY = new BitbankService("eth_jpy", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.0001))
-            .base(Currency.JPY.minimumSize(1)));
+            .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(100));
 
     public static final MarketService LTC_JPY = new BitbankService("ltc_jpy", MarketSetting.with.spot()
             .target(Currency.LTC.minimumSize(0.0001))

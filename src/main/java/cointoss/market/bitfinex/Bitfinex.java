@@ -34,6 +34,7 @@ public final class Bitfinex extends MarketServiceProvider {
     public static final MarketService ETH_USD = new BitfinexService("ETHUSD", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.01).scale(8))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService XRP_USD = new BitfinexService("XRPUSD", MarketSetting.with.spot()
@@ -49,6 +50,7 @@ public final class Bitfinex extends MarketServiceProvider {
     public static final MarketService ETH_PERP = new BitfinexService("ETHF0:USTF0", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.USDT.minimumSize(0.01))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
     /**

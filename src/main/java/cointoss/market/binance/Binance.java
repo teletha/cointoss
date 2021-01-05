@@ -25,6 +25,7 @@ public final class Binance extends MarketServiceProvider {
     public static final MarketService BTC_USDT = new BinanceService("BTCUSDT", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
+            .priceRangeModifier(500)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService EOS_USDT = new BinanceService("EOSUSDT", MarketSetting.with.spot()
@@ -33,8 +34,9 @@ public final class Binance extends MarketServiceProvider {
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService ETH_USDT = new BinanceService("ETHUSDT", MarketSetting.with.spot()
-            .target(Currency.ETH.minimumSize(0.01))
-            .base(Currency.USDT.minimumSize(0.00001))
+            .target(Currency.ETH.minimumSize(0.00001))
+            .base(Currency.USDT.minimumSize(0.01))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService LINK_USDT = new BinanceService("LINKUSDT", MarketSetting.with.spot()
@@ -55,11 +57,13 @@ public final class Binance extends MarketServiceProvider {
     public static final MarketService FUTURE_BTC_USDT = new BinanceService("BTCUSDT", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
+            .priceRangeModifier(500)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService FUTURE_EHT_USDT = new BinanceService("ETHUSDT", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService FUTURE_COMP_USDT = new BinanceService("COMPUSDT", MarketSetting.with.derivative()

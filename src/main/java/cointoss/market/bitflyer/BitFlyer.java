@@ -27,14 +27,15 @@ public final class BitFlyer extends MarketServiceProvider {
     public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.001).scale(8))
             .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(500)
             .targetCurrencyBidSizes(Num.of(0.01), Num.of(0.1), Num.of(1))
-            .priceRangeModifier(200)
             .acquirableExecutionSize(AcquirableSize)
             .executionLogger(BitFlyerLogger.class));
 
     public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.01).scale(8))
             .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(500)
             .targetCurrencyBidSizes(Num.of(0.01), Num.of(0.1), Num.of(1))
             .acquirableExecutionSize(AcquirableSize)
             .executionLogger(BitFlyerLogger.class));
@@ -42,6 +43,7 @@ public final class BitFlyer extends MarketServiceProvider {
     public static final MarketService ETH_JPY = new BitFlyerService("ETH_JPY", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.01).scale(8))
             .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize)
             .executionLogger(BitFlyerLogger.class));
 

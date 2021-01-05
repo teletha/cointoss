@@ -29,6 +29,7 @@ public final class BitMex extends MarketServiceProvider {
     public static final MarketService ETH_USD = new BitMexService(297, "ETHUSD", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(0.00001))
             .base(Currency.USD.minimumSize(0.05))
+            .priceRangeModifier(20)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService XRP_USD = new BitMexService(377, "XRPUSD", MarketSetting.with.derivative()

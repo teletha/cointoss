@@ -34,6 +34,7 @@ public final class Bybit extends MarketServiceProvider {
     public static final MarketService ETH_USD = new BybitService("ETHUSD", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(1).scale(5))
             .base(Currency.USD.minimumSize(0.05))
+            .priceRangeModifier(20)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService XRP_USD = new BybitService("XRPUSD", MarketSetting.with.derivative()

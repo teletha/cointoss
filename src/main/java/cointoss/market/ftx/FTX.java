@@ -54,6 +54,7 @@ public final class FTX extends MarketServiceProvider {
     public static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(0.001))
             .base(Currency.USD.minimumSize(0.01))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService LINK_PERP = new FTXService("LINK-PERP", MarketSetting.with.derivative()

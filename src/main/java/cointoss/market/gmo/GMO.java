@@ -24,21 +24,25 @@ public final class GMO extends MarketServiceProvider {
     public static final MarketService BTC = new GMOService("BTC", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(500)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService BTC_DERIVATIVE = new GMOService("BTC_JPY", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.01))
             .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(500)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService ETH = new GMOService("ETH", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.01))
             .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService ETH_DERIVATIVE = new GMOService("ETH_JPY", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(0.1))
             .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService LTC = new GMOService("LTC", MarketSetting.with.spot()
