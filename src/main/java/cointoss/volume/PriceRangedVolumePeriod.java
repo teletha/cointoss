@@ -70,7 +70,7 @@ public class PriceRangedVolumePeriod {
      *            automatically.
      * @return A price ranged valume.
      */
-    public double volumeAt(float price) {
+    public float volumeAt(float price) {
         int diff = (int) (price * tens) - startPrice;
 
         if (0 <= diff) {

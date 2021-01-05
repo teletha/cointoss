@@ -330,17 +330,17 @@ public class GlobalVolumeView extends View {
             canvas.clear();
 
             // compute maximum volume
-            final double[] maxs = new double[2];
+            final float[] maxs = new float[2];
             volumes.forEach(volume -> {
                 if (volume != null) {
                     maxs[0] = Math.max(maxs[0], volume.longVolume());
                     maxs[1] = Math.max(maxs[1], volume.shortVolume());
                 }
             });
-            final double maxVolume = Math.max(maxs[0], maxs[1]);
+            final float maxVolume = Math.max(maxs[0], maxs[1]);
             final double padding = 12;
-            final double maxHeight = 28;
-            final double ratio = Math.min(1, maxHeight / maxVolume);
+            final float maxHeight = 28;
+            final float ratio = Math.min(1, maxHeight / maxVolume);
 
             GraphicsContext context = canvas.getGraphicsContext2D();
             Paint textColor = context.getStroke();
@@ -356,17 +356,17 @@ public class GlobalVolumeView extends View {
                     double sellerY = maxHeight + padding + 1;
                     x[0] -= BarWidth;
 
-                    for (Entry<MarketService, double[]> entry : volume.volumes()) {
-                        double[] volumes = entry.getValue();
+                    for (Entry<MarketService, float[]> entry : volume.volumes()) {
+                        float[] volumes = entry.getValue();
 
                         // buyer
-                        double buyerFixedVolume = volumes[0] * ratio;
+                        float buyerFixedVolume = volumes[0] * ratio;
                         context.setFill(colors.get(entry.getKey().exchange));
                         context.fillRect(x[0], buyerY - buyerFixedVolume, BarWidth, buyerFixedVolume);
                         buyerY = buyerY - buyerFixedVolume;
 
                         // seller
-                        double sellerFixedVolume = volumes[1] * ratio;
+                        float sellerFixedVolume = volumes[1] * ratio;
                         context.setFill(colors.get(entry.getKey().exchange));
                         context.fillRect(x[0], sellerY, BarWidth, sellerFixedVolume);
                         sellerY = sellerY + sellerFixedVolume;

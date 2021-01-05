@@ -22,19 +22,19 @@ import cointoss.util.arithmetic.Num;
 public class GlobalVolume {
 
     /** The volume manager. */
-    private final ConcurrentHashMap<MarketService, double[]> services = new ConcurrentHashMap();
+    private final ConcurrentHashMap<MarketService, float[]> services = new ConcurrentHashMap();
 
     /** The directional volume. */
-    private double longs = 0;
+    private float longs = 0;
 
     /** The directional volume. */
-    private double shorts = 0;
+    private float shorts = 0;
 
     /** The directional volume. */
-    private double liquidatedLongs = 0;
+    private float liquidatedLongs = 0;
 
     /** The directional volume. */
-    private double liquidatedShorts = 0;
+    private float liquidatedShorts = 0;
 
     /**
      * Add volume.
@@ -54,7 +54,7 @@ public class GlobalVolume {
      * @param volume The volume to add.
      */
     public final void add(MarketService service, Directional side, Num volume) {
-        add(service, side, volume.doubleValue());
+        add(service, side, volume.floatValue());
     }
 
     /**
@@ -64,8 +64,8 @@ public class GlobalVolume {
      * @param side A side of the additional volume.
      * @param volume The volume to add.
      */
-    public final void add(MarketService service, Directional side, double volume) {
-        double[] volumes = services.computeIfAbsent(service, key -> new double[4]);
+    public final void add(MarketService service, Directional side, float volume) {
+        float[] volumes = services.computeIfAbsent(service, key -> new float[4]);
 
         if (side.isBuy()) {
             volumes[0] += volume;
@@ -83,7 +83,7 @@ public class GlobalVolume {
      * @param e An {@link Execution} of the additional volume.
      */
     public final void add(MarketService service, Liquidation e) {
-        double[] volumes = services.computeIfAbsent(service, key -> new double[4]);
+        float[] volumes = services.computeIfAbsent(service, key -> new float[4]);
 
         if (e.isBuy()) {
             volumes[2] += e.size;
@@ -100,8 +100,8 @@ public class GlobalVolume {
      * @param service A target service.
      * @return A total volume on long side.
      */
-    public final double longVolumeAt(MarketService service) {
-        double[] volumes = services.get(service);
+    public final float longVolumeAt(MarketService service) {
+        float[] volumes = services.get(service);
 
         if (volumes == null) {
             return 0;
@@ -116,8 +116,8 @@ public class GlobalVolume {
      * @param service A target service.
      * @return A total volume on short side.
      */
-    public final double shortVolumeAt(MarketService service) {
-        double[] volumes = services.get(service);
+    public final float shortVolumeAt(MarketService service) {
+        float[] volumes = services.get(service);
 
         if (volumes == null) {
             return 0;
@@ -132,8 +132,8 @@ public class GlobalVolume {
      * @param service A target service.
      * @return A total volume on long side.
      */
-    public final double liquidatedLongVolumeAt(MarketService service) {
-        double[] volumes = services.get(service);
+    public final float liquidatedLongVolumeAt(MarketService service) {
+        float[] volumes = services.get(service);
 
         if (volumes == null) {
             return 0;
@@ -148,8 +148,8 @@ public class GlobalVolume {
      * @param service A target service.
      * @return A total volume on short side.
      */
-    public final double liquidatedShortVolumeAt(MarketService service) {
-        double[] volumes = services.get(service);
+    public final float liquidatedShortVolumeAt(MarketService service) {
+        float[] volumes = services.get(service);
 
         if (volumes == null) {
             return 0;
@@ -163,7 +163,7 @@ public class GlobalVolume {
      * 
      * @return A total volume on long side.
      */
-    public final double longVolume() {
+    public final float longVolume() {
         return longs;
     }
 
@@ -172,7 +172,7 @@ public class GlobalVolume {
      * 
      * @return A total volume on short side.
      */
-    public final double shortVolume() {
+    public final float shortVolume() {
         return shorts;
     }
 
@@ -181,7 +181,7 @@ public class GlobalVolume {
      * 
      * @return A total volume on long side.
      */
-    public final double liquidatedLongVolume() {
+    public final float liquidatedLongVolume() {
         return liquidatedLongs;
     }
 
@@ -190,7 +190,7 @@ public class GlobalVolume {
      * 
      * @return A total volume on short side.
      */
-    public final double liquidatedShortVolume() {
+    public final float liquidatedShortVolume() {
         return liquidatedShorts;
     }
 
@@ -199,7 +199,7 @@ public class GlobalVolume {
      * 
      * @return
      */
-    public final Set<Entry<MarketService, double[]>> volumes() {
+    public final Set<Entry<MarketService, float[]>> volumes() {
         return services.entrySet();
     }
 }
