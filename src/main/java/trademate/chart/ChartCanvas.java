@@ -319,7 +319,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
                         .observe(), chart.orderbookPriceRange.observe())
-                .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(10, TimeUnit.SECONDS)))
+                .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(2, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
         configIndicator();
@@ -1409,17 +1409,17 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private void drawOn(EnhancedCanvas canvas) {
             PriceRangedVolumeType type = chart.pricedVolumeType.value();
 
-            double widthFor1Day = Math.min(50, axisX.getLengthForValue(60 * 60 * 24));
+            double widthForPeriod = Math.min(50, axisX.getLengthForValue(60 * 60 * 1));
             double maxValue = type.max(longs.maxVolume, shorts.maxVolume);
-            double scale = widthFor1Day / maxValue * type.scale();
+            double scale = widthForPeriod / maxValue * type.scale();
 
             GraphicsContext gc = canvas.getGraphicsContext2D();
             double start = axisX.getPositionForValue(longs.startTime);
 
             for (int i = 0, size = longs.prices.size(); i < size; i++) {
                 double position = axisY.getPositionForValue(longs.prices.get(i));
-                double l = longs.volumes.get(i);
-                double s = shorts.volumes.get(i);
+                float l = longs.volumes.get(i);
+                float s = shorts.volumes.get(i);
 
                 if (type == PriceRangedVolumeType.Both) {
                     gc.strokeLine(start, position, start + l * scale, position);
