@@ -39,9 +39,7 @@ public enum Span {
 
     Hour4(4, HOUR_OF_DAY, 10, DAYS, 10), // 6 * 10 * 10 = 600
 
-    Hour6(6, HOUR_OF_DAY, 15, DAYS, 10, 1), // 4 * 15 * 10 = 600
-
-    Hour12(12, HOUR_OF_DAY, 30, DAYS, 10, 1), // 2 * 30 * 10 = 600
+    Hour8(8, HOUR_OF_DAY, 20, DAYS, 10, 1), // 3 * 20 * 10 = 600
 
     Day1(1, EPOCH_DAY, 60, DAYS, 10, 1, 2), // 60 * 10 = 600
 
