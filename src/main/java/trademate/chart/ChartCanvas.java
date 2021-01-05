@@ -1413,9 +1413,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private void drawOn(EnhancedCanvas canvas) {
             PriceRangedVolumeType type = chart.pricedVolumeType.value();
 
-            double widthForPeriod = Math.min(50, axisX.getLengthForValue(60 * 60 * 1));
-            double maxValue = type.max(longs.maxVolume, shorts.maxVolume);
-            double scale = widthForPeriod / maxValue * type.scale();
+            // double widthForPeriod = Math.min(50, axisX.getLengthForValue(60 * 5 * 1));
+            // double maxValue = type.max(longs.maxVolume, shorts.maxVolume);
+            // double scale = widthForPeriod / maxValue * type.scale();
 
             GraphicsContext gc = canvas.getGraphicsContext2D();
             double start = axisX.getPositionForValue(longs.startTime);
@@ -1426,10 +1426,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 float s = shorts.volumes.get(i);
 
                 if (type == PriceRangedVolumeType.Both) {
-                    gc.strokeLine(start, position, start + l * scale, position);
-                    gc.strokeLine(start, position, start - s * scale, position);
+                    gc.strokeLine(start, position, start + l, position);
+                    gc.strokeLine(start, position, start - s, position);
                 } else {
-                    gc.strokeLine(start, position, start + type.width(l, s) * scale, position);
+                    gc.strokeLine(start, position, start + type.width(l, s), position);
                 }
             }
         }
