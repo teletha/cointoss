@@ -293,13 +293,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
-                .layoutBy(chart.candleType.observe(), chart.ticker.observe())
+                .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.open.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
                 .layoutWhile(chart.showChart.observing());
         layoutCandleLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
-                .layoutBy(chart.candleType.observe(), chart.ticker.observe())
+                .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
@@ -778,14 +778,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
                         double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
-                        gc.setLineWidth(1);
-                        gc.setStroke(chart.candleType.value().coordinator.apply(tick));
-                        gc.strokeLine(x, high, x, low);
-                        if (needDrawingOpenAndClose) {
-                            double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
-                            double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
-                            gc.setLineWidth(BarWidth);
-                            gc.strokeLine(x, open, x, close);
+                        if (chart.showCandle.is(true)) {
+                            gc.setLineWidth(1);
+                            gc.setStroke(chart.candleType.value().coordinator.apply(tick));
+                            gc.strokeLine(x, high, x, low);
+                            if (needDrawingOpenAndClose) {
+                                double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
+                                double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
+                                gc.setLineWidth(BarWidth);
+                                gc.strokeLine(x, open, x, close);
+                            }
                         }
 
                         // reduce drawing cost at initialization phase
@@ -881,11 +883,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
                 double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
-                gc.setStroke(chart.candleType.value().coordinator.apply(tick));
-                gc.setLineWidth(1);
-                gc.strokeLine(x, high, x, low);
-                gc.setLineWidth(BarWidth);
-                gc.strokeLine(x, open, x, close);
+                if (chart.showCandle.is(true)) {
+                    gc.setStroke(chart.candleType.value().coordinator.apply(tick));
+                    gc.setLineWidth(1);
+                    gc.strokeLine(x, high, x, low);
+                    gc.setLineWidth(BarWidth);
+                    gc.strokeLine(x, open, x, close);
+                }
 
                 Tick previous = ticker.ticks.before(tick);
                 if (previous != null) {

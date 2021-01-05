@@ -55,6 +55,9 @@ public class ChartView extends View {
     public UIComboBox<CandleType> candleType;
 
     /** Configuration UI */
+    public UICheckBox showCandle;
+
+    /** Configuration UI */
     public UICheckBox showLatestPrice;
 
     /** Configuration UI */
@@ -146,7 +149,7 @@ public class ChartView extends View {
         config.text(FontAwesome.Glyph.GEAR).popup(new ViewDSL() {
             {
                 $(vbox, () -> {
-                    form("Candle Type", candleType);
+                    form("Candle Type", showCandle, candleType);
                     form("Latest Price", showLatestPrice);
                     form("Orderbook", FormStyles.FormInputMin, showOrderbook, orderbookPriceRange, orderbookHideSize);
                     form("Priced Volume", FormStyles.FormInputMin, showPricedVolume, pricedVolumeType);
@@ -154,6 +157,7 @@ public class ChartView extends View {
             }
         });
         candleType.initialize(CandleType.values());
+        showCandle.initialize(true);
         showLatestPrice.initialize(true);
         showOrderbook.initialize(true);
         showPricedVolume.initialize(true);
