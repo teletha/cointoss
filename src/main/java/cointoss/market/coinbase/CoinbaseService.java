@@ -9,7 +9,7 @@
  */
 package cointoss.market.coinbase;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -139,22 +139,8 @@ public class CoinbaseService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "products/" + marketName + "/book?level=2").map(root -> {
-            OrderBookPageChanges changes = new OrderBookPageChanges();
-
-            for (JSON ask : root.find("asks", "*")) {
-                Num price = ask.get(Num.class, "0");
-                double size = ask.get(double.class, "1");
-                changes.asks.add(new OrderBookPage(price, size));
-            }
-            for (JSON bid : root.find("bids", "*")) {
-                Num price = bid.get(Num.class, "0");
-                double size = bid.get(double.class, "1");
-                changes.bids.add(new OrderBookPage(price, size));
-            }
-
-            return changes;
-        });
+        return call("GET", "products/" + marketName + "/book?level=2")
+                .map(e -> OrderBookPageChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "0", "1"));
     }
 
     /**
@@ -168,7 +154,7 @@ public class CoinbaseService extends MarketService {
             for (JSON ask : root.find("changes", "*")) {
                 Direction side = ask.get(Direction.class, "0");
                 Num price = ask.get(Num.class, "1");
-                double size = ask.get(double.class, "2");
+                float size = ask.get(float.class, "2");
                 if (side == Direction.BUY) {
                     changes.bids.add(new OrderBookPage(price, size));
                 } else {

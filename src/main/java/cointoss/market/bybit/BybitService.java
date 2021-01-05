@@ -260,7 +260,7 @@ public class BybitService extends MarketService {
     private void convertOrderBook(OrderBookPageChanges changes, JSON e) {
         Num price = e.get(Num.class, "price");
         String sizeValue = e.text("size");
-        double size = sizeValue == null ? 0 : Double.parseDouble(sizeValue) / price.doubleValue();
+        float size = sizeValue == null ? 0 : Float.parseFloat(sizeValue) / price.floatValue();
 
         List<OrderBookPage> books = e.text("side").charAt(0) == 'B' ? changes.bids : changes.asks;
         books.add(new OrderBookPage(price, size));

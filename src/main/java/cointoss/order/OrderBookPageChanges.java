@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static java.util.Collections.*;
+import static java.util.Collections.EMPTY_LIST;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,11 +74,11 @@ public class OrderBookPageChanges {
         OrderBookPageChanges changes = byHint(bidSize, askSize);
         for (int i = 0; i < bidSize; i++) {
             JSON e = bids.get(i);
-            changes.bids.add(new OrderBookPage(e.get(Num.class, priceKey), Double.parseDouble(e.text(sizeKey))));
+            changes.bids.add(new OrderBookPage(e.get(Num.class, priceKey), Float.parseFloat(e.text(sizeKey))));
         }
         for (int i = 0; i < askSize; i++) {
             JSON e = asks.get(i);
-            changes.asks.add(new OrderBookPage(e.get(Num.class, priceKey), Double.parseDouble(e.text(sizeKey))));
+            changes.asks.add(new OrderBookPage(e.get(Num.class, priceKey), Float.parseFloat(e.text(sizeKey))));
         }
         return changes;
     }
@@ -101,7 +101,7 @@ public class OrderBookPageChanges {
      * @param size A requested size.
      * @return
      */
-    public static OrderBookPageChanges singleBuy(Num price, double size) {
+    public static OrderBookPageChanges singleBuy(Num price, float size) {
         return new OrderBookPageChanges(Collections.singletonList(new OrderBookPage(price, size)), EMPTY_LIST);
     }
 
@@ -112,7 +112,7 @@ public class OrderBookPageChanges {
      * @param size A requested size.
      * @return
      */
-    public static OrderBookPageChanges singleSell(Num price, double size) {
+    public static OrderBookPageChanges singleSell(Num price, float size) {
         return new OrderBookPageChanges(EMPTY_LIST, Collections.singletonList(new OrderBookPage(price, size)));
     }
 }

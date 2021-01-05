@@ -107,7 +107,7 @@ class OrderBookManagerTest {
      * @param size
      * @return
      */
-    private List<OrderBookPage> page(double price, double size) {
+    private List<OrderBookPage> page(float price, float size) {
         return List.of(new OrderBookPage(Num.of(price), size));
     }
 }

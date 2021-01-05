@@ -156,7 +156,7 @@ public class BitfinexService extends MarketService {
 
             for (JSON data : json.find("*")) {
                 Num price = data.get(Num.class, "0");
-                double size = data.get(Double.class, "2");
+                float size = data.get(Float.class, "2");
 
                 if (0 < size) {
                     change.bids.add(new OrderBookPage(price, size));
@@ -179,7 +179,7 @@ public class BitfinexService extends MarketService {
                 .map(json -> {
                     JSON data = json.get("1");
                     Num price = data.get(Num.class, "0");
-                    double size = Double.parseDouble(data.text("2"));
+                    float size = Float.parseFloat(data.text("2"));
 
                     if (0 < size) {
                         return OrderBookPageChanges.singleBuy(price, size);

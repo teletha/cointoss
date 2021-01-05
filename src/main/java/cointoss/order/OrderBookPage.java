@@ -17,7 +17,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
     public Num price;
 
     /** The board size. */
-    public double size;
+    public float size;
 
     /** The price range. */
     private final Num range;
@@ -35,7 +35,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * @param price A price.
      * @param size A total size.
      */
-    public OrderBookPage(Num price, double size) {
+    public OrderBookPage(Num price, float size) {
         this(price, size, Num.ZERO);
     }
 
@@ -45,7 +45,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * @param price A price.
      * @param size A total size.
      */
-    OrderBookPage(Num price, double size, Num range) {
+    OrderBookPage(Num price, float size, Num range) {
         this.price = price;
         this.size = size;
         this.range = range;

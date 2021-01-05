@@ -209,7 +209,7 @@ public class BitMexService extends MarketService {
             long id = Long.parseLong(page.text("id"));
             Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
             JSON sizeElement = page.get("size");
-            double size = sizeElement == null ? 0 : sizeElement.as(Double.class) / price.doubleValue();
+            float size = sizeElement == null ? 0 : sizeElement.as(Float.class) / price.floatValue();
 
             if (page.text("side").charAt(0) == 'B') {
                 change.bids.add(new OrderBookPage(price, size));
