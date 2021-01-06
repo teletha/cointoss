@@ -165,7 +165,8 @@ public class SpecializedCodeGenerator {
             text = text.replaceAll("Wrapper\\.newArray\\((.+)\\)", //
                     numeric ? "new " + primitiveName + "[$1]" : "(E[]) java.lang.reflect.Array.newInstance(Object.class, $1)");
 
-            // increment and decrement
+            // comparing, increment and decrement
+            text = text.replaceAll("Primitive\\.compare\\((.+), (.+)\\)", wrapperType + ".compare($1, $2)");
             text = text.replaceAll("Primitive\\.increment\\((.+), (.+)\\)", "$1 += $2");
             text = text.replaceAll("Primitive\\.decrement\\((.+), (.+)\\)", "$1 -= $2");
 
@@ -291,6 +292,17 @@ public class SpecializedCodeGenerator {
          * @return Decrement code.
          */
         public static Primitive decrement(Primitive base, Primitive decrement) {
+            throw new Error("Dummy code");
+        }
+
+        /**
+         * This code will be replaced by comparing code of primitive type (i.e. Long.compare(a, b)).
+         * 
+         * @param a A target value.
+         * @param b A other value.
+         * @return Comparing code.
+         */
+        public static int compare(Primitive a, Primitive b) {
             throw new Error("Dummy code");
         }
     }

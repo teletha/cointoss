@@ -284,6 +284,16 @@ public interface IntMap<V> extends Map<Integer, V> {
     }
 
     /**
+     * Create the concurrent-safe sorted map for primitive int with reverse order.
+     *
+     * @param <V> A value type.
+     * @return A new created map.
+     */
+    public static <V> ConcurrentNavigableIntMap<V> createReversedMap() {
+        return new SkipListIntMap((a, b) -> Integer.compare(a, b) * -1);
+    }
+
+    /**
      * Create the concurrent-safe sorted map for primitive int with your order.
      *
      * @param <V> A value type.

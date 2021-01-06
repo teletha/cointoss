@@ -286,6 +286,16 @@ public interface WrapperMap<V> extends Map<Wrapper, V> {
     }
 
     /**
+     * Create the concurrent-safe sorted map for primitive Primitive with reverse order.
+     *
+     * @param <V> A value type.
+     * @return A new created map.
+     */
+    public static <V> ConcurrentNavigableWrapperMap<V> createReversedMap() {
+        return new SkipListWrapperMap((a, b) -> Primitive.compare(a, b) * -1);
+    }
+
+    /**
      * Create the concurrent-safe sorted map for primitive Primitive with your order.
      *
      * @param <V> A value type.

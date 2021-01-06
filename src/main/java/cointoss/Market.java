@@ -111,7 +111,7 @@ public class Market implements Disposable {
             tickers.update(e);
             priceVolume.update(e);
         });
-        tickers.on(Span.Minute5).open.to(priceVolume::start);
+        tickers.on(Span.Minute15).open.to(priceVolume::start);
 
         // manage disposer
         add(orderBook);

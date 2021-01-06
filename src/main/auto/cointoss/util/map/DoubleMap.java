@@ -284,6 +284,16 @@ public interface DoubleMap<V> extends Map<Double, V> {
     }
 
     /**
+     * Create the concurrent-safe sorted map for primitive double with reverse order.
+     *
+     * @param <V> A value type.
+     * @return A new created map.
+     */
+    public static <V> ConcurrentNavigableDoubleMap<V> createReversedMap() {
+        return new SkipListDoubleMap((a, b) -> Double.compare(a, b) * -1);
+    }
+
+    /**
      * Create the concurrent-safe sorted map for primitive double with your order.
      *
      * @param <V> A value type.

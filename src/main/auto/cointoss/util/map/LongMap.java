@@ -284,6 +284,16 @@ public interface LongMap<V> extends Map<Long, V> {
     }
 
     /**
+     * Create the concurrent-safe sorted map for primitive long with reverse order.
+     *
+     * @param <V> A value type.
+     * @return A new created map.
+     */
+    public static <V> ConcurrentNavigableLongMap<V> createReversedMap() {
+        return new SkipListLongMap((a, b) -> Long.compare(a, b) * -1);
+    }
+
+    /**
      * Create the concurrent-safe sorted map for primitive long with your order.
      *
      * @param <V> A value type.

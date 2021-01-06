@@ -9,20 +9,19 @@
  */
 package cointoss.volume;
 
-import java.util.Comparator;
-import java.util.concurrent.ConcurrentSkipListMap;
-
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.ticker.Tick;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.map.ConcurrentNavigableLongMap;
+import cointoss.util.map.LongMap;
 import kiss.I;
 import kiss.Signal;
 
 public class PriceRangedVolumeManager {
 
     /** The time-based cache. */
-    private final ConcurrentSkipListMap<Long, PriceRangedVolumePeriod[]> volumes = new ConcurrentSkipListMap(Comparator.reverseOrder());
+    private final ConcurrentNavigableLongMap<PriceRangedVolumePeriod[]> volumes = LongMap.createReversedMap();
 
     /** The volume for buyers. */
     private PriceRangedVolumePeriod buyer;
