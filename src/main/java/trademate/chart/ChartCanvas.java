@@ -9,7 +9,8 @@
  */
 package trademate.chart;
 
-import static cointoss.Direction.*;
+import static cointoss.Direction.BUY;
+import static cointoss.Direction.SELL;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -18,22 +19,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -56,8 +41,24 @@ import cointoss.util.Chrono;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.array.DoubleList;
+import cointoss.volume.PriceRangedVolumeManager;
 import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -995,7 +996,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             chart.market.to(m -> {
                 m.priceVolume.past().to(volumes -> {
                     if (volumes[0] != null) {
-                        PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
+                        PriceRangedVolumeBar bar = new PriceRangedVolumeBar(m.priceVolume, volumes);
                         bar.drawOn(priceRangedVolume);
                     }
                 });
@@ -1005,9 +1006,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutPriceRangedVolumeLatest.layout(() -> {
             priceRangedVolumeLatest.clear();
 
-            chart.market.map(m -> m.priceVolume.latest()).to(volumes -> {
+            chart.market.to(m -> {
+                PriceRangedVolumePeriod[] volumes = m.priceVolume.latest();
                 if (volumes[0] != null) {
-                    PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
+                    PriceRangedVolumeBar bar = new PriceRangedVolumeBar(m.priceVolume, volumes);
                     bar.drawOn(priceRangedVolumeLatest);
                 }
             });
@@ -1389,6 +1391,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class PriceRangedVolumeBar {
 
+        private PriceRangedVolumeManager manager;
+
         private GroupedVolumes longs;
 
         private GroupedVolumes shorts;
@@ -1398,9 +1402,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * 
          * @param market
          */
-        private PriceRangedVolumeBar(PriceRangedVolumePeriod[] period) {
+        private PriceRangedVolumeBar(PriceRangedVolumeManager manager, PriceRangedVolumePeriod[] period) {
             Num range = chart.orderbookPriceRange.value();
 
+            this.manager = manager;
             this.longs = period[0].aggregateByPrice(range);
             this.shorts = period[1].aggregateByPrice(range);
         }
@@ -1413,9 +1418,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private void drawOn(EnhancedCanvas canvas) {
             PriceRangedVolumeType type = chart.pricedVolumeType.value();
 
-            // double widthForPeriod = Math.min(50, axisX.getLengthForValue(60 * 5 * 1));
-            // double maxValue = type.max(longs.maxVolume, shorts.maxVolume);
-            // double scale = widthForPeriod / maxValue * type.scale();
+            double widthForPeriod = Math.min(50, axisX.getLengthForValue(60 * 15 * 1));
+            double maxValue = manager.max();
+            double scale = widthForPeriod / maxValue * type.scale();
 
             GraphicsContext gc = canvas.getGraphicsContext2D();
             double start = axisX.getPositionForValue(longs.startTime);
@@ -1426,10 +1431,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 float s = shorts.volumes.get(i);
 
                 if (type == PriceRangedVolumeType.Both) {
-                    gc.strokeLine(start, position, start + l, position);
-                    gc.strokeLine(start, position, start - s, position);
+                    gc.strokeLine(start, position, start + l * scale, position);
+                    gc.strokeLine(start, position, start - s * scale, position);
                 } else {
-                    gc.strokeLine(start, position, start + type.width(l, s), position);
+                    gc.strokeLine(start, position, start + type.width(l, s) * scale, position);
                 }
             }
         }

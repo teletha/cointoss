@@ -31,6 +31,8 @@ public class PriceRangedVolumePeriod {
 
     private final FloatList lower = new FloatList();
 
+    private float max;
+
     PriceRangedVolumePeriod(long startTime, Num startPrice, Num priceRange) {
         this.startTime = startTime;
         this.scale = Math.max(0, priceRange.scale());
@@ -47,9 +49,10 @@ public class PriceRangedVolumePeriod {
      */
     final void update(Num price, float volume) {
         int diff = price.decuple(scale).intValue() - startPrice;
+        float updated;
 
         if (0 <= diff) {
-            upper.increment(diff / priceRange, volume);
+            updated = upper.increment(diff / priceRange, volume);
         } else {
             // Convert a and b to a double, and you can use the division and Math.ceil as you wanted
             // it to work. However I strongly discourage the use of this approach, because double
@@ -59,8 +62,21 @@ public class PriceRangedVolumePeriod {
             // This is very short, but maybe for some less intuitive. I think this less
             // intuitive approach would be faster than the double division.
             // Please note that this doesn't work for b < 0.
-            lower.increment((-diff + priceRange - 1) / priceRange - 1, volume);
+            updated = lower.increment((-diff + priceRange - 1) / priceRange - 1, volume);
         }
+
+        if (max < updated) {
+            max = updated;
+        }
+    }
+
+    /**
+     * Get the maximum volumes in this session.
+     * 
+     * @return
+     */
+    public float max() {
+        return max;
     }
 
     /**
