@@ -13,6 +13,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -713,8 +714,10 @@ public class ExecutionLog {
                         .effectOnComplete(parser::stopParsing)
                         .effectOnObserve(stopwatch::start)
                         .effectOnError(e -> {
-                            log.error("Fail to read compact log and delete it. [" + compact + "]");
-                            compact.delete();
+                            log.error("Fail to read compact log. [" + compact + "]");
+                            if (existNormal()) {
+                                compact.delete();
+                            }
                         })
                         .effectOnComplete(() -> {
                             log.trace("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
@@ -889,7 +892,7 @@ public class ExecutionLog {
             File compact = compactLog();
 
             try {
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.maps(Market.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
@@ -913,7 +916,7 @@ public class ExecutionLog {
             File fast = fastLog();
 
             try {
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.maps(Market.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));

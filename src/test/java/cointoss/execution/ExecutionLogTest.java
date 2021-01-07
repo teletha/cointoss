@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -53,7 +53,7 @@ class ExecutionLogTest {
     @Test
     void readLog() {
         ZonedDateTime today = Chrono.utcNow();
-        List<Execution> original = writeExecutionLog(today);
+        List<Execution> original = writeNormalLog(today);
         List<Execution> restored = log.at(today).toList();
 
         assertIterableEquals(original, restored);
@@ -62,7 +62,7 @@ class ExecutionLogTest {
     @Test
     void readCompactLog() {
         ZonedDateTime today = Chrono.utcNow();
-        List<Execution> original = writeCompactExecutionLog(today);
+        List<Execution> original = writeCompactLog(today);
         List<Execution> restored = log.at(today).toList();
 
         assertIterableEquals(original, restored);
@@ -73,7 +73,7 @@ class ExecutionLogTest {
      * 
      * @param date A target date.
      */
-    private List<Execution> writeExecutionLog(ZonedDateTime date) {
+    private List<Execution> writeNormalLog(ZonedDateTime date) {
         List<Execution> list = Executions.random(10);
         log.cache(date).normal.text(I.signal(list).map(Execution::toString).toList());
         return list;
@@ -84,7 +84,7 @@ class ExecutionLogTest {
      * 
      * @param date A target date.
      */
-    private List<Execution> writeCompactExecutionLog(ZonedDateTime date) {
+    private List<Execution> writeCompactLog(ZonedDateTime date) {
         return log.cache(date).writeCompact(I.signal(Executions.random(10))).toList();
     }
 }
