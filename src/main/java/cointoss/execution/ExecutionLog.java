@@ -13,7 +13,6 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -308,7 +307,7 @@ public class ExecutionLog {
                                 .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
                         continue;
                     } else {
-                        log.info("{} \t{} size {}({})", service, rests.getFirst().date, retrieved, coefficient);
+                        log.info("{} \t{} size {}({})", service.marketReadableName, rests.getFirst().date, retrieved, coefficient);
 
                         for (Execution execution : rests) {
                             if (!buffer.canSwitch(execution)) {
@@ -892,7 +891,7 @@ public class ExecutionLog {
             File compact = compactLog();
 
             try {
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));
 
                 return executions.maps(Market.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
@@ -916,7 +915,7 @@ public class ExecutionLog {
             File fast = fastLog();
 
             try {
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
 
                 return executions.maps(Market.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
@@ -1219,7 +1218,7 @@ public class ExecutionLog {
                 for (Execution e : buffer) {
                     observer.accept(e);
                 }
-                log.info("{} \t{} size {} (WS)", service, buffer.peek().date, buffer.size());
+                log.info("{} \t{} size {}", service.marketReadableName, buffer.peek().date, buffer.size());
             }
             destination = observer;
         }
