@@ -659,6 +659,7 @@ public class ExecutionLog {
                     return readCompact();
                 }
             } else if (existNormal()) {
+                repair(true);
                 return readNormal();
             } else {
                 ExecutionLogRepository external = service.externalRepository();

@@ -23,38 +23,38 @@ import cointoss.util.Chrono;
 class SearchNearestExecutionTest {
 
     @Test
-    @Timeout(value = 10)
+    @Timeout(value = 15)
     void bitmex() {
         assert BitMex.XBT_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 160678079903700000L;
     }
 
     @Test
-    @Timeout(value = 10)
+    @Timeout(value = 15)
     void coinbase() {
         assert Coinbase.BTCUSD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 111789000;
     }
 
     @Test
-    @Timeout(value = 10)
+    @Timeout(value = 15)
     void binance() {
         assert Binance.BTC_USDT.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 443629856;
     }
 
     @Test
-    @Timeout(value = 10)
+    @Timeout(value = 15)
     void bybit() {
         assert Bybit.BTC_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 16067808009190000L;
     }
 
     @Test
-    @Timeout(value = 10)
+    @Timeout(value = 15)
     void ftx() {
         // need to normalize padding
         assert FTX.BTC_PERP.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id / 10 * 10 == 1606780799000L;
     }
 
     @Test
-    @Timeout(value = 10)
+    @Timeout(value = 15)
     void bitfinex() {
         assert Bitfinex.BTC_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 16067807986740000L;
     }
