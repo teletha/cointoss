@@ -1035,6 +1035,10 @@ public class ExecutionLog {
          * @return true if the compact log exists, false otherwise.
          */
         boolean repair(boolean converteAsync) {
+            // ignore today's data
+            if (Chrono.utcToday().toLocalDate().isEqual(date)) {
+                return false;
+            }
 
             // confirm the completed compact log
             if (existCompact()) {
