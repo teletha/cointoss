@@ -283,6 +283,22 @@ class CacheTest {
     }
 
     @Test
+    void repairIgnoreToday() {
+        ZonedDateTime date = Chrono.utcToday();
+        Execution e1 = Execution.with.buy(1).price(10).date(date);
+        Execution e2 = Execution.with.buy(1).price(12).date(date);
+
+        Execution r1 = Execution.with.buy(1).price(14).date(date.plusDays(1));
+        market.service.executionsWillResponse(r1);
+
+        Cache cache = log.cache(date);
+        cache.writeNormal(e1, e2);
+        assert cache.repair(false) == false;
+        assert cache.existCompact() == false;
+        assert cache.existNormal();
+    }
+
+    @Test
     void repairIncomletedNormalLogAndExternalRepository() {
         ZonedDateTime date = Chrono.utc(2020, 12, 15);
         Execution e1 = Execution.with.buy(1).price(10).date(date);
