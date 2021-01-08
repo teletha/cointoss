@@ -503,4 +503,14 @@ class CacheTest {
             assert executions[i].toString().equals(restored.get(i).toString());
         }
     }
+
+    @Test
+    void lastID() {
+        Execution e1 = Execution.with.buy(1).price(10).id(1);
+        Execution e2 = Execution.with.buy(1).price(10).id(2);
+        Execution e3 = Execution.with.buy(1).price(10).id(3);
+
+        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        cache.writeNormal(e1, e2, e3);
+    }
 }
