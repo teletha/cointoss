@@ -170,7 +170,7 @@ class CacheTest {
         assert cache.existCompact() == false;
 
         // convert
-        cache.convertNormalToCompact();
+        cache.convertNormalToCompact(false);
         assert cache.existNormal() == false;
         assert cache.existCompact();
 
@@ -504,7 +504,7 @@ class CacheTest {
         HashCode hashOriginal = Files.asByteSource(cache.normal.asJavaFile()).hash(Hashing.sha256());
 
         // encode and decode
-        cache.convertNormalToCompact();
+        cache.convertNormalToCompact(false);
         cache.normal.delete();
         cache.convertCompactToNormal();
 

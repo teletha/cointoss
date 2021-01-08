@@ -11,7 +11,6 @@ package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -373,7 +372,7 @@ public class ExecutionLog {
 
             if (!cache.date.isEqual(e.date.toLocalDate())) {
                 cache.disableAutoSave();
-                cache.convertNormalToCompactAsync();
+                cache.convertNormalToCompact(true);
                 cache = new Cache(e.date).enableAutoSave();
             }
             cache.queue.add(e);
@@ -956,24 +955,17 @@ public class ExecutionLog {
         /**
          * Convert normal log to compact log.
          */
-        void convertNormalToCompact() {
-            if (existNormal() && !existCompact()) {
-                writeCompact(readNormal()).to(I.NoOP, e -> {
-                    log.error("{} fails to compact the normal log. [{}]", service, date, e);
-                }, () -> {
-                    normal.delete();
-                });
-            }
-        }
-
-        /**
-         * Convert normal log to compact log asynchronously.
-         */
-        void convertNormalToCompactAsync() {
-            if (!existCompact() && (!queue.isEmpty() || normal.isPresent())) {
-                I.schedule(5, SECONDS).to(() -> {
-                    writeCompact(readNormal()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
-                });
+        void convertNormalToCompact(boolean async) {
+            if (!existCompact() && (!queue.isEmpty() || existNormal())) {
+                if (async) {
+                    scheduler.schedule(() -> convertNormalToCompact(false), 5, TimeUnit.SECONDS);
+                } else {
+                    writeCompact(readNormal()).to(I.NoOP, e -> {
+                        log.error("{} fails to compact the normal log. [{}]", service, date, e);
+                    }, () -> {
+                        normal.delete();
+                    });
+                }
             }
         }
 
@@ -1035,7 +1027,7 @@ public class ExecutionLog {
          * 
          * @return true if the compact log exists, false otherwise.
          */
-        boolean repair(boolean converteAsync) {
+        boolean repair(boolean async) {
             // ignore today's data
             if (Chrono.utcToday().toLocalDate().isEqual(date)) {
                 return false;
@@ -1056,7 +1048,7 @@ public class ExecutionLog {
             // imcompleted or no normal log
             ExecutionLogRepository external = service.externalRepository();
             if (external != null && external.has(date)) {
-                readExternalRepository(external).waitForTerminate().to(I.NoOP, log::error, this::convertNormalToCompact);
+                readExternalRepository(external).waitForTerminate().to(I.NoOP, log::error, () -> convertNormalToCompact(async));
                 return true;
             }
 
@@ -1135,12 +1127,7 @@ public class ExecutionLog {
             }
 
             if (completed) {
-                if (converteAsync) {
-                    convertNormalToCompactAsync();
-
-                } else {
-                    convertNormalToCompact();
-                }
+                convertNormalToCompact(async);
                 return true;
             } else {
                 return false;
