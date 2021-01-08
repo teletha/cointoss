@@ -261,7 +261,7 @@ class CacheTest {
 
         Cache cache = log.cache(date);
         cache.writeCompact(e1, e2);
-        assert cache.repair();
+        assert cache.repair(false);
         assert cache.existCompact();
         assert cache.existNormal() == false;
     }
@@ -277,7 +277,7 @@ class CacheTest {
 
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
-        assert cache.repair();
+        assert cache.repair(false);
         assert cache.existCompact();
         assert cache.existNormal() == false;
     }
@@ -294,7 +294,7 @@ class CacheTest {
 
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
-        assert cache.repair();
+        assert cache.repair(false);
         assert cache.existCompact();
         assert cache.existNormal() == false;
     }
@@ -308,7 +308,7 @@ class CacheTest {
         market.service.external = useExternalRepository(date);
 
         Cache cache = log.cache(date);
-        assert cache.repair();
+        assert cache.repair(false);
         assert cache.existCompact();
         assert cache.existNormal() == false;
     }
@@ -358,7 +358,7 @@ class CacheTest {
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
 
-        assert cache.repair();
+        assert cache.repair(false);
         assert checkCompact(cache, e1, e2, r1, r2);
         assert cache.existNormal() == false;
     }
@@ -377,7 +377,7 @@ class CacheTest {
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
 
-        assert cache.repair();
+        assert cache.repair(false);
         assert checkCompact(cache, e1, e2, r1, r2);
         assert cache.existNormal() == false;
     }
@@ -395,7 +395,7 @@ class CacheTest {
 
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
-        assert cache.repair() == false;
+        assert cache.repair(false) == false;
         assert checkNormal(cache, e1, e2, r1, r2, r3);
     }
 
@@ -412,7 +412,7 @@ class CacheTest {
 
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
-        assert cache.repair() == false;
+        assert cache.repair(false) == false;
         assert checkNormal(cache, e1, e2, r1, r2, r3);
     }
 
@@ -426,7 +426,7 @@ class CacheTest {
         market.service.searchNearestIdWillResponse(p0);
 
         Cache cache = log.cache(date);
-        assert cache.repair() == false;
+        assert cache.repair(false) == false;
         assert checkNormal(cache, e1, e2);
     }
 
@@ -442,7 +442,7 @@ class CacheTest {
 
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
-        assert cache.repair();
+        assert cache.repair(false);
         assert checkCompact(cache, e1, e2);
     }
 

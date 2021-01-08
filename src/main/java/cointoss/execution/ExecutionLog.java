@@ -211,7 +211,7 @@ public class ExecutionLog {
      * Get a physical checkup on logs.
      */
     public final void checkup() {
-        repository.collectLocals(false, false).map(this::cache).to(Cache::repair);
+        repository.collectLocals(false, false).map(this::cache).to(c -> c.repair(true));
     }
 
     /**
@@ -1034,7 +1034,7 @@ public class ExecutionLog {
          * 
          * @return true if the compact log exists, false otherwise.
          */
-        boolean repair() {
+        boolean repair(boolean converteAsync) {
 
             // confirm the completed compact log
             if (existCompact()) {
@@ -1130,7 +1130,12 @@ public class ExecutionLog {
             }
 
             if (completed) {
-                convertNormalToCompact();
+                if (converteAsync) {
+                    convertNormalToCompactAsync();
+
+                } else {
+                    convertNormalToCompact();
+                }
                 return true;
             } else {
                 return false;
