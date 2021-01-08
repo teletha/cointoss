@@ -10,9 +10,8 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
+import static java.nio.file.StandardOpenOption.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -155,7 +154,7 @@ public class ExecutionLog {
     };
 
     /** The log writer. */
-    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(run -> {
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, run -> {
         Thread thread = new Thread(run);
         thread.setName("ExecutionLog Writer");
         thread.setDaemon(true);
@@ -253,10 +252,7 @@ public class ExecutionLog {
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
                 .takeWhile(day -> day.isBefore(endDay) || day.isEqual(endDay))
-                .concatMap(day -> {
-                    Cache cache = new Cache(day);
-                    return cache.read(type);
-                })
+                .concatMap(day -> new Cache(day).read(type))
                 .effect(e -> cacheId = e.id)
                 .effectOnComplete(() -> storedId = cacheId)
                 .concat(network(-1).effect(this::cache));
@@ -647,10 +643,6 @@ public class ExecutionLog {
             return this;
         }
 
-        long lastID() {
-            return 0;
-        }
-
         /**
          * Read cached date.
          * 
@@ -667,7 +659,6 @@ public class ExecutionLog {
                     return readCompact();
                 }
             } else if (existNormal()) {
-                repair();
                 return readNormal();
             } else {
                 ExecutionLogRepository external = service.externalRepository();
@@ -898,7 +889,7 @@ public class ExecutionLog {
             File compact = compactLog();
 
             try {
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));
 
                 return executions.maps(Market.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
@@ -922,7 +913,7 @@ public class ExecutionLog {
             File fast = fastLog();
 
             try {
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
 
                 return executions.maps(Market.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
@@ -979,8 +970,8 @@ public class ExecutionLog {
          */
         void convertNormalToCompactAsync() {
             if (!existCompact() && (!queue.isEmpty() || normal.isPresent())) {
-                scheduler.execute(() -> {
-                    convertNormalToCompact();
+                I.schedule(5, SECONDS).to(() -> {
+                    writeCompact(readNormal()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
                 });
             }
         }
@@ -1044,10 +1035,6 @@ public class ExecutionLog {
          * @return true if the compact log exists, false otherwise.
          */
         boolean repair() {
-            // ignore today
-            if (Chrono.utcToday().toLocalDate().isEqual(date)) {
-                return false;
-            }
 
             // confirm the completed compact log
             if (existCompact()) {
@@ -1144,7 +1131,7 @@ public class ExecutionLog {
 
             if (completed) {
                 convertNormalToCompact();
-                return false;
+                return true;
             } else {
                 return false;
             }
