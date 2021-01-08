@@ -154,7 +154,7 @@ public class ExecutionLog {
     };
 
     /** The log writer. */
-    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, run -> {
+    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(run -> {
         Thread thread = new Thread(run);
         thread.setName("ExecutionLog Writer");
         thread.setDaemon(true);
