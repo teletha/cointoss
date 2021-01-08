@@ -1018,6 +1018,14 @@ public class ExecutionLog {
             return service.searchNearestExecution(Chrono.utc(date)).waitForTerminate().map(Execution::id).to().or(-1L);
         }
 
+        long estimateLastID() {
+            if (existCompact()) {
+                return compactLog().creation();
+            } else {
+                return new NormalLog(normal).lastID();
+            }
+        }
+
         /**
          * Attempt to create a complete compact log by any means necessary.
          * <p>
