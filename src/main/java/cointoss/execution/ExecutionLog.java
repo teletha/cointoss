@@ -367,7 +367,7 @@ public class ExecutionLog {
         if (cacheId < e.id) {
             cacheId = e.id;
 
-            if (!cache.date.isEqual(e.date.toLocalDate())) {
+            if (cache.endTime <= e.mills) {
                 cache.disableAutoSave();
                 cache.convertNormalToCompact(true);
                 cache = new Cache(e.date).enableAutoSave();
@@ -517,8 +517,11 @@ public class ExecutionLog {
      */
     class Cache {
 
-        /** The end date */
+        /** The target date */
         final LocalDate date;
+
+        /** The end time. */
+        final long endTime;
 
         /** The log file. */
         final File normal;
@@ -534,6 +537,7 @@ public class ExecutionLog {
          */
         private Cache(ZonedDateTime date) {
             this.date = date.toLocalDate();
+            this.endTime = date.plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant().toEpochMilli();
             this.normal = root.file("execution" + Chrono.DateCompact.format(date) + ".log");
         }
 

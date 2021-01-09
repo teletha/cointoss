@@ -426,9 +426,9 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
+        public ÅssignableTarget<ÅssignableBase<Self>> derivative() {
             Åssignable o = new Åssignable();
-            o.spot();
+            o.derivative();
             return o;
         }
 
@@ -437,9 +437,9 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTarget<ÅssignableBase<Self>> derivative() {
+        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
             Åssignable o = new Åssignable();
-            o.derivative();
+            o.spot();
             return o;
         }
     }
@@ -465,8 +465,8 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        default Next spot() {
-            return type(MarketType.SPOT);
+        default Next derivative() {
+            return type(MarketType.DERIVATIVE);
         }
 
         /**
@@ -474,8 +474,8 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        default Next derivative() {
-            return type(MarketType.DERIVATIVE);
+        default Next spot() {
+            return type(MarketType.SPOT);
         }
     }
 
