@@ -250,7 +250,6 @@ public class ExecutionLog {
                 .recurse(day -> day.plusDays(1))
                 .takeWhile(day -> day.isBefore(endDay) || day.isEqual(endDay))
                 .concatMap(day -> new Cache(day).read(type))
-                .effect(e -> cacheId = e.id)
                 .concat(network(-1).effect(this::cache));
     }
 
@@ -796,6 +795,10 @@ public class ExecutionLog {
                     if (lastID < e.id) {
                         text.append(e).append("\r\n");
                     }
+                }
+
+                if (text.isEmpty()) {
+                    return;
                 }
 
                 // write normal log
