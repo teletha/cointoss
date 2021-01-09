@@ -13,9 +13,7 @@ import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.bitfinex.Bitfinex;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.ftx.FTX;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -62,7 +60,7 @@ public class TradeTester extends View {
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = BitFlyer.BTC_JPY;
+        MarketService service = BitFlyer.FX_BTC_JPY;
         UITab tab = DockSystem.register(service.id())
                 .closable(false)
                 .text(service.marketReadableName)
@@ -70,21 +68,21 @@ public class TradeTester extends View {
 
         tab.load();
 
-        MarketService service2 = FTX.EOS_PERP;
-        tab = DockSystem.register(service2.id())
-                .closable(false)
-                .text(service2.marketReadableName)
-                .contents(ui -> new TradingView(ui, service2));
-
-        tab.load();
-
-        MarketService service3 = Bitfinex.ETH_USD;
-        tab = DockSystem.register(service3.id())
-                .closable(false)
-                .text(service3.marketReadableName)
-                .contents(ui -> new TradingView(ui, service3));
-
-        tab.load();
+        // MarketService service2 = FTX.EOS_PERP;
+        // tab = DockSystem.register(service2.id())
+        // .closable(false)
+        // .text(service2.marketReadableName)
+        // .contents(ui -> new TradingView(ui, service2));
+        //
+        // tab.load();
+        //
+        // MarketService service3 = Bitfinex.ETH_USD;
+        // tab = DockSystem.register(service3.id())
+        // .closable(false)
+        // .text(service3.marketReadableName)
+        // .contents(ui -> new TradingView(ui, service3));
+        //
+        // tab.load();
         //
         // MarketService service4 = GMO.XRP;
         // tab = DockSystem.register(service4.id())

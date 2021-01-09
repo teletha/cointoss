@@ -9,8 +9,7 @@
  */
 package trademate.chart;
 
-import static cointoss.Direction.BUY;
-import static cointoss.Direction.SELL;
+import static cointoss.Direction.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -19,6 +18,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -44,21 +59,6 @@ import cointoss.util.array.DoubleList;
 import cointoss.volume.PriceRangedVolumeManager;
 import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -623,8 +623,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void visualizeOrderPrice() {
         chart.market.observe()
-                .switchOn(chart.showRealtimeUpdate.observing())
                 .switchMap(m -> m.orders.manages())
+                .switchOn(chart.showRealtimeUpdate.observing())
                 .switchOn(chart.showOrderSupport.observing())
                 .on(Viewtify.UIThread)
                 .to(o -> {
@@ -644,14 +644,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeLatestPrice() {
         chart.market.observing() //
                 .skipNull()
-                .switchOn(chart.showRealtimeUpdate.observing())
-                // .effectOnDispose(() -> System.out.println("Dispose " + chart.market.v))
-                // .effectOnTerminate(() -> System.out.println("Terminate " + chart.market.v))
-                // .effect(m -> System.out.println("Switch on " + m))
                 .switchMap(m -> m.tickers.latest.observing().map(Execution::price))
-                .effectOnDispose(() -> System.out.println("Dispose " + chart.market.v))
-                .effectOnTerminate(() -> System.out.println("Terminate " + chart.market.v))
-                .effect(e -> System.out.println(chart.market.v.service + "  " + e))
+                .switchOn(chart.showRealtimeUpdate.observing())
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
                     TickLable latest = latestPrice.createLabel("最新値");
@@ -690,8 +684,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeMarketInfo() {
         chart.market.observing()
                 .skipNull()
-                .switchOn(chart.showRealtimeUpdate.observing())
                 .switchMap(m -> m.tickers.latest.observe())
+                .switchOn(chart.showRealtimeUpdate.observing())
                 .throttle(1000, TimeUnit.MILLISECONDS)
                 .on(Viewtify.UIThread)
                 .to(e -> {

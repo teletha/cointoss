@@ -173,6 +173,7 @@ class CacheTest {
         cache.convertNormalToCompact(false);
         assert cache.existNormal() == false;
         assert cache.existCompact();
+        assert cache.existFast();
 
         // read from compact
         List<Execution> executions = cache.read().toList();
@@ -202,27 +203,6 @@ class CacheTest {
         assert executions.size() == 2;
         assert executions.get(0).equals(e1);
         assert executions.get(1).equals(e2);
-    }
-
-    @Test
-    void convertCompactToFast() {
-        Execution e1 = Execution.with.buy(1).price(10);
-        Execution e2 = Execution.with.buy(1).price(12);
-
-        // write
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
-        cache.writeCompact(e1, e2);
-        assert cache.existCompact();
-        assert cache.existFast() == false;
-
-        // convert
-        cache.convertCompactToFast();
-        assert cache.existCompact();
-        assert cache.existFast();
-
-        // read from fast
-        List<Execution> executions = cache.readFast().toList();
-        assert executions.size() == 4;
     }
 
     @Test

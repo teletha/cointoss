@@ -10,8 +10,7 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -927,11 +926,12 @@ public class ExecutionLog {
             File fast = fastLog();
 
             try {
+                Execution[] prev = {Market.BASE};
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
 
-                return executions.maps(Market.BASE, (prev, e) -> {
-                    writer.writeRow(logger.encode(prev, e));
-                    return e;
+                return executions.plug(new FastLog(service.setting.target.scale)).effect(e -> {
+                    writer.writeRow(logger.encode(prev[0], e));
+                    prev[0] = e;
                 }).effectOnComplete(() -> {
                     writer.close();
                 });
@@ -974,7 +974,7 @@ public class ExecutionLog {
                 if (async) {
                     scheduler.schedule(() -> convertNormalToCompact(false), 5, TimeUnit.SECONDS);
                 } else {
-                    writeCompact(readNormal()).to(I.NoOP, e -> {
+                    writeFast(writeCompact(readNormal())).to(I.NoOP, e -> {
                         log.error("{} fails to compact the normal log. [{}]", service, date, e);
                     }, () -> {
                         normal.delete();
@@ -991,27 +991,6 @@ public class ExecutionLog {
                 CsvWriter writer = buildCsvWriter(normal.newOutputStream());
                 readCompact().to(e -> writer.writeRow(e.toString()));
                 writer.close();
-            }
-        }
-
-        /**
-         * Convert compact log to fast log synchronously.
-         */
-        void convertCompactToFast() {
-            File fast = fastLog();
-
-            if (!existFast() && existCompact()) {
-                try {
-                    Execution[] prev = {Market.BASE};
-                    CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
-                    readCompact().plug(new FastLog(service.setting.target.scale)).to(e -> {
-                        writer.writeRow(logger.encode(prev[0], e));
-                        prev[0] = e;
-                    });
-                    writer.close();
-                } catch (Throwable e) {
-                    throw new Error("Failed writing the fast log. [" + fast + "]", e);
-                }
             }
         }
 
