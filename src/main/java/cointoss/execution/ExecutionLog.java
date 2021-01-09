@@ -10,7 +10,8 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,6 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -57,7 +59,6 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
-import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
@@ -175,9 +176,6 @@ public class ExecutionLog {
     /** The latest cached id. */
     private long cacheId;
 
-    /** The latest stored id. */
-    private long storedId;
-
     /** The log parser. */
     private final ExecutionLogger logger;
 
@@ -235,7 +233,7 @@ public class ExecutionLog {
      * Clear all fast log.
      */
     public final void clearFastCache() {
-        root.delete("*,flog");
+        root.delete("*.flog");
     }
 
     /**
@@ -253,7 +251,6 @@ public class ExecutionLog {
                 .takeWhile(day -> day.isBefore(endDay) || day.isEqual(endDay))
                 .concatMap(day -> new Cache(day).read(type))
                 .effect(e -> cacheId = e.id)
-                .effectOnComplete(() -> storedId = cacheId)
                 .concat(network(-1).effect(this::cache));
     }
 
@@ -782,7 +779,7 @@ public class ExecutionLog {
             }
 
             root.lock().recover(OverlappingFileLockException.class, (FileLock) null).to(o -> {
-                readStoredId();
+                long lastID = estimateLastID();
 
                 // switch buffer
                 LinkedList<Execution> remaining = queue;
@@ -792,7 +789,7 @@ public class ExecutionLog {
                 StringBuilder text = new StringBuilder();
 
                 for (Execution e : remaining) {
-                    if (storedId < e.id) {
+                    if (lastID < e.id) {
                         text.append(e).append("\r\n");
                     }
                 }
@@ -800,7 +797,7 @@ public class ExecutionLog {
                 // write normal log
                 try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
                     channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
-                    storedId = remaining.getLast().id;
+                    lastID = remaining.getLast().id;
 
                     aggregateWritingLog.accept(service);
                     repository.updateLocal(date);
@@ -809,33 +806,18 @@ public class ExecutionLog {
                     throw I.quiet(e);
                 }
             }, npe -> {
-                readStoredId();
+                long lastID = estimateLastID();
 
                 // remove older execution from memory cache
                 Iterator<Execution> iterator = queue.iterator();
                 while (iterator.hasNext()) {
                     Execution e = iterator.next();
 
-                    if (e.id <= storedId) {
+                    if (e.id <= lastID) {
                         iterator.remove();
                     }
                 }
             });
-        }
-
-        /**
-         * Read the latest stored id.
-         */
-        private long readStoredId() {
-            try (NormalLog reader = new NormalLog(normal)) {
-                long id = reader.lastID();
-                if (0 <= id) {
-                    storedId = id;
-                }
-                return id;
-            } catch (Exception e) {
-                throw I.quiet(e);
-            }
         }
 
         /**
@@ -889,14 +871,19 @@ public class ExecutionLog {
             File compact = compactLog();
 
             try {
+                long[] id = {-1};
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));
 
                 return executions.maps(Market.BASE, (prev, e) -> {
+                    id[0] = e.id;
                     writer.writeRow(logger.encode(prev, e));
                     return e;
                 }).effectOnComplete(() -> {
                     writer.close();
                     repository.updateLocal(date);
+
+                    // must perform at last
+                    compact.creationTime(FileTime.from(id[0], TimeUnit.MILLISECONDS));
                 });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -1020,9 +1007,13 @@ public class ExecutionLog {
 
         long estimateLastID() {
             if (existCompact()) {
-                return compactLog().creation();
+                return compactLog().creationMilli();
             } else {
-                return new NormalLog(normal).lastID();
+                try (NormalLog reader = new NormalLog(normal)) {
+                    return reader.lastID();
+                } catch (Exception e) {
+                    throw I.quiet(e);
+                }
             }
         }
 
@@ -1241,24 +1232,5 @@ public class ExecutionLog {
                 return latestId = service.executionLatest().map(e -> e.id).waitForTerminate().to().or(-1L);
             }
         }
-    }
-
-    /**
-     * Restore normal log of the specified market and date.
-     * 
-     * @param service
-     * @param date
-     */
-    public static void restoreNormal(MarketService service, ZonedDateTime date) {
-        ExecutionLog log = new ExecutionLog(service);
-        Cache cache = log.cache(date);
-        cache.convertCompactToNormal();
-    }
-
-    public static void main2(String[] args) {
-        I.load(Market.class);
-        MarketServiceProvider.availableMarketServices().to(e -> {
-            e.log.clearFastCache();
-        });
     }
 }

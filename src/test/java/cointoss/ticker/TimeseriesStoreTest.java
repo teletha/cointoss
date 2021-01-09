@@ -540,14 +540,14 @@ class TimeseriesStoreTest {
         assert cache.isPresent();
 
         // no modification
-        long modified = cache.lastModified();
+        long modified = cache.lastModifiedMilli();
         store.persist();
-        assert modified == cache.lastModified();
+        assert modified == cache.lastModifiedMilli();
 
         // modified
         store.store(value(1));
         store.persist();
-        assert modified != cache.lastModified();
+        assert modified != cache.lastModifiedMilli();
     }
 
     @Test
