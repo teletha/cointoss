@@ -230,6 +230,54 @@ public class ExecutionLog {
     }
 
     /**
+     * Return the first cache.
+     * 
+     * @return
+     */
+    final Cache firstCache() {
+        return new Cache(firstCacheDate());
+    }
+
+    /**
+     * Return the last cache.
+     * 
+     * @return
+     */
+    final Cache lastCache() {
+        return new Cache(lastCacheDate());
+    }
+
+    /**
+     * Create the specified date cache for TEST.
+     * 
+     * @param date
+     */
+    final Cache cache(LocalDate date) {
+        return new Cache(Chrono.utc(date));
+    }
+
+    /**
+     * Create the specified date cache for TEST.
+     * 
+     * @param date
+     */
+    final Cache cache(ZonedDateTime date) {
+        return new Cache(date);
+    }
+
+    /**
+     * Read all caches.
+     * 
+     * @return
+     */
+    final Signal<Cache> caches() {
+        ZonedDateTime first = repository.firstZDT();
+        ZonedDateTime last = repository.lastZDT();
+
+        return I.signal(first).recurse(day -> day.plusDays(1)).takeWhile(day -> day.isBefore(last) || day.isEqual(last)).map(Cache::new);
+    }
+
+    /**
      * Clear all fast log.
      */
     public final void clearFastCache() {
@@ -273,8 +321,9 @@ public class ExecutionLog {
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
+            long cacheId = lastCache().estimateLastID();
             long startId = fromId != -1 ? fromId
-                    : cacheId != 0 ? cacheId : service.searchInitialExecution().map(e -> e.id).waitForTerminate().to().exact();
+                    : cacheId != -1 ? cacheId : service.searchInitialExecution().map(e -> e.id).waitForTerminate().to().exact();
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
             while (!disposer.isDisposed()) {
@@ -482,36 +531,6 @@ public class ExecutionLog {
     }
 
     /**
-     * Read all caches.
-     * 
-     * @return
-     */
-    final Signal<Cache> caches() {
-        ZonedDateTime first = repository.firstZDT();
-        ZonedDateTime last = repository.lastZDT();
-
-        return I.signal(first).recurse(day -> day.plusDays(1)).takeWhile(day -> day.isBefore(last) || day.isEqual(last)).map(Cache::new);
-    }
-
-    /**
-     * Create the specified date cache for TEST.
-     * 
-     * @param date
-     */
-    final Cache cache(LocalDate date) {
-        return new Cache(Chrono.utc(date));
-    }
-
-    /**
-     * Create the specified date cache for TEST.
-     * 
-     * @param date
-     */
-    final Cache cache(ZonedDateTime date) {
-        return new Cache(date);
-    }
-
-    /**
      * 
      */
     class Cache {
@@ -623,7 +642,7 @@ public class ExecutionLog {
          */
         private Cache enableAutoSave() {
             if (task == NOOP) {
-                task = scheduler.scheduleWithFixedDelay(this::write, 60, 240, TimeUnit.SECONDS);
+                task = scheduler.scheduleWithFixedDelay(this::write, 60, 180, TimeUnit.SECONDS);
             }
             return this;
         }
@@ -796,6 +815,7 @@ public class ExecutionLog {
                         text.append(e).append("\r\n");
                     }
                 }
+                remaining.clear(); // immediately
 
                 if (text.isEmpty()) {
                     return;
