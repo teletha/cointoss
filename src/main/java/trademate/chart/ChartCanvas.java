@@ -645,7 +645,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         chart.market.observing() //
                 .skipNull()
                 .switchOn(chart.showRealtimeUpdate.observing())
+                // .effectOnDispose(() -> System.out.println("Dispose " + chart.market.v))
+                // .effectOnTerminate(() -> System.out.println("Terminate " + chart.market.v))
+                // .effect(m -> System.out.println("Switch on " + m))
                 .switchMap(m -> m.tickers.latest.observing().map(Execution::price))
+                .effectOnDispose(() -> System.out.println("Dispose " + chart.market.v))
+                .effectOnTerminate(() -> System.out.println("Terminate " + chart.market.v))
+                .effect(e -> System.out.println(chart.market.v.service + "  " + e))
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
                     TickLable latest = latestPrice.createLabel("最新値");
