@@ -9,6 +9,8 @@
  */
 package trademate;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
@@ -23,6 +25,7 @@ import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
 import trademate.order.OrderView;
+import trademate.setting.StaticConfig;
 import viewtify.Viewtify;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
@@ -117,13 +120,15 @@ public class TradingView extends View {
         if (service == BitFlyer.FX_BTC_JPY) {
             diposer = SFD.now() //
                     .switchOff(isLoading())
+                    .throttle(StaticConfig.drawingThrottle(), MILLISECONDS)
                     .diff()
                     .on(Viewtify.UIThread)
                     .to(e -> tab.text(service.marketReadableName + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "));
         } else {
             diposer = service.executionsRealtimely()
-                    .switchOff(isLoading())
                     .startWith(service.executionLatest())
+                    .switchOff(isLoading())
+                    .throttle(StaticConfig.drawingThrottle(), MILLISECONDS)
                     .diff()
                     .on(Viewtify.UIThread)
                     .to(e -> tab.text(service.marketReadableName + "\n" + e.price));

@@ -10,6 +10,7 @@
 package trademate.chart;
 
 import static cointoss.Direction.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ import trademate.Theme;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.setting.Notificator;
+import trademate.setting.StaticConfig;
 import viewtify.Viewtify;
 import viewtify.ui.canvas.EnhancedCanvas;
 import viewtify.ui.helper.LayoutAssistant;
@@ -296,13 +298,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.ticker.observe()
-                        .switchMap(ticker -> ticker.open.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
+                        .switchMap(ticker -> ticker.open.startWithNull().throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
                 .layoutWhile(chart.showChart.observing());
         layoutCandleLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.market.observe()
-                        .switchMap(market -> market.timeline.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
+                        .switchMap(market -> market.timeline.startWithNull().throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
         layoutOrderbook.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
@@ -336,7 +338,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     private Signal userInterfaceModification() {
-        return Viewtify.observe(widthProperty()).merge(Viewtify.observe(heightProperty())).debounce(500, TimeUnit.MILLISECONDS);
+        return Viewtify.observe(widthProperty())
+                .merge(Viewtify.observe(heightProperty()))
+                .debounce(StaticConfig.drawingThrottle(), MILLISECONDS);
     }
 
     private Observable[] chartAxisModification() {

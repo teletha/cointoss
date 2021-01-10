@@ -9,8 +9,9 @@
  */
 package trademate.chart;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.time.ZonedDateTime;
-import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleFunction;
 
 import javafx.beans.property.LongProperty;
@@ -25,12 +26,10 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.Variable;
+import trademate.setting.StaticConfig;
 import viewtify.ui.helper.LayoutAssistant;
 
 public class Chart extends Region {
-
-    /** The chart refresh time. */
-    static final int RefreshTime = 250;
 
     /** The time unit interval. */
     private static long M = 60;
@@ -73,7 +72,7 @@ public class Chart extends Region {
                 .layoutBy(chart.ticker.observe())
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.open.startWithNull())
-                        .throttle(RefreshTime, TimeUnit.MILLISECONDS));
+                        .throttle(StaticConfig.drawingThrottle(), MILLISECONDS));
 
         // configure axis label
         chart.market.observe().to(m -> {
