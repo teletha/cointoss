@@ -11,6 +11,7 @@ package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
+import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -898,7 +899,7 @@ public class ExecutionLog {
 
             try {
                 long[] id = {-1};
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.maps(Market.BASE, (prev, e) -> {
                     id[0] = e.id;
@@ -927,7 +928,7 @@ public class ExecutionLog {
 
             try {
                 Execution[] prev = {Market.BASE};
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.plug(new FastLog(service.setting.target.scale)).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
@@ -988,7 +989,7 @@ public class ExecutionLog {
          */
         void convertCompactToNormal() {
             if (!existNormal() && existCompact()) {
-                CsvWriter writer = buildCsvWriter(normal.newOutputStream());
+                CsvWriter writer = buildCsvWriter(normal.newOutputStream(ATOMIC_WRITE));
                 readCompact().to(e -> writer.writeRow(e.toString()));
                 writer.close();
             }
