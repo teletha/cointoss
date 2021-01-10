@@ -44,6 +44,9 @@ public final class Ticker implements Disposable {
     /** The latest tick. */
     Tick current;
 
+    /** The end time (epoch ms) of the latest tick. */
+    private long currentTickEndTime;
+
     /** The realtime statistics for spread. */
     public final OnlineStats spreadStats = new OnlineStats();
 
@@ -78,6 +81,7 @@ public final class Ticker implements Disposable {
      */
     final void init(Execution execution) {
         current = new Tick(span.calculateStartTime(execution.date).toEpochSecond(), execution.price, this);
+        currentTickEndTime = computeEndTime();
 
         ticks.store(current);
         opening.accept(current);
@@ -92,7 +96,7 @@ public final class Ticker implements Disposable {
      */
     final boolean createTick(Execution execution) {
         // Make sure whether the execution does not exceed the end time of current tick.
-        if (!execution.isBeforeSeconds(current.openTime + span.seconds)) {
+        if (currentTickEndTime <= execution.mills) {
             // If the end time of current tick does not reach the start time of tick which
             // execution actually belongs to, it is assumed that there was a blank time
             // (i.e. server error, maintenance). So we complement them in advance.
@@ -109,12 +113,17 @@ public final class Ticker implements Disposable {
             current.freeze();
             closing.accept(current);
             current = new Tick(current.openTime + span.seconds, execution.price, this);
+            currentTickEndTime = computeEndTime();
             ticks.store(current);
             opening.accept(current);
             return true;
         } else {
             return false; // end it immediately
         }
+    }
+
+    private long computeEndTime() {
+        return (current.openTime + span.seconds) * 1000;
     }
 
     /**
