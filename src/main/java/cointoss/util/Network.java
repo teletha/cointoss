@@ -11,6 +11,7 @@ package cointoss.util;
 
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
@@ -36,7 +37,7 @@ public class Network {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) limiter.acquire(weight);
 
-            return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client).to(observer, disposer);
+            return I.http(request.timeout(Duration.ofSeconds(15)).version(Version.HTTP_1_1), JSON.class, client).to(observer, disposer);
         });
     }
 

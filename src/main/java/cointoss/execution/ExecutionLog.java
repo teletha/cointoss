@@ -10,7 +10,8 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -282,6 +283,13 @@ public class ExecutionLog {
      */
     public final void clearFastCache() {
         root.delete("*.flog");
+    }
+
+    /**
+     * Clear all fast log.
+     */
+    public final void clearRepositoryInfo() {
+        root.delete("repository.json");
     }
 
     /**
@@ -677,7 +685,6 @@ public class ExecutionLog {
                     return readCompact();
                 }
             } else if (existNormal()) {
-                repair(true);
                 return readNormal();
             } else {
                 ExecutionLogRepository external = service.externalRepository();
@@ -1014,7 +1021,7 @@ public class ExecutionLog {
 
         long estimateLastID() {
             if (existCompact()) {
-                return compactLog().creationMilli();
+                return readCompact().last().to().exact().id;
             } else {
                 try (NormalLog reader = new NormalLog(normal)) {
                     return reader.lastID();

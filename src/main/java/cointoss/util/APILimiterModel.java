@@ -74,7 +74,7 @@ abstract class APILimiterModel {
     @Icy.Intercept("refresh")
     private Duration config(Duration refresh) {
         thresholdOverload = limit() / 2;
-        refillTime = refresh.toNanos() * 2 / limit();
+        refillTime = refresh.toNanos() / limit();
         return refresh;
     }
 

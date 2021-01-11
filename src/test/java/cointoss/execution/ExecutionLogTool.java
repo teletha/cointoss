@@ -26,7 +26,7 @@ import kiss.I;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        setLastIdOnCompactLog();
+        deleteRepositoryInfo();
     }
 
     /**
@@ -39,6 +39,15 @@ public class ExecutionLogTool {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.convertCompactToNormal();
+    }
+
+    /**
+     * Delete all fast logs.
+     */
+    public static void deleteRepositoryInfo() {
+        processLog(log -> {
+            log.clearRepositoryInfo();
+        });
     }
 
     /**
