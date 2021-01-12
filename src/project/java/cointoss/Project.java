@@ -33,7 +33,6 @@ public class Project extends bee.api.Project {
         require("com.github.luben", "zstd-jni");
         require("ch.obermuhlner", "big-math");
         require("com.h2database", "h2");
-        require("io.netty", "netty-all", "4.1.56.Final");
         require("org.decimal4j", "decimal4j").atTest();
 
         versionControlSystem("https://github.com/teletha/cointoss");
