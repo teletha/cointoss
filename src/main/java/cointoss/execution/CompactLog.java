@@ -19,7 +19,7 @@ class CompactLog implements Function<Signal<Execution>, Signal<Execution>> {
 
     private Execution previous = Market.BASE;
 
-    private Num accumlative;
+    private Num accumlative = previous.size;
 
     /**
      * {@inheritDoc}

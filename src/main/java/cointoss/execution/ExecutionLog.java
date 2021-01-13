@@ -10,8 +10,7 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.*;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -60,6 +59,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
@@ -538,6 +538,15 @@ public class ExecutionLog {
         return range(first.plusDays(offset), first.plusDays(offset + days), type);
     }
 
+    public static void main(String[] args) {
+        int[] size = new int[2];
+        ExecutionLog log = new ExecutionLog(BitFlyer.FX_BTC_JPY);
+        Cache cache = log.cache(Chrono.utc(2021, 1, 1));
+        cache.writeNewCompact(cache.readCompact().effect(e -> size[0]++)).to(e -> size[1]++);
+        System.out.println("OLD " + size[0]);
+        System.out.println("NEW " + size[1]);
+    }
+
     /**
      * 
      */
@@ -940,6 +949,30 @@ public class ExecutionLog {
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.plug(new FastLog(service.setting.target.scale)).effect(e -> {
+                    writer.writeRow(logger.encode(prev[0], e));
+                    prev[0] = e;
+                }).effectOnComplete(() -> {
+                    writer.close();
+                });
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * Write the execution log to the fast log.
+         * 
+         * @param executions A stream of executions to write.
+         * @return Wrapped {@link Signal}.
+         */
+        Signal<Execution> writeNewCompact(Signal<Execution> executions) {
+            File compact = compactLog().extension("nlog");
+
+            try {
+                Execution[] prev = {Market.BASE};
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
+
+                return executions.plug(new CompactLog()).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
                     prev[0] = e;
                 }).effectOnComplete(() -> {
