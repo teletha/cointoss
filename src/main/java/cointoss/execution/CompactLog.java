@@ -30,7 +30,7 @@ class CompactLog implements Function<Signal<Execution>, Signal<Execution>> {
             Execution prev = previous;
             previous = now;
 
-            if (prev.mills == now.mills && prev.direction == now.direction && prev.price.equals(now.price)) {
+            if (prev.mills + 1000 >= now.mills && prev.direction == now.direction && prev.price.equals(now.price)) {
                 accumlative = accumlative.plus(now.size);
                 return null;
             } else {
