@@ -641,6 +641,19 @@ public class Execution extends ExecutionModel {
         return true;
     }
 
+    /**
+     * Create new {@link Execution} with the specified property and copy other properties from this model.
+     *
+     * @param value A new value to assign.
+     * @return A created new model instance.
+     */
+    public Execution withSize(Num value) {
+        if (this.size == value) {
+            return this;
+        }
+        return with.direction(this.direction, value).id(this.id).price(this.price).accumulative(this.accumulative).date(this.date).mills(this.mills).consecutive(this.consecutive).delay(this.delay).info(this.info);
+    }
+
     /** The singleton builder. */
     public static final  Ìnstantiator<?> with = new Ìnstantiator();
 

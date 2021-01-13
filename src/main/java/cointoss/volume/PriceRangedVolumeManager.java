@@ -32,9 +32,6 @@ public class PriceRangedVolumeManager {
     /** The minimum price range. */
     private final Num priceRange;
 
-    /** The maximum volume in all sessions. */
-    private float max;
-
     /**
      * @param service
      */
@@ -58,10 +55,6 @@ public class PriceRangedVolumeManager {
      * @param startPrice A starting price.
      */
     public void start(long startTime, Num startPrice) {
-        if (buyer != null) {
-            max = Math.max(max, Math.max(buyer.max(), seller.max()));
-        }
-
         buyer = new PriceRangedVolumePeriod(startTime, startPrice, priceRange);
         seller = new PriceRangedVolumePeriod(startTime, startPrice, priceRange);
         volumes.put(startTime, new PriceRangedVolumePeriod[] {buyer, seller});
@@ -96,14 +89,5 @@ public class PriceRangedVolumeManager {
      */
     public Signal<PriceRangedVolumePeriod[]> past() {
         return I.signal(volumes.values()).skip(1);
-    }
-
-    /**
-     * Get the maximum volumes in all sessions.
-     * 
-     * @return
-     */
-    public float max() {
-        return Math.max(max, Math.max(buyer.max(), seller.max()));
     }
 }

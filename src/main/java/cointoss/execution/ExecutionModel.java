@@ -63,7 +63,7 @@ abstract class ExecutionModel implements Directional {
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(copiable = true)
     public abstract Num size();
 
     /**
