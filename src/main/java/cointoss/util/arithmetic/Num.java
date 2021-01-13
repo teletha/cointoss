@@ -66,6 +66,9 @@ public class Num extends Arithmetic<Num> {
     public static final Num THREE = new Num(3, 0);
 
     /** reuse */
+    public static final Num FOUR = new Num(4, 0);
+
+    /** reuse */
     public static final Num TEN = new Num(10, 0);
 
     /** reuse */

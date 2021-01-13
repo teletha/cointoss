@@ -149,6 +149,26 @@ public final class Tick implements TimeseriesData {
     }
 
     /**
+     * Heikin price (sometimes called the pivot point) refers to the arithmetic average of the high,
+     * low, and closing prices for this {@link Tick}.
+     * 
+     * @return The tick related value.
+     */
+    public Num heikinPrice() {
+        return highPrice.plus(lowPrice).plus(openPrice).plus(closePrice()).divide(Num.FOUR);
+    }
+
+    /**
+     * Heikin price (sometimes called the pivot point) refers to the arithmetic average of the high,
+     * low, and closing prices for this {@link Tick}.
+     * 
+     * @return The tick related value.
+     */
+    public double heikinDoublePrice() {
+        return (highPrice.doubleValue() + lowPrice.doubleValue() + openPrice.doubleValue() + closePrice().doubleValue()) / 4;
+    }
+
+    /**
      * Typical price (sometimes called the pivot point) refers to the arithmetic average of the
      * high, low, and closing prices for this {@link Tick}.
      * 

@@ -13,7 +13,10 @@ import java.util.function.Function;
 
 import javafx.scene.paint.Color;
 
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Indicators;
 import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
 import cointoss.util.arithmetic.Num;
 import kiss.Variable;
 import trademate.Theme;
@@ -22,16 +25,18 @@ import viewtify.util.FXUtils;
 public enum CandleType {
 
     /** Coordinate by price. */
-    Price(CandleType::price),
+    Price(CandleType::price, Indicators::ohclCandle),
 
     /** Coordinate by volume. */
-    Volume(CandleType::volume),
+    Volume(CandleType::volume, Indicators::ohclCandle),
 
     /** Coordinate by volume. */
-    PriceVolume(CandleType::priceVolume),
+    PriceVolume(CandleType::priceVolume, Indicators::ohclCandle),
 
     /** Coordinate by volume. */
-    PriceVolumeWeight(CandleType::priceVolumeWeight);
+    PriceVolumeWeight(CandleType::priceVolumeWeight, Indicators::ohclCandle),
+
+    HeikinAshi(CandleType::price, Indicators::ohclHeikinAshi);
 
     /** The candle color. */
     private static final Variable<Color> BuyT = Theme.$.buy.observing().map(color -> color.deriveColor(0, 1, 1, 0.4)).to();
@@ -45,11 +50,14 @@ public enum CandleType {
     /** The color coordinator. */
     final Function<Tick, Color> coordinator;
 
+    final Function<Ticker, Indicator<double[]>> candles;
+
     /**
      * @param coordinator
      */
-    private CandleType(Function<Tick, Color> coordinator) {
+    private CandleType(Function<Tick, Color> coordinator, Function<Ticker, Indicator<double[]>> candles) {
         this.coordinator = coordinator;
+        this.candles = candles;
     }
 
     private static Color price(Tick tick) {

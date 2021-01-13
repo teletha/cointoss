@@ -18,6 +18,26 @@ import cointoss.util.arithmetic.Num;
  */
 public final class Indicators {
 
+    public static Indicator<double[]> ohclCandle(Ticker ticker) {
+        return Indicator.build(ticker, tick -> new double[] {tick.openPrice.doubleValue(), tick.highPrice.doubleValue(),
+                tick.lowPrice.doubleValue(), tick.closePrice().doubleValue()});
+    }
+
+    public static Indicator<double[]> ohclHeikinAshi(Ticker ticker) {
+        return ohclCandle(ticker).memoize(24, (tick, self) -> {
+            Tick before = ticker.ticks.before(tick);
+            if (before == null) {
+                return new double[] {tick.openPrice.doubleValue(), tick.highPrice.doubleValue(), tick.lowPrice.doubleValue(),
+                        tick.closePrice().doubleValue()};
+            }
+
+            double[] prev = self.apply(before);
+
+            return new double[] {(prev[0] + prev[3]) / 2, tick.highPrice.doubleValue(), tick.lowPrice.doubleValue(),
+                    tick.heikinDoublePrice()};
+        });
+    }
+
     public static NumIndicator trend(Ticker ticker, int length) {
         return new Trend(ticker, length);
     }
