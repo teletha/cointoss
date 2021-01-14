@@ -26,23 +26,6 @@ import kiss.I;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        convertNewLog();
-    }
-
-    public static void convertNewLog() {
-        LocalDate today = Chrono.utcToday().toLocalDate();
-
-        processLog(log -> {
-            log.caches().skip(c -> c.date.isEqual(today)).to(cache -> {
-                cache.compactLog().extension("nlog").moveTo(cache.compactLog());
-                System.out.println("convert " + cache);
-                // cache.writeNewCompact(cache.readCompact()).to(I.NoOP, e -> {
-                //
-                // }, () -> {
-                // System.out.println("Convert " + cache);
-                // });
-            });
-        });
     }
 
     /**

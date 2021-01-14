@@ -10,8 +10,7 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.*;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
-import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -60,7 +58,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bybit.Bybit;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
@@ -164,7 +162,7 @@ public class ExecutionLog {
     });
 
     /** The market provider. */
-    private final MarketService service;
+    public final MarketService service;
 
     /** The root directory of logs. */
     private final Directory root;
@@ -540,18 +538,15 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        int[] size = new int[2];
-        ExecutionLog log = new ExecutionLog(BitFlyer.FX_BTC_JPY);
-        Cache cache = log.cache(Chrono.utc(2021, 1, 11));
-        cache.writeCompact(cache.readCompact().effect(e -> size[0]++)).to(e -> size[1]++);
-        System.out.println("OLD " + size[0]);
-        System.out.println("NEW " + size[1]);
-
-        for (int i = 0; i < 5; i++) {
-            cache.readCompact().to(I.NoOP);
-            cache.readCompact().to(I.NoOP);
-            cache.readFast().to(I.NoOP);
+        ExecutionLog log = new ExecutionLog(Bybit.BTC_USD);
+        LocalDate day = Chrono.utc(2020, 12, 15).toLocalDate();
+        while (true) {
+            Cache cache = log.cache(day);
+            cache.repair(false);
+            cache.convertNormalToCompact(false);
+            day = day.minusDays(1);
         }
+
     }
 
     /**
@@ -744,35 +739,6 @@ public class ExecutionLog {
          * 
          * @return
          */
-        Signal<Execution> readOldCompact() {
-            CsvParser parser = buildCsvParser();
-            Stopwatch stopwatch = Stopwatch.createUnstarted();
-            File compact = compactLog();
-
-            try {
-                return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                        .scanWith(Market.BASE, logger::decode)
-                        .effectOnComplete(parser::stopParsing)
-                        .effectOnObserve(stopwatch::start)
-                        .effectOnError(e -> {
-                            log.error("Fail to read compact log. [" + compact + "]");
-                            if (existNormal()) {
-                                compact.delete();
-                            }
-                        })
-                        .effectOnComplete(() -> {
-                            log.info("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
-                        });
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        }
-
-        /**
-         * Read compact log.
-         * 
-         * @return
-         */
         Signal<Execution> readCompact() {
             CsvParser parser = buildCsvParser();
             Stopwatch stopwatch = Stopwatch.createUnstarted();
@@ -790,7 +756,7 @@ public class ExecutionLog {
                             }
                         })
                         .effectOnComplete(() -> {
-                            log.info("Read new compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                            log.info("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                         });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -940,35 +906,6 @@ public class ExecutionLog {
          */
         void writeCompact(Execution... executions) {
             writeCompact(I.signal(executions)).to(I.NoOP);
-        }
-
-        /**
-         * Write the execution log to the compact log.
-         * 
-         * @param executions A stream of executions to write.
-         * @return Wrapped {@link Signal}.
-         */
-        Signal<Execution> writeOldCompact(Signal<Execution> executions) {
-            File compact = compactLog();
-
-            try {
-                long[] id = {-1};
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
-
-                return executions.maps(Market.BASE, (prev, e) -> {
-                    id[0] = e.id;
-                    writer.writeRow(logger.encode(prev, e));
-                    return e;
-                }).effectOnComplete(() -> {
-                    writer.close();
-                    repository.updateLocal(date);
-
-                    // must perform at last
-                    compact.creationTime(FileTime.from(id[0], TimeUnit.MILLISECONDS));
-                });
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
         }
 
         /**

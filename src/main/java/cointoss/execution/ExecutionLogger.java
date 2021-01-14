@@ -23,35 +23,6 @@ import kiss.Singleton;
 @Managed(value = Singleton.class)
 public class ExecutionLogger {
 
-    /** CONSTANTS */
-    private static final int ConsecutiveTypeSize = 4;
-
-    /**
-     * Build execution from log.
-     * 
-     * @param values
-     * @return
-     */
-    public Execution decodeOld(Execution previous, String[] values) {
-        Direction direction;
-        int consecutive;
-        int value = decodeInt(values[3].charAt(0));
-        if (value < ConsecutiveTypeSize) {
-            direction = Direction.BUY;
-            consecutive = value;
-        } else {
-            direction = Direction.SELL;
-            consecutive = value - ConsecutiveTypeSize;
-        }
-
-        return Execution.with.direction(direction, decodeSize(values[3].substring(2), previous))
-                .id(decodeId(values[0], previous))
-                .date(decodeDate(values[1], previous))
-                .price(decodePrice(values[2], previous))
-                .delay(decodeInt(values[3].charAt(1)) - 3)
-                .consecutive(consecutive);
-    }
-
     /**
      * Build execution from log.
      * 
@@ -64,23 +35,6 @@ public class ExecutionLogger {
                 .date(decodeDate(values[1], previous))
                 .price(decodePrice(values[2], previous))
                 .delay(decodeInt(values[3].charAt(1)) - 3);
-    }
-
-    /**
-     * Build log from execution.
-     * 
-     * @param execution
-     * @return
-     */
-    public String[] encodeOld(Execution previous, Execution execution) {
-        String id = encodeId(execution, previous);
-        String time = encodeDate(execution, previous);
-        String price = encodePrice(execution, previous);
-        String size = encodeSize(execution, previous);
-        String delay = encodeInt(execution.delay + 3);
-        String sideAndConsecutive = String.valueOf(execution.isBuy() ? execution.consecutive : ConsecutiveTypeSize + execution.consecutive);
-
-        return new String[] {id, time, price, sideAndConsecutive + delay + size};
     }
 
     /**

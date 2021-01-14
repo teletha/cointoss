@@ -55,9 +55,9 @@ class CompactLogTest {
 
         List<Execution> compact = I.signal(e1, e2, e3).plug(new CompactLog()).toList();
         assert compact.size() == 3;
-        assert compact.get(0).size.is(1);
-        assert compact.get(1).size.is(1);
-        assert compact.get(2).size.is(1);
+        assert compact.get(0).direction.isBuy();
+        assert compact.get(1).direction.isSell();
+        assert compact.get(2).direction.isBuy();
     }
 
     @Test
