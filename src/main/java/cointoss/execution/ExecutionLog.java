@@ -10,8 +10,7 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.*;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -546,6 +545,12 @@ public class ExecutionLog {
         cache.writeNewCompact(cache.readCompact().effect(e -> size[0]++)).to(e -> size[1]++);
         System.out.println("OLD " + size[0]);
         System.out.println("NEW " + size[1]);
+
+        for (int i = 0; i < 5; i++) {
+            cache.readCompact().to(I.NoOP);
+            cache.readNewCompact().to(I.NoOP);
+            cache.readFast().to(I.NoOP);
+        }
     }
 
     /**
@@ -755,7 +760,36 @@ public class ExecutionLog {
                             }
                         })
                         .effectOnComplete(() -> {
-                            log.trace("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                            log.info("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                        });
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * Read compact log.
+         * 
+         * @return
+         */
+        Signal<Execution> readNewCompact() {
+            CsvParser parser = buildCsvParser();
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
+            File compact = compactLog().extension("nlog");
+
+            try {
+                return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
+                        .scanWith(Market.BASE, logger::decodeNew)
+                        .effectOnComplete(parser::stopParsing)
+                        .effectOnObserve(stopwatch::start)
+                        .effectOnError(e -> {
+                            log.error("Fail to read compact log. [" + compact + "]");
+                            if (existNormal()) {
+                                compact.delete();
+                            }
+                        })
+                        .effectOnComplete(() -> {
+                            log.info("Read new compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                         });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -787,7 +821,7 @@ public class ExecutionLog {
                             .effectOnObserve(stopwatch::start)
                             .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
                             .effectOnComplete(() -> {
-                                log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                                log.info("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                             });
                 }
             } catch (IOException e) {
@@ -974,7 +1008,7 @@ public class ExecutionLog {
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.plug(new CompactLog()).effect(e -> {
-                    writer.writeRow(logger.encode(prev[0], e));
+                    writer.writeRow(logger.encodeNew(prev[0], e));
                     prev[0] = e;
                 }).effectOnComplete(() -> {
                     writer.close();

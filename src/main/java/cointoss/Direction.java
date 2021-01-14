@@ -127,6 +127,18 @@ public enum Direction implements Directional {
     }
 
     /**
+     * <p>
+     * Parse by value.
+     * </p>
+     * 
+     * @param value
+     * @return
+     */
+    public static Direction parse(char c) {
+        return c == 'S' ? SELL : BUY;
+    }
+
+    /**
      * 
      */
     @Managed(value = Singleton.class)

@@ -53,6 +53,20 @@ public class ExecutionLogger {
     }
 
     /**
+     * Build execution from log.
+     * 
+     * @param values
+     * @return
+     */
+    public Execution decodeNew(Execution previous, String[] values) {
+        return Execution.with.direction(Direction.parse(values[3].charAt(0)), decodeSize(values[3].substring(2), previous))
+                .id(decodeId(values[0], previous))
+                .date(decodeDate(values[1], previous))
+                .price(decodePrice(values[2], previous))
+                .delay(decodeInt(values[3].charAt(1)) - 3);
+    }
+
+    /**
      * Build log from execution.
      * 
      * @param execution
@@ -81,9 +95,9 @@ public class ExecutionLogger {
         String price = encodePrice(execution, previous);
         String size = encodeSize(execution, previous);
         String delay = encodeInt(execution.delay + 3);
-        String sideAndConsecutive = String.valueOf(execution.isBuy() ? execution.consecutive : ConsecutiveTypeSize + execution.consecutive);
+        String side = execution.direction.mark();
 
-        return new String[] {id, time, price, sideAndConsecutive + delay + size};
+        return new String[] {id, time, price, side + delay + size};
     }
 
     /**
