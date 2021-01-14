@@ -19,7 +19,7 @@ class CompactLog implements Function<Signal<Execution>, Signal<Execution>> {
 
     private Execution previous = Market.BASE;
 
-    private Num accumlative = previous.size;
+    private Num cumulative = previous.size;
 
     /**
      * {@inheritDoc}
@@ -31,23 +31,23 @@ class CompactLog implements Function<Signal<Execution>, Signal<Execution>> {
             previous = now;
 
             if (prev.mills + 1000 >= now.mills && prev.direction == now.direction && prev.price.equals(now.price)) {
-                accumlative = accumlative.plus(now.size);
+                cumulative = cumulative.plus(now.size);
                 return null;
             } else {
-                Num previousAccumulative = accumlative;
-                accumlative = now.size;
+                Num previousCumulative = cumulative;
+                cumulative = now.size;
 
-                if (prev.size == previousAccumulative) {
+                if (prev.size == previousCumulative) {
                     return prev;
                 } else {
-                    return prev.withSize(previousAccumulative);
+                    return prev.withSize(previousCumulative);
                 }
             }
-        }).skipNull().concat(new Signal<>((observer, disposer) -> {
-            if (previous.size == accumlative) {
+        }).skip(e -> e == null || e == Market.BASE).concat(new Signal<>((observer, disposer) -> {
+            if (previous.size == cumulative) {
                 observer.accept(previous);
             } else {
-                observer.accept(previous.withSize(accumlative));
+                observer.accept(previous.withSize(cumulative));
             }
             observer.complete();
             return disposer;

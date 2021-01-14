@@ -70,6 +70,23 @@ public class ExecutionLogger {
     }
 
     /**
+     * Build log from execution.
+     * 
+     * @param execution
+     * @return
+     */
+    public String[] encodeNew(Execution previous, Execution execution) {
+        String id = encodeId(execution, previous);
+        String time = encodeDate(execution, previous);
+        String price = encodePrice(execution, previous);
+        String size = encodeSize(execution, previous);
+        String delay = encodeInt(execution.delay + 3);
+        String sideAndConsecutive = String.valueOf(execution.isBuy() ? execution.consecutive : ConsecutiveTypeSize + execution.consecutive);
+
+        return new String[] {id, time, price, sideAndConsecutive + delay + size};
+    }
+
+    /**
      * Decode id.
      * 
      * @param value A encoded value.

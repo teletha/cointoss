@@ -10,7 +10,8 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -541,7 +542,7 @@ public class ExecutionLog {
     public static void main(String[] args) {
         int[] size = new int[2];
         ExecutionLog log = new ExecutionLog(BitFlyer.FX_BTC_JPY);
-        Cache cache = log.cache(Chrono.utc(2021, 1, 1));
+        Cache cache = log.cache(Chrono.utc(2021, 1, 11));
         cache.writeNewCompact(cache.readCompact().effect(e -> size[0]++)).to(e -> size[1]++);
         System.out.println("OLD " + size[0]);
         System.out.println("NEW " + size[1]);
@@ -1032,8 +1033,14 @@ public class ExecutionLog {
         void convertCompactToNormal() {
             if (!existNormal() && existCompact()) {
                 CsvWriter writer = buildCsvWriter(normal.newOutputStream(ATOMIC_WRITE));
-                readCompact().to(e -> writer.writeRow(e.toString()));
-                writer.close();
+                readCompact().to(e -> {
+                    writer.writeRow(e.toString());
+                }, e -> {
+                    System.out.println("ERROR");
+                    log.error("{} fails to restore the normal log. [{}]", service, date, e);
+                }, () -> {
+                    writer.close();
+                });
             }
         }
 

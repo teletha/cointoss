@@ -17,6 +17,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
 import kiss.I;
 
@@ -26,7 +27,7 @@ import kiss.I;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        deleteRepositoryInfo();
+        restoreNormal(BitFlyer.FX_BTC_JPY, Chrono.utc(2021, 1, 13));
     }
 
     /**
