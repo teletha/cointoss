@@ -10,7 +10,8 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -542,13 +543,13 @@ public class ExecutionLog {
         int[] size = new int[2];
         ExecutionLog log = new ExecutionLog(BitFlyer.FX_BTC_JPY);
         Cache cache = log.cache(Chrono.utc(2021, 1, 11));
-        cache.writeNewCompact(cache.readCompact().effect(e -> size[0]++)).to(e -> size[1]++);
+        cache.writeCompact(cache.readCompact().effect(e -> size[0]++)).to(e -> size[1]++);
         System.out.println("OLD " + size[0]);
         System.out.println("NEW " + size[1]);
 
         for (int i = 0; i < 5; i++) {
             cache.readCompact().to(I.NoOP);
-            cache.readNewCompact().to(I.NoOP);
+            cache.readCompact().to(I.NoOP);
             cache.readFast().to(I.NoOP);
         }
     }
@@ -743,7 +744,7 @@ public class ExecutionLog {
          * 
          * @return
          */
-        Signal<Execution> readCompact() {
+        Signal<Execution> readOldCompact() {
             CsvParser parser = buildCsvParser();
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             File compact = compactLog();
@@ -772,14 +773,14 @@ public class ExecutionLog {
          * 
          * @return
          */
-        Signal<Execution> readNewCompact() {
+        Signal<Execution> readCompact() {
             CsvParser parser = buildCsvParser();
             Stopwatch stopwatch = Stopwatch.createUnstarted();
-            File compact = compactLog().extension("nlog");
+            File compact = compactLog();
 
             try {
                 return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                        .scanWith(Market.BASE, logger::decodeNew)
+                        .scanWith(Market.BASE, logger::decode)
                         .effectOnComplete(parser::stopParsing)
                         .effectOnObserve(stopwatch::start)
                         .effectOnError(e -> {
@@ -947,7 +948,7 @@ public class ExecutionLog {
          * @param executions A stream of executions to write.
          * @return Wrapped {@link Signal}.
          */
-        Signal<Execution> writeCompact(Signal<Execution> executions) {
+        Signal<Execution> writeOldCompact(Signal<Execution> executions) {
             File compact = compactLog();
 
             try {
@@ -1000,15 +1001,15 @@ public class ExecutionLog {
          * @param executions A stream of executions to write.
          * @return Wrapped {@link Signal}.
          */
-        Signal<Execution> writeNewCompact(Signal<Execution> executions) {
-            File compact = compactLog().extension("nlog");
+        Signal<Execution> writeCompact(Signal<Execution> executions) {
+            File compact = compactLog();
 
             try {
                 Execution[] prev = {Market.BASE};
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.plug(new CompactLog()).effect(e -> {
-                    writer.writeRow(logger.encodeNew(prev[0], e));
+                    writer.writeRow(logger.encode(prev[0], e));
                     prev[0] = e;
                 }).effectOnComplete(() -> {
                     writer.close();

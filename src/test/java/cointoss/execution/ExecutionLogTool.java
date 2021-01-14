@@ -17,7 +17,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
 import kiss.I;
 
@@ -27,7 +26,23 @@ import kiss.I;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        restoreNormal(BitFlyer.FX_BTC_JPY, Chrono.utc(2021, 1, 13));
+        convertNewLog();
+    }
+
+    public static void convertNewLog() {
+        LocalDate today = Chrono.utcToday().toLocalDate();
+
+        processLog(log -> {
+            log.caches().skip(c -> c.date.isEqual(today)).to(cache -> {
+                cache.compactLog().extension("nlog").moveTo(cache.compactLog());
+                System.out.println("convert " + cache);
+                // cache.writeNewCompact(cache.readCompact()).to(I.NoOP, e -> {
+                //
+                // }, () -> {
+                // System.out.println("Convert " + cache);
+                // });
+            });
+        });
     }
 
     /**

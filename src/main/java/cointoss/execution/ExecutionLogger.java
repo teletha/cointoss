@@ -32,7 +32,7 @@ public class ExecutionLogger {
      * @param values
      * @return
      */
-    public Execution decode(Execution previous, String[] values) {
+    public Execution decodeOld(Execution previous, String[] values) {
         Direction direction;
         int consecutive;
         int value = decodeInt(values[3].charAt(0));
@@ -58,7 +58,7 @@ public class ExecutionLogger {
      * @param values
      * @return
      */
-    public Execution decodeNew(Execution previous, String[] values) {
+    public Execution decode(Execution previous, String[] values) {
         return Execution.with.direction(Direction.parse(values[3].charAt(0)), decodeSize(values[3].substring(2), previous))
                 .id(decodeId(values[0], previous))
                 .date(decodeDate(values[1], previous))
@@ -72,7 +72,7 @@ public class ExecutionLogger {
      * @param execution
      * @return
      */
-    public String[] encode(Execution previous, Execution execution) {
+    public String[] encodeOld(Execution previous, Execution execution) {
         String id = encodeId(execution, previous);
         String time = encodeDate(execution, previous);
         String price = encodePrice(execution, previous);
@@ -89,7 +89,7 @@ public class ExecutionLogger {
      * @param execution
      * @return
      */
-    public String[] encodeNew(Execution previous, Execution execution) {
+    public String[] encode(Execution previous, Execution execution) {
         String id = encodeId(execution, previous);
         String time = encodeDate(execution, previous);
         String price = encodePrice(execution, previous);
