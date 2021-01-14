@@ -756,7 +756,7 @@ public class ExecutionLog {
                             }
                         })
                         .effectOnComplete(() -> {
-                            log.info("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                            log.trace("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                         });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -788,7 +788,7 @@ public class ExecutionLog {
                             .effectOnObserve(stopwatch::start)
                             .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
                             .effectOnComplete(() -> {
-                                log.info("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                                log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
                             });
                 }
             } catch (IOException e) {

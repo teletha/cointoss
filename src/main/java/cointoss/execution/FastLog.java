@@ -37,7 +37,11 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
 
     private double buys;
 
+    private double buyStack;
+
     private double sells;
+
+    private double sellStack;
 
     /**
      * @param scale
@@ -70,9 +74,11 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
         latestId = e.id;
         if (e.isBuy()) {
             buys = e.size.doubleValue();
+            buyStack = e.size.doubleValue() * e.price.doubleValue();
             sells = 0;
         } else {
             sells = e.size.doubleValue();
+            sellStack = e.size.doubleValue() * e.price.doubleValue();
             buys = 0;
         }
 
@@ -91,8 +97,10 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
 
         if (e.isBuy()) {
             buys += e.size.doubleValue();
+            buyStack += e.size.doubleValue() * e.price.doubleValue();
         } else {
             sells += e.size.doubleValue();
+            sellStack += e.size.doubleValue() * e.price.doubleValue();
         }
 
         return I.signal();

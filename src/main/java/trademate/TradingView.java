@@ -102,7 +102,7 @@ public class TradingView extends View {
             boolean update = chart.showRealtimeUpdate.exact();
             chart.showRealtimeUpdate.set(false);
             chart.market.set(market);
-            market.readLog(log -> log.fromLast(5, LogType.Normal));
+            market.readLog(log -> log.fromLast(5, LogType.Fast));
             chart.showRealtimeUpdate.set(update);
             isLoading.set(false);
 
