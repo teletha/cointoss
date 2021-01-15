@@ -10,7 +10,7 @@
 package cointoss;
 
 public enum MarketType {
-    SPOT, DERIVATIVE;
+    SPOT, DERIVATIVE, FUTURE;
 
     /**
      * Type detection helper.
@@ -27,6 +27,15 @@ public enum MarketType {
      * @return
      */
     public boolean isDerivative() {
-        return this == DERIVATIVE;
+        return this == DERIVATIVE || this == FUTURE;
+    }
+
+    /**
+     * Type detection helper.
+     * 
+     * @return
+     */
+    public boolean isFuture() {
+        return this == FUTURE;
     }
 }

@@ -437,6 +437,17 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
+        public ÅssignableTarget<ÅssignableBase<Self>> future() {
+            Åssignable o = new Åssignable();
+            o.future();
+            return o;
+        }
+
+        /**
+         * Create new {@link MarketSetting} with the specified type property.
+         * 
+         * @return The next assignable model.
+         */
         public ÅssignableTarget<ÅssignableBase<Self>> spot() {
             Åssignable o = new Åssignable();
             o.spot();
@@ -467,6 +478,15 @@ public class MarketSetting implements MarketSettingModel {
          */
         default Next derivative() {
             return type(MarketType.DERIVATIVE);
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next future() {
+            return type(MarketType.FUTURE);
         }
 
         /**
