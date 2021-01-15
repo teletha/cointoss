@@ -17,7 +17,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -104,14 +103,6 @@ public class CoincheckService extends MarketService {
                 .map(json -> createExecution(json, new long[3]));
     }
 
-    public static final void main(String[] a) throws InterruptedException {
-        Market m = Market.of(Coincheck.BTC_JPY);
-        m.readLog(x -> x.fromYestaday());
-        // Coincheck.BTC_JPY.executionsBefore(1000000000).waitForTerminate().to(e -> {
-        // System.out.println(e);
-        // });
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -187,6 +178,14 @@ public class CoincheckService extends MarketService {
         }
 
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Coincheck RESTCall"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean supportHistoricalTrade() {
+        return false;
     }
 
     /**

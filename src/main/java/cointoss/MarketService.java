@@ -503,6 +503,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Checking support for historical trade.
+     * 
+     * @return
+     */
+    public boolean supportHistoricalTrade() {
+        return true;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
