@@ -55,6 +55,7 @@ public class TradeTester extends View {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
         DockSystem.register("Order").contents(OrderView.class).closable(false);
+        DockSystem.register("Summury").contents(SummuryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
         // ========================================================

@@ -55,7 +55,7 @@ public class TradingView extends View {
     public TradingView(UITab tab, MarketService service) {
         this.tab = tab;
         this.service = service;
-        this.market = new Market(service);
+        this.market = Market.of(service);
 
         Viewtify.Terminator.add(market);
     }

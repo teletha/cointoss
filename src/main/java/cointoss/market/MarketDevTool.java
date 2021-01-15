@@ -20,7 +20,7 @@ public class MarketDevTool {
      * @param service
      */
     public static void collectLog(MarketService service) {
-        Market m = new Market(service);
+        Market m = Market.of(service);
         m.readLog(log -> log.fromToday());
     }
 }

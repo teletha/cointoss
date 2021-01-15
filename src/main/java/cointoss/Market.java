@@ -12,7 +12,9 @@ package cointoss;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -43,6 +45,9 @@ import kiss.Signaling;
  * Facade for the market related operations.
  */
 public class Market implements Disposable {
+
+    /** The cache. */
+    private static final Map<MarketService, Market> cachedMarket = new ConcurrentHashMap();
 
     /** The empty object. */
     public static final Execution BASE = Execution.with.buy(0).date(Chrono.utc(2000, 1, 1));
@@ -91,15 +96,16 @@ public class Market implements Disposable {
     /** The managed {@link Trader}. */
     public final List<Trader> traders = Collections.unmodifiableList(managedTraders);
 
-    /** Flag */
-    private boolean readingLog = false;
+    public static Market of(MarketService service) {
+        return cachedMarket.computeIfAbsent(service, Market::new);
+    }
 
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
      * @param provider A market provider.
      */
-    public Market(MarketService service) {
+    protected Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = createOrderManager();
         this.orderBook = createOrderBookManager();
@@ -138,7 +144,7 @@ public class Market implements Disposable {
      * @return
      */
     protected OrderBookManager createOrderBookManager() {
-        return new OrderBookManager(service, timeline.skipWhile(e -> readingLog).throttle(1, TimeUnit.SECONDS).map(Execution::price));
+        return new OrderBookManager(service, service.executionsRealtimely().throttle(1, TimeUnit.SECONDS).map(Execution::price));
     }
 
     /**
@@ -303,9 +309,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Market readLog(Function<ExecutionLog, Signal<Execution>> log) {
-        readingLog = true;
         service.add(log.apply(service.log).to(timelineObservers));
-        readingLog = false;
 
         return this;
     }

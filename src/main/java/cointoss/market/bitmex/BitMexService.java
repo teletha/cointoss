@@ -48,7 +48,7 @@ public class BitMexService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
+    private static final APILimiter Limit = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://www.bitmex.com/realtime")

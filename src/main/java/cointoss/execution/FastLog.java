@@ -9,8 +9,6 @@
  */
 package cointoss.execution;
 
-import java.util.NavigableMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
 
 import cointoss.Direction;
@@ -39,11 +37,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
 
     private double buys;
 
-    private NavigableMap<Num, Num> buying;
-
     private double sells;
-
-    private NavigableMap<Num, Num> selling;
 
     /**
      * @param scale
@@ -73,16 +67,12 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
         start = e.mills - e.mills % 5000;
         end = start + 5000;
         open = highest = lowest = close = e.price.doubleValue();
-        buying = new ConcurrentSkipListMap();
-        selling = new ConcurrentSkipListMap();
         latestId = e.id;
         if (e.isBuy()) {
             buys = e.size.doubleValue();
-            buying.put(e.price, e.size);
             sells = 0;
         } else {
             sells = e.size.doubleValue();
-            selling.put(e.price, e.size);
             buys = 0;
         }
 
@@ -101,10 +91,8 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
 
         if (e.isBuy()) {
             buys += e.size.doubleValue();
-            buying.compute(e.price, (k, o) -> o == null ? e.size : o.plus(e.size));
         } else {
             sells += e.size.doubleValue();
-            selling.compute(e.price, (k, o) -> o == null ? e.size : o.plus(e.size));
         }
 
         return I.signal();
@@ -143,10 +131,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
                 Direction[] sides = bull ? new Direction[] {buySide, sellSide, buySide, sellSide}
                         : new Direction[] {sellSide, buySide, sellSide, buySide};
 
-                System.out.println(buying.size() + "  " + selling.size());
-                Num[] buyV = bull ? volumes(buying, highest, open, true) : volumes(buying, highest, close, true);
-                Num[] sellV = bull ? volumes(selling, close, lowest, false) : volumes(selling, open, lowest, false);
-                Num[] sizes = bull ? new Num[] {buyV[1], sellV[1], buyV[0], sellV[0]} : new Num[] {sellV[0], buyV[0], sellV[1], buyV[1]};
+                Num[] sizes = bull ? new Num[] {buy, sell, buy, sell} : new Num[] {sell, buy, sell, buy};
                 double[] prices = bull ? new double[] {open, lowest, highest, close} : new double[] {open, highest, lowest, close};
 
                 for (int i = 0; i < prices.length; i++) {
@@ -167,19 +152,5 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
                 }
             }
         });
-    }
-
-    private Num[] volumes(NavigableMap<Num, Num> volumes, double upper, double lower, boolean buy) {
-        Num middle = Num.of((upper + lower) / 2);
-        double head = volumes.headMap(middle, buy).values().stream().mapToDouble(Num::doubleValue).sum();
-        double tail = volumes.tailMap(middle, !buy).values().stream().mapToDouble(Num::doubleValue).sum();
-
-        return Num.of(tail, head);
-    }
-
-    private Num[] volumes2(NavigableMap<Num, Num> volumes, double upper, double lower, boolean buy) {
-        double middle = volumes.values().stream().mapToDouble(Num::doubleValue).sum();
-
-        return Num.of(middle / 2d, middle / 2);
     }
 }

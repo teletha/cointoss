@@ -41,4 +41,6 @@ public interface CommonText {
     Variable<String> HighPrice = I.translate("High");
 
     Variable<String> LowPrice = I.translate("Low");
+
+    Variable<String> Market = I.translate("Market");
 }

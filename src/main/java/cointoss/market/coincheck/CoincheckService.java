@@ -105,7 +105,7 @@ public class CoincheckService extends MarketService {
     }
 
     public static final void main(String[] a) throws InterruptedException {
-        Market m = new Market(Coincheck.BTC_JPY);
+        Market m = Market.of(Coincheck.BTC_JPY);
         m.readLog(x -> x.fromYestaday());
         // Coincheck.BTC_JPY.executionsBefore(1000000000).waitForTerminate().to(e -> {
         // System.out.println(e);
