@@ -179,12 +179,12 @@ public class BitfinexService extends MarketService {
                 .map(json -> {
                     JSON data = json.get("1");
                     Num price = data.get(Num.class, "0");
-                    float size = Float.parseFloat(data.text("2"));
+                    float size = data.get(float.class, "2");
 
                     if (0 < size) {
                         return OrderBookPageChanges.singleBuy(price, size);
                     } else {
-                        return OrderBookPageChanges.singleSell(price, size);
+                        return OrderBookPageChanges.singleSell(price, -size);
                     }
                 });
     }

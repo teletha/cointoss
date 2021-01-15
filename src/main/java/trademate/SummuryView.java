@@ -96,8 +96,7 @@ public class SummuryView extends View {
                         .retry());
 
         MarketServiceProvider.availableMarketServices()
-                .take(service -> service.setting.type
-                        .isSpot() && service.setting.target.currency == Currency.BTC && service.setting.base.currency == Currency.JPY)
+                .take(service -> service.setting.type.isSpot() && service.setting.target.currency == Currency.BTC)
                 .to(service -> {
                     table.addItemAtLast(Market.of(service));
                 });

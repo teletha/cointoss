@@ -63,10 +63,10 @@ class FastLogTest {
 
         List<Execution> fast = I.signal(e1, e2, e3, e4, e5).plug(new FastLog(2)).toList();
         assert fast.size() == 4;
-        assert equals(fast.get(0), Execution.with.sell(1.5).price(100).date(base));
-        assert equals(fast.get(1), Execution.with.buy(1).price(90).date(base.plusSeconds(1)));
-        assert equals(fast.get(2), Execution.with.sell(1.5).price(150).date(base.plusSeconds(2)));
-        assert equals(fast.get(3), Execution.with.buy(1).price(140).date(base.plusSeconds(3)));
+        assert equals(fast.get(0), Execution.with.buy(1).price(100).date(base));
+        assert equals(fast.get(1), Execution.with.sell(1.5).price(90).date(base.plusSeconds(1)));
+        assert equals(fast.get(2), Execution.with.buy(1).price(150).date(base.plusSeconds(2)));
+        assert equals(fast.get(3), Execution.with.sell(1.5).price(140).date(base.plusSeconds(3)));
     }
 
     @Test
@@ -103,15 +103,15 @@ class FastLogTest {
 
         List<Execution> fast = I.signal(e1, e2, e3, e4, e5).plug(new FastLog(2)).toList();
         assert fast.size() == 8;
-        assert equals(fast.get(0), Execution.with.sell(0.5).price(100).date(base));
-        assert equals(fast.get(1), Execution.with.buy(0.5).price(100).date(base.plusSeconds(1)));
-        assert equals(fast.get(2), Execution.with.sell(0.5).price(150).date(base.plusSeconds(2)));
-        assert equals(fast.get(3), Execution.with.buy(0.5).price(150).date(base.plusSeconds(3)));
+        assert equals(fast.get(0), Execution.with.buy(0.5).price(100).date(base));
+        assert equals(fast.get(1), Execution.with.sell(0.5).price(100).date(base.plusSeconds(1)));
+        assert equals(fast.get(2), Execution.with.buy(0.5).price(150).date(base.plusSeconds(2)));
+        assert equals(fast.get(3), Execution.with.sell(0.5).price(150).date(base.plusSeconds(3)));
 
-        assert equals(fast.get(4), Execution.with.sell(1).price(120).date(base.plusSeconds(5)));
-        assert equals(fast.get(5), Execution.with.buy(0.5).price(90).date(base.plusSeconds(6)));
-        assert equals(fast.get(6), Execution.with.sell(1).price(140).date(base.plusSeconds(7)));
-        assert equals(fast.get(7), Execution.with.buy(0.5).price(140).date(base.plusSeconds(8)));
+        assert equals(fast.get(4), Execution.with.buy(0.5).price(120).date(base.plusSeconds(5)));
+        assert equals(fast.get(5), Execution.with.sell(1).price(90).date(base.plusSeconds(6)));
+        assert equals(fast.get(6), Execution.with.buy(0.5).price(140).date(base.plusSeconds(7)));
+        assert equals(fast.get(7), Execution.with.sell(1).price(140).date(base.plusSeconds(8)));
     }
 
     private boolean equals(Execution one, Execution other) {
