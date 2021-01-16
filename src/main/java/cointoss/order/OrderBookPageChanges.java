@@ -68,18 +68,47 @@ public class OrderBookPageChanges {
      * @return
      */
     public static OrderBookPageChanges byJSON(List<JSON> bids, List<JSON> asks, String priceKey, String sizeKey) {
+        return byJSON(bids, asks, priceKey, sizeKey, -1);
+    }
+
+    /**
+     * Helper method to build the optimized {@link OrderBookPageChanges} from simple JSON data set.
+     * 
+     * @param bids A bid data.
+     * @param asks An ask data.
+     * @param priceKey The price key on json.
+     * @param sizeKey The size key on json.
+     * @return
+     */
+    public static OrderBookPageChanges byJSON(List<JSON> bids, List<JSON> asks, String priceKey, String sizeKey, int scale) {
         int bidSize = bids.size();
         int askSize = asks.size();
-
         OrderBookPageChanges changes = byHint(bidSize, askSize);
-        for (int i = 0; i < bidSize; i++) {
-            JSON e = bids.get(i);
-            changes.bids.add(new OrderBookPage(e.get(Num.class, priceKey), Float.parseFloat(e.text(sizeKey))));
+
+        if (scale == -1) {
+            for (int i = 0; i < bidSize; i++) {
+                JSON e = bids.get(i);
+                changes.bids.add(new OrderBookPage(e.get(Num.class, priceKey), Float.parseFloat(e.text(sizeKey))));
+            }
+            for (int i = 0; i < askSize; i++) {
+                JSON e = asks.get(i);
+                changes.asks.add(new OrderBookPage(e.get(Num.class, priceKey), Float.parseFloat(e.text(sizeKey))));
+            }
+        } else {
+            for (int i = 0; i < bidSize; i++) {
+                JSON e = bids.get(i);
+                Num price = e.get(Num.class, priceKey);
+                Num size = e.get(Num.class, sizeKey).divide(price).scale(scale);
+                changes.bids.add(new OrderBookPage(price, size.floatValue()));
+            }
+            for (int i = 0; i < askSize; i++) {
+                JSON e = asks.get(i);
+                Num price = e.get(Num.class, priceKey);
+                Num size = e.get(Num.class, sizeKey).divide(price).scale(scale);
+                changes.asks.add(new OrderBookPage(price, size.floatValue()));
+            }
         }
-        for (int i = 0; i < askSize; i++) {
-            JSON e = asks.get(i);
-            changes.asks.add(new OrderBookPage(e.get(Num.class, priceKey), Float.parseFloat(e.text(sizeKey))));
-        }
+
         return changes;
     }
 

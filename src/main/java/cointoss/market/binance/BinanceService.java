@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import cointoss.Currency;
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
@@ -39,7 +40,7 @@ import kiss.Signal;
 public class BinanceService extends MarketService {
 
     /** The API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(2400).refresh(Duration.ofMinutes(1));
+    private static final APILimiter Limit = APILimiter.with.limit(200).refresh(Duration.ofSeconds(5));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.binance.com:9443/stream")
@@ -48,12 +49,19 @@ public class BinanceService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket RealtimeFuture = Realtime.withAddress("wss://fstream.binance.com/stream");
 
+    /** The realtime communicator. */
+    private static final EfficientWebSocket RealtimeDelivery = Realtime.withAddress("wss://dstream.binance.com/stream");
+
+    private final boolean isDelivery;
+
     /**
      * @param marketName
      * @param setting
      */
     protected BinanceService(String marketName, MarketSetting setting) {
         super(setting.type.isDerivative() ? Exchange.BinanceF : Exchange.Binance, marketName, setting);
+
+        this.isDelivery = setting.type.isDerivative() && setting.base.currency == Currency.USD;
     }
 
     /**
@@ -61,7 +69,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected EfficientWebSocket clientRealtimely() {
-        return setting.type.isDerivative() ? RealtimeFuture : Realtime;
+        return setting.type.isSpot() ? Realtime : isDelivery ? RealtimeDelivery : RealtimeFuture;
     }
 
     /**
@@ -120,6 +128,7 @@ public class BinanceService extends MarketService {
         Direction side = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
         Num size = e.get(Num.class, "q");
         Num price = e.get(Num.class, "p");
+        if (isDelivery) size = size.divide(price).scale(setting.target.scale);
         ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
 
         return Execution.with.direction(side, size)
@@ -154,7 +163,8 @@ public class BinanceService extends MarketService {
      * @return
      */
     private OrderBookPageChanges createOrderBook(JSON pages, String bidName, String askName) {
-        return OrderBookPageChanges.byJSON(pages.find(bidName, "*"), pages.find(askName, "*"), "0", "1");
+        return OrderBookPageChanges
+                .byJSON(pages.find(bidName, "*"), pages.find(askName, "*"), "0", "1", isDelivery ? setting.target.scale : -1);
     }
 
     /**
@@ -195,13 +205,6 @@ public class BinanceService extends MarketService {
                 .takeAt(i -> i % 5 == 0)
                 .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
                 .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(double.class, "openInterest")));
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Binance.FUTURE_BTC_USDT.openInterestRealtimely().to(e -> {
-            System.out.println(e);
-        });
-        Thread.sleep(1000 * 60 * 15);
     }
 
     /**
@@ -258,7 +261,8 @@ public class BinanceService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path, int weight) {
-        String uri = setting.type.isDerivative() ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
+        String uri = setting.type.isSpot() ? "https://api.binance.com/api/v3/"
+                : isDelivery ? "https://dapi.binance.com/dapi/v1/" : "https://fapi.binance.com/fapi/v1/";
         Builder builder = HttpRequest.newBuilder(URI.create(path.startsWith("http") ? path : uri + path));
 
         return Network.rest(builder, Limit, weight, client()).retryWhen(retryPolicy(10, "Binance RESTCall"));

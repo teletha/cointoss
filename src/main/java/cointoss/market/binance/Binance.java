@@ -13,7 +13,6 @@ import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
-import cointoss.market.MarketDevTool;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
 
@@ -81,15 +80,23 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService FUTURE_BTCUSD_210326 = new BinanceService("BTCUSD_210326", MarketSetting.with.derivative()
+            .target(Currency.BTC.minimumSize(0.00001))
+            .base(Currency.USD.minimumSize(0.1))
+            .priceRangeModifier(500)
+            .acquirableExecutionSize(AcquirableSize));
+
+    static final MarketService FUTURE_BTCUSD_210625 = new BinanceService("BTCUSD_210625", MarketSetting.with.derivative()
+            .target(Currency.BTC.minimumSize(0.00001))
+            .base(Currency.USD.minimumSize(0.1))
+            .priceRangeModifier(500)
+            .acquirableExecutionSize(AcquirableSize));
+
     /**
      * {@inheritDoc}
      */
     @Override
     public MarketAccount account() {
         return I.make(BinanceAccount.class);
-    }
-
-    public static void main(String[] args) {
-        MarketDevTool.collectLog(EOS_USDT);
     }
 }

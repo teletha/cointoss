@@ -95,10 +95,8 @@ public class SummuryView extends View {
                         .on(Viewtify.UIThread)
                         .retry());
 
-        MarketServiceProvider.availableMarketServices()
-                .take(service -> service.setting.type.isSpot() && service.setting.target.currency == Currency.BTC)
-                .to(service -> {
-                    table.addItemAtLast(Market.of(service));
-                });
+        MarketServiceProvider.availableMarketServices().take(service -> service.setting.target.currency == Currency.BTC).to(service -> {
+            table.addItemAtLast(Market.of(service));
+        });
     }
 }

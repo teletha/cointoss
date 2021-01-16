@@ -10,7 +10,8 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -58,7 +59,6 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
-import cointoss.market.bybit.Bybit;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
@@ -422,7 +422,7 @@ public class ExecutionLog {
         if (cacheId < e.id) {
             cacheId = e.id;
 
-            if (cache.endTime <= e.mills) {
+            if (e.mills < cache.startTime || cache.endTime <= e.mills) {
                 cache.disableAutoSave();
                 cache.convertNormalToCompact(true);
                 cache = new Cache(e.date).enableAutoSave();
@@ -537,18 +537,6 @@ public class ExecutionLog {
         return range(first.plusDays(offset), first.plusDays(offset + days), type);
     }
 
-    public static void main(String[] args) {
-        ExecutionLog log = new ExecutionLog(Bybit.BTC_USD);
-        LocalDate day = Chrono.utc(2020, 12, 15).toLocalDate();
-        while (true) {
-            Cache cache = log.cache(day);
-            cache.repair(false);
-            cache.convertNormalToCompact(false);
-            day = day.minusDays(1);
-        }
-
-    }
-
     /**
      * 
      */
@@ -556,6 +544,9 @@ public class ExecutionLog {
 
         /** The target date */
         final LocalDate date;
+
+        /** The start time. */
+        final long startTime;
 
         /** The end time. */
         final long endTime;
@@ -574,7 +565,8 @@ public class ExecutionLog {
          */
         private Cache(ZonedDateTime date) {
             this.date = date.toLocalDate();
-            this.endTime = date.plusDays(1).truncatedTo(ChronoUnit.DAYS).toInstant().toEpochMilli();
+            this.startTime = date.truncatedTo(ChronoUnit.DAYS).toInstant().toEpochMilli();
+            this.endTime = startTime + 24 * 60 * 60 * 1000;
             this.normal = root.file("execution" + Chrono.DateCompact.format(date) + ".log");
         }
 
@@ -914,18 +906,19 @@ public class ExecutionLog {
          * @param executions A stream of executions to write.
          * @return Wrapped {@link Signal}.
          */
-        Signal<Execution> writeFast(Signal<Execution> executions) {
-            File fast = fastLog();
-
+        Signal<Execution> writeCompact(Signal<Execution> executions) {
+            File compact = compactLog();
+        
             try {
                 Execution[] prev = {Market.BASE};
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
-
-                return executions.plug(new FastLog(service.setting.target.scale)).effect(e -> {
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
+        
+                return executions.plug(new CompactLog()).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
                     prev[0] = e;
                 }).effectOnComplete(() -> {
                     writer.close();
+                    repository.updateLocal(date);
                 });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -938,18 +931,19 @@ public class ExecutionLog {
          * @param executions A stream of executions to write.
          * @return Wrapped {@link Signal}.
          */
-        Signal<Execution> writeCompact(Signal<Execution> executions) {
-            File compact = compactLog();
+        Signal<Execution> writeFast(Signal<Execution> executions) {
+            File fast = fastLog();
 
             try {
                 Execution[] prev = {Market.BASE};
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
 
-                return executions.plug(new CompactLog()).effect(e -> {
+                return executions.plug(new FastLog(service.setting.target.scale)).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
                     prev[0] = e;
                 }).effectOnComplete(() -> {
                     writer.close();
+                    repository.updateLocal(date);
                 });
             } catch (IOException e) {
                 throw I.quiet(e);
