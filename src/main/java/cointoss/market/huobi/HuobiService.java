@@ -14,7 +14,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -36,12 +35,6 @@ import kiss.JSON;
 import kiss.Signal;
 
 public class HuobiService extends MarketService {
-
-    /** The right padding for id. */
-    private static final long PaddingForID = 100000;
-
-    /** The realtime data format */
-    private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(10).refresh(Duration.ofSeconds(1));
@@ -75,26 +68,7 @@ public class HuobiService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        startId++;
-        long startingPoint = startId % PaddingForID;
-        AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, encodeId(startId)};
-
-        return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(startId) + "&start=" + startingPoint)
-                .flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, increment, previous));
-    }
-
-    private ZonedDateTime encodeId(long id) {
-        return Chrono.utcByMills(id / PaddingForID);
-    }
-
-    private String formatEncodedId(long id) {
-        return RealTimeFormat.format(encodeId(id));
-    }
-
-    private long decodeId(ZonedDateTime time) {
-        return time.toInstant().toEpochMilli() * PaddingForID;
+        return I.signal();
     }
 
     /**
@@ -200,7 +174,17 @@ public class HuobiService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return I.signal();
+        return call("GET", "market/depth?symbol=" + marketName + "&type=step0").map(json -> {
+            JSON tick = json.get("tick");
+            return OrderBookPageChanges.byJSON(tick.find("bids", "*"), tick.find("asks", "*"), "0", "1");
+        });
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Huobi.BTC_USDT.orderBook().to(e -> {
+            System.out.println(e);
+        });
+        Thread.sleep(1000 * 5);
     }
 
     /**
@@ -208,7 +192,10 @@ public class HuobiService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return I.signal();
+        return clientRealtimely().subscribe(new Topic("depth.step1", marketName)).map(json -> {
+            JSON tick = json.get("tick");
+            return OrderBookPageChanges.byJSON(tick.find("bids", "*"), tick.find("asks", "*"), "0", "1");
+        });
     }
 
     /**
@@ -222,6 +209,14 @@ public class HuobiService extends MarketService {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.huobi.pro/" + path));
 
         return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Huobi RESTCall"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean supportHistoricalTrade() {
+        return false;
     }
 
     /**
