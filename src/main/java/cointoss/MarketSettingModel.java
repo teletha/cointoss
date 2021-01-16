@@ -93,7 +93,18 @@ interface MarketSettingModel {
      * 
      * @return
      */
-    public default ExecutionLogger createExecutionLogger() {
+    default ExecutionLogger createExecutionLogger() {
         return I.make(executionLogger());
+    }
+
+    /**
+     * Test the currency pair.
+     * 
+     * @param target
+     * @param base
+     * @return
+     */
+    default boolean match(Currency target, Currency base) {
+        return target().currency == target && base().currency == base;
     }
 }
