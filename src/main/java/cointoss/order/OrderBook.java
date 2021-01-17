@@ -230,6 +230,16 @@ public class OrderBook {
     }
 
     /**
+     * Predict the taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Signal<Num> predictTakingPrice(Signal<Num> size) {
+        return best.observing().combineLatest(size).map(e -> predictTakingPrice(e.ⅱ));
+    }
+
+    /**
      * Predict the making price.
      * 
      * @param size A threshold size.

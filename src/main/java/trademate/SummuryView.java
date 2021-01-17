@@ -80,17 +80,13 @@ public class SummuryView extends View {
                         .on(Viewtify.UIThread));
 
         priceForBuy.text(CommonText.Buy)
-                .modelBySignal(m -> m.orderBook.shorts.best.observing()
-                        .combineLatest(size.observing())
-                        .map(e -> m.orderBook.shorts.predictTakingPrice(e.ⅱ))
+                .modelBySignal(m -> m.orderBook.shorts.predictTakingPrice(size.observing())
                         .throttle(throttle, MILLISECONDS)
                         .on(Viewtify.UIThread)
                         .retry());
 
         priceForSell.text(CommonText.Sell)
-                .modelBySignal(m -> m.orderBook.longs.best.observing()
-                        .combineLatest(size.observing())
-                        .map(e -> m.orderBook.longs.predictTakingPrice(e.ⅱ))
+                .modelBySignal(m -> m.orderBook.longs.predictTakingPrice(size.observing())
                         .throttle(throttle, MILLISECONDS)
                         .on(Viewtify.UIThread)
                         .retry());

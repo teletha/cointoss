@@ -12,11 +12,28 @@ package cointoss.arbitrage;
 import java.util.List;
 
 import cointoss.Currency;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
+import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.Signal;
 
 public class Arbitrage {
+
+    /** The target. */
+    private final List<Market> markets;
+
+    private final Num min;
+
+    private Arbitrage(List<MarketService> services) {
+        this.markets = I.signal(services).map(Market::of).toList();
+        this.min = Num.ONE;
+
+        I.signal(markets).flatMap(m -> m.orderBook.longs.predictTakingPrice(I.signal(min))).to(e -> {
+
+        });
+    }
 
     public static Signal<Arbitrage> by(Currency target, Currency base) {
         List<MarketService> list = MarketServiceProvider.availableMarketServices()
@@ -28,7 +45,8 @@ public class Arbitrage {
             throw new Error("There must be at least two exchanges that are eligible. [Target: " + target + "  Base: " + base + "]");
         }
 
-        double size = list.stream().mapToDouble(s -> s.setting.target.minimumSize.floatValue()).max().orElseThrow();
+        I.signal(list).combineLatestMap2(s -> Market.of(s).orderBook.longs.predictTakingPrice(I.signal(Num.ONE)));
+        Arbitrage arbitrage = new Arbitrage(list);
 
         return null;
     }
