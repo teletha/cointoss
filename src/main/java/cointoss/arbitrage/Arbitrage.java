@@ -10,6 +10,8 @@
 package cointoss.arbitrage;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import cointoss.Currency;
 import cointoss.Market;
@@ -21,33 +23,35 @@ import kiss.Signal;
 
 public class Arbitrage {
 
-    /** The target. */
-    private final List<Market> markets;
-
-    private final Num min;
-
-    private Arbitrage(List<MarketService> services) {
-        this.markets = I.signal(services).map(Market::of).toList();
-        this.min = Num.ONE;
-
-        I.signal(markets).flatMap(m -> m.orderBook.longs.predictTakingPrice(I.signal(min))).to(e -> {
-
-        });
-    }
-
     public static Signal<Arbitrage> by(Currency target, Currency base) {
-        List<MarketService> list = MarketServiceProvider.availableMarketServices()
+        List<MarketService> services = MarketServiceProvider.availableMarketServices()
                 .take(service -> service.setting.type.isSpot())
                 .take(service -> service.setting.match(target, base))
                 .toList();
 
-        if (list.size() <= 1) {
+        if (services.size() <= 1) {
             throw new Error("There must be at least two exchanges that are eligible. [Target: " + target + "  Base: " + base + "]");
         }
 
-        I.signal(list).combineLatestMap2(s -> Market.of(s).orderBook.longs.predictTakingPrice(I.signal(Num.ONE)));
-        Arbitrage arbitrage = new Arbitrage(list);
+        Signal<Num> size = I.signal(services).map(service -> service.setting.target.minimumSize).scanWith(Num.ZERO, Num::max).last();
+        Signal<Entry<MarketService, Num>> maxSellPrice = I.signal(services)
+                .combineLatestMap(service -> Market.of(service).orderBook.longs.predictTakingPrice(size))
+                .map(Arbitrage::max);
+        Signal<Entry<MarketService, Num>> minBuyPrice = I.signal(services)
+                .combineLatestMap(service -> Market.of(service).orderBook.shorts.predictTakingPrice(size))
+                .map(Arbitrage::min);
 
+        return maxSellPrice.combineLatest(minBuyPrice).map(e -> {
+            Arbitrage arbitrage = new Arbitrage();
+            return arbitrage;
+        });
+    }
+
+    static Entry<MarketService, Num> min(Map<MarketService, Num> markets) {
+        return null;
+    }
+
+    static Entry<MarketService, Num> max(Map<MarketService, Num> markets) {
         return null;
     }
 }
