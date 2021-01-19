@@ -16,6 +16,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
 
 /**
@@ -73,6 +74,18 @@ public class MarketSetting implements MarketSettingModel {
     /** The final property updater. */
     private static final MethodHandle executionLoggerUpdater = updater("executionLogger");
 
+    /** The final property updater. */
+    private static final MethodHandle takerFeeUpdater = updater("takerFee");
+
+    /** The final property updater. */
+    private static final MethodHandle makerFeeUpdater = updater("makerFee");
+
+    /** The final property updater. */
+    private static final MethodHandle targetWithdrawingFeeUpdater = updater("targetWithdrawingFee");
+
+    /** The final property updater. */
+    private static final MethodHandle baseWithdrawingFeeUpdater = updater("baseWithdrawingFee");
+
     /** The exposed property. */
     public final MarketType type;
 
@@ -94,6 +107,18 @@ public class MarketSetting implements MarketSettingModel {
     /** The exposed property. */
     public final Class<? extends ExecutionLogger> executionLogger;
 
+    /** The exposed property. */
+    public final UnaryOperator<Num> takerFee;
+
+    /** The exposed property. */
+    public final UnaryOperator<Num> makerFee;
+
+    /** The exposed property. */
+    public final UnaryOperator<Num> targetWithdrawingFee;
+
+    /** The exposed property. */
+    public final UnaryOperator<Num> baseWithdrawingFee;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -105,6 +130,10 @@ public class MarketSetting implements MarketSettingModel {
         this.priceRangeModifier = MarketSettingModel.super.priceRangeModifier();
         this.acquirableExecutionSize = MarketSettingModel.super.acquirableExecutionSize();
         this.executionLogger = MarketSettingModel.super.executionLogger();
+        this.takerFee = MarketSettingModel.super.takerFee();
+        this.makerFee = MarketSettingModel.super.makerFee();
+        this.targetWithdrawingFee = MarketSettingModel.super.targetWithdrawingFee();
+        this.baseWithdrawingFee = MarketSettingModel.super.baseWithdrawingFee();
     }
 
     /**
@@ -352,6 +381,138 @@ public class MarketSetting implements MarketSettingModel {
         }
     }
 
+    /** Get the fee on taking order. */
+    @Override
+    public final UnaryOperator<Num> takerFee() {
+        return this.takerFee;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of takerFee property.
+     */
+    @SuppressWarnings("unused")
+    private final UnaryOperator<Num> getTakerFee() {
+        return this.takerFee;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of takerFee property to assign.
+     */
+    private final void setTakerFee(UnaryOperator<Num> value) {
+        if (value == null) {
+            value = MarketSettingModel.super.takerFee();
+        }
+        try {
+            takerFeeUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /** Get the fee on making order. */
+    @Override
+    public final UnaryOperator<Num> makerFee() {
+        return this.makerFee;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of makerFee property.
+     */
+    @SuppressWarnings("unused")
+    private final UnaryOperator<Num> getMakerFee() {
+        return this.makerFee;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of makerFee property to assign.
+     */
+    private final void setMakerFee(UnaryOperator<Num> value) {
+        if (value == null) {
+            value = MarketSettingModel.super.makerFee();
+        }
+        try {
+            makerFeeUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /** Get the fee on withdraw. */
+    @Override
+    public final UnaryOperator<Num> targetWithdrawingFee() {
+        return this.targetWithdrawingFee;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of targetWithdrawingFee property.
+     */
+    @SuppressWarnings("unused")
+    private final UnaryOperator<Num> getTargetWithdrawingFee() {
+        return this.targetWithdrawingFee;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of targetWithdrawingFee property to assign.
+     */
+    private final void setTargetWithdrawingFee(UnaryOperator<Num> value) {
+        if (value == null) {
+            value = MarketSettingModel.super.targetWithdrawingFee();
+        }
+        try {
+            targetWithdrawingFeeUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /** Get the fee on withdraw. */
+    @Override
+    public final UnaryOperator<Num> baseWithdrawingFee() {
+        return this.baseWithdrawingFee;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of baseWithdrawingFee property.
+     */
+    @SuppressWarnings("unused")
+    private final UnaryOperator<Num> getBaseWithdrawingFee() {
+        return this.baseWithdrawingFee;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of baseWithdrawingFee property to assign.
+     */
+    private final void setBaseWithdrawingFee(UnaryOperator<Num> value) {
+        if (value == null) {
+            value = MarketSettingModel.super.baseWithdrawingFee();
+        }
+        try {
+            baseWithdrawingFeeUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
     /**
      * Show all property values.
      *
@@ -366,7 +527,11 @@ public class MarketSetting implements MarketSettingModel {
         builder.append("targetCurrencyBidSizes=").append(targetCurrencyBidSizes).append(", ");
         builder.append("priceRangeModifier=").append(priceRangeModifier).append(", ");
         builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
-        builder.append("executionLogger=").append(executionLogger).append("]");
+        builder.append("executionLogger=").append(executionLogger).append(", ");
+        builder.append("takerFee=").append(takerFee).append(", ");
+        builder.append("makerFee=").append(makerFee).append(", ");
+        builder.append("targetWithdrawingFee=").append(targetWithdrawingFee).append(", ");
+        builder.append("baseWithdrawingFee=").append(baseWithdrawingFee).append("]");
         return builder.toString();
     }
 
@@ -377,7 +542,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, acquirableExecutionSize, executionLogger);
+        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, acquirableExecutionSize, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
     }
 
     /**
@@ -399,6 +564,10 @@ public class MarketSetting implements MarketSettingModel {
         if (priceRangeModifier != other.priceRangeModifier) return false;
         if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
+        if (!Objects.equals(takerFee, other.takerFee)) return false;
+        if (!Objects.equals(makerFee, other.makerFee)) return false;
+        if (!Objects.equals(targetWithdrawingFee, other.targetWithdrawingFee)) return false;
+        if (!Objects.equals(baseWithdrawingFee, other.baseWithdrawingFee)) return false;
         return true;
     }
 
@@ -426,17 +595,6 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
-            Åssignable o = new Åssignable();
-            o.spot();
-            return o;
-        }
-
-        /**
-         * Create new {@link MarketSetting} with the specified type property.
-         * 
-         * @return The next assignable model.
-         */
         public ÅssignableTarget<ÅssignableBase<Self>> derivative() {
             Åssignable o = new Åssignable();
             o.derivative();
@@ -451,6 +609,17 @@ public class MarketSetting implements MarketSettingModel {
         public ÅssignableTarget<ÅssignableBase<Self>> future() {
             Åssignable o = new Åssignable();
             o.future();
+            return o;
+        }
+
+        /**
+         * Create new {@link MarketSetting} with the specified type property.
+         * 
+         * @return The next assignable model.
+         */
+        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
+            Åssignable o = new Åssignable();
+            o.spot();
             return o;
         }
     }
@@ -476,15 +645,6 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        default Next spot() {
-            return type(MarketType.SPOT);
-        }
-
-        /**
-         * Assign type property.
-         * 
-         * @return The next assignable model.
-         */
         default Next derivative() {
             return type(MarketType.DERIVATIVE);
         }
@@ -496,6 +656,15 @@ public class MarketSetting implements MarketSettingModel {
          */
         default Next future() {
             return type(MarketType.FUTURE);
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next spot() {
+            return type(MarketType.SPOT);
         }
     }
 
@@ -590,6 +759,50 @@ public class MarketSetting implements MarketSettingModel {
             ((MarketSetting) this).setExecutionLogger(value);
             return (Next) this;
         }
+
+        /**
+         * Assign takerFee property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next takerFee(UnaryOperator<Num> value) {
+            ((MarketSetting) this).setTakerFee(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign makerFee property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next makerFee(UnaryOperator<Num> value) {
+            ((MarketSetting) this).setMakerFee(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign targetWithdrawingFee property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next targetWithdrawingFee(UnaryOperator<Num> value) {
+            ((MarketSetting) this).setTargetWithdrawingFee(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign baseWithdrawingFee property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next baseWithdrawingFee(UnaryOperator<Num> value) {
+            ((MarketSetting) this).setBaseWithdrawingFee(value);
+            return (Next) this;
+        }
     }
 
     /**
@@ -615,5 +828,9 @@ public class MarketSetting implements MarketSettingModel {
         static final String PriceRangeModifier = "priceRangeModifier";
         static final String AcquirableExecutionSize = "acquirableExecutionSize";
         static final String ExecutionLogger = "executionLogger";
+        static final String TakerFee = "takerFee";
+        static final String MakerFee = "makerFee";
+        static final String TargetWithdrawingFee = "targetWithdrawingFee";
+        static final String BaseWithdrawingFee = "baseWithdrawingFee";
     }
 }

@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.function.UnaryOperator;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
@@ -40,6 +41,9 @@ public class OrderBook {
     /** The scale for target currency. */
     private final int scaleTarget;
 
+    /** The taker fee calculator. */
+    private final UnaryOperator<Num> takerFee;
+
     /** The base boards. */
     private final ConcurrentSkipListMap<Num, OrderBookPage> base;
 
@@ -61,6 +65,7 @@ public class OrderBook {
         this.base = new ConcurrentSkipListMap(side.isBuy() ? Comparator.reverseOrder() : Comparator.naturalOrder());
         this.scaleBase = setting.base.scale;
         this.scaleTarget = setting.target.scale;
+        this.takerFee = setting.takerFee;
         this.group = new GroupedOrderBook(setting.base.minimumSize);
     }
 
@@ -88,6 +93,10 @@ public class OrderBook {
     // group.pages = replacer.apply(group.pages);
     // }
     // }
+
+    public final Num bestSize() {
+        return Num.of(Primitives.roundDecimal(best.v.size, scaleTarget));
+    }
 
     /**
      * Get the grouped view of this {@link OrderBook}.
@@ -237,6 +246,24 @@ public class OrderBook {
      */
     public final Signal<Num> predictTakingPrice(Signal<Num> size) {
         return best.observing().combineLatest(size).map(e -> predictTakingPrice(e.ⅱ));
+    }
+
+    /**
+     * Predict the real taking price.
+     * 
+     * @param size A taking size.
+     * @return A predicted price.
+     */
+    public final Signal<Num> predictRealTakingPrice(Signal<Num> size) {
+        return best.observing().combineLatest(size).map(e -> {
+            Num price = predictTakingPrice(e.ⅱ);
+
+            if (side == Direction.BUY) {
+                return price.minus(takerFee.apply(price));
+            } else {
+                return price.plus(takerFee.apply(price));
+            }
+        });
     }
 
     /**

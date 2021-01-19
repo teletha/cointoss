@@ -9,6 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
+import java.util.function.UnaryOperator;
+
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
@@ -24,13 +26,18 @@ public final class BitFlyer extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 499;
 
+    private static final UnaryOperator<Num> JPYWithdrawFee = size -> Num.of("770");
+
     public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.001).scale(8))
             .base(Currency.JPY.minimumSize(1))
             .priceRangeModifier(500)
             .targetCurrencyBidSizes(Num.of(0.01), Num.of(0.1), Num.of(1))
             .acquirableExecutionSize(AcquirableSize)
-            .executionLogger(BitFlyerLogger.class));
+            .executionLogger(BitFlyerLogger.class)
+            .takerFee(size -> size.multiply("0.0001"))
+            .targetWithdrawingFee(size -> Num.of("0.0004"))
+            .baseWithdrawingFee(JPYWithdrawFee));
 
     public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.01).scale(8))
@@ -38,14 +45,18 @@ public final class BitFlyer extends MarketServiceProvider {
             .priceRangeModifier(500)
             .targetCurrencyBidSizes(Num.of(0.01), Num.of(0.1), Num.of(1))
             .acquirableExecutionSize(AcquirableSize)
-            .executionLogger(BitFlyerLogger.class));
+            .executionLogger(BitFlyerLogger.class)
+            .baseWithdrawingFee(JPYWithdrawFee));
 
     public static final MarketService ETH_JPY = new BitFlyerService("ETH_JPY", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.01).scale(8))
             .base(Currency.JPY.minimumSize(1))
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize)
-            .executionLogger(BitFlyerLogger.class));
+            .executionLogger(BitFlyerLogger.class)
+            .takerFee(size -> size.multiply("0.0001"))
+            .targetWithdrawingFee(size -> Num.of("0.005"))
+            .baseWithdrawingFee(JPYWithdrawFee));
 
     /**
      * {@inheritDoc}

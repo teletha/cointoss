@@ -10,6 +10,7 @@
 package cointoss;
 
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLog;
@@ -86,6 +87,38 @@ interface MarketSettingModel {
     @Icy.Property
     default Class<? extends ExecutionLogger> executionLogger() {
         return ExecutionDeltaLogger.class;
+    }
+
+    /**
+     * Get the fee on taking order.
+     */
+    @Icy.Property
+    default UnaryOperator<Num> takerFee() {
+        return size -> Num.ZERO;
+    }
+
+    /**
+     * Get the fee on making order.
+     */
+    @Icy.Property
+    default UnaryOperator<Num> makerFee() {
+        return size -> Num.ZERO;
+    }
+
+    /**
+     * Get the fee on withdraw.
+     */
+    @Icy.Property
+    default UnaryOperator<Num> targetWithdrawingFee() {
+        return size -> Num.ZERO;
+    }
+
+    /**
+     * Get the fee on withdraw.
+     */
+    @Icy.Property
+    default UnaryOperator<Num> baseWithdrawingFee() {
+        return size -> Num.ZERO;
     }
 
     /**
