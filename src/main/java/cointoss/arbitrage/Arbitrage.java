@@ -9,6 +9,7 @@
  */
 package cointoss.arbitrage;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import kiss.I;
 import kiss.Signal;
 
 public class Arbitrage {
+
+    public LocalDateTime time = LocalDateTime.now();
 
     public Num size;
 
@@ -42,7 +45,7 @@ public class Arbitrage {
      */
     @Override
     public String toString() {
-        return "BUY: " + buyMarket + "@" + buyPrice + "  SELL:" + sellMarket + "@" + sellPrice + "  PROFIT: " + profit() + "(" + size + ")";
+        return time + "  BUY: " + buyMarket + "@" + buyPrice + "  SELL:" + sellMarket + "@" + sellPrice + "  PROFIT: " + profit() + "(" + size + ")";
     }
 
     public static Signal<Arbitrage> by(Currency target, Currency base) {
