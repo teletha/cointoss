@@ -10,6 +10,7 @@
 package cointoss.arbitrage;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ import kiss.Signal;
 
 public class Arbitrage {
 
-    public LocalDateTime time = LocalDateTime.now();
+    public LocalDateTime time = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
     public Num size;
 
@@ -36,8 +37,10 @@ public class Arbitrage {
 
     public Num sellPrice;
 
+    public Num diffPrice;
+
     public Num profit() {
-        return sellPrice.minus(buyPrice).multiply(size).scale(sellMarket.service.setting.base.scale);
+        return diffPrice.multiply(size).scale(sellMarket.service.setting.base.scale);
     }
 
     /**
@@ -45,7 +48,7 @@ public class Arbitrage {
      */
     @Override
     public String toString() {
-        return time + "  BUY: " + buyMarket + "@" + buyPrice + "  SELL:" + sellMarket + "@" + sellPrice + "  PROFIT: " + profit() + "(" + size + ")";
+        return time + " " + buyMarket.service.setting.target.currency + "  " + buyMarket.service.exchange + " -> " + sellMarket.service.exchange + "  PROFIT: " + diffPrice + " * " + size + " = " + profit();
     }
 
     public static Signal<Arbitrage> by(Currency target, Currency base) {
@@ -78,6 +81,7 @@ public class Arbitrage {
             arbitrage.buyPrice = e.ⅱ.getValue();
             arbitrage.sellMarket = e.ⅰ.getKey();
             arbitrage.sellPrice = e.ⅰ.getValue();
+            arbitrage.diffPrice = arbitrage.sellPrice.minus(arbitrage.buyPrice);
             arbitrage.size = Num.min(arbitrage.buyMarket.orderBook.shorts.bestSize(), arbitrage.sellMarket.orderBook.longs.bestSize());
 
             return arbitrage;
