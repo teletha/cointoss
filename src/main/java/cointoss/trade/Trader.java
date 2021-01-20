@@ -9,7 +9,8 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
@@ -209,6 +210,14 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
         };
         now(() -> s);
         return s;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Scenario entry(Market market, Directional directional, Num size, Consumer<Orderable> declaration) {
+        return null;
     }
 
     /**

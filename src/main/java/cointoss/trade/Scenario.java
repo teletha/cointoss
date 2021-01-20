@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -206,6 +206,19 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      */
     @Override
     public final Scenario entry(Directional directional, Num size, Consumer<Orderable> declaration) {
+        if (size == null || size.isLessThan(market.service.setting.target.minimumSize)) {
+            throw new Error("Entry size is less than minimum bid size.");
+        }
+        market.request(this.directional = directional, size, declaration).to(this::processEntryOrder);
+
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Scenario entry(Market market, Directional directional, Num size, Consumer<Orderable> declaration) {
         if (size == null || size.isLessThan(market.service.setting.target.minimumSize)) {
             throw new Error("Entry size is less than minimum bid size.");
         }
