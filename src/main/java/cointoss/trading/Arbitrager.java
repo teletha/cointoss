@@ -10,9 +10,9 @@
 package cointoss.trading;
 
 import cointoss.Currency;
+import cointoss.Direction;
 import cointoss.Market;
 import cointoss.arbitrage.Arbitrage;
-import cointoss.order.Order;
 import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
@@ -28,8 +28,8 @@ public class Arbitrager extends Trader {
 
             @Override
             protected void entry() {
-                arb.buyMarket.orders.requestNow(Order.with.buy(arb.size));
-                arb.sellMarket.orders.requestNow(Order.with.sell(arb.size));
+                entry(arb.buyMarket, Direction.BUY, arb.size);
+                entry(arb.sellMarket, Direction.SELL, arb.size);
             }
 
             @Override

@@ -9,8 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
@@ -271,6 +270,34 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
     }
 
     /**
+     * Set up entry at your timing.
+     * 
+     * @param <T>
+     * @param timing
+     * @param builder Your trading scenario.
+     * @return Chainable API.
+     */
+    public final <T> Trader when(Signal<T> timing, ScenarioBuilder<T> builder) {
+        Objects.requireNonNull(timing);
+        Objects.requireNonNull(builder);
+
+        add(timing.take(v -> disable.isEmpty()).to(value -> {
+            Scenario scenario = builder.apply(value);
+
+            if (scenario != null) {
+                scenario.trader = this;
+                scenario.market = market;
+                scenario.funds = funds;
+                scenario.entry();
+
+                scenarios.add(scenario);
+                scenarioAdded.accept(scenario);
+            }
+        }));
+        return this;
+    }
+
+    /**
      * Calcualte the sanpshot when market is the specified datetime and price.
      * 
      * @param time The specified date and time.
@@ -405,6 +432,11 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
     @Override
     public String toString() {
         return name();
+    }
+
+    public static interface ScenarioBuilder<V> {
+
+        List<Scenario> build(V timing);
     }
 
     /**
