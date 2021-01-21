@@ -9,7 +9,8 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
@@ -44,6 +45,7 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.WiseConsumer;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
@@ -238,7 +240,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
      * @return Chainable API.
      */
     public final <T> Trader when(Signal<T> timing, WiseSupplier<Scenario> builder) {
-        return when(timing, v -> builder.get());
+        return when(timing, (WiseFunction<T, Scenario>) v -> builder.get());
     }
 
     /**
@@ -277,7 +279,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
      * @param builder Your trading scenario.
      * @return Chainable API.
      */
-    public final <T> Trader when(Signal<T> timing, ScenarioBuilder<T> builder) {
+    public final <T> Trader when(Signal<T> timing, WiseConsumer<T> builder) {
         Objects.requireNonNull(timing);
         Objects.requireNonNull(builder);
 
@@ -295,6 +297,10 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
             }
         }));
         return this;
+    }
+
+    protected void scenario(Market market, WiseConsumer<TradingEntry> entry, WiseConsumer<TradingExit> exit) {
+
     }
 
     /**
@@ -432,11 +438,6 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
     @Override
     public String toString() {
         return name();
-    }
-
-    public static interface ScenarioBuilder<V> {
-
-        List<Scenario> build(V timing);
     }
 
     /**

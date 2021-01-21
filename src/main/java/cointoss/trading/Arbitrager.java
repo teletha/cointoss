@@ -14,7 +14,6 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.arbitrage.Arbitrage;
 import cointoss.trade.Funds;
-import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 
 public class Arbitrager extends Trader {
@@ -24,17 +23,19 @@ public class Arbitrager extends Trader {
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        when(Arbitrage.by(Currency.ETH, Currency.JPY), arb -> new Scenario() {
+        when(Arbitrage.by(Currency.ETH, Currency.JPY), arb -> {
 
-            @Override
-            protected void entry() {
-                entry(arb.buyMarket, Direction.BUY, arb.size);
-                entry(arb.sellMarket, Direction.SELL, arb.size);
-            }
+            scenario(arb.buyMarket, e -> {
+                e.entry(Direction.BUY, arb.size);
+            }, e -> {
 
-            @Override
-            protected void exit() {
-            }
+            });
+
+            scenario(arb.sellMarket, e -> {
+                e.entry(Direction.SELL, arb.size);
+            }, e -> {
+
+            });
         });
     }
 }
