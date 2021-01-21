@@ -108,7 +108,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param exit
      */
     protected final void entryPartial(Execution e, double partialEntrySize) {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -118,7 +118,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             @Override
             protected void exit() {
             }
-        });
+        }));
         market.perform(Execution.with.direction(e.direction, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();
     }
@@ -160,7 +160,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param exit
      */
     protected final void entryPartialAndExitPartial(Execution e, double partialEntrySize, Execution exit, double partialExitSize) {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -171,7 +171,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             protected void exit() {
                 exitWhen(now(), s -> s.make(exit.price));
             }
-        });
+        }));
 
         market.perform(Execution.with.direction(e.direction, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();

@@ -34,7 +34,7 @@ public class CrossOrder extends Trader {
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        when(market.open(span), v -> new Scenario() {
+        when(market.open(span), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.random(), size);
@@ -45,7 +45,7 @@ public class CrossOrder extends Trader {
                 exitAt(entryPrice.minus(this, 1000));
                 exitAt(entryPrice.plus(this, 1500));
             }
-        });
+        }));
     }
 
     public static void main(String[] args) {

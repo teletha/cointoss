@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class ScenarioTest extends TraderTestSupport {
 
     @TradeTest
     void entryWithMultipleExecutionsAndSingleExit() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
@@ -33,7 +33,7 @@ class ScenarioTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(20);
             }
-        });
+        }));
 
         Scenario s = last();
         assert s.exits.size() == 0;
@@ -51,7 +51,7 @@ class ScenarioTest extends TraderTestSupport {
 
     @Test
     void entryWithMultipleExecutionsAndMultipleExits() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
@@ -61,7 +61,7 @@ class ScenarioTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(20);
             }
-        });
+        }));
 
         Scenario s = last();
         assert s.exits.size() == 0;
@@ -94,7 +94,7 @@ class ScenarioTest extends TraderTestSupport {
 
     @Test
     void cancelEntryByTime() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10).cancelAfter(5, SECONDS));
@@ -103,7 +103,7 @@ class ScenarioTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         Scenario s = last();
 
@@ -119,7 +119,7 @@ class ScenarioTest extends TraderTestSupport {
 
     @Test
     void executingExitWillCancelRemainingEntry() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
@@ -129,7 +129,7 @@ class ScenarioTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(20);
             }
-        });
+        }));
 
         Scenario s = last();
         assert s.exits.size() == 0;
@@ -164,7 +164,7 @@ class ScenarioTest extends TraderTestSupport {
 
     @Test
     void exitAndStop() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
@@ -175,7 +175,7 @@ class ScenarioTest extends TraderTestSupport {
                 exitAt(20);
                 exitAt(5);
             }
-        });
+        }));
 
         Scenario s = last();
         assert s.exits.size() == 0;
@@ -203,7 +203,7 @@ class ScenarioTest extends TraderTestSupport {
 
     @Test
     void stopLossTaker() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(1700));
@@ -214,7 +214,7 @@ class ScenarioTest extends TraderTestSupport {
                 exitAt(entryPrice.plus(this, 1000));
                 exitAt(entryPrice.minus(this, 500), s -> s.take());
             }
-        });
+        }));
 
         Scenario s = last();
 
@@ -232,7 +232,7 @@ class ScenarioTest extends TraderTestSupport {
     @Test
     @Disabled
     void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -243,7 +243,7 @@ class ScenarioTest extends TraderTestSupport {
             protected void exit() {
                 exitWhen(now(), s -> s.take());
             }
-        });
+        }));
 
         Scenario s = last();
 

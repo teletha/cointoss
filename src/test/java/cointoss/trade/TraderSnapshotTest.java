@@ -143,7 +143,7 @@ class TraderSnapshotTest extends TraderTestSupport {
 
     @Test
     void snapshotDontCareSeconds() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1.5, s -> s.make(10));
@@ -152,7 +152,7 @@ class TraderSnapshotTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         market.perform(Execution.with.buy(0.5).price(9).date(afterSecond(20)));
         market.perform(Execution.with.buy(0.5).price(9).date(afterSecond(40)));

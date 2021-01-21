@@ -55,7 +55,7 @@ public class LongWaveTrend extends Trader {
         Ticker ticker = market.tickers.on(span);
         DoubleIndicator indicator = Indicators.waveTrend(ticker);
 
-        when(indicator.valueAt(ticker.open).plug(breakdownDouble(entryThreshold)), v -> new Scenario() {
+        when(indicator.valueAt(ticker.open).plug(breakdownDouble(entryThreshold)), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, size);
@@ -68,9 +68,9 @@ public class LongWaveTrend extends Trader {
                 exitWhen(indicator.valueAt(ticker.open).plug(breakupDouble(entryThreshold + stop)));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakdownDouble(exitThreshold)));
             }
-        });
+        }));
 
-        when(indicator.valueAt(ticker.open).plug(breakupDouble(-entryThreshold)), v -> new Scenario() {
+        when(indicator.valueAt(ticker.open).plug(breakupDouble(-entryThreshold)), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, size);
@@ -83,7 +83,7 @@ public class LongWaveTrend extends Trader {
                 exitWhen(indicator.valueAt(ticker.open).plug(breakdownDouble(-entryThreshold - stop)));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakupDouble(-exitThreshold)));
             }
-        });
+        }));
     }
 
     public static void main(String[] args) {

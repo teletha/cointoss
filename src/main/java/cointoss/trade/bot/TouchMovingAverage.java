@@ -83,7 +83,7 @@ public class TouchMovingAverage extends Trader {
                     return true;
                 });
 
-        when(up, tick -> new Scenario() {
+        when(up, tick -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, 1);
@@ -95,9 +95,9 @@ public class TouchMovingAverage extends Trader {
                 exitAt(entryPrice.plus(this, 12000));
                 exitAt(entryPrice.minus(this, 3000));
             }
-        });
+        }));
 
-        when(down, tick -> new Scenario() {
+        when(down, tick -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1);
@@ -109,7 +109,7 @@ public class TouchMovingAverage extends Trader {
                 exitAt(entryPrice.plus(this, 12000));
                 exitAt(entryPrice.minus(this, 3000));
             }
-        });
+        }));
     }
 
     public static void main(String[] args) {

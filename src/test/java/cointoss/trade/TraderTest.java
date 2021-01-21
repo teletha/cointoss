@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void entryBuy() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -32,7 +32,7 @@ class TraderTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         Scenario s = last();
         assert s.isBuy();
@@ -55,7 +55,7 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void entrySell() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -65,7 +65,7 @@ class TraderTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         Scenario s = last();
         assert s.isSell();
@@ -88,7 +88,7 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void exitMakeAtPrice() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -99,7 +99,7 @@ class TraderTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(20);
             }
-        });
+        }));
 
         Scenario s = last();
 
@@ -130,7 +130,7 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void exitWillStopAllEntries() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -141,7 +141,7 @@ class TraderTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(20);
             }
-        });
+        }));
 
         Scenario s = last();
 

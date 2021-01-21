@@ -25,13 +25,13 @@ public class Arbitrager extends Trader {
     protected void declareStrategy(Market market, Funds fund) {
         when(Arbitrage.by(Currency.ETH, Currency.JPY), arb -> {
 
-            scenario(arb.buyMarket, e -> {
+            trade(arb.buyMarket, e -> {
                 e.entry(Direction.BUY, arb.size);
             }, e -> {
 
             });
 
-            scenario(arb.sellMarket, e -> {
+            trade(arb.sellMarket, e -> {
                 e.entry(Direction.SELL, arb.size);
             }, e -> {
 

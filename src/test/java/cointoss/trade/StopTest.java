@@ -18,7 +18,7 @@ public class StopTest extends TraderTestSupport {
 
     @Test
     void stop() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 2, s -> s.make(10));
@@ -28,7 +28,7 @@ public class StopTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(5);
             }
-        });
+        }));
 
         Scenario s = last();
         assert s.exits.size() == 0;
@@ -54,7 +54,7 @@ public class StopTest extends TraderTestSupport {
 
     @Test
     void stopWillUseTheWorstExecutionPrice() {
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 2, s -> s.make(10));
@@ -64,7 +64,7 @@ public class StopTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(5);
             }
-        });
+        }));
 
         Scenario s = last();
         assert s.exits.size() == 0;

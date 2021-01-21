@@ -9,8 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
@@ -46,8 +45,7 @@ import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.WiseConsumer;
-import kiss.WiseFunction;
-import kiss.WiseSupplier;
+import kiss.WiseRunnable;
 
 public abstract class Trader extends AbstractTrader implements TradingFilters, Extensible, Disposable, TradingEntry {
 
@@ -209,98 +207,85 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
             protected void exit() {
             }
         };
-        now(() -> s);
+        now(() -> trade(s));
         return s;
     }
 
     /**
-     * {@inheritDoc}
+     * Declare when to start trading.
+     * 
+     * @param declare Declare trading scenario.
+     * @return Chainable API.
      */
-    @Override
-    public Scenario entry(Market market, Directional directional, Num size, Consumer<Orderable> declaration) {
-        return null;
+    public final Trader now(WiseRunnable declare) {
+        return when(I.signal("now"), declare);
     }
 
     /**
-     * Set up entry now.
+     * Declare when to start trading.
      * 
-     * @param builder Your trading scenario.
+     * @param <T> A timing value.
+     * @param timing When to start trading.
+     * @param declare Declare trading scenario.
      * @return Chainable API.
      */
-    public final Trader now(WiseSupplier<Scenario> builder) {
-        return when(I.signal("now"), builder);
+    public final <T> Trader when(Signal<T> timing, WiseRunnable declare) {
+        return when(timing, I.wiseC(declare));
     }
 
     /**
-     * Set up entry at your timing.
+     * Declare when to start trading.
      * 
-     * @param <T>
-     * @param timing
-     * @param builder Your trading scenario.
+     * @param <T> A timing value.
+     * @param timing When to start trading.
+     * @param declare Declare trading scenario.
      * @return Chainable API.
      */
-    public final <T> Trader when(Signal<T> timing, WiseSupplier<Scenario> builder) {
-        return when(timing, (WiseFunction<T, Scenario>) v -> builder.get());
-    }
-
-    /**
-     * Set up entry at your timing.
-     * 
-     * @param <T>
-     * @param timing
-     * @param builder Your trading scenario.
-     * @return Chainable API.
-     */
-    public final <T> Trader when(Signal<T> timing, WiseFunction<T, Scenario> builder) {
+    public final <T> Trader when(Signal<T> timing, WiseConsumer<T> declare) {
         Objects.requireNonNull(timing);
-        Objects.requireNonNull(builder);
+        Objects.requireNonNull(declare);
 
-        add(timing.take(v -> disable.isEmpty()).to(value -> {
-            Scenario scenario = builder.apply(value);
+        add(timing.take(v -> disable.isEmpty()).to(declare));
 
-            if (scenario != null) {
-                scenario.trader = this;
-                scenario.market = market;
-                scenario.funds = funds;
-                scenario.entry();
-
-                scenarios.add(scenario);
-                scenarioAdded.accept(scenario);
-            }
-        }));
+        // API definition
         return this;
     }
 
-    /**
-     * Set up entry at your timing.
-     * 
-     * @param <T>
-     * @param timing
-     * @param builder Your trading scenario.
-     * @return Chainable API.
-     */
-    public final <T> Trader when(Signal<T> timing, WiseConsumer<T> builder) {
-        Objects.requireNonNull(timing);
-        Objects.requireNonNull(builder);
-
-        add(timing.take(v -> disable.isEmpty()).to(value -> {
-            Scenario scenario = builder.apply(value);
-
-            if (scenario != null) {
-                scenario.trader = this;
-                scenario.market = market;
-                scenario.funds = funds;
-                scenario.entry();
-
-                scenarios.add(scenario);
-                scenarioAdded.accept(scenario);
-            }
-        }));
-        return this;
+    protected final void trade(WiseConsumer<Scenario> entry, WiseConsumer<Scenario> exit) {
+        trade(null, entry, exit);
     }
 
-    protected void scenario(Market market, WiseConsumer<TradingEntry> entry, WiseConsumer<TradingExit> exit) {
+    protected final void trade(Market market, WiseConsumer<Scenario> entry, WiseConsumer<Scenario> exit) {
+        trade(market, new Scenario() {
 
+            @Override
+            protected void entry() {
+                entry.accept(this);
+            }
+
+            @Override
+            protected void exit() {
+                exit.accept(this);
+            }
+        });
+    }
+
+    protected final void trade(Scenario scenario) {
+        trade(null, scenario);
+    }
+
+    protected final void trade(Market market, Scenario scenario) {
+        if (market == null) {
+            market = this.market;
+        }
+
+        scenario.trader = this;
+        scenario.market = market;
+        scenario.funds = funds;
+        scenario.entry();
+
+        scenarios.add(scenario);
+        scenarioAdded.accept(scenario);
     }
 
     /**

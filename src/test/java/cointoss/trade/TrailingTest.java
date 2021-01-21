@@ -23,7 +23,7 @@ public class TrailingTest extends TraderTestSupport {
         Num entryTriggerPrice = price.entryN.minus(side, 1);
         Num losscutTriggerPrice = price.entryN.minus(side, losscutPriceDistance);
 
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(side, 1, s -> s.make(price.entry));
@@ -33,7 +33,7 @@ public class TrailingTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(Trailing.with.losscut(losscutPriceDistance));
             }
-        });
+        }));
 
         Scenario s = last();
 
@@ -66,7 +66,7 @@ public class TrailingTest extends TraderTestSupport {
         Num losscutTriggerPrice = highPrice.minus(side, losscutPriceDistance);
         Num bottomTrailPrice = price.entryN.minus(side, losscutPriceDistance);
 
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(side, 1, s -> s.make(price.entry));
@@ -76,7 +76,7 @@ public class TrailingTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(Trailing.with.losscut(losscutPriceDistance));
             }
-        });
+        }));
 
         Scenario s = last();
 
@@ -111,7 +111,7 @@ public class TrailingTest extends TraderTestSupport {
         Num losscutTriggerPrice = highPrice.minus(side, losscutPriceDistance);
         Num bottomTrailPrice = price.entryN.minus(side, losscutPriceDistance);
 
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(side, 1, s -> s.make(price.entry));
@@ -121,7 +121,7 @@ public class TrailingTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(Trailing.with.losscut(losscutPriceDistance));
             }
-        });
+        }));
 
         Scenario s = last();
 
@@ -156,7 +156,7 @@ public class TrailingTest extends TraderTestSupport {
         Num losscutTriggerPrice = price.entryN;
         Num bottomTrailPrice = price.entryN.minus(side, losscutPriceDistance);
 
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(side, 1, s -> s.make(price.entry));
@@ -166,7 +166,7 @@ public class TrailingTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(Trailing.with.losscut(losscutPriceDistance));
             }
-        });
+        }));
 
         Scenario s = last();
 
@@ -202,7 +202,7 @@ public class TrailingTest extends TraderTestSupport {
         Num losscutTriggerPrice = price.entryN.plus(side, profitPriceDistance);
         Num bottomTrailPrice = price.entryN.minus(side, losscutPriceDistance);
 
-        when(now(), v -> new Scenario() {
+        when(now(), v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(side, 1, s -> s.make(price.entry));
@@ -212,7 +212,7 @@ public class TrailingTest extends TraderTestSupport {
             protected void exit() {
                 exitAt(Trailing.with.losscut(losscutPriceDistance).profit(profitPriceDistance));
             }
-        });
+        }));
 
         Scenario s = last();
 

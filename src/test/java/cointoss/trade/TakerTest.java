@@ -20,7 +20,7 @@ class TakerTest extends TraderTestSupport {
 
     @TradeTest
     void sameSide(SidePart side) {
-        when(now(), () -> new Scenario() {
+        when(now(), () -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -30,7 +30,7 @@ class TakerTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         // trigger taker
         market.perform(Execution.with.direction(side, 1).price(10));
@@ -44,7 +44,7 @@ class TakerTest extends TraderTestSupport {
 
     @TradeTest
     void diffSide(SidePart side) {
-        when(now(), () -> new Scenario() {
+        when(now(), () -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -54,7 +54,7 @@ class TakerTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         // trigger taker
         market.perform(Execution.with.direction(side.inverse(), 1).price(10));
@@ -68,7 +68,7 @@ class TakerTest extends TraderTestSupport {
 
     @TradeTest
     void dividedTakerWillUseTheWorstExecutionPrice1(SidePart side) {
-        when(now(), () -> new Scenario() {
+        when(now(), () -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -78,7 +78,7 @@ class TakerTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         // trigger taker
         market.perform(Execution.with.direction(side, 0.25).price(10));
@@ -96,7 +96,7 @@ class TakerTest extends TraderTestSupport {
 
     @TradeTest
     void dividedTakerWillUseTheWorstExecutionPrice2(SidePart side) {
-        when(now(), () -> new Scenario() {
+        when(now(), () -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -106,7 +106,7 @@ class TakerTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         // trigger taker
         market.perform(Execution.with.direction(side, 0.25).price(10));
@@ -124,7 +124,7 @@ class TakerTest extends TraderTestSupport {
 
     @TradeTest
     void dividedTakerWillUseTheWorstExecutionPrice3(SidePart side) {
-        when(now(), () -> new Scenario() {
+        when(now(), () -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -134,7 +134,7 @@ class TakerTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         // trigger taker
         market.perform(Execution.with.direction(side, 0.25).price(10));
@@ -155,7 +155,7 @@ class TakerTest extends TraderTestSupport {
         // set latest price
         market.perform(Execution.with.direction(side, 1).price(5));
 
-        when(now(), () -> new Scenario() {
+        when(now(), () -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(side, 1, o -> o.take());
@@ -164,7 +164,7 @@ class TakerTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         // trigger taker
         market.perform(Execution.with.direction(side, 1).price(10));
@@ -182,7 +182,7 @@ class TakerTest extends TraderTestSupport {
         // set latest price
         market.perform(Execution.with.direction(side, 1).price(10));
 
-        when(now(), () -> new Scenario() {
+        when(now(), () -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(side, 1, o -> o.take());
@@ -191,7 +191,7 @@ class TakerTest extends TraderTestSupport {
             @Override
             protected void exit() {
             }
-        });
+        }));
 
         // trigger taker
         market.perform(Execution.with.direction(side, 1).price(5));
@@ -206,7 +206,7 @@ class TakerTest extends TraderTestSupport {
 
     @Test
     void takerHasHighPriority() {
-        when(now(), () -> new Scenario() {
+        when(now(), () -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, o -> o.make(10));
@@ -217,7 +217,7 @@ class TakerTest extends TraderTestSupport {
                 exitAt(15);
                 exitAt(5, o -> o.take());
             }
-        });
+        }));
 
         // entry
         market.perform(Execution.with.buy(1).price(5));

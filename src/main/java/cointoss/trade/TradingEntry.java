@@ -12,7 +12,6 @@ package cointoss.trade;
 import java.util.function.Consumer;
 
 import cointoss.Directional;
-import cointoss.Market;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
@@ -92,77 +91,4 @@ public interface TradingEntry {
      * @return Chainable API.
      */
     Scenario entry(Directional directional, Num size, Consumer<Orderable> declaration);
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param directional This entry's direction.
-     * @param size This entry's size.
-     * @return Chainable API.
-     */
-    default Scenario entry(Market market, Directional directional, long size) {
-        return entry(market, directional, size, Orderable::take);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param directional This entry's direction.
-     * @param size This entry's size.
-     * @param declaration This entry's order strategy.
-     * @return Chainable API.
-     */
-    default Scenario entry(Market market, Directional directional, long size, Consumer<Orderable> declaration) {
-        return entry(market, directional, Num.of(size), declaration);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param directional This entry's direction.
-     * @param size This entry's size.
-     * @return Chainable API.
-     */
-    default Scenario entry(Market market, Directional directional, double size) {
-        return entry(market, directional, size, Orderable::take);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param directional This entry's direction.
-     * @param size This entry's size.
-     * @param declaration This entry's order strategy.
-     * @return Chainable API.
-     */
-    default Scenario entry(Market market, Directional directional, double size, Consumer<Orderable> declaration) {
-        return entry(market, directional, Num.of(size), declaration);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param directional This entry's direction.
-     * @param size This entry's size.
-     * @return Chainable API.
-     */
-    default Scenario entry(Market market, Directional directional, Num size) {
-        return entry(market, directional, size, Orderable::take);
-    }
-
-    /**
-     * We will order with the specified quantity. Use the return the {@link Takable} &
-     * {@link Makable} value to define the details of the ordering method.
-     * 
-     * @param directional This entry's direction.
-     * @param size This entry's size.
-     * @param declaration This entry's order strategy.
-     * @return Chainable API.
-     */
-    Scenario entry(Market market, Directional directional, Num size, Consumer<Orderable> declaration);
 }
