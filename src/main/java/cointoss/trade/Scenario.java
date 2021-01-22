@@ -13,14 +13,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
 import cointoss.Directional;
@@ -54,14 +51,6 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
 
     /** The parent {@link Trader}. */
     Trader trader;
-
-    /** The list entry orders. */
-    @VisibleForTesting
-    final Deque<Order> entries = new ArrayDeque();
-
-    /** The list exit orders. */
-    @VisibleForTesting
-    final Deque<Order> exits = new ArrayDeque();
 
     /** The entry disposer. */
     private final Disposable disposerForEntry = Disposable.empty();

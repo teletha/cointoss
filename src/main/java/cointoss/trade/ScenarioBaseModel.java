@@ -9,16 +9,33 @@
  */
 package cointoss.trade;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import org.apache.logging.log4j.util.PerformanceSensitive;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
 import cointoss.Directional;
+import cointoss.order.Order;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
+import kiss.Managed;
 
 @Icy(setterModifier = "final")
 abstract class ScenarioBaseModel implements Directional, Profitable {
+
+    /** The list entry orders. */
+    @VisibleForTesting
+    @Managed
+    Deque<Order> entries = new ArrayDeque();
+
+    /** The list exit orders. */
+    @VisibleForTesting
+    @Managed
+    Deque<Order> exits = new ArrayDeque();
 
     /**
      * {@inheritDoc}

@@ -9,7 +9,8 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
