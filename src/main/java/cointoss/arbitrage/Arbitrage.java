@@ -22,6 +22,7 @@ import cointoss.market.MarketServiceProvider;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
 import kiss.Signal;
+import kiss.Signaling;
 
 public class Arbitrage {
 
@@ -33,14 +34,36 @@ public class Arbitrage {
 
     public Num buyPrice;
 
+    private Num buyActualPrice;
+
     public Market sellMarket;
 
     public Num sellPrice;
 
+    private Num sellActualPrice;
+
     public Num diffPrice;
+
+    private Signaling<Num> closing = new Signaling();
 
     public Num profit() {
         return diffPrice.multiply(size).scale(sellMarket.service.setting.base.scale);
+    }
+
+    public Signal<Num> closeBuy(Num price) {
+        buyActualPrice = price;
+        if (sellActualPrice != null) {
+
+        }
+        return closing.expose;
+    }
+
+    public Signal<Num> closeSell(Num price) {
+        sellActualPrice = price;
+        if (buyActualPrice != null) {
+
+        }
+        return closing.expose;
     }
 
     /**

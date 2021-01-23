@@ -28,13 +28,13 @@ public class Arbitrager extends Trader {
             trade(arb.buyMarket, e -> {
                 e.entry(Direction.BUY, arb.size);
             }, e -> {
-
+                e.exitWhen(arb.closeBuy(e.entryPrice));
             });
 
             trade(arb.sellMarket, e -> {
                 e.entry(Direction.SELL, arb.size);
             }, e -> {
-
+                e.exitWhen(arb.closeSell(e.entryPrice));
             });
         });
     }
