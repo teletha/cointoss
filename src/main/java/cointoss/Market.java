@@ -36,6 +36,7 @@ import cointoss.trade.Funds;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
+import cointoss.verify.TrainingMarket;
 import cointoss.volume.PriceRangedVolumeManager;
 import kiss.Disposable;
 import kiss.Signal;
@@ -48,6 +49,9 @@ public class Market implements Disposable {
 
     /** The cache. */
     private static final Map<MarketService, Market> cachedMarket = new ConcurrentHashMap();
+
+    /** The cache. */
+    private static final Map<MarketService, Market> cachedTrainingMarket = new ConcurrentHashMap();
 
     /** The empty object. */
     public static final Execution BASE = Execution.with.buy(0).date(Chrono.utc(2000, 1, 1));
@@ -98,6 +102,10 @@ public class Market implements Disposable {
 
     public static Market of(MarketService service) {
         return cachedMarket.computeIfAbsent(service, Market::new);
+    }
+
+    public static Market trainingOf(MarketService service) {
+        return cachedTrainingMarket.computeIfAbsent(service, key -> new TrainingMarket(of(key)));
     }
 
     /**
