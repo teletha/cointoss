@@ -47,7 +47,7 @@ public class TrailingTest extends TraderTestSupport {
         assert s.exits.size() == 0;
 
         // trigger losscut at bottom
-        market.perform(Execution.with.buy(1).price(losscutTriggerPrice).date(afterSecond(5)));
+        market.perform(Execution.with.buy(1).price(losscutTriggerPrice).date(afterMinute(1)));
         assert s.exits.size() == 1;
         assert s.exitExecutedSize.is(0);
 
@@ -86,7 +86,7 @@ public class TrailingTest extends TraderTestSupport {
         assert s.exits.size() == 0;
 
         // advance trailing price
-        market.perform(Execution.with.buy(1).price(highPrice).date(afterSecond(5)));
+        market.perform(Execution.with.buy(1).price(highPrice).date(afterMinute(1)));
         assert s.entries.size() == 1;
         assert s.exits.size() == 0;
 
@@ -131,7 +131,7 @@ public class TrailingTest extends TraderTestSupport {
         assert s.exits.size() == 0;
 
         // advance trailing price
-        market.perform(Execution.with.buy(1).price(highPrice).date(afterSecond(5)));
+        market.perform(Execution.with.buy(1).price(highPrice).date(afterMinute(1)));
         assert s.entries.size() == 1;
         assert s.exits.size() == 0;
 
@@ -176,7 +176,7 @@ public class TrailingTest extends TraderTestSupport {
         assert s.exits.size() == 0;
 
         // advance trailing price
-        market.perform(Execution.with.buy(1).price(highPrice).date(afterSecond(5)));
+        market.perform(Execution.with.buy(1).price(highPrice).date(afterMinute(1)));
         assert s.entries.size() == 1;
         assert s.exits.size() == 0;
 
@@ -222,7 +222,7 @@ public class TrailingTest extends TraderTestSupport {
         assert s.exits.size() == 0;
 
         // advance trailing price
-        market.perform(Execution.with.buy(1).price(highPrice).date(afterSecond(5)));
+        market.perform(Execution.with.buy(1).price(highPrice).date(afterMinute(1)));
         assert s.entries.size() == 1;
         assert s.exits.size() == 0;
 

@@ -9,8 +9,11 @@
  */
 package cointoss.ticker;
 
-import static java.time.temporal.ChronoField.*;
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoField.EPOCH_DAY;
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.HOURS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -24,8 +27,6 @@ import kiss.Variable;
  * Defined tick span.
  */
 public enum Span {
-
-    Second5(5, SECOND_OF_MINUTE, 20, MINUTES, 3, 1), // 12 * 20 * 3 = 720
 
     Minute1(1, MINUTE_OF_HOUR, 4, HOURS, 7, 1), // 60 * 4 * 7 = 1680
 

@@ -101,47 +101,47 @@ class TimeseriesStoreTest {
 
     @Test
     void add() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
         store.store(value(0));
         assert store.at(0).value == 0;
-        assert store.at(5) == null;
-        assert store.at(10) == null;
+        assert store.at(60) == null;
+        assert store.at(120) == null;
 
         // update
         store.store(value(2));
         assert store.at(0).value == 2;
-        assert store.at(5) == null;
-        assert store.at(10) == null;
+        assert store.at(60) == null;
+        assert store.at(120) == null;
 
         // add next stamp
-        store.store(value(5));
+        store.store(value(60));
         assert store.at(0).value == 2;
-        assert store.at(5).value == 5;
-        assert store.at(10) == null;
+        assert store.at(60).value == 60;
+        assert store.at(120) == null;
 
         // add next stamp
-        store.store(value(10));
+        store.store(value(120));
         assert store.at(0).value == 2;
-        assert store.at(5).value == 5;
-        assert store.at(10).value == 10;
+        assert store.at(60).value == 60;
+        assert store.at(120).value == 120;
 
         // update
-        store.store(value(13));
+        store.store(value(156));
         assert store.at(0).value == 2;
-        assert store.at(5).value == 5;
-        assert store.at(10).value == 13;
+        assert store.at(60).value == 60;
+        assert store.at(120).value == 156;
     }
 
     @Test
     void getByTime() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(value(0), value(5), value(10));
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(value(0), value(60), value(120));
         assert store.at(0).value == 0;
-        assert store.at(3).value == 0;
-        assert store.at(5).value == 5;
-        assert store.at(7).value == 5;
-        assert store.at(10).value == 10;
-        assert store.at(14).value == 10;
+        assert store.at(30).value == 0;
+        assert store.at(60).value == 60;
+        assert store.at(70).value == 60;
+        assert store.at(120).value == 120;
+        assert store.at(140).value == 120;
     }
 
     @Test
@@ -159,24 +159,24 @@ class TimeseriesStoreTest {
 
     @Test
     void first() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(value(25));
-        assert store.first().value == 25;
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(value(300));
+        assert store.first().value == 300;
 
-        store.store(value(30));
-        assert store.first().value == 25;
+        store.store(value(360));
+        assert store.first().value == 300;
 
-        store.store(value(15));
-        assert store.first().value == 15;
+        store.store(value(180));
+        assert store.first().value == 180;
 
-        store.store(value(17));
-        assert store.first().value == 17;
+        store.store(value(204));
+        assert store.first().value == 204;
 
-        store.store(value(13));
-        assert store.first().value == 13;
+        store.store(value(156));
+        assert store.first().value == 156;
 
-        store.store(value(10));
-        assert store.first().value == 10;
+        store.store(value(120));
+        assert store.first().value == 120;
     }
 
     @Test
@@ -188,24 +188,24 @@ class TimeseriesStoreTest {
 
     @Test
     void last() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(value(5));
-        assert store.last().value == 5;
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(value(60));
+        assert store.last().value == 60;
 
-        store.store(value(10));
-        assert store.last().value == 10;
+        store.store(value(120));
+        assert store.last().value == 120;
 
-        store.store(value(12));
-        assert store.last().value == 12;
+        store.store(value(144));
+        assert store.last().value == 144;
 
-        store.store(value(20));
-        assert store.last().value == 20;
+        store.store(value(240));
+        assert store.last().value == 240;
 
-        store.store(value(16));
-        assert store.last().value == 20;
+        store.store(value(192));
+        assert store.last().value == 240;
 
-        store.store(value(30));
-        assert store.last().value == 30;
+        store.store(value(360));
+        assert store.last().value == 360;
     }
 
     @Test
@@ -217,19 +217,19 @@ class TimeseriesStoreTest {
 
     @Test
     void size() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
         assert store.size() == 0;
 
-        store.store(value(5));
+        store.store(value(60));
         assert store.size() == 1;
 
-        store.store(value(10));
+        store.store(value(120));
         assert store.size() == 2;
 
         // update will not modify size
-        store.store(value(5));
-        store.store(value(6));
-        store.store(value(7));
+        store.store(value(60));
+        store.store(value(72));
+        store.store(value(84));
         assert store.size() == 2;
     }
 
@@ -243,20 +243,20 @@ class TimeseriesStoreTest {
     @Test
     void each() {
         // padding right
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(value(0), value(5), value(10), value(15), value(20), value(25), value(30));
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(value(0), value(60), value(120), value(180), value(240), value(300), value(360));
 
         List<Value> list = new ArrayList();
         store.each(list::add);
-        assertIterableEquals(values(0, 5, 10, 15, 20, 25, 30), list);
+        assertIterableEquals(values(0, 60, 120, 180, 240, 300, 360), list);
 
         // padding both sides
-        store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(value(15), value(20), value(25), value(30));
+        store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(value(180), value(240), value(300), value(360));
 
         list = new ArrayList();
         store.each(list::add);
-        assertIterableEquals(values(15, 20, 25, 30), list);
+        assertIterableEquals(values(180, 240, 300, 360), list);
 
         // padding left side
         store = TimeseriesStore.create(Value.class, Span.Hour4);
@@ -279,27 +279,27 @@ class TimeseriesStoreTest {
 
     @Test
     void eachByTime() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(I.signal(5, 10, 15, 20, 25, 30, 35).map(this::value));
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(I.signal(60, 120, 180, 240, 300, 360, 420).map(this::value));
 
         List<Value> list = new ArrayList();
-        store.each(10, 35, list::add);
-        assertIterableEquals(values(10, 15, 20, 25, 30, 35), list);
+        store.each(120, 420, list::add);
+        assertIterableEquals(values(120, 180, 240, 300, 360, 420), list);
 
         list = new ArrayList();
-        store.each(10, 34, list::add);
-        assertIterableEquals(values(10, 15, 20, 25, 30), list);
+        store.each(120, 419, list::add);
+        assertIterableEquals(values(120, 180, 240, 300, 360), list);
 
         list = new ArrayList();
-        store.each(10, 36, list::add);
-        assertIterableEquals(values(10, 15, 20, 25, 30, 35), list);
+        store.each(120, 361, list::add);
+        assertIterableEquals(values(120, 180, 240, 300, 360), list);
 
         list = new ArrayList();
-        store.each(0, 15, list::add);
-        assertIterableEquals(values(5, 10, 15), list);
+        store.each(0, 180, list::add);
+        assertIterableEquals(values(60, 120, 180), list);
 
         list = new ArrayList();
-        store.each(100, 150, list::add);
+        store.each(1200, 1800, list::add);
         assertIterableEquals(values(), list);
     }
 
@@ -323,28 +323,28 @@ class TimeseriesStoreTest {
 
     @Test
     void eachByItem() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(values(0, 5, 10, 15, 20, 25, 30));
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(values(0, 60, 120, 180, 240, 300, 360));
 
-        List<Value> items = store.each(store.at(0), store.at(15)).toList();
+        List<Value> items = store.each(store.at(0), store.at(180)).toList();
         assert items.size() == 4;
         assert items.get(0).value == 0;
-        assert items.get(1).value == 5;
-        assert items.get(2).value == 10;
-        assert items.get(3).value == 15;
+        assert items.get(1).value == 60;
+        assert items.get(2).value == 120;
+        assert items.get(3).value == 180;
     }
 
     @Test
     void eachLatest() {
         // padding right
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(values(0, 5, 10, 15, 20, 25, 30));
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(values(0, 60, 120, 180, 240, 300, 360));
 
         List<Value> list = store.eachLatest().toList();
         assert list.size() == 7;
-        assert list.get(0).value == 30;
-        assert list.get(1).value == 25;
-        assert list.get(2).value == 20;
+        assert list.get(0).value == 360;
+        assert list.get(1).value == 300;
+        assert list.get(2).value == 240;
     }
 
     @Test
@@ -376,17 +376,17 @@ class TimeseriesStoreTest {
 
     @Test
     void before() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(values(0, 5, 10, 15));
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(values(0, 60, 120, 180));
         assert store.before(0) == null;
-        assert store.before(3) == null;
-        assert store.before(5).value == 0;
-        assert store.before(7).value == 0;
-        assert store.before(10).value == 5;
-        assert store.before(14).value == 5;
-        assert store.before(15).value == 10;
-        assert store.before(20).value == 15;
-        assert store.before(25) == null;
+        assert store.before(36) == null;
+        assert store.before(60).value == 0;
+        assert store.before(72).value == 0;
+        assert store.before(120).value == 60;
+        assert store.before(144).value == 60;
+        assert store.before(180).value == 120;
+        assert store.before(240).value == 180;
+        assert store.before(300) == null;
     }
 
     @Test
@@ -404,17 +404,17 @@ class TimeseriesStoreTest {
 
     @Test
     void befores() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(values(0, 5, 10, 15));
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(values(0, 60, 120, 180));
         assert store.beforeUntil(0, 1).isEmpty();
-        assert store.beforeUntil(3, 2).isEmpty();
-        assert store.beforeUntil(5, 1).equals(values(0));
-        assert store.beforeUntil(7, 2).equals(values(0));
-        assert store.beforeUntil(10, 1).equals(values(5));
-        assert store.beforeUntil(14, 2).equals(values(5, 0));
-        assert store.beforeUntil(15, 3).equals(values(10, 5, 0));
-        assert store.beforeUntil(20, 2).equals(values(15, 10));
-        assert store.beforeUntil(25, 5).equals(values(15, 10, 5, 0));
+        assert store.beforeUntil(36, 2).isEmpty();
+        assert store.beforeUntil(60, 1).equals(values(0));
+        assert store.beforeUntil(72, 2).equals(values(0));
+        assert store.beforeUntil(120, 1).equals(values(60));
+        assert store.beforeUntil(144, 2).equals(values(60, 0));
+        assert store.beforeUntil(180, 3).equals(values(120, 60, 0));
+        assert store.beforeUntil(240, 2).equals(values(180, 120));
+        assert store.beforeUntil(300, 5).equals(values(180, 120, 60, 0));
     }
 
     @Test
@@ -433,17 +433,17 @@ class TimeseriesStoreTest {
 
     @Test
     void beforeWith() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5);
-        store.store(values(0, 5, 10, 15));
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store.store(values(0, 60, 120, 180));
         assert store.beforeUntilWith(0, 1).equals(values(0));
-        assert store.beforeUntilWith(3, 2).equals(values(0));
-        assert store.beforeUntilWith(5, 1).equals(values(5));
-        assert store.beforeUntilWith(7, 2).equals(values(5, 0));
-        assert store.beforeUntilWith(10, 1).equals(values(10));
-        assert store.beforeUntilWith(14, 2).equals(values(10, 5));
-        assert store.beforeUntilWith(15, 5).equals(values(15, 10, 5, 0));
-        assert store.beforeUntilWith(20, 2).equals(values(15, 10));
-        assert store.beforeUntilWith(25, 5).equals(values(15, 10, 5, 0));
+        assert store.beforeUntilWith(36, 2).equals(values(0));
+        assert store.beforeUntilWith(60, 1).equals(values(60));
+        assert store.beforeUntilWith(72, 2).equals(values(60, 0));
+        assert store.beforeUntilWith(120, 1).equals(values(120));
+        assert store.beforeUntilWith(144, 2).equals(values(120, 60));
+        assert store.beforeUntilWith(180, 5).equals(values(180, 120, 60, 0));
+        assert store.beforeUntilWith(240, 2).equals(values(180, 120));
+        assert store.beforeUntilWith(300, 5).equals(values(180, 120, 60, 0));
     }
 
     @Test
@@ -465,23 +465,31 @@ class TimeseriesStoreTest {
 
     @Test
     void diskCache() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(room.locateRadom());
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
 
-        int base = (int) Span.Second5.segmentSeconds;
+        int base = (int) Span.Minute1.segmentSeconds;
 
         for (int i = 1; i <= 20; i++) {
             store.store(value(base * i));
         }
 
+        assert store.existOnHeap(value(base * 14));
+        assert store.existOnHeap(value(base * 15));
+        assert store.existOnHeap(value(base * 16));
+        assert store.existOnHeap(value(base * 17));
         assert store.existOnHeap(value(base * 18));
         assert store.existOnHeap(value(base * 19));
         assert store.existOnHeap(value(base * 20));
         assert store.existOnHeap(value(base * 2)) == false;
         assert store.existOnHeap(value(base * 8)) == false;
-        assert store.existOnHeap(value(base * 17)) == false;
+        assert store.existOnHeap(value(base * 13)) == false;
 
         assert store.at(base * 2).value == base * 2;
-        assert store.existOnHeap(value(base * 18)) == false;
+        assert store.existOnHeap(value(base * 14)) == false;
+        assert store.existOnHeap(value(base * 15));
+        assert store.existOnHeap(value(base * 16));
+        assert store.existOnHeap(value(base * 17));
+        assert store.existOnHeap(value(base * 18));
         assert store.existOnHeap(value(base * 19));
         assert store.existOnHeap(value(base * 20));
         assert store.existOnHeap(value(base * 2));
@@ -489,11 +497,11 @@ class TimeseriesStoreTest {
 
     @Test
     void dataSupply() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableActiveDataSupplier(time -> {
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableActiveDataSupplier(time -> {
             return I.signal(value((int) time));
         });
 
-        int base = (int) Span.Second5.segmentSeconds;
+        int base = (int) Span.Minute1.segmentSeconds;
         assert store.existOnHeap(value(base * 1)) == false;
         assert store.existOnHeap(value(base * 2)) == false;
         assert store.existOnHeap(value(base * 3)) == false;
@@ -509,7 +517,7 @@ class TimeseriesStoreTest {
     @Test
     void persist() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir);
         File cache = dir.file("1970-01-01 00.db");
 
         store.store(value(0));
@@ -521,7 +529,7 @@ class TimeseriesStoreTest {
     @Test
     void persistAutoSync() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir, true);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir, true);
         File cache = dir.file("1970-01-01 00.db");
         assert cache.isAbsent();
 
@@ -532,7 +540,7 @@ class TimeseriesStoreTest {
     @Test
     void persistOnlyModified() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir);
         File cache = dir.file("1970-01-01 00.db");
 
         store.store(value(0));
@@ -553,13 +561,13 @@ class TimeseriesStoreTest {
     @Test
     void readDataFromDiskCache() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Second5).enableDiskStore(dir, true);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir, true);
 
         store.store(value(0));
         store.clear();
         assert store.existOnHeap(value(0)) == false;
         assert store.at(0).value == 0;
-        assert store.at(5) == null;
+        assert store.at(60) == null;
     }
 
     @Test
@@ -574,7 +582,7 @@ class TimeseriesStoreTest {
         primitive.byteValue = 2;
         primitive.shortValue = 3;
 
-        TimeseriesStore<Primitive> store = TimeseriesStore.create(Primitive.class, Span.Second5).enableDiskStore(room.locateRadom(), true);
+        TimeseriesStore<Primitive> store = TimeseriesStore.create(Primitive.class, Span.Minute1).enableDiskStore(room.locateRadom(), true);
         store.store(primitive);
         store.clear();
 
@@ -619,7 +627,7 @@ class TimeseriesStoreTest {
         e.type = MarketType.DERIVATIVE;
         e.currency = Currency.BTC;
 
-        TimeseriesStore<Enums> store = TimeseriesStore.create(Enums.class, Span.Second5).enableDiskStore(room.locateRadom(), true);
+        TimeseriesStore<Enums> store = TimeseriesStore.create(Enums.class, Span.Minute1).enableDiskStore(room.locateRadom(), true);
         store.store(e);
         store.clear();
 
@@ -643,7 +651,7 @@ class TimeseriesStoreTest {
     @Test
     void supportZonedDateTime() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Second5).enableDiskStore(dir, true);
+        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(dir, true);
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
         store.clear();

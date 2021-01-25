@@ -14,17 +14,16 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.time.ZonedDateTime;
 import java.util.function.DoubleFunction;
 
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.geometry.Insets;
-import javafx.geometry.Side;
-import javafx.scene.layout.Region;
-
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Side;
+import javafx.scene.layout.Region;
 import kiss.Variable;
 import trademate.setting.StaticConfig;
 import viewtify.ui.helper.LayoutAssistant;
@@ -172,7 +171,7 @@ public class Chart extends Region {
         } else if (1 < duration / 300 /* 60x5 */) {
             span = Span.Minute5;
         } else {
-            span = Span.Second5;
+            span = Span.Minute1;
         }
 
         if (chart.market.isPresent()) {

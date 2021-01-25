@@ -74,7 +74,7 @@ abstract class TrailingModel {
      */
     @Icy.Property
     public Function<Market, Signal<Num>> update() {
-        return update(Span.Second5);
+        return update(Span.Minute1);
     }
 
     @Icy.Overload("update")
