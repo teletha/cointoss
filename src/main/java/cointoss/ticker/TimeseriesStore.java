@@ -9,7 +9,9 @@
  */
 package cointoss.ticker;
 
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -30,7 +32,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -933,10 +934,10 @@ public final class TimeseriesStore<E extends TimeseriesData> {
 
             try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE); FileLock lock = ch.tryLock()) {
                 if (lock != null) {
-                    ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
-                    ch.position(index * definition.widthTotal);
+                    ByteBuffer buffer = ByteBuffer.allocate(definition.width);
+                    ch.position(index * definition.width);
 
-                    for (int k = 0; k < definition.width.length; k++) {
+                    for (int k = 0; k < definition.readers.length; k++) {
                         definition.writers[k].accept(item, buffer);
                     }
                     ch.write(buffer.flip());
@@ -956,13 +957,13 @@ public final class TimeseriesStore<E extends TimeseriesData> {
             if (!segment.sync) {
                 try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE); FileLock lock = ch.tryLock()) {
                     if (lock != null) {
-                        ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                        ByteBuffer buffer = ByteBuffer.allocate(definition.width);
                         for (int i = 0; i < itemSize; i++) {
                             E item = segment.items[i];
                             if (item != null) {
-                                ch.position(i * definition.widthTotal);
+                                ch.position(i * definition.width);
 
-                                for (int k = 0; k < definition.width.length; k++) {
+                                for (int k = 0; k < definition.readers.length; k++) {
                                     definition.writers[k].accept(item, buffer);
                                 }
                                 buffer.flip();
@@ -995,13 +996,13 @@ public final class TimeseriesStore<E extends TimeseriesData> {
 
             try (FileChannel ch = FileChannel.open(file, READ, WRITE); FileLock lock = ch.tryLock()) {
                 if (lock != null) {
-                    ByteBuffer buffer = ByteBuffer.allocate(definition.widthTotal);
+                    ByteBuffer buffer = ByteBuffer.allocate(definition.width);
                     for (int i = 0; i < itemSize; i++) {
                         ch.read(buffer);
                         buffer.flip();
                         if (buffer.limit() != 0) {
                             E item = I.make(model.type);
-                            for (int k = 0; k < definition.width.length; k++) {
+                            for (int k = 0; k < definition.readers.length; k++) {
                                 definition.readers[k].accept(item, buffer);
                             }
                             heap.items[i] = item;
@@ -1032,76 +1033,74 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      */
     private static class Definition<E> {
 
-        private final int[] width;
-
-        private final int widthTotal;
+        private final int width;
 
         private final BiConsumer<E, ByteBuffer>[] readers;
 
         private final BiConsumer<E, ByteBuffer>[] writers;
 
         private Definition(Model<E> model) {
+            int width = 0;
             List<Property> properties = model.properties();
-            this.width = new int[properties.size()];
-            this.readers = new BiConsumer[width.length];
-            this.writers = new BiConsumer[width.length];
+            this.readers = new BiConsumer[properties.size()];
+            this.writers = new BiConsumer[properties.size()];
 
-            for (int i = 0; i < width.length; i++) {
+            for (int i = 0; i < properties.size(); i++) {
                 Property property = properties.get(i);
                 Class c = property.model.type;
                 if (c == boolean.class) {
-                    width[i] = 1;
+                    width += 1;
                     readers[i] = (o, b) -> model.set(o, property, b.get() == 0 ? Boolean.FALSE : Boolean.TRUE);
                     writers[i] = (o, b) -> b.put((byte) (model.get(o, property) == Boolean.FALSE ? 0 : 1));
                 } else if (c == byte.class) {
-                    width[i] = 1;
+                    width += 1;
                     readers[i] = (o, b) -> model.set(o, property, b.get());
                     writers[i] = (o, b) -> b.put((byte) model.get(o, property));
                 } else if (c == short.class) {
-                    width[i] = 2;
+                    width += 2;
                     readers[i] = (o, b) -> model.set(o, property, b.getShort());
                     writers[i] = (o, b) -> b.putShort((short) model.get(o, property));
                 } else if (c == char.class) {
-                    width[i] = 2;
+                    width += 2;
                     readers[i] = (o, b) -> model.set(o, property, b.getChar());
                     writers[i] = (o, b) -> b.putChar((char) model.get(o, property));
                 } else if (c == int.class) {
-                    width[i] = 4;
+                    width += 4;
                     readers[i] = (o, b) -> model.set(o, property, b.getInt());
                     writers[i] = (o, b) -> b.putInt((int) model.get(o, property));
                 } else if (c == float.class) {
-                    width[i] = 4;
+                    width += 4;
                     readers[i] = (o, b) -> model.set(o, property, b.getFloat());
                     writers[i] = (o, b) -> b.putFloat((float) model.get(o, property));
                 } else if (c == long.class) {
-                    width[i] = 8;
+                    width += 8;
                     readers[i] = (o, b) -> model.set(o, property, b.getLong());
                     writers[i] = (o, b) -> b.putLong((long) model.get(o, property));
                 } else if (c == double.class) {
-                    width[i] = 8;
+                    width += 8;
                     readers[i] = (o, b) -> model.set(o, property, b.getDouble());
                     writers[i] = (o, b) -> b.putDouble((double) model.get(o, property));
                 } else if (c.isEnum()) {
                     int size = c.getEnumConstants().length;
                     if (size < 8) {
-                        width[i] = 1;
+                        width += 1;
                         readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.get()]);
                         writers[i] = (o, b) -> b.put((byte) ((Enum) model.get(o, property)).ordinal());
                     } else if (size < 128) {
-                        width[i] = 2;
+                        width += 2;
                         readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.getShort()]);
                         writers[i] = (o, b) -> b.putShort((short) ((Enum) model.get(o, property)).ordinal());
                     } else {
-                        width[i] = 4;
+                        width += 4;
                         readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.getInt()]);
                         writers[i] = (o, b) -> b.putInt(((Enum) model.get(o, property)).ordinal());
                     }
                 } else if (Num.class.isAssignableFrom(c)) {
-                    width[i] = 4;
+                    width += 4;
                     readers[i] = (o, b) -> model.set(o, property, Num.of(b.getFloat()));
                     writers[i] = (o, b) -> b.putFloat(((Num) model.get(o, property)).floatValue());
                 } else if (ZonedDateTime.class.isAssignableFrom(c)) {
-                    width[i] = 8;
+                    width += 8;
                     readers[i] = (o, b) -> {
                         long time = b.getLong();
                         model.set(o, property, time == -1 ? null : Chrono.utcByMills(time));
@@ -1114,7 +1113,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                     throw new IllegalArgumentException("Unspported property type [" + c.getName() + "] on " + model.type.getName() + ".");
                 }
             }
-            this.widthTotal = IntStream.of(width).sum();
+            this.width = width;
         }
     }
 }
