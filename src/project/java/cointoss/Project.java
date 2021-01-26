@@ -32,7 +32,6 @@ public class Project extends bee.api.Project {
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
         require("ch.obermuhlner", "big-math");
-        require("com.h2database", "h2");
         require("com.h2database", "h2-mvstore");
         require("org.decimal4j", "decimal4j").atTest();
 

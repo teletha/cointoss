@@ -10,10 +10,14 @@
 package cointoss.store;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.h2.mvstore.WriteBuffer;
+import org.h2.mvstore.type.BasicDataType;
+import org.h2.mvstore.type.LongDataType;
 
 import antibug.profiler.Benchmark;
 import cointoss.ticker.Span;
@@ -23,12 +27,12 @@ import cointoss.util.Chrono;
 import psychopath.Locator;
 
 public class StoreBench {
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
 
         long[] time = {0};
         MVStore store = new MVStore.Builder().fileName("test.db").compress().open();
-        MVMap<Long, Orderbook> map = store.openMap("test");
+        MVMap<Long, Orderbook> map = store.openMap("test", new MVMap.Builder().keyType(new LongDataType()).valueType(new BeanType()));
 
         benchmark.measure("Num", () -> {
             Orderbook book = new Orderbook();
@@ -49,7 +53,7 @@ public class StoreBench {
         System.out.println(map.get(3600L).time);
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         Benchmark benchmark = new Benchmark();
 
         long[] time = {0};
@@ -73,7 +77,7 @@ public class StoreBench {
         System.out.println(store.at(3600).time);
     }
 
-    private static class Orderbook implements TimeseriesData, Serializable {
+    static class Orderbook implements TimeseriesData, Serializable {
         public float price;
 
         public float size;
@@ -94,6 +98,45 @@ public class StoreBench {
         @Override
         public long epochSeconds() {
             return time;
+        }
+    }
+
+    static class BeanType extends BasicDataType<Orderbook> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Orderbook[] createStorage(int size) {
+            return new Orderbook[size];
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getMemory(Orderbook obj) {
+            return 16;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(WriteBuffer buff, Orderbook o) {
+            buff.putFloat(o.price).putFloat(o.size).putLong(o.time);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Orderbook read(ByteBuffer buff) {
+            Orderbook o = new Orderbook();
+            o.price = buff.getFloat();
+            o.size = buff.getFloat();
+            o.time = buff.getLong();
+            return o;
         }
     }
 }
