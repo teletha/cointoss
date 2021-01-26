@@ -955,25 +955,24 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          */
         private void store(long time, OnHeap segment) {
             if (!segment.sync) {
-                try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE); FileLock lock = ch.tryLock()) {
-                    if (lock != null) {
-                        ByteBuffer buffer = ByteBuffer.allocate(definition.width);
-                        for (int i = 0; i < itemSize; i++) {
-                            E item = segment.items[i];
-                            if (item != null) {
-                                ch.position(i * definition.width);
+                try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE)) {
+                    ByteBuffer buffer = ByteBuffer.allocate(definition.width);
+                    for (int i = 0; i < itemSize; i++) {
+                        E item = segment.items[i];
+                        if (item != null) {
+                            ch.position(i * definition.width);
 
-                                for (int k = 0; k < definition.readers.length; k++) {
-                                    definition.writers[k].accept(item, buffer);
-                                }
-                                buffer.flip();
-                                ch.write(buffer);
-                                buffer.flip();
+                            for (int k = 0; k < definition.readers.length; k++) {
+                                definition.writers[k].accept(item, buffer);
                             }
+                            buffer.flip();
+                            ch.write(buffer);
+                            buffer.flip();
                         }
-                        segment.sync = true;
                     }
-                } catch (IOException e) {
+                    segment.sync = true;
+                } catch (Throwable e) {
+                    e.printStackTrace();
                     throw I.quiet(e);
                 }
             }
