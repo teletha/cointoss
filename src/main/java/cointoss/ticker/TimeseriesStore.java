@@ -9,9 +9,7 @@
  */
 package cointoss.ticker;
 
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.READ;
-import static java.nio.file.StandardOpenOption.WRITE;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -94,8 +92,10 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                 if (disk != null) {
                     disk.store(time, segment);
                 }
-                indexed.remove(time);
-                segment.clear();
+
+                indexed.put(time, new OnHeap(time));
+                // indexed.remove(time);
+                // segment.clear();
                 return true;
             } else {
                 return false;
@@ -909,6 +909,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         /** The table definition. */
         private final Definition<E> definition = definitions.computeIfAbsent(model, Definition::new);
 
+        private final ByteBuffer buffer = ByteBuffer.allocate(definition.width);
+
         /**
          * @param root
          */
@@ -934,7 +936,6 @@ public final class TimeseriesStore<E extends TimeseriesData> {
 
             try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE); FileLock lock = ch.tryLock()) {
                 if (lock != null) {
-                    ByteBuffer buffer = ByteBuffer.allocate(definition.width);
                     ch.position(index * definition.width);
 
                     for (int k = 0; k < definition.readers.length; k++) {
@@ -956,7 +957,6 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         private void store(long time, OnHeap segment) {
             if (!segment.sync) {
                 try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE)) {
-                    ByteBuffer buffer = ByteBuffer.allocate(definition.width);
                     for (int i = 0; i < itemSize; i++) {
                         E item = segment.items[i];
                         if (item != null) {
@@ -993,23 +993,21 @@ public final class TimeseriesStore<E extends TimeseriesData> {
 
             OnHeap heap = new OnHeap(time);
 
-            try (FileChannel ch = FileChannel.open(file, READ, WRITE); FileLock lock = ch.tryLock()) {
-                if (lock != null) {
-                    ByteBuffer buffer = ByteBuffer.allocate(definition.width);
-                    for (int i = 0; i < itemSize; i++) {
-                        ch.read(buffer);
-                        buffer.flip();
-                        if (buffer.limit() != 0) {
-                            E item = I.make(model.type);
-                            for (int k = 0; k < definition.readers.length; k++) {
-                                definition.readers[k].accept(item, buffer);
-                            }
-                            heap.items[i] = item;
-                            buffer.flip();
+            try (FileChannel ch = FileChannel.open(file, READ, WRITE)) {
+                ByteBuffer buffer = ByteBuffer.allocate(definition.width);
+                for (int i = 0; i < itemSize; i++) {
+                    ch.read(buffer);
+                    buffer.flip();
+                    if (buffer.limit() != 0) {
+                        E item = I.make(model.type);
+                        for (int k = 0; k < definition.readers.length; k++) {
+                            definition.readers[k].accept(item, buffer);
                         }
+                        heap.items[i] = item;
+                        buffer.flip();
                     }
-                    heap.sync = true;
                 }
+                heap.sync = true;
             } catch (IOException e) {
                 throw I.quiet(e);
             }

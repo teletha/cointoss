@@ -47,12 +47,16 @@ class TimeseriesStoreTest {
         return IntStream.of(values).mapToObj(this::value).collect(Collectors.toList());
     }
 
-    public static class Value implements TimeseriesData {
+    static class Value implements TimeseriesData {
 
         public int value;
 
-        private Value(int value) {
+        Value(int value) {
             this.value = value;
+        }
+
+        Value(long value) {
+            this.value = (int) value;
         }
 
         @Override
