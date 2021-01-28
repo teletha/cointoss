@@ -10,16 +10,16 @@
 package cointoss.ticker;
 
 import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.SPARSE;
 import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -922,7 +922,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                 this.directory = root;
                 Files.createDirectories(directory);
 
-                this.ch = FileChannel.open(directory.resolve("test.db"), CREATE, StandardOpenOption.READ, WRITE);
+                this.ch = FileChannel.open(directory.resolve("test.db"), CREATE, SPARSE, READ, WRITE);
             } catch (IOException e) {
                 throw I.quiet(e);
             }
@@ -939,15 +939,12 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                 return;
             }
 
-            try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE); FileLock lock = ch.tryLock()) {
-                if (lock != null) {
-                    ch.position(index * definition.width);
-
-                    for (int k = 0; k < definition.readers.length; k++) {
-                        definition.writers[k].accept(item, buffer);
-                    }
-                    ch.write(buffer.flip());
+            try {
+                ByteBuffer buffer = ByteBuffer.allocate(definition.width);
+                for (int k = 0; k < definition.readers.length; k++) {
+                    definition.writers[k].accept(item, buffer);
                 }
+                ch.write(buffer.flip(), time / itemDuration * definition.width);
             } catch (IOException e) {
                 throw I.quiet(e);
             }
@@ -975,7 +972,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                         }
                     }
                     buffer.flip();
-                    ch.write(buffer, 0);
+                    ch.write(buffer, time / itemDuration * definition.width);
                     segment.sync = true;
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -991,32 +988,29 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * @return
          */
         private OnHeap restore(long time) {
-            // Path file = file(time);
-            //
-            // if (!Files.exists(file)) {
-            // return null;
-            // }
-
             OnHeap heap = new OnHeap(time);
 
-            // try (FileChannel ch = FileChannel.open(file, READ, WRITE)) {
-            // ByteBuffer buffer = ByteBuffer.allocate(definition.width);
-            // for (int i = 0; i < itemSize; i++) {
-            // ch.read(buffer);
-            // buffer.flip();
-            // if (buffer.limit() != 0) {
-            // E item = I.make(model.type);
-            // for (int k = 0; k < definition.readers.length; k++) {
-            // definition.readers[k].accept(item, buffer);
-            // }
-            // heap.items[i] = item;
-            // buffer.flip();
-            // }
-            // }
-            // heap.sync = true;
-            // } catch (IOException e) {
-            // throw I.quiet(e);
-            // }
+            try {
+                ByteBuffer buffer = ByteBuffer.allocate(definition.width * itemSize);
+                int size = ch.read(buffer, time / itemDuration * definition.width);
+
+                if (size == -1) {
+                    return heap;
+                }
+                buffer.flip();
+
+                int count = size / definition.width;
+                for (int i = 0; i < count; i++) {
+                    E item = I.make(model.type);
+                    for (int k = 0; k < definition.readers.length; k++) {
+                        definition.readers[k].accept(item, buffer);
+                    }
+                    heap.items[i] = item;
+                }
+                heap.sync = true;
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
             return heap;
         }
 
