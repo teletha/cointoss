@@ -9,10 +9,7 @@
  */
 package cointoss.ticker;
 
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.READ;
-import static java.nio.file.StandardOpenOption.SPARSE;
-import static java.nio.file.StandardOpenOption.WRITE;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -28,12 +25,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 
 import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
@@ -79,9 +80,6 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     /** The disk store. */
     private OnDisk disk;
 
-    /** The disk synchronous mode. */
-    private boolean autoDiskSync;
-
     @SuppressWarnings("serial")
     private final Map<Long, OnHeap> stats = new LinkedHashMap<>(8, 0.75f, true) {
 
@@ -92,7 +90,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                 OnHeap segment = eldest.getValue();
 
                 if (disk != null) {
-                    disk.store(time, segment);
+                    disk.write(time, segment);
                 }
 
                 indexed.remove(time);
@@ -195,30 +193,9 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param directory A root directory to store data.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Directory directory, boolean autoSync) {
-        return enableDiskStore(directory.asJavaPath(), autoSync);
-    }
-
-    /**
-     * Enable the transparent disk persistence.
-     * 
-     * @param directory A root directory to store data.
-     * @return Chainable API.
-     */
     public synchronized TimeseriesStore<E> enableDiskStore(Path directory) {
-        return enableDiskStore(directory, false);
-    }
-
-    /**
-     * Enable the transparent disk persistence.
-     * 
-     * @param directory A root directory to store data.
-     * @return Chainable API.
-     */
-    public synchronized TimeseriesStore<E> enableDiskStore(Path directory, boolean autoSync) {
         if (directory != null && this.disk == null) {
             this.disk = new OnDisk(directory);
-            this.autoDiskSync = autoSync;
         }
         return this;
     }
@@ -691,7 +668,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
 
         // Disk Cache
         if (disk != null) {
-            segment = disk.restore(startTime);
+            segment = disk.read(startTime);
 
             if (segment != null) {
                 indexed.put(startTime, segment);
@@ -731,7 +708,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     public void persist() {
         if (disk != null) {
             for (Entry<Long, TimeseriesStore<E>.OnHeap> entry : stats.entrySet()) {
-                disk.store(entry.getKey(), entry.getValue());
+                disk.write(entry.getKey(), entry.getValue());
             }
         }
     }
@@ -753,6 +730,23 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     }
 
     /**
+     * For test.
+     * 
+     * @param item
+     * @return
+     */
+    @VisibleForTesting
+    boolean existOnDisk(E item) {
+        if (disk == null) {
+            return false;
+        }
+
+        long[] index = index(item.epochSeconds());
+        E read = disk.read(index[0]).items[(int) index[1]];
+        return Objects.equal(item, read);
+    }
+
+    /**
      * On-Heap data container.
      */
     private class OnHeap {
@@ -761,7 +755,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         private final long startTime;
 
         /** The managed items. */
-        private E[] items = (E[]) Array.newInstance(model.type, itemSize);
+        private E[] items;
 
         /** The first item index. */
         private int min = Integer.MAX_VALUE;
@@ -776,7 +770,15 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * @param startTime The starting time (epoch seconds).
          */
         private OnHeap(long startTime) {
+            this(startTime, itemSize);
+        }
+
+        /**
+         * @param startTime The starting time (epoch seconds).
+         */
+        private OnHeap(long startTime, int size) {
             this.startTime = startTime;
+            this.items = (E[]) Array.newInstance(model.type, size);
         }
 
         /**
@@ -811,11 +813,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
             if (index < min) min = index;
             if (max < index) max = index;
 
-            if (autoDiskSync) {
-                disk.store(startTime, index, item);
-            } else {
-                sync = false;
-            }
+            sync = false;
         }
 
         /**
@@ -910,9 +908,9 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         /** The table definition. */
         private final Definition<E> definition = definitions.computeIfAbsent(model, Definition::new);
 
-        private final ByteBuffer buffer = ByteBuffer.allocate(definition.width);
+        private final FileChannel channel;
 
-        private final FileChannel ch;
+        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
         /**
          * @param root
@@ -922,106 +920,90 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                 this.directory = root;
                 Files.createDirectories(directory);
 
-                this.ch = FileChannel.open(directory.resolve("test.db"), CREATE, SPARSE, READ, WRITE);
+                this.channel = FileChannel.open(directory.resolve("test.db"), CREATE, SPARSE, READ, WRITE);
             } catch (IOException e) {
                 throw I.quiet(e);
             }
         }
 
         /**
-         * Store data to disk cache.
+         * Write data to disk cache.
          * 
-         * @param time
+         * @param truncatedTime
          * @param segment
          */
-        private void store(long time, int index, E item) {
-            if (item == null) {
-                return;
-            }
-
-            try {
-                ByteBuffer buffer = ByteBuffer.allocate(definition.width);
-                for (int k = 0; k < definition.readers.length; k++) {
-                    definition.writers[k].accept(item, buffer);
-                }
-                ch.write(buffer.flip(), time / itemDuration * definition.width);
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        }
-
-        /**
-         * Store data to disk cache.
-         * 
-         * @param time
-         * @param segment
-         */
-        private void store(long time, OnHeap segment) {
+        private void write(long truncatedTime, OnHeap segment) {
             if (!segment.sync) {
+                WriteLock writeLock = lock.writeLock();
+                writeLock.lock();
+
                 try {
+                    long startPosition = truncatedTime / itemDuration * definition.width;
                     ByteBuffer buffer = ByteBuffer.allocate(definition.width * itemSize);
 
                     for (int i = 0; i < itemSize; i++) {
                         E item = segment.items[i];
                         if (item == null) {
-                            buffer.position(buffer.position() + definition.width);
+                            if (buffer.position() != 0) {
+                                buffer.flip();
+                                channel.write(buffer, startPosition);
+                                buffer.clear();
+                            }
+                            startPosition = (truncatedTime / itemDuration + i + 1) * definition.width;
                         } else {
                             for (int k = 0; k < definition.readers.length; k++) {
                                 definition.writers[k].accept(item, buffer);
                             }
                         }
                     }
-                    buffer.flip();
-                    ch.write(buffer, time / itemDuration * definition.width);
+
+                    if (buffer.position() != 0) {
+                        buffer.flip();
+                        channel.write(buffer, startPosition);
+                    }
                     segment.sync = true;
-                } catch (Throwable e) {
-                    e.printStackTrace();
+                } catch (IOException e) {
                     throw I.quiet(e);
+                } finally {
+                    writeLock.unlock();
                 }
             }
         }
 
         /**
-         * Restore data from disk cache.
+         * Read data from disk cache.
          * 
-         * @param time
+         * @param truncatedTime
          * @return
          */
-        private OnHeap restore(long time) {
-            OnHeap heap = new OnHeap(time);
+        private OnHeap read(long truncatedTime) {
+            OnHeap heap = new OnHeap(truncatedTime, itemSize);
+            ReadLock readLock = lock.readLock();
 
             try {
+                readLock.lock();
+
                 ByteBuffer buffer = ByteBuffer.allocate(definition.width * itemSize);
-                int size = ch.read(buffer, time / itemDuration * definition.width);
+                int size = channel.read(buffer, truncatedTime / itemDuration * definition.width);
 
-                if (size == -1) {
-                    return heap;
-                }
-                buffer.flip();
+                if (size != -1) {
+                    buffer.flip();
 
-                int count = size / definition.width;
-                for (int i = 0; i < count; i++) {
-                    E item = I.make(model.type);
-                    for (int k = 0; k < definition.readers.length; k++) {
-                        definition.readers[k].accept(item, buffer);
+                    int readableItemSize = size / definition.width;
+                    for (int i = 0; i < readableItemSize; i++) {
+                        heap.items[i] = I.make(model.type);
+                        for (int k = 0; k < definition.readers.length; k++) {
+                            definition.readers[k].accept(heap.items[i], buffer);
+                        }
                     }
-                    heap.items[i] = item;
+                    heap.sync = true;
                 }
-                heap.sync = true;
             } catch (IOException e) {
                 throw I.quiet(e);
+            } finally {
+                readLock.unlock();
             }
             return heap;
-        }
-
-        /**
-         * Compute cache file name by epoch second.
-         * 
-         * @param time
-         * @return
-         */
-        private Path file(long time) {
-            return directory.resolve(FileName.format(Chrono.utcBySeconds(time)) + ".db");
         }
     }
 

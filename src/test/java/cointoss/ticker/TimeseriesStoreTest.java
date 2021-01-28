@@ -522,23 +522,11 @@ class TimeseriesStoreTest {
     void persist() {
         Directory dir = Locator.directory(room.locateRadom());
         TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir);
-        File cache = dir.file("test.db");
 
         store.store(value(0));
-        assert cache.isAbsent();
+        assert store.existOnDisk(value(0)) == false;
         store.persist();
-        assert cache.isPresent();
-    }
-
-    @Test
-    void persistAutoSync() {
-        Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir, true);
-        File cache = dir.file("test.db");
-        assert cache.isAbsent();
-
-        store.store(value(0));
-        assert cache.isPresent();
+        assert store.existOnDisk(value(0)) == true;
     }
 
     @Test
@@ -565,9 +553,10 @@ class TimeseriesStoreTest {
     @Test
     void readDataFromDiskCache() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir, true);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir);
 
         store.store(value(0));
+        store.persist();
         store.clear();
         assert store.existOnHeap(value(0)) == false;
         assert store.at(0).value == 0;
@@ -586,8 +575,9 @@ class TimeseriesStoreTest {
         primitive.byteValue = 2;
         primitive.shortValue = 3;
 
-        TimeseriesStore<Primitive> store = TimeseriesStore.create(Primitive.class, Span.Minute1).enableDiskStore(room.locateRadom(), true);
+        TimeseriesStore<Primitive> store = TimeseriesStore.create(Primitive.class, Span.Minute1).enableDiskStore(room.locateRadom());
         store.store(primitive);
+        store.persist();
         store.clear();
 
         Primitive restored = store.at(primitive.intValue);
@@ -631,8 +621,9 @@ class TimeseriesStoreTest {
         e.type = MarketType.DERIVATIVE;
         e.currency = Currency.BTC;
 
-        TimeseriesStore<Enums> store = TimeseriesStore.create(Enums.class, Span.Minute1).enableDiskStore(room.locateRadom(), true);
+        TimeseriesStore<Enums> store = TimeseriesStore.create(Enums.class, Span.Minute1).enableDiskStore(room.locateRadom());
         store.store(e);
+        store.persist();
         store.clear();
 
         Enums restored = store.at(e.epochSeconds());
@@ -655,9 +646,10 @@ class TimeseriesStoreTest {
     @Test
     void supportZonedDateTime() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(dir, true);
+        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(dir);
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
+        store.persist();
         store.clear();
 
         assert store.at(oi.epochSeconds()).equals(oi);
@@ -666,11 +658,12 @@ class TimeseriesStoreTest {
     @Test
     void storeSparsedDisk() {
         Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Day1).enableDiskStore(dir, true);
+        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Day1).enableDiskStore(dir);
         OpenInterest oi1 = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);
         store.store(oi1, oi2, oi3);
+        store.persist();
         store.clear();
 
         assert store.at(oi1.epochSeconds()).equals(oi1);
