@@ -521,7 +521,7 @@ class TimeseriesStoreTest {
 
         store.store(value(0));
         assert store.existOnDisk(value(0)) == false;
-        store.persist();
+        store.commit();
         assert store.existOnDisk(value(0)) == true;
     }
 
@@ -530,7 +530,7 @@ class TimeseriesStoreTest {
         TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
 
         store.store(value(0));
-        store.persist();
+        store.commit();
         store.clear();
         assert store.existOnHeap(value(0)) == false;
         assert store.at(0).value == 0;
@@ -551,7 +551,7 @@ class TimeseriesStoreTest {
 
         TimeseriesStore<Primitive> store = TimeseriesStore.create(Primitive.class, Span.Minute1).enableDiskStore(room.locateRadom());
         store.store(primitive);
-        store.persist();
+        store.commit();
         store.clear();
 
         Primitive restored = store.at(primitive.intValue);
@@ -597,7 +597,7 @@ class TimeseriesStoreTest {
 
         TimeseriesStore<Enums> store = TimeseriesStore.create(Enums.class, Span.Minute1).enableDiskStore(room.locateRadom());
         store.store(e);
-        store.persist();
+        store.commit();
         store.clear();
 
         Enums restored = store.at(e.epochSeconds());
@@ -622,7 +622,7 @@ class TimeseriesStoreTest {
         TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(room.locateRadom());
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
-        store.persist();
+        store.commit();
         store.clear();
 
         assert store.at(oi.epochSeconds()).equals(oi);
@@ -635,7 +635,7 @@ class TimeseriesStoreTest {
         OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);
         store.store(oi1, oi2, oi3);
-        store.persist();
+        store.commit();
         store.clear();
 
         assert store.at(oi1.epochSeconds()).equals(oi1);

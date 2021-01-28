@@ -28,7 +28,7 @@ public class TimeseriseStoreBenchmark {
         // return memory.size();
         // });
 
-        TimeseriesStore<Value> disk = TimeseriesStore.create(Value.class, span).enableDiskStore(room.locateDirectory("persist"));
+        TimeseriesStore<Value> disk = TimeseriesStore.create(Value.class, span).enableDiskStore(room.locateFile("persist.db"));
         benchmark.measure("Store with persist", () -> {
             for (int i = 0; i < 10000; i++) {
                 disk.store(new Value(i * span.seconds));

@@ -156,7 +156,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      */
     public synchronized TimeseriesStore<E> enablePassiveDataSupplier(Signal<E> supplier, Disposable disposer) {
         if (disposer != null && supplier != null) {
-            disposer.add(supplier.effectOnDispose(this::persist).to(e -> {
+            disposer.add(supplier.effectOnDispose(this::commit).to(e -> {
                 store(e);
             }));
         }
@@ -701,7 +701,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * Forcibly saves all data that currently exists on the heap to disk immediately. All data on
      * disk will be overwritten. If the disk store is not enabled, nothing will happen.
      */
-    public void persist() {
+    public void commit() {
         if (disk != null) {
             for (Entry<Long, TimeseriesStore<E>.OnHeap> entry : stats.entrySet()) {
                 disk.write(entry.getKey(), entry.getValue());
@@ -747,9 +747,6 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      */
     private class OnHeap {
 
-        /** The starting time (epoch seconds). */
-        private final long startTime;
-
         /** The managed items. */
         private E[] items;
 
@@ -773,7 +770,6 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * @param startTime The starting time (epoch seconds).
          */
         private OnHeap(long startTime, int size) {
-            this.startTime = startTime;
             this.items = (E[]) Array.newInstance(model.type, size);
         }
 
