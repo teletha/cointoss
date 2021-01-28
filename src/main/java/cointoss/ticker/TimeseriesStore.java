@@ -9,7 +9,8 @@
  */
 package cointoss.ticker;
 
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -18,6 +19,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -93,9 +95,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                     disk.store(time, segment);
                 }
 
-                indexed.put(time, new OnHeap(time));
-                // indexed.remove(time);
-                // segment.clear();
+                indexed.remove(time);
+                segment.clear();
                 return true;
             } else {
                 return false;
@@ -911,6 +912,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
 
         private final ByteBuffer buffer = ByteBuffer.allocate(definition.width);
 
+        private final FileChannel ch;
+
         /**
          * @param root
          */
@@ -918,6 +921,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
             try {
                 this.directory = root;
                 Files.createDirectories(directory);
+
+                this.ch = FileChannel.open(directory.resolve("test.db"), CREATE, StandardOpenOption.READ, WRITE);
             } catch (IOException e) {
                 throw I.quiet(e);
             }
@@ -956,20 +961,21 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          */
         private void store(long time, OnHeap segment) {
             if (!segment.sync) {
-                try (FileChannel ch = FileChannel.open(file(time), CREATE, WRITE)) {
+                try {
+                    ByteBuffer buffer = ByteBuffer.allocate(definition.width * itemSize);
+
                     for (int i = 0; i < itemSize; i++) {
                         E item = segment.items[i];
-                        if (item != null) {
-                            ch.position(i * definition.width);
-
+                        if (item == null) {
+                            buffer.position(buffer.position() + definition.width);
+                        } else {
                             for (int k = 0; k < definition.readers.length; k++) {
                                 definition.writers[k].accept(item, buffer);
                             }
-                            buffer.flip();
-                            ch.write(buffer);
-                            buffer.flip();
                         }
                     }
+                    buffer.flip();
+                    ch.write(buffer, 0);
                     segment.sync = true;
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -985,32 +991,32 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * @return
          */
         private OnHeap restore(long time) {
-            Path file = file(time);
-
-            if (!Files.exists(file)) {
-                return null;
-            }
+            // Path file = file(time);
+            //
+            // if (!Files.exists(file)) {
+            // return null;
+            // }
 
             OnHeap heap = new OnHeap(time);
 
-            try (FileChannel ch = FileChannel.open(file, READ, WRITE)) {
-                ByteBuffer buffer = ByteBuffer.allocate(definition.width);
-                for (int i = 0; i < itemSize; i++) {
-                    ch.read(buffer);
-                    buffer.flip();
-                    if (buffer.limit() != 0) {
-                        E item = I.make(model.type);
-                        for (int k = 0; k < definition.readers.length; k++) {
-                            definition.readers[k].accept(item, buffer);
-                        }
-                        heap.items[i] = item;
-                        buffer.flip();
-                    }
-                }
-                heap.sync = true;
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
+            // try (FileChannel ch = FileChannel.open(file, READ, WRITE)) {
+            // ByteBuffer buffer = ByteBuffer.allocate(definition.width);
+            // for (int i = 0; i < itemSize; i++) {
+            // ch.read(buffer);
+            // buffer.flip();
+            // if (buffer.limit() != 0) {
+            // E item = I.make(model.type);
+            // for (int k = 0; k < definition.readers.length; k++) {
+            // definition.readers[k].accept(item, buffer);
+            // }
+            // heap.items[i] = item;
+            // buffer.flip();
+            // }
+            // }
+            // heap.sync = true;
+            // } catch (IOException e) {
+            // throw I.quiet(e);
+            // }
             return heap;
         }
 
