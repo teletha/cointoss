@@ -9,8 +9,11 @@
  */
 package cointoss.ticker;
 
+import java.nio.ByteBuffer;
+
 import antibug.CleanRoom;
 import antibug.profiler.Benchmark;
+import cointoss.ticker.TimeseriesStore.Codec;
 import cointoss.ticker.TimeseriesStoreTest.Value;
 
 public class TimeseriseStoreBenchmark {
@@ -28,7 +31,24 @@ public class TimeseriseStoreBenchmark {
         // return memory.size();
         // });
 
-        TimeseriesStore<Value> disk = TimeseriesStore.create(Value.class, span).enableDiskStore(room.locateFile("persist.db"));
+        TimeseriesStore<Value> disk = TimeseriesStore.create(Value.class, span)
+                .enableDiskStore(room.locateFile("persist.db"), new Codec<Value>() {
+
+                    @Override
+                    public int size() {
+                        return 4;
+                    }
+
+                    @Override
+                    public void write(Value item, ByteBuffer buffer) {
+                        buffer.putInt(item.value);
+                    }
+
+                    @Override
+                    public Value read(ByteBuffer buffer) {
+                        return new Value(buffer.getInt());
+                    }
+                });
         benchmark.measure("Store with persist", () -> {
             for (int i = 0; i < 10000; i++) {
                 disk.store(new Value(i * span.seconds));

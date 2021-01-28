@@ -51,7 +51,7 @@ import psychopath.Locator;
 public final class TimeseriesStore<E extends TimeseriesData> {
 
     /** The table definitions. */
-    private static final Map<Model, Definition> definitions = new ConcurrentHashMap();
+    private static final Map<Model, ModelCodec> definitions = new ConcurrentHashMap();
 
     /** The item type. */
     private final Model<E> model;
@@ -180,7 +180,17 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @return Chainable API.
      */
     public synchronized TimeseriesStore<E> enableDiskStore(Path databaseFile) {
-        return enableDiskStore(Locator.file(databaseFile));
+        return enableDiskStore(databaseFile, null);
+    }
+
+    /**
+     * Enable the transparent disk persistence.
+     * 
+     * @param databaseFile An actual file to store data.
+     * @return Chainable API.
+     */
+    public synchronized TimeseriesStore<E> enableDiskStore(Path databaseFile, Codec<E> codec) {
+        return enableDiskStore(Locator.file(databaseFile), codec);
     }
 
     /**
@@ -190,8 +200,18 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @return Chainable API.
      */
     public synchronized TimeseriesStore<E> enableDiskStore(File databaseFile) {
+        return enableDiskStore(databaseFile, null);
+    }
+
+    /**
+     * Enable the transparent disk persistence.
+     * 
+     * @param databaseFile An actual file to store data.
+     * @return Chainable API.
+     */
+    public synchronized TimeseriesStore<E> enableDiskStore(File databaseFile, Codec<E> codec) {
         if (databaseFile != null && this.disk == null) {
-            this.disk = new OnDisk(databaseFile);
+            this.disk = new OnDisk(databaseFile, codec);
         }
         return this;
     }
@@ -894,18 +914,22 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      */
     private class OnDisk {
 
-        /** The table definition. */
-        private final Definition<E> definition = definitions.computeIfAbsent(model, Definition::new);
-
+        /** The actual channel. */
         private final FileChannel channel;
 
+        /** The read-write lock. */
         private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
+        /** The table definition. */
+        private final Codec<E> codec;
+
         /**
-         * @param root
+         * @param databaseFile
+         * @param codec
          */
-        private OnDisk(File databaseFile) {
+        private OnDisk(File databaseFile, Codec<E> codec) {
             this.channel = databaseFile.newFileChannel(CREATE, SPARSE, READ, WRITE);
+            this.codec = codec != null ? codec : definitions.computeIfAbsent(model, ModelCodec::new);
         }
 
         /**
@@ -920,8 +944,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                 writeLock.lock();
 
                 try {
-                    long startPosition = truncatedTime / itemDuration * definition.width;
-                    ByteBuffer buffer = ByteBuffer.allocate(definition.width * itemSize);
+                    long startPosition = truncatedTime / itemDuration * codec.size();
+                    ByteBuffer buffer = ByteBuffer.allocate(codec.size() * itemSize);
 
                     for (int i = 0; i < itemSize; i++) {
                         E item = segment.items[i];
@@ -931,11 +955,9 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                                 channel.write(buffer, startPosition);
                                 buffer.clear();
                             }
-                            startPosition = (truncatedTime / itemDuration + i + 1) * definition.width;
+                            startPosition = (truncatedTime / itemDuration + i + 1) * codec.size();
                         } else {
-                            for (int k = 0; k < definition.readers.length; k++) {
-                                definition.writers[k].accept(item, buffer);
-                            }
+                            codec.write(item, buffer);
                         }
                     }
 
@@ -965,18 +987,15 @@ public final class TimeseriesStore<E extends TimeseriesData> {
             try {
                 readLock.lock();
 
-                ByteBuffer buffer = ByteBuffer.allocate(definition.width * itemSize);
-                int size = channel.read(buffer, truncatedTime / itemDuration * definition.width);
+                ByteBuffer buffer = ByteBuffer.allocate(codec.size() * itemSize);
+                int size = channel.read(buffer, truncatedTime / itemDuration * codec.size());
 
                 if (size != -1) {
                     buffer.flip();
 
-                    int readableItemSize = size / definition.width;
+                    int readableItemSize = size / codec.size();
                     for (int i = 0; i < readableItemSize; i++) {
-                        heap.items[i] = I.make(model.type);
-                        for (int k = 0; k < definition.readers.length; k++) {
-                            definition.readers[k].accept(heap.items[i], buffer);
-                        }
+                        heap.items[i] = codec.read(buffer);
                     }
                     heap.sync = true;
                 }
@@ -990,17 +1009,57 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     }
 
     /**
-     * 
+     * Data serializer and deserializer from/to bytes.
      */
-    private static class Definition<E> {
+    public interface Codec<E extends TimeseriesData> {
 
-        private final int width;
+        /**
+         * Total data size. (bytes)
+         * 
+         * @return
+         */
+        int size();
 
+        /**
+         * Convert from data to bytes.
+         * 
+         * @param item A data to store.
+         * @param writer A byte writer.
+         */
+        void write(E item, ByteBuffer writer);
+
+        /**
+         * Convert from bytes to data.
+         * 
+         * @param reader A byte reader.
+         * @return A restored data.
+         */
+        E read(ByteBuffer reader);
+    }
+
+    /**
+     * {@link Model} based automatic codec.
+     */
+    private static class ModelCodec<E extends TimeseriesData> implements Codec<E> {
+
+        /** The data type. */
+        private final Class<E> type;
+
+        /** The total size. */
+        private final int size;
+
+        /** The data readers. */
         private final BiConsumer<E, ByteBuffer>[] readers;
 
+        /** The data writers. */
         private final BiConsumer<E, ByteBuffer>[] writers;
 
-        private Definition(Model<E> model) {
+        /**
+         * @param model
+         */
+        private ModelCodec(Model<E> model) {
+            this.type = model.type;
+
             int width = 0;
             List<Property> properties = model.properties();
             this.readers = new BiConsumer[properties.size()];
@@ -1074,7 +1133,37 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                     throw new IllegalArgumentException("Unspported property type [" + c.getName() + "] on " + model.type.getName() + ".");
                 }
             }
-            this.width = width;
+            this.size = width;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int size() {
+            return size;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(E item, ByteBuffer buffer) {
+            for (int i = 0; i < writers.length; i++) {
+                writers[i].accept(item, buffer);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public E read(ByteBuffer buffer) {
+            E item = I.make(type);
+            for (int i = 0; i < readers.length; i++) {
+                readers[i].accept(item, buffer);
+            }
+            return item;
         }
     }
 }
