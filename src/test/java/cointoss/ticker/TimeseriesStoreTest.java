@@ -28,9 +28,6 @@ import cointoss.ticker.data.OpenInterest;
 import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
 import kiss.I;
-import psychopath.Directory;
-import psychopath.File;
-import psychopath.Locator;
 
 class TimeseriesStoreTest {
     private static final int days = 60 * 60 * 24;
@@ -520,8 +517,7 @@ class TimeseriesStoreTest {
 
     @Test
     void persist() {
-        Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
 
         store.store(value(0));
         assert store.existOnDisk(value(0)) == false;
@@ -530,30 +526,8 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void persistOnlyModified() {
-        Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir);
-        File cache = dir.file("test.db");
-
-        store.store(value(0));
-        store.persist();
-        assert cache.isPresent();
-
-        // no modification
-        long modified = cache.lastModifiedMilli();
-        store.persist();
-        assert modified == cache.lastModifiedMilli();
-
-        // modified
-        store.store(value(1));
-        store.persist();
-        assert modified != cache.lastModifiedMilli();
-    }
-
-    @Test
     void readDataFromDiskCache() {
-        Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(dir);
+        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
 
         store.store(value(0));
         store.persist();
@@ -645,8 +619,7 @@ class TimeseriesStoreTest {
 
     @Test
     void supportZonedDateTime() {
-        Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(dir);
+        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(room.locateRadom());
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
         store.persist();
@@ -657,8 +630,7 @@ class TimeseriesStoreTest {
 
     @Test
     void storeSparsedDisk() {
-        Directory dir = Locator.directory(room.locateRadom());
-        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Day1).enableDiskStore(dir);
+        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Day1).enableDiskStore(room.locateRadom());
         OpenInterest oi1 = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);

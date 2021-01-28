@@ -50,7 +50,7 @@ public class StoreBench {
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
 
-        TimeseriesStore<Orderbook> store = TimeseriesStore.create(Orderbook.class, Span.Minute1).enableDiskStore(Locator.directory("test"));
+        TimeseriesStore<Orderbook> store = TimeseriesStore.create(Orderbook.class, Span.Minute1).enableDiskStore(Locator.file("test.db"));
 
         benchmark.measure("Num", () -> {
             for (int i = 0; i < 100000; i++) {

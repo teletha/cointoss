@@ -15,15 +15,14 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -34,7 +33,6 @@ import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Objects;
 
 import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
@@ -47,11 +45,10 @@ import kiss.I;
 import kiss.Signal;
 import kiss.model.Model;
 import kiss.model.Property;
-import psychopath.Directory;
+import psychopath.File;
+import psychopath.Locator;
 
 public final class TimeseriesStore<E extends TimeseriesData> {
-
-    private static final DateTimeFormatter FileName = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
 
     /** The table definitions. */
     private static final Map<Model, Definition> definitions = new ConcurrentHashMap();
@@ -161,7 +158,6 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         if (disposer != null && supplier != null) {
             disposer.add(supplier.effectOnDispose(this::persist).to(e -> {
                 store(e);
-                System.out.println("store data " + e);
             }));
         }
         return this;
@@ -180,22 +176,22 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     /**
      * Enable the transparent disk persistence.
      * 
-     * @param directory A root directory to store data.
+     * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Directory directory) {
-        return enableDiskStore(directory.asJavaPath());
+    public synchronized TimeseriesStore<E> enableDiskStore(Path databaseFile) {
+        return enableDiskStore(Locator.file(databaseFile));
     }
 
     /**
      * Enable the transparent disk persistence.
      * 
-     * @param directory A root directory to store data.
+     * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Path directory) {
-        if (directory != null && this.disk == null) {
-            this.disk = new OnDisk(directory);
+    public synchronized TimeseriesStore<E> enableDiskStore(File databaseFile) {
+        if (databaseFile != null && this.disk == null) {
+            this.disk = new OnDisk(databaseFile);
         }
         return this;
     }
@@ -743,7 +739,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
 
         long[] index = index(item.epochSeconds());
         E read = disk.read(index[0]).items[(int) index[1]];
-        return Objects.equal(item, read);
+        return Objects.equals(item, read);
     }
 
     /**
@@ -902,9 +898,6 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      */
     private class OnDisk {
 
-        /** The disk store. */
-        private final Path directory;
-
         /** The table definition. */
         private final Definition<E> definition = definitions.computeIfAbsent(model, Definition::new);
 
@@ -915,15 +908,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         /**
          * @param root
          */
-        private OnDisk(Path root) {
-            try {
-                this.directory = root;
-                Files.createDirectories(directory);
-
-                this.channel = FileChannel.open(directory.resolve("test.db"), CREATE, SPARSE, READ, WRITE);
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
+        private OnDisk(File databaseFile) {
+            this.channel = databaseFile.newFileChannel(CREATE, SPARSE, READ, WRITE);
         }
 
         /**
