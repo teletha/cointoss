@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.ticker;
+package cointoss.util.feather;
 
 import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;

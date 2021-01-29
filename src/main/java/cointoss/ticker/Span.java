@@ -55,10 +55,10 @@ public enum Span {
     public final long seconds;
 
     /** The duration (seconds) of the segment. */
-    final long segmentSeconds;
+    public final long segmentSeconds;
 
     /** The maximum size of the segment. */
-    final int segmentSize;
+    public final int segmentSize;
 
     /** The indexes of associated upper tickers. */
     final int[] uppers;

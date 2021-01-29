@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.ticker;
+package cointoss.util.feather;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
@@ -24,9 +24,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import antibug.CleanRoom;
 import cointoss.Currency;
 import cointoss.MarketType;
+import cointoss.ticker.Span;
 import cointoss.ticker.data.OpenInterest;
-import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
+import cointoss.util.feather.FeatherStore;
 import kiss.I;
 
 class FeatherStoreTest {
@@ -44,7 +45,7 @@ class FeatherStoreTest {
         return IntStream.of(values).mapToObj(this::value).collect(Collectors.toList());
     }
 
-    static class Value implements TimeseriesData {
+    static class Value implements TemporalData {
 
         public int value;
 
@@ -566,7 +567,7 @@ class FeatherStoreTest {
         assert restored.shortValue == primitive.shortValue;
     }
 
-    private static class Primitive implements TimeseriesData {
+    private static class Primitive implements TemporalData {
         public int intValue;
 
         public long longValue;
@@ -606,7 +607,7 @@ class FeatherStoreTest {
         assert restored.currency == e.currency;
     }
 
-    private static class Enums implements TimeseriesData {
+    private static class Enums implements TemporalData {
         public MarketType type;
 
         public Currency currency;

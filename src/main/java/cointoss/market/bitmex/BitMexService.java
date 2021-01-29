@@ -27,7 +27,6 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
-import cointoss.ticker.FeatherStore;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
@@ -37,6 +36,7 @@ import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.feather.FeatherStore;
 import kiss.JSON;
 import kiss.Signal;
 

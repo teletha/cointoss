@@ -14,6 +14,7 @@ import java.util.Objects;
 
 import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
+import cointoss.util.feather.FeatherStore;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;

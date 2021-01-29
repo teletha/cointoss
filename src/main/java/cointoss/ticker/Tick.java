@@ -11,11 +11,11 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 
-import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.feather.TemporalData;
 
-public final class Tick implements TimeseriesData {
+public final class Tick implements TemporalData {
 
     /** The empty dummy. */
     static final Tick EMPTY = new Tick();

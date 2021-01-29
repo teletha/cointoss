@@ -7,11 +7,11 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.ticker.data;
+package cointoss.util.feather;
 
 import java.time.ZonedDateTime;
 
-public interface TimeseriesData {
+public interface TemporalData {
 
     /**
      * The date and time.

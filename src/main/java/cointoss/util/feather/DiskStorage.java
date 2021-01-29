@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.ticker;
+package cointoss.util.feather;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
@@ -17,6 +17,7 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -24,13 +25,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import kiss.I;
 import psychopath.File;
 
-/**
- * 
- */
-class FeatherDiskStorage<T> {
+class DiskStorage<T> {
 
     /** The actual channel. */
     private final FileChannel channel;
+
+    /** The process lock. */
+    private final FileLock lockForProcess;
 
     /** The read-write lock. */
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -48,10 +49,15 @@ class FeatherDiskStorage<T> {
      * @param codec The data definition.
      * @param duration The time that one element has.
      */
-    FeatherDiskStorage(File databaseFile, DataType<T> codec, long duration) {
-        this.channel = databaseFile.newFileChannel(CREATE, SPARSE, READ, WRITE);
-        this.codec = codec;
-        this.duration = duration;
+    DiskStorage(File databaseFile, DataType<T> codec, long duration) {
+        try {
+            this.channel = databaseFile.newFileChannel(CREATE, SPARSE, READ, WRITE);
+            this.lockForProcess = channel.tryLock();
+            this.codec = codec;
+            this.duration = duration;
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
     }
 
     /**
@@ -92,6 +98,10 @@ class FeatherDiskStorage<T> {
      * @param segment
      */
     void write(long truncatedTime, T[] items) {
+        if (lockForProcess == null) {
+            return;
+        }
+
         WriteLock writeLock = lock.writeLock();
         writeLock.lock();
 

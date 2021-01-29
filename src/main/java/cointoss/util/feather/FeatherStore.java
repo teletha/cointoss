@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.ticker;
+package cointoss.util.feather;
 
 import java.lang.reflect.Array;
 import java.nio.file.Path;
@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import cointoss.ticker.data.TimeseriesData;
+import cointoss.ticker.Span;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
 import cointoss.util.map.LongMap.LongEntry;
@@ -34,7 +34,7 @@ import kiss.model.Model;
 import psychopath.File;
 import psychopath.Locator;
 
-public final class FeatherStore<E extends TimeseriesData> {
+public final class FeatherStore<E extends TemporalData> {
 
     /** The item type. */
     private final Model<E> model;
@@ -58,7 +58,7 @@ public final class FeatherStore<E extends TimeseriesData> {
     private boolean shrink = true;
 
     /** The disk store. */
-    private FeatherDiskStorage<E> disk;
+    private DiskStorage<E> disk;
 
     @SuppressWarnings("serial")
     private final Map<Long, OnHeap<E>> stats = new LinkedHashMap<>(8, 0.75f, true) {
@@ -93,7 +93,7 @@ public final class FeatherStore<E extends TimeseriesData> {
      * @param span
      * @return
      */
-    public static <E extends TimeseriesData> FeatherStore<E> create(Class<E> type, Span span) {
+    public static <E extends TemporalData> FeatherStore<E> create(Class<E> type, Span span) {
         return new FeatherStore<E>(type, span.seconds, (int) (span.segmentSeconds / span.seconds), span.segmentSize);
     }
 
@@ -105,7 +105,7 @@ public final class FeatherStore<E extends TimeseriesData> {
      * @param span
      * @return
      */
-    public static <E extends TimeseriesData> FeatherStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
+    public static <E extends TemporalData> FeatherStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
         return new FeatherStore<E>(type, itemDuration, itemSize, segmentSize);
     }
 
@@ -194,7 +194,7 @@ public final class FeatherStore<E extends TimeseriesData> {
      */
     public synchronized FeatherStore<E> enableDiskStore(File databaseFile, DataType<E> dataType) {
         if (databaseFile != null && this.disk == null) {
-            this.disk = new FeatherDiskStorage(databaseFile, dataType != null ? dataType : DataType.of(model), itemDuration);
+            this.disk = new DiskStorage(databaseFile, dataType != null ? dataType : DataType.of(model), itemDuration);
         }
         return this;
     }
@@ -751,7 +751,7 @@ public final class FeatherStore<E extends TimeseriesData> {
     /**
      * On-Heap data container.
      */
-    static class OnHeap<T> {
+    private static class OnHeap<T> {
 
         /** The managed items. */
         private T[] items;

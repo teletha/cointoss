@@ -11,10 +11,11 @@ package cointoss.ticker.data;
 
 import java.time.ZonedDateTime;
 
+import cointoss.util.feather.TemporalData;
 import icy.manipulator.Icy;
 
 @Icy
-interface OpenInterestModel extends TimeseriesData {
+interface OpenInterestModel extends TemporalData {
 
     @Override
     @Icy.Property

@@ -7,13 +7,16 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.ticker;
+package cointoss.util.feather;
 
 import java.nio.ByteBuffer;
 
 import antibug.CleanRoom;
 import antibug.profiler.Benchmark;
-import cointoss.ticker.FeatherStoreTest.Value;
+import cointoss.ticker.Span;
+import cointoss.util.feather.DataType;
+import cointoss.util.feather.FeatherStore;
+import cointoss.util.feather.FeatherStoreTest.Value;
 
 public class FeatherStoreBenchmark {
 
