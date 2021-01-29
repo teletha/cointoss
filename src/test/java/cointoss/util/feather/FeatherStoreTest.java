@@ -623,9 +623,8 @@ class FeatherStoreTest {
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
         store.commit();
-        // store.clear();
-
-        // assert store.at(oi.epochSeconds()).equals(oi);
+        store.clear();
+        assert store.at(oi.epochSeconds()).equals(oi);
     }
 
     @Test

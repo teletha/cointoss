@@ -9,10 +9,7 @@
  */
 package cointoss.util.feather;
 
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.READ;
-import static java.nio.file.StandardOpenOption.SPARSE;
-import static java.nio.file.StandardOpenOption.WRITE;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -51,7 +48,8 @@ class DiskStorage<T> {
      */
     DiskStorage(File databaseFile, DataType<T> codec, long duration) {
         try {
-            this.channel = databaseFile.newFileChannel(CREATE, SPARSE, READ, WRITE);
+            this.channel = databaseFile.isPresent() ? databaseFile.newFileChannel(READ, WRITE)
+                    : databaseFile.newFileChannel(CREATE_NEW, SPARSE, READ, WRITE);
             this.lockForProcess = channel.tryLock();
             this.codec = codec;
             this.duration = duration;
@@ -114,12 +112,7 @@ class DiskStorage<T> {
                 if (item == null) {
                     if (buffer.position() != 0) {
                         buffer.flip();
-                        long start = System.nanoTime();
-                        System.out.println(buffer + "   " + startPosition + "   " + duration + "  " + truncatedTime);
                         channel.write(buffer, startPosition);
-                        long end = System.nanoTime();
-                        System.out.println((end - start) / 1000000L + "ms");
-
                         buffer.clear();
                     }
                     startPosition = (truncatedTime / duration + i + 1) * codec.size();
