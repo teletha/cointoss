@@ -97,6 +97,11 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.1))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService DOGE_PERP = new FTXService("DOGE-PERP", MarketSetting.with.derivative()
+            .target(Currency.DOGE.minimumSize(1))
+            .base(Currency.USD.minimumSize(0.0000005))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService BTC0326 = new FTXService("BTC-0326", MarketSetting.with.future()
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(1))

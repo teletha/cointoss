@@ -80,6 +80,11 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService FUTURE_DOGE_USDT = new BinanceService("DOGEUSDT", MarketSetting.with.derivative()
+            .target(Currency.DOGE.minimumSize(1))
+            .base(Currency.USDT.minimumSize(0.000001))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService FUTURE_BTCUSD_210326 = new BinanceService("BTCUSD_210326", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.00001))
             .base(Currency.USD.minimumSize(0.1))
