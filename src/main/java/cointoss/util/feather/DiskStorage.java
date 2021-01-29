@@ -9,7 +9,10 @@
  */
 package cointoss.util.feather;
 
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.SPARSE;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -23,6 +26,9 @@ import kiss.I;
 import psychopath.File;
 
 class DiskStorage<T> {
+
+    /** The header size. */
+    private static final int HEADER_SIZE = 8 + 8;
 
     /** The actual channel. */
     private final FileChannel channel;
@@ -39,6 +45,12 @@ class DiskStorage<T> {
     /** The time that one element has. */
     private final long duration;
 
+    /** The start time of all records. */
+    private long startTime;
+
+    /** The end time of all records. */
+    private long endTime;
+
     /**
      * Create disk storage.
      * 
@@ -53,6 +65,48 @@ class DiskStorage<T> {
             this.lockForProcess = channel.tryLock();
             this.codec = codec;
             this.duration = duration;
+
+            if (HEADER_SIZE < channel.size()) {
+                readHeader();
+            }
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
+     * Parse header.
+     */
+    private void readHeader() {
+        try {
+            // read
+            ByteBuffer buffer = ByteBuffer.allocate(HEADER_SIZE);
+            channel.read(buffer, 0);
+            buffer.flip();
+
+            // decode
+            startTime = buffer.getLong();
+            endTime = buffer.getLong();
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
+     * Update header.
+     * 
+     * @throws IOException
+     */
+    private void writeHeader() {
+        try {
+            // encode
+            ByteBuffer buffer = ByteBuffer.allocate(HEADER_SIZE);
+            buffer.putLong(startTime);
+            buffer.putLong(endTime);
+
+            // write
+            buffer.flip();
+            channel.write(buffer, 0);
         } catch (IOException e) {
             throw I.quiet(e);
         }
@@ -70,7 +124,7 @@ class DiskStorage<T> {
             readLock.lock();
 
             ByteBuffer buffer = ByteBuffer.allocate(codec.size() * items.length);
-            int size = channel.read(buffer, truncatedTime / duration * codec.size());
+            int size = channel.read(buffer, HEADER_SIZE + truncatedTime / duration * codec.size());
 
             if (size != -1) {
                 buffer.flip();
@@ -104,7 +158,7 @@ class DiskStorage<T> {
         writeLock.lock();
 
         try {
-            long startPosition = truncatedTime / duration * codec.size();
+            long startPosition = HEADER_SIZE + truncatedTime / duration * codec.size();
             ByteBuffer buffer = ByteBuffer.allocate(codec.size() * items.length);
 
             for (int i = 0; i < items.length; i++) {
@@ -115,7 +169,7 @@ class DiskStorage<T> {
                         channel.write(buffer, startPosition);
                         buffer.clear();
                     }
-                    startPosition = (truncatedTime / duration + i + 1) * codec.size();
+                    startPosition = HEADER_SIZE + (truncatedTime / duration + i + 1) * codec.size();
                 } else {
                     codec.write(item, buffer);
                 }
