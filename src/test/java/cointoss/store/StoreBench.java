@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 
 import antibug.profiler.Benchmark;
 import cointoss.ticker.Span;
-import cointoss.ticker.TimeseriesStore;
+import cointoss.ticker.FeatherStore;
 import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
 import psychopath.Locator;
@@ -50,7 +50,7 @@ public class StoreBench {
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
 
-        TimeseriesStore<Orderbook> store = TimeseriesStore.create(Orderbook.class, Span.Minute1).enableDiskStore(Locator.file("test.db"));
+        FeatherStore<Orderbook> store = FeatherStore.create(Orderbook.class, Span.Minute1).enableDiskStore(Locator.file("test.db"));
 
         benchmark.measure("Num", () -> {
             for (int i = 0; i < 100000; i++) {

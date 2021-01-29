@@ -13,10 +13,9 @@ import java.nio.ByteBuffer;
 
 import antibug.CleanRoom;
 import antibug.profiler.Benchmark;
-import cointoss.ticker.TimeseriesStore.Codec;
-import cointoss.ticker.TimeseriesStoreTest.Value;
+import cointoss.ticker.FeatherStoreTest.Value;
 
-public class TimeseriseStoreBenchmark {
+public class FeatherStoreBenchmark {
 
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
@@ -31,8 +30,8 @@ public class TimeseriseStoreBenchmark {
         // return memory.size();
         // });
 
-        TimeseriesStore<Value> disk = TimeseriesStore.create(Value.class, span)
-                .enableDiskStore(room.locateFile("persist.db"), new Codec<Value>() {
+        FeatherStore<Value> disk = FeatherStore.create(Value.class, span)
+                .enableDiskStore(room.locateFile("persist.db"), new DataType<Value>() {
 
                     @Override
                     public int size() {

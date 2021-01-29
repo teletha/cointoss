@@ -27,7 +27,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
-import cointoss.ticker.TimeseriesStore;
+import cointoss.ticker.FeatherStore;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
@@ -62,7 +62,7 @@ public class BitMexService extends MarketService {
     /** The instrument tick size. */
     private final Num instrumentTickSize;
 
-    private final TimeseriesStore<OpenInterest> openInterests = TimeseriesStore.create(OpenInterest.class, 10, 6 * 60 * 4, 3);
+    private final FeatherStore<OpenInterest> openInterests = FeatherStore.create(OpenInterest.class, 10, 6 * 60 * 4, 3);
 
     /**
      * @param marketName

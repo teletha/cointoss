@@ -36,7 +36,7 @@ public final class Ticker implements Disposable {
     public final Signal<Tick> close = closing.expose.skip(tick -> tick.volume() == 0);
 
     /** The tick store. */
-    public final TimeseriesStore<Tick> ticks;
+    public final FeatherStore<Tick> ticks;
 
     /** The cache of upper tickers. */
     final Ticker[] uppers;
@@ -69,7 +69,7 @@ public final class Ticker implements Disposable {
     Ticker(Span span, TickerManager manager) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
-        this.ticks = TimeseriesStore.create(Tick.class, span);
+        this.ticks = FeatherStore.create(Tick.class, span);
         this.manager = manager;
     }
 

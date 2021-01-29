@@ -29,7 +29,7 @@ import cointoss.ticker.data.TimeseriesData;
 import cointoss.util.Chrono;
 import kiss.I;
 
-class TimeseriesStoreTest {
+class FeatherStoreTest {
     private static final int days = 60 * 60 * 24;
 
     private Value day(int size) {
@@ -84,7 +84,7 @@ class TimeseriesStoreTest {
 
     @Test
     void isEmpty() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         assert store.isEmpty();
 
         store.store(value(1));
@@ -93,7 +93,7 @@ class TimeseriesStoreTest {
 
     @Test
     void isNotEmpty() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         assert store.isNotEmpty() == false;
 
         store.store(value(1));
@@ -102,7 +102,7 @@ class TimeseriesStoreTest {
 
     @Test
     void add() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(value(0));
         assert store.at(0).value == 0;
         assert store.at(60) == null;
@@ -135,7 +135,7 @@ class TimeseriesStoreTest {
 
     @Test
     void getByTime() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(value(0), value(60), value(120));
         assert store.at(0).value == 0;
         assert store.at(30).value == 0;
@@ -147,7 +147,7 @@ class TimeseriesStoreTest {
 
     @Test
     void getByTimeOverTime() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(value(0), value(days), value(2 * days), value(3 * days), value(4 * days));
         assert store.at(0).value == 0;
         assert store.at(days - 1).value == 0;
@@ -160,7 +160,7 @@ class TimeseriesStoreTest {
 
     @Test
     void first() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(value(300));
         assert store.first().value == 300;
 
@@ -182,14 +182,14 @@ class TimeseriesStoreTest {
 
     @Test
     void firstOverDays() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.first().value == 0;
     }
 
     @Test
     void last() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(value(60));
         assert store.last().value == 60;
 
@@ -211,14 +211,14 @@ class TimeseriesStoreTest {
 
     @Test
     void lastOverDays() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.last().value == 4 * days;
     }
 
     @Test
     void size() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         assert store.size() == 0;
 
         store.store(value(60));
@@ -236,7 +236,7 @@ class TimeseriesStoreTest {
 
     @Test
     void sizeOverDays() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.size() == 5;
     }
@@ -244,7 +244,7 @@ class TimeseriesStoreTest {
     @Test
     void each() {
         // padding right
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(value(0), value(60), value(120), value(180), value(240), value(300), value(360));
 
         List<Value> list = new ArrayList();
@@ -252,7 +252,7 @@ class TimeseriesStoreTest {
         assertIterableEquals(values(0, 60, 120, 180, 240, 300, 360), list);
 
         // padding both sides
-        store = TimeseriesStore.create(Value.class, Span.Minute1);
+        store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(value(180), value(240), value(300), value(360));
 
         list = new ArrayList();
@@ -260,7 +260,7 @@ class TimeseriesStoreTest {
         assertIterableEquals(values(180, 240, 300, 360), list);
 
         // padding left side
-        store = TimeseriesStore.create(Value.class, Span.Hour4);
+        store = FeatherStore.create(Value.class, Span.Hour4);
         store.store(value(3600 * 12), value(3600 * 16), value(3600 * 20));
 
         list = new ArrayList();
@@ -270,7 +270,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachOverDays() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
 
         List<Value> list = new ArrayList();
@@ -280,7 +280,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachByTime() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(I.signal(60, 120, 180, 240, 300, 360, 420).map(this::value));
 
         List<Value> list = new ArrayList();
@@ -306,7 +306,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachByTimeOverDays() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
 
         List<Value> list = new ArrayList();
@@ -324,7 +324,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachByItem() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(values(0, 60, 120, 180, 240, 300, 360));
 
         List<Value> items = store.each(store.at(0), store.at(180)).toList();
@@ -338,7 +338,7 @@ class TimeseriesStoreTest {
     @Test
     void eachLatest() {
         // padding right
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(values(0, 60, 120, 180, 240, 300, 360));
 
         List<Value> list = store.eachLatest().toList();
@@ -350,7 +350,7 @@ class TimeseriesStoreTest {
 
     @Test
     void eachLatestOverDays() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
 
         List<Value> list = store.eachLatest().toList();
@@ -363,7 +363,7 @@ class TimeseriesStoreTest {
 
     @Test
     void calculateStartTimeAndRemainderEpochSeconds() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
 
         // 2019-12-12 02:16:30
         Assertions.assertArrayEquals(new long[] {1576108800, 136}, store.index(1576116990));
@@ -377,7 +377,7 @@ class TimeseriesStoreTest {
 
     @Test
     void before() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(values(0, 60, 120, 180));
         assert store.before(0) == null;
         assert store.before(36) == null;
@@ -392,7 +392,7 @@ class TimeseriesStoreTest {
 
     @Test
     void beforeOverTime() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.before(0) == null;
         assert store.before(days - 1) == null;
@@ -405,7 +405,7 @@ class TimeseriesStoreTest {
 
     @Test
     void befores() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(values(0, 60, 120, 180));
         assert store.beforeUntil(0, 1).isEmpty();
         assert store.beforeUntil(36, 2).isEmpty();
@@ -420,7 +420,7 @@ class TimeseriesStoreTest {
 
     @Test
     void beforesOverTime() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.beforeUntil(0, 1).isEmpty();
         assert store.beforeUntil(days - 1, 2).isEmpty();
@@ -434,7 +434,7 @@ class TimeseriesStoreTest {
 
     @Test
     void beforeWith() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(values(0, 60, 120, 180));
         assert store.beforeUntilWith(0, 1).equals(values(0));
         assert store.beforeUntilWith(36, 2).equals(values(0));
@@ -449,7 +449,7 @@ class TimeseriesStoreTest {
 
     @Test
     void beforeWithOverTime() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.beforeUntilWith(0, 1).equals(values(0));
         assert store.beforeUntilWith(days - 1, 2).equals(values(0));
@@ -466,7 +466,7 @@ class TimeseriesStoreTest {
 
     @Test
     void diskCache() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
 
         int base = (int) Span.Minute1.segmentSeconds;
 
@@ -498,7 +498,7 @@ class TimeseriesStoreTest {
 
     @Test
     void dataSupply() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableActiveDataSupplier(time -> {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableActiveDataSupplier(time -> {
             return I.signal(value((int) time));
         });
 
@@ -517,7 +517,7 @@ class TimeseriesStoreTest {
 
     @Test
     void persist() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
 
         store.store(value(0));
         assert store.existOnDisk(value(0)) == false;
@@ -527,7 +527,7 @@ class TimeseriesStoreTest {
 
     @Test
     void readDataFromDiskCache() {
-        TimeseriesStore<Value> store = TimeseriesStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
 
         store.store(value(0));
         store.commit();
@@ -549,7 +549,7 @@ class TimeseriesStoreTest {
         primitive.byteValue = 2;
         primitive.shortValue = 3;
 
-        TimeseriesStore<Primitive> store = TimeseriesStore.create(Primitive.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Primitive> store = FeatherStore.create(Primitive.class, Span.Minute1).enableDiskStore(room.locateRadom());
         store.store(primitive);
         store.commit();
         store.clear();
@@ -595,7 +595,7 @@ class TimeseriesStoreTest {
         e.type = MarketType.DERIVATIVE;
         e.currency = Currency.BTC;
 
-        TimeseriesStore<Enums> store = TimeseriesStore.create(Enums.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Enums> store = FeatherStore.create(Enums.class, Span.Minute1).enableDiskStore(room.locateRadom());
         store.store(e);
         store.commit();
         store.clear();
@@ -619,7 +619,7 @@ class TimeseriesStoreTest {
 
     @Test
     void supportZonedDateTime() {
-        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(room.locateRadom());
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
         store.commit();
@@ -630,7 +630,7 @@ class TimeseriesStoreTest {
 
     @Test
     void storeSparsedDisk() {
-        TimeseriesStore<OpenInterest> store = TimeseriesStore.create(OpenInterest.class, Span.Day1).enableDiskStore(room.locateRadom());
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day1).enableDiskStore(room.locateRadom());
         OpenInterest oi1 = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);

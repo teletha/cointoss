@@ -12,7 +12,7 @@ package cointoss.store;
 import antibug.profiler.Benchmark;
 import cointoss.store.StoreBench.Orderbook;
 import cointoss.ticker.Span;
-import cointoss.ticker.TimeseriesStore;
+import cointoss.ticker.FeatherStore;
 import psychopath.Locator;
 
 public class ReadBench {
@@ -38,7 +38,7 @@ public class ReadBench {
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
 
-        TimeseriesStore<Orderbook> store = TimeseriesStore.create(Orderbook.class, Span.Hour1).enableDiskStore(Locator.file("test.db"));
+        FeatherStore<Orderbook> store = FeatherStore.create(Orderbook.class, Span.Hour1).enableDiskStore(Locator.file("test.db"));
         System.out.println(store.at(0));
 
         benchmark.measure("Num", () -> {

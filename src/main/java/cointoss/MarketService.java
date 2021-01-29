@@ -29,7 +29,7 @@ import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
-import cointoss.ticker.TimeseriesStore;
+import cointoss.ticker.FeatherStore;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.Chrono;
@@ -371,9 +371,9 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         return I.signal();
     }
 
-    public final TimeseriesStore<OpenInterest> openInterest = initializeOpenInterestStore();
+    public final FeatherStore<OpenInterest> openInterest = initializeOpenInterestStore();
 
-    protected TimeseriesStore<OpenInterest> initializeOpenInterestStore() {
+    protected FeatherStore<OpenInterest> initializeOpenInterestStore() {
         return null;
     }
 

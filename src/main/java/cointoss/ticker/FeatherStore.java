@@ -9,25 +9,14 @@
  */
 package cointoss.ticker;
 
-import static java.nio.file.StandardOpenOption.*;
-
-import java.io.IOException;
 import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
@@ -35,8 +24,6 @@ import java.util.function.Predicate;
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.ticker.data.TimeseriesData;
-import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
 import cointoss.util.map.LongMap.LongEntry;
@@ -44,14 +31,10 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.model.Model;
-import kiss.model.Property;
 import psychopath.File;
 import psychopath.Locator;
 
-public final class TimeseriesStore<E extends TimeseriesData> {
-
-    /** The table definitions. */
-    private static final Map<Model, ModelCodec> definitions = new ConcurrentHashMap();
+public final class FeatherStore<E extends TimeseriesData> {
 
     /** The item type. */
     private final Model<E> model;
@@ -69,25 +52,25 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     private final int segmentSize;
 
     /** The completed data manager. */
-    private final ConcurrentNavigableLongMap<OnHeap> indexed = LongMap.createSortedMap();
+    private final ConcurrentNavigableLongMap<OnHeap<E>> indexed = LongMap.createSortedMap();
 
     /** The usage of memory shrinking. */
     private boolean shrink = true;
 
     /** The disk store. */
-    private OnDisk disk;
+    private FeatherDiskStorage<E> disk;
 
     @SuppressWarnings("serial")
-    private final Map<Long, OnHeap> stats = new LinkedHashMap<>(8, 0.75f, true) {
+    private final Map<Long, OnHeap<E>> stats = new LinkedHashMap<>(8, 0.75f, true) {
 
         @Override
-        protected boolean removeEldestEntry(Entry<Long, OnHeap> eldest) {
+        protected boolean removeEldestEntry(Entry<Long, OnHeap<E>> eldest) {
             if (shrink && segmentSize < size()) {
                 long time = eldest.getKey();
-                OnHeap segment = eldest.getValue();
+                OnHeap<E> segment = eldest.getValue();
 
                 if (disk != null) {
-                    disk.write(time, segment);
+                    disk.write(time, segment.items);
                 }
 
                 indexed.remove(time);
@@ -110,8 +93,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param span
      * @return
      */
-    public static <E extends TimeseriesData> TimeseriesStore<E> create(Class<E> type, Span span) {
-        return new TimeseriesStore<E>(type, span.seconds, (int) (span.segmentSeconds / span.seconds), span.segmentSize);
+    public static <E extends TimeseriesData> FeatherStore<E> create(Class<E> type, Span span) {
+        return new FeatherStore<E>(type, span.seconds, (int) (span.segmentSeconds / span.seconds), span.segmentSize);
     }
 
     /**
@@ -122,14 +105,14 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param span
      * @return
      */
-    public static <E extends TimeseriesData> TimeseriesStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
-        return new TimeseriesStore<E>(type, itemDuration, itemSize, segmentSize);
+    public static <E extends TimeseriesData> FeatherStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
+        return new FeatherStore<E>(type, itemDuration, itemSize, segmentSize);
     }
 
     /**
      * 
      */
-    private TimeseriesStore(Class<E> type, long itemDuration, int itemSize, int SegmentSize) {
+    private FeatherStore(Class<E> type, long itemDuration, int itemSize, int SegmentSize) {
         this.model = Model.of(type);
         this.itemDuration = itemDuration;
         this.itemSize = itemSize;
@@ -143,7 +126,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param supplier
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableActiveDataSupplier(LongFunction<Signal<E>> supplier) {
+    public synchronized FeatherStore<E> enableActiveDataSupplier(LongFunction<Signal<E>> supplier) {
         this.supplier = supplier;
         return this;
     }
@@ -154,7 +137,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param supplier
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enablePassiveDataSupplier(Signal<E> supplier, Disposable disposer) {
+    public synchronized FeatherStore<E> enablePassiveDataSupplier(Signal<E> supplier, Disposable disposer) {
         if (disposer != null && supplier != null) {
             disposer.add(supplier.effectOnDispose(this::commit).to(e -> {
                 store(e);
@@ -168,7 +151,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * 
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> disableActiveDataSupplier() {
+    public synchronized FeatherStore<E> disableActiveDataSupplier() {
         this.supplier = null;
         return this;
     }
@@ -179,7 +162,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Path databaseFile) {
+    public synchronized FeatherStore<E> enableDiskStore(Path databaseFile) {
         return enableDiskStore(databaseFile, null);
     }
 
@@ -189,7 +172,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(Path databaseFile, Codec<E> codec) {
+    public synchronized FeatherStore<E> enableDiskStore(Path databaseFile, DataType<E> codec) {
         return enableDiskStore(Locator.file(databaseFile), codec);
     }
 
@@ -199,7 +182,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(File databaseFile) {
+    public synchronized FeatherStore<E> enableDiskStore(File databaseFile) {
         return enableDiskStore(databaseFile, null);
     }
 
@@ -209,9 +192,9 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableDiskStore(File databaseFile, Codec<E> codec) {
+    public synchronized FeatherStore<E> enableDiskStore(File databaseFile, DataType<E> dataType) {
         if (databaseFile != null && this.disk == null) {
-            this.disk = new OnDisk(databaseFile, codec);
+            this.disk = new FeatherDiskStorage(databaseFile, dataType != null ? dataType : DataType.of(model), itemDuration);
         }
         return this;
     }
@@ -221,7 +204,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * 
      * @return
      */
-    public synchronized TimeseriesStore<E> disableDiskStore() {
+    public synchronized FeatherStore<E> disableDiskStore() {
         this.disk = null;
         return this;
     }
@@ -231,7 +214,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * 
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> enableMemorySaving() {
+    public synchronized FeatherStore<E> enableMemorySaving() {
         this.shrink = true;
         return this;
     }
@@ -241,7 +224,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * 
      * @return Chainable API.
      */
-    public synchronized TimeseriesStore<E> disableMemorySaving() {
+    public synchronized FeatherStore<E> disableMemorySaving() {
         this.shrink = false;
         return this;
     }
@@ -259,7 +242,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     }
 
     /**
-     * Return the size of this {@link TimeseriesStore}.
+     * Return the size of this {@link FeatherStore}.
      * 
      * @return A positive size or zero.
      */
@@ -268,7 +251,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     }
 
     /**
-     * Check whether this {@link TimeseriesStore} is empty or not.
+     * Check whether this {@link FeatherStore} is empty or not.
      * 
      * @return Result.
      */
@@ -277,7 +260,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     }
 
     /**
-     * Check whether this {@link TimeseriesStore} is empty or not.
+     * Check whether this {@link FeatherStore} is empty or not.
      * 
      * @return Result.
      */
@@ -293,10 +276,10 @@ public final class TimeseriesStore<E extends TimeseriesData> {
     public void store(E item) {
         long[] index = index(item.epochSeconds());
 
-        OnHeap segment = supply(index[0]);
+        OnHeap<E> segment = supply(index[0]);
 
         if (segment == null) {
-            segment = new OnHeap(index[0]);
+            segment = new OnHeap(model, index[0], itemSize);
             indexed.put(index[0], segment);
             stats.put(index[0], segment);
         }
@@ -346,7 +329,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         }
 
         long[] index = index(timestamp);
-        OnHeap segment = supply(index[0]);
+        OnHeap<E> segment = supply(index[0]);
 
         if (segment == null) {
             return null;
@@ -360,7 +343,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @return The first stored time series item.
      */
     public E first() {
-        OnHeap entry = indexed.firstValue();
+        OnHeap<E> entry = indexed.firstValue();
         if (entry == null) {
             return null;
         }
@@ -373,7 +356,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @return The last stored time series item.
      */
     public E last() {
-        OnHeap entry = indexed.lastValue();
+        OnHeap<E> entry = indexed.lastValue();
         if (entry == null) {
             return null;
         }
@@ -495,10 +478,10 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         return new Signal<>((observer, disposer) -> {
             long[] startIndex = index(start);
             long[] endIndex = index(end);
-            ConcurrentNavigableLongMap<OnHeap> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
+            ConcurrentNavigableLongMap<OnHeap<E>> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
 
             try {
-                for (LongEntry<OnHeap> entry : sub.longEntrySet()) {
+                for (LongEntry<OnHeap<E>> entry : sub.longEntrySet()) {
                     if (disposer.isDisposed()) {
                         break;
                     }
@@ -635,7 +618,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         long[] index = index(timestamp);
         long timeIndex = index[0];
         int segmentIndex = ((int) index[1]);
-        OnHeap segment = supply(timeIndex);
+        OnHeap<E> segment = supply(timeIndex);
 
         if (segment == null) {
             return List.of();
@@ -675,18 +658,20 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      * @param startTime
      * @return
      */
-    private OnHeap supply(long startTime) {
+    private OnHeap<E> supply(long startTime) {
         // Memory Cache
-        OnHeap segment = indexed.get(startTime);
+        OnHeap<E> segment = indexed.get(startTime);
         if (segment != null) {
             return segment;
         }
 
         // Disk Cache
         if (disk != null) {
-            segment = disk.read(startTime);
+            segment = new OnHeap(model, startTime, itemSize);
+            int size = disk.read(startTime, segment.items);
+            segment.sync = true;
 
-            if (segment != null) {
+            if (1 <= size) {
                 indexed.put(startTime, segment);
                 stats.put(startTime, segment);
 
@@ -700,7 +685,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
             if (supply != null) {
                 long endTime = startTime + segmentDuration;
 
-                OnHeap heap = new OnHeap(startTime);
+                OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
                 indexed.put(startTime, heap);
                 stats.put(startTime, heap);
                 supply.to(item -> {
@@ -723,8 +708,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
      */
     public void commit() {
         if (disk != null) {
-            for (Entry<Long, TimeseriesStore<E>.OnHeap> entry : stats.entrySet()) {
-                disk.write(entry.getKey(), entry.getValue());
+            for (Entry<Long, OnHeap<E>> entry : stats.entrySet()) {
+                disk.write(entry.getKey(), entry.getValue().items);
             }
         }
     }
@@ -757,18 +742,19 @@ public final class TimeseriesStore<E extends TimeseriesData> {
             return false;
         }
 
+        E[] container = (E[]) Array.newInstance(model.type, 1);
         long[] index = index(item.epochSeconds());
-        E read = disk.read(index[0]).items[(int) index[1]];
-        return Objects.equals(item, read);
+        disk.read(index[0], container);
+        return Objects.equals(item, container[(int) index[1]]);
     }
 
     /**
      * On-Heap data container.
      */
-    private class OnHeap {
+    static class OnHeap<T> {
 
         /** The managed items. */
-        private E[] items;
+        private T[] items;
 
         /** The first item index. */
         private int min = Integer.MAX_VALUE;
@@ -782,15 +768,8 @@ public final class TimeseriesStore<E extends TimeseriesData> {
         /**
          * @param startTime The starting time (epoch seconds).
          */
-        private OnHeap(long startTime) {
-            this(startTime, itemSize);
-        }
-
-        /**
-         * @param startTime The starting time (epoch seconds).
-         */
-        private OnHeap(long startTime, int size) {
-            this.items = (E[]) Array.newInstance(model.type, size);
+        private OnHeap(Model<T> model, long startTime, int size) {
+            this.items = (T[]) Array.newInstance(model.type, size);
         }
 
         /**
@@ -808,7 +787,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * @param index An item index.
          * @return An item or null.
          */
-        E get(int index) {
+        T get(int index) {
             return items == null ? null : items[index];
         }
 
@@ -818,7 +797,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * @param index An item index.
          * @param item An item to set.
          */
-        void set(int index, E item) {
+        void set(int index, T item) {
             items[index] = item;
 
             // FAILSAFE : update min and max index after inserting item
@@ -841,7 +820,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * 
          * @return A first item or null.
          */
-        E first() {
+        T first() {
             return items == null || min < 0 ? null : items[min];
         }
 
@@ -850,7 +829,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * 
          * @return A last item or null.
          */
-        E last() {
+        T last() {
             return items == null || max < 0 ? null : items[max];
         }
 
@@ -860,7 +839,7 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * 
          * @param each An item processor.
          */
-        void each(Consumer<? super E> each) {
+        void each(Consumer<? super T> each) {
             each(min, max, each, Disposable.empty());
         }
 
@@ -872,10 +851,10 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * @param end A end index (exclusive).
          * @param each An item processor.
          */
-        void each(int start, int end, Consumer<? super E> consumer, Disposable disposer) {
+        void each(int start, int end, Consumer<? super T> consumer, Disposable disposer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
-            E[] avoidNPE = items; // copy reference to avoid NPE by #clear
+            T[] avoidNPE = items; // copy reference to avoid NPE by #clear
             if (avoidNPE != null) {
                 for (int i = start; i <= end; i++) {
                     if (disposer.isDisposed()) {
@@ -894,10 +873,10 @@ public final class TimeseriesStore<E extends TimeseriesData> {
          * @param end A end index (exclusive).
          * @param each An item processor.
          */
-        void eachLatest(int start, int end, Consumer<? super E> consumer, Disposable disposer) {
+        void eachLatest(int start, int end, Consumer<? super T> consumer, Disposable disposer) {
             start = Math.min(max, start);
             end = Math.max(min, end);
-            E[] avoidNPE = items; // copy reference to avoid NPE by #clear
+            T[] avoidNPE = items; // copy reference to avoid NPE by #clear
             if (avoidNPE != null) {
                 for (int i = start; end <= i; i--) {
                     if (disposer.isDisposed()) {
@@ -906,264 +885,6 @@ public final class TimeseriesStore<E extends TimeseriesData> {
                     consumer.accept(avoidNPE[i]);
                 }
             }
-        }
-    }
-
-    /**
-     * 
-     */
-    private class OnDisk {
-
-        /** The actual channel. */
-        private final FileChannel channel;
-
-        /** The read-write lock. */
-        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
-        /** The table definition. */
-        private final Codec<E> codec;
-
-        /**
-         * @param databaseFile
-         * @param codec
-         */
-        private OnDisk(File databaseFile, Codec<E> codec) {
-            this.channel = databaseFile.newFileChannel(CREATE, SPARSE, READ, WRITE);
-            this.codec = codec != null ? codec : definitions.computeIfAbsent(model, ModelCodec::new);
-        }
-
-        /**
-         * Write data to disk cache.
-         * 
-         * @param truncatedTime
-         * @param segment
-         */
-        private void write(long truncatedTime, OnHeap segment) {
-            if (!segment.sync) {
-                WriteLock writeLock = lock.writeLock();
-                writeLock.lock();
-
-                try {
-                    long startPosition = truncatedTime / itemDuration * codec.size();
-                    ByteBuffer buffer = ByteBuffer.allocate(codec.size() * itemSize);
-
-                    for (int i = 0; i < itemSize; i++) {
-                        E item = segment.items[i];
-                        if (item == null) {
-                            if (buffer.position() != 0) {
-                                buffer.flip();
-                                channel.write(buffer, startPosition);
-                                buffer.clear();
-                            }
-                            startPosition = (truncatedTime / itemDuration + i + 1) * codec.size();
-                        } else {
-                            codec.write(item, buffer);
-                        }
-                    }
-
-                    if (buffer.position() != 0) {
-                        buffer.flip();
-                        channel.write(buffer, startPosition);
-                    }
-                    segment.sync = true;
-                } catch (IOException e) {
-                    throw I.quiet(e);
-                } finally {
-                    writeLock.unlock();
-                }
-            }
-        }
-
-        /**
-         * Read data from disk cache.
-         * 
-         * @param truncatedTime
-         * @return
-         */
-        private OnHeap read(long truncatedTime) {
-            OnHeap heap = new OnHeap(truncatedTime, itemSize);
-            ReadLock readLock = lock.readLock();
-
-            try {
-                readLock.lock();
-
-                ByteBuffer buffer = ByteBuffer.allocate(codec.size() * itemSize);
-                int size = channel.read(buffer, truncatedTime / itemDuration * codec.size());
-
-                if (size != -1) {
-                    buffer.flip();
-
-                    int readableItemSize = size / codec.size();
-                    for (int i = 0; i < readableItemSize; i++) {
-                        heap.items[i] = codec.read(buffer);
-                    }
-                    heap.sync = true;
-                }
-            } catch (IOException e) {
-                throw I.quiet(e);
-            } finally {
-                readLock.unlock();
-            }
-            return heap;
-        }
-    }
-
-    /**
-     * Data serializer and deserializer from/to bytes.
-     */
-    public interface Codec<E extends TimeseriesData> {
-
-        /**
-         * Total data size. (bytes)
-         * 
-         * @return
-         */
-        int size();
-
-        /**
-         * Convert from data to bytes.
-         * 
-         * @param item A data to store.
-         * @param writer A byte writer.
-         */
-        void write(E item, ByteBuffer writer);
-
-        /**
-         * Convert from bytes to data.
-         * 
-         * @param reader A byte reader.
-         * @return A restored data.
-         */
-        E read(ByteBuffer reader);
-    }
-
-    /**
-     * {@link Model} based automatic codec.
-     */
-    private static class ModelCodec<E extends TimeseriesData> implements Codec<E> {
-
-        /** The data type. */
-        private final Class<E> type;
-
-        /** The total size. */
-        private final int size;
-
-        /** The data readers. */
-        private final BiConsumer<E, ByteBuffer>[] readers;
-
-        /** The data writers. */
-        private final BiConsumer<E, ByteBuffer>[] writers;
-
-        /**
-         * @param model
-         */
-        private ModelCodec(Model<E> model) {
-            this.type = model.type;
-
-            int width = 0;
-            List<Property> properties = model.properties();
-            this.readers = new BiConsumer[properties.size()];
-            this.writers = new BiConsumer[properties.size()];
-
-            for (int i = 0; i < properties.size(); i++) {
-                Property property = properties.get(i);
-                Class c = property.model.type;
-                if (c == boolean.class) {
-                    width += 1;
-                    readers[i] = (o, b) -> model.set(o, property, b.get() == 0 ? Boolean.FALSE : Boolean.TRUE);
-                    writers[i] = (o, b) -> b.put((byte) (model.get(o, property) == Boolean.FALSE ? 0 : 1));
-                } else if (c == byte.class) {
-                    width += 1;
-                    readers[i] = (o, b) -> model.set(o, property, b.get());
-                    writers[i] = (o, b) -> b.put((byte) model.get(o, property));
-                } else if (c == short.class) {
-                    width += 2;
-                    readers[i] = (o, b) -> model.set(o, property, b.getShort());
-                    writers[i] = (o, b) -> b.putShort((short) model.get(o, property));
-                } else if (c == char.class) {
-                    width += 2;
-                    readers[i] = (o, b) -> model.set(o, property, b.getChar());
-                    writers[i] = (o, b) -> b.putChar((char) model.get(o, property));
-                } else if (c == int.class) {
-                    width += 4;
-                    readers[i] = (o, b) -> model.set(o, property, b.getInt());
-                    writers[i] = (o, b) -> b.putInt((int) model.get(o, property));
-                } else if (c == float.class) {
-                    width += 4;
-                    readers[i] = (o, b) -> model.set(o, property, b.getFloat());
-                    writers[i] = (o, b) -> b.putFloat((float) model.get(o, property));
-                } else if (c == long.class) {
-                    width += 8;
-                    readers[i] = (o, b) -> model.set(o, property, b.getLong());
-                    writers[i] = (o, b) -> b.putLong((long) model.get(o, property));
-                } else if (c == double.class) {
-                    width += 8;
-                    readers[i] = (o, b) -> model.set(o, property, b.getDouble());
-                    writers[i] = (o, b) -> b.putDouble((double) model.get(o, property));
-                } else if (c.isEnum()) {
-                    int size = c.getEnumConstants().length;
-                    if (size < 8) {
-                        width += 1;
-                        readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.get()]);
-                        writers[i] = (o, b) -> b.put((byte) ((Enum) model.get(o, property)).ordinal());
-                    } else if (size < 128) {
-                        width += 2;
-                        readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.getShort()]);
-                        writers[i] = (o, b) -> b.putShort((short) ((Enum) model.get(o, property)).ordinal());
-                    } else {
-                        width += 4;
-                        readers[i] = (o, b) -> model.set(o, property, property.model.type.getEnumConstants()[b.getInt()]);
-                        writers[i] = (o, b) -> b.putInt(((Enum) model.get(o, property)).ordinal());
-                    }
-                } else if (Num.class.isAssignableFrom(c)) {
-                    width += 4;
-                    readers[i] = (o, b) -> model.set(o, property, Num.of(b.getFloat()));
-                    writers[i] = (o, b) -> b.putFloat(((Num) model.get(o, property)).floatValue());
-                } else if (ZonedDateTime.class.isAssignableFrom(c)) {
-                    width += 8;
-                    readers[i] = (o, b) -> {
-                        long time = b.getLong();
-                        model.set(o, property, time == -1 ? null : Chrono.utcByMills(time));
-                    };
-                    writers[i] = (o, b) -> {
-                        ZonedDateTime time = (ZonedDateTime) model.get(o, property);
-                        b.putLong(time == null ? -1 : time.toInstant().toEpochMilli());
-                    };
-                } else {
-                    throw new IllegalArgumentException("Unspported property type [" + c.getName() + "] on " + model.type.getName() + ".");
-                }
-            }
-            this.size = width;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int size() {
-            return size;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void write(E item, ByteBuffer buffer) {
-            for (int i = 0; i < writers.length; i++) {
-                writers[i].accept(item, buffer);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public E read(ByteBuffer buffer) {
-            E item = I.make(type);
-            for (int i = 0; i < readers.length; i++) {
-                readers[i].accept(item, buffer);
-            }
-            return item;
         }
     }
 }
