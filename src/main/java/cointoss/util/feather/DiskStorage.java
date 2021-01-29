@@ -114,7 +114,12 @@ class DiskStorage<T> {
                 if (item == null) {
                     if (buffer.position() != 0) {
                         buffer.flip();
+                        long start = System.nanoTime();
+                        System.out.println(buffer + "   " + startPosition + "   " + duration + "  " + truncatedTime);
                         channel.write(buffer, startPosition);
+                        long end = System.nanoTime();
+                        System.out.println((end - start) / 1000000L + "ms");
+
                         buffer.clear();
                     }
                     startPosition = (truncatedTime / duration + i + 1) * codec.size();
