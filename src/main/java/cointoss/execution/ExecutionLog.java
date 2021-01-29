@@ -10,8 +10,7 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.*;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -841,9 +840,9 @@ public class ExecutionLog {
                     aggregateWritingLog.accept(service);
                     repository.updateLocal(date);
                 } catch (IOException e) {
-                    e.printStackTrace();
                     throw I.quiet(e);
                 }
+                repository.updateLocal(date);
             }, npe -> {
                 long lastID = estimateLastID();
 
@@ -908,11 +907,11 @@ public class ExecutionLog {
          */
         Signal<Execution> writeCompact(Signal<Execution> executions) {
             File compact = compactLog();
-        
+
             try {
                 Execution[] prev = {Market.BASE};
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
-        
+
                 return executions.plug(new CompactLog()).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
                     prev[0] = e;
