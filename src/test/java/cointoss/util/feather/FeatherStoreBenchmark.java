@@ -14,8 +14,6 @@ import java.nio.ByteBuffer;
 import antibug.CleanRoom;
 import antibug.profiler.Benchmark;
 import cointoss.ticker.Span;
-import cointoss.util.feather.DataType;
-import cointoss.util.feather.FeatherStore;
 import cointoss.util.feather.FeatherStoreTest.Value;
 
 public class FeatherStoreBenchmark {

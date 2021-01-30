@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
@@ -87,7 +88,7 @@ public abstract class DataType<T> {
         private final int size;
 
         /** The data readers. */
-        private final BiConsumer<T, ByteBuffer>[] readers;
+        private final BiFunction<T, ByteBuffer, T>[] readers;
 
         /** The data writers. */
         private final BiConsumer<T, ByteBuffer>[] writers;
@@ -100,7 +101,7 @@ public abstract class DataType<T> {
 
             int width = 0;
             List<Property> properties = model.properties();
-            this.readers = new BiConsumer[properties.size()];
+            this.readers = new BiFunction[properties.size()];
             this.writers = new BiConsumer[properties.size()];
 
             for (int i = 0; i < properties.size(); i++) {
@@ -161,7 +162,7 @@ public abstract class DataType<T> {
                     width += 8;
                     readers[i] = (o, b) -> {
                         long time = b.getLong();
-                        model.set(o, property, time == -1 ? null : Chrono.utcByMills(time));
+                        return model.set(o, property, time == -1 ? null : Chrono.utcByMills(time));
                     };
                     writers[i] = (o, b) -> {
                         ZonedDateTime time = (ZonedDateTime) model.get(o, property);
@@ -199,7 +200,7 @@ public abstract class DataType<T> {
         public T read(ByteBuffer buffer) {
             T item = I.make(type);
             for (int i = 0; i < readers.length; i++) {
-                readers[i].accept(item, buffer);
+                item = readers[i].apply(item, buffer);
             }
             return item;
         }
