@@ -15,9 +15,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import java.util.concurrent.locks.StampedLock;
 
 import kiss.I;
 import psychopath.File;
@@ -43,7 +41,7 @@ class DiskStorage<T> {
     private final FileLock lockForProcess;
 
     /** The read-write lock. */
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final StampedLock lock = new StampedLock();
 
     /** The data definition. */
     private final DataType<T> codec;
@@ -157,11 +155,9 @@ class DiskStorage<T> {
      * @param truncatedTime
      */
     int read(long truncatedTime, T[] items) {
-        ReadLock readLock = lock.readLock();
+        long stamp = lock.readLock();
 
         try {
-            readLock.lock();
-
             ByteBuffer buffer = ByteBuffer.allocate(itemWidth * items.length);
             int size = channel.read(buffer, HEADER_SIZE + truncatedTime / duration * itemWidth);
             if (size == -1) {
@@ -183,7 +179,7 @@ class DiskStorage<T> {
         } catch (IOException e) {
             throw I.quiet(e);
         } finally {
-            readLock.unlock();
+            lock.unlockRead(stamp);
         }
     }
 
@@ -200,8 +196,7 @@ class DiskStorage<T> {
             return;
         }
 
-        WriteLock writeLock = lock.writeLock();
-        writeLock.lock();
+        long stamp = lock.writeLock();
 
         try {
             long startPosition = HEADER_SIZE + truncatedTime / duration * itemWidth;
@@ -232,7 +227,7 @@ class DiskStorage<T> {
             updateTime(truncatedTime, truncatedTime + items.length * duration);
             writeHeader();
 
-            writeLock.unlock();
+            lock.unlockWrite(stamp);
         }
     }
 
