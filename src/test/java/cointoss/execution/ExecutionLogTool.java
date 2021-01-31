@@ -26,7 +26,7 @@ import kiss.I;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        deleteFastLog();
+        deleteRepositoryInfo();
     }
 
     /**

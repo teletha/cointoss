@@ -23,56 +23,40 @@ public class FeatherStoreBenchmark {
         Span span = Span.Minute1;
         CleanRoom room = new CleanRoom();
 
-        // TimeseriesStore<Value> memory = TimeseriesStore.create(Value.class, span);
-        // benchmark.measure("Store without persist", () -> {
-        // for (int i = 0; i < 10000; i++) {
-        // memory.store(new Value(i * span.seconds));
-        // }
-        // return memory.size();
-        // });
-
-        FeatherStore<Value> disk = FeatherStore.create(Value.class, span)
-                .enableDiskStore(room.locateFile("persist.db"), new DataType<Value>() {
-
-                    @Override
-                    public int size() {
-                        return 4;
-                    }
-
-                    @Override
-                    public void write(Value item, ByteBuffer buffer) {
-                        buffer.putInt(item.value);
-                    }
-
-                    @Override
-                    public Value read(ByteBuffer buffer) {
-                        return new Value(buffer.getInt());
-                    }
-                });
-        benchmark.measure("Store with persist", () -> {
+        FeatherStore<Value> disk = FeatherStore.create(Value.class, span).enableDiskStore(room.locateFile("persist.db"), optimized);
+        benchmark.measure("Store on disk", () -> {
             for (int i = 0; i < 10000; i++) {
                 disk.store(new Value(i * span.seconds));
             }
             return disk.size();
         });
 
-        // ConcurrentNavigableLongMap<Long> map = LongMap.createSortedMap();
-        // List<Long> collect = LongStream.range(489600, 489600 +
-        // 1000).boxed().collect(Collectors.toList());
-        // List<Long> randomed = new ArrayList(collect);
-        // Collections.shuffle(randomed);
-        //
-        // benchmark.measure("Remove", () -> {
-        // for (Long i : randomed) {
-        // map.put(i.longValue(), i);
-        // }
-        //
-        // for (Long i : randomed) {
-        // map.remove(i.longValue());
-        // }
-        // return 10;
-        // });
+        FeatherStore<Value> memory = FeatherStore.create(Value.class, span);
+        benchmark.measure("Store on memory", () -> {
+            for (int i = 0; i < 10000; i++) {
+                memory.store(new Value(i * span.seconds));
+            }
+            return memory.size();
+        });
 
         benchmark.perform();
     }
+
+    private static final DataType<Value> optimized = new DataType<Value>() {
+
+        @Override
+        public int size() {
+            return 4;
+        }
+
+        @Override
+        public void write(Value item, ByteBuffer buffer) {
+            buffer.putInt(item.value);
+        }
+
+        @Override
+        public Value read(ByteBuffer buffer) {
+            return new Value(buffer.getInt());
+        }
+    };
 }

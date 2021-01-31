@@ -12,9 +12,7 @@ package cointoss.util.feather;
 import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -48,39 +46,14 @@ public final class FeatherStore<E extends TemporalData> {
     /** The duration of segmenet. */
     private final long segmentDuration;
 
-    /** The size of segment. */
-    private final int segmentSize;
-
     /** The completed data manager. */
     private final ConcurrentNavigableLongMap<OnHeap<E>> indexed = LongMap.createSortedMap();
-
-    /** The usage of memory shrinking. */
-    private boolean shrink = true;
 
     /** The disk store. */
     private DiskStorage<E> disk;
 
-    @SuppressWarnings("serial")
-    private final Map<Long, OnHeap<E>> stats = new LinkedHashMap<>(8, 0.75f, true) {
-
-        @Override
-        protected boolean removeEldestEntry(Entry<Long, OnHeap<E>> eldest) {
-            if (shrink && segmentSize < size()) {
-                long time = eldest.getKey();
-                OnHeap<E> segment = eldest.getValue();
-
-                if (disk != null) {
-                    disk.write(time, segment.items);
-                }
-
-                indexed.remove(time);
-                segment.clear();
-                return true;
-            } else {
-                return false;
-            }
-        }
-    };
+    /** The eviction policy. */
+    private EvictionPolicy eviction;
 
     /** The data supplier. */
     private LongFunction<Signal<E>> supplier;
@@ -112,12 +85,12 @@ public final class FeatherStore<E extends TemporalData> {
     /**
      * 
      */
-    private FeatherStore(Class<E> type, long itemDuration, int itemSize, int SegmentSize) {
+    private FeatherStore(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
         this.model = Model.of(type);
         this.itemDuration = itemDuration;
         this.itemSize = itemSize;
         this.segmentDuration = itemDuration * itemSize;
-        this.segmentSize = SegmentSize;
+        this.eviction = EvictionPolicy.byLRU(segmentSize);
     }
 
     /**
@@ -210,22 +183,12 @@ public final class FeatherStore<E extends TemporalData> {
     }
 
     /**
-     * Enable the automatic memory saving.
-     * 
-     * @return Chainable API.
-     */
-    public synchronized FeatherStore<E> enableMemorySaving() {
-        this.shrink = true;
-        return this;
-    }
-
-    /**
      * Disable the automatic memory saving.
      * 
      * @return Chainable API.
      */
     public synchronized FeatherStore<E> disableMemorySaving() {
-        this.shrink = false;
+        eviction = EvictionPolicy.never();
         return this;
     }
 
@@ -281,7 +244,7 @@ public final class FeatherStore<E extends TemporalData> {
         if (segment == null) {
             segment = new OnHeap(model, index[0], itemSize);
             indexed.put(index[0], segment);
-            stats.put(index[0], segment);
+            tryEvict(index[0]);
         }
         segment.set((int) index[1], item);
     }
@@ -673,7 +636,7 @@ public final class FeatherStore<E extends TemporalData> {
 
             if (1 <= size) {
                 indexed.put(startTime, segment);
-                stats.put(startTime, segment);
+                tryEvict(startTime);
 
                 return segment;
             }
@@ -687,7 +650,7 @@ public final class FeatherStore<E extends TemporalData> {
 
                 OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
                 indexed.put(startTime, heap);
-                stats.put(startTime, heap);
+                tryEvict(startTime);
                 supply.to(item -> {
                     long timestamp = item.epochSeconds();
                     if (startTime <= timestamp && timestamp < endTime) {
@@ -708,9 +671,25 @@ public final class FeatherStore<E extends TemporalData> {
      */
     public void commit() {
         if (disk != null) {
-            for (Entry<Long, OnHeap<E>> entry : stats.entrySet()) {
+            for (Entry<Long, OnHeap<E>> entry : indexed.entrySet()) {
                 disk.write(entry.getKey(), entry.getValue().items);
             }
+        }
+    }
+
+    /**
+     * Try to evict segment for memory compaction.
+     * 
+     * @param time
+     */
+    private void tryEvict(long time) {
+        long evictableTime = eviction.access(time);
+        if (evictableTime != -1) {
+            OnHeap<E> segment = indexed.remove(evictableTime);
+            if (disk != null) {
+                disk.write(evictableTime, segment.items);
+            }
+            segment.clear();
         }
     }
 
