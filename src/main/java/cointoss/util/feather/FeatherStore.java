@@ -29,7 +29,6 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.model.Model;
-import psychopath.File;
 import psychopath.Locator;
 
 public final class FeatherStore<E extends TemporalData> {
@@ -145,29 +144,9 @@ public final class FeatherStore<E extends TemporalData> {
      * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> enableDiskStore(Path databaseFile, DataType<E> codec) {
-        return enableDiskStore(Locator.file(databaseFile), codec);
-    }
-
-    /**
-     * Enable the transparent disk persistence.
-     * 
-     * @param databaseFile An actual file to store data.
-     * @return Chainable API.
-     */
-    public synchronized FeatherStore<E> enableDiskStore(File databaseFile) {
-        return enableDiskStore(databaseFile, null);
-    }
-
-    /**
-     * Enable the transparent disk persistence.
-     * 
-     * @param databaseFile An actual file to store data.
-     * @return Chainable API.
-     */
-    public synchronized FeatherStore<E> enableDiskStore(File databaseFile, DataType<E> dataType) {
+    public synchronized FeatherStore<E> enableDiskStore(Path databaseFile, DataType<E> dataType) {
         if (databaseFile != null && this.disk == null) {
-            this.disk = new DiskStorage(databaseFile, dataType != null ? dataType : DataType.of(model), itemDuration);
+            this.disk = new DiskStorage(Locator.file(databaseFile), dataType != null ? dataType : DataType.of(model), itemDuration);
         }
         return this;
     }

@@ -48,15 +48,12 @@ public interface EvictionPolicy {
 
             @Override
             public long access(long time) {
-                if (latest == time) {
-                    return -1;
-                }
-
                 if (latest < time) {
                     latest = time;
                 }
 
-                return policy.access(time);
+                long result = policy.access(time);
+                return result == time ? -1 : result;
             }
         };
     }
