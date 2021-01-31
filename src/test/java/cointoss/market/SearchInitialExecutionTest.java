@@ -24,19 +24,19 @@ class SearchInitialExecutionTest {
     @Test
     @Timeout(value = 10)
     void bitmex() {
-        assert BitMex.XBT_USD.searchInitialExecution().waitForTerminate().to().exact().id == 144318446570600000L;
+        assert BitMex.ETH_USD.searchInitialExecution().waitForTerminate().to().exact().id == 153320077068700000L;
     }
 
     @Test
     @Timeout(value = 10)
     void coinbase() {
-        assert Coinbase.BTCUSD.searchInitialExecution().waitForTerminate().to().exact().id == 1;
+        assert Coinbase.ETHUSD.searchInitialExecution().waitForTerminate().to().exact().id == 1;
     }
 
     @Test
     @Timeout(value = 10)
     void binance() {
-        assert Binance.BTC_USDT.searchInitialExecution().waitForTerminate().to().exact().id == 0;
+        assert Binance.FUTURE_BTCUSD_210625.searchInitialExecution().waitForTerminate().to().exact().id == 1;
     }
 
     @Test
