@@ -347,6 +347,6 @@ public class Market implements Disposable {
      */
     @Override
     public String toString() {
-        return service.marketReadableName;
+        return service.id;
     }
 }

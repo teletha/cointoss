@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,8 +56,11 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     /** The market name. */
     public final String marketName;
 
-    /** The human-readable market name. */
-    public final String marketReadableName;
+    /** The human-readable market identifier. */
+    public final String id;
+
+    /** The formatted market identifier. */
+    public final String formattedId;
 
     /** The execution log. */
     public final ExecutionLog log;
@@ -77,11 +81,12 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     protected MarketService(Exchange exchange, String marketName, MarketSetting setting) {
         this.exchange = Objects.requireNonNull(exchange);
         this.marketName = Objects.requireNonNull(marketName);
-        this.marketReadableName = id().replaceAll("_", "");
+        this.id = exchange + " " + marketName.replaceAll("_", "").toUpperCase();
+        this.formattedId = id.replace(exchange + " ", StringUtils.rightPad(exchange.name(), 8) + "\t");
         this.setting = setting;
         this.scheduler = new ScheduledThreadPoolExecutor(2, task -> {
             Thread thread = new Thread(task);
-            thread.setName(id() + " Scheduler");
+            thread.setName(id + " Scheduler");
             thread.setDaemon(true);
             return thread;
         });
@@ -453,15 +458,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * Returns the identity of market.
-     * 
-     * @return A market identity.
-     */
-    public final String id() {
-        return exchange + " " + marketName;
-    }
-
-    /**
      * Get the current time.
      * 
      * @return The current time.
@@ -499,7 +495,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         return RetryPolicy.with.limit(max)
                 .delayLinear(Duration.ofSeconds(2))
                 .scheduler(scheduler())
-                .name(name == null || name.length() == 0 ? null : id() + " : " + name);
+                .name(name == null || name.length() == 0 ? null : id + " : " + name);
     }
 
     /**
@@ -525,7 +521,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     @Override
     public final int compareTo(MarketService o) {
-        return id().compareTo(o.id());
+        return id.compareTo(o.id);
     }
 
     /**
@@ -533,7 +529,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     @Override
     public final String toString() {
-        return id();
+        return id;
     }
 
     /**

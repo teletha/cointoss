@@ -70,10 +70,7 @@ public class TradeMate extends View {
         // Create Tab for each Markets
         // ========================================================
         MarketServiceProvider.availableMarketServices().take(MarketService::supportHistoricalTrade).to(service -> {
-            UITab tab = DockSystem.register(service.id())
-                    .closable(false)
-                    .text(service.marketReadableName)
-                    .contents(ui -> new TradingView(ui, service));
+            UITab tab = DockSystem.register(service.id).closable(false).text(service.id).contents(ui -> new TradingView(ui, service));
 
             requestLoading(service, tab);
         });

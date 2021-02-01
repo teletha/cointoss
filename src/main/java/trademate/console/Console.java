@@ -11,19 +11,18 @@ package trademate.console;
 
 import java.util.LinkedList;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UIListView;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 
 public class Console extends View {
 
@@ -57,7 +56,7 @@ public class Console extends View {
     @Override
     protected void initialize() {
         // create logger
-        String name = view.service.id();
+        String name = view.service.id;
         logger = LogManager.getLogger(name);
         ConsoleAppender.consoles.put(name, this);
 

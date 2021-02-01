@@ -10,7 +10,8 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -355,7 +356,7 @@ public class ExecutionLog {
                                 .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
                         continue;
                     } else {
-                        log.info("{} \t{} size {}({})", service.marketReadableName, rests.getFirst().date, retrieved, coefficient);
+                        log.info("{} \t{} size {}({})", service.id, rests.getFirst().date, retrieved, coefficient);
 
                         for (Execution execution : rests) {
                             if (!buffer.canSwitch(execution)) {
@@ -721,7 +722,7 @@ public class ExecutionLog {
                     .effectOnObserve(stopwatch::start)
                     .effectOnError(e -> log.error("Fail to read normal log. [" + normal + "]"))
                     .effectOnComplete(() -> {
-                        log.trace("Read normal log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                        log.trace("Read normal log {} [{}] {}", service.id, date, stopwatch.stop().elapsed());
                     });
         }
 
@@ -747,7 +748,7 @@ public class ExecutionLog {
                             }
                         })
                         .effectOnComplete(() -> {
-                            log.trace("Read compact log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                            log.trace("Read compact log {} [{}] {}", service.id, date, stopwatch.stop().elapsed());
                         });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -770,7 +771,7 @@ public class ExecutionLog {
                             .effectOnObserve(stopwatch::start)
                             .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
                             .effectOnComplete(() -> {
-                                log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                                log.trace("Read fast log {} [{}] {}", service.id, date, stopwatch.stop().elapsed());
                             });
                 } else {
                     return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
@@ -779,7 +780,7 @@ public class ExecutionLog {
                             .effectOnObserve(stopwatch::start)
                             .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
                             .effectOnComplete(() -> {
-                                log.trace("Read fast log {} [{}] {}", service.id(), date, stopwatch.stop().elapsed());
+                                log.trace("Read fast log {} [{}] {}", service.id, date, stopwatch.stop().elapsed());
                             });
                 }
             } catch (IOException e) {
@@ -1234,7 +1235,7 @@ public class ExecutionLog {
                 for (Execution e : buffer) {
                     observer.accept(e);
                 }
-                log.info("{} \t{} size {}", service.marketReadableName, buffer.peek().date, buffer.size());
+                log.info("{} \t{} size {}", service.id, buffer.peek().date, buffer.size());
             }
             destination = observer;
         }

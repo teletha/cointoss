@@ -16,8 +16,8 @@ import java.util.Map;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.ticker.Ticker;
 import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -103,7 +103,7 @@ class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
      * @return A list of {@link PlotScript}.
      */
     final List<PlotScript> findPlottersBy(MarketService service, Span span) {
-        List<Class<? extends PlotScript>> classes = managedScripts.get(service.id());
+        List<Class<? extends PlotScript>> classes = managedScripts.get(service.id);
 
         if (classes == null) {
             classes = defaults();
@@ -135,7 +135,7 @@ class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
      * @return
      */
     final void register(MarketService service, Class<? extends PlotScript> type) {
-        List<Class<? extends PlotScript>> classes = managedScripts.computeIfAbsent(service.id(), key -> new ArrayList());
+        List<Class<? extends PlotScript>> classes = managedScripts.computeIfAbsent(service.id, key -> new ArrayList());
 
         for (Class<? extends PlotScript> clazz : classes) {
             if (clazz == type) {
@@ -182,7 +182,7 @@ class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
      * @param script A target script to remove.
      */
     final void unregister(MarketService market, Class<? extends PlotScript> script) {
-        List<Class<? extends PlotScript>> classes = managedScripts.get(market.id());
+        List<Class<? extends PlotScript>> classes = managedScripts.get(market.id);
 
         if (classes != null) {
             classes.remove(script);

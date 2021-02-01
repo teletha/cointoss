@@ -31,6 +31,13 @@ public class FeatherStoreBenchmark {
             return disk.size();
         });
 
+        benchmark.measure("Read from disk", () -> {
+            for (int i = 0; i < 10000; i++) {
+                disk.at(i * span.seconds);
+            }
+            return 10;
+        });
+        
         FeatherStore<Value> memory = FeatherStore.create(Value.class, span);
         benchmark.measure("Store on memory", () -> {
             for (int i = 0; i < 10000; i++) {
@@ -38,6 +45,7 @@ public class FeatherStoreBenchmark {
             }
             return memory.size();
         });
+
 
         benchmark.perform();
     }

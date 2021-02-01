@@ -47,8 +47,8 @@ public class SummuryView extends View {
                 $(hbox, () -> {
                     $(size);
                 });
-                $(table, () -> {
-                    $(name, style.normal);
+                $(table, style.table, () -> {
+                    $(name, style.name);
                     $(price, style.normal);
                     $(priceForBuy, style.normal);
                     $(priceForSell, style.normal);
@@ -58,8 +58,18 @@ public class SummuryView extends View {
     }
 
     interface style extends StyleDSL {
+        Style table = () -> {
+            display.height(1000, px);
+        };
+
+        Style name = () -> {
+            display.width(160, px);
+            text.align.left();
+        };
+
         Style normal = () -> {
-            display.width(140, px);
+            display.width(90, px);
+            text.align.right();
         };
 
     }
@@ -72,7 +82,7 @@ public class SummuryView extends View {
         long throttle = 500;
         size.initialize(Num.ONE);
 
-        name.text(CommonText.Market).model(m -> m.service.marketReadableName);
+        name.text(CommonText.Market).model(m -> m.service.formattedId);
         price.text(CommonText.Price)
                 .modelBySignal(m -> m.service.executionLatest()
                         .concat(m.service.executionsRealtimely().throttle(throttle, MILLISECONDS))

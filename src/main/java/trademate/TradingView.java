@@ -123,7 +123,7 @@ public class TradingView extends View {
                     .throttle(StaticConfig.drawingThrottle(), MILLISECONDS)
                     .diff()
                     .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.marketReadableName + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "));
+                    .to(e -> tab.text(service.id + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "));
         } else {
             diposer = service.executionsRealtimely()
                     .startWith(service.executionLatest())
@@ -131,7 +131,7 @@ public class TradingView extends View {
                     .throttle(StaticConfig.drawingThrottle(), MILLISECONDS)
                     .diff()
                     .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.marketReadableName + "\n" + e.price));
+                    .to(e -> tab.text(service.id + "\n" + e.price));
         }
         service.add(diposer);
     }
@@ -141,7 +141,7 @@ public class TradingView extends View {
      */
     @Override
     protected String name() {
-        return TradingView.class.getSimpleName() + View.IDSeparator + service.id();
+        return TradingView.class.getSimpleName() + View.IDSeparator + service.id;
     }
 
     /**

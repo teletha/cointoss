@@ -12,18 +12,14 @@ package trademate;
 import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
-import cointoss.MarketService;
-import cointoss.market.binance.Binance;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import trademate.order.OrderView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
 import viewtify.Viewtify;
-import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
@@ -54,20 +50,20 @@ public class TradeTester extends View {
     protected void initialize() {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
-        DockSystem.register("Order").contents(OrderView.class).closable(false);
+        // DockSystem.register("Order").contents(OrderView.class).closable(false);
         DockSystem.register("Summury").contents(SummuryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
         // ========================================================
         // Create Tab for each Markets
         // ========================================================
-        MarketService service = Binance.FUTURE_BTCUSD_210625;
-        UITab tab = DockSystem.register(service.id())
-                .closable(false)
-                .text(service.marketReadableName)
-                .contents(ui -> new TradingView(ui, service));
-
-        tab.load();
+        // MarketService service = Binance.FUTURE_BTCUSD_210625;
+        // UITab tab = DockSystem.register(service.id())
+        // .closable(false)
+        // .text(service.marketReadableName)
+        // .contents(ui -> new TradingView(ui, service));
+        //
+        // tab.load();
 
         // MarketService service2 = FTX.EOS_PERP;
         // tab = DockSystem.register(service2.id())
