@@ -21,6 +21,7 @@ import viewtify.Viewtify;
 import viewtify.ui.UIScrollPane;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
+import viewtify.ui.UIText;
 import viewtify.ui.UITextValue;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -41,10 +42,13 @@ public class SummuryView extends View {
 
     private UITableColumn<Market, Num> priceForSell;
 
+    UIText filter;
+
     class view extends ViewDSL {
         {
             $(vbox, () -> {
                 $(hbox, () -> {
+                    $(filter);
                     $(size);
                 });
                 $(table, style.table, () -> {
@@ -79,6 +83,8 @@ public class SummuryView extends View {
      */
     @Override
     protected void initialize() {
+        filter.placeholder("Filter markets").observe().to(this::filterMarkets);
+
         long throttle = 500;
         size.initialize(Num.ONE);
 
@@ -104,5 +110,12 @@ public class SummuryView extends View {
         MarketServiceProvider.availableMarketServices().take(service -> service.setting.target.currency == Currency.BTC).to(service -> {
             table.addItemAtLast(Market.of(service));
         });
+    }
+
+    /**
+     * Filtering markets.
+     */
+    private void filterMarkets(String text) {
+        System.out.println(text);
     }
 }

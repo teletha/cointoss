@@ -9,7 +9,8 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.net.ConnectException;
 import java.net.http.HttpClient;
@@ -408,7 +409,7 @@ public abstract class EfficientWebSocketModel {
             if (pong != null) {
                 String reply = pong.apply(json);
                 if (reply != null) {
-                    connection.v.sendText(reply.replace('\'', '"'), true);
+                    connection.to(v -> v.sendText(reply.replace('\'', '"'), true));
                     return;
                 }
             }

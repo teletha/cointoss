@@ -20,17 +20,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Sets;
 
 import cointoss.trade.Trader;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kiss.I;
 import kiss.Ⅱ;
 import kiss.model.Model;
@@ -214,8 +213,8 @@ public class BotEditor extends View {
             UISpinner<Integer> step = new UISpinner(this);
             step.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000);
 
-            UITextValue<Integer> start = new UITextValue(this);
-            UITextValue<Integer> end = new UITextValue(this);
+            UITextValue<Integer> start = new UITextValue(this, Integer.class);
+            UITextValue<Integer> end = new UITextValue(this, Integer.class);
 
             start.value(initial)
                     .acceptIntegralInput()
@@ -250,8 +249,8 @@ public class BotEditor extends View {
             UISpinner<Double> step = new UISpinner(this);
             step.items(0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0);
 
-            UITextValue<Double> start = new UITextValue(this);
-            UITextValue<Double> end = new UITextValue(this);
+            UITextValue<Double> start = new UITextValue(this, Double.class);
+            UITextValue<Double> end = new UITextValue(this, Double.class);
 
             start.value(initial)
                     .acceptDecimalInput()
