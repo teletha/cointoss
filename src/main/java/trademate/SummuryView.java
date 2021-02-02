@@ -88,6 +88,7 @@ public class SummuryView extends View {
         size.initialize(Num.ONE).acceptPositiveNumberInput();
 
         name.text(CommonText.Market).model(m -> m.service.formattedId);
+
         price.text(CommonText.Price)
                 .modelBySignal(m -> m.service.executionLatest()
                         .concat(m.service.executionsRealtimely().throttle(throttle, MILLISECONDS))
@@ -115,6 +116,21 @@ public class SummuryView extends View {
      * Filtering markets.
      */
     private void filterMarkets(String text) {
-        System.out.println(text);
+        if (text.isBlank()) {
+            table.take(null);
+        } else {
+            String[] values = text.toLowerCase().split("\\s");
+
+            table.take(m -> {
+                String target = m.service.id.toLowerCase();
+
+                for (String value : values) {
+                    if (target.contains(value)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
     }
 }
