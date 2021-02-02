@@ -39,7 +39,6 @@ import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboCheckBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
-import viewtify.ui.UITextValue;
 import viewtify.ui.UserInterface;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -170,7 +169,7 @@ public class BotEditor extends View {
             } else if (isDecimal(property.model.type)) {
                 return createDecimalRange((double) initialValue);
             } else {
-                return new UserInterface[] {new UIText(this)};
+                return new UserInterface[] {new UIText(this, String.class)};
             }
         }
 
@@ -213,8 +212,8 @@ public class BotEditor extends View {
             UISpinner<Integer> step = new UISpinner(this);
             step.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000);
 
-            UITextValue<Integer> start = new UITextValue(this, Integer.class);
-            UITextValue<Integer> end = new UITextValue(this, Integer.class);
+            UIText<Integer> start = new UIText(this, Integer.class);
+            UIText<Integer> end = new UIText(this, Integer.class);
 
             start.value(initial)
                     .acceptIntegralInput()
@@ -249,8 +248,8 @@ public class BotEditor extends View {
             UISpinner<Double> step = new UISpinner(this);
             step.items(0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0);
 
-            UITextValue<Double> start = new UITextValue(this, Double.class);
-            UITextValue<Double> end = new UITextValue(this, Double.class);
+            UIText<Double> start = new UIText(this, Double.class);
+            UIText<Double> end = new UIText(this, Double.class);
 
             start.value(initial)
                     .acceptDecimalInput()

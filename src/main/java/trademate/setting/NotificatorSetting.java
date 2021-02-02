@@ -9,10 +9,9 @@
  */
 package trademate.setting;
 
-import javafx.util.Duration;
-
 import cointoss.util.Network;
 import cointoss.util.Primitives;
+import javafx.util.Duration;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -69,7 +68,7 @@ class NotificatorSetting extends View {
     private UISpinner<Integer> desktopNumber;
 
     /** The LINE configuration UI. */
-    private UIText lineAccessToken;
+    private UIText<String> lineAccessToken;
 
     /** The LINE configuration UI. */
     private UIButton lineTest;

@@ -192,7 +192,7 @@ public class GlobalVolumeView extends View {
 
         private UILabel volumeRatio;
 
-        private UIText threshold;
+        private UIText<String> threshold;
 
         private final CurrencyVolume chart;
 

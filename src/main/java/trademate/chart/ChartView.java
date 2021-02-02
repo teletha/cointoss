@@ -14,9 +14,6 @@ import java.util.Comparator;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
@@ -24,6 +21,8 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -33,7 +32,7 @@ import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
-import viewtify.ui.UITextValue;
+import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
@@ -64,7 +63,7 @@ public class ChartView extends View {
     public UICheckBox showOrderbook;
 
     /** Configuration UI */
-    public UITextValue<Num> orderbookPriceRange;
+    public UIText<Num> orderbookPriceRange;
 
     /** Configuration UI */
     public UISpinner<Integer> orderbookHideSize;

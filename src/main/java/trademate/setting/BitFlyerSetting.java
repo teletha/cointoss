@@ -25,17 +25,17 @@ public class BitFlyerSetting extends View {
     /** The account info. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
 
-    private UIText apiKey;
+    private UIText<String> apiKey;
 
-    private UIText apiSecret;
+    private UIText<String> apiSecret;
 
-    private UIText loginId;
+    private UIText<String> loginId;
 
-    private UIText loginPassword;
+    private UIText<String> loginPassword;
 
-    private UIText accountId;
+    private UIText<String> accountId;
 
-    private UIText accountToken;
+    private UIText<String> accountToken;
 
     private UICheckBox loginBackground;
 

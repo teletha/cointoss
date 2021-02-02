@@ -9,18 +9,18 @@
  */
 package trademate.order;
 
-import static trademate.CommonText.*;
+import static trademate.CommonText.Amount;
+import static trademate.CommonText.Buy;
+import static trademate.CommonText.Cancel;
+import static trademate.CommonText.Price;
+import static trademate.CommonText.Sell;
+import static trademate.CommonText.Side;
 
 import java.math.RoundingMode;
 import java.text.Normalizer.Form;
 import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
-
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableRow;
-import javafx.scene.input.ScrollEvent;
 
 import cointoss.Direction;
 import cointoss.market.bitflyer.BitFlyer;
@@ -30,6 +30,10 @@ import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.trading.LazyBear;
 import cointoss.util.arithmetic.Num;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
+import javafx.scene.input.ScrollEvent;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;
@@ -64,13 +68,13 @@ public class OrderBuilder extends View {
     };
 
     /** UI */
-    private UIText orderSize;
+    private UIText<String> orderSize;
 
     /** UI */
     private UISpinner<Num> orderSizeAmount;
 
     /** UI */
-    UIText orderPrice;
+    UIText<String> orderPrice;
 
     /** UI */
     private UISpinner<Num> orderPriceAmount;
@@ -85,7 +89,7 @@ public class OrderBuilder extends View {
     private UISpinner<Num> optimizeThreshold;
 
     /** UI */
-    private UIText orderPriceInterval;
+    private UIText<String> orderPriceInterval;
 
     /** UI */
     private UISpinner<Num> orderPriceIntervalAmount;
@@ -242,7 +246,7 @@ public class OrderBuilder extends View {
      * @param amount
      * @return
      */
-    private WiseBiConsumer<ScrollEvent, UIText> changeBy(UISpinner<Num> spinner) {
+    private WiseBiConsumer<ScrollEvent, UIText<String>> changeBy(UISpinner<Num> spinner) {
         return (e, ui) -> {
             Num current = Num.of(ui.value());
             double deltaY = e.getDeltaY();

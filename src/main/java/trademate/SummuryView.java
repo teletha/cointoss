@@ -22,7 +22,6 @@ import viewtify.ui.UIScrollPane;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.UIText;
-import viewtify.ui.UITextValue;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
@@ -30,7 +29,7 @@ public class SummuryView extends View {
 
     private UIScrollPane scroll;
 
-    private UITextValue<Num> size;
+    private UIText<Num> size;
 
     private UITableView<Market> table;
 
@@ -42,7 +41,7 @@ public class SummuryView extends View {
 
     private UITableColumn<Market, Num> priceForSell;
 
-    UIText filter;
+    UIText<String> filter;
 
     class view extends ViewDSL {
         {
@@ -86,7 +85,7 @@ public class SummuryView extends View {
         filter.placeholder("Filter markets").observe().to(this::filterMarkets);
 
         long throttle = 500;
-        size.initialize(Num.ONE);
+        size.initialize(Num.ONE).acceptPositiveNumberInput();
 
         name.text(CommonText.Market).model(m -> m.service.formattedId);
         price.text(CommonText.Price)

@@ -9,11 +9,11 @@
  */
 package trademate.order;
 
-import static trademate.CommonText.*;
+import static trademate.CommonText.Amount;
+import static trademate.CommonText.Price;
+import static trademate.CommonText.Profit;
 
 import java.text.Normalizer.Form;
-
-import javafx.scene.control.SelectionMode;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -21,6 +21,7 @@ import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
+import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Variable;
@@ -37,7 +38,7 @@ import viewtify.ui.UICheckBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
-import viewtify.ui.UITextValue;
+import viewtify.ui.UIText;
 import viewtify.ui.UIVBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -103,10 +104,10 @@ public class OrderView extends View {
     private UIButton cancel;
 
     /** UI */
-    private UITextValue<Num> orderSize;
+    private UIText<Num> orderSize;
 
     /** UI */
-    private UITextValue<Num> orderThresholdSize;
+    private UIText<Num> orderThresholdSize;
 
     /** UI */
     private UICheckBox history;
