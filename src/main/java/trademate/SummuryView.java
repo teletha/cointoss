@@ -87,7 +87,7 @@ public class SummuryView extends View {
         long throttle = 500;
         size.initialize(Num.ONE).acceptPositiveNumberInput();
 
-        name.text(CommonText.Market).model(m -> m.service.formattedId);
+        name.text(CommonText.Market).model(m -> m.service.formattedId).filterable();
 
         price.text(CommonText.Price)
                 .modelBySignal(m -> m.service.executionLatest()
