@@ -1137,7 +1137,7 @@ public class ExecutionLog {
                         // update the last ID
                         id = valids.get(valids.size() - 1).id;
 
-                        log.info("{} acquires the execution log from {} ({}).", service, valids.get(0).date, valids.size());
+                        log.info("{} repairs the execution log from {} ({}).", service, valids.get(0).date, valids.size());
                     }
 
                     // clear all data to reuse the container
