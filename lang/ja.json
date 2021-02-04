@@ -134,10 +134,21 @@
 		"We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.": "非公開APIを利用して取引の高速化を図ります。\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。",
 		"Win Rate": "勝率",
 		"You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/).": "[LINE Notify](https://notify-bot.line.me/)から取得したアクセストークンを指定することでLINEに通知することが出来ます。",
+		"contains": "含む",
 		"days": "日",
+		"don't contain": "含まない",
+		"ends with": "終了する",
 		"hours": "時間",
+		"is equal to": "等しい",
+		"is greater than": "より大きい",
+		"is greater than or equal to": "より大きいか等しい",
+		"is less than": "より小さい",
+		"is less than or equal to": "より小さいか等しい",
+		"is not equal to": "以下と等しくない :",
+		"matches": "一致",
 		"mins": "分",
 		"seconds": "秒",
-		"secs": "秒"
+		"secs": "秒",
+		"starts with": "次で始まる"
 	}
 }
