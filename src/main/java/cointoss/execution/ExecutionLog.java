@@ -10,8 +10,7 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.*;
 import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -836,14 +835,12 @@ public class ExecutionLog {
                 // write normal log
                 try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
                     channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
-                    lastID = remaining.getLast().id;
 
                     aggregateWritingLog.accept(service);
                     repository.updateLocal(date);
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     throw I.quiet(e);
                 }
-                repository.updateLocal(date);
             }, npe -> {
                 long lastID = estimateLastID();
 
