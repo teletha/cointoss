@@ -90,6 +90,7 @@
 		"Run": "実行",
 		"Run backtests very fast using compressed execution history.\nHowever, the execution result may be inaccurate.": "圧縮された約定履歴を使用することで高速にバックテストを実行します。\nただし、実行結果が不正確になることがあります。",
 		"SFD": "SFD",
+		"Search Condition": "検索条件",
 		"Sell": "売り",
 		"Send test message": "テストメッセージの送信",
 		"Short": "ショート",
@@ -147,6 +148,7 @@
 		"is not equal to": "以下と等しくない :",
 		"matches": "一致",
 		"mins": "分",
+		"regular expression": "正規表現",
 		"seconds": "秒",
 		"secs": "秒",
 		"starts with": "次で始まる"
