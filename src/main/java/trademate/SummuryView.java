@@ -90,6 +90,7 @@ public class SummuryView extends View {
         name.text(CommonText.Market).model(m -> m.service.formattedId).filterable(true);
 
         price.text(CommonText.Price)
+                .filterable(true)
                 .modelBySignal(m -> m.service.executionLatest()
                         .concat(m.service.executionsRealtimely().throttle(throttle, MILLISECONDS))
                         .map(e -> e.price)
