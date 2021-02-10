@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import cointoss.Currency;
 import cointoss.Market;
+import cointoss.MarketType;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.arithmetic.Num;
 import stylist.Style;
@@ -41,15 +42,10 @@ public class SummuryView extends View {
 
     private UITableColumn<Market, Num> priceForSell;
 
-    UIText<String> filter;
-
     class view extends ViewDSL {
         {
             $(vbox, () -> {
-                $(hbox, () -> {
-                    $(filter);
-                    $(size);
-                });
+                $(size);
                 $(table, style.table, () -> {
                     $(name, style.name);
                     $(price, style.normal);
@@ -82,15 +78,12 @@ public class SummuryView extends View {
      */
     @Override
     protected void initialize() {
-        filter.placeholder("Filter markets").observe().to(this::filterMarkets);
-
         long throttle = 500;
         size.initialize(Num.ONE).acceptPositiveNumberInput();
 
         name.text(CommonText.Market).model(m -> m.service.formattedId).filterable(true);
 
         price.text(CommonText.Price)
-                .filterable(true)
                 .modelBySignal(m -> m.service.executionLatest()
                         .concat(m.service.executionsRealtimely().throttle(throttle, MILLISECONDS))
                         .map(e -> e.price)
@@ -111,6 +104,8 @@ public class SummuryView extends View {
         MarketServiceProvider.availableMarketServices().take(service -> service.setting.target.currency == Currency.BTC).to(service -> {
             table.addItemAtLast(Market.of(service));
         });
+
+        table.query().addQuery("Type", MarketType.class, m -> m.service.setting.type);
     }
 
     /**
