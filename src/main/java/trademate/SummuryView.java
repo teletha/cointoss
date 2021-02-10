@@ -105,7 +105,7 @@ public class SummuryView extends View {
             table.addItemAtLast(Market.of(service));
         });
 
-        table.query().addQuery("Type", MarketType.class, m -> m.service.setting.type);
+        table.query().addQuery(en("Type"), MarketType.class, m -> m.service.setting.type);
     }
 
     /**
