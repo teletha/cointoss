@@ -216,12 +216,27 @@ public class BinanceService extends MarketService {
             return I.signal();
         }
 
-        return call("GET", "allForceOrders?symbol=" + marketName + "&limit=1000&endTime=" + endExcluded.toInstant().toEpochMilli(), 20)
+        return call("GET", "allForceOrders?symbol=" + marketName + "&limit=1000&startTime=" + startExcluded.toInstant().toEpochMilli(), 20)
                 .flatIterable(e -> e.find("*"))
                 .map(e -> {
                     System.out.println(e);
-                    return null;
+                    return Liquidation.with.date(Chrono.utcByMills(e.get(long.class, "time")))
+                            .direction(e.get(Direction.class, "side"))
+                            .size(e.get(double.class, "executedQty"))
+                            .price(e.get(Num.class, "averagePrice"));
                 });
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Binance.FUTURE_BTC_USDT.liquidationRealtimely().to(e -> {
+            System.out.println(e);
+        });
+
+        Binance.FUTURE_BTC_USDT.liquidations(Chrono.utcNow().minusMinutes(60), Chrono.utcNow()).to(e -> {
+            System.out.println(e);
+        });
+
+        Thread.sleep(1000 * 60);
     }
 
     /**

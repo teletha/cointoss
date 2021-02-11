@@ -11,7 +11,6 @@ package trademate;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import cointoss.Currency;
 import cointoss.Market;
 import cointoss.MarketType;
 import cointoss.market.MarketServiceProvider;
@@ -101,32 +100,10 @@ public class SummuryView extends View {
                         .on(Viewtify.UIThread)
                         .retry());
 
-        MarketServiceProvider.availableMarketServices().take(service -> service.setting.target.currency == Currency.BTC).to(service -> {
+        MarketServiceProvider.availableMarketServices().to(service -> {
             table.addItemAtLast(Market.of(service));
         });
 
         table.query().addQuery(en("Type"), MarketType.class, m -> m.service.setting.type);
-    }
-
-    /**
-     * Filtering markets.
-     */
-    private void filterMarkets(String text) {
-        if (text.isBlank()) {
-            table.take(null);
-        } else {
-            String[] values = text.toLowerCase().split("\\s");
-
-            table.take(m -> {
-                String target = m.service.id.toLowerCase();
-
-                for (String value : values) {
-                    if (target.contains(value)) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-        }
     }
 }
