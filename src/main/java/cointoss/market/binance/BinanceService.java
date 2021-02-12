@@ -232,7 +232,7 @@ public class BinanceService extends MarketService {
             System.out.println(e);
         });
 
-        Binance.FUTURE_BTC_USDT.liquidations(Chrono.utcNow().minusMinutes(60), Chrono.utcNow()).to(e -> {
+        Binance.FUTURE_BTC_USDT.liquidations(Chrono.utcNow().minusMinutes(60 * 24 * 10), Chrono.utcNow()).to(e -> {
             System.out.println(e);
         });
 

@@ -9,7 +9,11 @@
  */
 package cointoss.util.feather;
 
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.SPARSE;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -17,6 +21,9 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.concurrent.locks.StampedLock;
 
+import cointoss.ticker.data.Liquidation;
+import cointoss.util.Chrono;
+import cointoss.util.arithmetic.Num;
 import kiss.I;
 import psychopath.File;
 
@@ -72,7 +79,7 @@ class DiskStorage<T> {
         try {
             this.channel = databaseFile.isPresent() ? databaseFile.newFileChannel(READ, WRITE)
                     : databaseFile.newFileChannel(CREATE_NEW, SPARSE, READ, WRITE);
-            this.lockForProcess = channel.tryLock();
+            this.lockForProcess = databaseFile.extension("lock").newFileChannel(CREATE, READ, WRITE).tryLock();
             this.codec = codec;
             this.itemWidth = codec.size() + 1;
             this.duration = duration;
@@ -112,8 +119,15 @@ class DiskStorage<T> {
      * @throws IOException
      */
     private void writeHeader() {
+        if (lockForProcess == null) {
+            // The current process does not have write permission because it is being used by
+            // another process.
+            return;
+        }
+
         if (headerModified) {
             try {
+                channel.force(true);
                 // encode
                 ByteBuffer buffer = ByteBuffer.allocate(HEADER_SIZE);
                 buffer.putLong(startTime);
@@ -225,7 +239,7 @@ class DiskStorage<T> {
             throw I.quiet(e);
         } finally {
             updateTime(truncatedTime, truncatedTime + items.length * duration);
-            writeHeader();
+            // writeHeader();
 
             lock.unlockWrite(stamp);
         }
@@ -247,5 +261,12 @@ class DiskStorage<T> {
      */
     final long endTime() {
         return endTime;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        DiskStorage storage = new DiskStorage(psychopath.Locator.file("test1"), DataType.of(Liquidation.class), 10);
+        storage.write(20, Liquidation.with.date(Chrono.utcNow()).buy().size(10).price(Num.of(10)));
+
+        Thread.sleep(1000 * 30);
     }
 }
