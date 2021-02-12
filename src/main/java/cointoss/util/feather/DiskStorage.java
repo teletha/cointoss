@@ -21,9 +21,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.concurrent.locks.StampedLock;
 
-import cointoss.ticker.data.Liquidation;
-import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
 import kiss.I;
 import psychopath.File;
 
@@ -261,12 +258,5 @@ class DiskStorage<T> {
      */
     final long endTime() {
         return endTime;
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        DiskStorage storage = new DiskStorage(psychopath.Locator.file("test1"), DataType.of(Liquidation.class), 10);
-        storage.write(20, Liquidation.with.date(Chrono.utcNow()).buy().size(10).price(Num.of(10)));
-
-        Thread.sleep(1000 * 30);
     }
 }

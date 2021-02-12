@@ -229,14 +229,12 @@ public class BinanceService extends MarketService {
 
     public static void main(String[] args) throws InterruptedException {
         Binance.FUTURE_BTC_USDT.liquidationRealtimely().to(e -> {
-            System.out.println(e);
         });
 
         Binance.FUTURE_BTC_USDT.liquidations(Chrono.utcNow().minusMinutes(60 * 24 * 10), Chrono.utcNow()).to(e -> {
-            System.out.println(e);
         });
 
-        Thread.sleep(1000 * 60);
+        Thread.sleep(1000 * 60 * 30);
     }
 
     /**
@@ -249,6 +247,7 @@ public class BinanceService extends MarketService {
         }
 
         return clientRealtimely().subscribe(new Topic("forceOrder", marketName)).map(e -> {
+            System.out.println(e);
             JSON json = e.get("data").get("o");
             return Liquidation.with.date(Chrono.utcByMills(json.get(long.class, "T")))
                     .direction(json.get(Direction.class, "S").inverse())
