@@ -37,7 +37,7 @@ public class FeatherStoreBenchmark {
             }
             return 10;
         });
-        
+
         FeatherStore<Value> memory = FeatherStore.create(Value.class, span);
         benchmark.measure("Store on memory", () -> {
             for (int i = 0; i < 10000; i++) {
@@ -46,7 +46,6 @@ public class FeatherStoreBenchmark {
             return memory.size();
         });
 
-
         benchmark.perform();
     }
 
@@ -54,17 +53,17 @@ public class FeatherStoreBenchmark {
 
         @Override
         public int size() {
-            return 4;
+            return 8;
         }
 
         @Override
         public void write(Value item, ByteBuffer buffer) {
-            buffer.putInt(item.value);
+            buffer.putLong(item.value);
         }
 
         @Override
         public Value read(ByteBuffer buffer) {
-            return new Value(buffer.getInt());
+            return new Value(buffer.getLong());
         }
     };
 }

@@ -46,14 +46,14 @@ class FeatherStoreTest {
 
     static class Value implements TemporalData {
 
-        public int value;
+        public long value;
 
         Value(int value) {
             this.value = value;
         }
 
         Value(long value) {
-            this.value = (int) value;
+            this.value = value;
         }
 
         @Override
@@ -66,7 +66,7 @@ class FeatherStoreTest {
          */
         @Override
         public int hashCode() {
-            return value;
+            return (int) value;
         }
 
         /**
@@ -644,11 +644,17 @@ class FeatherStoreTest {
 
     @Test
     void accumulator() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableAccumulator((prev, now) -> prev);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(new Value(0));
         assert store.at(0).value == 0;
 
+        // replaceable
         store.store(new Value(1));
-        assert store.at(0).value == 0;
+        assert store.at(0).value == 1;
+
+        store.enableAccumulator((prev, now) -> prev);
+        // no replaceable
+        store.store(new Value(2));
+        assert store.at(0).value == 1;
     }
 }

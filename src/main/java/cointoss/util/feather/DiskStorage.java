@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.time.LocalDate;
 import java.util.concurrent.locks.StampedLock;
 
 import kiss.I;
@@ -28,15 +29,19 @@ class DiskStorage<T> {
 
     /** The header size. */
     private static final int HEADER_SIZE = 0 //
+            + 8 // offset time;
             + 8 // start time
             + 8 // end time
-            + 112; // reserved space, use in future
+            + 104; // reserved space, use in future
 
     /** The item prefix. */
     private static final byte ITEM_UNDEFINED = 0;
 
     /** The item prefix. */
     private static final byte ITEM_DEFINED = 1;
+
+    /** The actual file. */
+    final File file;
 
     /** The actual channel. */
     private final FileChannel channel;
@@ -59,6 +64,9 @@ class DiskStorage<T> {
     /** The flag. */
     private boolean headerModified;
 
+    /** The logical starting point. (epoch seconds) */
+    private long offsetTime;
+
     /** The start time of all records. (included) */
     private long startTime;
 
@@ -74,6 +82,7 @@ class DiskStorage<T> {
      */
     DiskStorage(File databaseFile, DataType<T> codec, long duration) {
         try {
+            this.file = databaseFile;
             this.channel = databaseFile.isPresent() ? databaseFile.newFileChannel(READ, WRITE)
                     : databaseFile.newFileChannel(CREATE_NEW, SPARSE, READ, WRITE);
             this.lockForProcess = databaseFile.extension("lock").newFileChannel(CREATE, READ, WRITE).tryLock();
@@ -84,12 +93,17 @@ class DiskStorage<T> {
             if (HEADER_SIZE < channel.size()) {
                 readHeader();
             } else {
+                offsetTime = computeOffset(System.currentTimeMillis() / 1000);
                 startTime = Long.MAX_VALUE;
                 endTime = 0;
             }
         } catch (IOException e) {
             throw I.quiet(e);
         }
+    }
+
+    private long computeOffset(long seconds) {
+        return LocalDate.ofEpochDay(seconds / (60 * 60 * 24)).withDayOfMonth(1).toEpochDay() * 60 * 60 * 24;
     }
 
     /**
@@ -103,6 +117,7 @@ class DiskStorage<T> {
             buffer.flip();
 
             // decode
+            offsetTime = buffer.getLong();
             startTime = buffer.getLong();
             endTime = buffer.getLong();
         } catch (IOException e) {
@@ -127,6 +142,7 @@ class DiskStorage<T> {
                 channel.force(true);
                 // encode
                 ByteBuffer buffer = ByteBuffer.allocate(HEADER_SIZE);
+                buffer.putLong(offsetTime);
                 buffer.putLong(startTime);
                 buffer.putLong(endTime);
 
@@ -152,6 +168,10 @@ class DiskStorage<T> {
         if (startTime < this.startTime) {
             this.startTime = startTime;
             headerModified = true;
+
+            if (startTime < offsetTime) {
+                System.out.println("ne");
+            }
         }
 
         if (this.endTime < endTime) {
@@ -166,11 +186,15 @@ class DiskStorage<T> {
      * @param truncatedTime
      */
     int read(long truncatedTime, T[] items) {
+        if (endTime == 0) {
+            return 0;
+        }
+
         long stamp = lock.readLock();
 
         try {
             ByteBuffer buffer = ByteBuffer.allocate(itemWidth * items.length);
-            int size = channel.read(buffer, HEADER_SIZE + truncatedTime / duration * itemWidth);
+            int size = channel.read(buffer, HEADER_SIZE + (truncatedTime - offsetTime) / duration * itemWidth);
             if (size == -1) {
                 return 0;
             }
@@ -210,7 +234,16 @@ class DiskStorage<T> {
         long stamp = lock.writeLock();
 
         try {
-            long startPosition = HEADER_SIZE + truncatedTime / duration * itemWidth;
+            if (truncatedTime < offsetTime) {
+                if (endTime == 0) {
+                    offsetTime = computeOffset(truncatedTime);
+                    headerModified = true;
+                } else {
+                    expand(truncatedTime);
+                }
+            }
+
+            long startPosition = HEADER_SIZE + (truncatedTime - offsetTime) / duration * itemWidth;
             ByteBuffer buffer = ByteBuffer.allocate(itemWidth * items.length);
 
             for (int i = 0; i < items.length; i++) {
@@ -221,7 +254,7 @@ class DiskStorage<T> {
                         channel.write(buffer, startPosition);
                         buffer.clear();
                     }
-                    startPosition = HEADER_SIZE + (truncatedTime / duration + i + 1) * itemWidth;
+                    startPosition = HEADER_SIZE + ((truncatedTime - offsetTime) / duration + i + 1) * itemWidth;
                 } else {
                     buffer.put(ITEM_DEFINED);
                     codec.write(item, buffer);
@@ -236,10 +269,19 @@ class DiskStorage<T> {
             throw I.quiet(e);
         } finally {
             updateTime(truncatedTime, truncatedTime + items.length * duration);
-            // writeHeader();
+            writeHeader();
 
             lock.unlockWrite(stamp);
         }
+    }
+
+    /**
+     * Get the offset time.
+     * 
+     * @return
+     */
+    final long offsetTime() {
+        return offsetTime;
     }
 
     /**
@@ -258,5 +300,59 @@ class DiskStorage<T> {
      */
     final long endTime() {
         return endTime;
+    }
+
+    private void expand(long truncatedTime) {
+        long c = computeOffset(truncatedTime);
+        DiskStorage<T> expanded = copyTo(file.base("AUTO" + file.base()), offsetTime - c);
+        expanded.file.moveTo(file);
+        offsetTime = c;
+    }
+
+    DiskStorage<T> copyTo(File file, long additionalOffset) {
+        if (lockForProcess == null) {
+            // The current process does not have write permission because it is being used by
+            // another process.
+            return this;
+        }
+
+        try {
+            FileChannel output = FileChannel.open(file.asJavaPath(), CREATE_NEW, SPARSE, WRITE);
+
+            // copy header
+            ByteBuffer header = ByteBuffer.allocate(HEADER_SIZE);
+            channel.read(header, 0);
+            header.flip();
+            output.write(header);
+
+            // copy data
+            int maxItemSize = 1024;
+            int actualReadSize = 0;
+            ByteBuffer data = ByteBuffer.allocate(itemWidth * maxItemSize);
+
+            long inputPosition = HEADER_SIZE + startTime / duration * itemWidth;
+            long outputPosition = inputPosition + additionalOffset;
+
+            while ((actualReadSize = channel.read(data, inputPosition)) != -1) {
+                data.flip();
+
+                int readableItemSize = actualReadSize / itemWidth;
+                for (int i = 0; i < readableItemSize; i++) {
+                    int p = i * itemWidth;
+                    if (data.get(p) != ITEM_UNDEFINED) {
+                        output.write(data.slice(p, itemWidth), outputPosition);
+                    }
+                    outputPosition += itemWidth;
+                }
+                inputPosition += actualReadSize;
+                data.clear();
+            }
+
+            DiskStorage copied = new DiskStorage(file, codec, duration);
+            copied.offsetTime = offsetTime + additionalOffset;
+            return copied;
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
     }
 }
