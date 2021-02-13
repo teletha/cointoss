@@ -641,4 +641,14 @@ class FeatherStoreTest {
         assert store.at(oi2.epochSeconds()).equals(oi2);
         assert store.at(oi3.epochSeconds()).equals(oi3);
     }
+
+    @Test
+    void accumulator() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableAccumulator((prev, now) -> prev);
+        store.store(new Value(0));
+        assert store.at(0).value == 0;
+
+        store.store(new Value(1));
+        assert store.at(0).value == 0;
+    }
 }

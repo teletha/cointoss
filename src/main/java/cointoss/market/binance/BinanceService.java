@@ -219,9 +219,8 @@ public class BinanceService extends MarketService {
         return call("GET", "allForceOrders?symbol=" + marketName + "&limit=1000&startTime=" + startExcluded.toInstant().toEpochMilli(), 20)
                 .flatIterable(e -> e.find("*"))
                 .map(e -> {
-                    System.out.println(e);
                     return Liquidation.with.date(Chrono.utcByMills(e.get(long.class, "time")))
-                            .direction(e.get(Direction.class, "side"))
+                            .direction(e.get(Direction.class, "side").inverse())
                             .size(e.get(double.class, "executedQty"))
                             .price(e.get(Num.class, "averagePrice"));
                 });
@@ -247,7 +246,6 @@ public class BinanceService extends MarketService {
         }
 
         return clientRealtimely().subscribe(new Topic("forceOrder", marketName)).map(e -> {
-            System.out.println(e);
             JSON json = e.get("data").get("o");
             return Liquidation.with.date(Chrono.utcByMills(json.get(long.class, "T")))
                     .direction(json.get(Direction.class, "S").inverse())

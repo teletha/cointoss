@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
@@ -56,6 +57,9 @@ public final class FeatherStore<E extends TemporalData> {
 
     /** The data supplier. */
     private LongFunction<Signal<E>> supplier;
+
+    /** The data accumulator. */
+    private BiFunction<E, E, E> accumulator;
 
     /**
      * Create the store for timeseries data.
@@ -109,11 +113,23 @@ public final class FeatherStore<E extends TemporalData> {
      * @param supplier
      * @return Chainable API.
      */
+    public synchronized FeatherStore<E> enablePassiveDataSupplier(Signal<E> supplier) {
+        return enablePassiveDataSupplier(supplier, (Disposable) null);
+    }
+
+    /**
+     * Enable the data suppliance.
+     * 
+     * @param supplier
+     * @return Chainable API.
+     */
     public synchronized FeatherStore<E> enablePassiveDataSupplier(Signal<E> supplier, Disposable disposer) {
-        if (disposer != null && supplier != null) {
-            disposer.add(supplier.effectOnDispose(this::commit).to(e -> {
+        if (supplier != null) {
+            Disposable disposable = supplier.effectOnDispose(this::commit).to(e -> {
                 store(e);
-            }));
+            });
+
+            if (disposer != null) disposer.add(disposable);
         }
         return this;
     }
@@ -154,7 +170,7 @@ public final class FeatherStore<E extends TemporalData> {
     /**
      * Disable the transparent disk persistence.
      * 
-     * @return
+     * @return Chainable API.
      */
     public synchronized FeatherStore<E> disableDiskStore() {
         this.disk = null;
@@ -168,6 +184,27 @@ public final class FeatherStore<E extends TemporalData> {
      */
     public synchronized FeatherStore<E> disableMemorySaving() {
         eviction = EvictionPolicy.never();
+        return this;
+    }
+
+    /**
+     * Enable data accumulator.
+     * 
+     * @param accumulator
+     * @return Chainable API.
+     */
+    public FeatherStore<E> enableAccumulator(BiFunction<E, E, E> accumulator) {
+        this.accumulator = accumulator;
+        return this;
+    }
+
+    /**
+     * Disable data accumulator.
+     * 
+     * @return Chainable API.
+     */
+    public FeatherStore<E> disableAccumulator() {
+        this.accumulator = null;
         return this;
     }
 
@@ -225,7 +262,13 @@ public final class FeatherStore<E extends TemporalData> {
             indexed.put(index[0], segment);
             tryEvict(index[0]);
         }
-        segment.set((int) index[1], item);
+
+        if (accumulator == null) {
+            segment.set((int) index[1], item);
+        } else {
+            E previous = segment.get((int) index[1]);
+            segment.set((int) index[1], previous == null ? item : accumulator.apply(previous, item));
+        }
     }
 
     /**
