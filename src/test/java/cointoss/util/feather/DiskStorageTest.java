@@ -183,7 +183,7 @@ public class DiskStorageTest {
     }
 
     @Test
-    void copySparse() {
+    void rebuildSparse() {
         DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
         storage.write(0, new IntValue(0), null, new IntValue(2));
 
@@ -192,20 +192,22 @@ public class DiskStorageTest {
         assert items[0].value == 0;
         assert items[1] == null;
         assert items[2].value == 2;
+        assert storage.offsetTime() == 0;
 
-        DiskStorage<IntValue> copied = storage.copyTo(Locator.file(room.locateRadom()), 0);
+        DiskStorage<IntValue> rebuild = storage.rebuild(0);
         items = new IntValue[3];
-        assert copied.read(0, items) == 2;
+        assert rebuild.read(0, items) == 2;
         assert items[0].value == 0;
         assert items[1] == null;
         assert items[2].value == 2;
+        assert rebuild.offsetTime() == 0;
 
-        assert storage.file.size() == copied.file.size();
-        assert Arrays.equals(storage.file.bytes(), copied.file.bytes());
+        assert storage.file.size() == rebuild.file.size();
+        assert Arrays.equals(storage.file.bytes(), rebuild.file.bytes());
     }
 
     @Test
-    void copySparseWithExpand() {
+    void rebuildSparseWithNewOffset() {
         DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
         storage.write(10, new IntValue(0), null, new IntValue(2));
 
@@ -215,15 +217,15 @@ public class DiskStorageTest {
         assert items[1] == null;
         assert items[2].value == 2;
 
-        DiskStorage<IntValue> copied = storage.copyTo(Locator.file(room.locateRadom()), 10);
+        DiskStorage<IntValue> rebuild = storage.rebuild(0);
         items = new IntValue[3];
-        assert copied.read(10, items) == 2;
+        assert rebuild.read(10, items) == 2;
         assert items[0].value == 0;
         assert items[1] == null;
         assert items[2].value == 2;
-        //
-        // assert storage.file.size() == copied.file.size();
-        // assert Arrays.equals(storage.file.bytes(), copied.file.bytes());
+
+        assert storage.file.size() == rebuild.file.size();
+        assert Arrays.equals(storage.file.bytes(), rebuild.file.bytes());
     }
 
     @Test

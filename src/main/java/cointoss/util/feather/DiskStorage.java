@@ -9,11 +9,8 @@
  */
 package cointoss.util.feather;
 
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-import static java.nio.file.StandardOpenOption.READ;
-import static java.nio.file.StandardOpenOption.SPARSE;
-import static java.nio.file.StandardOpenOption.WRITE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -44,7 +41,7 @@ class DiskStorage<T> {
     final File file;
 
     /** The actual channel. */
-    private final FileChannel channel;
+    private FileChannel channel;
 
     /** The process lock. */
     private final FileLock lockForProcess;
@@ -93,17 +90,13 @@ class DiskStorage<T> {
             if (HEADER_SIZE < channel.size()) {
                 readHeader();
             } else {
-                offsetTime = computeOffset(System.currentTimeMillis() / 1000);
+                offsetTime = Long.MAX_VALUE;
                 startTime = Long.MAX_VALUE;
                 endTime = 0;
             }
         } catch (IOException e) {
             throw I.quiet(e);
         }
-    }
-
-    private long computeOffset(long seconds) {
-        return LocalDate.ofEpochDay(seconds / (60 * 60 * 24)).withDayOfMonth(1).toEpochDay() * 60 * 60 * 24;
     }
 
     /**
@@ -168,15 +161,43 @@ class DiskStorage<T> {
         if (startTime < this.startTime) {
             this.startTime = startTime;
             headerModified = true;
-
-            if (startTime < offsetTime) {
-                System.out.println("ne");
-            }
         }
 
         if (this.endTime < endTime) {
             this.endTime = endTime;
             headerModified = true;
+        }
+    }
+
+    private void updateOffsetTime(long candidate) {
+        long truncated = LocalDate.ofEpochDay(candidate / (60 * 60 * 24)).withDayOfMonth(1).toEpochDay() * 60 * 60 * 24;
+
+        if (offsetTime < truncated) {
+            return;
+        }
+
+        // If none of the data exists yet, it will initialize the specified time as the offset time.
+        if (offsetTime == Long.MAX_VALUE) {
+            writeOffsetTime(truncated);
+            return;
+        }
+
+        // Rebuild the database because a time earlier than the current offset time has been
+        // specified.
+        replaceBy(rebuild(truncated));
+    }
+
+    /**
+     * Write the new offset time to file actually.
+     * 
+     * @param time
+     */
+    private void writeOffsetTime(long time) {
+        try {
+            channel.write(ByteBuffer.allocate(8).putLong(time), 0);
+            offsetTime = time;
+        } catch (IOException e) {
+            throw I.quiet(e);
         }
     }
 
@@ -235,12 +256,7 @@ class DiskStorage<T> {
 
         try {
             if (truncatedTime < offsetTime) {
-                if (endTime == 0) {
-                    offsetTime = computeOffset(truncatedTime);
-                    headerModified = true;
-                } else {
-                    expand(truncatedTime);
-                }
+                updateOffsetTime(truncatedTime);
             }
 
             long startPosition = HEADER_SIZE + (truncatedTime - offsetTime) / duration * itemWidth;
@@ -302,14 +318,13 @@ class DiskStorage<T> {
         return endTime;
     }
 
-    private void expand(long truncatedTime) {
-        long c = computeOffset(truncatedTime);
-        DiskStorage<T> expanded = copyTo(file.base("AUTO" + file.base()), offsetTime - c);
-        expanded.file.moveTo(file);
-        offsetTime = c;
-    }
-
-    DiskStorage<T> copyTo(File file, long additionalOffset) {
+    /**
+     * Returns a fully reconstructed database for a given offset time.
+     * 
+     * @param newOffsetTime
+     * @return
+     */
+    DiskStorage<T> rebuild(long newOffsetTime) {
         if (lockForProcess == null) {
             // The current process does not have write permission because it is being used by
             // another process.
@@ -317,21 +332,27 @@ class DiskStorage<T> {
         }
 
         try {
-            FileChannel output = FileChannel.open(file.asJavaPath(), CREATE_NEW, SPARSE, WRITE);
+            DiskStorage rebuild = new DiskStorage(file.base(file.base() + "-rebuild"), codec, duration);
 
-            // copy header
+            // copy file header
             ByteBuffer header = ByteBuffer.allocate(HEADER_SIZE);
             channel.read(header, 0);
             header.flip();
-            output.write(header);
+            rebuild.channel.write(header, 0);
+            rebuild.writeOffsetTime(newOffsetTime); // rewrite offset time
 
-            // copy data
+            // copy object header
+            rebuild.startTime = startTime;
+            rebuild.endTime = endTime;
+            rebuild.offsetTime = newOffsetTime;
+
+            // copy file data
             int maxItemSize = 1024;
             int actualReadSize = 0;
             ByteBuffer data = ByteBuffer.allocate(itemWidth * maxItemSize);
 
-            long inputPosition = HEADER_SIZE + startTime / duration * itemWidth;
-            long outputPosition = inputPosition + additionalOffset;
+            long inputPosition = HEADER_SIZE + (startTime - offsetTime) / duration * itemWidth;
+            long outputPosition = inputPosition + (offsetTime - newOffsetTime) / duration * itemWidth;
 
             while ((actualReadSize = channel.read(data, inputPosition)) != -1) {
                 data.flip();
@@ -340,7 +361,7 @@ class DiskStorage<T> {
                 for (int i = 0; i < readableItemSize; i++) {
                     int p = i * itemWidth;
                     if (data.get(p) != ITEM_UNDEFINED) {
-                        output.write(data.slice(p, itemWidth), outputPosition);
+                        rebuild.channel.write(data.slice(p, itemWidth), outputPosition);
                     }
                     outputPosition += itemWidth;
                 }
@@ -348,9 +369,29 @@ class DiskStorage<T> {
                 data.clear();
             }
 
-            DiskStorage copied = new DiskStorage(file, codec, duration);
-            copied.offsetTime = offsetTime + additionalOffset;
-            return copied;
+            return rebuild;
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
+    }
+
+    void replaceBy(DiskStorage storage) {
+        // copy database file
+        storage.file.renameTo(file.name(), REPLACE_EXISTING);
+
+        // copy object header
+        offsetTime = storage.offsetTime;
+        startTime = storage.startTime;
+        endTime = storage.endTime;
+
+        // re-open
+        try {
+            storage.channel.close();
+            storage.lockForProcess.close();
+            storage.lockForProcess.channel().close();
+
+            channel.close();
+            channel = file.newFileChannel(READ, WRITE);
         } catch (IOException e) {
             throw I.quiet(e);
         }
