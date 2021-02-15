@@ -10,7 +10,11 @@
 package cointoss.util.feather;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.SPARSE;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -93,6 +97,21 @@ class DiskStorage<T> {
                 offsetTime = Long.MAX_VALUE;
                 startTime = Long.MAX_VALUE;
                 endTime = 0;
+            }
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
+     * Close all related resources.
+     */
+    void close() {
+        try {
+            channel.close();
+            if (lockForProcess != null) {
+                lockForProcess.close();
+                file.extension("lock").delete();
             }
         } catch (IOException e) {
             throw I.quiet(e);
@@ -386,9 +405,7 @@ class DiskStorage<T> {
 
         // re-open
         try {
-            storage.channel.close();
-            storage.lockForProcess.close();
-            storage.lockForProcess.channel().close();
+            storage.close();
 
             channel.close();
             channel = file.newFileChannel(READ, WRITE);

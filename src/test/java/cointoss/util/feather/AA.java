@@ -16,9 +16,11 @@ import psychopath.Locator;
 
 public class AA {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(Locator.file("test").asJavaPath());
         store.store(new Value(Chrono.currentTimeMills() / 1000));
         store.commit();
+
+        Thread.sleep(1000 * 30);
     }
 }
