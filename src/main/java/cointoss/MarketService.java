@@ -75,7 +75,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     private final ScheduledThreadPoolExecutor scheduler;
 
     /** Whether or not the current process has write access to the data. */
-    protected final boolean writable;
+    protected boolean writable;
 
     /**
      * @param exchange
@@ -96,7 +96,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         });
         this.scheduler.allowCoreThreadTimeOut(true);
         this.scheduler.setKeepAliveTime(30, TimeUnit.SECONDS);
-        this.writable = directory().file(".lock").lock().mapTo(true).recover(false).to().exact();
+        // this.writable = directory().file(".lock").lock().mapTo(true).recover(false).to().exact();
         this.log = new ExecutionLog(this);
     }
 
