@@ -9,8 +9,6 @@
  */
 package cointoss.util.feather;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -183,56 +181,11 @@ public class DiskStorageTest {
     }
 
     @Test
-    void rebuildSparse() {
-        DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
-        storage.write(0, new IntValue(0), null, new IntValue(2));
-
-        IntValue[] items = new IntValue[3];
-        assert storage.read(0, items) == 2;
-        assert items[0].value == 0;
-        assert items[1] == null;
-        assert items[2].value == 2;
-        assert storage.offsetTime() == 0;
-
-        DiskStorage<IntValue> rebuild = storage.rebuild(0);
-        items = new IntValue[3];
-        assert rebuild.read(0, items) == 2;
-        assert items[0].value == 0;
-        assert items[1] == null;
-        assert items[2].value == 2;
-        assert rebuild.offsetTime() == 0;
-
-        assert storage.file.size() == rebuild.file.size();
-        assert Arrays.equals(storage.file.bytes(), rebuild.file.bytes());
-    }
-
-    @Test
-    void rebuildSparseWithNewOffset() {
-        DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
-        storage.write(10, new IntValue(0), null, new IntValue(2));
-
-        IntValue[] items = new IntValue[3];
-        assert storage.read(10, items) == 2;
-        assert items[0].value == 0;
-        assert items[1] == null;
-        assert items[2].value == 2;
-
-        DiskStorage<IntValue> rebuild = storage.rebuild(0);
-        items = new IntValue[3];
-        assert rebuild.read(10, items) == 2;
-        assert items[0].value == 0;
-        assert items[1] == null;
-        assert items[2].value == 2;
-
-        assert storage.file.size() == rebuild.file.size();
-        assert Arrays.equals(storage.file.bytes(), rebuild.file.bytes());
-    }
-
-    @Test
-    void autoExpand() {
+    void rebuildAutomatically() {
         DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
         int base = 60 * 60 * 24 * 35;
         storage.write(base, new IntValue(base), null, new IntValue(base + 2));
+        assert storage.offsetTime() == 60 * 60 * 24 * 31;
 
         IntValue[] items = new IntValue[3];
         assert storage.read(base, items) == 2;
@@ -241,6 +194,8 @@ public class DiskStorageTest {
         assert items[2].value == base + 2;
 
         storage.write(0, new IntValue(0));
+        assert storage.offsetTime() == 0;
+
         items = new IntValue[3];
         assert storage.read(0, items) == 1;
         assert items[0].value == 0;
@@ -255,8 +210,5 @@ public class DiskStorageTest {
     }
 
     public record IntValue(int value) {
-    }
-
-    public record LongValue(long value) {
     }
 }

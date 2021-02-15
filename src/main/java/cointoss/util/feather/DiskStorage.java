@@ -198,12 +198,11 @@ class DiskStorage<T> {
         // If none of the data exists yet, it will initialize the specified time as the offset time.
         if (offsetTime == Long.MAX_VALUE) {
             writeOffsetTime(truncated);
-            return;
         }
 
         // Rebuild the database because a time earlier than the current offset time has been
         // specified.
-        replaceBy(rebuild(truncated));
+        rebuild(truncated);
     }
 
     /**
@@ -215,6 +214,73 @@ class DiskStorage<T> {
         try {
             channel.write(ByteBuffer.allocate(8).putLong(time), 0);
             offsetTime = time;
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
+     * Replace by the fully reconstructed database for a given offset time.
+     * 
+     * @param newOffsetTime
+     */
+    private void rebuild(long newOffsetTime) {
+        if (lockForProcess == null) {
+            // The current process does not have write permission because it is being used by
+            // another process.
+            return;
+        }
+    
+        try {
+            DiskStorage rebuild = new DiskStorage(file.base(file.base() + "-rebuild"), codec, duration);
+    
+            // copy file header
+            ByteBuffer header = ByteBuffer.allocate(HEADER_SIZE);
+            channel.read(header, 0);
+            header.flip();
+            rebuild.channel.write(header, 0);
+            rebuild.writeOffsetTime(newOffsetTime); // rewrite offset time
+    
+            // copy object header
+            rebuild.startTime = startTime;
+            rebuild.endTime = endTime;
+            rebuild.offsetTime = newOffsetTime;
+    
+            // copy file data
+            int maxItemSize = 1024;
+            int actualReadSize = 0;
+            ByteBuffer data = ByteBuffer.allocate(itemWidth * maxItemSize);
+    
+            long inputPosition = HEADER_SIZE + (startTime - offsetTime) / duration * itemWidth;
+            long outputPosition = inputPosition + (offsetTime - newOffsetTime) / duration * itemWidth;
+    
+            while ((actualReadSize = channel.read(data, inputPosition)) != -1) {
+                data.flip();
+    
+                int readableItemSize = actualReadSize / itemWidth;
+                for (int i = 0; i < readableItemSize; i++) {
+                    int p = i * itemWidth;
+                    if (data.get(p) != ITEM_UNDEFINED) {
+                        rebuild.channel.write(data.slice(p, itemWidth), outputPosition);
+                    }
+                    outputPosition += itemWidth;
+                }
+                inputPosition += actualReadSize;
+                data.clear();
+            }
+    
+            // swap database file
+            rebuild.file.renameTo(file.name(), REPLACE_EXISTING);
+            rebuild.close();
+    
+            // swap object header
+            offsetTime = rebuild.offsetTime;
+            startTime = rebuild.startTime;
+            endTime = rebuild.endTime;
+    
+            // swap channel
+            channel.close();
+            channel = file.newFileChannel(READ, WRITE);
         } catch (IOException e) {
             throw I.quiet(e);
         }
@@ -335,82 +401,5 @@ class DiskStorage<T> {
      */
     final long endTime() {
         return endTime;
-    }
-
-    /**
-     * Returns a fully reconstructed database for a given offset time.
-     * 
-     * @param newOffsetTime
-     * @return
-     */
-    DiskStorage<T> rebuild(long newOffsetTime) {
-        if (lockForProcess == null) {
-            // The current process does not have write permission because it is being used by
-            // another process.
-            return this;
-        }
-
-        try {
-            DiskStorage rebuild = new DiskStorage(file.base(file.base() + "-rebuild"), codec, duration);
-
-            // copy file header
-            ByteBuffer header = ByteBuffer.allocate(HEADER_SIZE);
-            channel.read(header, 0);
-            header.flip();
-            rebuild.channel.write(header, 0);
-            rebuild.writeOffsetTime(newOffsetTime); // rewrite offset time
-
-            // copy object header
-            rebuild.startTime = startTime;
-            rebuild.endTime = endTime;
-            rebuild.offsetTime = newOffsetTime;
-
-            // copy file data
-            int maxItemSize = 1024;
-            int actualReadSize = 0;
-            ByteBuffer data = ByteBuffer.allocate(itemWidth * maxItemSize);
-
-            long inputPosition = HEADER_SIZE + (startTime - offsetTime) / duration * itemWidth;
-            long outputPosition = inputPosition + (offsetTime - newOffsetTime) / duration * itemWidth;
-
-            while ((actualReadSize = channel.read(data, inputPosition)) != -1) {
-                data.flip();
-
-                int readableItemSize = actualReadSize / itemWidth;
-                for (int i = 0; i < readableItemSize; i++) {
-                    int p = i * itemWidth;
-                    if (data.get(p) != ITEM_UNDEFINED) {
-                        rebuild.channel.write(data.slice(p, itemWidth), outputPosition);
-                    }
-                    outputPosition += itemWidth;
-                }
-                inputPosition += actualReadSize;
-                data.clear();
-            }
-
-            return rebuild;
-        } catch (IOException e) {
-            throw I.quiet(e);
-        }
-    }
-
-    void replaceBy(DiskStorage storage) {
-        // copy database file
-        storage.file.renameTo(file.name(), REPLACE_EXISTING);
-
-        // copy object header
-        offsetTime = storage.offsetTime;
-        startTime = storage.startTime;
-        endTime = storage.endTime;
-
-        // re-open
-        try {
-            storage.close();
-
-            channel.close();
-            channel = file.newFileChannel(READ, WRITE);
-        } catch (IOException e) {
-            throw I.quiet(e);
-        }
     }
 }
