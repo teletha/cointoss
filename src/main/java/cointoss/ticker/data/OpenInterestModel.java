@@ -9,18 +9,60 @@
  */
 package cointoss.ticker.data;
 
+import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
 
+import cointoss.util.Chrono;
+import cointoss.util.feather.DataCodec;
 import cointoss.util.feather.TemporalData;
 import icy.manipulator.Icy;
 
 @Icy
-interface OpenInterestModel extends TemporalData {
+abstract class OpenInterestModel implements TemporalData {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Icy.Property
-    ZonedDateTime date();
+    public abstract ZonedDateTime date();
+
+    @Icy.Overload("date")
+    private ZonedDateTime date(long time) {
+        return Chrono.utcBySeconds(time);
+    }
 
     @Icy.Property
-    double size();
+    public abstract float size();
+
+    /**
+     * Codec for {@link OpenInterest}.
+     */
+    @SuppressWarnings("unused")
+    private static class Codec extends DataCodec<OpenInterest> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int size() {
+            return 4;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public OpenInterest read(long time, ByteBuffer reader) {
+            return OpenInterest.with.date(time).size(reader.getFloat());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(OpenInterest item, ByteBuffer writer) {
+            writer.putFloat(item.size);
+        }
+    }
 }

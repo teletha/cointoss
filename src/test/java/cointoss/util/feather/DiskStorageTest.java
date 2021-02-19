@@ -29,7 +29,7 @@ public class DiskStorageTest {
      * @return
      */
     private <T> DiskStorage<T> createStorage(Class<T> type, long duration) {
-        return new DiskStorage(Locator.file(room.locateRadom()), DataType.of(type), duration);
+        return new DiskStorage(Locator.file(room.locateRadom()), DataCodec.of(type), duration);
     }
 
     @Test

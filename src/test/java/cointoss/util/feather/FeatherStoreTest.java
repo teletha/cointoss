@@ -28,6 +28,8 @@ import cointoss.ticker.Span;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.Chrono;
 import kiss.I;
+import psychopath.File;
+import psychopath.Locator;
 
 class FeatherStoreTest {
     private static final int days = 60 * 60 * 24;
@@ -464,9 +466,13 @@ class FeatherStoreTest {
     @RegisterExtension
     CleanRoom room = new CleanRoom();
 
+    private File databaseFile() {
+        return Locator.file(room.locateRadom());
+    }
+
     @Test
     void diskCache() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
 
         int base = (int) Span.Minute1.segmentSeconds;
 
@@ -517,7 +523,7 @@ class FeatherStoreTest {
 
     @Test
     void persist() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
 
         store.store(value(0));
         assert store.existOnDisk(value(0)) == false;
@@ -527,7 +533,7 @@ class FeatherStoreTest {
 
     @Test
     void readDataFromDiskCache() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
 
         store.store(value(0));
         store.commit();
@@ -549,7 +555,7 @@ class FeatherStoreTest {
         primitive.byteValue = 2;
         primitive.shortValue = 3;
 
-        FeatherStore<Primitive> store = FeatherStore.create(Primitive.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Primitive> store = FeatherStore.create(Primitive.class, Span.Minute1).enableDiskStore(databaseFile());
         store.store(primitive);
         store.commit();
         store.clear();
@@ -595,12 +601,12 @@ class FeatherStoreTest {
         e.type = MarketType.DERIVATIVE;
         e.currency = Currency.BTC;
 
-        FeatherStore<Enums> store = FeatherStore.create(Enums.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<Enums> store = FeatherStore.create(Enums.class, Span.Minute1).enableDiskStore(databaseFile());
         store.store(e);
         store.commit();
         store.clear();
 
-        Enums restored = store.at(e.epochSeconds());
+        Enums restored = store.at(e.seconds());
         assert restored != null;
         assert restored.type == e.type;
         assert restored.currency == e.currency;
@@ -619,17 +625,17 @@ class FeatherStoreTest {
 
     @Test
     void supportZonedDateTime() {
-        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(room.locateRadom());
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(databaseFile());
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
         store.commit();
         store.clear();
-        assert store.at(oi.epochSeconds()).equals(oi);
+        assert store.at(oi.seconds()).equals(oi);
     }
 
     @Test
     void storeSparsedDisk() {
-        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day1).enableDiskStore(room.locateRadom());
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day1).enableDiskStore(databaseFile());
         OpenInterest oi1 = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);
@@ -637,9 +643,9 @@ class FeatherStoreTest {
         store.commit();
         store.clear();
 
-        assert store.at(oi1.epochSeconds()).equals(oi1);
-        assert store.at(oi2.epochSeconds()).equals(oi2);
-        assert store.at(oi3.epochSeconds()).equals(oi3);
+        assert store.at(oi1.seconds()).equals(oi1);
+        assert store.at(oi2.seconds()).equals(oi2);
+        assert store.at(oi3.seconds()).equals(oi3);
     }
 
     @Test

@@ -223,7 +223,7 @@ public class BitfinexService extends MarketService {
 
         return clientRealtimely().subscribe(new Topic("status", "deriv:t" + marketName)).map(root -> {
             JSON e = root.get("1");
-            return OpenInterest.with.date(Chrono.utcNow()).size(e.get(double.class, "17"));
+            return OpenInterest.with.date(Chrono.utcNow()).size(e.get(float.class, "17"));
         });
     }
 

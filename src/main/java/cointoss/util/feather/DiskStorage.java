@@ -10,11 +10,7 @@
 package cointoss.util.feather;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-import static java.nio.file.StandardOpenOption.READ;
-import static java.nio.file.StandardOpenOption.SPARSE;
-import static java.nio.file.StandardOpenOption.WRITE;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -54,7 +50,7 @@ class DiskStorage<T> {
     private final StampedLock lock = new StampedLock();
 
     /** The data definition. */
-    private final DataType<T> codec;
+    private final DataCodec<T> codec;
 
     /** The total byte size for each items. */
     private final int itemWidth;
@@ -81,7 +77,7 @@ class DiskStorage<T> {
      * @param codec The data definition.
      * @param duration The time that one element has.
      */
-    DiskStorage(File databaseFile, DataType<T> codec, long duration) {
+    DiskStorage(File databaseFile, DataCodec<T> codec, long duration) {
         try {
             this.file = databaseFile;
             this.channel = databaseFile.isPresent() ? databaseFile.newFileChannel(READ, WRITE)
@@ -310,13 +306,15 @@ class DiskStorage<T> {
 
             int readableItemSize = size / itemWidth;
             int skip = 0;
+            long time = truncatedTime;
             for (int i = 0; i < readableItemSize; i++) {
                 if (buffer.get() == ITEM_UNDEFINED) {
                     buffer.position(buffer.position() + itemWidth - 1);
                     skip++;
                 } else {
-                    items[i] = codec.read(buffer);
+                    items[i] = codec.read(time, buffer);
                 }
+                time += duration;
             }
             return readableItemSize - skip;
         } catch (IOException e) {

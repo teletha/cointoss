@@ -19,6 +19,7 @@ import java.util.function.BiFunction;
 
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
+import kiss.Extensible;
 import kiss.I;
 import kiss.model.Model;
 import kiss.model.Property;
@@ -26,10 +27,10 @@ import kiss.model.Property;
 /**
  * Data serializer and deserializer which can convert data from/to bytes.
  */
-public abstract class DataType<T> {
+public abstract class DataCodec<T> implements Extensible {
 
     /** The automatic data type collection. */
-    private static final Map<Model, DataType.AutoDataType> autos = new ConcurrentHashMap();
+    private static final Map<Model, DataCodec.AutoDataCodec> autos = new ConcurrentHashMap();
 
     /**
      * Total bytes size of this data type.
@@ -44,7 +45,7 @@ public abstract class DataType<T> {
      * @param reader A byte reader.
      * @return A restored data.
      */
-    public abstract T read(ByteBuffer reader);
+    public abstract T read(long time, ByteBuffer reader);
 
     /**
      * Convert from data to bytes.
@@ -59,9 +60,9 @@ public abstract class DataType<T> {
      * 
      * @param <T> A data class.
      * @param type A data class.
-     * @return The automatically derived {@link DataType}.
+     * @return The automatically derived {@link DataCodec}.
      */
-    public static <T> DataType<T> of(Class<T> type) {
+    public static <T> DataCodec<T> of(Class<T> type) {
         return of(Model.of(type));
     }
 
@@ -69,17 +70,22 @@ public abstract class DataType<T> {
      * Get the {@link Model} based data type for the specified type.
      * 
      * @param <T> A data class.
-     * @param type A data model.
-     * @return The automatically derived {@link DataType}.
+     * @param model A data model.
+     * @return The automatically derived {@link DataCodec}.
      */
-    public static <T> DataType<T> of(Model<T> type) {
-        return autos.computeIfAbsent(type, DataType.AutoDataType::new);
+    public static <T> DataCodec<T> of(Model<T> model) {
+        DataCodec found = I.find(DataCodec.class, model.type);
+        if (found != null) {
+            return found;
+        } else {
+            return autos.computeIfAbsent(model, DataCodec.AutoDataCodec::new);
+        }
     }
 
     /**
      * {@link Model} based automatic data type.
      */
-    private static class AutoDataType<T> extends DataType<T> {
+    private static class AutoDataCodec<T> extends DataCodec<T> {
 
         /** The data type. */
         private final Class<T> type;
@@ -96,7 +102,7 @@ public abstract class DataType<T> {
         /**
          * @param model
          */
-        private AutoDataType(Model<T> model) {
+        private AutoDataCodec(Model<T> model) {
             this.type = model.type;
 
             int width = 0;
@@ -197,7 +203,7 @@ public abstract class DataType<T> {
          * {@inheritDoc}
          */
         @Override
-        public T read(ByteBuffer buffer) {
+        public T read(long time, ByteBuffer buffer) {
             T item = I.make(type);
             for (int i = 0; i < readers.length; i++) {
                 item = readers[i].apply(item, buffer);

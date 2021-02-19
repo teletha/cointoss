@@ -273,7 +273,7 @@ public class BybitService extends MarketService {
     public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
         return call("GET", "open-interest?symbol=" + marketName + "&period=5min&limit=200").flatIterable(e -> e.find("result", "$"))
                 .map(e -> {
-                    double size = e.get(double.class, "open_interest");
+                    float size = e.get(float.class, "open_interest");
                     ZonedDateTime date = Chrono.utcBySeconds(e.get(long.class, "timestamp"));
 
                     return OpenInterest.with.date(date).size(size);
@@ -298,7 +298,7 @@ public class BybitService extends MarketService {
                 })
                 .take(e -> e.has("open_interest"))
                 .map(e -> OpenInterest.with.date(Chrono.utcNow())
-                        .size(Primitives.roundDecimal(e.get(double.class, "open_interest") / price[0], 2)));
+                        .size((float) Primitives.roundDecimal(e.get(double.class, "open_interest") / price[0], 2)));
     }
 
     public static void mai2n(String[] args) throws InterruptedException {

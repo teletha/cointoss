@@ -258,8 +258,8 @@ public class BitMexService extends MarketService {
                 .take(e -> e.has("openInterest"))
                 .map(e -> {
                     ZonedDateTime time = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat).truncatedTo(ChronoUnit.SECONDS);
-                    double size = e.get(double.class, "openInterest");
-                    double value = e.get(double.class, "openValue");
+                    float size = e.get(float.class, "openInterest");
+                    float value = e.get(float.class, "openValue");
                     return OpenInterest.with.date(time).size(value / size);
                 });
     }

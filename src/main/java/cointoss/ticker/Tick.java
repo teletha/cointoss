@@ -88,7 +88,7 @@ public final class Tick implements TemporalData {
      * {@inheritDoc}
      */
     @Override
-    public long epochSeconds() {
+    public long seconds() {
         return openTime;
     }
 

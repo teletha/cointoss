@@ -25,6 +25,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
@@ -33,6 +34,7 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.feather.FeatherStore;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -185,8 +187,8 @@ public class BinanceService extends MarketService {
                 .flatIterable(e -> e.find("*"))
                 .map(e -> {
                     ZonedDateTime time = Chrono.utcByMills(e.get(long.class, "timestamp"));
-                    double size = e.get(double.class, "sumOpenInterest");
-                    double value = e.get(double.class, "sumOpenInterestValue");
+                    float size = e.get(float.class, "sumOpenInterest");
+                    float value = e.get(float.class, "sumOpenInterestValue");
 
                     return OpenInterest.with.date(time).size(size);
                 });
@@ -204,7 +206,17 @@ public class BinanceService extends MarketService {
         return Chrono.minutes()
                 .takeAt(i -> i % 5 == 0)
                 .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
-                .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(double.class, "openInterest")));
+                .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(float.class, "openInterest")));
+    }
+
+    private final FeatherStore<OpenInterest> oi = FeatherStore.create(OpenInterest.class, Span.Minute5).enableDiskStore(file("oi.db"));
+
+    public static void main(String[] args) throws InterruptedException {
+        Binance.FUTURE_BTC_USDT.provideOpenInterest(ZonedDateTime.now().minusDays(33)).to(e -> {
+            System.out.println(e);
+        });
+
+        Thread.sleep(1000 * 60);
     }
 
     /**
@@ -224,16 +236,6 @@ public class BinanceService extends MarketService {
                             .size(e.get(double.class, "executedQty"))
                             .price(e.get(Num.class, "averagePrice"));
                 });
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Binance.FUTURE_BTC_USDT.liquidationRealtimely().to(e -> {
-        });
-
-        Binance.FUTURE_BTC_USDT.liquidations(Chrono.utcNow().minusMinutes(60 * 24 * 10), Chrono.utcNow()).to(e -> {
-        });
-
-        Thread.sleep(1000 * 60 * 30);
     }
 
     /**

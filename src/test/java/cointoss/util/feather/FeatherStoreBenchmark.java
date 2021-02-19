@@ -15,6 +15,7 @@ import antibug.CleanRoom;
 import antibug.profiler.Benchmark;
 import cointoss.ticker.Span;
 import cointoss.util.feather.FeatherStoreTest.Value;
+import psychopath.Locator;
 
 public class FeatherStoreBenchmark {
 
@@ -23,7 +24,8 @@ public class FeatherStoreBenchmark {
         Span span = Span.Minute1;
         CleanRoom room = new CleanRoom();
 
-        FeatherStore<Value> disk = FeatherStore.create(Value.class, span).enableDiskStore(room.locateFile("persist.db"), optimized);
+        FeatherStore<Value> disk = FeatherStore.create(Value.class, span)
+                .enableDiskStore(Locator.file(room.locateFile("persist.db")), optimized);
         benchmark.measure("Store on disk", () -> {
             for (int i = 0; i < 10000; i++) {
                 disk.store(new Value(i * span.seconds));
@@ -49,7 +51,7 @@ public class FeatherStoreBenchmark {
         benchmark.perform();
     }
 
-    private static final DataType<Value> optimized = new DataType<Value>() {
+    private static final DataCodec<Value> optimized = new DataCodec<Value>() {
 
         @Override
         public int size() {
@@ -62,7 +64,7 @@ public class FeatherStoreBenchmark {
         }
 
         @Override
-        public Value read(ByteBuffer buffer) {
+        public Value read(long time, ByteBuffer buffer) {
             return new Value(buffer.getLong());
         }
     };

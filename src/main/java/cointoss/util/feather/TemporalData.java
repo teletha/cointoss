@@ -11,21 +11,25 @@ package cointoss.util.feather;
 
 import java.time.ZonedDateTime;
 
+import cointoss.util.Chrono;
+
 public interface TemporalData {
 
     /**
-     * The date and time.
+     * The date and time. (UTC)
      * 
      * @return
      */
-    ZonedDateTime date();
+    default ZonedDateTime date() {
+        return Chrono.utcBySeconds(seconds());
+    }
 
     /**
-     * The date and time.
+     * The date and time represented by epoch seconds. (UTC)
      * 
      * @return
      */
-    default long epochSeconds() {
+    default long seconds() {
         return date().toEpochSecond();
     }
 }

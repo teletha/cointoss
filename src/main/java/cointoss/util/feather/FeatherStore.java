@@ -10,7 +10,6 @@
 package cointoss.util.feather;
 
 import java.lang.reflect.Array;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -30,7 +29,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.model.Model;
-import psychopath.Locator;
+import psychopath.File;
 
 public final class FeatherStore<E extends TemporalData> {
 
@@ -150,7 +149,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> enableDiskStore(Path databaseFile) {
+    public synchronized FeatherStore<E> enableDiskStore(File databaseFile) {
         return enableDiskStore(databaseFile, null);
     }
 
@@ -160,9 +159,9 @@ public final class FeatherStore<E extends TemporalData> {
      * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> enableDiskStore(Path databaseFile, DataType<E> dataType) {
+    public synchronized FeatherStore<E> enableDiskStore(File databaseFile, DataCodec<E> dataType) {
         if (databaseFile != null && this.disk == null) {
-            this.disk = new DiskStorage(Locator.file(databaseFile), dataType != null ? dataType : DataType.of(model), itemDuration);
+            this.disk = new DiskStorage(databaseFile, dataType != null ? dataType : DataCodec.of(model), itemDuration);
         }
         return this;
     }
@@ -253,7 +252,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @param item Time series items to store.
      */
     public void store(E item) {
-        long[] index = index(item.epochSeconds());
+        long[] index = index(item.seconds());
 
         OnHeap<E> segment = supply(index[0]);
 
@@ -366,7 +365,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @param each An item processor.
      */
     public void each(E start, E end, Consumer<? super E> each) {
-        each(start.epochSeconds(), end.epochSeconds(), each);
+        each(start.seconds(), end.seconds(), each);
     }
 
     /**
@@ -432,7 +431,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @return An item stream.
      */
     public Signal<E> each(E start, E end) {
-        return each(start.epochSeconds(), end.epochSeconds());
+        return each(start.seconds(), end.seconds());
     }
 
     /**
@@ -444,7 +443,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @return An item stream.
      */
     public Signal<E> eachInside(E start, E end) {
-        return each(start.epochSeconds() + itemDuration, end.epochSeconds() - itemDuration);
+        return each(start.seconds() + itemDuration, end.seconds() - itemDuration);
     }
 
     /**
@@ -507,7 +506,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @return
      */
     public E before(E item) {
-        return before(item.epochSeconds());
+        return before(item.seconds());
     }
 
     /**
@@ -517,7 +516,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @return A matched item or null.
      */
     public E before(E item, Predicate<E> condition) {
-        return before(item.epochSeconds(), condition);
+        return before(item.seconds(), condition);
     }
 
     /**
@@ -558,7 +557,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @return
      */
     public List<E> beforeUntil(E item, int maximumSize) {
-        return beforeUntil(item.epochSeconds(), maximumSize);
+        return beforeUntil(item.seconds(), maximumSize);
     }
 
     /**
@@ -578,7 +577,7 @@ public final class FeatherStore<E extends TemporalData> {
      * @return
      */
     public List<E> beforeUntilWith(E item, int maximumSize) {
-        return beforeUntilWith(item.epochSeconds(), maximumSize);
+        return beforeUntilWith(item.seconds(), maximumSize);
     }
 
     /**
@@ -674,7 +673,7 @@ public final class FeatherStore<E extends TemporalData> {
                 indexed.put(startTime, heap);
                 tryEvict(startTime);
                 supply.to(item -> {
-                    long timestamp = item.epochSeconds();
+                    long timestamp = item.seconds();
                     if (startTime <= timestamp && timestamp < endTime) {
                         heap.set((int) index(timestamp)[1], item);
                     }
@@ -723,7 +722,7 @@ public final class FeatherStore<E extends TemporalData> {
      */
     @VisibleForTesting
     boolean existOnHeap(E item) {
-        long[] index = index(item.epochSeconds());
+        long[] index = index(item.seconds());
         OnHeap segment = indexed.get(index[0]);
         if (segment == null) {
             return false;
@@ -744,7 +743,7 @@ public final class FeatherStore<E extends TemporalData> {
         }
 
         E[] container = (E[]) Array.newInstance(model.type, 1);
-        long[] index = index(item.epochSeconds());
+        long[] index = index(item.seconds());
         disk.read(index[0], container);
         return Objects.equals(item, container[(int) index[1]]);
     }

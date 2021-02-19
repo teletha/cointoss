@@ -43,6 +43,7 @@ import kiss.Encoder;
 import kiss.I;
 import kiss.Signal;
 import psychopath.Directory;
+import psychopath.File;
 import psychopath.Locator;
 
 public abstract class MarketService implements Comparable<MarketService>, Disposable {
@@ -459,6 +460,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public final Directory directory(String name) {
         return directory().directory(name);
+    }
+
+    /**
+     * Returns the file of this service.
+     * 
+     * @return
+     */
+    public final File file(String name) {
+        return directory().file(name);
     }
 
     /**

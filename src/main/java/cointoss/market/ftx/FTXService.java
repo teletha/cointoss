@@ -265,7 +265,7 @@ public class FTXService extends MarketService {
 
         return call("GET", "futures/" + marketName + "/stats").map(root -> {
             JSON e = root.get("result");
-            return OpenInterest.with.date(Chrono.utcNow()).size(e.get(double.class, "openInterest"));
+            return OpenInterest.with.date(Chrono.utcNow()).size(e.get(float.class, "openInterest"));
         });
     }
 
@@ -281,7 +281,7 @@ public class FTXService extends MarketService {
         return Chrono.seconds()
                 .takeAt(i -> i % 10 == 0)
                 .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
-                .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(double.class, "openInterest")));
+                .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(float.class, "openInterest")));
     }
 
     public static void main(String[] args) throws InterruptedException {
