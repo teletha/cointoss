@@ -75,6 +75,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     /** The market specific scheduler. */
     private final ScheduledThreadPoolExecutor scheduler;
 
+    private FeatherStore<OpenInterest> openInterest;
+
     /** Whether or not the current process has write access to the data. */
     protected boolean writable;
 
@@ -375,16 +377,26 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Provide the
+     * 
+     * @return
+     */
+    public final synchronized FeatherStore<OpenInterest> openInterest() {
+        if (openInterest == null) {
+            openInterest = initializeOpenInterest();
+        }
+        return openInterest;
+    }
+
+    protected FeatherStore<OpenInterest> initializeOpenInterest() {
+        return null;
+    }
+
+    /**
      * Provide the market specific tick related data if needed.
      */
     public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
         return I.signal();
-    }
-
-    public final FeatherStore<OpenInterest> openInterest = initializeOpenInterestStore();
-
-    protected FeatherStore<OpenInterest> initializeOpenInterestStore() {
-        return null;
     }
 
     /**

@@ -103,6 +103,16 @@ public final class FeatherStore<E extends TemporalData> {
      */
     public synchronized FeatherStore<E> enableActiveDataSupplier(LongFunction<Signal<E>> supplier) {
         this.supplier = supplier;
+
+        if (disk != null) {
+            long now = System.currentTimeMillis() / 1000;
+            if (disk.endTime() < now) {
+                I.signal(this).flatMap(store -> supplier.apply(disk.endTime()));
+                supplier.apply(disk.endTime()).to(item -> {
+                    System.out.println(item);
+                });
+            }
+        }
         return this;
     }
 

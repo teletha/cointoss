@@ -173,6 +173,21 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    protected FeatherStore<OpenInterest> initializeOpenInterest() {
+        if (setting.type.isSpot()) {
+            return null;
+        }
+
+        return FeatherStore.create(OpenInterest.class, Span.Minute5)
+                .enableDiskStore(file("oi.db"))
+                .enableActiveDataSupplier(time -> provideOpenInterest(Chrono.utcBySeconds(time)))
+                .enablePassiveDataSupplier(openInterestRealtimely());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
         if (setting.type.isSpot()) {
             return I.signal();
@@ -209,14 +224,13 @@ public class BinanceService extends MarketService {
                 .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(float.class, "openInterest")));
     }
 
-    private final FeatherStore<OpenInterest> oi = FeatherStore.create(OpenInterest.class, Span.Minute5).enableDiskStore(file("oi.db"));
-
     public static void main(String[] args) throws InterruptedException {
-        Binance.FUTURE_BTC_USDT.provideOpenInterest(ZonedDateTime.now().minusDays(33)).to(e -> {
-            System.out.println(e);
+        FeatherStore<OpenInterest> store = Binance.FUTURE_BTC_USDT.openInterest();
+        store.eachLatest().to(oi -> {
+            System.out.println(oi);
         });
 
-        Thread.sleep(1000 * 60);
+        Thread.sleep(1000 * 10);
     }
 
     /**
