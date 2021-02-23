@@ -31,7 +31,7 @@ import kiss.Signal;
 import kiss.model.Model;
 import psychopath.File;
 
-public final class FeatherStore<E extends TemporalData> {
+public final class FeatherStore<E extends TemporalData> implements Disposable {
 
     /** The item type. */
     private final Model<E> model;
@@ -53,9 +53,6 @@ public final class FeatherStore<E extends TemporalData> {
 
     /** The eviction policy. */
     private EvictionPolicy eviction;
-
-    /** The data supplier. */
-    private LongFunction<Signal<E>> supplier;
 
     /** The data accumulator. */
     private BiFunction<E, E, E> accumulator;
@@ -96,60 +93,34 @@ public final class FeatherStore<E extends TemporalData> {
     }
 
     /**
-     * Enable the data suppliance.
-     * 
-     * @param supplier
-     * @return Chainable API.
+     * {@inheritDoc}
      */
-    public synchronized FeatherStore<E> enableActiveDataSupplier(LongFunction<Signal<E>> supplier) {
-        this.supplier = supplier;
-
-        if (disk != null) {
-            long now = System.currentTimeMillis() / 1000;
-            if (disk.endTime() < now) {
-                I.signal(this).flatMap(store -> supplier.apply(disk.endTime()));
-                supplier.apply(disk.endTime()).to(item -> {
-                    System.out.println(item);
-                });
-            }
-        }
-        return this;
+    @Override
+    public void vandalize() {
     }
 
     /**
      * Enable the data suppliance.
      * 
-     * @param supplier
+     * @param passive
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> enablePassiveDataSupplier(Signal<E> supplier) {
-        return enablePassiveDataSupplier(supplier, (Disposable) null);
+    public FeatherStore<E> enableDataSupplier(Signal<E> passive) {
+        return enableDataSupplier(null, passive);
     }
 
     /**
      * Enable the data suppliance.
      * 
-     * @param supplier
+     * @param passive
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> enablePassiveDataSupplier(Signal<E> supplier, Disposable disposer) {
-        if (supplier != null) {
-            Disposable disposable = supplier.effectOnDispose(this::commit).to(e -> {
+    public synchronized FeatherStore<E> enableDataSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
+        if (passive != null) {
+            add(passive.effectOnDispose(this::commit).to(e -> {
                 store(e);
-            });
-
-            if (disposer != null) disposer.add(disposable);
+            }));
         }
-        return this;
-    }
-
-    /**
-     * Disable the data suppliance.
-     * 
-     * @return Chainable API.
-     */
-    public synchronized FeatherStore<E> disableActiveDataSupplier() {
-        this.supplier = null;
         return this;
     }
 
@@ -215,6 +186,19 @@ public final class FeatherStore<E extends TemporalData> {
     public FeatherStore<E> disableAccumulator() {
         this.accumulator = null;
         return this;
+    }
+
+    public long endTime() {
+        E heapLast = last();
+        long heapTime = heapLast == null ? 0 : heapLast.date().toEpochSecond();
+
+        if (disk == null) {
+            return heapTime;
+        } else {
+            long diskTime = disk.endTime();
+
+            return diskTime < heapTime ? heapTime : diskTime;
+        }
     }
 
     /**
@@ -674,23 +658,23 @@ public final class FeatherStore<E extends TemporalData> {
         }
 
         // Original Data Source
-        if (supplier != null) {
-            Signal<E> supply = supplier.apply(startTime);
-            if (supply != null) {
-                long endTime = startTime + segmentDuration;
-
-                OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
-                indexed.put(startTime, heap);
-                tryEvict(startTime);
-                supply.to(item -> {
-                    long timestamp = item.seconds();
-                    if (startTime <= timestamp && timestamp < endTime) {
-                        heap.set((int) index(timestamp)[1], item);
-                    }
-                });
-                return heap;
-            }
-        }
+        // if (supplier != null) {
+        // Signal<E> supply = supplier.apply(startTime);
+        // if (supply != null) {
+        // long endTime = startTime + segmentDuration;
+        //
+        // OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
+        // indexed.put(startTime, heap);
+        // tryEvict(startTime);
+        // supply.to(item -> {
+        // long timestamp = item.seconds();
+        // if (startTime <= timestamp && timestamp < endTime) {
+        // heap.set((int) index(timestamp)[1], item);
+        // }
+        // });
+        // return heap;
+        // }
+        // }
 
         // Not Found
         return null;

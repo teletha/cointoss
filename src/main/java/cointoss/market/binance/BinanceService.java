@@ -169,6 +169,15 @@ public class BinanceService extends MarketService {
                 .byJSON(pages.find(bidName, "*"), pages.find(askName, "*"), "0", "1", isDelivery ? setting.target.scale : -1);
     }
 
+    public static void main(String[] args) throws InterruptedException {
+        FeatherStore<OpenInterest> store = Binance.FUTURE_BTC_USDT.openInterest();
+        store.eachLatest().to(oi -> {
+            System.out.println(oi);
+        });
+
+        Thread.sleep(1000 * 10);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -180,8 +189,7 @@ public class BinanceService extends MarketService {
 
         return FeatherStore.create(OpenInterest.class, Span.Minute5)
                 .enableDiskStore(file("oi.db"))
-                .enableActiveDataSupplier(time -> provideOpenInterest(Chrono.utcBySeconds(time)))
-                .enablePassiveDataSupplier(openInterestRealtimely());
+                .enableDataSupplier(time -> provideOpenInterest(Chrono.utcBySeconds(time)), openInterestRealtimely());
     }
 
     /**
@@ -222,15 +230,6 @@ public class BinanceService extends MarketService {
                 .takeAt(i -> i % 5 == 0)
                 .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
                 .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(float.class, "openInterest")));
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        FeatherStore<OpenInterest> store = Binance.FUTURE_BTC_USDT.openInterest();
-        store.eachLatest().to(oi -> {
-            System.out.println(oi);
-        });
-
-        Thread.sleep(1000 * 10);
     }
 
     /**

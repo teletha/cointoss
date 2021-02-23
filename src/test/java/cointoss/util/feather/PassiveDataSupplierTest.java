@@ -24,7 +24,7 @@ class PassiveDataSupplierTest {
 
     @Test
     void store() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePassiveDataSupplier(supplier);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDataSupplier(supplier);
         assert store.size() == 0;
 
         stream.accept(0);

@@ -502,24 +502,25 @@ class FeatherStoreTest {
         assert store.existOnHeap(value(base * 2));
     }
 
-    @Test
-    void dataSupply() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableActiveDataSupplier(time -> {
-            return I.signal(value((int) time));
-        });
-
-        int base = (int) Span.Minute1.segmentSeconds;
-        assert store.existOnHeap(value(base * 1)) == false;
-        assert store.existOnHeap(value(base * 2)) == false;
-        assert store.existOnHeap(value(base * 3)) == false;
-        assert store.existOnHeap(value(base * 4)) == false;
-
-        // automatic creation
-        assert store.at(base * 1).value == base * 1;
-        assert store.at(base * 2).value == base * 2;
-        assert store.at(base * 3).value == base * 3;
-        assert store.at(base * 4).value == base * 4;
-    }
+    // @Test
+    // void dataSupply() {
+    // FeatherStore<Value> store = FeatherStore.create(Value.class,
+    // Span.Minute1).enableActiveDataSupplier(time -> {
+    // return I.signal(value((int) time));
+    // });
+    //
+    // int base = (int) Span.Minute1.segmentSeconds;
+    // assert store.existOnHeap(value(base * 1)) == false;
+    // assert store.existOnHeap(value(base * 2)) == false;
+    // assert store.existOnHeap(value(base * 3)) == false;
+    // assert store.existOnHeap(value(base * 4)) == false;
+    //
+    // // automatic creation
+    // assert store.at(base * 1).value == base * 1;
+    // assert store.at(base * 2).value == base * 2;
+    // assert store.at(base * 3).value == base * 3;
+    // assert store.at(base * 4).value == base * 4;
+    // }
 
     @Test
     void persist() {
