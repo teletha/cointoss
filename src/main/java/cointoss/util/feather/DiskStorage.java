@@ -92,7 +92,7 @@ class DiskStorage<T> {
             } else {
                 offsetTime = Long.MAX_VALUE;
                 startTime = Long.MAX_VALUE;
-                endTime = 0;
+                endTime = -1;
             }
         } catch (IOException e) {
             throw I.quiet(e);
@@ -290,7 +290,7 @@ class DiskStorage<T> {
      * @param truncatedTime
      */
     int read(long truncatedTime, T[] items) {
-        if (endTime == 0) {
+        if (endTime == -1) {
             return 0;
         }
 
@@ -338,6 +338,8 @@ class DiskStorage<T> {
         }
 
         long stamp = lock.writeLock();
+        int firstIndex = -1;
+        int lastIndex = -1;
 
         try {
             if (truncatedTime < offsetTime) {
@@ -359,6 +361,9 @@ class DiskStorage<T> {
                 } else {
                     buffer.put(ITEM_DEFINED);
                     codec.write(item, buffer);
+
+                    if (firstIndex == -1) firstIndex = i;
+                    lastIndex = i;
                 }
             }
 
@@ -369,7 +374,7 @@ class DiskStorage<T> {
         } catch (IOException e) {
             throw I.quiet(e);
         } finally {
-            updateTime(truncatedTime, truncatedTime + items.length * duration);
+            updateTime(truncatedTime + firstIndex * duration, truncatedTime + lastIndex * duration);
             writeHeader();
 
             lock.unlockWrite(stamp);

@@ -165,19 +165,19 @@ public class DiskStorageTest {
     @Test
     void endTime() {
         DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
-        assert storage.endTime() == 0;
+        assert storage.endTime() == -1;
 
         // insert item
         storage.write(10, new IntValue(10));
-        assert storage.endTime() == 11;
+        assert storage.endTime() == 10;
 
         // insert the post item
         storage.write(15, new IntValue(15));
-        assert storage.endTime() == 16;
+        assert storage.endTime() == 15;
 
         // insert the pre item
         storage.write(5, new IntValue(5));
-        assert storage.endTime() == 16;
+        assert storage.endTime() == 15;
     }
 
     @Test
