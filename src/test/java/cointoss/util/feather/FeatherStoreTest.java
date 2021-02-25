@@ -689,6 +689,7 @@ class FeatherStoreTest {
         assert store.endTime() == 600;
 
         store.commit();
+        store.clear();
         assert store.endTime() == 600;
     }
 }

@@ -16,14 +16,14 @@ import cointoss.util.feather.FeatherStoreTest.Value;
 import kiss.Signal;
 import kiss.Signaling;
 
-class PassiveDataSupplierTest {
+class DataSupplierTest {
 
     Signaling<Integer> stream = new Signaling();
 
     Signal<Value> supplier = stream.expose.map(Value::new);
 
     @Test
-    void store() {
+    void passive() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDataSupplier(supplier);
         assert store.size() == 0;
 

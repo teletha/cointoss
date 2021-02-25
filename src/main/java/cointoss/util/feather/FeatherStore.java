@@ -100,7 +100,17 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     }
 
     /**
-     * Enable the data suppliance.
+     * Enable the active data suppliance.
+     * 
+     * @param passive
+     * @return Chainable API.
+     */
+    public FeatherStore<E> enableDataSupplier(LongFunction<Signal<E>> active) {
+        return enableDataSupplier(active, null);
+    }
+
+    /**
+     * Enable the passive data suppliance.
      * 
      * @param passive
      * @return Chainable API.
@@ -116,12 +126,49 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @return Chainable API.
      */
     public synchronized FeatherStore<E> enableDataSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
+        if (active != null) {
+            startActiveSupplier(active, passive);
+        } else {
+            startPassiveSupplier(passive);
+        }
+        return this;
+    }
+
+    /**
+     * Invoke the active data supplier at start up.
+     * 
+     * @param active
+     * @param passive
+     */
+    private void startActiveSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
+        long start = endTime();
+
+        active.apply(start).to(e -> {
+            store(e);
+        }, error -> {
+            startPassiveSupplier(passive);
+        }, () -> {
+            long end = endTime();
+
+            if (start == end) {
+                startPassiveSupplier(passive);
+            } else {
+                startActiveSupplier(active, passive);
+            }
+        });
+    }
+
+    /**
+     * Invoke the passive data supplier at start up.
+     * 
+     * @param passive
+     */
+    private void startPassiveSupplier(Signal<E> passive) {
         if (passive != null) {
             add(passive.effectOnDispose(this::commit).to(e -> {
                 store(e);
             }));
         }
-        return this;
     }
 
     /**
