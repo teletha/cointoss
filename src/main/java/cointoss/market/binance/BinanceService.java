@@ -171,11 +171,13 @@ public class BinanceService extends MarketService {
 
     public static void main(String[] args) throws InterruptedException {
         FeatherStore<OpenInterest> store = Binance.FUTURE_BTC_USDT.openInterest();
+        Thread.sleep(1000 * 5);
         store.eachLatest().to(oi -> {
             System.out.println(oi);
         });
 
-        Thread.sleep(1000 * 10);
+        Thread.sleep(1000 * 5);
+        store.dispose();
     }
 
     /**
@@ -187,9 +189,11 @@ public class BinanceService extends MarketService {
             return null;
         }
 
-        return FeatherStore.create(OpenInterest.class, Span.Minute5)
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute5)
                 .enableDiskStore(file("oi.db"))
                 .enableDataSupplier(time -> provideOpenInterest(Chrono.utcBySeconds(time)), openInterestRealtimely());
+        add(store);
+        return store;
     }
 
     /**

@@ -144,6 +144,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         long start = endTime();
 
         active.apply(start).to(e -> {
+            System.out.println("Store " + e);
             store(e);
         }, error -> {
             startPassiveSupplier(passive);
@@ -165,7 +166,9 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     private void startPassiveSupplier(Signal<E> passive) {
         if (passive != null) {
-            add(passive.effectOnDispose(this::commit).to(e -> {
+            add(passive.effectOnDispose(this::commit).effectOnDispose(() -> {
+                System.out.println("Dispose store");
+            }).to(e -> {
                 store(e);
             }));
         }
