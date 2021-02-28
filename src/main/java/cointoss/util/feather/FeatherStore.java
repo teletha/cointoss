@@ -642,42 +642,88 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     private List<E> before(long timestamp, int maximumSize, boolean with) {
         List<E> items = new ArrayList();
-
+    
         long[] index = index(timestamp);
         long timeIndex = index[0];
         int segmentIndex = ((int) index[1]);
         OnHeap<E> segment = supply(timeIndex);
-
+    
         if (segment == null) {
             return List.of();
         }
-
+    
         if (with) {
             E item = segment.get(segmentIndex);
             if (item != null) {
                 items.add(item);
             }
         }
-
+    
         while (items.size() < maximumSize) {
             if (--segmentIndex == -1) {
                 timeIndex -= segmentDuration;
                 segment = supply(timeIndex);
-
+    
                 if (segment == null) {
                     break;
                 } else {
                     segmentIndex = itemSize - 1;
                 }
             }
-
+    
             E item = segment.get(segmentIndex);
             if (item != null) {
                 items.add(item);
             }
         }
-
+    
         return items;
+    }
+
+    /**
+     * Query items by temporal options.
+     * 
+     * @param start A starting time.
+     * @param option Your options.
+     * @return A result.
+     */
+    public Signal<E> query(long start, Consumer<TemporalQueryOption>... option) {
+        return query(start, -1, option);
+    }
+
+    /**
+     * Query items by temporal options.
+     * 
+     * @param start A starting time.
+     * @param end A ending time.
+     * @param option Your options.
+     * @return A result.
+     */
+    public Signal<E> query(long start, long end, Consumer<TemporalQueryOption>... option) {
+        return null;
+    }
+
+    /**
+     * Query items by temporal options.
+     * 
+     * @param start A starting time.
+     * @param option Your options.
+     * @return A result.
+     */
+    public Signal<E> query(TemporalData start, Consumer<TemporalQueryOption>... option) {
+        return query(start.seconds(), option);
+    }
+
+    /**
+     * Query items by temporal options.
+     * 
+     * @param start A starting time.
+     * @param end A ending time.
+     * @param option Your options.
+     * @return A result.
+     */
+    public Signal<E> query(TemporalData start, TemporalData end, Consumer<TemporalQueryOption>... option) {
+        return query(start.seconds(), end.seconds(), option);
     }
 
     /**
