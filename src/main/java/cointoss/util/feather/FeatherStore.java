@@ -11,6 +11,7 @@ package cointoss.util.feather;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -642,41 +643,41 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     private List<E> before(long timestamp, int maximumSize, boolean with) {
         List<E> items = new ArrayList();
-    
+
         long[] index = index(timestamp);
         long timeIndex = index[0];
         int segmentIndex = ((int) index[1]);
         OnHeap<E> segment = supply(timeIndex);
-    
+
         if (segment == null) {
             return List.of();
         }
-    
+
         if (with) {
             E item = segment.get(segmentIndex);
             if (item != null) {
                 items.add(item);
             }
         }
-    
+
         while (items.size() < maximumSize) {
             if (--segmentIndex == -1) {
                 timeIndex -= segmentDuration;
                 segment = supply(timeIndex);
-    
+
                 if (segment == null) {
                     break;
                 } else {
                     segmentIndex = itemSize - 1;
                 }
             }
-    
+
             E item = segment.get(segmentIndex);
             if (item != null) {
                 items.add(item);
             }
         }
-    
+
         return items;
     }
 
@@ -687,8 +688,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param option Your options.
      * @return A result.
      */
-    public Signal<E> query(long start, Consumer<TemporalQueryOption>... option) {
-        return query(start, -1, option);
+    public Signal<E> query(long start, Consumer<Option>... option) {
+        return query(start, Long.MAX_VALUE, option);
     }
 
     /**
@@ -699,7 +700,73 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param option Your options.
      * @return A result.
      */
-    public Signal<E> query(long start, long end, Consumer<TemporalQueryOption>... option) {
+    public Signal<E> query(long start, long end, Consumer<Option>... option) {
+        if (start < 0) {
+            throw new IllegalArgumentException("Start time must be position.");
+        }
+
+        if (end < 0) {
+            throw new IllegalArgumentException("End time must be position.");
+        }
+
+        boolean forward = start < end;
+        long[] startIndex = index(forward ? start : end);
+        long[] endIndex = index(forward ? end : start);
+
+        // if (end <= start) {
+        // throw new IllegalArgumentException("Start time must be earlier than end time.");
+        // }
+
+        // configre options
+        Option o = new Option();
+        for (Consumer<Option> x : option) {
+            x.accept(o);
+        }
+
+        return new Signal<>((observer, disposer) -> {
+            if (forward) {
+                Iterator<OnHeap<E>> iterator = supply(startIndex[0], endIndex[0]);
+                while (!disposer.isDisposed() && iterator.hasNext()) {
+                    OnHeap<E> heap = iterator.next();
+
+                    if (startIndex[0] == heap.startTime) {
+                        if (endIndex[0] == heap.startTime) {
+                            heap.each((int) startIndex[1], (int) endIndex[1], observer, disposer);
+                        } else {
+                            heap.each((int) startIndex[1], itemSize, observer, disposer);
+                        }
+                    } else if (endIndex[0] == heap.startTime) {
+                        heap.each(0, (int) endIndex[1], observer, disposer);
+                    } else {
+                        heap.each(0, itemSize, observer, disposer);
+                    }
+                }
+            } else {
+                Iterator<OnHeap<E>> iterator = supply(endIndex[0], startIndex[0]);
+                while (!disposer.isDisposed() && iterator.hasNext()) {
+                    OnHeap<E> heap = iterator.next();
+
+                    if (startIndex[0] == heap.startTime) {
+                        if (endIndex[0] == heap.startTime) {
+                            heap.eachLatest((int) endIndex[1], (int) startIndex[1], observer, disposer);
+                        } else {
+                            heap.eachLatest(itemSize, (int) startIndex[1], observer, disposer);
+                        }
+                    } else if (endIndex[0] == heap.startTime) {
+                        heap.eachLatest((int) endIndex[1], 0, observer, disposer);
+                    } else {
+                        heap.eachLatest(itemSize, 0, observer, disposer);
+                    }
+                }
+            }
+
+            observer.complete();
+
+            return disposer;
+        });
+    }
+
+    public Signal<E> query(Consumer<Option>... option) {
         return null;
     }
 
@@ -710,7 +777,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param option Your options.
      * @return A result.
      */
-    public Signal<E> query(TemporalData start, Consumer<TemporalQueryOption>... option) {
+    public Signal<E> query(TemporalData start, Consumer<Option>... option) {
         return query(start.seconds(), option);
     }
 
@@ -722,8 +789,76 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param option Your options.
      * @return A result.
      */
-    public Signal<E> query(TemporalData start, TemporalData end, Consumer<TemporalQueryOption>... option) {
+    public Signal<E> query(TemporalData start, TemporalData end, Consumer<Option>... option) {
         return query(start.seconds(), end.seconds(), option);
+    }
+
+    /**
+     * Get all data segments between the specified date-time.
+     * 
+     * @param start
+     * @return
+     */
+    private Iterator<OnHeap<E>> supply(long start, long end) {
+        new Iterator<>() {
+
+            boolean ascending = start <= end;
+
+            long startTime = ascending ? start : end;
+
+            long endTime = ascending ? end : start;
+
+            {
+                startTime = Math.max(startTime, indexed.firstLongKey());
+                endTime = Math.min(endTime, indexed.lastLongKey());
+
+                if (disk != null) {
+                    startTime = Math.max(startTime, disk.startTime());
+                    endTime = Math.min(endTime, disk.endTime());
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean hasNext() {
+                return startTime <= endTime;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public OnHeap<E> next() {
+                return null;
+            }
+        };
+
+        return new Signal<OnHeap<E>>((observer, disposer) -> {
+            boolean ascending = start <= end;
+            long startTime = ascending ? start : end;
+            long endTime = ascending ? end : start;
+
+            if (ascending) {
+                for (long i = startTime; i <= endTime; i += segmentDuration) {
+                    OnHeap<E> heap = supply(i);
+                    if (heap != null) {
+                        observer.accept(heap);
+                    }
+                }
+            } else {
+                for (long i = endTime; startTime <= i; i -= segmentDuration) {
+                    OnHeap<E> heap = supply(i);
+                    if (heap != null) {
+                        observer.accept(heap);
+                    }
+                }
+            }
+            observer.complete();
+
+            return disposer;
+        }).toList().iterator();
     }
 
     /**
@@ -843,6 +978,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     private static class OnHeap<T> {
 
+        private final long startTime;
+
         /** The managed items. */
         private T[] items;
 
@@ -859,6 +996,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
          * @param startTime The starting time (epoch seconds).
          */
         private OnHeap(Model<T> model, long startTime, int size) {
+            this.startTime = startTime;
             this.items = (T[]) Array.newInstance(model.type, size);
         }
 

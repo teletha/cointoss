@@ -9,13 +9,14 @@
  */
 package cointoss.util.feather;
 
-public final class TemporalQueryOption {
+public final class Option {
+
+    public static final long Latest = Long.MAX_VALUE;
+
+    public static final long Earliest = 0;
 
     /** The singleton. */
-    static final TemporalQueryOption Default = new TemporalQueryOption();
-
-    /** Option */
-    boolean forward = true;
+    static final Option Default = new Option();
 
     /** Option */
     boolean includeStart = true;
@@ -29,17 +30,14 @@ public final class TemporalQueryOption {
     /**
      * Hide constructor.
      */
-    TemporalQueryOption() {
+    Option() {
     }
 
-    /**
-     * The items are acquired in an order that goes backward from the future to the past. f not
-     * specified, the items will be retrieved in the order of going from the past to the future.
-     * 
-     * @return Chainable option.
-     */
-    public TemporalQueryOption backward() {
-        forward = false;
+    public Option from(long start) {
+        return this;
+    }
+
+    public Option fromLatest() {
         return this;
     }
 
@@ -49,7 +47,7 @@ public final class TemporalQueryOption {
      * 
      * @return Chainable option.
      */
-    public TemporalQueryOption exclude() {
+    public Option exclude() {
         return include(false, false);
     }
 
@@ -61,7 +59,7 @@ public final class TemporalQueryOption {
      * @param end
      * @return Chainable option.
      */
-    public TemporalQueryOption include(boolean start, boolean end) {
+    public Option include(boolean start, boolean end) {
         includeStart = start;
         includeEnd = end;
         return this;
@@ -73,7 +71,7 @@ public final class TemporalQueryOption {
      * @param size
      * @return
      */
-    public TemporalQueryOption max(int size) {
+    public Option max(int size) {
         if (size < 0) {
             size = -1;
         }
