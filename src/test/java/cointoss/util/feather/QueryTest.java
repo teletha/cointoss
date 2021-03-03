@@ -62,10 +62,23 @@ class QueryTest {
     }
 
     @Test
+    void latest() {
+        FeatherStore<Int> store = createFilledStore(0, 20);
+        assert equality(store.query(10), "10~20");
+        assert equality(store.query(10, Option::reverse), "10~0");
+        assert equality(store.query(Latest), "20");
+        assert equality(store.query(Latest, Option::reverse), "20~0");
+        assert equality(store.query(10, Latest), "10~20");
+        assert equality(store.query(10, Latest, Option::reverse), "20~10");
+        assert equality(store.query(Latest, 10), "20~10");
+        assert equality(store.query(Latest, 10, Option::reverse), "10~20");
+    }
+
+    @Test
     void reverse() {
         FeatherStore<Int> store = createFilledStore(0, 30);
         assert equality(store.query(15), "15~30");
-        assert equality(store.query(15), "15~0");
+        assert equality(store.query(15, Option::reverse), "15~0");
         assert equality(store.query(Latest), 30);
 
         assert equality(store.query(25, Latest), "25~30");

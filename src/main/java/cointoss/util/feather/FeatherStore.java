@@ -11,7 +11,6 @@ package cointoss.util.feather;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -689,7 +688,11 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @return A result.
      */
     public Signal<E> query(long start, Consumer<Option>... option) {
-        return query(start, Long.MAX_VALUE, option);
+        return query(start, -1, option);
+    }
+
+    public Signal<E> queryLatest(long start, long end, Consumer<Option>... option) {
+        return null;
     }
 
     /**
@@ -705,17 +708,9 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             throw new IllegalArgumentException("Start time must be position.");
         }
 
-        if (end < 0) {
+        if (end < -1) {
             throw new IllegalArgumentException("End time must be position.");
         }
-
-        boolean forward = start < end;
-        long[] startIndex = index(forward ? start : end);
-        long[] endIndex = index(forward ? end : start);
-
-        // if (end <= start) {
-        // throw new IllegalArgumentException("Start time must be earlier than end time.");
-        // }
 
         // configre options
         Option o = new Option();
@@ -723,51 +718,68 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             x.accept(o);
         }
 
-        return new Signal<>((observer, disposer) -> {
-            if (forward) {
-                Iterator<OnHeap<E>> iterator = supply(startIndex[0], endIndex[0]);
-                while (!disposer.isDisposed() && iterator.hasNext()) {
-                    OnHeap<E> heap = iterator.next();
+        if (start == Option.Latest) {
 
-                    if (startIndex[0] == heap.startTime) {
-                        if (endIndex[0] == heap.startTime) {
-                            heap.each((int) startIndex[1], (int) endIndex[1], observer, disposer);
-                        } else {
-                            heap.each((int) startIndex[1], itemSize, observer, disposer);
-                        }
-                    } else if (endIndex[0] == heap.startTime) {
-                        heap.each(0, (int) endIndex[1], observer, disposer);
-                    } else {
-                        heap.each(0, itemSize, observer, disposer);
-                    }
-                }
+        }
+
+        if (end == -1) {
+            if (o.forward) {
+                end = Option.Latest;
             } else {
-                Iterator<OnHeap<E>> iterator = supply(endIndex[0], startIndex[0]);
-                while (!disposer.isDisposed() && iterator.hasNext()) {
-                    OnHeap<E> heap = iterator.next();
+                end = start;
+                start = 0;
+            }
+        }
 
-                    if (startIndex[0] == heap.startTime) {
-                        if (endIndex[0] == heap.startTime) {
-                            heap.eachLatest((int) endIndex[1], (int) startIndex[1], observer, disposer);
-                        } else {
-                            heap.eachLatest(itemSize, (int) startIndex[1], observer, disposer);
-                        }
-                    } else if (endIndex[0] == heap.startTime) {
-                        heap.eachLatest((int) endIndex[1], 0, observer, disposer);
+        boolean forward = start < end;
+        long[] startIndex = index(forward ? start : end);
+        long[] endIndex = index(forward ? end : start);
+        o.forward = o.forward == forward;
+
+        return new Signal<>((observer, disposer) -> {
+            Consumer<OnHeap<E>> consumer = heap -> {
+                if (startIndex[0] == heap.startTime) {
+                    if (endIndex[0] == heap.startTime) {
+                        heap.each((int) startIndex[1], (int) endIndex[1], o.forward, observer, disposer);
                     } else {
-                        heap.eachLatest(itemSize, 0, observer, disposer);
+                        heap.each((int) startIndex[1], itemSize, o.forward, observer, disposer);
                     }
+                } else if (endIndex[0] == heap.startTime) {
+                    heap.each(0, (int) endIndex[1], o.forward, observer, disposer);
+                } else {
+                    heap.each(0, itemSize, o.forward, observer, disposer);
                 }
+            };
+
+            // Retrieves the segments that exist on heap or disk in the specified order.
+            // If the specified time is out of the range of the actual data time, you can shrink it
+            // to within the range of the actual data.
+            long segmentStartTime = Math.max(startIndex[0], indexed.firstLongKey());
+            long segmentEndTime = Math.min(endIndex[0], indexed.lastLongKey());
+            if (disk != null) {
+                segmentStartTime = Math.max(segmentStartTime, disk.startTime());
+                segmentEndTime = Math.min(segmentEndTime, disk.endTime());
             }
 
+            if (o.forward) {
+                for (long time = segmentStartTime; time <= segmentEndTime && !disposer.isDisposed(); time += segmentDuration) {
+                    OnHeap<E> heap = supply(time);
+                    if (heap != null) consumer.accept(heap);
+                }
+            } else {
+                for (long time = segmentEndTime; segmentStartTime <= time && !disposer.isDisposed(); time -= segmentDuration) {
+                    OnHeap<E> heap = supply(time);
+                    if (heap != null) consumer.accept(heap);
+                }
+            }
             observer.complete();
 
             return disposer;
         });
     }
 
-    public Signal<E> query(Consumer<Option>... option) {
-        return null;
+    private long latestTime() {
+
     }
 
     /**
@@ -791,74 +803,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     public Signal<E> query(TemporalData start, TemporalData end, Consumer<Option>... option) {
         return query(start.seconds(), end.seconds(), option);
-    }
-
-    /**
-     * Get all data segments between the specified date-time.
-     * 
-     * @param start
-     * @return
-     */
-    private Iterator<OnHeap<E>> supply(long start, long end) {
-        new Iterator<>() {
-
-            boolean ascending = start <= end;
-
-            long startTime = ascending ? start : end;
-
-            long endTime = ascending ? end : start;
-
-            {
-                startTime = Math.max(startTime, indexed.firstLongKey());
-                endTime = Math.min(endTime, indexed.lastLongKey());
-
-                if (disk != null) {
-                    startTime = Math.max(startTime, disk.startTime());
-                    endTime = Math.min(endTime, disk.endTime());
-                }
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean hasNext() {
-                return startTime <= endTime;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public OnHeap<E> next() {
-                return null;
-            }
-        };
-
-        return new Signal<OnHeap<E>>((observer, disposer) -> {
-            boolean ascending = start <= end;
-            long startTime = ascending ? start : end;
-            long endTime = ascending ? end : start;
-
-            if (ascending) {
-                for (long i = startTime; i <= endTime; i += segmentDuration) {
-                    OnHeap<E> heap = supply(i);
-                    if (heap != null) {
-                        observer.accept(heap);
-                    }
-                }
-            } else {
-                for (long i = endTime; startTime <= i; i -= segmentDuration) {
-                    OnHeap<E> heap = supply(i);
-                    if (heap != null) {
-                        observer.accept(heap);
-                    }
-                }
-            }
-            observer.complete();
-
-            return disposer;
-        }).toList().iterator();
     }
 
     /**
@@ -1089,6 +1033,33 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
                         return;
                     }
                     consumer.accept(avoidNPE[i]);
+                }
+            }
+        }
+
+        /**
+         * Get the time series items stored from the specified start index (inclusive) to end index
+         * (inclusive) in ascending order.
+         * 
+         * @param start A start index (included).
+         * @param end A end index (exclusive).
+         * @param forward A iteration order.
+         * @param each An item processor.
+         * @param disposer A iteration stopper.
+         */
+        void each(int start, int end, boolean forward, Consumer<? super T> consumer, Disposable disposer) {
+            start = Math.max(min, start);
+            end = Math.min(max, end);
+            T[] avoidNPE = items; // copy reference to avoid NPE by #clear
+            if (avoidNPE != null) {
+                if (forward) {
+                    for (int i = start; i <= end && !disposer.isDisposed(); i++) {
+                        consumer.accept(avoidNPE[i]);
+                    }
+                } else {
+                    for (int i = end; start <= i && !disposer.isDisposed(); i--) {
+                        consumer.accept(avoidNPE[i]);
+                    }
                 }
             }
         }

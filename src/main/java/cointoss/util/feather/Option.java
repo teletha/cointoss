@@ -19,6 +19,12 @@ public final class Option {
     static final Option Default = new Option();
 
     /** Option */
+    boolean infinite;
+
+    /** Option */
+    boolean forward = true;
+
+    /** Option */
     boolean includeStart = true;
 
     /** Option */
@@ -33,11 +39,24 @@ public final class Option {
     Option() {
     }
 
-    public Option from(long start) {
+    /**
+     * Internal usage.
+     * 
+     * @return Chainable option.
+     */
+    Option infinite() {
+        infinite = true;
         return this;
     }
 
-    public Option fromLatest() {
+    /**
+     * The items are acquired in an order that goes backward from the future to the past. f not
+     * specified, the items will be retrieved in the order of going from the past to the future.
+     * 
+     * @return Chainable option.
+     */
+    public Option reverse() {
+        forward = false;
         return this;
     }
 
