@@ -1057,6 +1057,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
          * @param disposer A iteration stopper.
          */
         void each(int start, int end, boolean forward, Consumer<? super T> consumer, Disposable disposer) {
+            System.out.println(min + "  " + max + "  " + start + "   " + end);
             start = Math.max(min, start);
             end = Math.min(max, end);
             T[] avoidNPE = items; // copy reference to avoid NPE by #clear
