@@ -38,16 +38,16 @@ public class DiskStorageTest {
         storage.write(0, new IntValue(0), new IntValue(1), new IntValue(2));
 
         IntValue[] items = new IntValue[1];
-        assert storage.read(0, items) == 1;
+        assert storage.read(0, items)[0] == 1;
         assert items[0].value == 0;
 
         items = new IntValue[2];
-        assert storage.read(0, items) == 2;
+        assert storage.read(0, items)[0] == 2;
         assert items[0].value == 0;
         assert items[1].value == 1;
 
         items = new IntValue[3];
-        assert storage.read(0, items) == 3;
+        assert storage.read(0, items)[0] == 3;
         assert items[0].value == 0;
         assert items[1].value == 1;
         assert items[2].value == 2;
@@ -59,14 +59,14 @@ public class DiskStorageTest {
         storage.write(0, new IntValue(0), new IntValue(1), new IntValue(2));
 
         IntValue[] items = new IntValue[4];
-        assert storage.read(0, items) == 3;
+        assert storage.read(0, items)[0] == 3;
         assert items[0].value == 0;
         assert items[1].value == 1;
         assert items[2].value == 2;
         assert items[3] == null;
 
         items = new IntValue[5];
-        assert storage.read(0, items) == 3;
+        assert storage.read(0, items)[0] == 3;
         assert items[0].value == 0;
         assert items[1].value == 1;
         assert items[2].value == 2;
@@ -80,17 +80,17 @@ public class DiskStorageTest {
         storage.write(0, new IntValue(0), new IntValue(1), new IntValue(2));
 
         IntValue[] items = new IntValue[1];
-        assert storage.read(2, items) == 1;
+        assert storage.read(2, items)[0] == 1;
         assert items[0].value == 2;
 
         items = new IntValue[3];
-        assert storage.read(2, items) == 1;
+        assert storage.read(2, items)[0] == 1;
         assert items[0].value == 2;
         assert items[1] == null;
         assert items[2] == null;
 
         items = new IntValue[3];
-        assert storage.read(5, items) == 0;
+        assert storage.read(5, items)[0] == 0;
         assert items[0] == null;
         assert items[1] == null;
         assert items[2] == null;
@@ -100,9 +100,9 @@ public class DiskStorageTest {
     void readNoItem() {
         DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
 
-        assert storage.read(0, new IntValue[1]) == 0;
-        assert storage.read(0, new IntValue[2]) == 0;
-        assert storage.read(5, new IntValue[3]) == 0;
+        assert storage.read(0, new IntValue[1])[0] == 0;
+        assert storage.read(0, new IntValue[2])[0] == 0;
+        assert storage.read(5, new IntValue[3])[0] == 0;
     }
 
     @Test
@@ -111,7 +111,7 @@ public class DiskStorageTest {
         storage.write(0, new IntValue(0), null, new IntValue(2));
 
         IntValue[] items = new IntValue[3];
-        assert storage.read(0, items) == 2;
+        assert storage.read(0, items)[0] == 2;
         assert items[0].value == 0;
         assert items[1] == null;
         assert items[2].value == 2;
@@ -123,7 +123,7 @@ public class DiskStorageTest {
         storage.write(0, new IntValue(0), null, null, new IntValue(3));
 
         IntValue[] items = new IntValue[4];
-        assert storage.read(0, items) == 2;
+        assert storage.read(0, items)[0] == 2;
         assert items[0].value == 0;
         assert items[1] == null;
         assert items[2] == null;
@@ -136,7 +136,7 @@ public class DiskStorageTest {
         storage.write(0, null, new IntValue(1), null, new IntValue(3), null);
 
         IntValue[] items = new IntValue[5];
-        assert storage.read(0, items) == 2;
+        assert storage.read(0, items)[0] == 2;
         assert items[0] == null;
         assert items[1].value == 1;
         assert items[2] == null;
@@ -188,7 +188,7 @@ public class DiskStorageTest {
         assert storage.offsetTime() == 60 * 60 * 24 * 31;
 
         IntValue[] items = new IntValue[3];
-        assert storage.read(base, items) == 2;
+        assert storage.read(base, items)[0] == 2;
         assert items[0].value == base;
         assert items[1] == null;
         assert items[2].value == base + 2;
@@ -197,13 +197,13 @@ public class DiskStorageTest {
         assert storage.offsetTime() == 0;
 
         items = new IntValue[3];
-        assert storage.read(0, items) == 1;
+        assert storage.read(0, items)[0] == 1;
         assert items[0].value == 0;
         assert items[1] == null;
         assert items[2] == null;
 
         items = new IntValue[3];
-        assert storage.read(base, items) == 2;
+        assert storage.read(base, items)[0] == 2;
         assert items[0].value == base;
         assert items[1] == null;
         assert items[2].value == base + 2;

@@ -161,64 +161,6 @@ class FeatherStoreTest {
     }
 
     @Test
-    void first() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(value(300));
-        assert store.first().value == 300;
-
-        store.store(value(360));
-        assert store.first().value == 300;
-
-        store.store(value(180));
-        assert store.first().value == 180;
-
-        store.store(value(204));
-        assert store.first().value == 204;
-
-        store.store(value(156));
-        assert store.first().value == 156;
-
-        store.store(value(120));
-        assert store.first().value == 120;
-    }
-
-    @Test
-    void firstOverDays() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
-        store.store(day(0), day(1), day(2), day(3), day(4));
-        assert store.first().value == 0;
-    }
-
-    @Test
-    void last() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(value(60));
-        assert store.last().value == 60;
-
-        store.store(value(120));
-        assert store.last().value == 120;
-
-        store.store(value(144));
-        assert store.last().value == 144;
-
-        store.store(value(240));
-        assert store.last().value == 240;
-
-        store.store(value(192));
-        assert store.last().value == 240;
-
-        store.store(value(360));
-        assert store.last().value == 360;
-    }
-
-    @Test
-    void lastOverDays() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
-        store.store(day(0), day(1), day(2), day(3), day(4));
-        assert store.last().value == 4 * days;
-    }
-
-    @Test
     void size() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         assert store.size() == 0;

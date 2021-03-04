@@ -10,7 +10,11 @@
 package cointoss.util.feather;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.SPARSE;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -289,9 +293,9 @@ class DiskStorage<T> {
      * 
      * @param truncatedTime
      */
-    int read(long truncatedTime, T[] items) {
+    int[] read(long truncatedTime, T[] items) {
         if (endTime == -1) {
-            return 0;
+            return new int[] {0, -1, -1};
         }
 
         long stamp = lock.readLock();
@@ -300,12 +304,14 @@ class DiskStorage<T> {
             ByteBuffer buffer = ByteBuffer.allocate(itemWidth * items.length);
             int size = channel.read(buffer, HEADER_SIZE + (truncatedTime - offsetTime) / duration * itemWidth);
             if (size == -1) {
-                return 0;
+                return new int[] {0, -1, -1};
             }
             buffer.flip();
 
             int readableItemSize = size / itemWidth;
             int skip = 0;
+            int firstIndex = -1;
+            int lastIndex = -1;
             long time = truncatedTime;
             for (int i = 0; i < readableItemSize; i++) {
                 if (buffer.get() == ITEM_UNDEFINED) {
@@ -313,10 +319,12 @@ class DiskStorage<T> {
                     skip++;
                 } else {
                     items[i] = codec.read(time, buffer);
+                    if (firstIndex == -1) firstIndex = i;
+                    lastIndex = i;
                 }
                 time += duration;
             }
-            return readableItemSize - skip;
+            return new int[] {readableItemSize - skip, firstIndex, lastIndex};
         } catch (IOException e) {
             throw I.quiet(e);
         } finally {

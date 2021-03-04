@@ -18,19 +18,11 @@ import org.junit.jupiter.api.Test;
 import cointoss.util.array.IntList;
 import kiss.Signal;
 
-class QueryTest {
-
-    private FeatherStore<Int> createFilledStore(int start, int end) {
-        FeatherStore<Int> store = FeatherStore.create(Int.class, 1, 10, 10);
-        for (int i = start; i <= end; i++) {
-            store.store(new Int(i));
-        }
-        return store;
-    }
+class QueryTest extends FeatherStoreTestBase {
 
     @Test
     void startTime() {
-        FeatherStore<Int> store = createFilledStore(0, 30);
+        FeatherStore<Value> store = createStore(values(0, 30), null);
         assert equality(store.query(0), "0~30");
         assert equality(store.query(1), "1~30");
         assert equality(store.query(2), "2~30");
@@ -38,15 +30,23 @@ class QueryTest {
         assert equality(store.query(20), "20~30");
         assert equality(store.query(30), 30);
         assert equality(store.query(40), EMPTY);
+    }
 
-        // reverse order
-        assert equality(store.query(Latest, 0), "30~0");
-        assert equality(store.query(Latest, 20), "30~20");
+    @Test
+    void startTimeOnDisk() {
+        FeatherStore<Value> store = createStore(null, values(0, 30));
+        assert equality(store.query(0), "0~30");
+
+        store = createStore(null, values(0, 30));
+        assert equality(store.query(15), "15~30");
+
+        store = createStore(null, values(0, 30));
+        assert equality(store.query(40), EMPTY);
     }
 
     @Test
     void endTime() {
-        FeatherStore<Int> store = createFilledStore(0, 30);
+        FeatherStore<Value> store = createStore(values(0, 30), null);
         assert equality(store.query(0, 5), "0~5");
         assert equality(store.query(10, 15), "10~15");
         assert equality(store.query(25, 30), "25~30");
@@ -62,8 +62,20 @@ class QueryTest {
     }
 
     @Test
+    void endTimeOnDisk() {
+        FeatherStore<Value> store = createStore(null, values(0, 30));
+        assert equality(store.query(0, 5), "0~5");
+
+        store = createStore(null, values(0, 30));
+        assert equality(store.query(15, 30), "15~30");
+
+        store = createStore(null, values(0, 30));
+        assert equality(store.query(40, 50), EMPTY);
+    }
+
+    @Test
     void latest() {
-        FeatherStore<Int> store = createFilledStore(0, 20);
+        FeatherStore<Value> store = createStore(values(0, 20), null);
         assert equality(store.query(10), "10~20");
         assert equality(store.query(10, Option::reverse), "10~0");
         assert equality(store.query(Latest), "20");
@@ -76,20 +88,19 @@ class QueryTest {
 
     @Test
     void reverse() {
-        FeatherStore<Int> store = createFilledStore(0, 30);
-        assert equality(store.query(15), "15~30");
+        FeatherStore<Value> store = createStore(values(0, 30), null);
         assert equality(store.query(15, Option::reverse), "15~0");
-        assert equality(store.query(Latest), 30);
+        assert equality(store.query(Latest, Option::reverse), "30~0");
 
-        assert equality(store.query(25, Latest), "25~30");
-        assert equality(store.query(30, 25), "30~25");
-        assert equality(store.query(25, 30), "30~25");
-        assert equality(store.query(30, 25), "25~35");
+        assert equality(store.query(25, 30, Option::reverse), "30~25");
+        assert equality(store.query(30, 25, Option::reverse), "25~30");
+        assert equality(store.query(25, Latest, Option::reverse), "30~25");
+        assert equality(store.query(Latest, 25, Option::reverse), "25~30");
     }
 
     private static final int[] EMPTY = new int[0];
 
-    private boolean equality(Signal<Int> query, String values) {
+    private boolean equality(Signal<Value> query, String values) {
         IntList ints = new IntList();
 
         for (String segment : values.replaceAll("\\s", "").split(",")) {
@@ -111,29 +122,20 @@ class QueryTest {
             }
         }
 
-        List<Int> list = query.toList();
+        List<Value> list = query.toList();
         assert list.size() == ints.size();
         for (int i = 0; i < list.size(); i++) {
-            assert list.get(i).value == ints.get(i);
+            assert list.get(i).value() == ints.get(i);
         }
         return true;
     }
 
-    private boolean equality(Signal<Int> query, int... values) {
-        List<Int> list = query.toList();
+    private boolean equality(Signal<Value> query, int... values) {
+        List<Value> list = query.toList();
         assert list.size() == values.length;
         for (int i = 0; i < list.size(); i++) {
-            assert list.get(i).value == values[i];
+            assert list.get(i).value() == values[i];
         }
         return true;
-    }
-
-    @SuppressWarnings("preview")
-    record Int(int value) implements TemporalData {
-
-        @Override
-        public long seconds() {
-            return value;
-        }
     }
 }

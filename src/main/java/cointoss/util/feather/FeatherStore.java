@@ -371,11 +371,18 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @return The first stored time series item.
      */
     public E first() {
-        OnHeap<E> entry = indexed.firstValue();
-        if (entry == null) {
-            return null;
+        OnHeap<E> heap = indexed.firstValue();
+
+        if (disk == null) {
+            return heap == null ? null : heap.first();
+        } else {
+            if (heap == null) {
+                return at(disk.startTime());
+            } else {
+                E first = heap.first();
+                return first.seconds() <= disk.startTime() ? first : at(disk.startTime());
+            }
         }
-        return entry.first();
     }
 
     /**
@@ -384,11 +391,18 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @return The last stored time series item.
      */
     public E last() {
-        OnHeap<E> entry = indexed.lastValue();
-        if (entry == null) {
-            return null;
+        OnHeap<E> heap = indexed.lastValue();
+
+        if (disk == null) {
+            return heap == null ? null : heap.last();
+        } else {
+            if (heap == null) {
+                return at(disk.endTime());
+            } else {
+                E last = heap.last();
+                return disk.endTime() < last.seconds() ? last : at(disk.endTime());
+            }
         }
-        return entry.last();
     }
 
     /**
@@ -691,10 +705,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         return query(start, -1, option);
     }
 
-    public Signal<E> queryLatest(long start, long end, Consumer<Option>... option) {
-        return null;
-    }
-
     /**
      * Query items by temporal options.
      * 
@@ -719,7 +729,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         }
 
         if (start == Option.Latest) {
-
+            E last = last();
+            start = last == null ? 0 : last.seconds();
         }
 
         if (end == -1) {
@@ -754,8 +765,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             // Retrieves the segments that exist on heap or disk in the specified order.
             // If the specified time is out of the range of the actual data time, you can shrink it
             // to within the range of the actual data.
-            long segmentStartTime = Math.max(startIndex[0], indexed.firstLongKey());
-            long segmentEndTime = Math.min(endIndex[0], indexed.lastLongKey());
+            long segmentStartTime = Math.max(startIndex[0], indexed.isEmpty() ? 0 : indexed.firstLongKey());
+            long segmentEndTime = Math.min(endIndex[0], indexed.isEmpty() ? Long.MAX_VALUE : indexed.lastLongKey());
             if (disk != null) {
                 segmentStartTime = Math.max(segmentStartTime, disk.startTime());
                 segmentEndTime = Math.min(segmentEndTime, disk.endTime());
@@ -776,10 +787,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
 
             return disposer;
         });
-    }
-
-    private long latestTime() {
-
     }
 
     /**
@@ -821,10 +828,12 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         // Disk Cache
         if (disk != null) {
             segment = new OnHeap(model, startTime, itemSize);
-            int size = disk.read(startTime, segment.items);
+            int[] result = disk.read(startTime, segment.items);
             segment.sync = true;
 
-            if (1 <= size) {
+            if (1 <= result[0]) {
+                segment.min = result[1];
+                segment.max = result[2];
                 indexed.put(startTime, segment);
                 tryEvict(startTime);
 
