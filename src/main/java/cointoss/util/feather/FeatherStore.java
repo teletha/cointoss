@@ -57,6 +57,12 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     /** The data accumulator. */
     private BiFunction<E, E, E> accumulator;
 
+    /** The date-time of first item. */
+    private long first = Long.MAX_VALUE;
+
+    /** The date-time of last item. */
+    private long last = -1;
+
     /**
      * Create the store for timeseries data.
      * 
@@ -141,7 +147,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param passive
      */
     private void startActiveSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
-        long start = endTime();
+        long start = lastTime();
 
         active.apply(start).to(e -> {
             System.out.println("Store " + e);
@@ -149,7 +155,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         }, error -> {
             startPassiveSupplier(passive);
         }, () -> {
-            long end = endTime();
+            long end = lastTime();
 
             if (start == end) {
                 startPassiveSupplier(passive);
@@ -193,17 +199,13 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     public synchronized FeatherStore<E> enableDiskStore(File databaseFile, DataCodec<E> dataType) {
         if (databaseFile != null && this.disk == null) {
             this.disk = new DiskStorage(databaseFile, dataType != null ? dataType : DataCodec.of(model), itemDuration);
+            if (disk.startTime() < first) {
+                first = disk.startTime();
+            }
+            if (last < disk.endTime()) {
+                last = disk.endTime();
+            }
         }
-        return this;
-    }
-
-    /**
-     * Disable the transparent disk persistence.
-     * 
-     * @return Chainable API.
-     */
-    public synchronized FeatherStore<E> disableDiskStore() {
-        this.disk = null;
         return this;
     }
 
@@ -236,19 +238,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     public FeatherStore<E> disableAccumulator() {
         this.accumulator = null;
         return this;
-    }
-
-    public long endTime() {
-        E heapLast = last();
-        long heapTime = heapLast == null ? 0 : heapLast.date().toEpochSecond();
-
-        if (disk == null) {
-            return heapTime;
-        } else {
-            long diskTime = disk.endTime();
-
-            return diskTime < heapTime ? heapTime : diskTime;
-        }
     }
 
     /**
@@ -296,7 +285,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param item Time series items to store.
      */
     public void store(E item) {
-        long[] index = index(item.seconds());
+        long time = item.seconds();
+        long[] index = index(time);
 
         OnHeap<E> segment = supply(index[0]);
 
@@ -311,6 +301,14 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         } else {
             E previous = segment.get((int) index[1]);
             segment.set((int) index[1], previous == null ? item : accumulator.apply(previous, item));
+        }
+
+        // update managed time
+        if (time < first) {
+            first = time;
+        }
+        if (last < time) {
+            last = time;
         }
     }
 
@@ -365,24 +363,21 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         return segment.get((int) index[1]);
     }
 
+    public long firstTime() {
+        return first;
+    }
+
+    public long lastTime() {
+        return last;
+    }
+
     /**
      * Get the first stored time series item.
      * 
      * @return The first stored time series item.
      */
     public E first() {
-        OnHeap<E> heap = indexed.firstValue();
-
-        if (disk == null) {
-            return heap == null ? null : heap.first();
-        } else {
-            if (heap == null) {
-                return at(disk.startTime());
-            } else {
-                E first = heap.first();
-                return first.seconds() <= disk.startTime() ? first : at(disk.startTime());
-            }
-        }
+        return at(first);
     }
 
     /**
@@ -391,18 +386,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @return The last stored time series item.
      */
     public E last() {
-        OnHeap<E> heap = indexed.lastValue();
-
-        if (disk == null) {
-            return heap == null ? null : heap.last();
-        } else {
-            if (heap == null) {
-                return at(disk.endTime());
-            } else {
-                E last = heap.last();
-                return disk.endTime() < last.seconds() ? last : at(disk.endTime());
-            }
-        }
+        return at(last);
     }
 
     /**
@@ -555,6 +539,14 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             segment.clear();
         }
         indexed.clear();
+
+        if (disk == null) {
+            first = Long.MAX_VALUE;
+            last = -1;
+        } else {
+            first = disk.startTime();
+            last = disk.endTime();
+        }
     }
 
     /**
@@ -748,29 +740,25 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         o.forward = o.forward == forward;
 
         return new Signal<>((observer, disposer) -> {
+            // Retrieves the segments that exist on heap or disk in the specified order.
+            // If the specified time is out of the range of the actual data time, you can shrink it
+            // to within the range of the actual data.
+            long segmentStartTime = Math.max(startIndex[0], first);
+            long segmentEndTime = Math.min(endIndex[0], last);
+
             Consumer<OnHeap<E>> consumer = heap -> {
-                if (startIndex[0] == heap.startTime) {
-                    if (endIndex[0] == heap.startTime) {
+                if (segmentStartTime == heap.startTime) {
+                    if (segmentEndTime == heap.startTime) {
                         heap.each((int) startIndex[1], (int) endIndex[1], o.forward, observer, disposer);
                     } else {
                         heap.each((int) startIndex[1], itemSize, o.forward, observer, disposer);
                     }
-                } else if (endIndex[0] == heap.startTime) {
+                } else if (segmentEndTime == heap.startTime) {
                     heap.each(0, (int) endIndex[1], o.forward, observer, disposer);
                 } else {
                     heap.each(0, itemSize, o.forward, observer, disposer);
                 }
             };
-
-            // Retrieves the segments that exist on heap or disk in the specified order.
-            // If the specified time is out of the range of the actual data time, you can shrink it
-            // to within the range of the actual data.
-            long segmentStartTime = Math.max(startIndex[0], indexed.isEmpty() ? 0 : indexed.firstLongKey());
-            long segmentEndTime = Math.min(endIndex[0], indexed.isEmpty() ? Long.MAX_VALUE : indexed.lastLongKey());
-            if (disk != null) {
-                segmentStartTime = Math.max(segmentStartTime, disk.startTime());
-                segmentEndTime = Math.min(segmentEndTime, disk.endTime());
-            }
 
             if (o.forward) {
                 for (long time = segmentStartTime; time <= segmentEndTime && !disposer.isDisposed(); time += segmentDuration) {
@@ -889,6 +877,17 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
                 disk.write(evictableTime, segment.items);
             }
             segment.clear();
+
+            System.out.println(evictableTime + "  " + first + "  " + indexed.keySet());
+            if (evictableTime <= first) {
+                OnHeap<E> heap = indexed.firstValue();
+                first = heap == null ? Long.MAX_VALUE : heap.first().seconds();
+            }
+
+            if (last < evictableTime + segmentDuration) {
+                OnHeap<E> heap = indexed.lastValue();
+                last = heap == null ? -1 : heap.last().seconds();
+            }
         }
     }
 
@@ -1057,7 +1056,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
          * @param disposer A iteration stopper.
          */
         void each(int start, int end, boolean forward, Consumer<? super T> consumer, Disposable disposer) {
-            System.out.println(min + "  " + max + "  " + start + "   " + end);
             start = Math.max(min, start);
             end = Math.min(max, end);
             T[] avoidNPE = items; // copy reference to avoid NPE by #clear

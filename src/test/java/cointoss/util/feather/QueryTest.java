@@ -46,13 +46,10 @@ class QueryTest extends FeatherStoreTestBase {
 
     @Test
     void startTimeOnMemoryAndDisk() {
-        FeatherStore<Value> store = createStore(value(30, 40), values(10, 30));
+        FeatherStore<Value> store = createStore(values(30, 40), values(10, 30));
         assert equality(store.query(0), "10~40");
 
-        store = createStore(value(30, 40), values(10, 30));
-        assert equality(store.query(15), "15~40");
-
-        store = createStore(value(30, 40), values(10, 30));
+        store = createStore(values(30, 40), values(10, 30));
         assert equality(store.query(40), 40);
     }
 

@@ -610,28 +610,28 @@ class FeatherStoreTest {
     @Test
     void endTime() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        assert store.endTime() == 0;
+        assert store.lastTime() == -1;
 
         store.store(new Value(60));
-        assert store.endTime() == 60;
+        assert store.lastTime() == 60;
 
         store.store(new Value(600));
-        assert store.endTime() == 600;
+        assert store.lastTime() == 600;
     }
 
     @Test
     void endTimeWithDisk() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
-        assert store.endTime() == 0;
+        assert store.lastTime() == -1;
 
         store.store(new Value(60));
-        assert store.endTime() == 60;
+        assert store.lastTime() == 60;
 
         store.store(new Value(600));
-        assert store.endTime() == 600;
+        assert store.lastTime() == 600;
 
         store.commit();
         store.clear();
-        assert store.endTime() == 600;
+        assert store.lastTime() == 600;
     }
 }
