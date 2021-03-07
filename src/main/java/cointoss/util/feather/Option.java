@@ -74,6 +74,26 @@ public final class Option {
      * Specifies whether to include or exclude the elements with the specified start and end times.
      * The default is to include both elements.
      * 
+     * @return Chainable option.
+     */
+    public Option excludeStart() {
+        return include(false, true);
+    }
+
+    /**
+     * Specifies whether to include or exclude the elements with the specified start and end times.
+     * The default is to include both elements.
+     * 
+     * @return Chainable option.
+     */
+    public Option excludeEnd() {
+        return include(true, false);
+    }
+
+    /**
+     * Specifies whether to include or exclude the elements with the specified start and end times.
+     * The default is to include both elements.
+     * 
      * @param start
      * @param end
      * @return Chainable option.

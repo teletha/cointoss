@@ -107,6 +107,16 @@ class QueryTest extends FeatherStoreTestBase {
         assert equality(store.query(Latest, 25, Option::reverse), "25~30");
     }
 
+    @Test
+    void escludeStart() {
+        FeatherStore<Value> store = createStore(values(0, 30), null);
+        assert equality(store.query(15, Option::excludeStart), "16~30");
+        assert equality(store.query(25, 30, Option::excludeStart), "26~30");
+        assert equality(store.query(30, 25, Option::excludeStart), "29~25");
+        assert equality(store.query(25, Latest, Option::excludeStart), "26~30");
+        assert equality(store.query(Latest, 25, Option::excludeStart), "29~25");
+    }
+
     private static final int[] EMPTY = new int[0];
 
     private boolean equality(Signal<Value> query, String values) {

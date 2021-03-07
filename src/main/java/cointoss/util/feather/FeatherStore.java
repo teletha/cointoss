@@ -759,12 +759,15 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             Consumer<OnHeap<E>> consumer = heap -> {
                 if (segmentStartTime == heap.startTime) {
                     if (segmentEndTime == heap.startTime) {
+
                         heap.each((int) startIndex[1], (int) endIndex[1], o.forward, observer, disposer);
                     } else {
-                        heap.each((int) startIndex[1], itemSize, o.forward, observer, disposer);
+                        int gap = o.forward && !o.includeStart ? 1 : 0;
+                        heap.each((int) startIndex[1] + gap, itemSize, o.forward, observer, disposer);
                     }
                 } else if (segmentEndTime == heap.startTime) {
-                    heap.each(0, (int) endIndex[1], o.forward, observer, disposer);
+                    int gap = o.forward || o.includeStart ? 0 : -1;
+                    heap.each(0, (int) endIndex[1] + gap, o.forward, observer, disposer);
                 } else {
                     heap.each(0, itemSize, o.forward, observer, disposer);
                 }
