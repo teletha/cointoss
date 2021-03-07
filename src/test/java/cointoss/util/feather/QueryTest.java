@@ -117,6 +117,22 @@ class QueryTest extends FeatherStoreTestBase {
         assert equality(store.query(Latest, 25, Option::excludeStart), "29~25");
     }
 
+    @Test
+    void max() {
+        FeatherStore<Value> store = createStore(values(0, 30), null);
+        assert equality(store.query(15, o -> o.max(10)), "15~24");
+        assert equality(store.query(25, 30, o -> o.max(10)), "25~30");
+        assert equality(store.query(30, 20, o -> o.max(5)), "30~26");
+    }
+
+    @Test
+    void maxAndReverse() {
+        FeatherStore<Value> store = createStore(values(0, 30), null);
+        assert equality(store.query(15, o -> o.max(10).reverse()), "15~6");
+        assert equality(store.query(25, 30, o -> o.max(10).reverse()), "30~25");
+        assert equality(store.query(30, 20, o -> o.max(5).reverse()), "20~24");
+    }
+
     private static final int[] EMPTY = new int[0];
 
     private boolean equality(Signal<Value> query, String values) {

@@ -31,7 +31,7 @@ public final class Option {
     boolean includeEnd = true;
 
     /** Option */
-    int max = -1;
+    int max = Integer.MAX_VALUE;
 
     /**
      * Hide constructor.
