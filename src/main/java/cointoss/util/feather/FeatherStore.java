@@ -611,43 +611,13 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     }
 
     /**
-     * Get the specified number of items before the specified item.
-     * 
-     * @param item An indexable item.
-     * @return
-     */
-    public List<E> beforeUntil(E item, int maximumSize) {
-        return beforeUntil(item.seconds(), maximumSize);
-    }
-
-    /**
      * Get the specified number of items before the specified timestamp (epoch seconds).
      * 
      * @param timestamp A time stamp.
      * @return
      */
     public List<E> beforeUntil(long timestamp, int maximumSize) {
-        return before(timestamp, maximumSize, false);
-    }
-
-    /**
-     * Get the specified number of items before the specified item.
-     * 
-     * @param item An indexable item.
-     * @return
-     */
-    public List<E> beforeUntilWith(E item, int maximumSize) {
-        return beforeUntilWith(item.seconds(), maximumSize);
-    }
-
-    /**
-     * Get the specified number of items before the specified timestamp (epoch seconds).
-     * 
-     * @param timestamp A time stamp.
-     * @return
-     */
-    public List<E> beforeUntilWith(long timestamp, int maximumSize) {
-        return before(timestamp, maximumSize, true);
+        return query(timestamp, o -> o.max(maximumSize).reverse().excludeStart()).toList();
     }
 
     /**
