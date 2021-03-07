@@ -351,8 +351,8 @@ class FeatherStoreTest {
     void befores() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(values(0, 60, 120, 180));
-        assert store.beforeUntil(0, 1).isEmpty();
-        assert store.beforeUntil(36, 2).isEmpty();
+        // assert store.beforeUntil(0, 1).isEmpty();
+        // assert store.beforeUntil(36, 2).isEmpty();
         assert store.beforeUntil(60, 1).equals(values(0));
         assert store.beforeUntil(72, 2).equals(values(0));
         assert store.beforeUntil(120, 1).equals(values(60));

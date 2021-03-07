@@ -25,10 +25,7 @@ public final class Option {
     boolean forward = true;
 
     /** Option */
-    boolean includeStart = true;
-
-    /** Option */
-    boolean includeEnd = true;
+    boolean include = true;
 
     /** Option */
     int max = Integer.MAX_VALUE;
@@ -67,40 +64,7 @@ public final class Option {
      * @return Chainable option.
      */
     public Option exclude() {
-        return include(false, false);
-    }
-
-    /**
-     * Specifies whether to include or exclude the elements with the specified start and end times.
-     * The default is to include both elements.
-     * 
-     * @return Chainable option.
-     */
-    public Option excludeStart() {
-        return include(false, true);
-    }
-
-    /**
-     * Specifies whether to include or exclude the elements with the specified start and end times.
-     * The default is to include both elements.
-     * 
-     * @return Chainable option.
-     */
-    public Option excludeEnd() {
-        return include(true, false);
-    }
-
-    /**
-     * Specifies whether to include or exclude the elements with the specified start and end times.
-     * The default is to include both elements.
-     * 
-     * @param start
-     * @param end
-     * @return Chainable option.
-     */
-    public Option include(boolean start, boolean end) {
-        includeStart = start;
-        includeEnd = end;
+        include = false;
         return this;
     }
 

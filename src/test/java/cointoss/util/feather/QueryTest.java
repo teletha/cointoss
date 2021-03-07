@@ -110,11 +110,21 @@ class QueryTest extends FeatherStoreTestBase {
     @Test
     void escludeStart() {
         FeatherStore<Value> store = createStore(values(0, 30), null);
-        assert equality(store.query(15, Option::excludeStart), "16~30");
-        assert equality(store.query(25, 30, Option::excludeStart), "26~30");
-        assert equality(store.query(30, 25, Option::excludeStart), "29~25");
-        assert equality(store.query(25, Latest, Option::excludeStart), "26~30");
-        assert equality(store.query(Latest, 25, Option::excludeStart), "29~25");
+        assert equality(store.query(15, Option::exclude), "16~30");
+        assert equality(store.query(25, 30, Option::exclude), "26~30");
+        assert equality(store.query(30, 25, Option::exclude), "29~25");
+        assert equality(store.query(25, Latest, Option::exclude), "26~30");
+        assert equality(store.query(Latest, 25, Option::exclude), "29~25");
+    }
+
+    @Test
+    void escludeStartAndReverse() {
+        FeatherStore<Value> store = createStore(values(0, 30), null);
+        // assert equality(store.query(15, o -> o.excludeStart().reverse()), "14~0");
+        // assert equality(store.query(25, 30, o -> o.excludeStart().reverse()), "29~25");
+        // assert equality(store.query(30, 25, o -> o.excludeStart().reverse()), "26~30");
+        assert equality(store.query(25, Latest, o -> o.exclude().reverse()), "29~25");
+        assert equality(store.query(Latest, 25, o -> o.exclude().reverse()), "26~30");
     }
 
     @Test
