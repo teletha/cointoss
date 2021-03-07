@@ -292,8 +292,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
 
         if (segment == null) {
             segment = new OnHeap(model, index[0], itemSize);
-            indexed.put(index[0], segment);
             tryEvict(index[0]);
+            indexed.put(index[0], segment);
         }
 
         if (accumulator == null) {
@@ -822,8 +822,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             if (1 <= result[0]) {
                 segment.min = result[1];
                 segment.max = result[2];
-                indexed.put(startTime, segment);
                 tryEvict(startTime);
+                indexed.put(startTime, segment);
 
                 return segment;
             }
@@ -878,7 +878,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             }
             segment.clear();
 
-            System.out.println(evictableTime + "  " + first + "  " + indexed.keySet());
             if (evictableTime <= first) {
                 OnHeap<E> heap = indexed.firstValue();
                 first = heap == null ? Long.MAX_VALUE : heap.first().seconds();

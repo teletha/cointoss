@@ -50,16 +50,16 @@ class FirstTimeTest extends FeatherStoreTestBase {
     }
 
     @Test
-    void memoryHasLatestData() {
-        FeatherStore<Value> store = createStore(1, 10, value(3, 4, 5), value(1, 2, 3, 4));
-        assert store.existOnHeap(value(5));
+    void memoryHasEarliestData() {
+        FeatherStore<Value> store = createStore(1, 10, value(1, 2, 3, 4, 5), value(3, 4));
+        assert store.existOnHeap(value(1));
         assert store.firstTime() == 1;
     }
 
     @Test
-    void diskHasLatestData() {
-        FeatherStore<Value> store = createStore(1, 10, value(1, 2, 3), value(3, 4, 5));
-        assert store.existOnHeap(value(5)) == false;
+    void diskHasEarliestData() {
+        FeatherStore<Value> store = createStore(1, 10, value(3, 4), value(1, 2, 3));
+        assert store.existOnHeap(value(1)) == false;
         assert store.firstTime() == 1;
     }
 }
