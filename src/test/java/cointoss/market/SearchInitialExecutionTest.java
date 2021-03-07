@@ -9,7 +9,6 @@
  */
 package cointoss.market;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -20,7 +19,6 @@ import cointoss.market.bybit.Bybit;
 import cointoss.market.coinbase.Coinbase;
 import cointoss.market.ftx.FTX;
 
-@Disabled
 class SearchInitialExecutionTest {
 
     @Test

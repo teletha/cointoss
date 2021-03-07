@@ -351,8 +351,8 @@ class FeatherStoreTest {
     void befores() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(values(0, 60, 120, 180));
-        // assert store.beforeUntil(0, 1).isEmpty();
-        // assert store.beforeUntil(36, 2).isEmpty();
+        assert store.beforeUntil(0, 1).isEmpty();
+        assert store.beforeUntil(36, 2).isEmpty();
         assert store.beforeUntil(60, 1).equals(values(0));
         assert store.beforeUntil(72, 2).equals(values(0));
         assert store.beforeUntil(120, 1).equals(values(60));
@@ -374,6 +374,35 @@ class FeatherStoreTest {
         assert store.beforeUntil(2 * days, 1).equals(values(days));
         assert store.beforeUntil(2 * days + 1, 3).equals(values(days, 0));
         assert store.beforeUntil(4 * days, 3).equals(values(3 * days, 2 * days, days));
+    }
+
+    @Test
+    void beforeWith() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
+        store.store(values(0, 60, 120, 180));
+        assert store.beforeUntilWith(0, 1).equals(values(0));
+        assert store.beforeUntilWith(36, 2).equals(values(0));
+        assert store.beforeUntilWith(60, 1).equals(values(60));
+        assert store.beforeUntilWith(72, 2).equals(values(60, 0));
+        assert store.beforeUntilWith(120, 1).equals(values(120));
+        assert store.beforeUntilWith(144, 2).equals(values(120, 60));
+        assert store.beforeUntilWith(180, 5).equals(values(180, 120, 60, 0));
+        assert store.beforeUntilWith(240, 2).equals(values(180, 120));
+        assert store.beforeUntilWith(300, 5).equals(values(180, 120, 60, 0));
+    }
+
+    @Test
+    void beforeWithOverTime() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
+        store.store(day(0), day(1), day(2), day(3), day(4));
+        assert store.beforeUntilWith(0, 1).equals(values(0));
+        assert store.beforeUntilWith(days - 1, 2).equals(values(0));
+        assert store.beforeUntilWith(days, 1).equals(values(days));
+        assert store.beforeUntilWith(days + 1, 2).equals(values(days, 0));
+        assert store.beforeUntilWith(2 * days - 1, 3).equals(values(days, 0));
+        assert store.beforeUntilWith(2 * days, 1).equals(values(2 * days));
+        assert store.beforeUntilWith(2 * days + 1, 5).equals(values(2 * days, days, 0));
+        assert store.beforeUntilWith(4 * days, 3).equals(values(4 * days, 3 * days, 2 * days));
     }
 
     @RegisterExtension

@@ -9,7 +9,6 @@
  */
 package cointoss.market;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -21,7 +20,6 @@ import cointoss.market.coinbase.Coinbase;
 import cointoss.market.ftx.FTX;
 import cointoss.util.Chrono;
 
-@Disabled
 class SearchNearestExecutionTest {
 
     @Test

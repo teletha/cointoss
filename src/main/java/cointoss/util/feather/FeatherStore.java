@@ -292,8 +292,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
 
         if (segment == null) {
             segment = new OnHeap(model, index[0], itemSize);
-            tryEvict(index[0]);
             indexed.put(index[0], segment);
+            tryEvict(index[0]);
         }
 
         if (accumulator == null) {
@@ -363,20 +363,10 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         return segment.get((int) index[1]);
     }
 
-    /**
-     * Get epoch time of the earliest item.
-     * 
-     * @return
-     */
     public long firstTime() {
         return first;
     }
 
-    /**
-     * Get epoch time of the latest item.
-     * 
-     * @return
-     */
     public long lastTime() {
         return last;
     }
@@ -611,13 +601,43 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     }
 
     /**
+     * Get the specified number of items before the specified item.
+     * 
+     * @param item An indexable item.
+     * @return
+     */
+    public List<E> beforeUntil(E item, int maximumSize) {
+        return beforeUntil(item.seconds(), maximumSize);
+    }
+
+    /**
      * Get the specified number of items before the specified timestamp (epoch seconds).
      * 
      * @param timestamp A time stamp.
      * @return
      */
     public List<E> beforeUntil(long timestamp, int maximumSize) {
-        return query(timestamp, o -> o.max(maximumSize).reverse().exclude()).toList();
+        return before(timestamp, maximumSize, false);
+    }
+
+    /**
+     * Get the specified number of items before the specified item.
+     * 
+     * @param item An indexable item.
+     * @return
+     */
+    public List<E> beforeUntilWith(E item, int maximumSize) {
+        return beforeUntilWith(item.seconds(), maximumSize);
+    }
+
+    /**
+     * Get the specified number of items before the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp A time stamp.
+     * @return
+     */
+    public List<E> beforeUntilWith(long timestamp, int maximumSize) {
+        return before(timestamp, maximumSize, true);
     }
 
     /**
@@ -680,64 +700,73 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     /**
      * Query items by temporal options.
      * 
-     * @param startTime A starting time.
-     * @param endTime A ending time.
+     * @param start A starting time.
+     * @param end A ending time.
      * @param option Your options.
      * @return A result.
      */
-    public Signal<E> query(long startTime, long endTime, Consumer<Option>... option) {
-        if (startTime < 0) {
+    public Signal<E> query(long start, long end, Consumer<Option>... option) {
+        if (start < 0) {
             throw new IllegalArgumentException("Start time must be position.");
         }
 
-        if (endTime < -1) {
+        if (end < -1) {
             throw new IllegalArgumentException("End time must be position.");
         }
 
-        // configure options
+        // configre options
         Option o = new Option();
         for (Consumer<Option> x : option) {
             x.accept(o);
         }
 
-        long start = endTime == -1 && !o.forward ? 0 : startTime == Option.Latest ? last : startTime;
-        long end = endTime == -1 ? o.forward ? Option.Latest : startTime : endTime;
+        if (start == Option.Latest) {
+            E last = last();
+            start = last == null ? 0 : last.seconds();
+        }
+
+        if (end == -1) {
+            if (o.forward) {
+                end = Option.Latest;
+            } else {
+                end = start;
+                start = 0;
+            }
+        }
+
         boolean forward = start < end;
         long[] startIndex = index(forward ? start : end);
         long[] endIndex = index(forward ? end : start);
         o.forward = o.forward == forward;
 
-        Signal<E> signal = new Signal<E>((observer, disposer) -> {
+        return new Signal<>((observer, disposer) -> {
             // Retrieves the segments that exist on heap or disk in the specified order.
             // If the specified time is out of the range of the actual data time, you can shrink it
             // to within the range of the actual data.
             long segmentStartTime = Math.max(startIndex[0], first);
             long segmentEndTime = Math.min(endIndex[0], last);
-            int[] size = {o.max};
 
             Consumer<OnHeap<E>> consumer = heap -> {
                 if (segmentStartTime == heap.startTime) {
                     if (segmentEndTime == heap.startTime) {
-                        heap.each((int) startIndex[1], (int) endIndex[1], o.forward, size, observer, disposer);
+                        heap.each((int) startIndex[1], (int) endIndex[1], o.forward, observer, disposer);
                     } else {
-                        heap.each((int) startIndex[1], itemSize, o.forward, size, observer, disposer);
+                        heap.each((int) startIndex[1], itemSize, o.forward, observer, disposer);
                     }
                 } else if (segmentEndTime == heap.startTime) {
-                    heap.each(0, (int) endIndex[1], o.forward, size, observer, disposer);
+                    heap.each(0, (int) endIndex[1], o.forward, observer, disposer);
                 } else {
-                    heap.each(0, itemSize, o.forward, size, observer, disposer);
+                    heap.each(0, itemSize, o.forward, observer, disposer);
                 }
             };
 
             if (o.forward) {
-                for (long time = segmentStartTime; time <= segmentEndTime && 0 < size[0] && !disposer
-                        .isDisposed(); time += segmentDuration) {
+                for (long time = segmentStartTime; time <= segmentEndTime && !disposer.isDisposed(); time += segmentDuration) {
                     OnHeap<E> heap = supply(time);
                     if (heap != null) consumer.accept(heap);
                 }
             } else {
-                for (long time = segmentEndTime; segmentStartTime <= time && 0 < size[0] && !disposer
-                        .isDisposed(); time -= segmentDuration) {
+                for (long time = segmentEndTime; segmentStartTime <= time && !disposer.isDisposed(); time -= segmentDuration) {
                     OnHeap<E> heap = supply(time);
                     if (heap != null) consumer.accept(heap);
                 }
@@ -746,12 +775,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
 
             return disposer;
         });
-
-        if (!o.include) {
-            signal = signal.skip(1);
-        }
-
-        return signal;
     }
 
     /**
@@ -799,8 +822,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             if (1 <= result[0]) {
                 segment.min = result[1];
                 segment.max = result[2];
-                tryEvict(startTime);
                 indexed.put(startTime, segment);
+                tryEvict(startTime);
 
                 return segment;
             }
@@ -855,6 +878,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             }
             segment.clear();
 
+            System.out.println(evictableTime + "  " + first + "  " + indexed.keySet());
             if (evictableTime <= first) {
                 OnHeap<E> heap = indexed.firstValue();
                 first = heap == null ? Long.MAX_VALUE : heap.first().seconds();
@@ -1031,17 +1055,17 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
          * @param each An item processor.
          * @param disposer A iteration stopper.
          */
-        void each(int start, int end, boolean forward, int[] size, Consumer<? super T> consumer, Disposable disposer) {
+        void each(int start, int end, boolean forward, Consumer<? super T> consumer, Disposable disposer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
             T[] avoidNPE = items; // copy reference to avoid NPE by #clear
             if (avoidNPE != null) {
                 if (forward) {
-                    for (int i = start; i <= end && 0 < size[0] && !disposer.isDisposed(); i++, size[0]--) {
+                    for (int i = start; i <= end && !disposer.isDisposed(); i++) {
                         consumer.accept(avoidNPE[i]);
                     }
                 } else {
-                    for (int i = end; start <= i && 0 < size[0] && !disposer.isDisposed(); i--, size[0]--) {
+                    for (int i = end; start <= i && !disposer.isDisposed(); i--) {
                         consumer.accept(avoidNPE[i]);
                     }
                 }

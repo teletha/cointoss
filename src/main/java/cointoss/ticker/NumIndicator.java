@@ -134,7 +134,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
             @Override
             protected Num valueAtRounded(Tick tick) {
                 double value = 0;
-                List<Tick> before = ticker.ticks.query(tick, o -> o.max(size).reverse()).toList();
+                List<Tick> before = ticker.ticks.beforeUntilWith(tick, size);
                 int actualSize = before.size();
                 for (int i = 0; i < actualSize; i++) {
                     value += NumIndicator.this.valueAt(before.get(i)).doubleValue();
@@ -154,7 +154,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
             @Override
             protected Num valueAtRounded(Tick tick) {
                 double value = 0;
-                List<Tick> previous = ticker.ticks.query(tick, o -> o.max(size).reverse()).toList();
+                List<Tick> previous = ticker.ticks.beforeUntilWith(tick, size);
                 int actualSize = previous.size();
 
                 for (int i = 0; i < actualSize; i++) {

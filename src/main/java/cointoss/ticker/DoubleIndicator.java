@@ -133,7 +133,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
             @Override
             protected double valueAtRounded(Tick tick) {
                 double value = 0;
-                List<Tick> before = ticker.ticks.query(tick, o -> o.max(size).reverse()).toList();
+                List<Tick> before = ticker.ticks.beforeUntilWith(tick, size);
                 int actualSize = before.size();
                 for (int i = 0; i < actualSize; i++) {
                     value += DoubleIndicator.this.doubleAt(before.get(i));
@@ -153,7 +153,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
             @Override
             protected double valueAtRounded(Tick tick) {
                 double value = 0;
-                List<Tick> previous = ticker.ticks.query(tick, o -> o.max(size).reverse()).toList();
+                List<Tick> previous = ticker.ticks.beforeUntilWith(tick, size);
                 int actualSize = previous.size();
                 for (int i = 0; i < actualSize; i++) {
                     value += DoubleIndicator.this.doubleAt(previous.get(i)) * (actualSize - i);
