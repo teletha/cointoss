@@ -745,28 +745,31 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             // to within the range of the actual data.
             long segmentStartTime = Math.max(startIndex[0], first);
             long segmentEndTime = Math.min(endIndex[0], last);
+            int[] size = {o.max};
 
             Consumer<OnHeap<E>> consumer = heap -> {
                 if (segmentStartTime == heap.startTime) {
                     if (segmentEndTime == heap.startTime) {
-                        heap.each((int) startIndex[1], (int) endIndex[1], o.forward, observer, disposer);
+                        heap.each((int) startIndex[1], (int) endIndex[1], o.forward, size, observer, disposer);
                     } else {
-                        heap.each((int) startIndex[1], itemSize, o.forward, observer, disposer);
+                        heap.each((int) startIndex[1], itemSize, o.forward, size, observer, disposer);
                     }
                 } else if (segmentEndTime == heap.startTime) {
-                    heap.each(0, (int) endIndex[1], o.forward, observer, disposer);
+                    heap.each(0, (int) endIndex[1], o.forward, size, observer, disposer);
                 } else {
-                    heap.each(0, itemSize, o.forward, observer, disposer);
+                    heap.each(0, itemSize, o.forward, size, observer, disposer);
                 }
             };
 
             if (o.forward) {
-                for (long time = segmentStartTime; time <= segmentEndTime && !disposer.isDisposed(); time += segmentDuration) {
+                for (long time = segmentStartTime; time <= segmentEndTime && 0 < size[0] && !disposer
+                        .isDisposed(); time += segmentDuration) {
                     OnHeap<E> heap = supply(time);
                     if (heap != null) consumer.accept(heap);
                 }
             } else {
-                for (long time = segmentEndTime; segmentStartTime <= time && !disposer.isDisposed(); time -= segmentDuration) {
+                for (long time = segmentEndTime; segmentStartTime <= time && 0 < size[0] && !disposer
+                        .isDisposed(); time -= segmentDuration) {
                     OnHeap<E> heap = supply(time);
                     if (heap != null) consumer.accept(heap);
                 }
@@ -1054,17 +1057,17 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
          * @param each An item processor.
          * @param disposer A iteration stopper.
          */
-        void each(int start, int end, boolean forward, Consumer<? super T> consumer, Disposable disposer) {
+        void each(int start, int end, boolean forward, int[] size, Consumer<? super T> consumer, Disposable disposer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
             T[] avoidNPE = items; // copy reference to avoid NPE by #clear
             if (avoidNPE != null) {
                 if (forward) {
-                    for (int i = start; i <= end && !disposer.isDisposed(); i++) {
+                    for (int i = start; i <= end && 0 < size[0] && !disposer.isDisposed(); i++, size[0]--) {
                         consumer.accept(avoidNPE[i]);
                     }
                 } else {
-                    for (int i = end; start <= i && !disposer.isDisposed(); i--) {
+                    for (int i = end; start <= i && 0 < size[0] && !disposer.isDisposed(); i--, size[0]--) {
                         consumer.accept(avoidNPE[i]);
                     }
                 }
