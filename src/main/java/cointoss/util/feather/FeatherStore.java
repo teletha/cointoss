@@ -714,7 +714,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             throw new IllegalArgumentException("End time must be position.");
         }
 
-        // configre options
+        // configure options
         Option o = new Option();
         for (Consumer<Option> x : option) {
             x.accept(o);
@@ -743,18 +743,18 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             // Retrieves the segments that exist on heap or disk in the specified order.
             // If the specified time is out of the range of the actual data time, you can shrink it
             // to within the range of the actual data.
-            long segmentStartTime = Math.max(startIndex[0], first);
-            long segmentEndTime = Math.min(endIndex[0], last);
+            long segmentStart = Math.max(startIndex[0], first);
+            long segmentEnd = Math.min(endIndex[0], last);
             int[] size = {o.max};
 
             Consumer<OnHeap<E>> consumer = heap -> {
-                if (segmentStartTime == heap.startTime) {
-                    if (segmentEndTime == heap.startTime) {
+                if (segmentStart == heap.startTime) {
+                    if (segmentEnd == heap.startTime) {
                         heap.each((int) startIndex[1], (int) endIndex[1], o.forward, size, observer, disposer);
                     } else {
                         heap.each((int) startIndex[1], itemSize, o.forward, size, observer, disposer);
                     }
-                } else if (segmentEndTime == heap.startTime) {
+                } else if (segmentEnd == heap.startTime) {
                     heap.each(0, (int) endIndex[1], o.forward, size, observer, disposer);
                 } else {
                     heap.each(0, itemSize, o.forward, size, observer, disposer);
@@ -762,14 +762,12 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             };
 
             if (o.forward) {
-                for (long time = segmentStartTime; time <= segmentEndTime && 0 < size[0] && !disposer
-                        .isDisposed(); time += segmentDuration) {
+                for (long time = segmentStart; time <= segmentEnd && 0 < size[0] && !disposer.isDisposed(); time += segmentDuration) {
                     OnHeap<E> heap = supply(time);
                     if (heap != null) consumer.accept(heap);
                 }
             } else {
-                for (long time = segmentEndTime; segmentStartTime <= time && 0 < size[0] && !disposer
-                        .isDisposed(); time -= segmentDuration) {
+                for (long time = segmentEnd; segmentStart <= time && 0 < size[0] && !disposer.isDisposed(); time -= segmentDuration) {
                     OnHeap<E> heap = supply(time);
                     if (heap != null) consumer.accept(heap);
                 }
