@@ -123,6 +123,13 @@ class QueryTest extends FeatherStoreTestBase {
         assert equality(store.query(30, 20, o -> o.max(5).reverse()), "20~24");
     }
 
+    @Test
+    void sparseSegment() {
+        FeatherStore<Value> store = createStore(value(0, 1, 7, 9, 11, 15), null);
+        assert equality(store.query(0), 0, 1, 7, 9, 11, 15);
+        assert equality(store.query(0, o -> o.max(5)), 0, 1, 7, 9, 11);
+    }
+
     private static final int[] EMPTY = new int[0];
 
     private boolean equality(Signal<Value> query, String values) {

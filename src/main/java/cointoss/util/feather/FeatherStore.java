@@ -743,20 +743,24 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             // Retrieves the segments that exist on heap or disk in the specified order.
             // If the specified time is out of the range of the actual data time, you can shrink it
             // to within the range of the actual data.
-            long segmentStart = Math.max(startIndex[0], first);
-            long segmentEnd = Math.min(endIndex[0], last);
+            long segmentStart = Math.max(startIndex[0], index(first)[0]);
+            long segmentEnd = Math.min(endIndex[0], index(last)[0]);
             int[] size = {o.max};
 
             Consumer<OnHeap<E>> consumer = heap -> {
                 if (segmentStart == heap.startTime) {
                     if (segmentEnd == heap.startTime) {
+                        // start and end segments are same
                         heap.each((int) startIndex[1], (int) endIndex[1], o.forward, size, observer, disposer);
                     } else {
+                        // start segment
                         heap.each((int) startIndex[1], itemSize, o.forward, size, observer, disposer);
                     }
                 } else if (segmentEnd == heap.startTime) {
+                    // end segment
                     heap.each(0, (int) endIndex[1], o.forward, size, observer, disposer);
                 } else {
+                    // full segment
                     heap.each(0, itemSize, o.forward, size, observer, disposer);
                 }
             };
@@ -1061,12 +1065,18 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             T[] avoidNPE = items; // copy reference to avoid NPE by #clear
             if (avoidNPE != null) {
                 if (forward) {
-                    for (int i = start; i <= end && 0 < size[0] && !disposer.isDisposed(); i++, size[0]--) {
-                        consumer.accept(avoidNPE[i]);
+                    for (int i = start; i <= end && 0 < size[0] && !disposer.isDisposed(); i++) {
+                        if (avoidNPE[i] != null) {
+                            consumer.accept(avoidNPE[i]);
+                            size[0]--;
+                        }
                     }
                 } else {
-                    for (int i = end; start <= i && 0 < size[0] && !disposer.isDisposed(); i--, size[0]--) {
-                        consumer.accept(avoidNPE[i]);
+                    for (int i = end; start <= i && 0 < size[0] && !disposer.isDisposed(); i--) {
+                        if (avoidNPE[i] != null) {
+                            consumer.accept(avoidNPE[i]);
+                            size[0]--;
+                        }
                     }
                 }
             }
