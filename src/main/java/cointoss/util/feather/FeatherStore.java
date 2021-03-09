@@ -735,6 +735,13 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         }
 
         boolean forward = start < end;
+        if (o.excludeStart == 1) {
+            if (forward) {
+                start += itemDuration;
+            } else {
+                end -= itemDuration;
+            }
+        }
         long[] startIndex = index(forward ? start : end);
         long[] endIndex = index(forward ? end : start);
         o.forward = o.forward == forward;
@@ -745,35 +752,25 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             // to within the range of the actual data.
             long segmentStart = Math.max(startIndex[0], index(first)[0]);
             long segmentEnd = Math.min(endIndex[0], index(last)[0]);
-            int[] size = {o.max};
-
-            Consumer<OnHeap<E>> consumer = heap -> {
-                if (segmentStart == heap.startTime) {
-                    if (segmentEnd == heap.startTime) {
-                        // start and end segments are same
-                        heap.each((int) startIndex[1], (int) endIndex[1], o.forward, size, observer, disposer);
-                    } else {
-                        // start segment
-                        heap.each((int) startIndex[1], itemSize, o.forward, size, observer, disposer);
-                    }
-                } else if (segmentEnd == heap.startTime) {
-                    // end segment
-                    heap.each(0, (int) endIndex[1], o.forward, size, observer, disposer);
-                } else {
-                    // full segment
-                    heap.each(0, itemSize, o.forward, size, observer, disposer);
-                }
-            };
+            int size = o.max;
 
             if (o.forward) {
-                for (long time = segmentStart; time <= segmentEnd && 0 < size[0] && !disposer.isDisposed(); time += segmentDuration) {
+                for (long time = segmentStart; time <= segmentEnd && 0 < size && !disposer.isDisposed(); time += segmentDuration) {
                     OnHeap<E> heap = supply(time);
-                    if (heap != null) consumer.accept(heap);
+                    if (heap != null) {
+                        int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
+                        int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
+                        size = heap.each(open, close, o.forward, size, observer, disposer);
+                    }
                 }
             } else {
-                for (long time = segmentEnd; segmentStart <= time && 0 < size[0] && !disposer.isDisposed(); time -= segmentDuration) {
+                for (long time = segmentEnd; segmentStart <= time && 0 < size && !disposer.isDisposed(); time -= segmentDuration) {
                     OnHeap<E> heap = supply(time);
-                    if (heap != null) consumer.accept(heap);
+                    if (heap != null) {
+                        int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
+                        int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
+                        size = heap.each(open, close, o.forward, size, observer, disposer);
+                    }
                 }
             }
             observer.complete();
@@ -1059,27 +1056,28 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
          * @param each An item processor.
          * @param disposer A iteration stopper.
          */
-        void each(int start, int end, boolean forward, int[] size, Consumer<? super T> consumer, Disposable disposer) {
+        int each(int start, int end, boolean forward, int size, Consumer<? super T> consumer, Disposable disposer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
             T[] avoidNPE = items; // copy reference to avoid NPE by #clear
             if (avoidNPE != null) {
                 if (forward) {
-                    for (int i = start; i <= end && 0 < size[0] && !disposer.isDisposed(); i++) {
+                    for (int i = start; i <= end && 0 < size && !disposer.isDisposed(); i++) {
                         if (avoidNPE[i] != null) {
                             consumer.accept(avoidNPE[i]);
-                            size[0]--;
+                            size--;
                         }
                     }
                 } else {
-                    for (int i = end; start <= i && 0 < size[0] && !disposer.isDisposed(); i--) {
+                    for (int i = end; start <= i && 0 < size && !disposer.isDisposed(); i--) {
                         if (avoidNPE[i] != null) {
                             consumer.accept(avoidNPE[i]);
-                            size[0]--;
+                            size--;
                         }
                     }
                 }
             }
+            return size;
         }
 
         /**

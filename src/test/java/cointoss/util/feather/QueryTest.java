@@ -124,9 +124,27 @@ class QueryTest extends FeatherStoreTestBase {
     }
 
     @Test
+    void excludeStart() {
+        FeatherStore<Value> store = createStore(values(0, 30), null);
+        assert equality(store.query(15, Option::exclude), "16~30");
+        assert equality(store.query(25, 30, Option::exclude), "26~30");
+        assert equality(store.query(30, 20, Option::exclude), "29~20");
+    }
+
+    @Test
+    void excludeStartAndReverse() {
+        FeatherStore<Value> store = createStore(values(0, 30), null);
+        assert equality(store.query(15, o -> o.exclude().reverse()), "14~0");
+        assert equality(store.query(25, 30, o -> o.exclude().reverse()), "29~25");
+        assert equality(store.query(30, 20, o -> o.exclude().reverse()), "21~30");
+        assert equality(store.query(25, 40, o -> o.exclude().reverse()), "30~25");
+    }
+
+    @Test
     void sparseSegment() {
         FeatherStore<Value> store = createStore(value(0, 1, 7, 9, 11, 15), null);
         assert equality(store.query(0), 0, 1, 7, 9, 11, 15);
+        assert equality(store.query(15, o -> o.reverse()), 15, 11, 9, 7, 1, 0);
         assert equality(store.query(0, o -> o.max(5)), 0, 1, 7, 9, 11);
     }
 
