@@ -25,7 +25,7 @@ public final class Option {
     boolean forward = true;
 
     /** Option */
-    int excludeStart;
+    boolean excludeStart;
 
     /** Option */
     int max = Integer.MAX_VALUE;
@@ -64,7 +64,7 @@ public final class Option {
      * @return Chainable option.
      */
     public Option exclude() {
-        excludeStart = 1;
+        excludeStart = true;
         return this;
     }
 

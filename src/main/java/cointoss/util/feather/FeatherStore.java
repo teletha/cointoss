@@ -607,7 +607,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @return
      */
     public List<E> beforeUntil(E item, int maximumSize) {
-        return beforeUntil(item.seconds(), maximumSize);
+        return query(item.seconds(), 0, o -> o.exclude().max(maximumSize)).toList();
     }
 
     /**
@@ -617,7 +617,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @return
      */
     public List<E> beforeUntil(long timestamp, int maximumSize) {
-        return before(timestamp, maximumSize, false);
+        return query(timestamp, 0, o -> o.exclude().max(maximumSize)).toList();
     }
 
     /**
@@ -627,17 +627,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @return
      */
     public List<E> beforeUntilWith(E item, int maximumSize) {
-        return beforeUntilWith(item.seconds(), maximumSize);
-    }
-
-    /**
-     * Get the specified number of items before the specified timestamp (epoch seconds).
-     * 
-     * @param timestamp A time stamp.
-     * @return
-     */
-    public List<E> beforeUntilWith(long timestamp, int maximumSize) {
-        return before(timestamp, maximumSize, true);
+        return query(item.seconds(), 0, o -> o.max(maximumSize)).toList();
     }
 
     /**
@@ -741,6 +731,16 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             long[] startIndex = index(forward ? s : e);
             long[] endIndex = index(forward ? e : s);
             forward = o.forward == forward;
+
+            if (o.excludeStart) {
+                if (forward) {
+                    startIndex[1] += 1;
+                } else {
+                    if (e <= last) {
+                        endIndex[1] -= 1;
+                    }
+                }
+            }
 
             // Retrieves the segments that exist on heap or disk in the specified order.
             // If the specified time is out of the range of the actual data time, you can shrink it
