@@ -26,6 +26,7 @@ import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.feather.Option;
 import cointoss.verify.BackTest;
 import kiss.Signal;
 
@@ -56,7 +57,9 @@ public class TouchMovingAverage extends Trader {
                         entries.remove(latest).stop();
                     }
 
-                    if (!ticker.ticks.eachInside(latest, now).all(tick -> tick.highPrice().isLessThan(sma.valueAt(tick))).to().v) {
+                    if (!ticker.ticks.query(latest, now, Option::exclude)
+                            .all(tick -> tick.highPrice().isLessThan(sma.valueAt(tick)))
+                            .to().v) {
                         return false;
                     }
                     return true;
@@ -77,7 +80,9 @@ public class TouchMovingAverage extends Trader {
                         entries.remove(latest).stop();
                     }
 
-                    if (!ticker.ticks.eachInside(latest, now).all(tick -> tick.highPrice().isGreaterThan(sma.valueAt(tick))).to().v) {
+                    if (!ticker.ticks.query(latest, now, Option::exclude)
+                            .all(tick -> tick.highPrice().isGreaterThan(sma.valueAt(tick)))
+                            .to().v) {
                         return false;
                     }
                     return true;

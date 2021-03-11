@@ -479,18 +479,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * Get the time series items stored from the specified start time to end time in ascending
      * order.
      * 
-     * @param start A start time (excluded).
-     * @param end A end time (excluded).
-     * @return An item stream.
-     */
-    public Signal<E> eachInside(E start, E end) {
-        return each(start.seconds() + itemDuration, end.seconds() - itemDuration);
-    }
-
-    /**
-     * Get the time series items stored from the specified start time to end time in ascending
-     * order.
-     * 
      * @param start A start time (included).
      * @param end A end time (included).
      * @return An item stream.
@@ -559,16 +547,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     }
 
     /**
-     * Get the most recent item that matches the conditions before the indexable item.
-     * 
-     * @param item An indexable item.
-     * @return A matched item or null.
-     */
-    public E before(E item, Predicate<E> condition) {
-        return before(item.seconds(), condition);
-    }
-
-    /**
      * Get the item just before the specified timestamp (epoch seconds).
      * 
      * @param timestamp A time stamp.
@@ -576,6 +554,16 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     public E before(long timestamp) {
         return at(timestamp - itemDuration);
+    }
+
+    /**
+     * Get the most recent item that matches the conditions before the indexable item.
+     * 
+     * @param item An indexable item.
+     * @return A matched item or null.
+     */
+    public E before(E item, Predicate<E> condition) {
+        return before(item.seconds(), condition);
     }
 
     /**
