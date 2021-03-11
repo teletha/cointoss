@@ -23,8 +23,8 @@ import kiss.Managed;
 import kiss.Singleton;
 import kiss.Storable;
 import kiss.Variable;
+import trademate.chart.builtin.OpenInterestIndicator;
 import trademate.chart.builtin.SMAIndicator;
-import trademate.chart.builtin.TrendLineIndicator;
 import trademate.chart.builtin.VolumeIndicator;
 import trademate.chart.builtin.WaveTrendIndicator;
 
@@ -195,7 +195,7 @@ class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
      * @return
      */
     protected List<Class<? extends PlotScript>> defaults() {
-        return List.of(SMAIndicator.class, VolumeIndicator.class, WaveTrendIndicator.class, TrendLineIndicator.class);
+        return List.of(SMAIndicator.class, VolumeIndicator.class, WaveTrendIndicator.class, OpenInterestIndicator.class);
     }
 
     /**
