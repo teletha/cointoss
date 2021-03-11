@@ -10,7 +10,6 @@
 package cointoss.util.feather;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -606,74 +605,8 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param item An indexable item.
      * @return
      */
-    public List<E> beforeUntil(E item, int maximumSize) {
-        return query(item.seconds(), 0, o -> o.exclude().max(maximumSize)).toList();
-    }
-
-    /**
-     * Get the specified number of items before the specified timestamp (epoch seconds).
-     * 
-     * @param timestamp A time stamp.
-     * @return
-     */
-    public List<E> beforeUntil(long timestamp, int maximumSize) {
-        return query(timestamp, 0, o -> o.exclude().max(maximumSize)).toList();
-    }
-
-    /**
-     * Get the specified number of items before the specified item.
-     * 
-     * @param item An indexable item.
-     * @return
-     */
     public List<E> beforeUntilWith(E item, int maximumSize) {
         return query(item.seconds(), 0, o -> o.max(maximumSize)).toList();
-    }
-
-    /**
-     * Get the specified number of items before the specified timestamp (epoch seconds).
-     * 
-     * @param timestamp A time stamp.
-     * @return
-     */
-    private List<E> before(long timestamp, int maximumSize, boolean with) {
-        List<E> items = new ArrayList();
-
-        long[] index = index(timestamp);
-        long timeIndex = index[0];
-        int segmentIndex = ((int) index[1]);
-        OnHeap<E> segment = supply(timeIndex);
-
-        if (segment == null) {
-            return List.of();
-        }
-
-        if (with) {
-            E item = segment.get(segmentIndex);
-            if (item != null) {
-                items.add(item);
-            }
-        }
-
-        while (items.size() < maximumSize) {
-            if (--segmentIndex == -1) {
-                timeIndex -= segmentDuration;
-                segment = supply(timeIndex);
-
-                if (segment == null) {
-                    break;
-                } else {
-                    segmentIndex = itemSize - 1;
-                }
-            }
-
-            E item = segment.get(segmentIndex);
-            if (item != null) {
-                items.add(item);
-            }
-        }
-
-        return items;
     }
 
     /**

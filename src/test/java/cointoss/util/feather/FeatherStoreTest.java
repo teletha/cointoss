@@ -347,35 +347,6 @@ class FeatherStoreTest {
         assert store.before(2 * days + 1).value == days;
     }
 
-    @Test
-    void befores() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(values(0, 60, 120, 180));
-        assert store.beforeUntil(0, 1).isEmpty();
-        assert store.beforeUntil(36, 2).isEmpty();
-        assert store.beforeUntil(60, 1).equals(values(0));
-        assert store.beforeUntil(72, 2).equals(values(0));
-        assert store.beforeUntil(120, 1).equals(values(60));
-        assert store.beforeUntil(144, 2).equals(values(60, 0));
-        assert store.beforeUntil(180, 3).equals(values(120, 60, 0));
-        assert store.beforeUntil(240, 2).equals(values(180, 120));
-        assert store.beforeUntil(300, 5).equals(values(180, 120, 60, 0));
-    }
-
-    @Test
-    void beforesOverTime() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
-        store.store(day(0), day(1), day(2), day(3), day(4));
-        assert store.beforeUntil(0, 1).isEmpty();
-        assert store.beforeUntil(days - 1, 2).isEmpty();
-        assert store.beforeUntil(days, 1).equals(values(0));
-        assert store.beforeUntil(days + 1, 2).equals(values(0));
-        assert store.beforeUntil(2 * days - 1, 3).equals(values(0));
-        assert store.beforeUntil(2 * days, 1).equals(values(days));
-        assert store.beforeUntil(2 * days + 1, 3).equals(values(days, 0));
-        assert store.beforeUntil(4 * days, 3).equals(values(3 * days, 2 * days, days));
-    }
-
     @RegisterExtension
     CleanRoom room = new CleanRoom();
 

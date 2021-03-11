@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.ticker.Span;
 import cointoss.util.array.IntList;
 import kiss.Signal;
 
@@ -146,6 +147,34 @@ class QueryTest extends FeatherStoreTestBase {
         assert equality(store.query(0), 0, 1, 7, 9, 11, 15);
         assert equality(store.query(15, o -> o.reverse()), 15, 11, 9, 7, 1, 0);
         assert equality(store.query(0, o -> o.max(5)), 0, 1, 7, 9, 11);
+    }
+
+    @Test
+    void before() {
+        FeatherStore<Value> store = createStore(Span.Minute1, value(0, 60, 120, 180), null);
+        assert equality(store.query(0, o -> o.before().max(1)), EMPTY);
+        assert equality(store.query(36, o -> o.before().max(2)), EMPTY);
+        assert equality(store.query(60, o -> o.before().max(1)), 0);
+        assert equality(store.query(72, o -> o.before().max(2)), 0);
+        assert equality(store.query(120, o -> o.before().max(1)), 60);
+        assert equality(store.query(144, o -> o.before().max(2)), 60, 0);
+        assert equality(store.query(180, o -> o.before().max(3)), 120, 60, 0);
+        assert equality(store.query(240, o -> o.before().max(2)), 180, 120);
+        assert equality(store.query(300, o -> o.before().max(5)), 180, 120, 60, 0);
+    }
+
+    @Test
+    void beforesOverTime() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
+        store.store(day(0), day(1), day(2), day(3), day(4));
+        assert equality(store.query(0, o -> o.before().max(1)), EMPTY);
+        assert equality(store.query(days - 1, o -> o.before().max(2)), EMPTY);
+        assert equality(store.query(days, o -> o.before().max(1)), 0);
+        assert equality(store.query(days + 1, o -> o.before().max(2)), 0);
+        assert equality(store.query(2 * days - 1, o -> o.before().max(3)), 0);
+        assert equality(store.query(2 * days, o -> o.before().max(1)), days);
+        assert equality(store.query(2 * days + 1, o -> o.before().max(3)), days, 0);
+        assert equality(store.query(4 * days, o -> o.before().max(3)), 3 * days, 2 * days, 1 * days);
     }
 
     private static final int[] EMPTY = new int[0];

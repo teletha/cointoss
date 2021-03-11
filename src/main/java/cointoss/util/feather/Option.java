@@ -47,6 +47,15 @@ public final class Option {
     }
 
     /**
+     * Shorthand method of {@link #reverse()} and {@link #exclude()}.
+     * 
+     * @return Chainable option.
+     */
+    public Option before() {
+        return reverse().exclude();
+    }
+
+    /**
      * The items are acquired in an order that goes backward from the future to the past. f not
      * specified, the items will be retrieved in the order of going from the past to the future.
      * 
