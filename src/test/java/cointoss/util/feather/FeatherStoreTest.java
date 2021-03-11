@@ -9,10 +9,7 @@
  */
 package cointoss.util.feather;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,7 +24,6 @@ import cointoss.MarketType;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.Chrono;
-import kiss.I;
 import psychopath.File;
 import psychopath.Locator;
 
@@ -183,126 +179,6 @@ class FeatherStoreTest {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.size() == 5;
-    }
-
-    @Test
-    void each() {
-        // padding right
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(value(0), value(60), value(120), value(180), value(240), value(300), value(360));
-
-        List<Value> list = new ArrayList();
-        store.each(list::add);
-        assertIterableEquals(values(0, 60, 120, 180, 240, 300, 360), list);
-
-        // padding both sides
-        store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(value(180), value(240), value(300), value(360));
-
-        list = new ArrayList();
-        store.each(list::add);
-        assertIterableEquals(values(180, 240, 300, 360), list);
-
-        // padding left side
-        store = FeatherStore.create(Value.class, Span.Hour4);
-        store.store(value(3600 * 12), value(3600 * 16), value(3600 * 20));
-
-        list = new ArrayList();
-        store.each(list::add);
-        assertIterableEquals(values(3600 * 12, 3600 * 16, 3600 * 20), list);
-    }
-
-    @Test
-    void eachOverDays() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
-        store.store(day(0), day(1), day(2), day(3), day(4));
-
-        List<Value> list = new ArrayList();
-        store.each(list::add);
-        assertIterableEquals(values(0, days, 2 * days, 3 * days, 4 * days), list);
-    }
-
-    @Test
-    void eachByTime() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(I.signal(60, 120, 180, 240, 300, 360, 420).map(this::value));
-
-        List<Value> list = new ArrayList();
-        store.each(120, 420, list::add);
-        assertIterableEquals(values(120, 180, 240, 300, 360, 420), list);
-
-        list = new ArrayList();
-        store.each(120, 419, list::add);
-        assertIterableEquals(values(120, 180, 240, 300, 360), list);
-
-        list = new ArrayList();
-        store.each(120, 361, list::add);
-        assertIterableEquals(values(120, 180, 240, 300, 360), list);
-
-        list = new ArrayList();
-        store.each(0, 180, list::add);
-        assertIterableEquals(values(60, 120, 180), list);
-
-        list = new ArrayList();
-        store.each(1200, 1800, list::add);
-        assertIterableEquals(values(), list);
-    }
-
-    @Test
-    void eachByTimeOverDays() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
-        store.store(day(0), day(1), day(2), day(3), day(4));
-
-        List<Value> list = new ArrayList();
-        store.each(0, 2 * days, list::add);
-        assertIterableEquals(values(0, days, 2 * days), list);
-
-        list = new ArrayList();
-        store.each(days, 3 * days, list::add);
-        assertIterableEquals(values(days, 2 * days, 3 * days), list);
-
-        list = new ArrayList();
-        store.each(3 * days, 4 * days, list::add);
-        assertIterableEquals(values(3 * days, 4 * days), list);
-    }
-
-    @Test
-    void eachByItem() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(values(0, 60, 120, 180, 240, 300, 360));
-
-        List<Value> items = store.each(store.at(0), store.at(180)).toList();
-        assert items.size() == 4;
-        assert items.get(0).value == 0;
-        assert items.get(1).value == 60;
-        assert items.get(2).value == 120;
-        assert items.get(3).value == 180;
-    }
-
-    @Test
-    void eachLatest() {
-        // padding right
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(values(0, 60, 120, 180, 240, 300, 360));
-
-        List<Value> list = store.eachLatest().toList();
-        assert list.size() == 7;
-        assert list.get(0).value == 360;
-        assert list.get(1).value == 300;
-        assert list.get(2).value == 240;
-    }
-
-    @Test
-    void eachLatestOverDays() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
-        store.store(day(0), day(1), day(2), day(3), day(4));
-
-        List<Value> list = store.eachLatest().toList();
-        assert list.size() == 5;
-        assert list.get(0).value == 4 * days;
-        assert list.get(1).value == 3 * days;
-        assert list.get(2).value == 2 * days;
-        assert list.get(3).value == 1 * days;
     }
 
     @Test

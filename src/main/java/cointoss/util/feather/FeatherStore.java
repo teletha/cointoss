@@ -23,9 +23,7 @@ import com.google.common.annotations.VisibleForTesting;
 import cointoss.ticker.Span;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
-import cointoss.util.map.LongMap.LongEntry;
 import kiss.Disposable;
-import kiss.I;
 import kiss.Signal;
 import kiss.model.Model;
 import psychopath.File;
@@ -389,136 +387,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     }
 
     /**
-     * Get all stored time series items in ascending order.
-     * 
-     * @param each An item processor.
-     */
-    public void each(Consumer<? super E> each) {
-        each().to(each);
-    }
-
-    /**
-     * Get the time series items stored from the specified start time to end time in ascending
-     * order.
-     * 
-     * @param start A start time (included).
-     * @param end A end time (included).
-     * @param each An item processor.
-     */
-    public void each(E start, E end, Consumer<? super E> each) {
-        each(start.seconds(), end.seconds(), each);
-    }
-
-    /**
-     * Get the time series items stored from the specified start time to end time in ascending
-     * order.
-     * 
-     * @param start A start time (included).
-     * @param end A end time (included).
-     * @param each An item processor.
-     */
-    public void each(long start, long end, Consumer<? super E> each) {
-        each(start, end).to(each);
-    }
-
-    /**
-     * Get the time series items stored from the specified start time to end time in ascending
-     * order.
-     * 
-     * @param start A start time (included).
-     * @param end A end time (included).
-     * @return An item stream.
-     */
-    public Signal<E> each() {
-        return new Signal<>((observer, disposer) -> {
-            for (OnHeap segment : indexed.values()) {
-                if (disposer.isDisposed()) {
-                    break;
-                }
-                segment.each(0, itemSize, observer, disposer);
-            }
-            observer.complete();
-            return disposer;
-        });
-    }
-
-    /**
-     * Get the time series items stored from the specified start time to end time in ascending
-     * order.
-     * 
-     * @param start A start time (included).
-     * @param end A end time (included).
-     * @return An item stream.
-     */
-    public Signal<E> eachLatest() {
-        return new Signal<>((observer, disposer) -> {
-            for (OnHeap segment : indexed.descendingMap().values()) {
-                if (disposer.isDisposed()) {
-                    break;
-                }
-                segment.eachLatest(itemSize, 0, observer, disposer);
-            }
-            observer.complete();
-            return disposer;
-        });
-    }
-
-    /**
-     * Get the time series items stored from the specified start time to end time in ascending
-     * order.
-     * 
-     * @param start A start time (included).
-     * @param end A end time (included).
-     * @return An item stream.
-     */
-    public Signal<E> each(E start, E end) {
-        return each(start.seconds(), end.seconds());
-    }
-
-    /**
-     * Get the time series items stored from the specified start time to end time in ascending
-     * order.
-     * 
-     * @param start A start time (included).
-     * @param end A end time (included).
-     * @return An item stream.
-     */
-    public Signal<E> each(long start, long end) {
-        if (end < start) {
-            return I.signal();
-        }
-
-        return new Signal<>((observer, disposer) -> {
-            long[] startIndex = index(start);
-            long[] endIndex = index(end);
-            ConcurrentNavigableLongMap<OnHeap<E>> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
-
-            try {
-                for (LongEntry<OnHeap<E>> entry : sub.longEntrySet()) {
-                    if (disposer.isDisposed()) {
-                        break;
-                    }
-                    long time = entry.getLongKey();
-                    int startItemIndex = 0;
-                    int endItemIndex = itemSize;
-
-                    if (time == startIndex[0]) {
-                        startItemIndex = (int) startIndex[1];
-                    }
-                    if (time == endIndex[0]) {
-                        endItemIndex = (int) endIndex[1];
-                    }
-                    entry.getValue().each(startItemIndex, endItemIndex, observer, disposer);
-                }
-                observer.complete();
-            } catch (Throwable e) {
-                observer.error(e);
-            }
-            return disposer;
-        });
-    }
-
-    /**
      * Clear all items from heap.
      */
     public void clear() {
@@ -706,6 +574,16 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     public Signal<E> query(TemporalData start, TemporalData end, Consumer<Option>... option) {
         return query(start.seconds(), end.seconds(), option);
+    }
+
+    /**
+     * Query the latest items with temporal options.
+     * 
+     * @param option Your options.
+     * @return A result.
+     */
+    public Signal<E> queryLatest(Consumer<Option>... option) {
+        return query(Option.Latest, 0, option);
     }
 
     /**
@@ -922,38 +800,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
 
         /**
          * Get the time series items stored from the specified start index (inclusive) to end index
-         * (exclusive) in ascending order.
-         * 
-         * @param each An item processor.
-         */
-        void each(Consumer<? super T> each) {
-            each(min, max, each, Disposable.empty());
-        }
-
-        /**
-         * Get the time series items stored from the specified start index (inclusive) to end index
-         * (exclusive) in ascending order.
-         * 
-         * @param start A start index (included).
-         * @param end A end index (exclusive).
-         * @param each An item processor.
-         */
-        void each(int start, int end, Consumer<? super T> consumer, Disposable disposer) {
-            start = Math.max(min, start);
-            end = Math.min(max, end);
-            T[] avoidNPE = items; // copy reference to avoid NPE by #clear
-            if (avoidNPE != null) {
-                for (int i = start; i <= end; i++) {
-                    if (disposer.isDisposed()) {
-                        return;
-                    }
-                    consumer.accept(avoidNPE[i]);
-                }
-            }
-        }
-
-        /**
-         * Get the time series items stored from the specified start index (inclusive) to end index
          * (inclusive) in ascending order.
          * 
          * @param start A start index (included).
@@ -962,7 +808,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
          * @param each An item processor.
          * @param disposer A iteration stopper.
          */
-        int each(int start, int end, boolean forward, int size, Consumer<? super T> consumer, Disposable disposer) {
+        private int each(int start, int end, boolean forward, int size, Consumer<? super T> consumer, Disposable disposer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
             T[] avoidNPE = items; // copy reference to avoid NPE by #clear
@@ -984,28 +830,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
                 }
             }
             return size;
-        }
-
-        /**
-         * Get the time series items stored from the specified start index (inclusive) to end index
-         * (exclusive) in ascending order.
-         * 
-         * @param start A start index (included).
-         * @param end A end index (exclusive).
-         * @param each An item processor.
-         */
-        void eachLatest(int start, int end, Consumer<? super T> consumer, Disposable disposer) {
-            start = Math.min(max, start);
-            end = Math.max(min, end);
-            T[] avoidNPE = items; // copy reference to avoid NPE by #clear
-            if (avoidNPE != null) {
-                for (int i = start; end <= i; i--) {
-                    if (disposer.isDisposed()) {
-                        return;
-                    }
-                    consumer.accept(avoidNPE[i]);
-                }
-            }
         }
     }
 }

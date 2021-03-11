@@ -187,7 +187,7 @@ public class Chart extends Region {
                 startTick = endTick;
             }
 
-            ticker.ticks.each(start, end, tick -> {
+            ticker.ticks.query(start, end).to(tick -> {
                 max.set(Num.max(max.v, tick.highPrice()));
                 min.set(Num.min(min.v, tick.lowPrice()));
             });

@@ -172,7 +172,7 @@ public class BinanceService extends MarketService {
     public static void main(String[] args) throws InterruptedException {
         FeatherStore<OpenInterest> store = Binance.FUTURE_BTC_USDT.openInterest();
         Thread.sleep(1000 * 5);
-        store.eachLatest().to(oi -> {
+        store.queryLatest().to(oi -> {
             System.out.println(oi);
         });
 

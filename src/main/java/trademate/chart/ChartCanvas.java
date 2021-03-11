@@ -9,7 +9,8 @@
  */
 package trademate.chart;
 
-import static cointoss.Direction.*;
+import static cointoss.Direction.BUY;
+import static cointoss.Direction.SELL;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
@@ -19,22 +20,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -59,6 +44,21 @@ import cointoss.util.arithmetic.Num;
 import cointoss.util.array.DoubleList;
 import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -779,7 +779,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     DoubleList valueX = new DoubleList((int) tickSize);
                     Indicator<double[]> candle = candleType.candles.apply(ticker);
 
-                    ticker.ticks.each(start, end, tick -> {
+                    ticker.ticks.query(start, end).to(tick -> {
                         double[] values = candle.valueAt(tick);
                         double x = axisX.getPositionForValue(tick.openTime);
                         double high = axisY.getPositionForValue(values[1]);

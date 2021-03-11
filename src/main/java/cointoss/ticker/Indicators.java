@@ -42,10 +42,6 @@ public final class Indicators {
         return new Trend(ticker, length);
     }
 
-    public static NumIndicator lowTrendLine(Ticker ticker, int length) {
-        return new LowTrendLine(ticker, length);
-    }
-
     public static DoubleIndicator waveTrend(Ticker ticker) {
         return waveTrend(ticker, 10, 21);
     }
@@ -63,102 +59,6 @@ public final class Indicators {
         DoubleIndicator indi = ci.ema(averageLength).scale(2);
         indi.name.set(ticker.span.toString());
         return indi;
-    }
-
-    /**
-     * 
-     */
-    private static class LowTrendLine extends NumIndicator {
-
-        private final Ticker ticker;
-
-        private final int length;
-
-        private final SimpleRegression regression = new SimpleRegression(true);
-
-        private long minTime = 0;
-
-        private double minValue = Double.MAX_VALUE;
-
-        /**
-         * @param ticker
-         */
-        private LowTrendLine(Ticker ticker, int length) {
-            super(ticker);
-
-            this.ticker = ticker;
-            this.length = length;
-
-            ticker.ticks.each(this::add);
-            ticker.close.to(this::add);
-        }
-
-        private void add(Tick tick) {
-            double low = tick.closePrice().doubleValue();
-
-            regression.addData(tick.openTime, low);
-
-            if (low < minValue) {
-                minValue = low;
-                minTime = tick.openTime;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected Num valueAtRounded(Tick tick) {
-            return Num.of(regression.predict(tick.openTime));
-        }
-    }
-
-    /**
-     * 
-     */
-    private static class HighTrendLine extends NumIndicator {
-
-        private final Ticker ticker;
-
-        private final int length;
-
-        private final SimpleRegression regression = new SimpleRegression(true);
-
-        private long maxTime = 0;
-
-        private double maxValue = Double.MIN_VALUE;
-
-        /**
-         * @param ticker
-         */
-        private HighTrendLine(Ticker ticker, int length) {
-            super(ticker);
-
-            this.ticker = ticker;
-            this.length = length;
-
-            ticker.ticks.each(this::add);
-            ticker.close.to(this::add);
-        }
-
-        private void add(Tick tick) {
-            double high = tick.highPrice.doubleValue();
-
-            regression.addData(tick.openTime, high);
-
-            if (maxValue < high) {
-                maxValue = high;
-                maxTime = tick.openTime;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected Num valueAtRounded(Tick tick) {
-            return Num.of(regression.predict(tick.openTime) + (maxValue - regression.predict(maxTime)));
-        }
     }
 
     /**
