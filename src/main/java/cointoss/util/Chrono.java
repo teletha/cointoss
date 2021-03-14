@@ -339,6 +339,40 @@ public class Chrono {
     }
 
     /**
+     * Returns the maximum of the specified time.
+     * 
+     * @param times
+     * @return
+     */
+    public static ZonedDateTime max(ZonedDateTime... times) {
+        ZonedDateTime max = times[0];
+
+        for (int i = 1; i < times.length; i++) {
+            if (max.isBefore(times[i])) {
+                max = times[i];
+            }
+        }
+        return max;
+    }
+
+    /**
+     * Returns the maximum of the specified time.
+     * 
+     * @param times
+     * @return
+     */
+    public static ZonedDateTime min(ZonedDateTime... times) {
+        ZonedDateTime min = times[0];
+
+        for (int i = 1; i < times.length; i++) {
+            if (min.isAfter(times[i])) {
+                min = times[i];
+            }
+        }
+        return min;
+    }
+
+    /**
      * Ensures that the specified date is between the minimum and maximum date. If the specified
      * date is out of range, the closest date is returned.
      * 

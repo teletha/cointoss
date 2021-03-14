@@ -54,6 +54,9 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     /** The data accumulator. */
     private BiFunction<E, E, E> accumulator;
 
+    /** The data interpolation. */
+    private int interpolation;
+
     /** The date-time of first item. */
     private long first = Long.MAX_VALUE;
 
@@ -144,20 +147,21 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param passive
      */
     private void startActiveSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
-        long start = lastTime();
+        long startingLatestTime = lastTime();
 
-        active.apply(start).to(e -> {
-            System.out.println("Store " + e);
+        active.apply(last).to(e -> {
             store(e);
         }, error -> {
             startPassiveSupplier(passive);
         }, () -> {
-            long end = lastTime();
+            // If the new data is being retrieved, then the last time before and after the method
+            // call is probably different.
+            long currentLatestTime = lastTime();
 
-            if (start == end) {
-                startPassiveSupplier(passive);
-            } else {
+            if (startingLatestTime != currentLatestTime) {
                 startActiveSupplier(active, passive);
+            } else {
+                startPassiveSupplier(passive);
             }
         });
     }
@@ -169,9 +173,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     private void startPassiveSupplier(Signal<E> passive) {
         if (passive != null) {
-            add(passive.effectOnDispose(this::commit).effectOnDispose(() -> {
-                System.out.println("Dispose store");
-            }).to(e -> {
+            add(passive.effectOnDispose(this::commit).to(e -> {
                 store(e);
             }));
         }
@@ -224,6 +226,16 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     public FeatherStore<E> enableAccumulator(BiFunction<E, E, E> accumulator) {
         this.accumulator = accumulator;
+        return this;
+    }
+
+    /**
+     * Enable empty data interpolation.
+     * 
+     * @return Chainable API.
+     */
+    public FeatherStore<E> enableInterpolation(int range) {
+        this.interpolation = range;
         return this;
     }
 
@@ -357,7 +369,16 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
         if (segment == null) {
             return null;
         }
-        return segment.get((int) index[1]);
+
+        E item = segment.get((int) index[1]);
+        if (item == null) {
+            if (0 < interpolation) {
+                for (int i = (int) index[1] - 1, j = interpolation; 0 <= i && 0 < j && item == null; i--, j--) {
+                    item = segment.get(i);
+                }
+            }
+        }
+        return item;
     }
 
     public long firstTime() {

@@ -120,4 +120,18 @@ class ChronoTest {
         assert Chrono.range(2021, 3).size() == 31;
         assert Chrono.range(2021, 4).size() == 30;
     }
+
+    @Test
+    void max() {
+        assert Chrono.max(Chrono.utc(2021, 1, 1)).equals(Chrono.utc(2021, 1, 1));
+        assert Chrono.max(Chrono.utc(2021, 1, 1), Chrono.utc(2021, 1, 2)).equals(Chrono.utc(2021, 1, 2));
+        assert Chrono.max(Chrono.utc(2021, 1, 2), Chrono.utc(2021, 1, 1)).equals(Chrono.utc(2021, 1, 2));
+    }
+
+    @Test
+    void min() {
+        assert Chrono.min(Chrono.utc(2021, 1, 1)).equals(Chrono.utc(2021, 1, 1));
+        assert Chrono.min(Chrono.utc(2021, 1, 1), Chrono.utc(2021, 1, 2)).equals(Chrono.utc(2021, 1, 1));
+        assert Chrono.min(Chrono.utc(2021, 1, 2), Chrono.utc(2021, 1, 1)).equals(Chrono.utc(2021, 1, 1));
+    }
 }

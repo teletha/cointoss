@@ -34,6 +34,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.Span;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
@@ -42,6 +43,7 @@ import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.feather.FeatherStore;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -270,7 +272,16 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
+    protected FeatherStore<OpenInterest> initializeOpenInterest() {
+        return FeatherStore.create(OpenInterest.class, Span.Minute5)
+                .enableDiskStore(file("oi.db"))
+                .enableDataSupplier(time -> provideOpenInterest(Chrono.utcBySeconds(time)), connectOpenInterest());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
         return call("GET", "open-interest?symbol=" + marketName + "&period=5min&limit=200").flatIterable(e -> e.find("result", "$"))
                 .map(e -> {
                     float size = e.get(float.class, "open_interest");
@@ -285,8 +296,7 @@ public class BybitService extends MarketService {
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected Signal<OpenInterest> connectOpenInterest() {
+    private Signal<OpenInterest> connectOpenInterest() {
         double[] price = {0};
 
         return clientRealtimely().subscribe(new Topic("instrument_info.100ms", marketName))
@@ -299,13 +309,6 @@ public class BybitService extends MarketService {
                 .take(e -> e.has("open_interest"))
                 .map(e -> OpenInterest.with.date(Chrono.utcNow())
                         .size((float) Primitives.roundDecimal(e.get(double.class, "open_interest") / price[0], 2)));
-    }
-
-    public static void mai2n(String[] args) throws InterruptedException {
-        Bybit.BTC_USD.openInterestRealtimely().to(e -> {
-            System.out.println(e);
-        });
-        Thread.sleep(1000 * 60 * 10);
     }
 
     /**

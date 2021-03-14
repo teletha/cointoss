@@ -27,6 +27,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
@@ -34,7 +35,6 @@ import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
-import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.feather.FeatherStore;
 import kiss.JSON;
@@ -243,15 +243,16 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
-        return super.provideOpenInterest(startExcluded);
+    protected FeatherStore<OpenInterest> initializeOpenInterest() {
+        return FeatherStore.create(OpenInterest.class, Span.Minute5)
+                .enableDiskStore(file("oi.db"))
+                .enableDataSupplier(null, connectOpenInterest());
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected Signal<OpenInterest> connectOpenInterest() {
+    private Signal<OpenInterest> connectOpenInterest() {
         return clientRealtimely().subscribe(new Topic("instrument", marketName))
                 .take(e -> e.has("action", "update"))
                 .flatIterable(e -> e.find("data", "*"))
@@ -278,22 +279,22 @@ public class BitMexService extends MarketService {
             }
         });
 
-        BitMex.XBT_USD.openInterestRealtimely().to(e -> {
-            double deltaOI = e.size - previousOISize[0];
-            double total = volume[0] + volume[1];
-            double entry = total + deltaOI / 2d;
-            double exit = total - deltaOI / 2d;
-
-            System.out.println(e + "  B:" + Primitives.roundString(volume[0], 6) + "   S:" + Primitives
-                    .roundString(volume[1], 6) + "   Total:" + Primitives
-                            .roundString(volume[0] + volume[1], 6) + "   AvePrice:" + Primitives
-                                    .roundString(volume[2] / total, 2) + "  Entry:" + Primitives
-                                            .roundString(entry, 2) + "    Exit:" + Primitives.roundString(exit, 2));
-            volume[0] = 0;
-            volume[1] = 0;
-            volume[2] = 0;
-            previousOISize[0] = e.size;
-        });
+        // BitMex.XBT_USD.openInterestRealtimely().to(e -> {
+        // double deltaOI = e.size - previousOISize[0];
+        // double total = volume[0] + volume[1];
+        // double entry = total + deltaOI / 2d;
+        // double exit = total - deltaOI / 2d;
+        //
+        // System.out.println(e + " B:" + Primitives.roundString(volume[0], 6) + " S:" + Primitives
+        // .roundString(volume[1], 6) + " Total:" + Primitives
+        // .roundString(volume[0] + volume[1], 6) + " AvePrice:" + Primitives
+        // .roundString(volume[2] / total, 2) + " Entry:" + Primitives
+        // .roundString(entry, 2) + " Exit:" + Primitives.roundString(exit, 2));
+        // volume[0] = 0;
+        // volume[1] = 0;
+        // volume[2] = 0;
+        // previousOISize[0] = e.size;
+        // });
 
         Thread.sleep(1000 * 60 * 10);
 

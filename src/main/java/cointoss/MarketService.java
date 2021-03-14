@@ -377,44 +377,21 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * Provide the
-     * 
-     * @return
+     * Provide the market specific tick related data if needed.
      */
     public final synchronized FeatherStore<OpenInterest> openInterest() {
-        if (openInterest == null) {
+        if (openInterest == null && !setting.type.isSpot()) {
             openInterest = initializeOpenInterest();
+            add(openInterest);
         }
         return openInterest;
-    }
-
-    protected FeatherStore<OpenInterest> initializeOpenInterest() {
-        return null;
     }
 
     /**
      * Provide the market specific tick related data if needed.
      */
-    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
-        return I.signal();
-    }
-
-    /**
-     * Provide the market specific tick related data infinitely.
-     * 
-     * @return A shared realtime stream.
-     */
-    public final synchronized Signal<OpenInterest> openInterestRealtimely() {
-        return this.connectOpenInterest().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "OpenInterest"));
-    }
-
-    /**
-     * Provide the market specific tick related data infinitely.
-     * 
-     * @return A shared realtime stream.
-     */
-    protected Signal<OpenInterest> connectOpenInterest() {
-        return I.signal();
+    protected FeatherStore<OpenInterest> initializeOpenInterest() {
+        return null;
     }
 
     /**

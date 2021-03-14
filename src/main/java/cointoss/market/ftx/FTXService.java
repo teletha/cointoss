@@ -29,6 +29,7 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
@@ -38,6 +39,7 @@ import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.feather.FeatherStore;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -258,11 +260,16 @@ public class FTXService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
-        if (setting.type.isSpot()) {
-            return I.signal();
-        }
+    protected FeatherStore<OpenInterest> initializeOpenInterest() {
+        return FeatherStore.create(OpenInterest.class, Span.Minute5)
+                .enableDiskStore(file("oi.db"))
+                .enableDataSupplier(this::provideOpenInterest, connectOpenInterest());
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    private Signal<OpenInterest> provideOpenInterest(long startExcluded) {
         return call("GET", "futures/" + marketName + "/stats").map(root -> {
             JSON e = root.get("result");
             return OpenInterest.with.date(Chrono.utcNow()).size(e.get(float.class, "openInterest"));
@@ -272,12 +279,7 @@ public class FTXService extends MarketService {
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected Signal<OpenInterest> connectOpenInterest() {
-        if (setting.type.isSpot()) {
-            return I.signal();
-        }
-
+    private Signal<OpenInterest> connectOpenInterest() {
         return Chrono.seconds()
                 .takeAt(i -> i % 10 == 0)
                 .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
@@ -300,7 +302,7 @@ public class FTXService extends MarketService {
         I.schedule(1, 1, TimeUnit.SECONDS, true)
                 .take(360 * 5)
                 .waitForTerminate()
-                .concatMap(x -> FTX.BTC_PERP.provideOpenInterest(Chrono.utcNow().minusMinutes(10)))
+                .concatMap(x -> ((FTXService) FTX.BTC_PERP).provideOpenInterest(10))
                 .diff((p, n) -> p.size == n.size)
                 .to(e -> {
                     double deltaOI = e.size - previousOISize[0];

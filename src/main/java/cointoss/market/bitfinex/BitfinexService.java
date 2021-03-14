@@ -23,6 +23,7 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
+import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
@@ -31,6 +32,7 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.feather.FeatherStore;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -216,11 +218,14 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OpenInterest> connectOpenInterest() {
-        if (setting.type.isSpot()) {
-            return I.signal();
-        }
+    protected FeatherStore<OpenInterest> initializeOpenInterest() {
+        return FeatherStore.create(OpenInterest.class, Span.Minute5).enableDiskStore(file("oi.db")).enableDataSupplier(null, null);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    private Signal<OpenInterest> connectOpenInterest() {
         return clientRealtimely().subscribe(new Topic("status", "deriv:t" + marketName)).map(root -> {
             JSON e = root.get("1");
             return OpenInterest.with.date(Chrono.utcNow()).size(e.get(float.class, "17"));

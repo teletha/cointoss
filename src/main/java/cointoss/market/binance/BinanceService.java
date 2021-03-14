@@ -9,10 +9,13 @@
  */
 package cointoss.market.binance;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -170,13 +173,11 @@ public class BinanceService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        FeatherStore<OpenInterest> store = Binance.FUTURE_BTC_USDT.openInterest();
-        store.queryLatest(o -> o.max(100)).to(oi -> {
-            System.out.println(oi);
+        ((BinanceService) Binance.FUTURE_MKR_USDT).retrieveOpenInterest(ZonedDateTime.now().minusDays(28), 500).to(e -> {
+            System.out.println(e);
         });
 
-        Thread.sleep(1000 * 5);
-        store.dispose();
+        Thread.sleep(1000 * 10);
     }
 
     /**
@@ -184,55 +185,41 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected FeatherStore<OpenInterest> initializeOpenInterest() {
-        if (setting.type.isSpot()) {
-            return null;
-        }
-
-        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute5)
+        return FeatherStore.create(OpenInterest.class, Span.Minute5)
+                .enableInterpolation(4)
                 .enableDiskStore(file("oi.db"))
-                .enableDataSupplier(time -> provideOpenInterest(Chrono.utcBySeconds(time)), openInterestRealtimely());
-        add(store);
-        return store;
+                .enableDataSupplier(seconds -> {
+                    // https://binance-docs.github.io/apidocs/futures/en/#open-interest-statistics
+                    // [[ Only the data of the latest 30 days is available. ]]
+                    //
+                    // Contrary to the description in the document, setting the lower limit to 30
+                    // days ago
+                    // returns an error, so we set the lower limit to 28 days ago with a margin of 2
+                    // days.
+                    ZonedDateTime lowerLimit = Chrono.utcNow().minusDays(28);
+                    ZonedDateTime time = Chrono.max(lowerLimit, Chrono.utcBySeconds(seconds));
+
+                    return retrieveOpenInterest(time, 500);
+                }, I.schedule(LocalTime.of(0, 1), 5, MINUTES).flatMap(x -> {
+                    return retrieveOpenInterest(Chrono.utcNow().minusMinutes(5 * 9), 10);
+                }));
     }
 
     /**
-     * {@inheritDoc}
+     * Call REST API for OI.
+     * 
+     * @param start A starting time.
+     * @param size A total size to retrieve.
+     * @return
      */
-    @Override
-    public Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
-        if (setting.type.isSpot()) {
-            return I.signal();
-        }
+    private Signal<OpenInterest> retrieveOpenInterest(ZonedDateTime time, int size) {
+        long start = time.toInstant().toEpochMilli();
+        long end = time.plusMinutes(5 * (size - 1)).toInstant().toEpochMilli();
 
-        startExcluded = Chrono.between(Chrono.utcNow().minusDays(30), startExcluded, startExcluded);
-
-        long start = startExcluded.plusMinutes(5).toInstant().toEpochMilli();
-        long end = startExcluded.plusMinutes(5 * 500).toInstant().toEpochMilli();
-
-        return call("GET", "https://fapi.binance.com/futures/data/openInterestHist?symbol=" + marketName + "&period=5m&limit=500&startTime=" + start + "&endTime=" + end)
+        return call("GET", "https://fapi.binance.com/futures/data/openInterestHist?symbol=" + marketName + "&period=5m&limit=" + size + "&startTime=" + start + "&endTime=" + end)
                 .flatIterable(e -> e.find("*"))
-                .map(e -> {
-                    ZonedDateTime time = Chrono.utcByMills(e.get(long.class, "timestamp"));
-                    float size = e.get(float.class, "sumOpenInterest");
-                    float value = e.get(float.class, "sumOpenInterestValue");
-
-                    return OpenInterest.with.date(time).size(size);
-                });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<OpenInterest> connectOpenInterest() {
-        if (setting.type.isSpot()) {
-            return I.signal();
-        }
-
-        return Chrono.minutes()
-                .takeAt(i -> i % 5 == 0)
-                .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
-                .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(float.class, "openInterest")));
+                .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "timestamp")))
+                        .size(e.get(float.class, "sumOpenInterest")));
     }
 
     /**

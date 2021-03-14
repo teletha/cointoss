@@ -9,7 +9,6 @@
  */
 package trademate.chart.builtin;
 
-import cointoss.Currency;
 import cointoss.Market;
 import cointoss.market.Exchange;
 import cointoss.ticker.DoubleIndicator;
@@ -30,10 +29,6 @@ public class OpenInterestIndicator extends PlotScript {
     @Override
     protected void declare(Market market, Ticker ticker) {
         if (market.service.exchange != Exchange.BinanceF) {
-            return;
-        }
-
-        if (market.service.setting.target.currency != Currency.BTC) {
             return;
         }
 
