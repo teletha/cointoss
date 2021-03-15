@@ -13,7 +13,10 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -42,10 +45,7 @@ public class BitfinexService extends MarketService {
     private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The API limit. */
-    private static final APILimiter LimitForTradeHistory = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
-
-    /** The API limit. */
-    private static final APILimiter LimitForBook = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
+    private static final APILimiter LimitForREST = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
 
     /** The realtiem communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api-pub.bitfinex.com/ws/2")
@@ -79,8 +79,7 @@ public class BitfinexService extends MarketService {
         long startingPoint = startId % Support.padding;
         long[] previous = new long[] {0, 0, startingPoint - 1};
 
-        return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=10000&start=" + startTime, LimitForTradeHistory)
-                .flatIterable(e -> e.find("*"))
+        return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=10000&start=" + startTime).flatIterable(e -> e.find("*"))
                 .map(e -> createExecution(e, previous));
     }
 
@@ -101,7 +100,7 @@ public class BitfinexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "trades/t" + marketName + "/hist?limit=1", LimitForTradeHistory).flatIterable(e -> e.find("*"))
+        return call("GET", "trades/t" + marketName + "/hist?limit=1").flatIterable(e -> e.find("*"))
                 .map(e -> createExecution(e, new long[3]));
     }
 
@@ -112,7 +111,7 @@ public class BitfinexService extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         long startTime = Support.computeEpochTime(id) + 1;
 
-        return call("GET", "trades/t" + marketName + "/hist?end=" + startTime + "&limit=" + setting.acquirableExecutionSize, LimitForTradeHistory)
+        return call("GET", "trades/t" + marketName + "/hist?end=" + startTime + "&limit=" + setting.acquirableExecutionSize)
                 .flatIterable(e -> e.find("$"))
                 .map(e -> createExecution(e, new long[3]));
     }
@@ -122,7 +121,7 @@ public class BitfinexService extends MarketService {
      */
     @Override
     public Signal<Execution> searchInitialExecution() {
-        return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=1", LimitForTradeHistory).flatIterable(e -> e.find("*"))
+        return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=1").flatIterable(e -> e.find("*"))
                 .map(e -> createExecution(e, new long[3]));
     }
 
@@ -153,7 +152,7 @@ public class BitfinexService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "book/t" + marketName + "/P1?len=100", LimitForBook).map(json -> {
+        return call("GET", "book/t" + marketName + "/P1?len=100").map(json -> {
             OrderBookPageChanges change = new OrderBookPageChanges();
 
             for (JSON data : json.find("*")) {
@@ -219,12 +218,41 @@ public class BitfinexService extends MarketService {
      */
     @Override
     protected FeatherStore<OpenInterest> initializeOpenInterest() {
-        return FeatherStore.create(OpenInterest.class, Span.Minute5).enableDiskStore(file("oi.db")).enableDataSupplier(null, null);
+        return FeatherStore.create(OpenInterest.class, Span.Minute5)
+                .enableInterpolation(5)
+                .enableDiskStore(file("oi.db"))
+                .enableDataSupplier(seconds -> {
+                    ZonedDateTime lowerLimit = Chrono.utcNow().minusYears(1);
+                    ZonedDateTime time = Chrono.max(lowerLimit, Chrono.utcBySeconds(seconds));
+
+                    return retrieveOpenInterest(time, 1000);
+                }, I.schedule(LocalTime.of(0, 1), 5, TimeUnit.MINUTES).flatMap(x -> {
+                    return retrieveOpenInterest(Chrono.utcNow().minusMinutes(20), 10);
+                }));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    private Signal<OpenInterest> retrieveOpenInterest(ZonedDateTime start, int limit) {
+        long startMilli = Math.max(start.truncatedTo(ChronoUnit.MINUTES).minusMinutes(1).toInstant().toEpochMilli(), 0);
+        limit = Math.min(5 * limit, 5000);
+
+        return call("GET", "status/deriv/t" + marketName + "/hist?limit=" + limit + "&sort=1&start=" + startMilli)
+                .flatIterable(json -> json.find("*"))
+                .map(x -> {
+                    // All times are near 57 seconds, so move them up.
+                    ZonedDateTime time = Chrono
+                            .utcByMills(x.get(long.class, "0") + 10000 /* 10 seconds */)
+                            .truncatedTo(ChronoUnit.MINUTES);
+
+                    if (time.getMinute() % 5 == 0) {
+                        float size = x.get(float.class, "17");
+                        return OpenInterest.with.date(time).size(size);
+                    } else {
+                        return (OpenInterest) null;
+                    }
+                })
+                .skipNull();
+    }
+
     private Signal<OpenInterest> connectOpenInterest() {
         return clientRealtimely().subscribe(new Topic("status", "deriv:t" + marketName)).map(root -> {
             JSON e = root.get("1");
@@ -239,10 +267,10 @@ public class BitfinexService extends MarketService {
      * @param path
      * @return
      */
-    private Signal<JSON> call(String method, String path, APILimiter limiter) {
+    private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api-pub.bitfinex.com/v2/" + path));
 
-        return Network.rest(builder, limiter, client()).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
+        return Network.rest(builder, LimitForREST, client()).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
     }
 
     /**
