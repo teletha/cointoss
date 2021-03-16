@@ -173,7 +173,7 @@ public class BinanceService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ((BinanceService) Binance.FUTURE_MKR_USDT).retrieveOpenInterest(ZonedDateTime.now().minusDays(28), 500).to(e -> {
+        ((BinanceService) Binance.FUTURE_MKR_USDT).retrieveOpenInterest(ZonedDateTime.now().minusDays(25), 500).to(e -> {
             System.out.println(e);
         });
 
@@ -193,10 +193,9 @@ public class BinanceService extends MarketService {
                     // [[ Only the data of the latest 30 days is available. ]]
                     //
                     // Contrary to the description in the document, setting the lower limit to 30
-                    // days ago
-                    // returns an error, so we set the lower limit to 28 days ago with a margin of 2
-                    // days.
-                    ZonedDateTime lowerLimit = Chrono.utcNow().minusDays(28);
+                    // days ago returns an error, so we set the lower limit to 25 days ago with a
+                    // margin of 5 days.
+                    ZonedDateTime lowerLimit = Chrono.utcNow().minusDays(25);
                     ZonedDateTime time = Chrono.max(lowerLimit, Chrono.utcBySeconds(seconds));
 
                     return retrieveOpenInterest(time, 500);
