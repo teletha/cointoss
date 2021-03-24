@@ -10,9 +10,8 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static psychopath.PsychopathOpenOption.ATOMIC_WRITE;
+import static java.nio.file.StandardOpenOption.*;
+import static psychopath.Option.ATOMIC_WRITE;
 
 import java.io.IOException;
 import java.io.OutputStream;
