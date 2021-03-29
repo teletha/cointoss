@@ -93,6 +93,28 @@ $RECYCLE.BIN/
 *.lnk
 # End of https://www.gitignore.io/api/Java,Maven,Windows,Eclipse
 !/.github
+# Created by https://www.toptal.com/developers/gitignore/api/Java,Maven,Windows,Eclipse
+# Edit at https://www.toptal.com/developers/gitignore?templates=Java,Maven,Windows,Eclipse
+# CDT- autotools
+.autotools
+# Annotation Processing
+.apt_generated/
+.apt_generated_test/
+# Uncomment this line if you wish to ignore the project description file.
+# Typically, this file would be tracked if it contains build/dependency configurations:
+#.project
+# Spring Boot Tooling
+.sts4-cache/
+*.nar
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+.mvn/wrapper/maven-wrapper.jar
+.flattened-pom.xml
+Thumbs.db:encryptable
+# Dump file
+*.stackdump
+[Dd]esktop.ini
+*.msix
+# End of https://www.toptal.com/developers/gitignore/api/Java,Maven,Windows,Eclipse
 
 # Created by https://www.toptal.com/developers/gitignore/api/Java,Maven,Windows,Eclipse
 # Edit at https://www.toptal.com/developers/gitignore?templates=Java,Maven,Windows,Eclipse
