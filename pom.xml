@@ -38,7 +38,7 @@
 		<dependency>
 			<groupId>com.github.teletha</groupId>
 			<artifactId>antibug</artifactId>
-			<version>[1.0.2,)</version>
+			<version>[1.0.3,)</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -235,7 +235,7 @@
 			<groupId>com.github.teletha</groupId>
 			<artifactId>icymanipulator</artifactId>
 			<version>[1.3.0,)</version>
-			<scope>Pluggable Annotation Processing</scope>
+			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.errorprone</groupId>
@@ -290,7 +290,7 @@
 		<dependency>
 			<groupId>com.github.teletha</groupId>
 			<artifactId>sinobu</artifactId>
-			<version>[2.2.0,)</version>
+			<version>[2.2.1,)</version>
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
@@ -374,7 +374,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>[1.4.9-1,)</version>
+			<version>[1.4.9-2,)</version>
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
@@ -437,9 +437,7 @@
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<release>16</release>
-					<compilerArgs>
-						<arg>-proc:none</arg>
-					</compilerArgs>
+					<compilerArgs/>
 				</configuration>
 			</plugin>
 			<plugin>

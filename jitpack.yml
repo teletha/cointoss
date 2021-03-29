@@ -1,0 +1,4 @@
+before_install:
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
+  - sdk install java 16-open
+  - sdk use java 16-open
