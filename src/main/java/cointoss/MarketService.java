@@ -113,7 +113,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     /**
      * Acquire the execution log between start (exclusive) and end (exclusive) key.
      * 
-     * @param key An execution sequencial key (i.e. ID, datetime etc).
      * @return This {@link Signal} will be completed immediately.
      */
     public abstract Signal<Execution> executions(long startId, long endId);
@@ -360,7 +359,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     /**
      * Acquire order book in realtime. This is infinitely.
      * 
-     * @param autoReconnect Need to reconnect automatically.
      * @return A shared realtime order books.
      */
     public final synchronized Signal<Liquidation> liquidationRealtimely() {

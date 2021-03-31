@@ -80,7 +80,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * 
      * @param <E>
      * @param type
-     * @param span
      * @return
      */
     public static <E extends TemporalData> FeatherStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
@@ -108,7 +107,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     /**
      * Enable the active data suppliance.
      * 
-     * @param passive
+     * @param active
      * @return Chainable API.
      */
     public FeatherStore<E> enableDataSupplier(LongFunction<Signal<E>> active) {
@@ -458,7 +457,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     /**
      * Get the most recent item that matches the conditions before the indexable item.
      * 
-     * @param item An indexable item.
      * @return A matched item or null.
      */
     public E before(long timestamp, Predicate<E> condition) {

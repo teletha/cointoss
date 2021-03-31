@@ -2777,7 +2777,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
         /**
          * Create specila {@link Comparator} for {@link Spliterator}.
          * 
-         * @param comprator
+         * @param comparator
          * @return
          */
         public abstract Comparator create(WrapperComparator comparator);

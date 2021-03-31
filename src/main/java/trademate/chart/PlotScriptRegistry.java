@@ -120,8 +120,7 @@ class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
      * Register {@link PlotScript} on the specified {@link MarketService}.
      * 
      * @param market A target market.
-     * @param script A target script to add.
-     * @return
+     * @param type A target script to add.
      */
     final void register(Market market, Class<? extends PlotScript> type) {
         register(market.service, type);
@@ -131,8 +130,7 @@ class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
      * Register {@link PlotScript} on the specified {@link MarketService}.
      * 
      * @param service A target market.
-     * @param script A target script to add.
-     * @return
+     * @param type A target script to add.
      */
     final void register(MarketService service, Class<? extends PlotScript> type) {
         List<Class<? extends PlotScript>> classes = managedScripts.computeIfAbsent(service.id, key -> new ArrayList());

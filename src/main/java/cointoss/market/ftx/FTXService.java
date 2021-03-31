@@ -267,7 +267,8 @@ public class FTXService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
+     * @param startExcluded
+     * @return
      */
     private Signal<OpenInterest> provideOpenInterest(long startExcluded) {
         return call("GET", "futures/" + marketName + "/stats").map(root -> {
@@ -277,7 +278,7 @@ public class FTXService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
+     * @return
      */
     private Signal<OpenInterest> connectOpenInterest() {
         return Chrono.seconds()

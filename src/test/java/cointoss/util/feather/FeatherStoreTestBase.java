@@ -109,7 +109,7 @@ class FeatherStoreTestBase {
     /**
      * Create new values.
      * 
-     * @param value
+     * @param values
      * @return
      */
     protected final List<Value> value(int... values) {
@@ -118,9 +118,6 @@ class FeatherStoreTestBase {
 
     /**
      * Create new sequencial values.
-     * 
-     * @param value
-     * @return
      */
     protected final List<Value> values(int start, int end) {
         List<Value> list = new ArrayList();

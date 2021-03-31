@@ -35,7 +35,6 @@ public class SpecializedCodeGenerator {
      * Generates the specialized code for each type from the specified source code.
      * 
      * @param sourceCode
-     * @param types
      */
     public static void write(Class sourceCode) {
         write(sourceCode, Type.values());
@@ -55,7 +54,6 @@ public class SpecializedCodeGenerator {
      * Generates the specialized code for each type from the specified source code.
      * 
      * @param sourceCode
-     * @param types
      */
     public static void writeAsPackagePrivate(Class sourceCode) {
         write(sourceCode, true, Type.values());

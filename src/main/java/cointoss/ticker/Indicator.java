@@ -38,7 +38,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
     /**
      * Return the value of this {@link Indicator}.
      * 
-     * @param tick A {@link Tick} on {@link Ticker}.
+     * @param timestamp A {@link Tick} on {@link Ticker}.
      * @return A time-based value.
      */
     @Override

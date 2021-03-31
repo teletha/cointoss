@@ -327,8 +327,6 @@ public class VerifiableMarketService extends MarketService {
 
     /**
      * Mock the next call of
-     * 
-     * @param executions
      */
     public void searchNearestIdWillResponse(Execution e) {
         this.nextNearest = e;
@@ -429,7 +427,6 @@ public class VerifiableMarketService extends MarketService {
      * 
      * @param time
      * @param unit
-     * @return
      */
     final void elapse(long time, TimeUnit unit) {
         long seconds = unit.toSeconds(time);
@@ -446,9 +443,6 @@ public class VerifiableMarketService extends MarketService {
 
     /**
      * Emulate {@link Execution}.
-     * 
-     * @param e
-     * @return
      */
     final void emulate(Execution e, Consumer<Execution> executor) {
         now = e.date;

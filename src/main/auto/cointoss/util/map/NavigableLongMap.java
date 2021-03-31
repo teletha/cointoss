@@ -444,13 +444,7 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code subMap(fromKey, true, toKey, false)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableLongMap<V> subMap(long fromKey, long toKey);
 
@@ -463,13 +457,7 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code headMap(toKey, false)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableLongMap<V> headMap(long toKey);
 
@@ -482,13 +470,7 @@ public interface NavigableLongMap<V> extends NavigableMap<Long, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code tailMap(fromKey, true)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableLongMap<V> tailMap(long fromKey);
 }

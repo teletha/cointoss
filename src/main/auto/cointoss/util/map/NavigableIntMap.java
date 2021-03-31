@@ -444,13 +444,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code subMap(fromKey, true, toKey, false)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableIntMap<V> subMap(int fromKey, int toKey);
 
@@ -463,13 +457,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code headMap(toKey, false)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableIntMap<V> headMap(int toKey);
 
@@ -482,13 +470,7 @@ public interface NavigableIntMap<V> extends NavigableMap<Integer, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code tailMap(fromKey, true)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableIntMap<V> tailMap(int fromKey);
 }

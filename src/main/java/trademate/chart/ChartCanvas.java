@@ -9,9 +9,8 @@
  */
 package trademate.chart;
 
-import static cointoss.Direction.BUY;
-import static cointoss.Direction.SELL;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static cointoss.Direction.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -1040,7 +1039,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private final double[] dashArray;
 
         /**
-         * @param indicator
+         * @param value
          * @param style
          */
         Horizon(double value, Style style) {

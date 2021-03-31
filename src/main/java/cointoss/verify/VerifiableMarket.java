@@ -53,10 +53,6 @@ public class VerifiableMarket extends Market {
 
     /**
      * Emulate execution event.
-     * 
-     * @param direction
-     * @param positionSize
-     * @param positionPrice
      */
     public VerifiableMarket perform(Execution e) {
         return perform(e, e.date.isAfter(service.now()) ? e.date : service.now());
@@ -104,8 +100,6 @@ public class VerifiableMarket extends Market {
 
     /**
      * Emulate order and execution event.
-     * 
-     * @param limitShort
      */
     public void requestAndExecution(Order order) {
         request(order).to(id -> {

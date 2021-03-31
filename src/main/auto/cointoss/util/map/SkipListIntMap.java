@@ -2775,7 +2775,7 @@ class SkipListIntMap<V> extends AbstractMap<Integer, V> implements ConcurrentNav
         /**
          * Create specila {@link Comparator} for {@link Spliterator}.
          * 
-         * @param comprator
+         * @param comparator
          * @return
          */
         public abstract Comparator create(IntComparator comparator);

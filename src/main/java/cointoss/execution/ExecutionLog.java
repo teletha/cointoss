@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static psychopath.Option.ATOMIC_WRITE;
+import static psychopath.Option.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -181,7 +181,7 @@ public class ExecutionLog {
     /**
      * Create log manager.
      * 
-     * @param provider
+     * @param service
      */
     public ExecutionLog(MarketService service) {
         this(service, service.directory());
@@ -474,7 +474,6 @@ public class ExecutionLog {
     /**
      * Read log from the specified date.
      * 
-     * @param init
      * @return
      */
     public final Signal<Execution> fromToday(LogType... type) {
@@ -484,7 +483,6 @@ public class ExecutionLog {
     /**
      * Read log from the specified date.
      * 
-     * @param init
      * @return
      */
     public final Signal<Execution> fromYestaday(LogType... type) {
@@ -494,7 +492,6 @@ public class ExecutionLog {
     /**
      * Read log from the specified date.
      * 
-     * @param init
      * @return
      */
     public final Signal<Execution> fromLast(int days, LogType... type) {
@@ -504,8 +501,6 @@ public class ExecutionLog {
     /**
      * Read log from the specified start to end.
      * 
-     * @param init
-     * @param limit
      * @return
      */
     public final Signal<Execution> rangeAll(LogType... type) {
@@ -572,7 +567,6 @@ public class ExecutionLog {
         /**
          * Locate compressed execution log.
          * 
-         * @param date A date time.
          * @return A file location.
          */
         final File compactLog() {
@@ -582,7 +576,6 @@ public class ExecutionLog {
         /**
          * Locate fast execution log.
          * 
-         * @param date A date time.
          * @return A file location.
          */
         final File fastLog() {

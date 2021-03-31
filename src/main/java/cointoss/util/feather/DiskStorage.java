@@ -9,12 +9,8 @@
  */
 package cointoss.util.feather;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-import static java.nio.file.StandardOpenOption.READ;
-import static java.nio.file.StandardOpenOption.SPARSE;
-import static java.nio.file.StandardOpenOption.WRITE;
+import static java.nio.file.StandardCopyOption.*;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -224,7 +220,6 @@ class DiskStorage<T> {
      * Replace by the fully reconstructed database for a given offset time.
      * 
      * @param newOffsetTime
-     * @return
      */
     private void rebuild(long newOffsetTime) {
         if (lockForProcess == null) {
@@ -336,7 +331,7 @@ class DiskStorage<T> {
      * Write data to disk cache.
      * 
      * @param truncatedTime
-     * @param segment
+     * @param items
      */
     void write(long truncatedTime, T... items) {
         if (lockForProcess == null) {

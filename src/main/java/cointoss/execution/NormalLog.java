@@ -154,7 +154,6 @@ class NormalLog implements AutoCloseable {
      * Move pointer to the head of the current line.
      * 
      * @param size
-     * @return
      */
     private void moveToLineHead() throws IOException {
         byte[] bytes = readBack(128);

@@ -78,7 +78,6 @@ public final class Ticker implements Disposable {
      * Initialize {@link Ticker}.
      * 
      * @param execution The latest {@link Execution}.
-     * @param manager The realtime execution statistic.
      */
     final void init(Execution execution) {
         current = new Tick(span.calculateStartTime(execution.date).toEpochSecond(), execution.price, this);
@@ -92,7 +91,6 @@ public final class Ticker implements Disposable {
      * Add the new {@link Tick} if needed.
      * 
      * @param execution The latest {@link Execution}.
-     * @param manager The realtime execution statistic.
      * @return When the new {@link Tick} was added, this method will return <code>true</code>.
      */
     final boolean createTick(Execution execution) {

@@ -14,11 +14,6 @@ import java.util.Set;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
 
-/**
- * A Currency class roughly modeled after {@link java.util.Currency}. Each object retains the code
- * it was acquired with -- so {@link #getInstance}("BTC").{@link #getCurrencyCode}() will always be
- * "BTC", even though the proposed ISO 4217 code is "XBT"
- */
 public enum Currency {
 
     AED("AED", "United Arab Emirates Dirham"),

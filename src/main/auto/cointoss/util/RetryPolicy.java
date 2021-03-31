@@ -372,12 +372,12 @@ public class RetryPolicy extends RetryPolicyModel {
         /**
          * Set the delay time between trials.
          *  
-         *  @param delay
+         *  @param time A delay time on retry.
          *  @return
          */
-        default Next delay(Duration delay) {
+        default Next delay(Duration time) {
             try {
-                return delay((LongFunction<Duration>) delay$823551244.invoke(this, delay));
+                return delay((LongFunction<Duration>) delay$823551244.invoke(this, time));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -386,7 +386,8 @@ public class RetryPolicy extends RetryPolicyModel {
         /**
          * Set the delay time between trials.
          *  
-         *  @param delay
+         *  @param time A delay time on retry.
+         *  @param unit A delay time unit on retry.
          *  @return
          */
         default Next delay(long time, ChronoUnit unit) {
@@ -400,7 +401,8 @@ public class RetryPolicy extends RetryPolicyModel {
         /**
          * Set the delay time between trials.
          *  
-         *  @param delay
+         *  @param time A delay time on retry.
+         *  @param unit A delay time unit on retry.
          *  @return
          */
         default Next delay(long time, TimeUnit unit) {

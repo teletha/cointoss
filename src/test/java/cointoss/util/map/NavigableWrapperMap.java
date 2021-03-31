@@ -446,13 +446,7 @@ public interface NavigableWrapperMap<V> extends NavigableMap<Wrapper, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code subMap(fromKey, true, toKey, false)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableWrapperMap<V> subMap(Primitive fromKey, Primitive toKey);
 
@@ -465,13 +459,7 @@ public interface NavigableWrapperMap<V> extends NavigableMap<Wrapper, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code headMap(toKey, false)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableWrapperMap<V> headMap(Primitive toKey);
 
@@ -484,13 +472,7 @@ public interface NavigableWrapperMap<V> extends NavigableMap<Wrapper, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code tailMap(fromKey, true)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableWrapperMap<V> tailMap(Primitive fromKey);
 }

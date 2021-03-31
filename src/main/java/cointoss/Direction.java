@@ -127,11 +127,9 @@ public enum Direction implements Directional {
     }
 
     /**
-     * <p>
      * Parse by value.
-     * </p>
      * 
-     * @param value
+     * @param c A directional text.
      * @return
      */
     public static Direction parse(char c) {

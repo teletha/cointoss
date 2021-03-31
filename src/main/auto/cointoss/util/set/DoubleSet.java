@@ -36,7 +36,7 @@ public interface DoubleSet extends Set<Double> {
      * <p>
      * The stipulation above does not imply that sets must accept all elements; sets may refuse to
      * add any particular element, including {@code null}, and throw an exception, as described in
-     * the specification for {@link Collection#added Collection.add}. Individual set implementations
+     * the specification for {@link Collection#add Collection.add}. Individual set implementations
      * should clearly document any restrictions on the elements that they may contain.
      *
      * @param value element to be added to this set
@@ -91,7 +91,7 @@ public interface DoubleSet extends Set<Double> {
      * {@code true} if and only if this set contains an element {@code e} such that
      * {@code Objects.equals(o, e)}.
      *
-     * @param o element whose presence in this set is to be tested
+     * @param value element whose presence in this set is to be tested
      * @return {@code true} if this set contains the specified element
      * @throws ClassCastException if the type of the specified element is incompatible with this set
      *             (<a href="Collection.html#optional-restrictions">optional</a>)

@@ -161,7 +161,7 @@ public interface DoubleMap<V> extends Map<Double, V> {
     Set<DoubleEntry<V>> doubleEntrySet();
 
     /**
-     * Specialized {@link Entry} for primitive double.
+     * Specialized entry for primitive double.
      */
     interface DoubleEntry<V> extends Map.Entry<Double, V>, Comparable<DoubleEntry<V>> {
 

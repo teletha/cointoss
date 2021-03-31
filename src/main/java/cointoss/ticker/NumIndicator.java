@@ -243,7 +243,6 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
     /**
      * Build your original {@link NumIndicator}.
      * 
-     * @param <T>
      * @param ticker
      * @param calculator
      * @return

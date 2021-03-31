@@ -92,7 +92,7 @@ public class TimestampBasedMarketServiceSupporter {
     /**
      * Convert from {@link ZonedDateTime} to id.
      * 
-     * @param date A target date-time.
+     * @param time A target date-time.
      * @return The computed ID.
      */
     public final long computeID(ZonedDateTime time) {

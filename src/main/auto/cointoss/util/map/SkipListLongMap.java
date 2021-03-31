@@ -2775,7 +2775,7 @@ class SkipListLongMap<V> extends AbstractMap<Long, V> implements ConcurrentNavig
         /**
          * Create specila {@link Comparator} for {@link Spliterator}.
          * 
-         * @param comprator
+         * @param comparator
          * @return
          */
         public abstract Comparator create(LongComparator comparator);

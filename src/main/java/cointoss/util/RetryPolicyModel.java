@@ -73,18 +73,19 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     /**
      * Set the delay time between trials.
      * 
-     * @param delay
+     * @param time A delay time on retry.
      * @return
      */
     @Icy.Overload("delay")
-    private LongFunction<Duration> delay(Duration delay) {
-        return i -> delay;
+    private LongFunction<Duration> delay(Duration time) {
+        return i -> time;
     }
 
     /**
      * Set the delay time between trials.
      * 
-     * @param delay
+     * @param time A delay time on retry.
+     * @param unit A delay time unit on retry.
      * @return
      */
     @Icy.Overload("delay")
@@ -95,7 +96,8 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     /**
      * Set the delay time between trials.
      * 
-     * @param delay
+     * @param time A delay time on retry.
+     * @param unit A delay time unit on retry.
      * @return
      */
     @Icy.Overload("delay")

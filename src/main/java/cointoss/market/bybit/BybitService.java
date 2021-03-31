@@ -279,7 +279,8 @@ public class BybitService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
+     * @param startExcluded
+     * @return
      */
     private Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
         return call("GET", "open-interest?symbol=" + marketName + "&period=5min&limit=200").flatIterable(e -> e.find("result", "$"))
@@ -294,7 +295,7 @@ public class BybitService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
+     * @return
      */
     private Signal<OpenInterest> connectOpenInterest() {
         double[] price = {0};

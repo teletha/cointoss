@@ -250,7 +250,7 @@ public class BitMexService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
+     * @return
      */
     private Signal<OpenInterest> connectOpenInterest() {
         return clientRealtimely().subscribe(new Topic("instrument", marketName))

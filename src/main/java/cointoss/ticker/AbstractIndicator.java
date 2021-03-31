@@ -87,7 +87,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @param tick A {@link Tick} on {@link Ticker}.
      * @return A time-based value.
      */
-    public abstract T valueAt(Tick timestamp);
+    public abstract T valueAt(Tick tick);
 
     /**
      * Acquires the latest value of this {@link Indicator}.
@@ -140,7 +140,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     /**
      * Gets the indicator whose value is paired with the combinator.
      * 
-     * @param <With> First combination type.
+     * @param <With1> First combination type.
      * @param combinator1 First Combinator.
      * @param combinator2 Second Combinator.
      * @return Combined indicator.
@@ -219,7 +219,6 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     /**
      * Gets the indicator whose value is changed by the mapping function.
      * 
-     * @param <Out> A result type.
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
@@ -284,7 +283,6 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     /**
      * Gets the indicator whose value is changed by the mapping function.
      * 
-     * @param <Out> A result type.
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
@@ -305,7 +303,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     /**
      * Gets the indicator whose value is changed by the mapping function.
      * 
-     * @param <Out> A result type.
+     * @param <With> A result type.
      * @param combinator First Combinator.
      * @param mapper A mapping function.
      * @return Mapped indicator.

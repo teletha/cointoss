@@ -166,7 +166,6 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
     /**
      * Build your original {@link DoubleIndicator}.
      * 
-     * @param <T>
      * @param ticker
      * @param calculator
      * @return

@@ -161,7 +161,7 @@ public interface IntMap<V> extends Map<Integer, V> {
     Set<IntEntry<V>> intEntrySet();
 
     /**
-     * Specialized {@link Entry} for primitive int.
+     * Specialized entry for primitive int.
      */
     interface IntEntry<V> extends Map.Entry<Integer, V>, Comparable<IntEntry<V>> {
 

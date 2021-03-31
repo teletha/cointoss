@@ -26,9 +26,7 @@ import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderManager;
-import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
-import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickerManager;
@@ -111,7 +109,7 @@ public class Market implements Disposable {
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
-     * @param provider A market provider.
+     * @param service A market provider.
      */
     protected Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
@@ -229,7 +227,6 @@ public class Market implements Disposable {
      * strategy. If you do not describe the ordering strategy, it will be processed as a market
      * order.
      * 
-     * @param <S> {@link Takable} or {@link Makable}.
      * @param directional A dirction of the order.
      * @param size A quantity of the order.
      * @param declaration Your order strategy.
@@ -246,7 +243,6 @@ public class Market implements Disposable {
      * strategy. If you do not describe the ordering strategy, it will be processed as a market
      * order.
      * 
-     * @param <S> {@link Takable} or {@link Makable}.
      * @param directional A dirction of the order.
      * @param size A quantity of the order.
      * @param declaration Your order strategy.
@@ -263,7 +259,6 @@ public class Market implements Disposable {
      * strategy. If you do not describe the ordering strategy, it will be processed as a market
      * order.
      * 
-     * @param <S> {@link Takable} or {@link Makable}.
      * @param directional A dirction of the order.
      * @param size A quantity of the order.
      * @param declaration Your order strategy.

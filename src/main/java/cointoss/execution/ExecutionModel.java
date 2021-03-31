@@ -191,7 +191,7 @@ abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #positionPrice}.
+     * Executed date-time.
      * 
      * @return
      */
@@ -224,7 +224,7 @@ abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #positionPrice}.
+     * Executed date-time. (Epoch mills)
      * 
      * @return
      */
@@ -234,7 +234,7 @@ abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #positionPrice}.
+     * Consecutive state.
      * 
      * @return
      */
@@ -244,7 +244,7 @@ abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #positionPrice}.
+     * Delay time.
      * 
      * @return
      */
@@ -286,7 +286,6 @@ abstract class ExecutionModel implements Directional {
     /**
      * Helper method to compare date and time.
      * 
-     * @param time
      * @return A result.
      */
     public final boolean isAfterSeconds(long second) {

@@ -33,7 +33,7 @@ public class PriceRangedVolumeManager {
     private final Num priceRange;
 
     /**
-     * @param service
+     * 
      */
     public PriceRangedVolumeManager(Num priceRange) {
         this.priceRange = priceRange;

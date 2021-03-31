@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -189,7 +189,6 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * We will order with the specified quantity. Use the return the {@link Takable} &
      * {@link Makable} value to define the details of the ordering method.
      * 
-     * @param <S> Ordering interface
      * @param size A entry size.
      * @return A ordering method.
      */
@@ -213,15 +212,13 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntrySize, Order::size, this::setEntryCommission);
         logEntry("Launch entry");
         if (state.is(OrderState.INIT)) state.set(OrderState.ACTIVE);
-        disposerForEntry.add(order.observeState()
-                .take(OrderState.CANCELED)
-                .to(() -> {
-                    // If all entries have been cancelled without being executed, then this scenario
-                    // is considered cancelled.
-                    if (entryExecutedSize.isZero() && entries.stream().allMatch(Order::isCanceled)) {
-                        state.set(OrderState.CANCELED);
-                    }
-                }));
+        disposerForEntry.add(order.observeState().take(OrderState.CANCELED).to(() -> {
+            // If all entries have been cancelled without being executed, then this scenario
+            // is considered cancelled.
+            if (entryExecutedSize.isZero() && entries.stream().allMatch(Order::isCanceled)) {
+                state.set(OrderState.CANCELED);
+            }
+        }));
 
         order.observeExecutedSize().to(v -> {
             Num deltaSize = v.minus(entryExecutedSize);
@@ -266,8 +263,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * Declare exit order by price. Loss cutting is the only element in the trade that investors can
      * control.
      * 
-     * @param time
-     * @param unit
+     * @param span
      */
     public final void exitAfter(Span span) {
         exitAfter(span.seconds, TimeUnit.SECONDS);
@@ -413,9 +409,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     /**
      * Declare exit order
      * 
-     * @param <S>
      * @param timing
-     * @param strategy
      */
     public final void exitWhen(Signal<?> timing) {
         exitWhen(timing, Orderable::take);
@@ -424,7 +418,6 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     /**
      * Declare exit order
      * 
-     * @param <S>
      * @param timing
      * @param strategy
      */

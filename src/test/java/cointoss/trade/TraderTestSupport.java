@@ -44,7 +44,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     private ZonedDateTime base;
 
     /**
-     * @param provider
+     * 
      */
     public TraderTestSupport() {
     }
@@ -94,8 +94,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     /**
      * Shorthand method to entry.
      * 
-     * @param eentry
-     * @param exit
+     * @param e
      */
     protected final void entry(Execution e) {
         entryPartial(e, e.size.doubleValue());
@@ -104,8 +103,8 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     /**
      * Shorthand method to entry.
      * 
-     * @param eentry
-     * @param exit
+     * @param e
+     * @param partialEntrySize
      */
     protected final void entryPartial(Execution e, double partialEntrySize) {
         when(now(), v -> trade(new Scenario() {
@@ -126,7 +125,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     /**
      * Shorthand method to entry and exit.
      * 
-     * @param eentry
+     * @param e
      * @param exit
      */
     protected final void entryAndExit(Execution e, Execution exit) {
@@ -136,7 +135,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     /**
      * Shorthand method to entry and exit.
      * 
-     * @param eentry
+     * @param e
      * @param exit
      */
     protected final void entryAndExitPartial(Execution e, Execution exit, double partialExitSize) {
@@ -146,7 +145,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     /**
      * Shorthand method to entry and exit.
      * 
-     * @param eentry
+     * @param e
      * @param exit
      */
     protected final void entryPartialAndExit(Execution e, double partialEntrySize, Execution exit) {
@@ -156,7 +155,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     /**
      * Shorthand method to entry and exit.
      * 
-     * @param eentry
+     * @param e
      * @param exit
      */
     protected final void entryPartialAndExitPartial(Execution e, double partialEntrySize, Execution exit, double partialExitSize) {

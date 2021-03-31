@@ -444,13 +444,7 @@ public interface NavigableDoubleMap<V> extends NavigableMap<Double, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code subMap(fromKey, true, toKey, false)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableDoubleMap<V> subMap(double fromKey, double toKey);
 
@@ -463,13 +457,7 @@ public interface NavigableDoubleMap<V> extends NavigableMap<Double, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code headMap(toKey, false)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableDoubleMap<V> headMap(double toKey);
 
@@ -482,13 +470,7 @@ public interface NavigableDoubleMap<V> extends NavigableMap<Double, V> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Equivalent to {@code tailMap(fromKey, true)}.
-     *
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     NavigableDoubleMap<V> tailMap(double fromKey);
 }

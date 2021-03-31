@@ -41,7 +41,6 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
 
     /**
      * @param scale
-     * @param initial
      */
     FastLog(int scale) {
         this.scale = scale;

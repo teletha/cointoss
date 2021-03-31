@@ -2775,7 +2775,7 @@ class SkipListDoubleMap<V> extends AbstractMap<Double, V> implements ConcurrentN
         /**
          * Create specila {@link Comparator} for {@link Spliterator}.
          * 
-         * @param comprator
+         * @param comparator
          * @return
          */
         public abstract Comparator create(DoubleComparator comparator);

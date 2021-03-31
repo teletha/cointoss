@@ -163,7 +163,7 @@ public interface WrapperMap<V> extends Map<Wrapper, V> {
     Set<WrapperEntry<V>> PrimitiveEntrySet();
 
     /**
-     * Specialized {@link Entry} for primitive Primitive.
+     * Specialized entry for primitive Primitive.
      */
     interface WrapperEntry<V> extends Map.Entry<Wrapper, V>, Comparable<WrapperEntry<V>> {
 

@@ -9,11 +9,8 @@
  */
 package cointoss.ticker;
 
-import static java.time.temporal.ChronoField.EPOCH_DAY;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.time.temporal.ChronoUnit.HOURS;
+import static java.time.temporal.ChronoField.*;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -93,8 +90,6 @@ public enum Span {
 
     /**
      * Calculate the start time.
-     * 
-     * @param e
      */
     public ZonedDateTime calculateStartTime(ZonedDateTime time) {
         long value = time.getLong(unit);
@@ -103,8 +98,6 @@ public enum Span {
 
     /**
      * Calculate the next start time.
-     * 
-     * @param e
      */
     public ZonedDateTime calculateNextStartTime(ZonedDateTime time) {
         return calculateStartTime(time).plus(duration);

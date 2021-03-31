@@ -50,8 +50,6 @@ class Repository implements Storable<Repository> {
 
     /**
      * Initialize.
-     * 
-     * @param external
      */
     Repository(Directory root, MarketService service) {
         this.root = root;
@@ -193,8 +191,6 @@ class Repository implements Storable<Repository> {
     /**
      * Collect all managed date-times.
      * 
-     * @param ascending
-     * @param includeToday
      * @return
      */
     Signal<ZonedDateTime> collectLocals() {
@@ -204,8 +200,6 @@ class Repository implements Storable<Repository> {
     /**
      * Collect all managed date-times.
      * 
-     * @param ascending
-     * @param includeToday
      * @return
      */
     Signal<ZonedDateTime> collectLocals(boolean ascending) {

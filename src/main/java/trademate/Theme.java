@@ -13,10 +13,9 @@ import static javafx.scene.paint.Color.*;
 
 import java.util.List;
 
-import javafx.scene.paint.Color;
-
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
+import javafx.scene.paint.Color;
 import kiss.I;
 import viewtify.model.Model;
 
@@ -93,7 +92,6 @@ public class Theme extends Model<Theme> {
     /**
      * Detec the color by number.
      * 
-     * @param direction
      * @return
      */
     public static Color colorBy(Num num) {

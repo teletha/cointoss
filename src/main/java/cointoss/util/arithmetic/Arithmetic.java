@@ -658,7 +658,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self remainder(Self divisor);
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other
      * @return A result.
@@ -668,7 +668,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other
      * @return A result.
@@ -678,7 +678,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other
      * @return A result.
@@ -688,7 +688,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other
      * @return A result.
@@ -698,7 +698,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other
      * @return A result.
@@ -718,7 +718,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -728,7 +728,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -738,7 +738,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -748,7 +748,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
@@ -937,8 +937,8 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param other the other value
      * @return true is this is greater than the specified value, false otherwise
      */
-    public final boolean isGreaterThan(Directional direction, Variable<Self> price) {
-        return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
+    public final boolean isGreaterThan(Directional direction, Variable<Self> other) {
+        return direction.isBuy() ? isGreaterThan(other) : isLessThan(other);
     }
 
     /**
@@ -947,8 +947,8 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * @param other the other value
      * @return true is this is greater than the specified value, false otherwise
      */
-    public final boolean isGreaterThan(Directional direction, Self price) {
-        return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
+    public final boolean isGreaterThan(Directional direction, Self other) {
+        return direction.isBuy() ? isGreaterThan(other) : isLessThan(other);
     }
 
     /**
@@ -1172,7 +1172,7 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     }
 
     /**
-     * Compare {@link Self}.
+     * Compare value.
      * 
      * @param direction
      * @param other
@@ -1507,11 +1507,12 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self floor(Self base);
 
     /**
-     * Returns a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>).
-     * The scale of the result is {@code (this.scale() - n)}.
+     * Returns a {@link Arithmetic} whose Selferical value is equal to ({@code this} *
+     * 10<sup>n</sup>). The scale of the result is {@code (this.scale() - n)}.
      *
      * @param n the exponent power of ten to scale by
-     * @return a {@link Self} whose Selferical value is equal to ({@code this} * 10<sup>n</sup>)
+     * @return a {@link Arithmetic} whose Selferical value is equal to ({@code this} *
+     *         10<sup>n</sup>)
      * @throws ArithmeticException if the scale would be outside the range of a 32-bit integer.
      */
     public abstract Self decuple(int n);
@@ -1533,7 +1534,6 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * exponent range.
      *
      * @param n power to raise this {@code Self} to.
-     * @param mc the context to use.
      * @return <code>this<sup>n</sup></code> using the ANSI standard X3.274-1996 algorithm
      * @throws ArithmeticException if the result is inexact but the rounding mode is
      *             {@code UNNECESSARY}, or {@code n} is out of range.
@@ -1549,7 +1549,6 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
      * exponent range.
      *
      * @param n power to raise this {@code Self} to.
-     * @param mc the context to use.
      * @return <code>this<sup>n</sup></code> using the ANSI standard X3.274-1996 algorithm
      * @throws ArithmeticException if the result is inexact but the rounding mode is
      *             {@code UNNECESSARY}, or {@code n} is out of range.

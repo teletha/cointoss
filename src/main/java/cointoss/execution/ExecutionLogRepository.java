@@ -40,7 +40,6 @@ public abstract class ExecutionLogRepository {
     /**
      * Collect all resource locations.
      * 
-     * @param service
      * @return
      */
     public abstract Signal<ZonedDateTime> collect();
@@ -68,7 +67,6 @@ public abstract class ExecutionLogRepository {
     /**
      * Convert data.
      * 
-     * @param url
      * @return
      */
     public final Signal<Execution> convert(LocalDate date) {
@@ -78,7 +76,6 @@ public abstract class ExecutionLogRepository {
     /**
      * Convert data.
      * 
-     * @param url
      * @return
      */
     public abstract Signal<Execution> convert(ZonedDateTime date);

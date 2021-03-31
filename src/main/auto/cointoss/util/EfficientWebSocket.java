@@ -177,7 +177,6 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
     /**
      * Extract channel id from massage.
      *  
-     *  @param extractId An id extractor.
      *  @return Chainable API.
      */
     @Override
@@ -251,10 +250,9 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
     }
 
     /**
-     * Sets the maximum number of subscriptions per connection. Default value is 25.
+     * Sets the maximum number of subscriptions per connection. Default value is 25. A number less
+     *  than or equal to 0 is considered unlimited.
      *  
-     *  @param size The maximum number of subscriptions per connection. A number less than or equal
-     *             to 0 is considered unlimited.
      *  @return Chainable API.
      */
     @Override
@@ -290,7 +288,6 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
      * Ignore JSON that match the specified criteria. This process is very efficient because it is
      *  tried only once for each JSON data on the base stream.
      *  
-     *  @param condition
      *  @return Chainable API.
      */
     @Override
@@ -328,7 +325,6 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
     /**
      * Reconnect socket when some message match the specified criteria.
      *  
-     *  @param condition
      *  @return Chainable API.
      */
     @Override
@@ -366,7 +362,6 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
     /**
      * Stop reconnecting socket when some message match the specified criteria.
      *  
-     *  @param condition
      *  @return Chainable API.
      */
     @Override
@@ -404,7 +399,6 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
     /**
      * Pong when some message match the specified criteria.
      *  
-     *  @param condition
      *  @return Chainable API.
      */
     @Override

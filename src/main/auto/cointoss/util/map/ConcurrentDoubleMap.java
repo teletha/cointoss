@@ -190,8 +190,6 @@ public interface ConcurrentDoubleMap<V> extends ConcurrentMap<Double, V>, Double
     V replace(double key, V value);
 
     /**
-     * {@inheritDoc}
-     *
      * @implSpec The default implementation is equivalent to the following steps for this
      *           {@code map}: <pre> {@code
      * V oldValue, newValue;
@@ -205,10 +203,6 @@ public interface ConcurrentDoubleMap<V> extends ConcurrentMap<Double, V>, Double
      *           {@code get()} returning null unambiguously means the key is absent. Implementations
      *           which support null values <strong>must</strong> override this default
      *           implementation.
-     * @throws UnsupportedOperationException {@inheritDoc}
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     default V computeIfAbsent(double key, DoubleFunction<? extends V> mappingFunction) {
         Objects.requireNonNull(mappingFunction);
@@ -218,8 +212,6 @@ public interface ConcurrentDoubleMap<V> extends ConcurrentMap<Double, V>, Double
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @implSpec The default implementation is equivalent to performing the following steps for this
      *           {@code map}: <pre> {@code
      * for (;;) {
@@ -242,10 +234,6 @@ public interface ConcurrentDoubleMap<V> extends ConcurrentMap<Double, V>, Double
      *           {@code get()} returning null unambiguously means the key is absent. Implementations
      *           which support null values <strong>must</strong> override this default
      *           implementation.
-     * @throws UnsupportedOperationException {@inheritDoc}
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     default V merge(double key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);

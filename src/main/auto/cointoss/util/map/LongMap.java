@@ -161,7 +161,7 @@ public interface LongMap<V> extends Map<Long, V> {
     Set<LongEntry<V>> longEntrySet();
 
     /**
-     * Specialized {@link Entry} for primitive long.
+     * Specialized entry for primitive long.
      */
     interface LongEntry<V> extends Map.Entry<Long, V>, Comparable<LongEntry<V>> {
 

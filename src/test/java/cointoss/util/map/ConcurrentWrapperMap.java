@@ -192,8 +192,6 @@ public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, Wrap
     V replace(Primitive key, V value);
 
     /**
-     * {@inheritDoc}
-     *
      * @implSpec The default implementation is equivalent to the following steps for this
      *           {@code map}: <pre> {@code
      * V oldValue, newValue;
@@ -207,10 +205,6 @@ public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, Wrap
      *           {@code get()} returning null unambiguously means the key is absent. Implementations
      *           which support null values <strong>must</strong> override this default
      *           implementation.
-     * @throws UnsupportedOperationException {@inheritDoc}
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     default V computeIfAbsent(Primitive key, WrapperFunction<? extends V> mappingFunction) {
         Objects.requireNonNull(mappingFunction);
@@ -220,8 +214,6 @@ public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, Wrap
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @implSpec The default implementation is equivalent to performing the following steps for this
      *           {@code map}: <pre> {@code
      * for (;;) {
@@ -244,10 +236,6 @@ public interface ConcurrentWrapperMap<V> extends ConcurrentMap<Wrapper, V>, Wrap
      *           {@code get()} returning null unambiguously means the key is absent. Implementations
      *           which support null values <strong>must</strong> override this default
      *           implementation.
-     * @throws UnsupportedOperationException {@inheritDoc}
-     * @throws ClassCastException {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     * @throws IllegalArgumentException {@inheritDoc}
      */
     default V merge(Primitive key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);

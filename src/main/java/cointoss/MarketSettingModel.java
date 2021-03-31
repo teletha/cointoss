@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 import cointoss.execution.ExecutionDeltaLogger;
-import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
@@ -80,7 +79,7 @@ interface MarketSettingModel {
     }
 
     /**
-     * Configure {@link ExecutionLog} parser.
+     * Configure {@link ExecutionLogger} parser.
      * 
      * @return
      */

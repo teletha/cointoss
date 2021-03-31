@@ -387,7 +387,7 @@ public class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #positionPrice}.
+     * Executed date-time.
      *  
      *  @return
      */
@@ -424,7 +424,7 @@ public class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #positionPrice}.
+     * Executed date-time. (Epoch mills)
      *  
      *  @return
      */
@@ -458,7 +458,7 @@ public class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #positionPrice}.
+     * Consecutive state.
      *  
      *  @return
      */
@@ -492,7 +492,7 @@ public class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #positionPrice}.
+     * Delay time.
      *  
      *  @return
      */

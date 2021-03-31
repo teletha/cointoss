@@ -181,7 +181,6 @@ public class Chrono {
     /**
      * UTC {@link ZonedDateTime} from epoch micros.
      * 
-     * @param mills
      * @return
      */
     public static ZonedDateTime utcByMicros(long micros) {
@@ -201,7 +200,6 @@ public class Chrono {
     /**
      * UTC {@link ZonedDateTime} from epoch seconds.
      * 
-     * @param mills
      * @return
      */
     public static ZonedDateTime utcBySeconds(long seconds) {
@@ -301,7 +299,6 @@ public class Chrono {
     /**
      * System default {@link ZonedDateTime} from current time
      * 
-     * @param mills
      * @return
      */
     public static ZonedDateTime systemNow() {
@@ -331,7 +328,6 @@ public class Chrono {
     /**
      * System default {@link ZonedDateTime} from epoch mills.
      * 
-     * @param mills
      * @return
      */
     public static ZonedDateTime system(ZonedDateTime time) {
@@ -492,7 +488,6 @@ public class Chrono {
     /**
      * Format the duration (mills) to human-readable expression.
      * 
-     * @param mills
      * @return
      */
     public static String formatAsDuration(ZonedDateTime start, ZonedDateTime end) {
@@ -502,7 +497,6 @@ public class Chrono {
     /**
      * Format the duration to human-readable expression.
      * 
-     * @param mills
      * @return
      */
     public static String formatAsDuration(Duration duration) {

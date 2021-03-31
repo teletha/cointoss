@@ -782,7 +782,8 @@ public class BitFlyerService extends MarketService {
         public Map<String, String> params = new HashMap();
 
         /**
-         * @param id
+         * @param channel
+         * @param marketName
          */
         public Topic(String channel, String marketName) {
             super("[" + channel + marketName + "]");

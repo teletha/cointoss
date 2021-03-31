@@ -419,7 +419,7 @@ public class AbstractTrader extends AbstractTraderModel {
         /**
          * Create initialized {@link AbstractTrader} with scenarios property.
          *
-         * @param value A value to assign.
+         * @param values A value to assign.
          * @return A initialized model.
          */
         public Self scenarios(Scenario... values) {

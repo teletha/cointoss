@@ -61,7 +61,7 @@ public final class Tick implements TemporalData {
     /**
      * New {@link Tick}.
      * 
-     * @param openTime A start time of period.
+     * @param startEpochSeconds A start time of period.
      * @param open A open price.
      * @param ticker The data source.
      */
@@ -269,8 +269,6 @@ public final class Tick implements TemporalData {
 
     /**
      * Make this {@link Tick}'s related values fixed.
-     * 
-     * @return
      */
     synchronized void freeze() {
         if (ticker != null) {

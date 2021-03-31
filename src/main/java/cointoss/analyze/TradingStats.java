@@ -230,7 +230,6 @@ public class TradingStats {
     /**
      * Output result by text format.
      * 
-     * @param detail
      * @return
      */
     public final String showByText() {
@@ -241,9 +240,6 @@ public class TradingStats {
 
     /**
      * Output result by text format.
-     * 
-     * @param detail
-     * @return
      */
     public final void showByText(Appendable builder) {
         try {
