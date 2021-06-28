@@ -38,7 +38,7 @@ class SearchInitialExecutionTest {
     @Test
     @Timeout(value = 10)
     void binance() {
-        assert Binance.FUTURE_BTCUSD_210625.searchInitialExecution().waitForTerminate().to().exact().id == 1;
+        assert Binance.FUTURE_BTCUSD_210924.searchInitialExecution().waitForTerminate().to().exact().id == 1;
     }
 
     @Test
