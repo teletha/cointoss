@@ -9,8 +9,6 @@
  */
 package cointoss.ticker;
 
-import org.apache.commons.math3.stat.regression.SimpleRegression;
-
 import cointoss.util.arithmetic.Num;
 
 /**
