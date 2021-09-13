@@ -1541,21 +1541,6 @@ public abstract class Arithmetic<Self extends Arithmetic> extends Number impleme
     public abstract Self pow(int n);
 
     /**
-     * Returns a {@code Self} whose value is <code>(this<sup>n</sup>)</code>. The current
-     * implementation uses the core algorithm defined in ANSI standard X3.274-1996 with rounding
-     * according to the context settings. In general, the returned Selferical value is within two
-     * ulps of the exact Selferical value for the chosen precision. Note that future releases may
-     * use a different algorithm with a decreased allowable error bound and increased allowable
-     * exponent range.
-     *
-     * @param n power to raise this {@code Self} to.
-     * @return <code>this<sup>n</sup></code> using the ANSI standard X3.274-1996 algorithm
-     * @throws ArithmeticException if the result is inexact but the rounding mode is
-     *             {@code UNNECESSARY}, or {@code n} is out of range.
-     */
-    public abstract Self pow(double n);
-
-    /**
      * Compute scale.
      */
     public abstract int scale();

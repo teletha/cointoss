@@ -38,30 +38,4 @@ class ArithmeticPowTest extends ArithmeticTestSupport {
         assert equality(Num.of(Long.MAX_VALUE).pow(2), "85070591730234615847396907784232501249");
         assert equality(Num.of(Long.MAX_VALUE).pow(-2), "0.000000000000000000000000000000000000011754943508222875");
     }
-
-    @Test
-    void powDouble() {
-        assert equality(Num.of(2).pow(0D), 1);
-        assert equalityVaguely(Num.of(2).pow(1.5), 2.82842712474619009760337744841939615713934375075389614635335947598);
-        assert equalityVaguely(Num.of(2).pow(0.12), 1.08673486252605810085520592372923691993692216652212063431723914676);
-        assert equalityVaguely(Num.of(2D).pow(-2), 0.25);
-        assert equalityVaguely(Num.of(2).pow(-1.5), 0.35355339059327);
-        assert equalityVaguely(Num.of(2).pow(-0.12), 0.92018765062487);
-    }
-
-    @Test
-    void powDoubleZeroBase() {
-        assert equality(Num.ZERO.pow(0D), 1);
-        assert equality(Num.ZERO.pow(0.12), 0);
-        assert equality(Num.ZERO.pow(1.5), 0);
-        assert equality(Num.ZERO.pow(-0.12), 0);
-        assert equality(Num.ZERO.pow(-1.5), 0);
-    }
-
-    @Test
-    void powDoubleBigBase() {
-        assert equality(Num.of(Long.MAX_VALUE).pow(0D), 1);
-        assert equality(Num.of(Long.MAX_VALUE).pow(1.5), "28011385487393069954810468363.76501");
-        assert equality(Num.of(Long.MAX_VALUE).pow(-1.5), "0.000000000000000000000000000035699769311663094");
-    }
 }

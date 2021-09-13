@@ -22,7 +22,6 @@ import org.apache.commons.lang3.RandomUtils;
 
 import com.google.common.math.DoubleMath;
 
-import ch.obermuhlner.math.big.BigDecimalMath;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
@@ -245,7 +244,7 @@ public class Num extends Arithmetic<Num> {
                         return new Num(negative ? result : -result, lastDigitIndex - Math.max(0, index) - parseInt(value, i + 1, length));
                     } else {
                         // fallback
-                        return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
+                        return create(new BigDecimal(value, CONTEXT));
                     }
                 }
             }
@@ -268,7 +267,7 @@ public class Num extends Arithmetic<Num> {
         // BigDecimalMath.toBigDecimal(String) is a drop-in replacement with the same
         // functionality (converting a string representation into a BigDecimal) but it is using
         // a faster recursive implementation.
-        return create(BigDecimalMath.toBigDecimal(value, CONTEXT));
+        return create(new BigDecimal(value, CONTEXT));
     }
 
     /**
@@ -732,30 +731,6 @@ public class Num extends Arithmetic<Num> {
                 return create(result, () -> scale * n);
             } catch (ArithmeticException e) {
                 return create(big().pow(n));
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Num pow(double n) {
-        if (big != null) {
-            return create(BigDecimal.valueOf(Math.pow(big.doubleValue(), n)));
-        } else if (n == 0) {
-            return Num.ONE; // by definition
-        } else if (n == 1) {
-            return this; // shortcut
-        } else if (v == 0) {
-            return Num.ZERO; // cache
-        } else {
-            try {
-                double result = Math.pow(v, n);
-                DoubleMath.roundToLong(result, RoundingMode.HALF_DOWN);
-                return create(result, () -> (int) (scale * n));
-            } catch (ArithmeticException e) {
-                return create(BigDecimalMath.pow(big(), BigDecimal.valueOf(n), MathContext.DECIMAL128));
             }
         }
     }

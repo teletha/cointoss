@@ -31,7 +31,6 @@ public class Project extends bee.api.Project {
         unrequire("org.checkerframework", "checker-qual");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
-        require("ch.obermuhlner", "big-math");
         require("org.decimal4j", "decimal4j").atTest();
 
         versionControlSystem("https://github.com/teletha/cointoss");
