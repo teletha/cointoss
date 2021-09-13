@@ -11,8 +11,6 @@ package cointoss.verify;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang3.RandomUtils;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
@@ -84,7 +82,7 @@ public class TrainingMarketService extends MarketService {
     public Signal<String> request(Order order) {
         System.out.println("request " + order);
         if (order.type.isTaker()) {
-            String id = "ID" + RandomUtils.nextInt();
+            String id = "ID" + Num.random(0, Integer.MAX_VALUE);
             return I.signal(id).effectOnComplete(() -> {
                 frontend.orderUpdateRealtimely.accept(OrderManager.Update
                         .execute(id, order.size, orderbooks.by(order.inverse()).predictTakingPrice(order.size), Num.ZERO));

@@ -14,11 +14,10 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.SplittableRandom;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.IntSupplier;
 import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.RandomUtils;
 
 import com.google.common.math.DoubleMath;
 
@@ -42,6 +41,9 @@ import kiss.Variable;
  */
 @SuppressWarnings("serial")
 public class Num extends Arithmetic<Num> {
+
+    /** RANDOM Generator */
+    private static final SplittableRandom RANDOM = new SplittableRandom();
 
     /** The reusable cache. */
     private static final IntSupplier NoOP = () -> 0;
@@ -1114,14 +1116,40 @@ public class Num extends Arithmetic<Num> {
     }
 
     /**
+     * Create {@link Num} with random number between {@link Integer#MIN_VALUE} and
+     * {@link Integer#MAX_VALUE}.
+     * 
+     * @return A random number.
+     */
+    public static Num random() {
+        return of(RANDOM.nextInt());
+    }
+
+    /**
      * Create {@link Num} with random number between min and max.
      * 
-     * @param minInclusive A minimum number (inclusive).
-     * @param maxExclusive A maximum number (exclusive).
+     * @return A random number.
+     */
+    public static Num random(int minInclusive, int maxExclusive) {
+        return of(RANDOM.nextInt(minInclusive, maxExclusive));
+    }
+
+    /**
+     * Create {@link Num} with random number between min and max.
+     * 
+     * @return A random number.
+     */
+    public static Num random(long minInclusive, long maxExclusive) {
+        return of(RANDOM.nextLong(minInclusive, maxExclusive));
+    }
+
+    /**
+     * Create {@link Num} with random number between min and max.
+     * 
      * @return A random number.
      */
     public static Num random(double minInclusive, double maxExclusive) {
-        return of(RandomUtils.nextDouble(minInclusive, maxExclusive));
+        return of(RANDOM.nextDouble(minInclusive, maxExclusive));
     }
 
     /**

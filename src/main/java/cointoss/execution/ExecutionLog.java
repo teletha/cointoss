@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static psychopath.Option.*;
+import static psychopath.Option.ATOMIC_WRITE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,7 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -527,7 +526,7 @@ public class ExecutionLog {
     public final Signal<Execution> rangeRandom(int days, LogType... type) {
         ZonedDateTime first = repository.firstZDT();
         long range = ChronoUnit.DAYS.between(first, repository.lastZDT().minusDays(days + 1));
-        long offset = RandomUtils.nextLong(0, range);
+        long offset = Num.random(0L, range).longValue();
         return range(first.plusDays(offset), first.plusDays(offset + days), type);
     }
 
