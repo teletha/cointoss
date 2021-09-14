@@ -6,6 +6,7 @@ import cointoss.MarketSettingModel;
 import cointoss.MarketType;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.arithmetic.Num;
+
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.StringBuilder;

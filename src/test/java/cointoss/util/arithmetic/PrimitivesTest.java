@@ -11,8 +11,6 @@ package cointoss.util.arithmetic;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.arithmetic.Primitives;
-
 class PrimitivesTest {
 
     @Test
