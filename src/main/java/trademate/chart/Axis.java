@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
+import cointoss.util.arithmetic.Primitives;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -29,8 +30,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
-
-import cointoss.util.Primitives;
 import kiss.Disposable;
 import kiss.Variable;
 import stylist.Style;

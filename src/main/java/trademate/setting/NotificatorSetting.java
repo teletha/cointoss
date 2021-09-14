@@ -10,7 +10,7 @@
 package trademate.setting;
 
 import cointoss.util.Network;
-import cointoss.util.Primitives;
+import cointoss.util.arithmetic.Primitives;
 import javafx.util.Duration;
 import kiss.I;
 import kiss.Managed;

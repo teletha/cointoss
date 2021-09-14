@@ -21,8 +21,8 @@ import java.util.function.UnaryOperator;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
-import cointoss.util.Primitives;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.arithmetic.Primitives;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;

@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
-import cointoss.util.Primitives;
+import cointoss.util.arithmetic.Primitives;
 
 public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, DoubleIndicator> {
 

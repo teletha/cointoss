@@ -24,7 +24,6 @@ import com.google.common.math.DoubleMath;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.util.Primitives;
 import cointoss.util.function.DoublePentaFunction;
 import cointoss.util.function.DoubleTetraFunction;
 import cointoss.util.function.DoubleTriFunction;
@@ -622,9 +621,9 @@ public class Num extends Arithmetic<Num> {
     @Override
     public Num ceiling(Num base) {
         if (big != null) {
-            return create(BigDecimals.ceiling(big, base.big()));
+            return create(Num.ceiling(big, base.big()));
         } else if (base.big != null) {
-            return create(BigDecimals.ceiling(big(), base.big));
+            return create(Num.ceiling(big(), base.big));
         } else {
             if (base.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
 
@@ -642,9 +641,21 @@ public class Num extends Arithmetic<Num> {
                     return rem == 0 ? this : new Num(v - rem + value, scale);
                 }
             } catch (ArithmeticException e) {
-                return create(BigDecimals.ceiling(big(), base.big()));
+                return create(Num.ceiling(big(), base.big()));
             }
         }
+    }
+
+    /**
+     * Helper method to calculate round-up value on {@link BigDecimal} context.
+     * 
+     * @param value A target value.
+     * @param base A base value.
+     * @return A round-up value.
+     */
+    static BigDecimal ceiling(BigDecimal value, BigDecimal base) {
+        BigDecimal rem = value.remainder(base);
+        return rem.signum() == 0 ? value : value.subtract(rem).add(base);
     }
 
     /**
@@ -653,9 +664,9 @@ public class Num extends Arithmetic<Num> {
     @Override
     public Num floor(Num base) {
         if (big != null) {
-            return create(BigDecimals.floor(big, base.big()));
+            return create(Num.floor(big, base.big()));
         } else if (base.big != null) {
-            return create(BigDecimals.floor(big(), base.big));
+            return create(Num.floor(big(), base.big));
         } else {
             if (base.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
 
@@ -669,9 +680,21 @@ public class Num extends Arithmetic<Num> {
                     return new Num(v - v % Math.multiplyExact(base.v, (long) pow10(scale - base.scale)), scale);
                 }
             } catch (ArithmeticException e) {
-                return create(BigDecimals.floor(big(), base.big()));
+                return create(Num.floor(big(), base.big()));
             }
         }
+    }
+
+    /**
+     * Helper method to calculate round-down value on {@link BigDecimal} context.
+     * 
+     * @param value A target value.
+     * @param base A base value.
+     * @return A round-down value.
+     */
+    static BigDecimal floor(BigDecimal value, BigDecimal base) {
+        BigDecimal rem = value.remainder(base);
+        return rem.signum() == 0 ? value : value.subtract(rem);
     }
 
     /**

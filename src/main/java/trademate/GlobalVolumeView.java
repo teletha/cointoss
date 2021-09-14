@@ -29,7 +29,7 @@ import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
-import cointoss.util.Primitives;
+import cointoss.util.arithmetic.Primitives;
 import cointoss.util.ring.RingBuffer;
 import cointoss.volume.GlobalVolume;
 import javafx.collections.FXCollections;

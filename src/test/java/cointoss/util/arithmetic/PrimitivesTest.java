@@ -7,9 +7,11 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.util.arithmetic;
 
 import org.junit.jupiter.api.Test;
+
+import cointoss.util.arithmetic.Primitives;
 
 class PrimitivesTest {
 
