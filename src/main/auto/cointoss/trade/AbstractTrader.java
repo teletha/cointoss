@@ -5,7 +5,6 @@ import cointoss.trade.AbstractTraderModel;
 import cointoss.trade.Scenario;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
@@ -15,7 +14,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
 import javax.annotation.processing.Generated;
-
 import kiss.Signal;
 
 /**
@@ -152,29 +150,14 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldSizeDiff() {
         return holdSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldSize() {
         return holdSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldSizeNow() {
         return holdSizeCustomizer.observe$Now();
     }
@@ -217,29 +200,14 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldMaxSizeDiff() {
         return holdMaxSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldMaxSize() {
         return holdMaxSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeHoldMaxSizeNow() {
         return holdMaxSizeCustomizer.observe$Now();
     }
@@ -282,29 +250,14 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeProfitDiff() {
         return profitCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeProfit() {
         return profitCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeProfitNow() {
         return profitCustomizer.observe$Now();
     }
