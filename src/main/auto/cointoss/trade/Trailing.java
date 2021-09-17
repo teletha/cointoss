@@ -5,7 +5,6 @@ import cointoss.ticker.Span;
 import cointoss.trade.Trailing;
 import cointoss.trade.TrailingModel;
 import cointoss.util.arithmetic.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
@@ -17,7 +16,6 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.function.Function;
 import javax.annotation.processing.Generated;
-
 import kiss.Signal;
 
 /**

@@ -9,8 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
@@ -110,7 +109,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
      * 
      * @return An identical trader name.
      */
-    public String name() {
+    public final String name() {
         return getClass().getSimpleName();
     }
 
