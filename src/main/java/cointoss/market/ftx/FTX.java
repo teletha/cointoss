@@ -102,12 +102,11 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.0000005))
             .acquirableExecutionSize(AcquirableSize));
 
-    // public static final MarketService BTC0326 = new FTXService("BTC-0326",
-    // MarketSetting.with.future()
-    // .target(Currency.BTC.minimumSize(0.0001))
-    // .base(Currency.USD.minimumSize(1))
-    // .acquirableExecutionSize(AcquirableSize));
-    //
+    public static final MarketService BTC0325 = new FTXService("BTC-0325", MarketSetting.with.future()
+            .target(Currency.BTC.minimumSize(0.0001))
+            .base(Currency.USD.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
+
     // public static final MarketService BTC0625 = new FTXService("BTC-0625",
     // MarketSetting.with.future()
     // .target(Currency.BTC.minimumSize(0.0001))
@@ -124,12 +123,16 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 
-    // public static final MarketService ETH0326 = new FTXService("ETH-0326",
-    // MarketSetting.with.future()
-    // .target(Currency.ETH.minimumSize(0.001))
-    // .base(Currency.USD.minimumSize(0.1))
-    // .acquirableExecutionSize(AcquirableSize));
-    //
+    public static final MarketService ETH1231 = new FTXService("ETH-1231", MarketSetting.with.future()
+            .target(Currency.ETH.minimumSize(0.001))
+            .base(Currency.USD.minimumSize(0.1))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService ETH0325 = new FTXService("ETH-0325", MarketSetting.with.future()
+            .target(Currency.ETH.minimumSize(0.001))
+            .base(Currency.USD.minimumSize(0.1))
+            .acquirableExecutionSize(AcquirableSize));
+
     // public static final MarketService ETH0625 = new FTXService("ETH-0625",
     // MarketSetting.with.future()
     // .target(Currency.ETH.minimumSize(0.001))
