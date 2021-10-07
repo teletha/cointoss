@@ -14,8 +14,6 @@ import java.net.http.HttpClient;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.parallel.Execution;
@@ -97,7 +95,6 @@ public abstract class MarketServiceTester<S extends MarketService> {
         if (usedRealWebSocket) {
             Thread.sleep(12500);
         }
-        Configurator.setRootLevel(Level.ERROR);
     }
 
     /**
@@ -115,7 +112,6 @@ public abstract class MarketServiceTester<S extends MarketService> {
                     return superMethod.call().withClient(websocketServer.httpClient()).withScheduler(chronus);
                 } else {
                     usedRealWebSocket = true;
-                    enableDebug();
                     return superMethod.call().enableDebug();
                 }
             } catch (Exception e) {
@@ -216,13 +212,6 @@ public abstract class MarketServiceTester<S extends MarketService> {
             }
         }
         return true;
-    }
-
-    /**
-     * Display debug log.
-     */
-    protected final void enableDebug() {
-        Configurator.setRootLevel(Level.TRACE);
     }
 
     /**

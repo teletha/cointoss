@@ -12,9 +12,6 @@ package cointoss.trade.bot;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
@@ -28,6 +25,7 @@ import cointoss.trade.Trader;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.feather.Option;
 import cointoss.verify.BackTest;
+import kiss.I;
 import kiss.Signal;
 
 public class TouchMovingAverage extends Trader {
@@ -118,8 +116,7 @@ public class TouchMovingAverage extends Trader {
     }
 
     public static void main(String[] args) {
-        Logger log = LogManager.getLogger();
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> I.error(e));
 
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2020, 3, 2)

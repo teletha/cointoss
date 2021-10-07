@@ -11,8 +11,6 @@ package cointoss.order;
 
 import java.time.ZonedDateTime;
 
-import org.apache.logging.log4j.util.PerformanceSensitive;
-
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
@@ -40,7 +38,6 @@ abstract class PositionModel implements Directional {
      * @param currentPrice A current price.
      * @return A total profit or loss of this entry.
      */
-    @PerformanceSensitive
     public final Num profit(Num currentPrice) {
         return currentPrice.minus(this, price()).multiply(size());
     }

@@ -15,9 +15,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.annotations.VisibleForTesting;
 
 import icy.manipulator.Icy;
@@ -28,8 +25,6 @@ import kiss.WiseRunnable;
 
 @Icy
 abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signal<?>> {
-
-    private static final Logger logger = LogManager.getLogger();
 
     @VisibleForTesting
     long count;
@@ -168,7 +163,8 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
 
             String name = name();
             if (name != null && name.length() != 0) {
-                logger.error(this + " will retry after {}.", Chrono.formatAsDuration(duration), e);
+                I.error(this + " will retry after " + Chrono.formatAsDuration(duration) + ".");
+                I.error(e);
             }
 
             return duration;

@@ -19,8 +19,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
@@ -47,9 +45,6 @@ import psychopath.File;
 import psychopath.Locator;
 
 public abstract class MarketService implements Comparable<MarketService>, Disposable {
-
-    /** The logging system. */
-    protected static final Logger logger = LogManager.getLogger(MarketService.class);
 
     /** The exchange. */
     public final Exchange exchange;
@@ -183,7 +178,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     private Signal<Execution> searchInitialExecution(long start, Execution end) {
         long middle = (start + end.id) / 2;
-        logger.info("{} searches for the initial execution log. [{} ~ {} ~ {}]", this, start, middle, end.date);
+        I.info(this + " searches for the initial execution log. [" + start + " ~ " + middle + " ~ " + end.date + "]");
 
         return executionsBefore(middle).buffer().skipError().or(List.of()).flatMap(result -> {
             int size = result.size();
@@ -228,8 +223,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     private Signal<Execution> searchNearestExecution(ZonedDateTime target, Execution sampleStart, Execution sampleEnd, int count) {
-        logger.info("{} searches for the execution log closest to {}. [{} ~ {}]", this, target.toLocalDate(), sampleStart.date
-                .toLocalDateTime(), sampleEnd.date.toLocalDateTime());
+        I.info(this + " searches for the execution log closest to " + target.toLocalDate() + ". [" + sampleStart.date
+                .toLocalDateTime() + " ~ " + sampleEnd.date.toLocalDateTime() + "]");
 
         double timeDistance = sampleEnd.mills - sampleStart.mills;
         double idDistance = sampleEnd.id - sampleStart.id;

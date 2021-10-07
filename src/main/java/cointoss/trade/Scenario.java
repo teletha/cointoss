@@ -52,6 +52,9 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     /** The parent {@link Trader}. */
     Trader trader;
 
+    /** The logger name. */
+    String logger;
+
     /** The entry disposer. */
     private final Disposable disposerForEntry = Disposable.empty();
 
@@ -566,7 +569,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param message
      */
     protected final void log(String message) {
-        trader.log.debug(message);
+        I.debug(trader.name(), message);
 
         if (logs != null) {
             logs.add(message);

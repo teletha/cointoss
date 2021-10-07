@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static psychopath.Option.ATOMIC_WRITE;
+import static psychopath.Option.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,9 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.google.common.base.Stopwatch;
@@ -71,9 +68,6 @@ import psychopath.File;
  */
 public class ExecutionLog {
 
-    /** The logging system. */
-    private static final Logger log = LogManager.getLogger(ExecutionLog.class);
-
     /** The message aggregator. */
     private static final Signaling<MarketService> aggregateWritingLog = new Signaling();
 
@@ -86,7 +80,7 @@ public class ExecutionLog {
             }
 
             for (Entry<Exchange, Collection<String>> entry : map.asMap().entrySet()) {
-                log.info("Saved execution log for " + entry.getValue().size() + " markets in " + entry.getKey() + ". " + entry.getValue());
+                I.info("Saved execution log for " + entry.getValue().size() + " markets in " + entry.getKey() + ". " + entry.getValue());
             }
         });
     }
@@ -354,7 +348,7 @@ public class ExecutionLog {
                                 .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
                         continue;
                     } else {
-                        log.info("{} \t{} size {}({})", service.id, rests.getFirst().date, retrieved, coefficient);
+                        I.info(service.id + " \t" + rests.getFirst().date + " size " + retrieved + "(" + coefficient + ")");
 
                         for (Execution execution : rests) {
                             if (!buffer.canSwitch(execution)) {
@@ -711,9 +705,9 @@ public class ExecutionLog {
                             .delay(Integer.parseInt(values[6])))
                     .effectOnComplete(parser::stopParsing)
                     .effectOnObserve(stopwatch::start)
-                    .effectOnError(e -> log.error("Fail to read normal log. [" + normal + "]"))
+                    .effectOnError(e -> I.error("Fail to read normal log. [" + normal + "]"))
                     .effectOnComplete(() -> {
-                        log.trace("Read normal log {} [{}] {}", service.id, date, stopwatch.stop().elapsed());
+                        I.trace("Read normal log " + service.id + " [" + date + "] " + stopwatch.stop().elapsed());
                     });
         }
 
@@ -733,13 +727,13 @@ public class ExecutionLog {
                         .effectOnComplete(parser::stopParsing)
                         .effectOnObserve(stopwatch::start)
                         .effectOnError(e -> {
-                            log.error("Fail to read compact log. [" + compact + "]");
+                            I.error("Fail to read compact log. [" + compact + "]");
                             if (existNormal()) {
                                 compact.delete();
                             }
                         })
                         .effectOnComplete(() -> {
-                            log.trace("Read compact log {} [{}] {}", service.id, date, stopwatch.stop().elapsed());
+                            I.trace("Read compact log " + service.id + " [" + date + "] " + stopwatch.stop().elapsed());
                         });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -760,18 +754,18 @@ public class ExecutionLog {
                 if (!existFast()) {
                     return this.writeFast(readCompact().plug(new FastLog(service.setting.target.scale)))
                             .effectOnObserve(stopwatch::start)
-                            .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
+                            .effectOnError(e -> I.error("Fail to read fast log. [" + fast + "]"))
                             .effectOnComplete(() -> {
-                                log.trace("Read fast log {} [{}] {}", service.id, date, stopwatch.stop().elapsed());
+                                I.trace("Read fast log " + service.id + " [" + date + "] " + stopwatch.stop().elapsed());
                             });
                 } else {
                     return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
                             .scanWith(Market.BASE, logger::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
-                            .effectOnError(e -> log.error("Fail to read fast log. [" + fast + "]"))
+                            .effectOnError(e -> I.error("Fail to read fast log. [" + fast + "]"))
                             .effectOnComplete(() -> {
-                                log.trace("Read fast log {} [{}] {}", service.id, date, stopwatch.stop().elapsed());
+                                I.trace("Read fast log " + service.id + " [" + date + "] " + stopwatch.stop().elapsed());
                             });
                 }
             } catch (IOException e) {
@@ -788,10 +782,10 @@ public class ExecutionLog {
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
             return writeNormal(external.convert(date)
-                    .effectOnError(e -> log.error("Fail to download external log {} [{}].", service, date))
+                    .effectOnError(e -> I.error("Fail to download external log " + service + " [" + date + "]."))
                     .effectOnObserve(stopwatch::start)
                     .effectOnComplete(() -> {
-                        log.info("Donwload external log {} [{}] {}", service, date, stopwatch.stop().elapsed());
+                        I.info("Donwload external log " + service + " [" + date + "] " + stopwatch.stop().elapsed());
                     }));
         }
 
@@ -974,7 +968,8 @@ public class ExecutionLog {
                     scheduler.schedule(() -> convertNormalToCompact(false), 5, TimeUnit.SECONDS);
                 } else {
                     writeFast(writeCompact(readNormal())).to(I.NoOP, e -> {
-                        log.error("{} fails to compact the normal log. [{}]", service, date, e);
+                        I.error(service + " fails to compact the normal log. [" + date + "]");
+                        I.error(e);
                     }, () -> {
                         normal.delete();
                     });
@@ -991,8 +986,8 @@ public class ExecutionLog {
                 readCompact().to(e -> {
                     writer.writeRow(e.toString());
                 }, e -> {
-                    System.out.println("ERROR");
-                    log.error("{} fails to restore the normal log. [{}]", service, date, e);
+                    I.error(service + " fails to restore the normal log. [" + date + "]");
+                    I.error(e);
                 }, () -> {
                     writer.close();
                 });
@@ -1058,7 +1053,7 @@ public class ExecutionLog {
             // imcompleted or no normal log
             ExecutionLogRepository external = service.externalRepository();
             if (external != null && external.has(date)) {
-                readExternalRepository(external).waitForTerminate().to(I.NoOP, log::error, () -> convertNormalToCompact(async));
+                readExternalRepository(external).waitForTerminate().to(I.NoOP, I::error, () -> convertNormalToCompact(async));
                 return true;
             }
 
@@ -1126,7 +1121,7 @@ public class ExecutionLog {
                         // update the last ID
                         id = valids.get(valids.size() - 1).id;
 
-                        log.info("{} repairs the execution log from {} ({}).", service, valids.get(0).date, valids.size());
+                        I.info(service + " repairs the execution log from " + valids.get(0).delay + " (" + valids.size() + ").");
                     }
 
                     // clear all data to reuse the container
@@ -1224,7 +1219,7 @@ public class ExecutionLog {
                 for (Execution e : buffer) {
                     observer.accept(e);
                 }
-                log.info("{} \t{} size {}", service.id, buffer.peek().date, buffer.size());
+                I.info(service.id + " \t" + buffer.peek().date + " size " + buffer.size());
             }
             destination = observer;
         }

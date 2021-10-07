@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import cointoss.util.arithmetic.Num;
 import kiss.I;
@@ -69,9 +67,6 @@ public class Chrono {
     /** Reusable format. HH:mm */
     public static final DateTimeFormatter TimeWithoutSec = DateTimeFormatter.ofPattern("HH:mm");
 
-    /** The logging system. */
-    private static final Logger logger = LogManager.getLogger();
-
     /** Difference between the time of the NTP server and local PC. */
     private static long latestDelay;
 
@@ -89,10 +84,11 @@ public class Chrono {
             TimeInfo info = client.getTime(InetAddress.getByName("ntp.nict.jp"));
             info.computeDetails();
             latestDelay = info.getOffset();
-            logger.trace("Using NTP server to measure the time deviation : " + latestDelay + "ms");
+            I.trace("Using NTP server to measure the time deviation : " + latestDelay + "ms");
         } catch (Throwable e) {
             // ignore
-            logger.error("A query to NTP server failed. ", e);
+            I.error("A query to NTP server failed. ");
+            I.error(e);
         } finally {
             client.close();
         }

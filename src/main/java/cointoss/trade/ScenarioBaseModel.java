@@ -12,8 +12,6 @@ package cointoss.trade;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.apache.logging.log4j.util.PerformanceSensitive;
-
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
@@ -147,7 +145,6 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
      * {@inheritDoc}
      */
     @Override
-    @PerformanceSensitive
     public final Num unrealizedProfit(Num currentPrice) {
         return currentPrice.diff(direction(), entryPrice()).multiply(entryExecutedSize().minus(exitExecutedSize())).minus(commission());
     }

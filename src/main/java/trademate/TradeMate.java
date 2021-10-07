@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.logging.log4j.LogManager;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
@@ -155,6 +153,9 @@ public class TradeMate extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application().logging(LogManager.getLogger()::error).use(Theme.Dark).icon("icon/app.png").activate(TradeMate.class);
+        Viewtify.application().logging((msg, error) -> {
+            I.error(msg);
+            I.error(error);
+        }).use(Theme.Dark).icon("icon/app.png").activate(TradeMate.class);
     }
 }

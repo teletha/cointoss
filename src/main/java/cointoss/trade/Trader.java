@@ -27,8 +27,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
@@ -37,7 +35,6 @@ import cointoss.Market;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
 import cointoss.order.OrderStrategy.Orderable;
-import cointoss.util.Loggings;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
 import kiss.Extensible;
@@ -51,9 +48,6 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
 
     /** The identity element of {@link Snapshot}. */
     private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO);
-
-    /** The logger for this {@link Trader}. */
-    Logger log;
 
     /** The registered options. */
     private final List options = new ArrayList();
@@ -70,6 +64,9 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
     /** The scenario add event. */
     public final Signal<Scenario> added = scenarioAdded.expose;
 
+    /** The test mode. */
+    public String loggerName;
+
     /** The state snapshot. */
     private final NavigableMap<Long, Snapshot> snapshots = new TreeMap();
 
@@ -82,7 +79,11 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
     public final synchronized void initialize(Market market) {
         boolean backtest = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
                 .walk(stream -> stream.filter(frame -> frame.getClassName().contains("BackTestModel")).findFirst().isPresent());
-        log = Loggings.getTradingLogger(name(), backtest);
+
+        loggerName = name() + (backtest ? "-BackTest" : "-Trading");
+
+        I.env(loggerName + ".append", backtest);
+        I.env(loggerName + ".dir", ".log/trading/" + name());
 
         scenarios.clear();
         setHoldSize(Num.ZERO);

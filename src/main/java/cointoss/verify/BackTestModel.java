@@ -23,7 +23,6 @@ import cointoss.analyze.TradingStats;
 import cointoss.execution.LogType;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
-import cointoss.util.Loggings;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 
@@ -158,8 +157,6 @@ interface BackTestModel {
         if (analyzer == null) {
             analyzer = new ConsoleAnalyzer();
         }
-
-        Loggings.requestTradingLoggerReset();
 
         VerifiableMarket market = new VerifiableMarket(service());
         market.tickers.tickers().to(e -> e.ticks.disableMemorySaving());

@@ -26,11 +26,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
-
 import icy.manipulator.Icy;
 import kiss.Disposable;
 import kiss.I;
@@ -43,8 +38,6 @@ import kiss.Variable;
 public abstract class EfficientWebSocketModel {
 
     private static final Disposable Shutdown = Disposable.empty();
-
-    private static final Logger logger = LogManager.getLogger();
 
     /** The connection holder. */
     private final Variable<WebSocket> connection = Variable.empty();
@@ -192,7 +185,6 @@ public abstract class EfficientWebSocketModel {
      */
     public EfficientWebSocket enableDebug() {
         this.debug = true;
-        Configurator.setLevel(logger.getName(), Level.TRACE);
         return (EfficientWebSocket) this;
     }
 
@@ -257,10 +249,10 @@ public abstract class EfficientWebSocketModel {
                                 // 42["join-room","transactions_btc_jpy"]
                                 String command = "42[\"join-room\",\"" + topic.id + "\"]";
                                 ws.sendText(command, true);
-                                logger.trace("Sent websocket command {} to {}. @{}", command, address(), count);
+                                I.trace("Sent websocket command " + command + " to " + address() + ". @" + count);
                             } else {
                                 ws.sendText(I.write(topic), true);
-                                logger.trace("Sent websocket command {} to {}. @{}", topic, address(), count);
+                                I.trace("Sent websocket command " + topic + " to " + address() + ". @" + count);
                             }
 
                             if (noReplyMode) {
@@ -285,7 +277,7 @@ public abstract class EfficientWebSocketModel {
                     IdentifiableTopic unsubscribe = topic.unsubscribe();
                     ws.sendText(I.write(unsubscribe), true);
                     subscribed.remove(topic);
-                    logger.trace("Sent websocket command {} to {}.", unsubscribe, address());
+                    I.trace("Sent websocket command " + unsubscribe + " to " + address() + ".");
                 } catch (Throwable e) {
                     // ignore
                 } finally {
@@ -301,10 +293,10 @@ public abstract class EfficientWebSocketModel {
      * Connect to the server by websocket.
      */
     private synchronized void connect() {
-        logger.trace("Starting websocket [{}].", address());
+        I.trace("Starting websocket [" + address() + "].");
 
         I.http(address() + (socketIO ? "?EIO=3&transport=websocket" : ""), ws -> {
-            logger.trace("Connected websocket [{}].", address());
+            I.trace("Connected websocket [" + address() + "].");
 
             Consumer<WebSocket> connected = whenConnected();
             if (connected != null) {
@@ -340,9 +332,10 @@ public abstract class EfficientWebSocketModel {
             subscribed.clear();
 
             if (error == null) {
-                logger.info("Disconnected websocket [{}] normally because {}", address(), message);
+                I.info("Disconnected websocket [" + address() + "] normally because " + message);
             } else {
-                logger.error("Disconnected websocket [{}]  unexpectedly because {}", address(), message, error);
+                I.error("Disconnected websocket [" + address() + "]  unexpectedly because " + message);
+                I.error(error);
             }
         });
         connecting.set(false);
@@ -385,13 +378,13 @@ public abstract class EfficientWebSocketModel {
                 if (topic.verifySubscribedReply(json)) {
                     subscribed.add(topic);
                     subscribing.remove(topic);
-                    logger.trace("Accepted websocket subscription [{}] {}.", address(), topic.id);
+                    I.trace("Accepted websocket subscription [" + address() + "] " + topic.id + ".");
 
                     Function<JSON, String> updater = updateId();
                     if (updater != null) {
                         topic.updatedId = updater.apply(json);
                         signals.put(topic.updatedId, signals.get(topic.id));
-                        logger.trace("Update websocket [{}] subscription id from '{}' to '{}'.", address(), topic.id, topic.updatedId);
+                        I.trace("Update websocket [" + address() + "] subscription id from '" + topic.id + "' to '" + topic.updatedId + "'.");
                     }
                     return;
                 }
@@ -429,12 +422,12 @@ public abstract class EfficientWebSocketModel {
             if (stopping != null && stopping.test(json)) {
                 cleanup.dispose();
                 cleanup = Disposable.empty();
-                logger.trace("Stop reconnecting because the channel was already subscribed. {}", json);
+                I.trace("Stop reconnecting because the channel was already subscribed. " + json);
                 return;
             }
 
             // we can't handle message
-            logger.warn("Unknown message was recieved. [{}] {}", address(), text);
+            I.warn("Unknown message was recieved. [" + address() + "] " + text);
         }
     }
 

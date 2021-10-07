@@ -9,8 +9,6 @@
  */
 package cointoss.trade;
 
-import org.apache.logging.log4j.util.PerformanceSensitive;
-
 import cointoss.util.arithmetic.Num;
 
 public interface Profitable {
@@ -21,7 +19,6 @@ public interface Profitable {
      * @param currentPrice A current price.
      * @return A total profit or loss of this entry.
      */
-    @PerformanceSensitive
     default Num profit(Num currentPrice) {
         return realizedProfit().plus(unrealizedProfit(currentPrice));
     }
@@ -39,7 +36,6 @@ public interface Profitable {
      * @param currentPrice A current price.
      * @return An unrealized profit or loss of this entry.
      */
-    @PerformanceSensitive
     Num unrealizedProfit(Num currentPrice);
 
     /**
