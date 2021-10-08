@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static psychopath.Option.*;
+import static psychopath.Option.ATOMIC_WRITE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1121,7 +1121,7 @@ public class ExecutionLog {
                         // update the last ID
                         id = valids.get(valids.size() - 1).id;
 
-                        I.info(service + " repairs the execution log from " + valids.get(0).delay + " (" + valids.size() + ").");
+                        I.info(service + " repairs the execution log from " + valids.get(0).date + " (" + valids.size() + ").");
                     }
 
                     // clear all data to reuse the container
