@@ -54,10 +54,10 @@ public class BotEditor extends View {
     private final Model<Trader> model;
 
     /** The property filter. */
-    public final ObjectProperty<Predicate<Property>> acceptableProperty = new SimpleObjectProperty(I.accept());
+    public final ObjectProperty<Predicate<Property>> acceptableProperty = new SimpleObjectProperty<>(I::accept);
 
     /** The property filter. */
-    public final ObjectProperty<Predicate<Property>> rejectableProperty = new SimpleObjectProperty(I.reject());
+    public final ObjectProperty<Predicate<Property>> rejectableProperty = new SimpleObjectProperty<>(I::reject);
 
     /** The value holder. */
     private final Map<Property, List<Object>> properties = new HashMap();
