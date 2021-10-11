@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -527,7 +527,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     private Num calculateCanceledSize(Deque<Order> orders) {
-        return I.signal(orders).take(Order::isCanceled).scanWith(Num.ZERO, (v, o) -> v.plus(o.remainingSize())).to().or(Num.ZERO);
+        return I.signal(orders).take(Order::isCanceled).scan(() -> Num.ZERO, (v, o) -> v.plus(o.remainingSize())).to().or(Num.ZERO);
     }
 
     private void format(StringBuilder builder, String type, Deque<Order> orders, Num price, Num size, Num executedSize, Num canceledSize) {

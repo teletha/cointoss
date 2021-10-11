@@ -723,7 +723,7 @@ public class ExecutionLog {
 
             try {
                 return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                        .scanWith(Market.BASE, logger::decode)
+                        .scan(() -> Market.BASE, logger::decode)
                         .effectOnComplete(parser::stopParsing)
                         .effectOnObserve(stopwatch::start)
                         .effectOnError(e -> {
@@ -760,7 +760,7 @@ public class ExecutionLog {
                             });
                 } else {
                     return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
-                            .scanWith(Market.BASE, logger::decode)
+                            .scan(() -> Market.BASE, logger::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnError(e -> I.error("Fail to read fast log. [" + fast + "]"))
