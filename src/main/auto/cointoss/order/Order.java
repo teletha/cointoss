@@ -1108,6 +1108,15 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
+        }
+
+        /**
+         * Assign quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
         default Next goodTillCanceled() {
             return quantityCondition(QuantityCondition.GoodTillCanceled);
         }
@@ -1119,15 +1128,6 @@ public class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(QuantityCondition.ImmediateOrCancel);
-        }
-
-        /**
-         * Assign quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1229,24 +1229,6 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next init() {
-            return state(OrderState.INIT);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(OrderState.REQUESTING);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
         default Next active() {
             return state(OrderState.ACTIVE);
         }
@@ -1265,8 +1247,8 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next completed() {
-            return state(OrderState.COMPLETED);
+        default Next canceled() {
+            return state(OrderState.CANCELED);
         }
 
         /**
@@ -1274,8 +1256,8 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next canceled() {
-            return state(OrderState.CANCELED);
+        default Next completed() {
+            return state(OrderState.COMPLETED);
         }
 
         /**
@@ -1292,8 +1274,26 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next init() {
+            return state(OrderState.INIT);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next rejected() {
             return state(OrderState.REJECTED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(OrderState.REQUESTING);
         }
     }
 

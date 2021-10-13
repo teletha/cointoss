@@ -9,15 +9,14 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static psychopath.Option.ATOMIC_WRITE;
+import static psychopath.Option.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -797,7 +796,7 @@ public class ExecutionLog {
                 return;
             }
 
-            root.lock().recover(OverlappingFileLockException.class, (FileLock) null).to(o -> {
+            root.lock().recoverWhen(e -> e.as(OverlappingFileLockException.class).mapTo(null)).to(o -> {
                 long lastID = estimateLastID();
 
                 // switch buffer
