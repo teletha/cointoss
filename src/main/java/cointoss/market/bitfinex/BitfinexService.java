@@ -270,7 +270,7 @@ public class BitfinexService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api-pub.bitfinex.com/v2/" + path));
 
-        return Network.rest(builder, LimitForREST, client()).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
+        return Network.rest(builder, LimitForREST, client()).retry(retryPolicy(10, "Bitfinex RESTCall"));
     }
 
     /**

@@ -346,7 +346,7 @@ public class FTXService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://ftx.com/api/" + path));
 
-        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "FTX RESTCall"));
+        return Network.rest(builder, Limit, client()).retry(retryPolicy(10, "FTX RESTCall"));
     }
 
     /**

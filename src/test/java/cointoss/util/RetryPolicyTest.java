@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ class RetryPolicyTest {
         RetryPolicy policy = RetryPolicy.with.limit(3);
         Result result = new Result();
 
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
+        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retry(policy).to((Observer) result);
         assert policy.count == 3;
         assert result.hasOnlyError("Failed Number 1");
     }
@@ -48,7 +48,7 @@ class RetryPolicyTest {
         RetryPolicy policy = RetryPolicy.with.limit(3).delay(100, MILLISECONDS).scheduler(chronus);
         policy.onRetry = result;
 
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
+        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retry(policy).to((Observer) result);
         chronus.await();
         assert policy.count == 3;
         assert result.hasOnlyError("Failed Number 1");
@@ -61,7 +61,7 @@ class RetryPolicyTest {
         RetryPolicy policy = RetryPolicy.with.limit(5).delayLinear(Duration.ofMillis(30)).scheduler(chronus);
         policy.onRetry = result;
 
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
+        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retry(policy).to((Observer) result);
         chronus.await();
         assert policy.count == 5;
         assert result.hasOnlyError("Failed Number 1");

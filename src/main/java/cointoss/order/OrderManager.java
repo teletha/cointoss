@@ -70,7 +70,7 @@ public final class OrderManager {
 
         // retrieve orders on server
         // don't use orders().to(addition); it completes addition signaling itself
-        service.orders(OrderState.ACTIVE).retryWhen(service.retryPolicy(5)).to(this::update);
+        service.orders(OrderState.ACTIVE).retry(service.retryPolicy(5)).to(this::update);
 
         // retrieve orders on realtime
         service.add(service.ordersRealtimely().to(this::update));
@@ -266,7 +266,7 @@ public final class OrderManager {
             Complementer complementer = new Complementer(order);
 
             return service.request(order)
-                    .retryWhen(service.retryPolicy(5))
+                    .retry(service.retryPolicy(5))
                     .effectOnObserve(complementer::start)
                     .effect(complementer::complement)
                     .effectOnTerminate(complementer::stop)
@@ -312,7 +312,7 @@ public final class OrderManager {
             OrderState previous = order.state;
             order.setState(REQUESTING);
 
-            return service.cancel(order).retryWhen(service.retryPolicy(5)).effectOnError(e -> {
+            return service.cancel(order).retry(service.retryPolicy(5)).effectOnError(e -> {
                 order.setState(previous);
             });
         } else {

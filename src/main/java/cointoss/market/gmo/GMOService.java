@@ -191,7 +191,7 @@ public class GMOService extends MarketService {
             } else {
                 return I.signal(json);
             }
-        }).retryWhen(retryPolicy(10, "GMO RESTCall"));
+        }).retry(retryPolicy(10, "GMO RESTCall"));
     }
 
     /**

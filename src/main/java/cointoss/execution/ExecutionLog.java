@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static psychopath.Option.*;
+import static psychopath.Option.ATOMIC_WRITE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -401,7 +401,7 @@ public class ExecutionLog {
                 }
             }
             return disposer;
-        }).effectOnError(e -> e.printStackTrace()).retryWhen(service.retryPolicy(500, "ExecutionLog"));
+        }).effectOnError(e -> e.printStackTrace()).retry(service.retryPolicy(500, "ExecutionLog"));
     }
 
     /**
@@ -796,7 +796,7 @@ public class ExecutionLog {
                 return;
             }
 
-            root.lock().recoverWhen(e -> e.as(OverlappingFileLockException.class).mapTo(null)).to(o -> {
+            root.lock().recover(e -> e.as(OverlappingFileLockException.class).mapTo(null)).to(o -> {
                 long lastID = estimateLastID();
 
                 // switch buffer

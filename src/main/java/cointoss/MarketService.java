@@ -136,7 +136,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public final synchronized Signal<Execution> executionsRealtimely(boolean autoReconnect) {
         return connectExecutionRealtimely().effectOnObserve(disposer::add)
-                .retryWhen(autoReconnect ? retryPolicy(500, "ExecutionRealtimely") : null);
+                .retry(autoReconnect ? retryPolicy(500, "ExecutionRealtimely") : null);
     }
 
     /**
@@ -300,7 +300,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A event stream of order state.
      */
     public final synchronized Signal<Order> ordersRealtimely() {
-        return connectOrdersRealtimely().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "OrderRealtimely"));
+        return connectOrdersRealtimely().effectOnObserve(disposer::add).retry(retryPolicy(500, "OrderRealtimely"));
     }
 
     /**
@@ -337,7 +337,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely(boolean autoReconnect) {
         return orderBook().concat(connectOrderBookRealtimely())
                 .effectOnObserve(disposer::add)
-                .retryWhen(autoReconnect ? retryPolicy(500, "OrderBookRealtimely") : null);
+                .retry(autoReconnect ? retryPolicy(500, "OrderBookRealtimely") : null);
     }
 
     /**
@@ -357,7 +357,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A shared realtime order books.
      */
     public final synchronized Signal<Liquidation> liquidationRealtimely() {
-        return this.connectLiquidation().effectOnObserve(disposer::add).retryWhen(retryPolicy(500, "Liquidation"));
+        return this.connectLiquidation().effectOnObserve(disposer::add).retry(retryPolicy(500, "Liquidation"));
     }
 
     /**

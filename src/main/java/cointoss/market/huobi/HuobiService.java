@@ -208,7 +208,7 @@ public class HuobiService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.huobi.pro/" + path));
 
-        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "Huobi RESTCall"));
+        return Network.rest(builder, Limit, client()).retry(retryPolicy(10, "Huobi RESTCall"));
     }
 
     /**

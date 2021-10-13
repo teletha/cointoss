@@ -310,7 +310,7 @@ public class BitMexService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://www.bitmex.com/api/v1/" + path));
 
-        return Network.rest(builder, Limit, client()).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return Network.rest(builder, Limit, client()).retry(retryPolicy(10, "BitMEX RESTCall"));
     }
 
     /**
