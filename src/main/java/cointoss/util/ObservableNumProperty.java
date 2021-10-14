@@ -20,6 +20,6 @@ public abstract class ObservableNumProperty extends ObservableProperty<Num> {
      * @return
      */
     public Signal<Num> observe$Diff() {
-        return observe$Now().maps(Num.ZERO, (prev, now) -> now.minus(prev));
+        return observe$Now().pair(Num.ZERO).map(values -> values.get(1).minus(values.get(0)));
     }
 }
