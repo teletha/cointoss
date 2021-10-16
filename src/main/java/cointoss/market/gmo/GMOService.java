@@ -9,7 +9,7 @@
  */
 package cointoss.market.gmo;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -307,7 +307,7 @@ public class GMOService extends MarketService {
             REPOSITORY_LIMITER.acquire();
 
             return I.http(uri, InputStream.class)
-                    .errorResume(I.signal())
+                    .stopError()
                     .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
                     .effectOnComplete(parser::stopParsing);
         }
