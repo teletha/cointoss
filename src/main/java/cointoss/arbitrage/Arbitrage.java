@@ -88,12 +88,12 @@ public class Arbitrage {
         Num size = markets.stream().map(e -> e.service.setting.target.minimumSize).max(Comparator.naturalOrder()).get();
 
         Signal<Entry<Market, Num>> highestSellPrice = I.signal(markets)
-                .combineLatestMap(market -> market.orderBook.longs.predictRealTakingPrice(I.signal(size)))
+                .keyMap(market -> market.orderBook.longs.predictRealTakingPrice(I.signal(size)))
                 .map(Arbitrage::max)
                 .diff()
                 .skip(e -> e.getValue().isZero());
         Signal<Entry<Market, Num>> lowestBuyPrice = I.signal(markets)
-                .combineLatestMap(market -> market.orderBook.shorts.predictRealTakingPrice(I.signal(size)))
+                .keyMap(market -> market.orderBook.shorts.predictRealTakingPrice(I.signal(size)))
                 .map(Arbitrage::min)
                 .diff()
                 .skip(e -> e.getValue().isZero());

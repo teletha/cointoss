@@ -53,12 +53,12 @@ public class Arbitrager extends Trader {
 
         Num size = markets.stream().map(e -> e.service.setting.target.minimumSize).max(Comparator.naturalOrder()).get();
         Signal<Entry<Market, Num>> highestSellPrice = I.signal(markets)
-                .combineLatestMap(m -> m.orderBook.longs.predictRealTakingPrice(I.signal(size)))
+                .keyMap(m -> m.orderBook.longs.predictRealTakingPrice(I.signal(size)))
                 .map(this::max)
                 .diff()
                 .skip(e -> e.getValue().isZero());
         Signal<Entry<Market, Num>> lowestBuyPrice = I.signal(markets)
-                .combineLatestMap(m -> m.orderBook.shorts.predictRealTakingPrice(I.signal(size)))
+                .keyMap(m -> m.orderBook.shorts.predictRealTakingPrice(I.signal(size)))
                 .map(this::min)
                 .diff()
                 .skip(e -> e.getValue().isZero());
