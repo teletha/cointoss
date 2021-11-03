@@ -9,7 +9,7 @@
  */
 package cointoss.market.gmo;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -191,7 +191,7 @@ public class GMOService extends MarketService {
             } else {
                 return I.signal(json);
             }
-        }).retry(retryPolicy(10, "GMO RESTCall"));
+        }).retry(retryPolicy(300, "GMO RESTCall"));
     }
 
     /**
