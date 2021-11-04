@@ -400,8 +400,8 @@ public class Trailing extends TrailingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next update(Function<Market, Signal<Num>> value) {
-            ((Trailing) this).setUpdate(value);
+        default Next update(Function<? extends Market, ? extends Signal<Num>> value) {
+            ((Trailing) this).setUpdate((java.util.function.Function)value);
             return (Next) this;
         }
 

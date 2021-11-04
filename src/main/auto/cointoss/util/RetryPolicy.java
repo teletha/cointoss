@@ -364,8 +364,8 @@ public class RetryPolicy extends RetryPolicyModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next delay(LongFunction<Duration> value) {
-            ((RetryPolicy) this).setDelay(value);
+        default Next delay(LongFunction<? extends Duration> value) {
+            ((RetryPolicy) this).setDelay((java.util.function.LongFunction)value);
             return (Next) this;
         }
 

@@ -689,8 +689,8 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next extractId(Function<JSON, String> value) {
-            ((EfficientWebSocket) this).setExtractId(value);
+        default Next extractId(Function<? extends JSON, ? extends String> value) {
+            ((EfficientWebSocket) this).setExtractId((java.util.function.Function)value);
             return (Next) this;
         }
     }
@@ -706,8 +706,8 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next updateId(Function<JSON, String> value) {
-            ((EfficientWebSocket) this).setUpdateId(value);
+        default Next updateId(Function<? extends JSON, ? extends String> value) {
+            ((EfficientWebSocket) this).setUpdateId((java.util.function.Function)value);
             return (Next) this;
         }
 
@@ -728,8 +728,8 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next ignoreMessageIf(Predicate<JSON> value) {
-            ((EfficientWebSocket) this).setIgnoreMessageIf(value);
+        default Next ignoreMessageIf(Predicate<? extends JSON> value) {
+            ((EfficientWebSocket) this).setIgnoreMessageIf((java.util.function.Predicate)value);
             return (Next) this;
         }
 
@@ -739,8 +739,8 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next recconnectIf(Predicate<JSON> value) {
-            ((EfficientWebSocket) this).setRecconnectIf(value);
+        default Next recconnectIf(Predicate<? extends JSON> value) {
+            ((EfficientWebSocket) this).setRecconnectIf((java.util.function.Predicate)value);
             return (Next) this;
         }
 
@@ -750,8 +750,8 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next stopRecconnectIf(Predicate<JSON> value) {
-            ((EfficientWebSocket) this).setStopRecconnectIf(value);
+        default Next stopRecconnectIf(Predicate<? extends JSON> value) {
+            ((EfficientWebSocket) this).setStopRecconnectIf((java.util.function.Predicate)value);
             return (Next) this;
         }
 
@@ -761,8 +761,8 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next pongIf(Function<JSON, String> value) {
-            ((EfficientWebSocket) this).setPongIf(value);
+        default Next pongIf(Function<? extends JSON, ? extends String> value) {
+            ((EfficientWebSocket) this).setPongIf((java.util.function.Function)value);
             return (Next) this;
         }
 
@@ -772,8 +772,8 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next whenConnected(Consumer<WebSocket> value) {
-            ((EfficientWebSocket) this).setWhenConnected(value);
+        default Next whenConnected(Consumer<? extends WebSocket> value) {
+            ((EfficientWebSocket) this).setWhenConnected((java.util.function.Consumer)value);
             return (Next) this;
         }
 

@@ -597,8 +597,8 @@ public class BackTest implements BackTestModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next traders(List<Trader> value) {
-            ((BackTest) this).setTraders(value);
+        default Next traders(List<? extends Trader> value) {
+            ((BackTest) this).setTraders((java.util.List)value);
             return (Next) this;
         }
 

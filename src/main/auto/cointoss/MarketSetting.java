@@ -713,8 +713,8 @@ public class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next targetCurrencyBidSizes(List<Num> value) {
-            ((MarketSetting) this).setTargetCurrencyBidSizes(value);
+        default Next targetCurrencyBidSizes(List<? extends Num> value) {
+            ((MarketSetting) this).setTargetCurrencyBidSizes((java.util.List)value);
             return (Next) this;
         }
 
@@ -756,7 +756,7 @@ public class MarketSetting implements MarketSettingModel {
          * @return The next assignable model.
          */
         default Next executionLogger(Class<? extends ExecutionLogger> value) {
-            ((MarketSetting) this).setExecutionLogger(value);
+            ((MarketSetting) this).setExecutionLogger((java.lang.Class)value);
             return (Next) this;
         }
 
@@ -766,8 +766,8 @@ public class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next takerFee(UnaryOperator<Num> value) {
-            ((MarketSetting) this).setTakerFee(value);
+        default Next takerFee(UnaryOperator<? extends Num> value) {
+            ((MarketSetting) this).setTakerFee((java.util.function.UnaryOperator)value);
             return (Next) this;
         }
 
@@ -777,8 +777,8 @@ public class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next makerFee(UnaryOperator<Num> value) {
-            ((MarketSetting) this).setMakerFee(value);
+        default Next makerFee(UnaryOperator<? extends Num> value) {
+            ((MarketSetting) this).setMakerFee((java.util.function.UnaryOperator)value);
             return (Next) this;
         }
 
@@ -788,8 +788,8 @@ public class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next targetWithdrawingFee(UnaryOperator<Num> value) {
-            ((MarketSetting) this).setTargetWithdrawingFee(value);
+        default Next targetWithdrawingFee(UnaryOperator<? extends Num> value) {
+            ((MarketSetting) this).setTargetWithdrawingFee((java.util.function.UnaryOperator)value);
             return (Next) this;
         }
 
@@ -799,8 +799,8 @@ public class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next baseWithdrawingFee(UnaryOperator<Num> value) {
-            ((MarketSetting) this).setBaseWithdrawingFee(value);
+        default Next baseWithdrawingFee(UnaryOperator<? extends Num> value) {
+            ((MarketSetting) this).setBaseWithdrawingFee((java.util.function.UnaryOperator)value);
             return (Next) this;
         }
     }
