@@ -135,6 +135,7 @@ public class BybitService extends MarketService {
 
             JSON first = executions.get(0);
             long firstTime = time(first);
+
             JSON last = executions.get(executions.size() - 1);
             long lastTime = time(last);
 
@@ -143,7 +144,7 @@ public class BybitService extends MarketService {
             } else {
                 long firstID = first.get(long.class, "id");
                 double timeDistance = baseTime - firstTime; // use double to avoid auto rounding
-                long idDistance = baseID - firstID;
+                double idDistance = baseID - firstID;
                 double targetDistance = firstTime - targetTime; // use double to avoid auto rounding
                 double mod = targetDistance / timeDistance;
                 long diff = Math.round(idDistance * mod);
@@ -373,19 +374,23 @@ public class BybitService extends MarketService {
 
             long[] context = new long[3];
 
-            return I.http(uri, InputStream.class)
+            Signal<String[]> signal = I.http(uri, InputStream.class)
                     .effectOnError(e -> e.printStackTrace())
                     .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
-                    .effectOnComplete(parser::stopParsing)
-                    .reverse()
-                    .map(values -> {
-                        ZonedDateTime time = parseTime(values[0]);
-                        Direction side = Direction.parse(values[2]);
-                        Num size = Num.of(values[9]);
-                        Num price = Num.of(values[4]);
+                    .effectOnComplete(parser::stopParsing);
 
-                        return Support.createExecution(side, size, price, time, context);
-                    });
+            if (date.isBefore(Chrono.utc(2021, 12, 7))) {
+                signal = signal.reverse();
+            }
+
+            return signal.map(values -> {
+                ZonedDateTime time = parseTime(values[0]);
+                Direction side = Direction.parse(values[2]);
+                Num size = Num.of(values[9]);
+                Num price = Num.of(values[4]);
+
+                return Support.createExecution(side, size, price, time, context);
+            });
         }
 
         /**
