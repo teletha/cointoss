@@ -9,8 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
-import static java.util.concurrent.TimeUnit.*;
-import static kiss.I.*;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.math.RoundingMode;
@@ -69,7 +69,7 @@ public class BitFlyerService extends MarketService {
     private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(100).refresh(1, MINUTES);
+    private static final APILimiter LIMITER = APILimiter.with.limit(80 /* 100 */).refresh(1, MINUTES);
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
