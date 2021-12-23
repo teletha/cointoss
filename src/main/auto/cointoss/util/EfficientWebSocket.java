@@ -1,7 +1,6 @@
 package cointoss.util;
 
 import cointoss.util.EfficientWebSocket;
-import cointoss.util.EfficientWebSocketModel;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
@@ -17,13 +16,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import javax.annotation.processing.Generated;
 import kiss.JSON;
 
 /**
  * Generated model for {@link EfficientWebSocketModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class EfficientWebSocket extends EfficientWebSocketModel {
 
     /**

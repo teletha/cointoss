@@ -2,7 +2,6 @@ package cointoss.order;
 
 import cointoss.Direction;
 import cointoss.order.Position;
-import cointoss.order.PositionModel;
 import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
@@ -14,12 +13,12 @@ import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
-import javax.annotation.processing.Generated;
 
 /**
  * Generated model for {@link PositionModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class Position extends PositionModel {
 
     /**

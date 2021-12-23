@@ -3,7 +3,6 @@ package cointoss.trade;
 import cointoss.Market;
 import cointoss.ticker.Span;
 import cointoss.trade.Trailing;
-import cointoss.trade.TrailingModel;
 import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
@@ -15,13 +14,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.function.Function;
-import javax.annotation.processing.Generated;
 import kiss.Signal;
 
 /**
  * Generated model for {@link TrailingModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class Trailing extends TrailingModel {
 
     /**
@@ -45,7 +44,7 @@ public class Trailing extends TrailingModel {
      */
     private static final MethodHandle invoker(String name, Class... parameterTypes)  {
         try {
-            Method method = TrailingModel.class.getDeclaredMethod(name, parameterTypes);
+            Method method = cointoss.trade.TrailingModel.class.getDeclaredMethod(name, parameterTypes);
             method.setAccessible(true);
             return MethodHandles.lookup().unreflect(method);
         } catch (Throwable e) {

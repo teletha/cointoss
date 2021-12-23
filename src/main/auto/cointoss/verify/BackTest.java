@@ -5,7 +5,6 @@ import cointoss.execution.LogType;
 import cointoss.trade.Trader;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.BackTest;
-import cointoss.verify.BackTestModel;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
@@ -17,12 +16,12 @@ import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.processing.Generated;
 
 /**
  * Generated model for {@link BackTestModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class BackTest implements BackTestModel {
 
     /**
@@ -46,7 +45,7 @@ public class BackTest implements BackTestModel {
      */
     private static final MethodHandle invoker(String name, Class... parameterTypes)  {
         try {
-            Method method = BackTestModel.class.getDeclaredMethod(name, parameterTypes);
+            Method method = cointoss.verify.BackTestModel.class.getDeclaredMethod(name, parameterTypes);
             method.setAccessible(true);
             return MethodHandles.lookup().unreflect(method);
         } catch (Throwable e) {
@@ -138,10 +137,10 @@ public class BackTest implements BackTestModel {
         this.start = null;
         this.end = null;
         this.traders = null;
-        this.initialBaseCurrency = BackTestModel.super.initialBaseCurrency();
-        this.initialTargetCurrency = BackTestModel.super.initialTargetCurrency();
-        this.detail = BackTestModel.super.detail();
-        this.type = BackTestModel.super.type();
+        this.initialBaseCurrency = cointoss.verify.BackTestModel.super.initialBaseCurrency();
+        this.initialTargetCurrency = cointoss.verify.BackTestModel.super.initialTargetCurrency();
+        this.detail = cointoss.verify.BackTestModel.super.detail();
+        this.type = cointoss.verify.BackTestModel.super.type();
     }
 
     /**
@@ -319,7 +318,7 @@ public class BackTest implements BackTestModel {
      */
     private final void setInitialBaseCurrency(Num value) {
         if (value == null) {
-            value = BackTestModel.super.initialBaseCurrency();
+            value = cointoss.verify.BackTestModel.super.initialBaseCurrency();
         }
         try {
             initialBaseCurrencyUpdater.invoke(this, value);
@@ -356,7 +355,7 @@ public class BackTest implements BackTestModel {
      */
     private final void setInitialTargetCurrency(Num value) {
         if (value == null) {
-            value = BackTestModel.super.initialTargetCurrency();
+            value = cointoss.verify.BackTestModel.super.initialTargetCurrency();
         }
         try {
             initialTargetCurrencyUpdater.invoke(this, value);
@@ -427,7 +426,7 @@ public class BackTest implements BackTestModel {
      */
     private final void setType(LogType value) {
         if (value == null) {
-            value = BackTestModel.super.type();
+            value = cointoss.verify.BackTestModel.super.type();
         }
         try {
             typeUpdater.invoke(this, value);

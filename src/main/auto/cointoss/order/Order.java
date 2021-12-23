@@ -3,10 +3,6 @@ package cointoss.order;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.order.Order;
-import cointoss.order.OrderModel;
-import cointoss.order.OrderState;
-import cointoss.order.OrderType;
-import cointoss.order.QuantityCondition;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
 import cointoss.util.arithmetic.Num;
@@ -19,13 +15,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
-import javax.annotation.processing.Generated;
 import kiss.Signal;
 
 /**
  * Generated model for {@link OrderModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class Order extends OrderModel {
 
     /**
@@ -49,7 +45,7 @@ public class Order extends OrderModel {
      */
     private static final MethodHandle invoker(String name, Class... parameterTypes)  {
         try {
-            Method method = OrderModel.class.getDeclaredMethod(name, parameterTypes);
+            Method method = cointoss.order.OrderModel.class.getDeclaredMethod(name, parameterTypes);
             method.setAccessible(true);
             return MethodHandles.lookup().unreflect(method);
         } catch (Throwable e) {
@@ -200,13 +196,13 @@ public class Order extends OrderModel {
     };
 
     /** The exposed property. */
-    public final OrderState state;
+    public final cointoss.order.OrderState state;
 
     /** The property customizer. */
-    private final ObservableProperty<OrderState> stateCustomizer = new ObservableProperty<OrderState>() {
+    private final ObservableProperty<cointoss.order.OrderState> stateCustomizer = new ObservableProperty<cointoss.order.OrderState>() {
 
         @Override
-        public OrderState get() {
+        public cointoss.order.OrderState get() {
             return state;
         }
     };
@@ -328,7 +324,7 @@ public class Order extends OrderModel {
             value = super.price();
         }
         try {
-            priceUpdater.invoke(this, price$701841881.invoke(this, value, (Consumer<OrderType>) this::setType));
+            priceUpdater.invoke(this, price$701841881.invoke(this, value, (Consumer<cointoss.order.OrderType>) this::setType));
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -341,7 +337,7 @@ public class Order extends OrderModel {
      *  @return
      */
     @Override
-    public final OrderType type() {
+    public final cointoss.order.OrderType type() {
         return this.type;
     }
 
@@ -351,7 +347,7 @@ public class Order extends OrderModel {
      * @return A value of type property.
      */
     @SuppressWarnings("unused")
-    private final OrderType getType() {
+    private final cointoss.order.OrderType getType() {
         return this.type;
     }
 
@@ -360,7 +356,7 @@ public class Order extends OrderModel {
      *
      * @paran value A new value of type property to assign.
      */
-    private final void setType(OrderType value) {
+    private final void setType(cointoss.order.OrderType value) {
         if (value == null) {
             value = super.type();
         }
@@ -378,7 +374,7 @@ public class Order extends OrderModel {
      *  @return
      */
     @Override
-    public final QuantityCondition quantityCondition() {
+    public final cointoss.order.QuantityCondition quantityCondition() {
         return this.quantityCondition;
     }
 
@@ -388,7 +384,7 @@ public class Order extends OrderModel {
      * @return A value of quantityCondition property.
      */
     @SuppressWarnings("unused")
-    private final QuantityCondition getQuantityCondition() {
+    private final cointoss.order.QuantityCondition getQuantityCondition() {
         return this.quantityCondition;
     }
 
@@ -397,7 +393,7 @@ public class Order extends OrderModel {
      *
      * @paran value A new value of quantityCondition property to assign.
      */
-    private final void setQuantityCondition(QuantityCondition value) {
+    private final void setQuantityCondition(cointoss.order.QuantityCondition value) {
         if (value == null) {
             value = super.quantityCondition();
         }
@@ -666,7 +662,7 @@ public class Order extends OrderModel {
      *  @return
      */
     @Override
-    public final OrderState state() {
+    public final cointoss.order.OrderState state() {
         return this.state;
     }
 
@@ -676,7 +672,7 @@ public class Order extends OrderModel {
      * @return A value of state property.
      */
     @SuppressWarnings("unused")
-    private final OrderState getState() {
+    private final cointoss.order.OrderState getState() {
         return this.state;
     }
 
@@ -685,7 +681,7 @@ public class Order extends OrderModel {
      *
      * @paran value A new value of state property to assign.
      */
-    final void setState(OrderState value) {
+    final void setState(cointoss.order.OrderState value) {
         if (value == null) {
             value = super.state();
         }
@@ -703,7 +699,7 @@ public class Order extends OrderModel {
      *  
      *  @return
      */
-    public final Signal<OrderState> observeState() {
+    public final Signal<cointoss.order.OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
@@ -712,7 +708,7 @@ public class Order extends OrderModel {
      *  
      *  @return
      */
-    public final Signal<OrderState> observeStateNow() {
+    public final Signal<cointoss.order.OrderState> observeStateNow() {
         return stateCustomizer.observe$Now();
     }
 
@@ -1069,7 +1065,7 @@ public class Order extends OrderModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next type(OrderType value) {
+        default Next type(cointoss.order.OrderType value) {
             ((Order) this).setType(value);
             return (Next) this;
         }
@@ -1080,7 +1076,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next maker() {
-            return type(OrderType.Maker);
+            return type(cointoss.order.OrderType.Maker);
         }
 
         /**
@@ -1089,7 +1085,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next taker() {
-            return type(OrderType.Taker);
+            return type(cointoss.order.OrderType.Taker);
         }
 
         /**
@@ -1098,7 +1094,7 @@ public class Order extends OrderModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next quantityCondition(QuantityCondition value) {
+        default Next quantityCondition(cointoss.order.QuantityCondition value) {
             ((Order) this).setQuantityCondition(value);
             return (Next) this;
         }
@@ -1109,7 +1105,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next goodTillCanceled() {
-            return quantityCondition(QuantityCondition.GoodTillCanceled);
+            return quantityCondition(cointoss.order.QuantityCondition.GoodTillCanceled);
         }
 
         /**
@@ -1118,7 +1114,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next immediateOrCancel() {
-            return quantityCondition(QuantityCondition.ImmediateOrCancel);
+            return quantityCondition(cointoss.order.QuantityCondition.ImmediateOrCancel);
         }
 
         /**
@@ -1127,7 +1123,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
+            return quantityCondition(cointoss.order.QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1219,7 +1215,7 @@ public class Order extends OrderModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next state(OrderState value) {
+        default Next state(cointoss.order.OrderState value) {
             ((Order) this).setState(value);
             return (Next) this;
         }
@@ -1230,7 +1226,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next init() {
-            return state(OrderState.INIT);
+            return state(cointoss.order.OrderState.INIT);
         }
 
         /**
@@ -1239,7 +1235,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next requesting() {
-            return state(OrderState.REQUESTING);
+            return state(cointoss.order.OrderState.REQUESTING);
         }
 
         /**
@@ -1248,7 +1244,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next active() {
-            return state(OrderState.ACTIVE);
+            return state(cointoss.order.OrderState.ACTIVE);
         }
 
         /**
@@ -1257,7 +1253,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next active_partial() {
-            return state(OrderState.ACTIVE_PARTIAL);
+            return state(cointoss.order.OrderState.ACTIVE_PARTIAL);
         }
 
         /**
@@ -1266,7 +1262,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next completed() {
-            return state(OrderState.COMPLETED);
+            return state(cointoss.order.OrderState.COMPLETED);
         }
 
         /**
@@ -1275,7 +1271,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next canceled() {
-            return state(OrderState.CANCELED);
+            return state(cointoss.order.OrderState.CANCELED);
         }
 
         /**
@@ -1284,7 +1280,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next expired() {
-            return state(OrderState.EXPIRED);
+            return state(cointoss.order.OrderState.EXPIRED);
         }
 
         /**
@@ -1293,7 +1289,7 @@ public class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next rejected() {
-            return state(OrderState.REJECTED);
+            return state(cointoss.order.OrderState.REJECTED);
         }
     }
 

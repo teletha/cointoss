@@ -1,7 +1,6 @@
 package cointoss.trade;
 
 import cointoss.trade.ScenarioBase;
-import cointoss.trade.ScenarioBaseModel;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
 import java.lang.Override;
@@ -11,13 +10,13 @@ import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import javax.annotation.processing.Generated;
 import kiss.Signal;
 
 /**
  * Generated model for {@link ScenarioBaseModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class ScenarioBase extends ScenarioBaseModel {
 
     /**

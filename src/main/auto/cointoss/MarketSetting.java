@@ -1,9 +1,6 @@
 package cointoss;
 
-import cointoss.CurrencySetting;
 import cointoss.MarketSetting;
-import cointoss.MarketSettingModel;
-import cointoss.MarketType;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.arithmetic.Num;
 import java.lang.Class;
@@ -17,12 +14,12 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
-import javax.annotation.processing.Generated;
 
 /**
  * Generated model for {@link MarketSettingModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class MarketSetting implements MarketSettingModel {
 
     /**
@@ -93,7 +90,7 @@ public class MarketSetting implements MarketSettingModel {
     public final CurrencySetting target;
 
     /** The exposed property. */
-    public final CurrencySetting base;
+    public final cointoss.CurrencySetting base;
 
     /** The exposed property. */
     public final List<Num> targetCurrencyBidSizes;
@@ -126,14 +123,14 @@ public class MarketSetting implements MarketSettingModel {
         this.type = null;
         this.target = null;
         this.base = null;
-        this.targetCurrencyBidSizes = MarketSettingModel.super.targetCurrencyBidSizes();
-        this.priceRangeModifier = MarketSettingModel.super.priceRangeModifier();
-        this.acquirableExecutionSize = MarketSettingModel.super.acquirableExecutionSize();
-        this.executionLogger = MarketSettingModel.super.executionLogger();
-        this.takerFee = MarketSettingModel.super.takerFee();
-        this.makerFee = MarketSettingModel.super.makerFee();
-        this.targetWithdrawingFee = MarketSettingModel.super.targetWithdrawingFee();
-        this.baseWithdrawingFee = MarketSettingModel.super.baseWithdrawingFee();
+        this.targetCurrencyBidSizes = cointoss.MarketSettingModel.super.targetCurrencyBidSizes();
+        this.priceRangeModifier = cointoss.MarketSettingModel.super.priceRangeModifier();
+        this.acquirableExecutionSize = cointoss.MarketSettingModel.super.acquirableExecutionSize();
+        this.executionLogger = cointoss.MarketSettingModel.super.executionLogger();
+        this.takerFee = cointoss.MarketSettingModel.super.takerFee();
+        this.makerFee = cointoss.MarketSettingModel.super.makerFee();
+        this.targetWithdrawingFee = cointoss.MarketSettingModel.super.targetWithdrawingFee();
+        this.baseWithdrawingFee = cointoss.MarketSettingModel.super.baseWithdrawingFee();
     }
 
     /**
@@ -142,7 +139,7 @@ public class MarketSetting implements MarketSettingModel {
      *  @return
      */
     @Override
-    public final MarketType type() {
+    public final cointoss.MarketType type() {
         return this.type;
     }
 
@@ -152,7 +149,7 @@ public class MarketSetting implements MarketSettingModel {
      * @return A value of type property.
      */
     @SuppressWarnings("unused")
-    private final MarketType getType() {
+    private final cointoss.MarketType getType() {
         return this.type;
     }
 
@@ -161,7 +158,7 @@ public class MarketSetting implements MarketSettingModel {
      *
      * @paran value A new value of type property to assign.
      */
-    private final void setType(MarketType value) {
+    private final void setType(cointoss.MarketType value) {
         if (value == null) {
             throw new IllegalArgumentException("The type property requires non-null value.");
         }
@@ -179,7 +176,7 @@ public class MarketSetting implements MarketSettingModel {
      *  @return
      */
     @Override
-    public final CurrencySetting target() {
+    public final cointoss.CurrencySetting target() {
         return this.target;
     }
 
@@ -189,7 +186,7 @@ public class MarketSetting implements MarketSettingModel {
      * @return A value of target property.
      */
     @SuppressWarnings("unused")
-    private final CurrencySetting getTarget() {
+    private final cointoss.CurrencySetting getTarget() {
         return this.target;
     }
 
@@ -198,7 +195,7 @@ public class MarketSetting implements MarketSettingModel {
      *
      * @paran value A new value of target property to assign.
      */
-    private final void setTarget(CurrencySetting value) {
+    private final void setTarget(cointoss.CurrencySetting value) {
         if (value == null) {
             throw new IllegalArgumentException("The target property requires non-null value.");
         }
@@ -216,7 +213,7 @@ public class MarketSetting implements MarketSettingModel {
      *  @return
      */
     @Override
-    public final CurrencySetting base() {
+    public final cointoss.CurrencySetting base() {
         return this.base;
     }
 
@@ -226,7 +223,7 @@ public class MarketSetting implements MarketSettingModel {
      * @return A value of base property.
      */
     @SuppressWarnings("unused")
-    private final CurrencySetting getBase() {
+    private final cointoss.CurrencySetting getBase() {
         return this.base;
     }
 
@@ -235,7 +232,7 @@ public class MarketSetting implements MarketSettingModel {
      *
      * @paran value A new value of base property to assign.
      */
-    private final void setBase(CurrencySetting value) {
+    private final void setBase(cointoss.CurrencySetting value) {
         if (value == null) {
             throw new IllegalArgumentException("The base property requires non-null value.");
         }
@@ -270,7 +267,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setTargetCurrencyBidSizes(List<Num> value) {
         if (value == null) {
-            value = MarketSettingModel.super.targetCurrencyBidSizes();
+            value = cointoss.MarketSettingModel.super.targetCurrencyBidSizes();
         }
         try {
             targetCurrencyBidSizesUpdater.invoke(this, value);
@@ -371,7 +368,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setExecutionLogger(Class<? extends ExecutionLogger> value) {
         if (value == null) {
-            value = MarketSettingModel.super.executionLogger();
+            value = cointoss.MarketSettingModel.super.executionLogger();
         }
         try {
             executionLoggerUpdater.invoke(this, value);
@@ -404,7 +401,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setTakerFee(UnaryOperator<Num> value) {
         if (value == null) {
-            value = MarketSettingModel.super.takerFee();
+            value = cointoss.MarketSettingModel.super.takerFee();
         }
         try {
             takerFeeUpdater.invoke(this, value);
@@ -437,7 +434,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setMakerFee(UnaryOperator<Num> value) {
         if (value == null) {
-            value = MarketSettingModel.super.makerFee();
+            value = cointoss.MarketSettingModel.super.makerFee();
         }
         try {
             makerFeeUpdater.invoke(this, value);
@@ -470,7 +467,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setTargetWithdrawingFee(UnaryOperator<Num> value) {
         if (value == null) {
-            value = MarketSettingModel.super.targetWithdrawingFee();
+            value = cointoss.MarketSettingModel.super.targetWithdrawingFee();
         }
         try {
             targetWithdrawingFeeUpdater.invoke(this, value);
@@ -503,7 +500,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setBaseWithdrawingFee(UnaryOperator<Num> value) {
         if (value == null) {
-            value = MarketSettingModel.super.baseWithdrawingFee();
+            value = cointoss.MarketSettingModel.super.baseWithdrawingFee();
         }
         try {
             baseWithdrawingFeeUpdater.invoke(this, value);
@@ -584,7 +581,7 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTarget<ÅssignableBase<Self>> type(MarketType type) {
+        public ÅssignableTarget<ÅssignableBase<Self>> type(cointoss.MarketType type) {
             Åssignable o = new Åssignable();
             o.type(type);
             return o;
@@ -635,7 +632,7 @@ public class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next type(MarketType value) {
+        default Next type(cointoss.MarketType value) {
             ((MarketSetting) this).setType(value);
             return (Next) this;
         }
@@ -646,7 +643,7 @@ public class MarketSetting implements MarketSettingModel {
          * @return The next assignable model.
          */
         default Next spot() {
-            return type(MarketType.SPOT);
+            return type(cointoss.MarketType.SPOT);
         }
 
         /**
@@ -655,7 +652,7 @@ public class MarketSetting implements MarketSettingModel {
          * @return The next assignable model.
          */
         default Next derivative() {
-            return type(MarketType.DERIVATIVE);
+            return type(cointoss.MarketType.DERIVATIVE);
         }
 
         /**
@@ -664,7 +661,7 @@ public class MarketSetting implements MarketSettingModel {
          * @return The next assignable model.
          */
         default Next future() {
-            return type(MarketType.FUTURE);
+            return type(cointoss.MarketType.FUTURE);
         }
     }
 
@@ -679,7 +676,7 @@ public class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next target(CurrencySetting value) {
+        default Next target(cointoss.CurrencySetting value) {
             ((MarketSetting) this).setTarget(value);
             return (Next) this;
         }
@@ -696,7 +693,7 @@ public class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next base(CurrencySetting value) {
+        default Next base(cointoss.CurrencySetting value) {
             ((MarketSetting) this).setBase(value);
             return (Next) this;
         }

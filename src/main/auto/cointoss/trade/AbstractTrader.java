@@ -1,8 +1,6 @@
 package cointoss.trade;
 
 import cointoss.trade.AbstractTrader;
-import cointoss.trade.AbstractTraderModel;
-import cointoss.trade.Scenario;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.arithmetic.Num;
 import java.lang.Override;
@@ -13,13 +11,13 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
-import javax.annotation.processing.Generated;
 import kiss.Signal;
 
 /**
  * Generated model for {@link AbstractTraderModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class AbstractTrader extends AbstractTraderModel {
 
     /**
@@ -313,7 +311,7 @@ public class AbstractTrader extends AbstractTraderModel {
      *  @return
      */
     @Override
-    public final List<Scenario> scenarios() {
+    public final List<cointoss.trade.Scenario> scenarios() {
         return this.scenarios;
     }
 
@@ -323,7 +321,7 @@ public class AbstractTrader extends AbstractTraderModel {
      * @return A value of scenarios property.
      */
     @SuppressWarnings("unused")
-    private final List<Scenario> getScenarios() {
+    private final List<cointoss.trade.Scenario> getScenarios() {
         return this.scenarios;
     }
 
@@ -332,7 +330,7 @@ public class AbstractTrader extends AbstractTraderModel {
      *
      * @paran value A new value of scenarios property to assign.
      */
-    private final void setScenarios(List<Scenario> value) {
+    private final void setScenarios(List<cointoss.trade.Scenario> value) {
         if (value == null) {
             value = super.scenarios();
         }
@@ -412,7 +410,7 @@ public class AbstractTrader extends AbstractTraderModel {
          * @param value A value to assign.
          * @return A initialized model.
          */
-        public Self scenarios(List<Scenario> value) {
+        public Self scenarios(List<cointoss.trade.Scenario> value) {
             return create().scenarios(value);
         }
 
@@ -422,7 +420,7 @@ public class AbstractTrader extends AbstractTraderModel {
          * @param values A value to assign.
          * @return A initialized model.
          */
-        public Self scenarios(Scenario... values) {
+        public Self scenarios(cointoss.trade.Scenario... values) {
             return scenarios(List.of(values));
         }
     }
@@ -471,7 +469,7 @@ public class AbstractTrader extends AbstractTraderModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next scenarios(List<? extends Scenario> value) {
+        default Next scenarios(List<? extends cointoss.trade.Scenario> value) {
             ((AbstractTrader) this).setScenarios((java.util.List)value);
             return (Next) this;
         }
@@ -481,7 +479,7 @@ public class AbstractTrader extends AbstractTraderModel {
          * 
          * @return The next assignable model.
          */
-        default Next scenarios(Scenario... values) {
+        default Next scenarios(cointoss.trade.Scenario... values) {
             return scenarios(List.of(values));
         }
     }

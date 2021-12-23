@@ -1,7 +1,6 @@
 package cointoss.util;
 
 import cointoss.util.RetryPolicy;
-import cointoss.util.RetryPolicyModel;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Throwable;
@@ -16,12 +15,12 @@ import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
-import javax.annotation.processing.Generated;
 
 /**
  * Generated model for {@link RetryPolicyModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class RetryPolicy extends RetryPolicyModel {
 
     /**
@@ -45,7 +44,7 @@ public class RetryPolicy extends RetryPolicyModel {
      */
     private static final MethodHandle invoker(String name, Class... parameterTypes)  {
         try {
-            Method method = RetryPolicyModel.class.getDeclaredMethod(name, parameterTypes);
+            Method method = cointoss.util.RetryPolicyModel.class.getDeclaredMethod(name, parameterTypes);
             method.setAccessible(true);
             return MethodHandles.lookup().unreflect(method);
         } catch (Throwable e) {

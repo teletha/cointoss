@@ -1,7 +1,6 @@
 package cointoss.util;
 
 import cointoss.util.APILimiter;
-import cointoss.util.APILimiterModel;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
@@ -14,12 +13,12 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.processing.Generated;
 
 /**
  * Generated model for {@link APILimiterModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class APILimiter extends APILimiterModel {
 
     /**
@@ -43,7 +42,7 @@ public class APILimiter extends APILimiterModel {
      */
     private static final MethodHandle invoker(String name, Class... parameterTypes)  {
         try {
-            Method method = APILimiterModel.class.getDeclaredMethod(name, parameterTypes);
+            Method method = cointoss.util.APILimiterModel.class.getDeclaredMethod(name, parameterTypes);
             method.setAccessible(true);
             return MethodHandles.lookup().unreflect(method);
         } catch (Throwable e) {

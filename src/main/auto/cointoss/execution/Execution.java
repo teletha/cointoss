@@ -3,7 +3,6 @@ package cointoss.execution;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionModel;
 import cointoss.util.arithmetic.Num;
 import java.lang.Override;
 import java.lang.String;
@@ -20,12 +19,12 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.IntUnaryOperator;
 import java.util.function.LongConsumer;
 import java.util.function.UnaryOperator;
-import javax.annotation.processing.Generated;
 
 /**
  * Generated model for {@link ExecutionModel}.
+ * 
+ * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-@Generated("Icy Manipulator")
 public class Execution extends ExecutionModel {
 
     /**
@@ -49,7 +48,7 @@ public class Execution extends ExecutionModel {
      */
     private static final MethodHandle invoker(String name, Class... parameterTypes)  {
         try {
-            Method method = ExecutionModel.class.getDeclaredMethod(name, parameterTypes);
+            Method method = cointoss.execution.ExecutionModel.class.getDeclaredMethod(name, parameterTypes);
             method.setAccessible(true);
             return MethodHandles.lookup().unreflect(method);
         } catch (Throwable e) {
