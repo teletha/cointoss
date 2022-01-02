@@ -85,7 +85,7 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.000001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService FUTURE_BTCUSD_211231 = new BinanceService("BTCUSD_211231", MarketSetting.with.derivative()
+    public static final MarketService FUTURE_BTCUSD_220624 = new BinanceService("BTCUSD_220624", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.00001))
             .base(Currency.USD.minimumSize(0.1))
             .priceRangeModifier(500)

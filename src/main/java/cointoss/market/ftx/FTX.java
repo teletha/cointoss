@@ -114,7 +114,7 @@ public final class FTX extends MarketServiceProvider {
     // .base(Currency.USD.minimumSize(1))
     // .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService BTC1231 = new FTXService("BTC-1231", MarketSetting.with.future()
+    public static final MarketService BTC0624 = new FTXService("BTC-0624", MarketSetting.with.future()
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
@@ -124,7 +124,7 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(1))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService ETH1231 = new FTXService("ETH-1231", MarketSetting.with.future()
+    public static final MarketService ETH0624 = new FTXService("ETH-0624", MarketSetting.with.future()
             .target(Currency.ETH.minimumSize(0.001))
             .base(Currency.USD.minimumSize(0.1))
             .acquirableExecutionSize(AcquirableSize));
