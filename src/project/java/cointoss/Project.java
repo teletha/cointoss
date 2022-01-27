@@ -30,6 +30,8 @@ public class Project extends bee.api.Project {
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
         require("org.decimal4j", "decimal4j").atTest();
+        require("org.apache.spark", "spark-streaming_2.13");
+        require("org.apache.spark", "spark-sql_2.13");
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }
