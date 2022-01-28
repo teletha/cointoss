@@ -32,6 +32,7 @@ public class Project extends bee.api.Project {
         require("org.decimal4j", "decimal4j").atTest();
         require("org.apache.spark", "spark-streaming_2.13");
         require("org.apache.spark", "spark-sql_2.13");
+        require("org.apache.htrace", "htrace-core4");
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }
