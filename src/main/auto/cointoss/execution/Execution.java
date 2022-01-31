@@ -422,11 +422,7 @@ public class Execution extends ExecutionModel {
         }
     }
 
-    /**
-     * Executed date-time. (Epoch mills)
-     *  
-     *  @return
-     */
+    /** {@inheritDoc} */
     @Override
     public final long mills() {
         return this.mills;

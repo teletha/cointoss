@@ -16,12 +16,13 @@ import java.util.function.LongConsumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
+import cointoss.Timelinable;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 
 @Icy(grouping = 2)
-abstract class ExecutionModel implements Directional {
+abstract class ExecutionModel implements Directional, Timelinable {
 
     /** The internal id counter. */
     private static final AtomicLong counter = new AtomicLong(1);
@@ -224,10 +225,9 @@ abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Executed date-time. (Epoch mills)
-     * 
-     * @return
+     * {@inheritDoc}
      */
+    @Override
     @Icy.Property
     public long mills() {
         return 0;
