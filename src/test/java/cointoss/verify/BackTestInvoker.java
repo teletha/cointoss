@@ -9,16 +9,32 @@
  */
 package cointoss.verify;
 
+import cointoss.execution.LogType;
+import cointoss.market.ftx.FTX;
+import cointoss.trading.LiquidationEater;
+
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
-        // BackTest.with.service(BitFlyer.FX_BTC_JPY)
-        // .start(2021, 11, 11)
-        // .end(2021, 11, 11)
-        // .traders(new LazyBear())
-        // .initialBaseCurrency(3000000)
-        // .type(LogType.Fast)
-        // .run();
+        BackTest.with.service(FTX.BTC_PERP)
+                .start(2021, 11, 1)
+                .end(2021, 12, 30)
+                .traders(new LiquidationEater())
+                .initialBaseCurrency(3000000)
+                .type(LogType.Normal)
+                .run();
 
+        // ZonedDateTime start = Chrono.utc(2022, 1, 10);
+        // ZonedDateTime end = Chrono.utc(2022, 1, 11);
+        // SignalSynchronizer synchronizer = new SignalSynchronizer();
+        //
+        // Binance.FUTURE_EHT_USDT.openInterest().query(start.toEpochSecond(),
+        // end.toEpochSecond()).plug(synchronizer.sync()).to(oi -> {
+        // System.out.println(oi);
+        // });
+        //
+        // new ExecutionLog(Binance.FUTURE_EHT_USDT).at(start).plug(synchronizer.sync()).to(exe -> {
+        // System.out.println(exe);
+        // });
     }
 }

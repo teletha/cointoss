@@ -38,13 +38,28 @@ public class SignalSynchronizerTest {
     void syncs() {
         Signal<Timelinable> A = signal('a', 'c');
         Signal<Timelinable> B = signal('b', 'd');
+        A.combineLatest(B).to();
         SignalSynchronizer synchronizer = new SignalSynchronizer();
 
         List<String> list = new ArrayList();
         A.plug(synchronizer.sync()).map(Timelinable::toString).toCollection(list);
         B.plug(synchronizer.sync()).map(Timelinable::toString).toCollection(list);
 
-        Assertions.assertIterableEquals(List.of("a", "b", 'c', 'd'), list);
+        Assertions.assertIterableEquals(List.of("a", "b", "c", "d"), list);
+    }
+
+    @Test
+    void syncs2() {
+        Signal<Timelinable> A = signal('a', 'c', 'g', 'j');
+        Signal<Timelinable> B = signal('b', 'd', 'e', 'f', 'h', 'i');
+        A.combineLatest(B).to();
+        SignalSynchronizer synchronizer = new SignalSynchronizer();
+
+        List<String> list = new ArrayList();
+        A.plug(synchronizer.sync()).map(Timelinable::toString).toCollection(list);
+        B.plug(synchronizer.sync()).map(Timelinable::toString).toCollection(list);
+
+        Assertions.assertIterableEquals(List.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j"), list);
     }
 
     private Signal<Timelinable> signal(Character... values) {

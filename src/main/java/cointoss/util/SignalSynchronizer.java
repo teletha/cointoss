@@ -9,34 +9,47 @@
  */
 package cointoss.util;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Function;
 
 import cointoss.Timelinable;
+import kiss.Observer;
 import kiss.Signal;
 
 public class SignalSynchronizer {
 
-    private List<Deque<Timelinable>> queues = new ArrayList();
+    private final ConcurrentLinkedDeque<Timelinable> timeline = new ConcurrentLinkedDeque();
 
-    private long latest;
+    private Observer<Timelinable> base;
 
     public <T extends Timelinable> Function<Signal<T>, Signal<T>> sync() {
         return signal -> {
-            return new Signal<>((observer, disposer) -> {
-                Deque<Timelinable> queue = new ArrayDeque();
-                queues.add(queue);
-
+            return new Signal<T>((observer, disposer) -> {
                 signal.to(v -> {
-                    long mills = v.mills();
-
-                    if (mills < latest) {
+                    if (base == null) {
+                        base = (Observer<Timelinable>) observer;
+                        timeline.offerLast(v);
+                    } else if (base == observer) {
+                        timeline.offerLast(v);
+                    } else {
+                        long mills = v.mills();
+                        while (!timeline.isEmpty() && timeline.peekFirst().mills() <= mills) {
+                            base.accept(timeline.pollFirst());
+                        }
                         observer.accept(v);
+
+                        if (timeline.isEmpty()) {
+                            base = null;
+                        }
                     }
-                }, observer::error, observer::complete);
+                }, observer::error, () -> {
+                    if (base != observer) {
+                        for (Timelinable value : timeline) {
+                            base.accept(value);
+                        }
+                    }
+                    observer.complete();
+                });
 
                 return disposer;
             });

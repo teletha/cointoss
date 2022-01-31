@@ -11,9 +11,10 @@ package cointoss.util.feather;
 
 import java.time.ZonedDateTime;
 
+import cointoss.Timelinable;
 import cointoss.util.Chrono;
 
-public interface TemporalData {
+public interface TemporalData extends Timelinable {
 
     /**
      * The date and time. (UTC)
@@ -31,5 +32,13 @@ public interface TemporalData {
      */
     default long seconds() {
         return date().toEpochSecond();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default long mills() {
+        return date().toInstant().toEpochMilli();
     }
 }
