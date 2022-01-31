@@ -41,15 +41,15 @@ public class LiquidationEater extends Trader {
         market.timeline.to(exe -> {
             if (exe.delay == Execution.DelayHuge) {
                 if (exe.direction == Direction.BUY) {
-                    if (startBuy == 0) startBuy = exe.mills;
+                    startBuy = exe.mills;
                     volumeBuy = volumeBuy.plus(exe.size);
                 } else {
-                    if (startSell == 0) startSell = exe.mills;
+                    startSell = exe.mills;
                     volumeSell = volumeSell.plus(exe.size);
                 }
             } else {
-                if (exe.mills - startBuy > 60 * 1000) {
-                    if (volumeBuy.isGreaterThan(70)) {
+                if (exe.mills - startBuy > 15 * 1000) {
+                    if (volumeBuy.isGreaterThan(50)) {
                         when(I.signal("now"), x -> trade(new Scenario() {
 
                             @Override
@@ -61,6 +61,8 @@ public class LiquidationEater extends Trader {
                             @Override
                             protected void exit() {
                                 exitWhen(exitSell.expose);
+                                exitAt(entryPrice.plus(500));
+                                exitAt(entryPrice.minus(400));
                             }
                         }));
                     }
@@ -68,8 +70,8 @@ public class LiquidationEater extends Trader {
                     volumeBuy = Num.ZERO;
                 }
 
-                if (exe.mills - startSell > 60 * 1000) {
-                    if (volumeSell.isGreaterThan(70)) {
+                if (exe.mills - startSell > 15 * 1000) {
+                    if (volumeSell.isGreaterThan(50)) {
                         when(I.signal("now"), x -> trade(new Scenario() {
 
                             @Override
@@ -81,6 +83,8 @@ public class LiquidationEater extends Trader {
                             @Override
                             protected void exit() {
                                 exitWhen(exitBuy.expose);
+                                exitAt(entryPrice.minus(500));
+                                exitAt(entryPrice.plus(400));
                             }
                         }));
                     }

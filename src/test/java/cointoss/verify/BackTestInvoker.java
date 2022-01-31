@@ -17,8 +17,8 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(FTX.BTC_PERP)
-                .start(2021, 11, 1)
-                .end(2021, 12, 30)
+                .start(2022, 1, 1)
+                .end(2022, 1, 30)
                 .traders(new LiquidationEater())
                 .initialBaseCurrency(3000000)
                 .type(LogType.Normal)
