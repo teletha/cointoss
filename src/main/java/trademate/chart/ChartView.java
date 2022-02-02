@@ -14,6 +14,9 @@ import java.util.Comparator;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
@@ -21,8 +24,6 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -85,6 +86,9 @@ public class ChartView extends View {
 
     /** The chart configuration. */
     public final Variable<Boolean> showChart = Variable.of(true);
+
+    /** The chart configuration. */
+    public final Variable<Boolean> showIndicator = Variable.of(true);
 
     /** The additional scripts. */
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();

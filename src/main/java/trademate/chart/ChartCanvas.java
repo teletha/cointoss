@@ -10,7 +10,8 @@
 package trademate.chart;
 
 import static cointoss.Direction.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.lang.Boolean.TRUE;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -19,6 +20,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -43,21 +60,6 @@ import cointoss.util.arithmetic.Primitives;
 import cointoss.util.array.DoubleList;
 import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -763,12 +765,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
                     // draw chart in visible range
-                    for (Plotter plotter : plotters) {
-                        plotter.lineMaxY = 0;
+                    if (chart.showIndicator.is(TRUE)) {
+                        for (Plotter plotter : plotters) {
+                            plotter.lineMaxY = 0;
 
-                        // ensure size
-                        for (LineChart chart : plotter.lines) {
-                            chart.valueY.clear();
+                            // ensure size
+                            for (LineChart chart : plotter.lines) {
+                                chart.valueY.clear();
+                            }
                         }
                     }
 
@@ -797,7 +801,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         }
 
                         // reduce drawing cost at initialization phase
-                        if (chart.showRealtimeUpdate.is(true)) {
+                        if (chart.showRealtimeUpdate.is(TRUE) && chart.showIndicator.is(TRUE)) {
                             for (Plotter plotter : plotters) {
                                 if (registry.globalSetting(plotter.origin).visible.is(false)) {
                                     continue;
@@ -830,7 +834,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     });
 
                     // reduce drawing cost at initialization phase
-                    if (chart.showRealtimeUpdate.is(true)) {
+                    if (chart.showRealtimeUpdate.is(TRUE) && chart.showIndicator.is(TRUE)) {
                         for (Plotter plotter : plotters) {
                             if (registry.globalSetting(plotter.origin).visible.is(false)) {
                                 continue;

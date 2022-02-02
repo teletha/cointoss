@@ -456,11 +456,12 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     /**
-     * 
-     * 
+     * Declare exit order
      */
-    protected final void exitAtRiskRewardRatio() {
-
+    public final void exitAtRiskRewardRatio(double ratio, Span span) {
+        Num range = Num.of(market.tickers.on(span).spreadStats.getMean()).scale(market.service.setting.target.scale);
+        exitAt(entryPrice.plus(directional, range.multiply(ratio)));
+        exitAt(entryPrice.minus(directional, range));
     }
 
     /**

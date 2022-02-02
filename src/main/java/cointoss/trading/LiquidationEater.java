@@ -36,13 +36,11 @@ public class LiquidationEater extends Trader {
 
     public double size = 0.5;
 
-    public int profitRange = 500;
-
-    public int losscutRange = 400;
-
     public int liquidationVolume = 50;
 
     public int liquidationWait = 10;
+
+    public double riskRewardRatio = 1.5;
 
     /**
      * {@inheritDoc}
@@ -65,16 +63,12 @@ public class LiquidationEater extends Trader {
 
                             @Override
                             protected void entry() {
-                                exitBuy.accept("E");
-                                entry(Direction.SELL, size, o -> o.make(exe.price.plus(10)));
+                                entry(Direction.SELL, size);
                             }
 
                             @Override
                             protected void exit() {
-                                exitWhen(exitSell.expose);
-                                exitAt(entryPrice.plus(losscutRange));
-                                exitAt(entryPrice.minus(profitRange));
-                                exitWhen(market.tickers.on(Span.Hour1).open);
+                                exitAtRiskRewardRatio(riskRewardRatio, Span.Hour1);
                             }
                         }));
                     }
@@ -88,16 +82,12 @@ public class LiquidationEater extends Trader {
 
                             @Override
                             protected void entry() {
-                                exitSell.accept("E");
-                                entry(Direction.BUY, size, o -> o.make(exe.price.minus(10)));
+                                entry(Direction.BUY, size);
                             }
 
                             @Override
                             protected void exit() {
-                                exitWhen(exitBuy.expose);
-                                exitAt(entryPrice.minus(losscutRange));
-                                exitAt(entryPrice.plus(profitRange));
-                                exitWhen(market.tickers.on(Span.Hour1).open);
+                                exitAtRiskRewardRatio(riskRewardRatio, Span.Hour1);
                             }
                         }));
                     }

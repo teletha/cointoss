@@ -20,6 +20,8 @@ public class Funds {
     public final Variable<Num> acceptableRiskAssetsRatio = Variable.of(Num.of("0.01"))
             .intercept((prev, now) -> Num.between(Num.of("0.001"), now, Num.of("0.05")));
 
+    public final Variable<Num> riskRewardRatio = Variable.of(Num.of(1.5));
+
     /**
      * Load markert info.
      * 

@@ -12,20 +12,25 @@ package trademate.chart;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.ZonedDateTime;
+import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleFunction;
+
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Side;
+import javafx.scene.layout.Region;
 
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.geometry.Insets;
-import javafx.geometry.Side;
-import javafx.scene.layout.Region;
+import kiss.Signal;
 import kiss.Variable;
 import trademate.setting.StaticConfig;
+import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 
 public class Chart extends Region {
@@ -78,8 +83,9 @@ public class Chart extends Region {
             DoubleFunction<String> readablePrice = p -> Num.of(p).scale(m.service.setting.base.scale).toString();
             DoubleFunction<String> readableTime = seconds -> {
                 ZonedDateTime time = Chrono.systemBySeconds((long) seconds);
+                int hour = time.getHour() * 60 * 60 - time.getOffset().getTotalSeconds();
 
-                if (time.getMinute() == 0 && time.getHour() % 6 == 0) {
+                if (time.getMinute() == 0 && hour == 0) {
                     return time.format(Chrono.DateTimeWithoutSec);
                 } else {
                     return time.format(Chrono.TimeWithoutSec);
@@ -90,7 +96,25 @@ public class Chart extends Region {
             axisY.tickLabelFormatter.set(readablePrice);
         });
 
+        observeStartAndFinish(axisX.scroll.valueProperty()).to(e -> {
+            chart.showIndicator.set(e);
+            canvas.layoutCandle.layoutForcely();
+        });
+        observeStartAndFinish(axisY.scroll.valueProperty()).to(e -> {
+            chart.showIndicator.set(e);
+            canvas.layoutCandle.layoutForcely();
+        });
+
         getChildren().addAll(canvas, axisX, axisY);
+    }
+
+    private Signal<Boolean> observeStartAndFinish(DoubleProperty property) {
+        return Viewtify.observe(property)
+                .first()
+                .merge(Viewtify.observe(property).debounce(150, TimeUnit.MILLISECONDS))
+                .take(2)
+                .repeat()
+                .toggle(Boolean.FALSE, Boolean.TRUE);
     }
 
     /**
