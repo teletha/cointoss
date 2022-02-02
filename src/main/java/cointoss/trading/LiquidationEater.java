@@ -12,6 +12,7 @@ package cointoss.trading;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.execution.Execution;
+import cointoss.ticker.Span;
 import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
@@ -33,6 +34,16 @@ public class LiquidationEater extends Trader {
 
     private Signaling exitSell = new Signaling();
 
+    public double size = 0.5;
+
+    public int profitRange = 500;
+
+    public int losscutRange = 400;
+
+    public int liquidationVolume = 50;
+
+    public int liquidationWait = 10;
+
     /**
      * {@inheritDoc}
      */
@@ -48,21 +59,22 @@ public class LiquidationEater extends Trader {
                     volumeSell = volumeSell.plus(exe.size);
                 }
             } else {
-                if (exe.mills - startBuy > 15 * 1000) {
-                    if (volumeBuy.isGreaterThan(50)) {
+                if (exe.mills - startBuy > liquidationWait * 1000) {
+                    if (volumeBuy.isGreaterThan(liquidationVolume)) {
                         when(I.signal("now"), x -> trade(new Scenario() {
 
                             @Override
                             protected void entry() {
                                 exitBuy.accept("E");
-                                entry(Direction.SELL, 0.1, o -> o.make(exe.price.plus(10)));
+                                entry(Direction.SELL, size, o -> o.make(exe.price.plus(10)));
                             }
 
                             @Override
                             protected void exit() {
                                 exitWhen(exitSell.expose);
-                                exitAt(entryPrice.plus(500));
-                                exitAt(entryPrice.minus(400));
+                                exitAt(entryPrice.plus(losscutRange));
+                                exitAt(entryPrice.minus(profitRange));
+                                exitWhen(market.tickers.on(Span.Hour1).open);
                             }
                         }));
                     }
@@ -70,21 +82,22 @@ public class LiquidationEater extends Trader {
                     volumeBuy = Num.ZERO;
                 }
 
-                if (exe.mills - startSell > 15 * 1000) {
-                    if (volumeSell.isGreaterThan(50)) {
+                if (exe.mills - startSell > liquidationWait * 1000) {
+                    if (volumeSell.isGreaterThan(liquidationVolume)) {
                         when(I.signal("now"), x -> trade(new Scenario() {
 
                             @Override
                             protected void entry() {
                                 exitSell.accept("E");
-                                entry(Direction.BUY, 0.1, o -> o.make(exe.price.minus(10)));
+                                entry(Direction.BUY, size, o -> o.make(exe.price.minus(10)));
                             }
 
                             @Override
                             protected void exit() {
                                 exitWhen(exitBuy.expose);
-                                exitAt(entryPrice.minus(500));
-                                exitAt(entryPrice.plus(400));
+                                exitAt(entryPrice.minus(losscutRange));
+                                exitAt(entryPrice.plus(profitRange));
+                                exitWhen(market.tickers.on(Span.Hour1).open);
                             }
                         }));
                     }

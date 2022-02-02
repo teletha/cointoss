@@ -9,9 +9,7 @@
  */
 package trademate.order;
 
-import static trademate.CommonText.Amount;
-import static trademate.CommonText.Price;
-import static trademate.CommonText.Profit;
+import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
@@ -210,7 +208,7 @@ public class OrderView extends View {
                     current = m;
                     market.text(m);
                     disposer = Disposable.empty();
-                    disposer.add(I.signal(m.trader().scenarios()).merge(m.trader().added).to(table::addItemAtLast));
+                    disposer.add(m.trader().observeScenario().to(table::addItemAtLast));
                     disposer.add(m.orderBook.longs.best.observing()
                             .combineLatest(orderSize.observing(), orderThresholdSize.observing())
                             .on(Viewtify.UIThread)

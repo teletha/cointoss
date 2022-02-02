@@ -61,12 +61,6 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
     /** The scenario managing event. */
     private final Signaling<Scenario> scenarioAdded = new Signaling();
 
-    /** The scenario add event. */
-    public final Signal<Scenario> added = scenarioAdded.expose;
-
-    /** The test mode. */
-    public String loggerName;
-
     /** The state snapshot. */
     private final NavigableMap<Long, Snapshot> snapshots = new TreeMap();
 
@@ -80,8 +74,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
         boolean backtest = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
                 .walk(stream -> stream.filter(frame -> frame.getClassName().contains("BackTestModel")).findFirst().isPresent());
 
-        loggerName = name() + (backtest ? "-BackTest" : "-Trading");
-
+        String loggerName = name() + (backtest ? "-BackTest" : "-Trading");
         I.env(loggerName + ".append", backtest);
         I.env(loggerName + ".dir", ".log/trading/" + name());
 
@@ -163,6 +156,15 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
      */
     public final boolean isDisable() {
         return !disable.isEmpty();
+    }
+
+    /**
+     * Expose the new scenario event.
+     * 
+     * @return
+     */
+    public final Signal<Scenario> observeScenario() {
+        return scenarioAdded.expose.startWith(scenarios);
     }
 
     /**

@@ -58,7 +58,7 @@ abstract class AbstractTraderModel {
      * @return
      */
     @Icy.Property
-    public List<Scenario> scenarios() {
+    protected List<Scenario> scenarios() {
         return new ArrayList();
     }
 

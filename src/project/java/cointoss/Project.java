@@ -33,7 +33,8 @@ public class Project extends bee.api.Project {
         require("ai.djl", "api");
         require("ai.djl.mxnet", "mxnet-engine");
         require("edu.brown.cs.burlap", "burlap");
-        require("org.deeplearning4j", "rl4j");
+        require("org.nd4j", "nd4j-native-platform");
+        require("org.deeplearning4j", "rl4j-core");
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }

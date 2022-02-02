@@ -92,6 +92,7 @@ public class BotEditor extends View {
                 .flatIterable(Model::properties)
                 .take(acceptableProperty.get())
                 .skip(rejectableProperty.get())
+                .skip(p -> p.name.equals("scenarios"))
                 .to(property -> {
                     BotEditor.PropertyEditor form = new PropertyEditor(property, model.get(trader, property));
 
