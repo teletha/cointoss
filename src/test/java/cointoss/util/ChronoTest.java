@@ -10,6 +10,7 @@
 package cointoss.util;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Test;
@@ -66,13 +67,13 @@ class ChronoTest {
 
     @Test
     void format() {
-        assert Chrono.format(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC)).equals("1970-01-01T09:00:01");
+        assert Chrono.format(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC), ZoneId.of("Japan")).equals("1970-01-01T09:00:01");
     }
 
     @Test
     void formatAsDate() {
-        assert Chrono.formatAsDate(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC)).equals("1970-01-01");
-        assert Chrono.formatAsDate(ZonedDateTime.of(1970, 1, 1, 23, 0, 1, 0, Chrono.UTC)).equals("1970-01-02");
+        assert Chrono.formatAsDate(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC), ZoneId.of("Japan")).equals("1970-01-01");
+        assert Chrono.formatAsDate(ZonedDateTime.of(1970, 1, 1, 23, 0, 1, 0, Chrono.UTC), ZoneId.of("Japan")).equals("1970-01-02");
     }
 
     @Test

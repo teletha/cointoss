@@ -458,7 +458,17 @@ public class Chrono {
      * @return A formatted literal.
      */
     public static String format(ZonedDateTime date) {
-        return DateTimeWithT.format(date.withZoneSameInstant(SYSTEM));
+        return format(date, SYSTEM);
+    }
+
+    /**
+     * Format the date-time to human-readable expression.
+     * 
+     * @param date A target date-time to format.
+     * @return A formatted literal.
+     */
+    public static String format(ZonedDateTime date, ZoneId zone) {
+        return DateTimeWithT.format(date.withZoneSameInstant(zone));
     }
 
     /**
@@ -468,7 +478,17 @@ public class Chrono {
      * @return A formatted literal.
      */
     public static String formatAsDate(ZonedDateTime date) {
-        return Date.format(date.withZoneSameInstant(SYSTEM));
+        return formatAsDate(date, SYSTEM);
+    }
+
+    /**
+     * Format the date to human-readable expression.
+     * 
+     * @param date A target date to format.
+     * @return A formatted literal.
+     */
+    public static String formatAsDate(ZonedDateTime date, ZoneId zone) {
+        return Date.format(date.withZoneSameInstant(zone));
     }
 
     /**

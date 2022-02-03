@@ -157,7 +157,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             if (delay != null) {
                 duration = delay.apply(count++);
                 if (10 < duration.toMinutes()) {
-                    duration = Duration.ofMinutes(3);
+                    duration = Duration.ofMinutes(10);
                 }
             }
 
