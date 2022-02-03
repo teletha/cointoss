@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static psychopath.Option.ATOMIC_WRITE;
+import static psychopath.Option.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -85,7 +85,7 @@ public class ExecutionLog {
     }
 
     /** NOOP TASK */
-    private static final ScheduledFuture NOOP = new ScheduledFuture() {
+    private static final ScheduledFuture<Object> NOOP = new ScheduledFuture<Object>() {
 
         /**
          * {@inheritDoc}

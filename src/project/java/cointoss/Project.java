@@ -32,7 +32,5 @@ public class Project extends bee.api.Project {
         require("org.decimal4j", "decimal4j").atTest();
         require("org.nd4j", "nd4j-native-platform");
         require("org.deeplearning4j", "rl4j-core");
-
-        versionControlSystem("https://github.com/teletha/cointoss");
     }
 }

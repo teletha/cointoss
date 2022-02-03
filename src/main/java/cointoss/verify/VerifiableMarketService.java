@@ -843,7 +843,7 @@ public class VerifiableMarketService extends MarketService {
     /**
      * 
      */
-    private class Task<V> implements ScheduledFuture, Callable<V>, Runnable {
+    private class Task<V> implements ScheduledFuture<V>, Callable<V>, Runnable {
 
         /** The active time by epoch mills. */
         private final long activeTime;
@@ -944,7 +944,7 @@ public class VerifiableMarketService extends MarketService {
          * {@inheritDoc}
          */
         @Override
-        public Object get() throws InterruptedException, ExecutionException {
+        public V get() throws InterruptedException, ExecutionException {
             throw new Error();
         }
 
@@ -952,7 +952,7 @@ public class VerifiableMarketService extends MarketService {
          * {@inheritDoc}
          */
         @Override
-        public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             throw new Error();
         }
 
