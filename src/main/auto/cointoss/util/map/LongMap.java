@@ -199,7 +199,7 @@ public interface LongMap<V> extends Map<Long, V> {
          * @return
          */
         static <V> LongEntry<V> immutable(long key, V value) {
-            return new LongEntry() {
+            return new LongEntry<V>() {
 
                 /**
                  * {@inheritDoc}
@@ -213,7 +213,7 @@ public interface LongMap<V> extends Map<Long, V> {
                  * {@inheritDoc}
                  */
                 @Override
-                public Object getValue() {
+                public V getValue() {
                     return value;
                 }
 
@@ -221,7 +221,7 @@ public interface LongMap<V> extends Map<Long, V> {
                  * {@inheritDoc}
                  */
                 @Override
-                public Object setValue(Object value) {
+                public V setValue(V value) {
                     throw new UnsupportedOperationException("This is immutable entry.");
                 }
 

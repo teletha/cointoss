@@ -199,7 +199,7 @@ public interface IntMap<V> extends Map<Integer, V> {
          * @return
          */
         static <V> IntEntry<V> immutable(int key, V value) {
-            return new IntEntry() {
+            return new IntEntry<V>() {
 
                 /**
                  * {@inheritDoc}
@@ -213,7 +213,7 @@ public interface IntMap<V> extends Map<Integer, V> {
                  * {@inheritDoc}
                  */
                 @Override
-                public Object getValue() {
+                public V getValue() {
                     return value;
                 }
 
@@ -221,7 +221,7 @@ public interface IntMap<V> extends Map<Integer, V> {
                  * {@inheritDoc}
                  */
                 @Override
-                public Object setValue(Object value) {
+                public V setValue(V value) {
                     throw new UnsupportedOperationException("This is immutable entry.");
                 }
 

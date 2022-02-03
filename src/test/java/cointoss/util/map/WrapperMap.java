@@ -201,7 +201,7 @@ public interface WrapperMap<V> extends Map<Wrapper, V> {
          * @return
          */
         static <V> WrapperEntry<V> immutable(Primitive key, V value) {
-            return new WrapperEntry() {
+            return new WrapperEntry<V>() {
 
                 /**
                  * {@inheritDoc}
@@ -215,7 +215,7 @@ public interface WrapperMap<V> extends Map<Wrapper, V> {
                  * {@inheritDoc}
                  */
                 @Override
-                public Object getValue() {
+                public V getValue() {
                     return value;
                 }
 
@@ -223,7 +223,7 @@ public interface WrapperMap<V> extends Map<Wrapper, V> {
                  * {@inheritDoc}
                  */
                 @Override
-                public Object setValue(Object value) {
+                public V setValue(V value) {
                     throw new UnsupportedOperationException("This is immutable entry.");
                 }
 

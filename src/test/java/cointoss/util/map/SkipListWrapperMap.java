@@ -2045,7 +2045,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
          * Variant of main Iter class to traverse through submaps. Also serves as back-up
          * Spliterator for views.
          */
-        private class SubMapGenericIterator<T> implements Iterator<T>, Spliterator<T> {
+        private class SubMapGenericIterator implements Iterator<V>, Spliterator<V> {
 
             /** The node access type. */
             private final Type type;
@@ -2093,11 +2093,11 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
              * {@inheritDoc}
              */
             @Override
-            public final T next() {
+            public final V next() {
                 Node<V> node = next;
                 V value = nextValue;
                 advance();
-                return (T) type.create(node.key, value);
+                return (V) type.create(node.key, value);
             }
 
             /**
@@ -2164,7 +2164,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
              * {@inheritDoc}
              */
             @Override
-            public Spliterator<T> trySplit() {
+            public Spliterator<V> trySplit() {
                 return null;
             }
 
@@ -2172,7 +2172,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
              * {@inheritDoc}
              */
             @Override
-            public boolean tryAdvance(Consumer<? super T> action) {
+            public boolean tryAdvance(Consumer<? super V> action) {
                 if (hasNext()) {
                     action.accept(next());
                     return true;
@@ -2184,7 +2184,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
              * {@inheritDoc}
              */
             @Override
-            public void forEachRemaining(Consumer<? super T> action) {
+            public void forEachRemaining(Consumer<? super V> action) {
                 while (hasNext())
                     action.accept(next());
             }
@@ -2201,9 +2201,9 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
              * {@inheritDoc}
              */
             @Override
-            public final Comparator<? super T> getComparator() {
+            public final Comparator<? super V> getComparator() {
                 if (type == Type.Key) {
-                    return (Comparator<? super T>) SubMap.this.comparator();
+                    return (Comparator<? super V>) SubMap.this.comparator();
                 } else {
                     return null;
                 }
@@ -2525,7 +2525,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
         @Override
         public Spliterator<V> spliterator() {
             return (m instanceof SkipListWrapperMap) ? ((SkipListWrapperMap<V>) m).createSpliteratorFor(Type.Value)
-                    : ((SubMap<V>) m).new SubMapGenericIterator(Type.Value);
+                    : ((SubMap) m).new SubMapGenericIterator(Type.Value);
         }
 
         @Override
@@ -2533,7 +2533,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
             if (filter == null) throw new NullPointerException();
             if (m instanceof SkipListWrapperMap) return ((SkipListWrapperMap<V>) m).removeValueIf(filter);
             // else use iterator
-            Iterator<WrapperEntry<V>> it = ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
+            Iterator<WrapperEntry<V>> it = ((SubMap) m).new SubMapGenericIterator(Type.Entry);
             boolean removed = false;
             while (it.hasNext()) {
                 WrapperEntry<V> e = it.next();
@@ -2631,7 +2631,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
         @Override
         public Spliterator<WrapperEntry<V>> spliterator() {
             return (m instanceof SkipListWrapperMap) ? ((SkipListWrapperMap<V>) m).createSpliteratorFor(Type.Entry)
-                    : ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
+                    : ((SubMap) m).new SubMapGenericIterator(Type.Entry);
         }
 
         @Override
@@ -2639,7 +2639,7 @@ public class SkipListWrapperMap<V> extends AbstractMap<Wrapper, V> implements Co
             if (filter == null) throw new NullPointerException();
             if (m instanceof SkipListWrapperMap) return ((SkipListWrapperMap<V>) m).removeEntryIf(filter);
             // else use iterator
-            Iterator<WrapperEntry<V>> it = ((SubMap<V>) m).new SubMapGenericIterator(Type.Entry);
+            Iterator<WrapperEntry<V>> it = ((SubMap) m).new SubMapGenericIterator(Type.Entry);
             boolean removed = false;
             while (it.hasNext()) {
                 WrapperEntry<V> e = it.next();

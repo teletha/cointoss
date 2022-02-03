@@ -199,7 +199,7 @@ public interface DoubleMap<V> extends Map<Double, V> {
          * @return
          */
         static <V> DoubleEntry<V> immutable(double key, V value) {
-            return new DoubleEntry() {
+            return new DoubleEntry<V>() {
 
                 /**
                  * {@inheritDoc}
@@ -213,7 +213,7 @@ public interface DoubleMap<V> extends Map<Double, V> {
                  * {@inheritDoc}
                  */
                 @Override
-                public Object getValue() {
+                public V getValue() {
                     return value;
                 }
 
@@ -221,7 +221,7 @@ public interface DoubleMap<V> extends Map<Double, V> {
                  * {@inheritDoc}
                  */
                 @Override
-                public Object setValue(Object value) {
+                public V setValue(V value) {
                     throw new UnsupportedOperationException("This is immutable entry.");
                 }
 
