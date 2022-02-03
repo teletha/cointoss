@@ -10,6 +10,7 @@
 package cointoss.execution;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -477,7 +478,7 @@ class CacheTest {
     @Test
     void codec() throws IOException {
         int size = 1000;
-        Execution[] executions = Executions.random(size).toArray(new Execution[size]);
+        Execution[] executions = Executions.random(size, Duration.ofMillis(2000)).toArray(new Execution[size]);
 
         Cache cache = log.cache(Chrono.utc(2020, 12, 15));
         cache.writeNormal(executions);

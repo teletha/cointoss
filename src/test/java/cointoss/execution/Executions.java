@@ -9,10 +9,13 @@
  */
 package cointoss.execution;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import cointoss.Direction;
+import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 
 public class Executions {
@@ -25,11 +28,29 @@ public class Executions {
      */
     public static List<Execution> random(int numbers) {
         List<Execution> list = new ArrayList();
-    
+
         for (int i = 0; i < numbers; i++) {
             list.add(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)));
         }
-    
+
+        return list;
+    }
+
+    /**
+     * Create the specified numbers of {@link Execution}.
+     * 
+     * @param numbers
+     * @return
+     */
+    public static List<Execution> random(int numbers, Duration interval) {
+        List<Execution> list = new ArrayList();
+        ZonedDateTime date = Chrono.MIN;
+
+        for (int i = 0; i < numbers; i++) {
+            list.add(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)).date(date));
+            date = date.plus(interval);
+        }
+
         return list;
     }
 
@@ -42,11 +63,12 @@ public class Executions {
      */
     public static List<Execution> sequence(int count, Direction side, double size, double price) {
         List<Execution> list = new ArrayList();
-    
+
         for (int i = 0; i < count; i++) {
             list.add(Execution.with.direction(side, size)
                     .price(price)
-                    .consecutive(i == 0 ? ExecutionModel.ConsecutiveDifference : side.isBuy() ? ExecutionModel.ConsecutiveSameBuyer : ExecutionModel.ConsecutiveSameSeller));
+                    .consecutive(i == 0 ? ExecutionModel.ConsecutiveDifference
+                            : side.isBuy() ? ExecutionModel.ConsecutiveSameBuyer : ExecutionModel.ConsecutiveSameSeller));
         }
         return list;
     }
