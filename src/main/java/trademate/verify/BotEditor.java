@@ -211,7 +211,7 @@ public class BotEditor extends View {
          */
         private UserInterface[] createIntegralRange(int initial) {
             UISpinner<Integer> step = new UISpinner(this);
-            step.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000);
+            step.items(1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000);
 
             UIText<Integer> start = new UIText(this, Integer.class);
             UIText<Integer> end = new UIText(this, Integer.class);
@@ -227,6 +227,9 @@ public class BotEditor extends View {
                     .when(User.Scroll, Actions.traverseInt(step::value))
                     .verify(en("The end value must be greater than the start value."), ui -> start.value() <= ui.value())
                     .verifyWhen(start.isChanged());
+
+            int length = start.value().toString().length();
+            step.value(2 <= length && length <= 5 ? step.items().get((length - 1) * 3) : 1);
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {
                 List values = new ArrayList();
@@ -247,7 +250,7 @@ public class BotEditor extends View {
          */
         private UserInterface[] createDecimalRange(double initial) {
             UISpinner<Double> step = new UISpinner(this);
-            step.items(0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0);
+            step.items(0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0);
 
             UIText<Double> start = new UIText(this, Double.class);
             UIText<Double> end = new UIText(this, Double.class);
@@ -265,6 +268,9 @@ public class BotEditor extends View {
                     .when(User.Scroll, Actions.traverseDouble(step::value))
                     .verify(en("The end value must be greater than the start value."), ui -> start.value() <= ui.value())
                     .verifyWhen(start.isChanged());
+
+            int length = start.value().toString().replace(".", "").length();
+            step.value(1 <= length && length <= 4 ? step.items().get((4 - length) * 3) : 0.001);
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {
                 List values = new ArrayList();
