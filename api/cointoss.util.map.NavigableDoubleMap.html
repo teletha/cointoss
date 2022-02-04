@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.util.map</code>
+					<h2 class="Interface l"><code class="f">NavigableDoubleMap</code><code class="M">&#60;<code>V</code>&#62;</code></h2>
+					<div class="R">
+						<ul class="C D">
+							<li><code>V</code></li>
+						</ul>
+						<ul class="C F">
+							<li><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></li>
+							<li><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/NavigableMap.html">NavigableMap</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></li>
+							<li><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/SortedMap.html">SortedMap</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></li>
+						</ul>
+						<ul class="C G">
+							<li><code><a href="api/cointoss.util.map.ConcurrentNavigableDoubleMap.html">ConcurrentNavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="O" id="lowerEntry(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">lowerEntry</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>key</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="lowerEntry(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">lowerEntry</code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>key</code></td>
+							<td><span><p>the key</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>an entry with the greatest key less than <code>key</code>, or <code>null</code> if there is no
+         such key</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a key-value mapping associated with the greatest key strictly less than the given
+ key, or <code>null</code> if there is no such key.</p>
+					</span></section>
+				<section class="O" id="lowerKey(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">lowerKey</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>key</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="lowerKey(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">lowerKey</code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="e"><code>double</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>key</code></td>
+							<td><span><p>the key</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code>double</code></td>
+							<td><span><p>the greatest key less than <code>key</code>, or <code>null</code> if there is no such key</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns the greatest key strictly less than the given key, or <code>null</code> if there is no
+ such key.</p>
+					</span></section>
+				<section class="O" id="floorEntry(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">floorEntry</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>key</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="floorEntry(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">floorEntry</code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>key</code></td>
+							<td><span><p>the key</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>an entry with the greatest key less than or equal to <code>key</code>, or <code>null</code> if
+         there is no such key</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a key-value mapping associated with the greatest key less than or equal to the given
+ key, or <code>null</code> if there is no such key.</p>
+					</span></section>
+				<section class="O" id="floorKey(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">floorKey</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>key</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="floorKey(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">floorKey</code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="e"><code>double</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>key</code></td>
+							<td><span><p>the key</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code>double</code></td>
+							<td><span><p>the greatest key less than or equal to <code>key</code>, or <code>null</code> if there is no
+         such key</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns the greatest key less than or equal to the given key, or <code>null</code> if there is no
+ such key.</p>
+					</span></section>
+				<section class="O" id="ceilingEntry(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">ceilingEntry</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>key</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="ceilingEntry(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">ceilingEntry</code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>key</code></td>
+							<td><span><p>the key</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>an entry with the least key greater than or equal to <code>key</code>, or <code>null</code> if
+         there is no such key</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a key-value mapping associated with the least key greater than or equal to the given
+ key, or <code>null</code> if there is no such key.</p>
+					</span></section>
+				<section class="O" id="ceilingKey(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">ceilingKey</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>key</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="ceilingKey(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">ceilingKey</code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="e"><code>double</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>key</code></td>
+							<td><span><p>the key</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code>double</code></td>
+							<td><span><p>the least key greater than or equal to <code>key</code>, or <code>null</code> if there is no
+         such key</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns the least key greater than or equal to the given key, or <code>null</code> if there is no
+ such key.</p>
+					</span></section>
+				<section class="O" id="higherEntry(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">higherEntry</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>key</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="higherEntry(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">higherEntry</code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>key</code></td>
+							<td><span><p>the key</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>an entry with the least key greater than <code>key</code>, or <code>null</code> if there is no
+         such key</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a key-value mapping associated with the least key strictly greater than the given
+ key, or <code>null</code> if there is no such key.</p>
+					</span></section>
+				<section class="O" id="higherKey(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">higherKey</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>key</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="higherKey(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">higherKey</code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="e"><code>double</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>key</code></td>
+							<td><span><p>the key</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code>double</code></td>
+							<td><span><p>the least key greater than <code>key</code>, or <code>null</code> if there is no such key</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns the least key strictly greater than the given key, or <code>null</code> if there is no
+ such key.</p>
+					</span></section>
+				<section class="O" id="firstKey()">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">firstKey</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="firstDoubleKey()">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">firstDoubleKey</code><code class="M">()</code><i class="e"><code>double</code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>double</code></td>
+							<td><span><p>the first (lowest) key currently in this map</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns the first (lowest) key currently in this map.</p>
+					</span></section>
+				<section class="O" id="firstValue()">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">firstValue</code><code class="M">()</code><i class="e"><code>V</code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>V</code></td>
+							<td><span><p>A value with the least key, or <code>null</code> if this map is empty</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a value mapping associated with the least key in this map, or <code>null</code> if the map
+ is empty.</p>
+					</span></section>
+				<section class="O" id="firstEntry()">
+					<h2 class="U"><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">firstEntry</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>an entry with the least key, or <code>null</code> if this map is empty</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a key-value mapping associated with the least key in this map, or <code>null</code> if the
+ map is empty.</p>
+					</span></section>
+				<section class="O" id="lastKey()">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">lastKey</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="lastDoubleKey()">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">lastDoubleKey</code><code class="M">()</code><i class="e"><code>double</code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>double</code></td>
+							<td><span><p>the last (highest) key currently in this map</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns the last (highest) key currently in this map.</p>
+					</span></section>
+				<section class="O" id="lastValue()">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">lastValue</code><code class="M">()</code><i class="e"><code>V</code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>V</code></td>
+							<td><span><p>A value with the greatest key, or <code>null</code> if this map is empty</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a value mapping associated with the greatest key in this map, or <code>null</code> if the
+ map is empty.</p>
+					</span></section>
+				<section class="O" id="lastEntry()">
+					<h2 class="U"><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">lastEntry</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>an entry with the greatest key, or <code>null</code> if this map is empty</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a key-value mapping associated with the greatest key in this map, or <code>null</code> if
+ the map is empty.</p>
+					</span></section>
+				<section class="O" id="pollFirstEntry()">
+					<h2 class="U"><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">pollFirstEntry</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>the removed first entry of this map, or <code>null</code> if this map is empty</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Removes and returns a key-value mapping associated with the least key in this map, or
+ <code>null</code> if the map is empty.</p>
+					</span></section>
+				<section class="O" id="pollLastEntry()">
+					<h2 class="U"><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">pollLastEntry</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>the removed last entry of this map, or <code>null</code> if this map is empty</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Removes and returns a key-value mapping associated with the greatest key in this map, or
+ <code>null</code> if the map is empty.</p>
+					</span></section>
+				<section class="O" id="descendingMap()">
+					<h2 class="U"><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">descendingMap</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>a reverse order view of this map</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a reverse order view of the mappings contained in this map. The descending map is
+ backed by this map, so changes to the map are reflected in the descending map, and
+ vice-versa. If either map is modified while an iteration over a collection view of either map
+ is in progress (except through the iterator&#39;s own <code>remove</code> operation), the results of
+ the iteration are undefined.
+ 
+							<p>
+ The returned map has an ordering equivalent to <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collections.html#reverseOrder(java.util.Comparator)">Collections#reverseOrder(Comparator)</a></code><code>(comparator())</code>. The expression
+ <code>m.descendingMap().descendingMap()</code> returns a view of <code>m</code> essentially equivalent
+ to <code>m</code>.</p>
+						</p>
+					</span></section>
+				<section class="O" id="navigableKeySet()">
+					<h2 class="U"><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">navigableKeySet</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.set.NavigableDoubleSet.html">NavigableDoubleSet</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.set.NavigableDoubleSet.html">NavigableDoubleSet</a></code></td>
+							<td><span><p>a navigable set view of the keys in this map</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/NavigableSet.html">NavigableSet</a></code> view of the keys contained in this map. The set&#39;s iterator
+ returns the keys in ascending order. The set is backed by the map, so changes to the map are
+ reflected in the set, and vice-versa. If the map is modified while an iteration over the set
+ is in progress (except through the iterator&#39;s own <code>
+ remove</code> operation), the results of the iteration are undefined. The set supports element
+ removal, which removes the corresponding mapping from the map, via the
+ <code>Iterator.remove</code>, <code>Set.remove</code>, <code>removeAll</code>, <code>retainAll</code>, and
+ <code>clear</code> operations. It does not support the <code>add</code> or <code>addAll</code> operations.</p>
+					</span></section>
+				<section class="O" id="descendingKeySet()">
+					<h2 class="U"><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">descendingKeySet</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.set.NavigableDoubleSet.html">NavigableDoubleSet</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.set.NavigableDoubleSet.html">NavigableDoubleSet</a></code></td>
+							<td><span><p>a reverse order navigable set view of the keys in this map</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a reverse order <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/NavigableSet.html">NavigableSet</a></code> view of the keys contained in this map. The
+ set&#39;s iterator returns the keys in descending order. The set is backed by the map, so changes
+ to the map are reflected in the set, and vice-versa. If the map is modified while an
+ iteration over the set is in progress (except through the iterator&#39;s own <code>
+ remove</code> operation), the results of the iteration are undefined. The set supports element
+ removal, which removes the corresponding mapping from the map, via the
+ <code>Iterator.remove</code>, <code>Set.remove</code>, <code>removeAll</code>, <code>retainAll</code>, and
+ <code>clear</code> operations. It does not support the <code>add</code> or <code>addAll</code> operations.</p>
+					</span></section>
+				<section class="O" id="subMap(java.lang.Double,boolean,java.lang.Double,boolean)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">subMap</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">fromKey</code>, <code>boolean</code> <code class="parameterName">fromInclusive</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">toKey</code>, <code>boolean</code> <code class="parameterName">toInclusive</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/NavigableMap.html">NavigableMap</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>fromKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>boolean</code> <code>fromInclusive</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>toKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>boolean</code> <code>toInclusive</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/NavigableMap.html">NavigableMap</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="subMap(double,boolean,double,boolean)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">subMap</code><code class="M">(<code>double</code> <code class="parameterName">fromKey</code>, <code>boolean</code> <code class="parameterName">fromInclusive</code>, <code>double</code> <code class="parameterName">toKey</code>, <code>boolean</code> <code class="parameterName">toInclusive</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>fromKey</code></td>
+							<td><span><p>low endpoint of the keys in the returned map</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>boolean</code> <code>fromInclusive</code></td>
+							<td><span><code>true</code> if the low endpoint is to be included in the returned view</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>double</code> <code>toKey</code></td>
+							<td><span><p>high endpoint of the keys in the returned map</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>boolean</code> <code>toInclusive</code></td>
+							<td><span><code>true</code> if the high endpoint is to be included in the returned view</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>a view of the portion of this map whose keys range from <code>fromKey</code> to
+         <code>toKey</code></p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a view of the portion of this map whose keys range from <code>fromKey</code> to
+ <code>toKey</code>. If <code>fromKey</code> and <code>toKey</code> are equal, the returned map is empty
+ unless <code>fromInclusive</code> and <code>toInclusive</code> are both true. The returned map is
+ backed by this map, so changes in the returned map are reflected in this map, and vice-versa.
+ The returned map supports all optional map operations that this map supports.
+ 
+							<p>
+ The returned map will throw an <code>IllegalArgumentException</code> on an attempt to insert a key
+ outside of its range, or to construct a submap either of whose endpoints lie outside its
+ range.</p>
+						</p>
+					</span></section>
+				<section class="O" id="headMap(java.lang.Double,boolean)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">headMap</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">toKey</code>, <code>boolean</code> <code class="parameterName">inclusive</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>toKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>boolean</code> <code>inclusive</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="headMap(double,boolean)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">headMap</code><code class="M">(<code>double</code> <code class="parameterName">toKey</code>, <code>boolean</code> <code class="parameterName">inclusive</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>toKey</code></td>
+							<td><span><p>high endpoint of the keys in the returned map</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>boolean</code> <code>inclusive</code></td>
+							<td><span><code>true</code> if the high endpoint is to be included in the returned view</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>a view of the portion of this map whose keys are less than (or equal to, if
+         <code>inclusive</code> is true) <code>toKey</code></p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a view of the portion of this map whose keys are less than (or equal to, if
+ <code>inclusive</code> is true) <code>toKey</code>. The returned map is backed by this map, so changes
+ in the returned map are reflected in this map, and vice-versa. The returned map supports all
+ optional map operations that this map supports.
+ 
+							<p>
+ The returned map will throw an <code>IllegalArgumentException</code> on an attempt to insert a key
+ outside its range.</p>
+						</p>
+					</span></section>
+				<section class="O" id="tailMap(java.lang.Double,boolean)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">tailMap</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">fromKey</code>, <code>boolean</code> <code class="parameterName">inclusive</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>fromKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>boolean</code> <code>inclusive</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="tailMap(double,boolean)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">tailMap</code><code class="M">(<code>double</code> <code class="parameterName">fromKey</code>, <code>boolean</code> <code class="parameterName">inclusive</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>fromKey</code></td>
+							<td><span><p>low endpoint of the keys in the returned map</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>boolean</code> <code>inclusive</code></td>
+							<td><span><code>true</code> if the low endpoint is to be included in the returned view</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td><span><p>a view of the portion of this map whose keys are greater than (or equal to, if
+         <code>inclusive</code> is true) <code>fromKey</code></p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Returns a view of the portion of this map whose keys are greater than (or equal to, if
+ <code>inclusive</code> is true) <code>fromKey</code>. The returned map is backed by this map, so
+ changes in the returned map are reflected in this map, and vice-versa. The returned map
+ supports all optional map operations that this map supports.
+ 
+							<p>
+ The returned map will throw an <code>IllegalArgumentException</code> on an attempt to insert a key
+ outside its range.</p>
+						</p>
+					</span></section>
+				<section class="O" id="subMap(java.lang.Double,java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">subMap</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">fromKey</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">toKey</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>fromKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>toKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="subMap(double,double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">subMap</code><code class="M">(<code>double</code> <code class="parameterName">fromKey</code>, <code>double</code> <code class="parameterName">toKey</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>fromKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>double</code> <code>toKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Equivalent to <code>subMap(fromKey, true, toKey, false)</code>.</p>
+					</span></section>
+				<section class="O" id="headMap(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">headMap</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">toKey</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>toKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="headMap(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">headMap</code><code class="M">(<code>double</code> <code class="parameterName">toKey</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>toKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Equivalent to <code>headMap(toKey, false)</code>.</p>
+					</span></section>
+				<section class="O" id="tailMap(java.lang.Double)">
+					<h2 class="U"><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code class="f">tailMap</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">fromKey</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code>fromKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="tailMap(double)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">tailMap</code><code class="M">(<code>double</code> <code class="parameterName">fromKey</code>)</code><i class="e"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>fromKey</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Equivalent to <code>tailMap(fromKey, true)</code>.</p>
+					</span></section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#lowerEntry(java.lang.Double)">lowerEntry</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#lowerEntry(double)">lowerEntry</a></code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#lowerKey(java.lang.Double)">lowerKey</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#lowerKey(double)">lowerKey</a></code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="K"><code>double</code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#floorEntry(java.lang.Double)">floorEntry</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#floorEntry(double)">floorEntry</a></code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#floorKey(java.lang.Double)">floorKey</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#floorKey(double)">floorKey</a></code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="K"><code>double</code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#ceilingEntry(java.lang.Double)">ceilingEntry</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#ceilingEntry(double)">ceilingEntry</a></code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#ceilingKey(java.lang.Double)">ceilingKey</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#ceilingKey(double)">ceilingKey</a></code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="K"><code>double</code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#higherEntry(java.lang.Double)">higherEntry</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html">Entry</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#higherEntry(double)">higherEntry</a></code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#higherKey(java.lang.Double)">higherKey</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">key</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#higherKey(double)">higherKey</a></code><code class="M">(<code>double</code> <code class="parameterName">key</code>)</code><i class="K"><code>double</code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#firstKey()">firstKey</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#firstDoubleKey()">firstDoubleKey</a></code><code class="M">()</code><i class="K"><code>double</code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#firstValue()">firstValue</a></code><code class="M">()</code><i class="K"><code>V</code></i></li>
+						<li><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#firstEntry()">firstEntry</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#lastKey()">lastKey</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#lastDoubleKey()">lastDoubleKey</a></code><code class="M">()</code><i class="K"><code>double</code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#lastValue()">lastValue</a></code><code class="M">()</code><i class="K"><code>V</code></i></li>
+						<li><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#lastEntry()">lastEntry</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#pollFirstEntry()">pollFirstEntry</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#pollLastEntry()">pollLastEntry</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.map.DoubleMap.DoubleEntry.html">DoubleEntry</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#descendingMap()">descendingMap</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#navigableKeySet()">navigableKeySet</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.set.NavigableDoubleSet.html">NavigableDoubleSet</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#descendingKeySet()">descendingKeySet</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.set.NavigableDoubleSet.html">NavigableDoubleSet</a></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#subMap(java.lang.Double,boolean,java.lang.Double,boolean)">subMap</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">fromKey</code>, <code>boolean</code> <code class="parameterName">fromInclusive</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">toKey</code>, <code>boolean</code> <code class="parameterName">toInclusive</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/NavigableMap.html">NavigableMap</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code>, <code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#subMap(double,boolean,double,boolean)">subMap</a></code><code class="M">(<code>double</code> <code class="parameterName">fromKey</code>, <code>boolean</code> <code class="parameterName">fromInclusive</code>, <code>double</code> <code class="parameterName">toKey</code>, <code>boolean</code> <code class="parameterName">toInclusive</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#headMap(java.lang.Double,boolean)">headMap</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">toKey</code>, <code>boolean</code> <code class="parameterName">inclusive</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#headMap(double,boolean)">headMap</a></code><code class="M">(<code>double</code> <code class="parameterName">toKey</code>, <code>boolean</code> <code class="parameterName">inclusive</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#tailMap(java.lang.Double,boolean)">tailMap</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">fromKey</code>, <code>boolean</code> <code class="parameterName">inclusive</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#tailMap(double,boolean)">tailMap</a></code><code class="M">(<code>double</code> <code class="parameterName">fromKey</code>, <code>boolean</code> <code class="parameterName">inclusive</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#subMap(java.lang.Double,java.lang.Double)">subMap</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">fromKey</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">toKey</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#subMap(double,double)">subMap</a></code><code class="M">(<code>double</code> <code class="parameterName">fromKey</code>, <code>double</code> <code class="parameterName">toKey</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#headMap(java.lang.Double)">headMap</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">toKey</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#headMap(double)">headMap</a></code><code class="M">(<code>double</code> <code class="parameterName">toKey</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#tailMap(java.lang.Double)">tailMap</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code> <code class="parameterName">fromKey</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.map.NavigableDoubleMap.html#tailMap(double)">tailMap</a></code><code class="M">(<code>double</code> <code class="parameterName">fromKey</code>)</code><i class="K"><code><a href="api/cointoss.util.map.NavigableDoubleMap.html">NavigableDoubleMap</a><code class="parameters"><code>V</code></code></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

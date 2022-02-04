@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.arbitrage</code>
+					<h2 class="Class l"><code class="f">Arbitrage</code></h2>
+					<div class="R"></div>
+				</section>
+				<section class="O" id="time">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">time</code><i class="e"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDateTime.html">LocalDateTime</a></code></i></h2>
+				</section>
+				<section class="O" id="size">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">size</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+				</section>
+				<section class="O" id="buyMarket">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">buyMarket</code><i class="e"><code class="return"><a href="api/cointoss.Market.html">Market</a></code></i></h2>
+				</section>
+				<section class="O" id="buyPrice">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">buyPrice</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+				</section>
+				<section class="O" id="sellMarket">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">sellMarket</code><i class="e"><code class="return"><a href="api/cointoss.Market.html">Market</a></code></i></h2>
+				</section>
+				<section class="O" id="sellPrice">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">sellPrice</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+				</section>
+				<section class="O" id="diffPrice">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">diffPrice</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+				</section>
+				<section class="O" id="Arbitrage()">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">Arbitrage</code><code class="M">()</code></h2>
+				</section>
+				<section class="O" id="profit()">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">profit</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="closeBuy(cointoss.util.arithmetic.Num)">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">closeBuy</code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>price</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="closeSell(cointoss.util.arithmetic.Num)">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">closeSell</code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>price</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="toString()">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">toString</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="by(cointoss.Currency,cointoss.Currency)">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">by</code><code class="M">(<code><a href="api/cointoss.Currency.html">Currency</a></code> <code class="parameterName">target</code>, <code><a href="api/cointoss.Currency.html">Currency</a></code> <code class="parameterName">base</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.arbitrage.Arbitrage.html">Arbitrage</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.Currency.html">Currency</a></code> <code>target</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="api/cointoss.Currency.html">Currency</a></code> <code>base</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.arbitrage.Arbitrage.html">Arbitrage</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="main(java.lang.String[])">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">main</code><code class="M">(<code array="fix"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">args</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code array="fix"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>args</code></td>
+							<td></td>
+						</tr>
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/InterruptedException.html">InterruptedException</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#Arbitrage()">Arbitrage</a></code><code class="M">()</code></li>
+					</ul>
+					<h5 class="i">Fields</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#time">time</a></code><i class="K"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDateTime.html">LocalDateTime</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#size">size</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#buyMarket">buyMarket</a></code><i class="K"><code class="return"><a href="api/cointoss.Market.html">Market</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#buyPrice">buyPrice</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#sellMarket">sellMarket</a></code><i class="K"><code class="return"><a href="api/cointoss.Market.html">Market</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#sellPrice">sellPrice</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#diffPrice">diffPrice</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+					</ul>
+					<h5 class="i">Static Methods</h5>
+					<ul>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#by(cointoss.Currency,cointoss.Currency)">by</a></code><code class="M">(<code><a href="api/cointoss.Currency.html">Currency</a></code> <code class="parameterName">target</code>, <code><a href="api/cointoss.Currency.html">Currency</a></code> <code class="parameterName">base</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.arbitrage.Arbitrage.html">Arbitrage</a></code></code></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#main(java.lang.String[])">main</a></code><code class="M">(<code array="fix"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">args</code>)</code><i class="K"><code>void</code></i></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#profit()">profit</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#closeBuy(cointoss.util.arithmetic.Num)">closeBuy</a></code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#closeSell(cointoss.util.arithmetic.Num)">closeSell</a></code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.arbitrage.Arbitrage.html#toString()">toString</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

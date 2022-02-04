@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.trade</code>
+					<h2 class="Class l"><code class="f">ScenarioBase</code></h2>
+					<div class="R">
+						<ul class="C E">
+							<li><code><a href="api/cointoss.trade.ScenarioBaseModel.html">ScenarioBaseModel</a></code></li>
+						</ul>
+						<ul class="C F">
+							<li><code><a href="api/cointoss.Directional.html">Directional</a></code></li>
+							<li><code><a href="api/cointoss.trade.Profitable.html">Profitable</a></code></li>
+						</ul>
+						<ul class="C G">
+							<li><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></li>
+						</ul>
+					</div><span class="B"><p>Generated model for <code><a href="api/cointoss.trade.ScenarioBaseModel.html">ScenarioBaseModel</a></code>.</p>
+					</span></section>
+				<section class="O" id="entrySize">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">entrySize</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="entryExecutedSize">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">entryExecutedSize</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="entryPrice">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">entryPrice</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="entryCommission">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">entryCommission</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="exitSize">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">exitSize</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="exitExecutedSize">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">exitExecutedSize</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="exitPrice">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">exitPrice</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="exitCommission">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">exitCommission</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="realizedProfit">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">realizedProfit</code><i class="e"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+					</span></section>
+				<section class="O" id="with">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code class="f">with</code><i class="e"><code class="return"><a href="api/cointoss.trade.ScenarioBase.Ìnstantiator.html">Ìnstantiator</a><code class="parameters"><code>?</code></code></code></i></h2><span class="B"><p>The singleton builder.</p>
+					</span></section>
+				<section class="O" id="ScenarioBase()">
+					<h2 class="U"><i class="PROTECTED"></i><code class="f">ScenarioBase</code><code class="M">()</code></h2><span class="B"><p>HIDE CONSTRUCTOR</p>
+					</span></section>
+				<section class="O" id="entrySize()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">entrySize</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A total size of entry orders.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>A total size of entry orders.</p>
+					</span></section>
+				<section class="O" id="observeEntrySizeDiff()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntrySizeDiff</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeEntrySize()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntrySize</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeEntrySizeNow()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntrySizeNow</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="entryExecutedSize()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">entryExecutedSize</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A total size of executed entry orders.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>A total size of executed entry orders.</p>
+					</span></section>
+				<section class="O" id="observeEntryExecutedSizeDiff()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntryExecutedSizeDiff</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeEntryExecutedSize()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntryExecutedSize</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeEntryExecutedSizeNow()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntryExecutedSizeNow</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="entryPrice()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">entryPrice</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>An average price of executed entry orders.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>An average price of executed entry orders.</p>
+					</span></section>
+				<section class="O" id="observeEntryPriceDiff()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntryPriceDiff</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeEntryPrice()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntryPrice</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeEntryPriceNow()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeEntryPriceNow</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="entryCommission()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">entryCommission</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>The total of all entry orders.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>The total of all entry orders.</p>
+					</span></section>
+				<section class="O" id="exitSize()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">exitSize</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A total size of exit orders.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>A total size of exit orders.</p>
+					</span></section>
+				<section class="O" id="observeExitSizeDiff()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitSizeDiff</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeExitSize()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitSize</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeExitSizeNow()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitSizeNow</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="exitExecutedSize()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">exitExecutedSize</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A total size of executed exit orders.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>A total size of executed exit orders.</p>
+					</span></section>
+				<section class="O" id="observeExitExecutedSizeDiff()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitExecutedSizeDiff</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeExitExecutedSize()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitExecutedSize</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeExitExecutedSizeNow()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitExecutedSizeNow</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="exitPrice()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">exitPrice</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>An average price of executed exit orders.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>An average price of executed exit orders.</p>
+					</span></section>
+				<section class="O" id="observeExitPriceDiff()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitPriceDiff</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeExitPrice()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitPrice</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeExitPriceNow()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeExitPriceNow</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="exitCommission()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">exitCommission</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>The total of all exit orders.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>The total of all exit orders.</p>
+					</span></section>
+				<section class="O" id="realizedProfit()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">realizedProfit</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeRealizedProfitDiff()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeRealizedProfitDiff</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeRealizedProfit()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeRealizedProfit</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="observeRealizedProfitNow()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeRealizedProfitNow</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="toString()">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">toString</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></td>
+							<td><span><p>All property values.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Show all property values.</p>
+					</span></section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.trade.ScenarioBase.html#ScenarioBase()">ScenarioBase</a></code><code class="M">()</code></li>
+					</ul>
+					<h5 class="i">Static Fields</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#with">with</a></code><i class="K"><code class="return"><a href="api/cointoss.trade.ScenarioBase.Ìnstantiator.html">Ìnstantiator</a><code class="parameters"><code>?</code></code></code></i></li>
+					</ul>
+					<h5 class="i">Fields</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#entrySize">entrySize</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#entryExecutedSize">entryExecutedSize</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#entryPrice">entryPrice</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#entryCommission">entryCommission</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#exitSize">exitSize</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#exitExecutedSize">exitExecutedSize</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#exitPrice">exitPrice</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#exitCommission">exitCommission</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#realizedProfit">realizedProfit</a></code><i class="K"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#entrySize()">entrySize</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntrySizeDiff()">observeEntrySizeDiff</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntrySize()">observeEntrySize</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntrySizeNow()">observeEntrySizeNow</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#entryExecutedSize()">entryExecutedSize</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntryExecutedSizeDiff()">observeEntryExecutedSizeDiff</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntryExecutedSize()">observeEntryExecutedSize</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntryExecutedSizeNow()">observeEntryExecutedSizeNow</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#entryPrice()">entryPrice</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntryPriceDiff()">observeEntryPriceDiff</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntryPrice()">observeEntryPrice</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeEntryPriceNow()">observeEntryPriceNow</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#entryCommission()">entryCommission</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#exitSize()">exitSize</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitSizeDiff()">observeExitSizeDiff</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitSize()">observeExitSize</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitSizeNow()">observeExitSizeNow</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#exitExecutedSize()">exitExecutedSize</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitExecutedSizeDiff()">observeExitExecutedSizeDiff</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitExecutedSize()">observeExitExecutedSize</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitExecutedSizeNow()">observeExitExecutedSizeNow</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#exitPrice()">exitPrice</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitPriceDiff()">observeExitPriceDiff</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitPrice()">observeExitPrice</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeExitPriceNow()">observeExitPriceNow</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#exitCommission()">exitCommission</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#realizedProfit()">realizedProfit</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeRealizedProfitDiff()">observeRealizedProfitDiff</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeRealizedProfit()">observeRealizedProfit</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.ScenarioBase.html#observeRealizedProfitNow()">observeRealizedProfitNow</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.trade.ScenarioBase.html#toString()">toString</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

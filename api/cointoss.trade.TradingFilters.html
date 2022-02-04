@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.trade</code>
+					<h2 class="Interface l"><code class="f">TradingFilters</code></h2>
+					<div class="R">
+						<ul class="C G">
+							<li><code><a href="api/cointoss.trading.Arbitrager.html">Arbitrager</a></code></li>
+							<li><code><a href="api/cointoss.trading.CrossOrder.html">CrossOrder</a></code></li>
+							<li><code><a href="api/cointoss.trading.LazyBear.html">LazyBear</a></code></li>
+							<li><code><a href="api/cointoss.trading.LiquidationEater.html">LiquidationEater</a></code></li>
+							<li><code><a href="api/cointoss.trading.LongWaveTrend.html">LongWaveTrend</a></code></li>
+							<li><code><a href="api/cointoss.trade.bot.TouchMovingAverage.html">TouchMovingAverage</a></code></li>
+							<li><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></li>
+						</ul>
+					</div><span class="B"><p>Define Chart Domain Specific Filters.</p>
+					</span></section>
+				<section class="O" id="breakup(double)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakup</code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value exceeds the specified value.</p>
+					</span></section>
+				<section class="O" id="breakup(cointoss.util.arithmetic.Num)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakup</code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value exceeds the specified value.</p>
+					</span></section>
+				<section class="O" id="breakup(java.util.function.Supplier)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakup</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">threshold</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value exceeds the specified value.</p>
+					</span></section>
+				<section class="O" id="breakdownDouble(double)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakdownDouble</code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value falls below the specified value.</p>
+					</span></section>
+				<section class="O" id="breakupDouble(double)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakupDouble</code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value exceeds the specified value.</p>
+					</span></section>
+				<section class="O" id="breakdown(double)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakdown</code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value falls below the specified value.</p>
+					</span></section>
+				<section class="O" id="breakdown(double,double)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakdown</code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>, <code>double</code> <code class="parameterName">gap</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>double</code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>double</code> <code>gap</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value falls below the specified value.</p>
+					</span></section>
+				<section class="O" id="breakdown(cointoss.util.arithmetic.Num)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakdown</code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value falls below the specified value.</p>
+					</span></section>
+				<section class="O" id="breakdown(java.util.function.Supplier)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakdown</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">threshold</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value falls below the specified value.</p>
+					</span></section>
+				<section class="O" id="breakdown(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">
+					<h2 class="U"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="f">breakdown</code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">gap</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>threshold</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>gap</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></td>
+							<td><span><p>A value transition filter.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Provides a filter that allows only when the value falls below the specified value.</p>
+					</span></section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakup(double)">breakup</a></code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakup(cointoss.util.arithmetic.Num)">breakup</a></code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakup(java.util.function.Supplier)">breakup</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">threshold</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakdownDouble(double)">breakdownDouble</a></code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakupDouble(double)">breakupDouble</a></code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html">Double</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakdown(double)">breakdown</a></code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakdown(double,double)">breakdown</a></code><code class="M">(<code>double</code> <code class="parameterName">threshold</code>, <code>double</code> <code class="parameterName">gap</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakdown(cointoss.util.arithmetic.Num)">breakdown</a></code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakdown(java.util.function.Supplier)">breakdown</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">threshold</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingFilters.html#breakdown(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">breakdown</a></code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">gap</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></code></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

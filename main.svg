@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<symbol id="chevrons">
+			<path d="M13 17l5-5-5-5"/>
+			<path d="M6 17l5-5-5-5"/>
+		</symbol>
+		<symbol id="chevron">
+			<path d="M9 18l6-6-6-6"/>
+		</symbol>
+		<symbol id="x">
+			<path d="M18 6L6 18"/>
+			<path d="M6 6l12 12"/>
+		</symbol>
+		<symbol id="circle">
+			<circle cx="12" cy="12" r="10"/>
+		</symbol>
+		<symbol id="edit">
+			<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+			<path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+		</symbol>
+		<symbol id="help">
+			<circle cx="12" cy="12" r="10"/>
+			<path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+			<path d="M12 17h.01"/>
+		</symbol>
+		<symbol id="twitter">
+			<path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+		</symbol>
+		<symbol id="copy">
+			<path d="M8 17.929H6c-1.105 0-2-.912-2-2.036V5.036C4 3.91 4.895 3 6 3h8c1.105 0 2 .911 2 2.036v1.866m-6 .17h8c1.105 0 2 .91 2 2.035v10.857C20 21.09 19.105 22 18 22h-8c-1.105 0-2-.911-2-2.036V9.107c0-1.124.895-2.036 2-2.036z"/>
+		</symbol>
+		<symbol id="moon">
+			<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+		</symbol>
+		<symbol id="sun">
+			<circle cx="12" cy="12" r="5"/><path d="M12 1v2"/>
+			<path d="M12 21v2"/>
+			<path d="M4.22 4.22l1.42 1.42"/>
+			<path d="M18.36 18.36l1.42 1.42"/>
+			<path d="M1 12h2"/>
+			<path d="M21 12h2"/>
+			<path d="M4.22 19.78l1.42-1.42"/>
+			<path d="M18.36 5.64l1.42-1.42"/>
+		</symbol>
+		<symbol id="text">
+			<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+			<path d="M14 2v6h6"/>
+			<path d="M16 13H8"/>
+			<path d="M16 17H8"/>
+			<path d="M10 9H8"/>
+		</symbol>
+		<symbol id="package">
+			<path d="M16.5 9.4l-9-5.19"/>
+			<path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+			<path d="M3.27 6.96L12 12.01l8.73-5.05"/>
+			<path d="M12 22.08V12"/>
+		</symbol>
+		<symbol id="user">
+			<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+			<circle cx="12" cy="7" r="4"/>
+		</symbol>
+		<symbol id="activity">
+			<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+		</symbol>
+		<symbol id="github">
+			<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+		</symbol>
+	</defs>
+</svg>

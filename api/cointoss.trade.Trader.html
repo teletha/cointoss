@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.trade</code>
+					<h2 class="AbstractClass l"><code class="f">Trader</code></h2>
+					<div class="R">
+						<ul class="C E">
+							<li><code><a href="api/cointoss.trade.AbstractTrader.html">AbstractTrader</a></code></li>
+							<li><code><a href="api/cointoss.trade.AbstractTraderModel.html">AbstractTraderModel</a></code></li>
+						</ul>
+						<ul class="C F">
+							<li><code>kiss.Disposable</code></li>
+							<li><code>kiss.Extensible</code></li>
+							<li><code><a href="api/cointoss.trade.TradingEntry.html">TradingEntry</a></code></li>
+							<li><code><a href="api/cointoss.trade.TradingFilters.html">TradingFilters</a></code></li>
+						</ul>
+						<ul class="C G">
+							<li><code><a href="api/cointoss.trading.Arbitrager.html">Arbitrager</a></code></li>
+							<li><code><a href="api/cointoss.trading.CrossOrder.html">CrossOrder</a></code></li>
+							<li><code><a href="api/cointoss.trading.LazyBear.html">LazyBear</a></code></li>
+							<li><code><a href="api/cointoss.trading.LiquidationEater.html">LiquidationEater</a></code></li>
+							<li><code><a href="api/cointoss.trading.LongWaveTrend.html">LongWaveTrend</a></code></li>
+							<li><code><a href="api/cointoss.trade.bot.TouchMovingAverage.html">TouchMovingAverage</a></code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="O" id="Trader()">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">Trader</code><code class="M">()</code></h2>
+				</section>
+				<section class="O" id="initialize(cointoss.Market)">
+					<h2 class="U"><i class="FINAL SYNCHRONIZED"><i class="PUBLIC"></i></i><code class="f">initialize</code><code class="M">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.Market.html">Market</a></code> <code>market</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Initialize this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code>.</p>
+					</span></section>
+				<section class="O" id="declareStrategy(cointoss.Market,cointoss.trade.Funds)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PROTECTED"></i></i><code class="f">declareStrategy</code><code class="M">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code> <code class="parameterName">fund</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.Market.html">Market</a></code> <code>market</code></td>
+							<td><span><p>A target market to deal.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="api/cointoss.trade.Funds.html">Funds</a></code> <code>fund</code></td>
+							<td><span><p>A fund manager.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Declare your strategy.</p>
+					</span></section>
+				<section class="O" id="name()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">name</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></td>
+							<td><span><p>An identical trader name.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>The human-readable identical name.</p>
+					</span></section>
+				<section class="O" id="vandalize()">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">vandalize</code><code class="M">()</code><i class="e"><code>void</code></i></h2>
+				</section>
+				<section class="O" id="enable()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">enable</code><code class="M">()</code><i class="e"><code>void</code></i></h2><span class="B"><p>Make this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code> enable forcibly.</p>
+					</span></section>
+				<section class="O" id="disable()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">disable</code><code class="M">()</code><i class="e"><code>void</code></i></h2><span class="B"><p>Make this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code> disable forcibly.</p>
+					</span></section>
+				<section class="O" id="isEnable()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">isEnable</code><code class="M">()</code><i class="e"><code>boolean</code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>boolean</code></td>
+							<td><span><p>it returns true if this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code> is active.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Check whether this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code> is active or not.</p>
+					</span></section>
+				<section class="O" id="isDisable()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">isDisable</code><code class="M">()</code><i class="e"><code>boolean</code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>boolean</code></td>
+							<td><span><p>it returns true if this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code> is disactive.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Check whether this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code> is disactive or not.</p>
+					</span></section>
+				<section class="O" id="observeScenario()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">observeScenario</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Expose the new scenario event.</p>
+					</span></section>
+				<section class="O" id="disableWhile(kiss.Signal)">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">disableWhile</code><code class="M">(<code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code> <code class="parameterName">duration</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code> <code>duration</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Disable this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code> while the specified duration.</p>
+					</span></section>
+				<section class="O" id="entry(cointoss.Directional,cointoss.util.arithmetic.Num,java.util.function.Consumer)">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">entry</code><code class="M">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>size</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code>declaration</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="now(kiss.WiseRunnable)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">now</code><code class="M">(<code>kiss.WiseRunnable</code> <code class="parameterName">declare</code>)</code><i class="e"><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>kiss.WiseRunnable</code> <code>declare</code></td>
+							<td><span><p>Declare trading scenario.</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></td>
+							<td><span><p>Chainable API.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Declare when to start trading.</p>
+					</span></section>
+				<section class="O" id="when(kiss.Signal,kiss.WiseRunnable)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">when</code><code class="M">(<code>kiss.Signal<code class="parameters"><code>T</code></code></code> <code class="parameterName">timing</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">declare</code>)</code><i class="e"><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></i></h2>
+					<table class="H">
+						<tr class="V">
+							<td><code>T</code></td>
+							<td><span><p>A timing value.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>kiss.Signal<code class="parameters"><code>T</code></code></code> <code>timing</code></td>
+							<td><span><p>When to start trading.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>kiss.WiseRunnable</code> <code>declare</code></td>
+							<td><span><p>Declare trading scenario.</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></td>
+							<td><span><p>Chainable API.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Declare when to start trading.</p>
+					</span></section>
+				<section class="O" id="when(kiss.Signal,kiss.WiseConsumer)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">when</code><code class="M">(<code>kiss.Signal<code class="parameters"><code>T</code></code></code> <code class="parameterName">timing</code>, <code>kiss.WiseConsumer<code class="parameters"><code>T</code></code></code> <code class="parameterName">declare</code>)</code><i class="e"><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></i></h2>
+					<table class="H">
+						<tr class="V">
+							<td><code>T</code></td>
+							<td><span><p>A timing value.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>kiss.Signal<code class="parameters"><code>T</code></code></code> <code>timing</code></td>
+							<td><span><p>When to start trading.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>kiss.WiseConsumer<code class="parameters"><code>T</code></code></code> <code>declare</code></td>
+							<td><span><p>Declare trading scenario.</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></td>
+							<td><span><p>Chainable API.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Declare when to start trading.</p>
+					</span></section>
+				<section class="O" id="trade(kiss.WiseConsumer,kiss.WiseConsumer)">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">trade</code><code class="M">(<code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code class="parameterName">entry</code>, <code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code class="parameterName">exit</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code>entry</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code>exit</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="trade(cointoss.Market,kiss.WiseConsumer,kiss.WiseConsumer)">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">trade</code><code class="M">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code class="parameterName">entry</code>, <code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code class="parameterName">exit</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.Market.html">Market</a></code> <code>market</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code>entry</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code>exit</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="trade(cointoss.trade.Scenario)">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">trade</code><code class="M">(<code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code> <code class="parameterName">scenario</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code> <code>scenario</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="trade(cointoss.Market,cointoss.trade.Scenario)">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">trade</code><code class="M">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code> <code class="parameterName">scenario</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.Market.html">Market</a></code> <code>market</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code> <code>scenario</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="snapshotAt(long)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">snapshotAt</code><code class="M">(<code>long</code> <code class="parameterName">time</code>)</code><i class="e"><code><a href="api/cointoss.trade.Trader.Snapshot.html">Snapshot</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>long</code> <code>time</code></td>
+							<td><span><p>The specified date and time.</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.trade.Trader.Snapshot.html">Snapshot</a></code></td>
+							<td><span><p>A snapshot of this <code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code>.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Calcualte the sanpshot when market is the specified datetime and price.</p>
+					</span></section>
+				<section class="O" id="statistics()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">statistics</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.analyze.TradingStats.html">TradingStats</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.analyze.TradingStats.html">TradingStats</a></code></td>
+							<td><span><p>A current statistics.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Create the current trading statistics.</p>
+					</span></section>
+				<section class="O" id="keep(int,java.time.temporal.TemporalUnit,java.util.function.BooleanSupplier)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code class="f">keep</code><code class="M">(<code>int</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/TemporalUnit.html">TemporalUnit</a></code> <code class="parameterName">unit</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BooleanSupplier.html">BooleanSupplier</a></code> <code class="parameterName">condition</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>int</code> <code>time</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/TemporalUnit.html">TemporalUnit</a></code> <code>unit</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BooleanSupplier.html">BooleanSupplier</a></code> <code>condition</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Create rule which the specified condition is fulfilled during the specified duration.</p>
+					</span></section>
+				<section class="O" id="keep(int,java.time.temporal.TemporalUnit,java.util.function.Predicate)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code class="f">keep</code><code class="M">(<code>int</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/TemporalUnit.html">TemporalUnit</a></code> <code class="parameterName">unit</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code> <code class="parameterName">condition</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>int</code> <code>time</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/TemporalUnit.html">TemporalUnit</a></code> <code>unit</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code> <code>condition</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Create rule which the specified condition is fulfilled during the specified duration.</p>
+					</span></section>
+				<section class="O" id="option(java.lang.Object)">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">option</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">option</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html">Object</a></code> <code>option</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Register optional helper for this <code><a href="api/cointoss.trade.Trader.html">Trader</a></code>.</p>
+					</span></section>
+				<section class="O" id="findOptionBy(java.lang.Class)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">findOptionBy</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>T</code></code></code> <code class="parameterName">type</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>T</code></code></code></i></h2>
+					<table class="H">
+						<tr class="V">
+							<td><code>T</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>T</code></code></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>T</code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Find all registered options by the specified type.</p>
+					</span></section>
+				<section class="O" id="toString()">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">toString</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.trade.Trader.html#Trader()">Trader</a></code><code class="M">()</code></li>
+					</ul>
+					<h5 class="i">Static Methods</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code><a href="api/cointoss.trade.Trader.html#keep(int,java.time.temporal.TemporalUnit,java.util.function.BooleanSupplier)">keep</a></code><code class="M">(<code>int</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/TemporalUnit.html">TemporalUnit</a></code> <code class="parameterName">unit</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BooleanSupplier.html">BooleanSupplier</a></code> <code class="parameterName">condition</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code><a href="api/cointoss.trade.Trader.html#keep(int,java.time.temporal.TemporalUnit,java.util.function.Predicate)">keep</a></code><code class="M">(<code>int</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/TemporalUnit.html">TemporalUnit</a></code> <code class="parameterName">unit</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code> <code class="parameterName">condition</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="FINAL SYNCHRONIZED"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#initialize(cointoss.Market)">initialize</a></code><code class="M">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="ABSTRACT"><i class="PROTECTED"></i></i><code><a href="api/cointoss.trade.Trader.html#declareStrategy(cointoss.Market,cointoss.trade.Funds)">declareStrategy</a></code><code class="M">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code> <code class="parameterName">fund</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#name()">name</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.trade.Trader.html#vandalize()">vandalize</a></code><code class="M">()</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#enable()">enable</a></code><code class="M">()</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#disable()">disable</a></code><code class="M">()</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#isEnable()">isEnable</a></code><code class="M">()</code><i class="K"><code>boolean</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#isDisable()">isDisable</a></code><code class="M">()</code><i class="K"><code>boolean</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#observeScenario()">observeScenario</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.trade.Trader.html#disableWhile(kiss.Signal)">disableWhile</a></code><code class="M">(<code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code> <code class="parameterName">duration</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.trade.Trader.html#entry(cointoss.Directional,cointoss.util.arithmetic.Num,java.util.function.Consumer)">entry</a></code><code class="M">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="K"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#now(kiss.WiseRunnable)">now</a></code><code class="M">(<code>kiss.WiseRunnable</code> <code class="parameterName">declare</code>)</code><i class="K"><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#when(kiss.Signal,kiss.WiseRunnable)">when</a></code><code class="M">(<code>kiss.Signal<code class="parameters"><code>T</code></code></code> <code class="parameterName">timing</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">declare</code>)</code><i class="K"><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#when(kiss.Signal,kiss.WiseConsumer)">when</a></code><code class="M">(<code>kiss.Signal<code class="parameters"><code>T</code></code></code> <code class="parameterName">timing</code>, <code>kiss.WiseConsumer<code class="parameters"><code>T</code></code></code> <code class="parameterName">declare</code>)</code><i class="K"><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.trade.Trader.html#trade(kiss.WiseConsumer,kiss.WiseConsumer)">trade</a></code><code class="M">(<code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code class="parameterName">entry</code>, <code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code class="parameterName">exit</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.trade.Trader.html#trade(cointoss.Market,kiss.WiseConsumer,kiss.WiseConsumer)">trade</a></code><code class="M">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code class="parameterName">entry</code>, <code>kiss.WiseConsumer<code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code> <code class="parameterName">exit</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.trade.Trader.html#trade(cointoss.trade.Scenario)">trade</a></code><code class="M">(<code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code> <code class="parameterName">scenario</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.trade.Trader.html#trade(cointoss.Market,cointoss.trade.Scenario)">trade</a></code><code class="M">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code> <code class="parameterName">scenario</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#snapshotAt(long)">snapshotAt</a></code><code class="M">(<code>long</code> <code class="parameterName">time</code>)</code><i class="K"><code><a href="api/cointoss.trade.Trader.Snapshot.html">Snapshot</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#statistics()">statistics</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.analyze.TradingStats.html">TradingStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.trade.Trader.html#option(java.lang.Object)">option</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">option</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.Trader.html#findOptionBy(java.lang.Class)">findOptionBy</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>T</code></code></code> <code class="parameterName">type</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>T</code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.trade.Trader.html#toString()">toString</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

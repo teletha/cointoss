@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.order</code>
+					<h2 class="Class l"><code class="f">OrderBookPageChanges</code></h2>
+					<div class="R"></div>
+				</section>
+				<section class="O" id="clearInside">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">clearInside</code><i class="e"><code class="return">boolean</code></i></h2><span class="B"><p>The specific API does not tell you the information that the quantity has reached zero, so you
+ should erase any existing data that is within the range of the retrieved data.</p>
+					</span></section>
+				<section class="O" id="bids">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">bids</code><i class="e"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2><span class="B"><p>The list of long orders.</p>
+					</span></section>
+				<section class="O" id="asks">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">asks</code><i class="e"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2><span class="B"><p>The list of short orders.</p>
+					</span></section>
+				<section class="O" id="OrderBookPageChanges()">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">OrderBookPageChanges</code><code class="M">()</code></h2>
+				</section>
+				<section class="O" id="toString()">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">toString</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="byJSON(java.util.List,java.util.List,java.lang.String,java.lang.String)">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">byJSON</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code class="parameterName">bids</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code class="parameterName">asks</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">priceKey</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">sizeKey</code>)</code><i class="e"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code>bids</code></td>
+							<td><span><p>A bid data.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code>asks</code></td>
+							<td><span><p>An ask data.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>priceKey</code></td>
+							<td><span><p>The price key on json.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>sizeKey</code></td>
+							<td><span><p>The size key on json.</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Helper method to build the optimized <code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code> from simple JSON data set.</p>
+					</span></section>
+				<section class="O" id="byJSON(java.util.List,java.util.List,java.lang.String,java.lang.String,int)">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">byJSON</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code class="parameterName">bids</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code class="parameterName">asks</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">priceKey</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">sizeKey</code>, <code>int</code> <code class="parameterName">scale</code>)</code><i class="e"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code>bids</code></td>
+							<td><span><p>A bid data.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code>asks</code></td>
+							<td><span><p>An ask data.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>priceKey</code></td>
+							<td><span><p>The price key on json.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>sizeKey</code></td>
+							<td><span><p>The size key on json.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>int</code> <code>scale</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Helper method to build the optimized <code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code> from simple JSON data set.</p>
+					</span></section>
+				<section class="O" id="byHint(int,int)">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">byHint</code><code class="M">(<code>int</code> <code class="parameterName">bids</code>, <code>int</code> <code class="parameterName">asks</code>)</code><i class="e"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>int</code> <code>bids</code></td>
+							<td><span><p>An amount of bids.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>int</code> <code>asks</code></td>
+							<td><span><p>An amount of asks.</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Build the optimized <code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code>.</p>
+					</span></section>
+				<section class="O" id="singleBuy(cointoss.util.arithmetic.Num,float)">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">singleBuy</code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code><i class="e"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>price</code></td>
+							<td><span><p>A requested price.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>float</code> <code>size</code></td>
+							<td><span><p>A requested size.</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Build the optimized <code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code> for bid.</p>
+					</span></section>
+				<section class="O" id="singleSell(cointoss.util.arithmetic.Num,float)">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">singleSell</code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code><i class="e"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>price</code></td>
+							<td><span><p>A requested price.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code>float</code> <code>size</code></td>
+							<td><span><p>A requested size.</p>
+								</span></td>
+						</tr>
+						<tr class="W">
+							<td><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Build the optimized <code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code> for bid.</p>
+					</span></section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#OrderBookPageChanges()">OrderBookPageChanges</a></code><code class="M">()</code></li>
+					</ul>
+					<h5 class="i">Fields</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#clearInside">clearInside</a></code><i class="K"><code class="return">boolean</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#bids">bids</a></code><i class="K"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#asks">asks</a></code><i class="K"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+					</ul>
+					<h5 class="i">Static Methods</h5>
+					<ul>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#byJSON(java.util.List,java.util.List,java.lang.String,java.lang.String)">byJSON</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code class="parameterName">bids</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code class="parameterName">asks</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">priceKey</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">sizeKey</code>)</code><i class="K"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#byJSON(java.util.List,java.util.List,java.lang.String,java.lang.String,int)">byJSON</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code class="parameterName">bids</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>kiss.JSON</code></code></code> <code class="parameterName">asks</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">priceKey</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">sizeKey</code>, <code>int</code> <code class="parameterName">scale</code>)</code><i class="K"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#byHint(int,int)">byHint</a></code><code class="M">(<code>int</code> <code class="parameterName">bids</code>, <code>int</code> <code class="parameterName">asks</code>)</code><i class="K"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#singleBuy(cointoss.util.arithmetic.Num,float)">singleBuy</a></code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code><i class="K"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#singleSell(cointoss.util.arithmetic.Num,float)">singleSell</a></code><code class="M">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code><i class="K"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></i></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.order.OrderBookPageChanges.html#toString()">toString</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

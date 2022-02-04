@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.util</code>
+					<h2 class="AbstractClass l"><code class="f">EfficientWebSocketModel.IdentifiableTopic</code><code class="M">&#60;<code>T</code>&#62;</code></h2>
+					<div class="R">
+						<ul class="C D">
+							<li><code>T</code><code class="extends"><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html">IdentifiableTopic</a></code></code></li>
+						</ul>
+						<ul class="C F">
+							<li><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Cloneable.html">Cloneable</a></code></li>
+						</ul>
+					</div><span class="B"><p>Identifiable topic which can represents subscribe and unsubscribe commands.</p>
+					</span></section>
+				<section class="O" id="id">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">id</code><i class="e"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2><span class="B"><p>The identifier.</p>
+					</span></section>
+				<section class="O" id="updatedId">
+					<h2 class="U"><i class="PROTECTED"></i><code class="f">updatedId</code><i class="e"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2><span class="B"><p>The updated id holder.</p>
+					</span></section>
+				<section class="O" id="IdentifiableTopic(java.lang.String)">
+					<h2 class="U"><i class="PROTECTED"></i><code class="f">IdentifiableTopic</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>)</code></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>id</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="verifySubscribedReply(kiss.JSON)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PROTECTED"></i></i><code class="f">verifySubscribedReply</code><code class="M">(<code>kiss.JSON</code> <code class="parameterName">reply</code>)</code><i class="e"><code>boolean</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>kiss.JSON</code> <code>reply</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>boolean</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Make sure your channel (un)subscription has been properly accepted.</p>
+					</span></section>
+				<section class="O" id="buildUnsubscribeMessage(java.lang.Object)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PROTECTED"></i></i><code class="f">buildUnsubscribeMessage</code><code class="M">(<code>T</code> <code class="parameterName">topic</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>T</code> <code>topic</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Build the unsubscription message for this topic.</p>
+					</span></section>
+				<section class="O" id="hashCode()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">hashCode</code><code class="M">()</code><i class="e"><code>int</code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>int</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="equals(java.lang.Object)">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">equals</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">obj</code>)</code><i class="e"><code>boolean</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html">Object</a></code> <code>obj</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>boolean</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="toString()">
+					<h2 class="U"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="f">toString</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html#IdentifiableTopic(java.lang.String)">IdentifiableTopic</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>)</code></li>
+					</ul>
+					<h5 class="i">Fields</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html#id">id</a></code><i class="K"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html#updatedId">updatedId</a></code><i class="K"><code class="return"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="ABSTRACT"><i class="PROTECTED"></i></i><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html#verifySubscribedReply(kiss.JSON)">verifySubscribedReply</a></code><code class="M">(<code>kiss.JSON</code> <code class="parameterName">reply</code>)</code><i class="K"><code>boolean</code></i></li>
+						<li><i class="ABSTRACT"><i class="PROTECTED"></i></i><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html#buildUnsubscribeMessage(java.lang.Object)">buildUnsubscribeMessage</a></code><code class="M">(<code>T</code> <code class="parameterName">topic</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html#hashCode()">hashCode</a></code><code class="M">()</code><i class="K"><code>int</code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html#equals(java.lang.Object)">equals</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">obj</code>)</code><i class="K"><code>boolean</code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.util.EfficientWebSocketModel.IdentifiableTopic.html#toString()">toString</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

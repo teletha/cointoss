@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.execution</code>
+					<h2 class="Class l"><code class="f">ExecutionLog</code></h2>
+					<div class="R"></div><span class="B"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> Log Manager.</span></section>
+				<section class="O" id="service">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">service</code><i class="e"><code class="return"><a href="api/cointoss.MarketService.html">MarketService</a></code></i></h2><span class="B"><p>The market provider.</p>
+					</span></section>
+				<section class="O" id="ExecutionLog(cointoss.MarketService)">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">ExecutionLog</code><code class="M">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code>service</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Create log manager.</p>
+					</span></section>
+				<section class="O" id="checkup()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">checkup</code><code class="M">()</code><i class="e"><code>void</code></i></h2><span class="B"><p>Get a physical checkup on logs.</p>
+					</span></section>
+				<section class="O" id="firstCacheDate()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">firstCacheDate</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Return the first cached date.</p>
+					</span></section>
+				<section class="O" id="lastCacheDate()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">lastCacheDate</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Return the last cached date.</p>
+					</span></section>
+				<section class="O" id="clearFastCache()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">clearFastCache</code><code class="M">()</code><i class="e"><code>void</code></i></h2><span class="B"><p>Clear all fast log.</p>
+					</span></section>
+				<section class="O" id="clearRepositoryInfo()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">clearRepositoryInfo</code><code class="M">()</code><i class="e"><code>void</code></i></h2><span class="B"><p>Clear all fast log.</p>
+					</span></section>
+				<section class="O" id="from(java.time.ZonedDateTime,cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL SYNCHRONIZED"><i class="PUBLIC"></i></i><code class="f">from</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>start</code></td>
+							<td><span><p>The start date.</p>
+								</span></td>
+						</tr>
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read date from the specified date.</p>
+					</span></section>
+				<section class="O" id="at(int,int,int,cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">at</code><code class="M">(<code>int</code> <code class="parameterName">year</code>, <code>int</code> <code class="parameterName">month</code>, <code>int</code> <code class="parameterName">day</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>int</code> <code>year</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>int</code> <code>month</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>int</code> <code>day</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log at the specified date.</p>
+					</span></section>
+				<section class="O" id="at(java.time.LocalDate,cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">at</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code>date</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log at the specified date.</p>
+					</span></section>
+				<section class="O" id="at(java.time.ZonedDateTime,cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">at</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>date</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log at the specified date.</p>
+					</span></section>
+				<section class="O" id="fromId(long)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">fromId</code><code class="M">(<code>long</code> <code class="parameterName">id</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>long</code> <code>id</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log from the specified id.</p>
+					</span></section>
+				<section class="O" id="fromToday(cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">fromToday</code><code class="M">(<code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log from the specified date.</p>
+					</span></section>
+				<section class="O" id="fromYestaday(cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">fromYestaday</code><code class="M">(<code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log from the specified date.</p>
+					</span></section>
+				<section class="O" id="fromLast(int,cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">fromLast</code><code class="M">(<code>int</code> <code class="parameterName">days</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>int</code> <code>days</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log from the specified date.</p>
+					</span></section>
+				<section class="O" id="rangeAll(cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">rangeAll</code><code class="M">(<code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log from the specified start to end.</p>
+					</span></section>
+				<section class="O" id="range(java.time.ZonedDateTime,java.time.ZonedDateTime,cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">range</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>start</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>end</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log from the specified start to end.</p>
+					</span></section>
+				<section class="O" id="rangeRandom(int,cointoss.execution.LogType...)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">rangeRandom</code><code class="M">(<code>int</code> <code class="parameterName">days</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>int</code> <code>days</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code>type</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Read log from the specified start to end.</p>
+					</span></section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.execution.ExecutionLog.html#ExecutionLog(cointoss.MarketService)">ExecutionLog</a></code><code class="M">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></li>
+					</ul>
+					<h5 class="i">Fields</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#service">service</a></code><i class="K"><code class="return"><a href="api/cointoss.MarketService.html">MarketService</a></code></i></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#checkup()">checkup</a></code><code class="M">()</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#firstCacheDate()">firstCacheDate</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#lastCacheDate()">lastCacheDate</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#clearFastCache()">clearFastCache</a></code><code class="M">()</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#clearRepositoryInfo()">clearRepositoryInfo</a></code><code class="M">()</code><i class="K"><code>void</code></i></li>
+						<li><i class="FINAL SYNCHRONIZED"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#from(java.time.ZonedDateTime,cointoss.execution.LogType...)">from</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#at(int,int,int,cointoss.execution.LogType...)">at</a></code><code class="M">(<code>int</code> <code class="parameterName">year</code>, <code>int</code> <code class="parameterName">month</code>, <code>int</code> <code class="parameterName">day</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#at(java.time.LocalDate,cointoss.execution.LogType...)">at</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#at(java.time.ZonedDateTime,cointoss.execution.LogType...)">at</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#fromId(long)">fromId</a></code><code class="M">(<code>long</code> <code class="parameterName">id</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#fromToday(cointoss.execution.LogType...)">fromToday</a></code><code class="M">(<code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#fromYestaday(cointoss.execution.LogType...)">fromYestaday</a></code><code class="M">(<code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#fromLast(int,cointoss.execution.LogType...)">fromLast</a></code><code class="M">(<code>int</code> <code class="parameterName">days</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#rangeAll(cointoss.execution.LogType...)">rangeAll</a></code><code class="M">(<code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#range(java.time.ZonedDateTime,java.time.ZonedDateTime,cointoss.execution.LogType...)">range</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLog.html#rangeRandom(int,cointoss.execution.LogType...)">rangeRandom</a></code><code class="M">(<code>int</code> <code class="parameterName">days</code>, <code array="var"><a href="api/cointoss.execution.LogType.html">LogType</a></code> <code class="parameterName">type</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

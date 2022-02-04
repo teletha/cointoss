@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.market.ftx</code>
+					<h2 class="Class l"><code class="f">FTXService</code></h2>
+					<div class="R">
+						<ul class="C E">
+							<li><code><a href="api/cointoss.MarketService.html">MarketService</a></code></li>
+						</ul>
+						<ul class="C F">
+							<li><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Comparable.html">Comparable</a><code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></li>
+							<li><code>kiss.Disposable</code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="O" id="FTXService(java.lang.String,cointoss.MarketSetting)">
+					<h2 class="U"><i class="PROTECTED"></i><code class="f">FTXService</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">marketName</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code> <code class="parameterName">setting</code>)</code></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>marketName</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code> <code>setting</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="clientRealtimely()">
+					<h2 class="U"><i class="OVERRIDE PROTECTED"></i><code class="f">clientRealtimely</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.EfficientWebSocket.html">EfficientWebSocket</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.EfficientWebSocket.html">EfficientWebSocket</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="executions(long,long)">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">executions</code><code class="M">(<code>long</code> <code class="parameterName">startId</code>, <code>long</code> <code class="parameterName">endId</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>long</code> <code>startId</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code>long</code> <code>endId</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="connectExecutionRealtimely()">
+					<h2 class="U"><i class="OVERRIDE PROTECTED"></i><code class="f">connectExecutionRealtimely</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="executionLatest()">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">executionLatest</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="executionsBefore(long)">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">executionsBefore</code><code class="M">(<code>long</code> <code class="parameterName">id</code>)</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code>long</code> <code>id</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="checkEquality(cointoss.execution.Execution,cointoss.execution.Execution)">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">checkEquality</code><code class="M">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">one</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">other</code>)</code><i class="e"><code>boolean</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>one</code></td>
+							<td></td>
+						</tr>
+						<tr class="T">
+							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>other</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>boolean</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="orderBook()">
+					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="f">orderBook</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="connectOrderBookRealtimely()">
+					<h2 class="U"><i class="OVERRIDE PROTECTED"></i><code class="f">connectOrderBookRealtimely</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="connectLiquidation()">
+					<h2 class="U"><i class="OVERRIDE PROTECTED"></i><code class="f">connectLiquidation</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.ticker.data.Liquidation.html">Liquidation</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.ticker.data.Liquidation.html">Liquidation</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="initializeOpenInterest()">
+					<h2 class="U"><i class="OVERRIDE PROTECTED"></i><code class="f">initializeOpenInterest</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code><a href="api/cointoss.ticker.data.OpenInterest.html">OpenInterest</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code><a href="api/cointoss.ticker.data.OpenInterest.html">OpenInterest</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="O" id="main(java.lang.String[])">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">main</code><code class="M">(<code array="fix"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">args</code>)</code><i class="e"><code>void</code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code array="fix"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>args</code></td>
+							<td></td>
+						</tr>
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/InterruptedException.html">InterruptedException</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.market.ftx.FTXService.html#FTXService(java.lang.String,cointoss.MarketSetting)">FTXService</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">marketName</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code> <code class="parameterName">setting</code>)</code></li>
+					</ul>
+					<h5 class="i">Static Methods</h5>
+					<ul>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.market.ftx.FTXService.html#main(java.lang.String[])">main</a></code><code class="M">(<code array="fix"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">args</code>)</code><i class="K"><code>void</code></i></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.ftx.FTXService.html#clientRealtimely()">clientRealtimely</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.EfficientWebSocket.html">EfficientWebSocket</a></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.ftx.FTXService.html#executions(long,long)">executions</a></code><code class="M">(<code>long</code> <code class="parameterName">startId</code>, <code>long</code> <code class="parameterName">endId</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.ftx.FTXService.html#connectExecutionRealtimely()">connectExecutionRealtimely</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.ftx.FTXService.html#executionLatest()">executionLatest</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.ftx.FTXService.html#executionsBefore(long)">executionsBefore</a></code><code class="M">(<code>long</code> <code class="parameterName">id</code>)</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.ftx.FTXService.html#checkEquality(cointoss.execution.Execution,cointoss.execution.Execution)">checkEquality</a></code><code class="M">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">one</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">other</code>)</code><i class="K"><code>boolean</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.ftx.FTXService.html#orderBook()">orderBook</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.ftx.FTXService.html#connectOrderBookRealtimely()">connectOrderBookRealtimely</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderBookPageChanges.html">OrderBookPageChanges</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.ftx.FTXService.html#connectLiquidation()">connectLiquidation</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.ticker.data.Liquidation.html">Liquidation</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.ftx.FTXService.html#initializeOpenInterest()">initializeOpenInterest</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code><a href="api/cointoss.ticker.data.OpenInterest.html">OpenInterest</a></code></code></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="a">
+		<header class="k">
+			<h1 class="J" date="2022-02-04" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="N" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="X">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="j" id="Article">
+				<section class="O"><code class="h">cointoss.market</code>
+					<h2 class="AbstractClass l"><code class="f">MarketServiceProvider</code></h2>
+					<div class="R">
+						<ul class="C F">
+							<li><code>kiss.Extensible</code></li>
+						</ul>
+						<ul class="C G">
+							<li><code><a href="api/cointoss.market.binance.Binance.html">Binance</a></code></li>
+							<li><code><a href="api/cointoss.market.bitflyer.BitFlyer.html">BitFlyer</a></code></li>
+							<li><code><a href="api/cointoss.market.bitmex.BitMex.html">BitMex</a></code></li>
+							<li><code><a href="api/cointoss.market.bitbank.Bitbank.html">Bitbank</a></code></li>
+							<li><code><a href="api/cointoss.market.bitfinex.Bitfinex.html">Bitfinex</a></code></li>
+							<li><code><a href="api/cointoss.market.bybit.Bybit.html">Bybit</a></code></li>
+							<li><code><a href="api/cointoss.market.coinbase.Coinbase.html">Coinbase</a></code></li>
+							<li><code><a href="api/cointoss.market.coincheck.Coincheck.html">Coincheck</a></code></li>
+							<li><code><a href="api/cointoss.market.ftx.FTX.html">FTX</a></code></li>
+							<li><code><a href="api/cointoss.market.finnhub.Funnhub.html">Funnhub</a></code></li>
+							<li><code><a href="api/cointoss.market.gmo.GMO.html">GMO</a></code></li>
+							<li><code><a href="api/cointoss.market.huobi.Huobi.html">Huobi</a></code></li>
+							<li><code><a href="api/cointoss.market.liquid.Liquid.html">Liquid</a></code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="O" id="MarketServiceProvider()">
+					<h2 class="U"><i class="PROTECTED"></i><code class="f">MarketServiceProvider</code><code class="M">()</code></h2><span class="B"><p>Initialization.</p>
+					</span></section>
+				<section class="O" id="markets()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">markets</code><code class="M">()</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Retrieve all <code><a href="api/cointoss.Market.html">Market</a></code>s.</p>
+					</span></section>
+				<section class="O" id="account()">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">account</code><code class="M">()</code><i class="e"><code><a href="api/cointoss.market.MarketAccount.html">MarketAccount</a></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code><a href="api/cointoss.market.MarketAccount.html">MarketAccount</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Get the market account infomation.</p>
+					</span></section>
+				<section class="O" id="availableProviders()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code class="f">availableProviders</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.market.MarketServiceProvider.html">MarketServiceProvider</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.market.MarketServiceProvider.html">MarketServiceProvider</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Retrieve all <code><a href="api/cointoss.market.MarketServiceProvider.html">MarketServiceProvider</a></code>s.</p>
+					</span></section>
+				<section class="O" id="availableMarketServices()">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code class="f">availableMarketServices</code><code class="M">()</code><i class="e"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="W">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Retrieve all <code><a href="api/cointoss.MarketService.html">MarketService</a></code>s.</p>
+					</span></section>
+				<section class="O" id="by(java.lang.String)">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code class="f">by</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">identity</code>)</code><i class="e"><code>kiss.Variable<code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="T">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>identity</code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>kiss.Variable<code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Retrieve by identical name.</p>
+					</span></section>
+			</article>
+			<aside class="d" id="SubNavi">
+				<div class="c">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.market.MarketServiceProvider.html#MarketServiceProvider()">MarketServiceProvider</a></code><code class="M">()</code></li>
+					</ul>
+					<h5 class="i">Static Methods</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code><a href="api/cointoss.market.MarketServiceProvider.html#availableProviders()">availableProviders</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.market.MarketServiceProvider.html">MarketServiceProvider</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code><a href="api/cointoss.market.MarketServiceProvider.html#availableMarketServices()">availableMarketServices</a></code><code class="M">()</code><i class="K"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code><a href="api/cointoss.market.MarketServiceProvider.html#by(java.lang.String)">by</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">identity</code>)</code><i class="K"><code>kiss.Variable<code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></i></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.MarketServiceProvider.html#markets()">markets</a></code><code class="M">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.MarketService.html">MarketService</a></code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.MarketServiceProvider.html#account()">account</a></code><code class="M">()</code><i class="K"><code><a href="api/cointoss.market.MarketAccount.html">MarketAccount</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>
