@@ -955,6 +955,7 @@ public class ExecutionLog {
             CsvWriterSettings setting = new CsvWriterSettings();
             setting.getFormat().setDelimiter(' ');
             setting.getFormat().setComment('無');
+            setting.getFormat().setLineSeparator("\r\n");
             return new CsvWriter(out, ISO_8859_1, setting);
         }
 

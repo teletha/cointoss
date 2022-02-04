@@ -12,7 +12,7 @@ package cointoss;
 public class Project extends bee.api.Project {
 
     {
-        product("cointoss", "cointoss", ref("version.txt"));
+        product("com.github.teletha", "cointoss", ref("version.txt"));
 
         require("com.github.teletha", "sinobu");
         require("com.github.teletha", "viewtify");
