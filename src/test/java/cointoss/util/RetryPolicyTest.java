@@ -44,8 +44,8 @@ class RetryPolicyTest {
     }
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTION", matches = "true")
-    @DisabledIfEnvironmentVariable(named = "JITPACK", matches = "true")
+    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTION", matches = ".+")
+    @DisabledIfEnvironmentVariable(named = "JITPACK", matches = ".+")
     void delayFixedDuration() {
         Result result = new Result();
         RetryPolicy policy = RetryPolicy.with.limit(3).delay(100, MILLISECONDS).scheduler(chronus);
@@ -59,8 +59,8 @@ class RetryPolicyTest {
     }
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTION", matches = "true")
-    @DisabledIfEnvironmentVariable(named = "JITPACK", matches = "true")
+    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTION", matches = ".+")
+    @DisabledIfEnvironmentVariable(named = "JITPACK", matches = ".+")
     void delayLinearDuration() {
         Result result = new Result();
         RetryPolicy policy = RetryPolicy.with.limit(5).delayLinear(Duration.ofMillis(30)).scheduler(chronus);
