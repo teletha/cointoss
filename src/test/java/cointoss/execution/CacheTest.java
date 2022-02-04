@@ -354,6 +354,7 @@ class CacheTest {
 
         Cache cache = log.cache(date);
         cache.writeNormal(e1, e2);
+        assert cache.existNormal() == true;
 
         assert cache.repair(false);
         assert checkCompact(cache, e1, e2, r1, r2);
@@ -509,6 +510,8 @@ class CacheTest {
 
         Cache cache = log.cache(Chrono.utc(2020, 12, 15));
         cache.writeNormal(e1, e2, e3);
+        assert cache.existNormal() == true;
+        assert cache.normal.size() != 0;
         assert cache.estimateLastID() == 3;
     }
 
