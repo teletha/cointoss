@@ -9,13 +9,14 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import antibug.Chronus;
 import kiss.I;
@@ -43,6 +44,8 @@ class RetryPolicyTest {
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTION", matches = "true")
+    @DisabledIfEnvironmentVariable(named = "JITPACK", matches = "true")
     void delayFixedDuration() {
         Result result = new Result();
         RetryPolicy policy = RetryPolicy.with.limit(3).delay(100, MILLISECONDS).scheduler(chronus);
@@ -56,6 +59,8 @@ class RetryPolicyTest {
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTION", matches = "true")
+    @DisabledIfEnvironmentVariable(named = "JITPACK", matches = "true")
     void delayLinearDuration() {
         Result result = new Result();
         RetryPolicy policy = RetryPolicy.with.limit(5).delayLinear(Duration.ofMillis(30)).scheduler(chronus);
