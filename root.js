@@ -25,7 +25,6 @@ const root = {
 		"cointoss.ticker.data",
 		"cointoss.trade",
 		"cointoss.trade.bot",
-		"cointoss.trading",
 		"cointoss.util",
 		"cointoss.util.arithmetic",
 		"cointoss.util.array",
@@ -160,7 +159,7 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Arbitrager",
-			"packageName": "cointoss.trading",
+			"packageName": "cointoss.trade.bot",
 			"type": "Class"
 		},
 		{
@@ -545,7 +544,7 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "CrossOrder",
-			"packageName": "cointoss.trading",
+			"packageName": "cointoss.trade.bot",
 			"type": "Class"
 		},
 		{
@@ -1014,7 +1013,7 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "LazyBear",
-			"packageName": "cointoss.trading",
+			"packageName": "cointoss.trade.bot",
 			"type": "Class"
 		},
 		{
@@ -1098,7 +1097,7 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "LiquidationEater",
-			"packageName": "cointoss.trading",
+			"packageName": "cointoss.trade.bot",
 			"type": "Class"
 		},
 		{
@@ -1175,7 +1174,7 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "LongWaveTrend",
-			"packageName": "cointoss.trading",
+			"packageName": "cointoss.trade.bot",
 			"type": "Class"
 		},
 		{
