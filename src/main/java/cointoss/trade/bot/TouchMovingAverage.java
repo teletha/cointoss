@@ -67,10 +67,10 @@ public class TouchMovingAverage extends Trader {
 
         when(up, tick -> {
             trade(new Scenario() {
+
                 @Override
                 protected void entry() {
                     entry(Direction.SELL, 1);
-                    entries.put(tick, this);
                 }
 
                 @Override
@@ -85,7 +85,6 @@ public class TouchMovingAverage extends Trader {
                 @Override
                 protected void entry() {
                     entry(Direction.BUY, 1);
-                    entries.put(tick, this);
                 }
 
                 @Override

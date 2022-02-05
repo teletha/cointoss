@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.arithmetic.Num.*;
+import static cointoss.util.arithmetic.Num.HUNDRED;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -17,6 +17,7 @@ import java.lang.reflect.Modifier;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,45 +233,45 @@ public class TradingStats {
      * 
      * @return
      */
-    public final String showByText() {
+    public final String showByText(boolean detail) {
         StringBuilder builder = new StringBuilder();
-        showByText(builder);
+        showByText(builder, detail);
         return builder.toString();
     }
 
     /**
      * Output result by text format.
      */
-    public final void showByText(Appendable builder) {
+    public final void showByText(Appendable builder, boolean detail) {
         try {
             String EOL = "\r\n";
 
-            // for (Scenario entry : entries) {
-            // builder.append(entry.toString()).append(EOL);
-            // }
+            if (detail) {
+                for (Scenario scenario : scenarios) {
+                    builder.append(scenario.toString()).append(EOL);
+                }
+            }
 
-            builder.append("実行時間 ").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
-            builder.append("枚数 現在").append(holdCurrentSize.toString()).append(" 最大").append(holdMaxSize.toString()).append(EOL);
-            builder.append("時間 ").append(holdTime.toString()).append(EOL);
-            builder.append("利幅 ").append(profitRange.toString()).append(EOL);
-            builder.append("含利幅 ").append(unrealizedProfitRange.toString()).append(EOL);
-            builder.append("損幅 ").append(lossRange.toString()).append(EOL);
-            builder.append("含損幅 ").append(unrealizedLossRange.toString()).append(EOL);
-            builder.append("総合 ")
-                    .append(profitAndLoss.toString())
-                    .append("\t勝率")
+            String time = duration.truncatedTo(ChronoUnit.MILLIS).toString().substring(2).toLowerCase();
+            builder.append("実行時間\t").append(time).append(EOL);
+            builder.append("枚数  \t現在").append(holdCurrentSize.toString()).append("  \t最大").append(holdMaxSize.toString()).append(EOL);
+            builder.append("時間  \t").append(holdTime.toString()).append(EOL);
+            builder.append("利幅  \t").append(profitRange.toString()).append(EOL);
+            builder.append("含利幅 \t").append(unrealizedProfitRange.toString()).append(EOL);
+            builder.append("損幅  \t").append(lossRange.toString()).append(EOL);
+            builder.append("含損幅 \t").append(unrealizedLossRange.toString()).append(EOL);
+            builder.append("総合  \t").append(profitAndLoss.toString());
+            builder.append(" 勝率")
                     .append(winningRate().toString())
-                    .append("% ")
-                    .append(" PF")
+                    .append("% PF")
                     .append(profitFactor().toString())
                     .append(" DD")
                     .append(drawDownRatio.multiply(100).toString())
-                    .append("% ")
-                    .append("総")
+                    .append("% 総数")
                     .append(String.valueOf(total))
-                    .append(" 済")
+                    .append(" 決済")
                     .append(String.valueOf(terminated))
-                    .append(" 残")
+                    .append(" 未決済")
                     .append(String.valueOf(active))
                     .append(EOL);
         } catch (IOException e) {
@@ -283,6 +284,6 @@ public class TradingStats {
      */
     @Override
     public String toString() {
-        return showByText();
+        return showByText(false);
     }
 }

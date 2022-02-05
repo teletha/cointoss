@@ -18,9 +18,10 @@ public class BackTestInvoker {
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(FTX.BTC_PERP)
                 .start(2021, 11, 19)
-                .end(2021, 12, 29)
+                .end(2021, 11, 29)
                 .traders(new TouchMovingAverage())
                 .fast()
+                .detail(true)
                 .initialBaseCurrency(3000000)
                 .type(LogType.Normal)
                 .run();

@@ -273,13 +273,13 @@ public class NumStats {
      */
     @Override
     public String toString() {
-        return new StringBuilder().append("最小")
+        return new StringBuilder().append("最小 ")
                 .append(padding(formatter.apply(min)))
-                .append("\t最大")
+                .append("\t最大 ")
                 .append(padding(formatter.apply(max)))
-                .append("\t平均")
+                .append("\t平均 ")
                 .append(padding(formatter.apply(mean)))
-                .append("\t合計")
+                .append("\t合計 ")
                 .append(padding(formatter.apply(total)))
                 .toString();
     }
@@ -293,13 +293,13 @@ public class NumStats {
     private String padding(String value) {
         int length = value.length();
 
-        if (4 < length) {
+        if (8 < length) {
             return value;
         }
 
         StringBuilder builder = new StringBuilder(value);
-        for (int i = length; i < 4; i++) {
-            builder.append(" ");
+        for (int i = length; i < 8; i++) {
+            builder.append("　");
         }
         return builder.toString();
     }
