@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trading;
+package cointoss.trade.bot;
 
 import cointoss.Direction;
 import cointoss.Market;

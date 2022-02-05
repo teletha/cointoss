@@ -23,7 +23,7 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.order.Order;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
-import cointoss.trading.LazyBear;
+import cointoss.trade.bot.LazyBear;
 import cointoss.util.arithmetic.Num;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.SelectionMode;

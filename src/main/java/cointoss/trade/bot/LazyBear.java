@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.trading;
+package cointoss.trade.bot;
 
 import java.time.temporal.ChronoUnit;
 

@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trading;
+package cointoss.trade.bot;
 
 import java.util.Comparator;
 import java.util.List;

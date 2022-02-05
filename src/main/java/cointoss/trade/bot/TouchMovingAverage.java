@@ -65,30 +65,34 @@ public class TouchMovingAverage extends Trader {
                     return true;
                 });
 
-        when(up, tick -> trade(new Scenario() {
-            @Override
-            protected void entry() {
-                entry(Direction.SELL, 1);
-                entries.put(tick, this);
-            }
+        when(up, tick -> {
+            trade(new Scenario() {
+                @Override
+                protected void entry() {
+                    entry(Direction.SELL, 1);
+                    entries.put(tick, this);
+                }
 
-            @Override
-            protected void exit() {
-                exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
-            }
-        }));
+                @Override
+                protected void exit() {
+                    exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
+                }
+            });
+        });
 
-        when(down, tick -> trade(new Scenario() {
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1);
-                entries.put(tick, this);
-            }
+        when(down, tick -> {
+            trade(new Scenario() {
+                @Override
+                protected void entry() {
+                    entry(Direction.BUY, 1);
+                    entries.put(tick, this);
+                }
 
-            @Override
-            protected void exit() {
-                exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
-            }
-        }));
+                @Override
+                protected void exit() {
+                    exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
+                }
+            });
+        });
     }
 }
