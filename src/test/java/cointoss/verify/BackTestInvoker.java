@@ -11,15 +11,16 @@ package cointoss.verify;
 
 import cointoss.execution.LogType;
 import cointoss.market.ftx.FTX;
-import cointoss.trading.LiquidationEater;
+import cointoss.trade.bot.TouchMovingAverage;
 
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(FTX.BTC_PERP)
                 .start(2021, 11, 19)
-                .end(2021, 11, 19)
-                .traders(new LiquidationEater())
+                .end(2021, 12, 29)
+                .traders(new TouchMovingAverage())
+                .fast()
                 .initialBaseCurrency(3000000)
                 .type(LogType.Normal)
                 .run();

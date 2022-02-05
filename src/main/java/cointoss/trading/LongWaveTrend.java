@@ -11,7 +11,6 @@ package cointoss.trading;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Span;
@@ -20,8 +19,6 @@ import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.trade.Trailing;
-import cointoss.verify.BackTest;
-import kiss.I;
 
 /**
  * 
@@ -82,11 +79,5 @@ public class LongWaveTrend extends Trader {
                 exitWhen(indicator.valueAt(ticker.open).plug(breakupDouble(-exitThreshold)));
             }
         }));
-    }
-
-    public static void main(String[] args) {
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> I.error(e));
-
-        BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2020, 3, 2).end(2020, 3, 2).traders(new LongWaveTrend()).fast().detail(true).run();
     }
 }

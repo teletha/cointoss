@@ -10,11 +10,11 @@
 package cointoss.trade.bot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
@@ -22,65 +22,44 @@ import cointoss.ticker.Ticker;
 import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import cointoss.util.arithmetic.Num;
-import cointoss.util.feather.Option;
-import cointoss.verify.BackTest;
-import kiss.I;
 import kiss.Signal;
 
 public class TouchMovingAverage extends Trader {
 
     private Map<Tick, Scenario> entries = new HashMap();
 
+    public int tickSize = 4;
+
+    public double riskRewardRatio = 2.5;
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        Span span = Span.Minute5;
+        Span span = Span.Hour4;
         Ticker ticker = market.tickers.on(span);
-        NumIndicator sma = NumIndicator.build(ticker, tick -> tick.closePrice()).sma(25);
+        NumIndicator sma = NumIndicator.build(ticker, tick -> tick.highPrice()).sma(21);
 
-        Signal<Tick> up = market.timeline.map(e -> e.price())
+        Signal<Tick> up = market.tickers.on(Span.Minute5).close.map(e -> e.closePrice())
                 .plug(breakup(sma::valueAtLast))
                 .map(v -> ticker.ticks.last())
                 .diff()
                 .take(now -> {
-                    Tick latest = sma.findLatest((tick, price) -> Num.within(tick.lowPrice(), price, tick.highPrice()));
-                    if (span.distance(latest, now) <= 6) {
-                        return false;
-                    }
-
-                    if (entries.containsKey(latest)) {
-                        entries.remove(latest).stop();
-                    }
-
-                    if (!ticker.ticks.query(latest, now, Option::exclude)
-                            .all(tick -> tick.highPrice().isLessThan(sma.valueAt(tick)))
-                            .to().v) {
+                    List<Tick> list = ticker.ticks.query(now, o -> o.max(tickSize).before()).toList();
+                    if (list.size() < tickSize || list.stream().anyMatch(tick -> tick.highPrice().isGreaterThan(sma.valueAt(tick)))) {
                         return false;
                     }
                     return true;
                 });
 
-        Signal<Tick> down = market.timeline.map(e -> e.price())
+        Signal<Tick> down = market.tickers.on(Span.Minute5).close.map(e -> e.lowerPrice())
                 .plug(breakdown(sma::valueAtLast))
                 .map(v -> ticker.ticks.last())
                 .diff()
                 .take(now -> {
-                    Num currentMAPrice = sma.valueAt(now);
-                    Tick latest = sma.findLatest((tick, price) -> Num.within(tick.lowPrice(), price, tick.highPrice()));
-                    if (span.distance(latest, now) <= 6) {
-                        return false;
-                    }
-
-                    if (entries.containsKey(latest)) {
-                        entries.remove(latest).stop();
-                    }
-
-                    if (!ticker.ticks.query(latest, now, Option::exclude)
-                            .all(tick -> tick.highPrice().isGreaterThan(sma.valueAt(tick)))
-                            .to().v) {
+                    List<Tick> list = ticker.ticks.query(now, o -> o.max(tickSize).before()).toList();
+                    if (list.size() < tickSize || list.stream().anyMatch(tick -> tick.lowerPrice().isLessThan(sma.valueAt(tick)))) {
                         return false;
                     }
                     return true;
@@ -95,8 +74,7 @@ public class TouchMovingAverage extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(entryPrice.plus(this, 12000));
-                exitAt(entryPrice.minus(this, 3000));
+                exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
             }
         }));
 
@@ -109,21 +87,8 @@ public class TouchMovingAverage extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(entryPrice.plus(this, 12000));
-                exitAt(entryPrice.minus(this, 3000));
+                exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
             }
         }));
-    }
-
-    public static void main(String[] args) {
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> I.error(e));
-
-        BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2020, 3, 2)
-                .end(2020, 3, 10)
-                .traders(new TouchMovingAverage())
-                .fast()
-                .detail(true)
-                .run();
     }
 }
