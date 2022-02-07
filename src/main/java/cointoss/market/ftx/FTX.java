@@ -46,6 +46,16 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.5))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService BTC_USD = new FTXService("BTC/USD", MarketSetting.with.spot()
+            .target(Currency.BTC.minimumSize(0.0001))
+            .base(Currency.USDT.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService BTC_USDT = new FTXService("BTC/USDT", MarketSetting.with.spot()
+            .target(Currency.BTC.minimumSize(0.0001))
+            .base(Currency.USDT.minimumSize(1))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService EOS_PERP = new FTXService("EOS-PERP", MarketSetting.with.derivative()
             .target(Currency.EOS.minimumSize(0.1))
             .base(Currency.USD.minimumSize(0.00005))
@@ -54,6 +64,12 @@ public final class FTX extends MarketServiceProvider {
     public static final MarketService ETH_PERP = new FTXService("ETH-PERP", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(0.001))
             .base(Currency.USD.minimumSize(0.01))
+            .priceRangeModifier(100)
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService ETH_USDT = new FTXService("ETH/USDT", MarketSetting.with.spot()
+            .target(Currency.ETH.minimumSize(0.001))
+            .base(Currency.USDT.minimumSize(0.1))
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 

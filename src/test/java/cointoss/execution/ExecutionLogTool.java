@@ -27,7 +27,19 @@ import kiss.I;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        restoreNormal(Binance.FUTURE_BTC_USDT, Chrono.utc(2022, 1, 27));
+        repairLog(Binance.FUTURE_BTC_USDT, Chrono.utc(2022, 2, 4));
+    }
+
+    /**
+     * Restore normal log of the specified market and date.
+     * 
+     * @param service
+     * @param date
+     */
+    public static void repairLog(MarketService service, ZonedDateTime date) {
+        ExecutionLog log = new ExecutionLog(service);
+        Cache cache = log.cache(date);
+        cache.repair(false);
     }
 
     /**
