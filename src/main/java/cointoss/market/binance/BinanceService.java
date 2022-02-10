@@ -83,8 +83,7 @@ public class BinanceService extends MarketService {
     @Override
     public Signal<Execution> executions(long startId, long endId) {
         return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (startId + 1), 20).flatIterable(e -> e.find("*"))
-                .map(this::createExecution)
-                .skipNull();
+                .map(this::createExecution);
     }
 
     /**
@@ -92,7 +91,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        return clientRealtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> createExecution(json.get("data"))).skipNull();
+        return clientRealtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> createExecution(json.get("data")));
     }
 
     /**
@@ -100,9 +99,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1", 20).flatIterable(e -> e.find("*"))
-                .map(this::createExecution)
-                .skipNull();
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1", 20).flatIterable(e -> e.find("*")).map(this::createExecution);
     }
 
     /**
@@ -122,8 +119,7 @@ public class BinanceService extends MarketService {
 
         return this.call("GET", "aggTrades?symbol=" + marketName + "&fromId=" + fromId + "&limit=" + limit, 20)
                 .flatIterable(e -> e.find("*"))
-                .map(this::createExecution)
-                .skipNull();
+                .map(this::createExecution);
     }
 
     /**
@@ -133,23 +129,19 @@ public class BinanceService extends MarketService {
      * @return
      */
     private Execution createExecution(JSON e) {
-        try {
-            long id = Long.parseLong(e.text("a"));
-            Direction side = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
-            Num size = e.get(Num.class, "q");
-            Num price = e.get(Num.class, "p");
-            if (isDelivery) size = size.divide(price).scale(setting.target.scale);
-            ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
+        long id = Long.parseLong(e.text("a"));
+        Direction side = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
+        Num size = e.get(Num.class, "q");
+        Num price = e.get(Num.class, "p");
+        if (isDelivery) size = size.divide(price).scale(setting.target.scale);
+        ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
 
-            return Execution.with.direction(side, size)
-                    .id(id)
-                    .price(price)
-                    .date(date)
-                    .consecutive(Execution.ConsecutiveDifference)
-                    .delay(Execution.DelayInestimable);
-        } catch (Throwable x) {
-            return null;
-        }
+        return Execution.with.direction(side, size)
+                .id(id)
+                .price(price)
+                .date(date)
+                .consecutive(Execution.ConsecutiveDifference)
+                .delay(Execution.DelayInestimable);
     }
 
     /**

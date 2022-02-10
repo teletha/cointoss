@@ -94,8 +94,7 @@ public class BitMexService extends MarketService {
 
         return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(startId) + "&start=" + startingPoint)
                 .flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, previous))
-                .skipNull();
+                .map(json -> convert(json, previous));
     }
 
     /**
@@ -107,8 +106,7 @@ public class BitMexService extends MarketService {
 
         return clientRealtimely().subscribe(new Topic("trade", marketName))
                 .flatIterable(json -> json.find("data", "*"))
-                .map(json -> convert(json, previous))
-                .skipNull();
+                .map(json -> convert(json, previous));
     }
 
     /**
@@ -117,8 +115,7 @@ public class BitMexService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true").flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, new long[3]))
-                .skipNull();
+                .map(json -> convert(json, new long[3]));
     }
 
     /**
@@ -129,8 +126,7 @@ public class BitMexService extends MarketService {
         long[] context = new long[3];
         return call("GET", "trade?symbol=" + marketName + "&reverse=true&count=1000&endTime=" + formatEncodedId(id))
                 .flatIterable(e -> e.find("$"))
-                .map(json -> convert(json, context))
-                .skipNull();
+                .map(json -> convert(json, context));
     }
 
     /**
@@ -147,8 +143,7 @@ public class BitMexService extends MarketService {
     @Override
     public Signal<Execution> searchInitialExecution() {
         return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=false").flatIterable(e -> e.find("*"))
-                .map(json -> convert(json, new long[3]))
-                .skipNull();
+                .map(json -> convert(json, new long[3]));
     }
 
     /**
@@ -158,8 +153,7 @@ public class BitMexService extends MarketService {
     public Signal<Execution> searchNearestExecution(ZonedDateTime target) {
         return call("GET", "trade?symbol=" + marketName + "&reverse=true&count=1&endTime=" + RealTimeFormat.format(target))
                 .flatIterable(e -> e.find("$"))
-                .map(json -> convert(json, new long[3]))
-                .skipNull();
+                .map(json -> convert(json, new long[3]));
     }
 
     /**
@@ -170,17 +164,13 @@ public class BitMexService extends MarketService {
      * @return
      */
     private Execution convert(JSON e, long[] previous) {
-        try {
-            Direction direction = Direction.parse(e.get(String.class, "side"));
-            Num size = Num.of(e.get(String.class, "homeNotional"));
-            Num price = Num.of(e.get(String.class, "price"));
-            ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
-            String internalId = e.get(String.class, "trdMatchID");
+        Direction direction = Direction.parse(e.get(String.class, "side"));
+        Num size = Num.of(e.get(String.class, "homeNotional"));
+        Num price = Num.of(e.get(String.class, "price"));
+        ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
+        String internalId = e.get(String.class, "trdMatchID");
 
-            return Support.createExecution(direction, size, price, date, previous).assignInfo(internalId);
-        } catch (Throwable x) {
-            return null;
-        }
+        return Support.createExecution(direction, size, price, date, previous).assignInfo(internalId);
     }
 
     private String formatEncodedId(long id) {
