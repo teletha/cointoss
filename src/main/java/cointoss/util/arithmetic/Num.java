@@ -16,7 +16,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.SplittableRandom;
 import java.util.function.DoubleBinaryOperator;
-import java.util.function.IntSupplier;
 import java.util.stream.IntStream;
 
 import com.google.common.math.DoubleMath;
@@ -44,35 +43,35 @@ public class Num extends Arithmetic<Num> {
     /** RANDOM Generator */
     private static final SplittableRandom RANDOM = new SplittableRandom();
 
-    /** The reusable cache. */
-    private static final IntSupplier NoOP = () -> 0;
-
     /** The acceptable decimal difference. */
     static final double Fuzzy = 1e-14;
 
     /** The base context. */
     static final MathContext CONTEXT = new MathContext(19, RoundingMode.HALF_UP);
 
-    /** reuse */
-    public static final Num ZERO = new Num(0, 0);
+    /** Reusable cache. */
+    private static final Num[] CACHE = IntStream.rangeClosed(0, 100).mapToObj(i -> new Num(i, 0)).toArray(Num[]::new);
 
     /** reuse */
-    public static final Num ONE = new Num(1, 0);
+    public static final Num ZERO = CACHE[0];
 
     /** reuse */
-    public static final Num TWO = new Num(2, 0);
+    public static final Num ONE = CACHE[1];
 
     /** reuse */
-    public static final Num THREE = new Num(3, 0);
+    public static final Num TWO = CACHE[2];
 
     /** reuse */
-    public static final Num FOUR = new Num(4, 0);
+    public static final Num THREE = CACHE[3];
 
     /** reuse */
-    public static final Num TEN = new Num(10, 0);
+    public static final Num FOUR = CACHE[4];
 
     /** reuse */
-    public static final Num HUNDRED = new Num(100, 0);
+    public static final Num TEN = CACHE[10];
+
+    /** reuse */
+    public static final Num HUNDRED = CACHE[100];
 
     /** reuse */
     public static final Num MAX = new Num(Long.MAX_VALUE, 0);
@@ -120,7 +119,11 @@ public class Num extends Arithmetic<Num> {
      */
     @Override
     protected Num create(long value) {
-        return new Num(value, 0);
+        if (0 <= value && value <= 100) {
+            return CACHE[(int) value];
+        } else {
+            return new Num(value, 0);
+        }
     }
 
     /**
@@ -128,7 +131,7 @@ public class Num extends Arithmetic<Num> {
      */
     @Override
     protected Num create(double value) {
-        return create(value, NoOP);
+        return create(value, 0);
     }
 
     /**
@@ -138,12 +141,12 @@ public class Num extends Arithmetic<Num> {
      * @param scaler
      * @return
      */
-    private Num create(double value, IntSupplier sclaer) {
+    private Num create(double value, int sclaer) {
         try {
             int scale = computeScale(value);
             double longed = value * pow10(scale);
             if (Long.MIN_VALUE < longed && longed < Long.MAX_VALUE) {
-                return new Num((long) longed, scale + sclaer.getAsInt());
+                return new Num((long) longed, scale + sclaer);
             } else {
                 // don't use BigDecimal constructor
                 return create(BigDecimal.valueOf(value));
@@ -467,7 +470,7 @@ public class Num extends Arithmetic<Num> {
         } else {
             if (value.v == 0) throw new ArithmeticException("Trying to divide " + this + " by 0.");
 
-            return create((double) v / value.v, () -> scale - value.scale);
+            return create((double) v / value.v, scale - value.scale);
         }
     }
 
@@ -753,7 +756,7 @@ public class Num extends Arithmetic<Num> {
             try {
                 double result = Math.pow(v, n);
                 DoubleMath.roundToLong(result, RoundingMode.HALF_DOWN);
-                return create(result, () -> scale * n);
+                return create(result, scale * n);
             } catch (ArithmeticException e) {
                 return create(big().pow(n));
             }
@@ -800,7 +803,7 @@ public class Num extends Arithmetic<Num> {
         } else if (v < 0) {
             throw new ArithmeticException("Cannot calculate the square root of a negative number.");
         } else if (scale % 2 == 0) {
-            return create(Math.sqrt(v), () -> scale / 2);
+            return create(Math.sqrt(v), scale / 2);
         } else {
             return create(big().sqrt(CONTEXT));
         }
