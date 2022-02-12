@@ -40,25 +40,6 @@ public final class Indicators {
         return new Trend(ticker, length);
     }
 
-    public static DoubleIndicator waveTrend(Ticker ticker) {
-        return waveTrend(ticker, 10, 21);
-    }
-
-    public static DoubleIndicator waveTrend(Ticker ticker, int channelLength, int averageLength) {
-        DoubleIndicator price = DoubleIndicator.build(ticker, Tick::typicalDoublePrice);
-        DoubleIndicator priceEMA = price.ema(channelLength);
-        DoubleIndicator emaOnDiffPriceAndPriceEMA = priceEMA.dmap(price, (pEMA, p) -> Math.abs(pEMA - p)).ema(channelLength);
-        DoubleIndicator ci = price.dmap(priceEMA, emaOnDiffPriceAndPriceEMA, (a, b, c) -> {
-            if (c == 0) {
-                return a - b;
-            }
-            return (a - b) / (0.015 * c);
-        });
-        DoubleIndicator indi = ci.ema(averageLength).scale(2);
-        indi.name.set(ticker.span.toString());
-        return indi;
-    }
-
     /**
      * 
      */

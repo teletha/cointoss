@@ -17,18 +17,18 @@ import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
+import javafx.scene.input.ScrollEvent;
+
 import cointoss.Direction;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.order.Order;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
-import cointoss.trade.bot.LazyBear;
 import cointoss.util.arithmetic.Num;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableRow;
-import javafx.scene.input.ScrollEvent;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;
@@ -215,7 +215,7 @@ public class OrderBuilder extends View {
         });
 
         bot.text("Active Bot").observe().take(1).to(v -> {
-            view.market.register(new LazyBear());
+            // view.market.register(new LazyBear());
         });
 
         table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
