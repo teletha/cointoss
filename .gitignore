@@ -1,8 +1,6 @@
 .*
 !/.gitignore
 !/.github
-!/src/main/auto
-!/src/test/auto
 
 # Created by https://www.toptal.com/developers/gitignore/api/Java,Maven,Windows,Linux,Eclipse,IntelliJ
 # Edit at https://www.toptal.com/developers/gitignore?templates=Java,Maven,Windows,Linux,Eclipse,IntelliJ
