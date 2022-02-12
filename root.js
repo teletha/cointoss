@@ -1012,13 +1012,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LazyBear",
-			"packageName": "cointoss.trade.bot",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Liquid",
 			"packageName": "cointoss.market.liquid",
 			"type": "Class"
@@ -1169,13 +1162,6 @@ const root = {
 			"name": "LongTriFunction",
 			"packageName": "cointoss.util.function",
 			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongWaveTrend",
-			"packageName": "cointoss.trade.bot",
-			"type": "Class"
 		},
 		{
 			"modifiers": {
@@ -2133,13 +2119,6 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "VolumeIndicator",
-			"packageName": "trademate.chart.builtin",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "WaveTrendIndicator",
 			"packageName": "trademate.chart.builtin",
 			"type": "Class"
 		}
