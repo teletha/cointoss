@@ -12,6 +12,7 @@ package trademate.chart.builtin;
 import cointoss.Market;
 import cointoss.market.Exchange;
 import cointoss.ticker.DoubleIndicator;
+import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.feather.FeatherStore;
@@ -28,20 +29,45 @@ public class OpenInterestIndicator extends PlotScript {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        if (market.service.exchange != Exchange.BinanceF && market.service.exchange != Exchange.Bitfinex) {
+        if (market.service.exchange != Exchange.BinanceF && market.service.exchange != Exchange.Bitfinex && market.service.exchange != Exchange.Bybit) {
             return;
         }
 
         FeatherStore<OpenInterest> oi = market.service.openInterest();
 
         if (oi != null) {
-            DoubleIndicator ois = DoubleIndicator.build(ticker, tick -> {
+            DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> {
                 OpenInterest o = oi.at(tick.openTime);
                 return o == null ? 0 : o.size;
             });
 
-            in(PlotArea.Bottom, () -> {
-                line(ois.scale(0).name("OI"), style.Short);
+            in(PlotArea.Low, () -> {
+                line(indicator.scale(0).name("OI"), style.oi);
+            });
+
+            Indicator<double[]> entryAndExit = Indicator.build(ticker, tick -> {
+                OpenInterest currentOI = oi.at(tick.openTime);
+                if (currentOI == null) {
+                    return new double[] {0, 0};
+                }
+
+                OpenInterest previousOI = oi.before(tick.openTime);
+                if (previousOI == null) {
+                    return new double[] {0, 0};
+                }
+
+                float deltaOI = currentOI.size - previousOI.size;
+
+                double volume = tick.volume();
+                double entry = volume + deltaOI / 2d;
+                double exit = volume - deltaOI / 2d;
+
+                return new double[] {entry, exit};
+            });
+
+            in(PlotArea.LowNarrow, () -> {
+                line(entryAndExit.dmap(x -> x[0]).scale(2).name("Entry"), style.entry);
+                line(entryAndExit.dmap(x -> x[1]).scale(2).name("Exit"), style.exit);
             });
         }
     }
@@ -50,7 +76,15 @@ public class OpenInterestIndicator extends PlotScript {
      * 
      */
     interface style extends StyleDSL {
-        Style Short = () -> {
+        Style oi = () -> {
+            stroke.color(ChartStyles.same);
+        };
+
+        Style entry = () -> {
+            stroke.color(ChartStyles.buy);
+        };
+
+        Style exit = () -> {
             stroke.color(ChartStyles.sell);
         };
     }

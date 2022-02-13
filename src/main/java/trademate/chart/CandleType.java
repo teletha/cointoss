@@ -36,7 +36,9 @@ public enum CandleType {
     /** Coordinate by volume. */
     PriceVolumeWeight(CandleType::priceVolumeWeight, Indicators::ohclCandle),
 
-    HeikinAshi(CandleType::price, Indicators::ohclHeikinAshi);
+    HeikinAshi(CandleType::price, Indicators::ohclHeikinAshi),
+
+    HeikinAshiVolume(CandleType::volume, Indicators::ohclHeikinAshi);
 
     /** The candle color. */
     private static final Variable<Color> BuyT = Theme.$.buy.observing().map(color -> color.deriveColor(0, 1, 1, 0.4)).to();

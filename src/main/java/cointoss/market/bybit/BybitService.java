@@ -19,7 +19,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import com.univocity.parsers.csv.CsvParser;
@@ -288,11 +287,10 @@ public class BybitService extends MarketService {
                 .map(e -> {
                     float size = e.get(float.class, "open_interest");
                     ZonedDateTime date = Chrono.utcBySeconds(e.get(long.class, "timestamp"));
-
-                    return OpenInterest.with.date(date).size(size);
+                    OpenInterest oi = OpenInterest.with.date(date).size(size);
+                    return oi;
                 })
-                .as(OpenInterest.class)
-                .take((Predicate<OpenInterest>) e -> e.date.isAfter(startExcluded));
+                .take(e -> e.date.isAfter(startExcluded));
     }
 
     /**

@@ -325,6 +325,21 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(2, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
+        // scroll on chart
+        when(User.Scroll).to(axisX::fireEvent);
+        when(User.MouseDrag).take(MouseEvent::isPrimaryButtonDown)
+                .buffer(2, 1)
+                .takeUntil(when(User.MouseRelease).take(e -> e.getButton() == MouseButton.PRIMARY))
+                .repeat()
+                .to(e -> {
+                    double prev = e.get(0).getX();
+                    double now = e.get(1).getX();
+
+                    if (prev != now) {
+                        axisX.scroll.setValue(Math.min(1, axisX.scroll.getValue() + (now - prev) * 0.001));
+                    }
+                });
+
         configIndicator();
         visualizeOrderPrice();
         visualizeLatestPrice();
