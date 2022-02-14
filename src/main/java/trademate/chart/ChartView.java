@@ -10,6 +10,7 @@
 package trademate.chart;
 
 import java.text.Normalizer.Form;
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -36,6 +37,7 @@ import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.helper.User;
 
 public class ChartView extends View {
 
@@ -44,6 +46,9 @@ public class ChartView extends View {
 
     /** The list of plottable candle date. */
     public final Variable<Ticker> ticker = Variable.empty();
+
+    /** Configuration UI */
+    private UIButton load;
 
     /** Configuration UI */
     private UIButton config;
@@ -104,6 +109,8 @@ public class ChartView extends View {
                     $(span, style.span);
                     $(config);
                 });
+
+                $(load, style.load);
             });
         }
     }
@@ -119,6 +126,10 @@ public class ChartView extends View {
         Style configBox = () -> {
             display.maxWidth(130, px).maxHeight(26, px);
             position.top(0, px).right(54, px);
+        };
+
+        Style load = () -> {
+            position.bottom(0, px).left(0, px);
         };
 
         Style span = () -> {
@@ -180,6 +191,24 @@ public class ChartView extends View {
                 });
 
         pricedVolumeType.initialize(PriceRangedVolumeType.values()).enableWhen(showPricedVolume.isSelected());
+
+        load.text(FontAwesome.Glyph.DOWNLOAD).when(User.Action, this::loadPastData);
+    }
+
+    public void loadPastData() {
+        ZonedDateTime min = Chrono.systemBySeconds(chart.axisX.logicalMinValue.longValue());
+        ZonedDateTime max = Chrono.systemBySeconds(chart.axisX.logicalMaxValue.longValue());
+
+        if (ticker.isPresent()) {
+            ticker.v.ticks.enableDataSupplier(time -> {
+                System.out.println(Chrono.systemBySeconds(time));
+                return null;
+            });
+            ticker.v.ticks.query(min.minusDays(1).toEpochSecond(), min.toEpochSecond()).to(tick -> {
+                System.out.println(tick);
+            });
+            chart.layoutForcely();
+        }
     }
 
     /**

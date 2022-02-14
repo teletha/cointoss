@@ -248,6 +248,7 @@ public class BackTestView extends View implements Analyzer {
     @Override
     protected void initialize() {
         marketSelection.initialize(MarketServiceProvider.availableMarketServices())
+                .selectAt(0)
                 .render(service -> service.id)
                 .renderSelected(service -> service.id);
 

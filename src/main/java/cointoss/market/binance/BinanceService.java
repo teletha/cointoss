@@ -191,7 +191,7 @@ public class BinanceService extends MarketService {
                 .enableDataSupplier(seconds -> {
                     // https://binance-docs.github.io/apidocs/futures/en/#open-interest-statistics
                     // [[ Only the data of the latest 30 days is available. ]]
-                    //
+                    // >>
                     // Contrary to the description in the document, setting the lower limit to 30
                     // days ago returns an error, so we set the lower limit to 25 days ago with a
                     // margin of 5 days.
