@@ -8,10 +8,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="R">
-		<header class="J">
-			<h1 class="h" date="2022-02-14" ver="1.0.0"><code>Cointoss</code></h1>
-			<nav class="X"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="k">
+		<header class="Z">
+			<h1 class="l" date="2022-02-16" ver="1.0.0"><code>Cointoss</code></h1>
+			<nav class="W"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -20,7 +20,7 @@
 					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="j" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="i" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -28,14 +28,14 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="I">
-			<nav class="L">
+		<main class="Y">
+			<nav class="H">
 				<div></div>
 			</nav>
-			<article class="H" id="Article">
-				<section class="W"><code class="d">cointoss.analyze</code>
-					<h2 class="Class f"><code class="U">OnlineStats</code></h2>
-					<div class="S"></div><span class="B"><p>Utility to incrementally calculate mean, variance and standard deviation of a sample. Sample
+			<article class="N" id="Article">
+				<section class="d"><code class="e">cointoss.analyze</code>
+					<h2 class="Class g"><code class="R">OnlineStats</code></h2>
+					<div class="b"></div><span class="B"><p>Utility to incrementally calculate mean, variance and standard deviation of a sample. Sample
  points can be <code><a href="api/cointoss.analyze.OnlineStats.html#add(double)">#add(double)</a></code>, <code><a href="api/cointoss.analyze.OnlineStats.html#remove(double)">#remove(double)</a></code> or
  <code><a href="api/cointoss.analyze.OnlineStats.html#replace(double,double)">#replace(double, double)</a></code>.
  
@@ -47,11 +47,11 @@
 							</p>
 						</p>
 					</span></section>
-				<section class="W" id="OnlineStats()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">OnlineStats</code><code class="O">()</code></h2>
+				<section class="d" id="OnlineStats()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">OnlineStats</code><code class="j">()</code></h2>
 				</section>
-				<section class="W" id="add(double)">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">add</code><code class="O">(<code>double</code> <code class="parameterName">x</code>)</code><i class="P"><code>void</code></i></h2>
+				<section class="d" id="add(double)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">add</code><code class="j">(<code>double</code> <code class="parameterName">x</code>)</code><i class="S"><code>void</code></i></h2>
 					<table class="a">
 						<tr class="K">
 							<td><code>double</code> <code>x</code></td>
@@ -61,8 +61,8 @@
 					</table><span class="B"><p>Adds the value <code>x</code> to the sample. The sample count is incremented by one by this
  operation,</p>
 					</span></section>
-				<section class="W" id="remove(double)">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">remove</code><code class="O">(<code>double</code> <code class="parameterName">x</code>)</code><i class="P"><code>void</code></i></h2>
+				<section class="d" id="remove(double)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">remove</code><code class="j">(<code>double</code> <code class="parameterName">x</code>)</code><i class="S"><code>void</code></i></h2>
 					<table class="a">
 						<tr class="K">
 							<td><code>double</code> <code>x</code></td>
@@ -72,8 +72,8 @@
 					</table><span class="B"><p>Removes the value <code>x</code> currently present in this sample. The sample count is decremented
  by one by this operation.</p>
 					</span></section>
-				<section class="W" id="replace(double,double)">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">replace</code><code class="O">(<code>double</code> <code class="parameterName">x</code>, <code>double</code> <code class="parameterName">y</code>)</code><i class="P"><code>void</code></i></h2>
+				<section class="d" id="replace(double,double)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">replace</code><code class="j">(<code>double</code> <code class="parameterName">x</code>, <code>double</code> <code class="parameterName">y</code>)</code><i class="S"><code>void</code></i></h2>
 					<table class="a">
 						<tr class="K">
 							<td><code>double</code> <code>x</code></td>
@@ -89,29 +89,29 @@
  In a sliding window, <code>x</code> is the value that drops out and <code>y</code> is the new value
  entering the window. The sample count remains constant with this operation.</p>
 					</span></section>
-				<section class="W" id="getCount()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">getCount</code><code class="O">()</code><i class="P"><code>long</code></i></h2>
+				<section class="d" id="getCount()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">getCount</code><code class="j">()</code><i class="S"><code>long</code></i></h2>
 					<table class="a">
-						<tr class="i">
+						<tr class="h">
 							<td><code>long</code></td>
 							<td><span><p>the number of values in the sample</p>
 								</span></td>
 						</tr>
 					</table><span class="B"><p>Returns the number of values in the sample.</p>
 					</span></section>
-				<section class="W" id="getSum()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">getSum</code><code class="O">()</code><i class="P"><code>double</code></i></h2>
+				<section class="d" id="getSum()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">getSum</code><code class="j">()</code><i class="S"><code>double</code></i></h2>
 					<table class="a">
-						<tr class="i">
+						<tr class="h">
 							<td><code>double</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Returns the sum value of the sample. Returns 0 if the sample count is zero.</p>
 					</span></section>
-				<section class="W" id="getMean()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">getMean</code><code class="O">()</code><i class="P"><code>double</code></i></h2>
+				<section class="d" id="getMean()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">getMean</code><code class="j">()</code><i class="S"><code>double</code></i></h2>
 					<table class="a">
-						<tr class="i">
+						<tr class="h">
 							<td><code>double</code></td>
 							<td><span><p>the mean value of the sample</p>
 								</span></td>
@@ -122,10 +122,10 @@
  The method returns the calculated value and returns immediately.</p>
 						</p>
 					</span></section>
-				<section class="W" id="getVariance()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">getVariance</code><code class="O">()</code><i class="P"><code>double</code></i></h2>
+				<section class="d" id="getVariance()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">getVariance</code><code class="j">()</code><i class="S"><code>double</code></i></h2>
 					<table class="a">
-						<tr class="i">
+						<tr class="h">
 							<td><code>double</code></td>
 							<td><span><p>the biased variance of the sample</p>
 								</span></td>
@@ -137,10 +137,10 @@
  division).</p>
 						</p>
 					</span></section>
-				<section class="W" id="getVarianceUnbiased()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">getVarianceUnbiased</code><code class="O">()</code><i class="P"><code>double</code></i></h2>
+				<section class="d" id="getVarianceUnbiased()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">getVarianceUnbiased</code><code class="j">()</code><i class="S"><code>double</code></i></h2>
 					<table class="a">
-						<tr class="i">
+						<tr class="h">
 							<td><code>double</code></td>
 							<td><span><p>the variance of the sample (bias corrected)</p>
 								</span></td>
@@ -153,10 +153,10 @@
  division).</p>
 						</p>
 					</span></section>
-				<section class="W" id="getStdDev()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">getStdDev</code><code class="O">()</code><i class="P"><code>double</code></i></h2>
+				<section class="d" id="getStdDev()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">getStdDev</code><code class="j">()</code><i class="S"><code>double</code></i></h2>
 					<table class="a">
-						<tr class="i">
+						<tr class="h">
 							<td><code>double</code></td>
 							<td><span><p>the biased standard deviation of the sample</p>
 								</span></td>
@@ -169,10 +169,10 @@
  root and division operation).</p>
 						</p>
 					</span></section>
-				<section class="W" id="getStdDevUnbiased()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">getStdDevUnbiased</code><code class="O">()</code><i class="P"><code>double</code></i></h2>
+				<section class="d" id="getStdDevUnbiased()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">getStdDevUnbiased</code><code class="j">()</code><i class="S"><code>double</code></i></h2>
 					<table class="a">
-						<tr class="i">
+						<tr class="h">
 							<td><code>double</code></td>
 							<td><span><p>the standard deviation of the sample (bias corrected)</p>
 								</span></td>
@@ -185,11 +185,11 @@
  root and division operation).</p>
 						</p>
 					</span></section>
-				<section class="W" id="reset()">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">reset</code><code class="O">()</code><i class="P"><code>void</code></i></h2><span class="B"><p>Resets this sampler to its initial state. The sample count is 0 after this operation.</p>
+				<section class="d" id="reset()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">reset</code><code class="j">()</code><i class="S"><code>void</code></i></h2><span class="B"><p>Resets this sampler to its initial state. The sample count is 0 after this operation.</p>
 					</span></section>
-				<section class="W" id="combine(cointoss.analyze.OnlineStats)">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">combine</code><code class="O">(<code><a href="api/cointoss.analyze.OnlineStats.html">OnlineStats</a></code> <code class="parameterName">with</code>)</code><i class="P"><code>void</code></i></h2>
+				<section class="d" id="combine(cointoss.analyze.OnlineStats)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">combine</code><code class="j">(<code><a href="api/cointoss.analyze.OnlineStats.html">OnlineStats</a></code> <code class="parameterName">with</code>)</code><i class="S"><code>void</code></i></h2>
 					<table class="a">
 						<tr class="K">
 							<td><code><a href="api/cointoss.analyze.OnlineStats.html">OnlineStats</a></code> <code>with</code></td>
@@ -205,55 +205,55 @@
  the combined statistics with a lower frequency (e.g. every 1000 data points).</p>
 						</p>
 					</span></section>
-				<section class="W" id="calculateSigma(double)">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">calculateSigma</code><code class="O">(<code>double</code> <code class="parameterName">value</code>)</code><i class="P"><code>int</code></i></h2>
+				<section class="d" id="calculateSigma(double)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">calculateSigma</code><code class="j">(<code>double</code> <code class="parameterName">value</code>)</code><i class="S"><code>int</code></i></h2>
 					<table class="a">
 						<tr class="K">
 							<td><code>double</code> <code>value</code></td>
 							<td></td>
 						</tr>
-						<tr class="i">
+						<tr class="h">
 							<td><code>int</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute sigma of the specified value.</p>
 					</span></section>
-				<section class="W" id="sigma(int)">
-					<h2 class="c"><i class="PUBLIC"></i><code class="U">sigma</code><code class="O">(<code>int</code> <code class="parameterName">value</code>)</code><i class="P"><code>double</code></i></h2>
+				<section class="d" id="sigma(int)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="R">sigma</code><code class="j">(<code>int</code> <code class="parameterName">value</code>)</code><i class="S"><code>double</code></i></h2>
 					<table class="a">
 						<tr class="K">
 							<td><code>int</code> <code>value</code></td>
 							<td></td>
 						</tr>
-						<tr class="i">
+						<tr class="h">
 							<td><code>double</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute sigma of the specified value.</p>
 					</span></section>
 			</article>
-			<aside class="T" id="SubNavi">
-				<div class="l">
-					<h5 class="k">Constructors</h5>
+			<aside class="P" id="SubNavi">
+				<div class="M">
+					<h5 class="c">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#OnlineStats()">OnlineStats</a></code><code class="O">()</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#OnlineStats()">OnlineStats</a></code><code class="j">()</code></li>
 					</ul>
-					<h5 class="k">Methods</h5>
+					<h5 class="c">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#add(double)">add</a></code><code class="O">(<code>double</code> <code class="parameterName">x</code>)</code><i class="Y"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#remove(double)">remove</a></code><code class="O">(<code>double</code> <code class="parameterName">x</code>)</code><i class="Y"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#replace(double,double)">replace</a></code><code class="O">(<code>double</code> <code class="parameterName">x</code>, <code>double</code> <code class="parameterName">y</code>)</code><i class="Y"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getCount()">getCount</a></code><code class="O">()</code><i class="Y"><code>long</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getSum()">getSum</a></code><code class="O">()</code><i class="Y"><code>double</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getMean()">getMean</a></code><code class="O">()</code><i class="Y"><code>double</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getVariance()">getVariance</a></code><code class="O">()</code><i class="Y"><code>double</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getVarianceUnbiased()">getVarianceUnbiased</a></code><code class="O">()</code><i class="Y"><code>double</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getStdDev()">getStdDev</a></code><code class="O">()</code><i class="Y"><code>double</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getStdDevUnbiased()">getStdDevUnbiased</a></code><code class="O">()</code><i class="Y"><code>double</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#reset()">reset</a></code><code class="O">()</code><i class="Y"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#combine(cointoss.analyze.OnlineStats)">combine</a></code><code class="O">(<code><a href="api/cointoss.analyze.OnlineStats.html">OnlineStats</a></code> <code class="parameterName">with</code>)</code><i class="Y"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#calculateSigma(double)">calculateSigma</a></code><code class="O">(<code>double</code> <code class="parameterName">value</code>)</code><i class="Y"><code>int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#sigma(int)">sigma</a></code><code class="O">(<code>int</code> <code class="parameterName">value</code>)</code><i class="Y"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#add(double)">add</a></code><code class="j">(<code>double</code> <code class="parameterName">x</code>)</code><i class="J"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#remove(double)">remove</a></code><code class="j">(<code>double</code> <code class="parameterName">x</code>)</code><i class="J"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#replace(double,double)">replace</a></code><code class="j">(<code>double</code> <code class="parameterName">x</code>, <code>double</code> <code class="parameterName">y</code>)</code><i class="J"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getCount()">getCount</a></code><code class="j">()</code><i class="J"><code>long</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getSum()">getSum</a></code><code class="j">()</code><i class="J"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getMean()">getMean</a></code><code class="j">()</code><i class="J"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getVariance()">getVariance</a></code><code class="j">()</code><i class="J"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getVarianceUnbiased()">getVarianceUnbiased</a></code><code class="j">()</code><i class="J"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getStdDev()">getStdDev</a></code><code class="j">()</code><i class="J"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#getStdDevUnbiased()">getStdDevUnbiased</a></code><code class="j">()</code><i class="J"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#reset()">reset</a></code><code class="j">()</code><i class="J"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#combine(cointoss.analyze.OnlineStats)">combine</a></code><code class="j">(<code><a href="api/cointoss.analyze.OnlineStats.html">OnlineStats</a></code> <code class="parameterName">with</code>)</code><i class="J"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#calculateSigma(double)">calculateSigma</a></code><code class="j">(<code>double</code> <code class="parameterName">value</code>)</code><i class="J"><code>int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.OnlineStats.html#sigma(int)">sigma</a></code><code class="j">(<code>int</code> <code class="parameterName">value</code>)</code><i class="J"><code>double</code></i></li>
 					</ul>
 				</div>
 			</aside>
