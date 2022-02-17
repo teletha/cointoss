@@ -9,23 +9,24 @@
  */
 package trademate.chart;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleFunction;
 
-import cointoss.ticker.Span;
-import cointoss.ticker.Tick;
-import cointoss.ticker.Ticker;
-import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
+
+import cointoss.ticker.Span;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import cointoss.util.arithmetic.Num;
 import kiss.Signal;
 import kiss.Variable;
 import trademate.setting.StaticConfig;
@@ -98,12 +99,10 @@ public class Chart extends Region {
         observeStartAndFinish(axisX.scroll.valueProperty()).merge(observeStartAndFinish(axisX.scroll.visibleAmountProperty())).to(e -> {
             chart.showIndicator.set(e);
             canvas.layoutCandle.layoutForcely();
-            canvas.layoutCandleLatest.layoutForcely();
         });
         observeStartAndFinish(axisY.scroll.valueProperty()).merge(observeStartAndFinish(axisY.scroll.visibleAmountProperty())).to(e -> {
             chart.showIndicator.set(e);
             canvas.layoutCandle.layoutForcely();
-            canvas.layoutCandleLatest.layoutForcely();
         });
 
         getChildren().addAll(canvas, axisX, axisY);

@@ -216,6 +216,24 @@ public class Primitives {
     }
 
     /**
+     * Checks if the specified value is in the range of valid values.
+     * 
+     * @param min A minimum value.
+     * @param value A target value.
+     * @param max A maximum value.
+     */
+    public static double between(double min, double value, double max) {
+        if (value < min || value == Double.NEGATIVE_INFINITY) {
+            value = min;
+        }
+
+        if (max < value || value == Double.POSITIVE_INFINITY) {
+            value = max;
+        }
+        return value;
+    }
+
+    /**
      * Compute the maximum value.
      * 
      * @param values

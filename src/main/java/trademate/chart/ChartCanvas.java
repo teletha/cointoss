@@ -11,7 +11,7 @@ package trademate.chart;
 
 import static cointoss.Direction.*;
 import static java.lang.Boolean.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -20,6 +20,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -44,21 +60,6 @@ import cointoss.util.arithmetic.Primitives;
 import cointoss.util.array.DoubleList;
 import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -339,7 +340,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         double logicalDuration = axisX.logicalMaxValue.get() - axisX.logicalMinValue.get();
                         double movedDuration = visibleDuration / candles.widthProperty().get() * (now - prev);
                         double ratio = movedDuration / (logicalDuration * (1 - axisX.scroll.getVisibleAmount()));
-                        axisX.scroll.setValue(Math.max(0, Math.min(1, axisX.scroll.getValue() - ratio)));
+                        if (ratio != 0 && Double.isFinite(ratio)) {
+                            axisX.scroll.setValue(Primitives.between(0, axisX.scroll.getValue() - ratio, 1));
+                        }
                     }
                 });
 
@@ -896,7 +899,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         layoutCandleLatest.layout(() -> {
             chart.ticker.to(ticker -> {
-                if (ticker.ticks.isEmpty() || chart.showRealtimeUpdate.is(FALSE) || chart.showIndicator.is(FALSE)) {
+                if (ticker.ticks.isEmpty() || chart.showRealtimeUpdate.is(FALSE)) {
                     return;
                 }
 
@@ -920,7 +923,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
 
                 Tick previous = ticker.ticks.before(tick);
-                if (previous != null) {
+                if (previous != null && chart.showIndicator.is(TRUE)) {
                     double lastX = axisX.getPositionForValue(previous.openTime);
 
                     for (Plotter plotter : plotters) {

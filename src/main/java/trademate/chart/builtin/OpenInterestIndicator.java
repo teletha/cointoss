@@ -66,6 +66,7 @@ public class OpenInterestIndicator extends PlotScript {
             });
 
             in(PlotArea.HighNarrow, () -> {
+                line(0, style.ratioBase);
                 line(entryAndExit.dmap(x -> x[2]).scale(2).name("EER"), style.ratio);
             });
 
@@ -96,8 +97,8 @@ public class OpenInterestIndicator extends PlotScript {
             stroke.color("#eee");
         };
 
-        Style bsratio = () -> {
-            stroke.color("#e59");
+        Style ratioBase = () -> {
+            stroke.color("#aaa");
         };
     }
 }
