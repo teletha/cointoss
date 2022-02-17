@@ -335,12 +335,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     double now = e.get(1).getX();
 
                     if (prev != now) {
-                        double max = axisX.computeVisibleMaxValue();
-                        double min = axisX.computeVisibleMinValue();
-                        double prevValue = axisX.getValueForPosition(prev);
-                        double nowValue = axisX.getValueForPosition(now);
-                        double ratio = (nowValue - prevValue) / (max - min);
-                        System.out.println(ratio);
+                        double visibleDuration = axisX.computeVisibleMaxValue() - axisX.computeVisibleMinValue();
+                        double logicalDuration = axisX.logicalMaxValue.get() - axisX.logicalMinValue.get();
+                        double movedDuration = visibleDuration / candles.widthProperty().get() * (now - prev);
+                        double ratio = movedDuration / (logicalDuration * (1 - axisX.scroll.getVisibleAmount()));
                         axisX.scroll.setValue(Math.min(1, axisX.scroll.getValue() - ratio));
                     }
                 });
