@@ -10,8 +10,8 @@
 package trademate.chart;
 
 import static cointoss.Direction.*;
-import static java.lang.Boolean.TRUE;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.lang.Boolean.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -20,22 +20,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -60,6 +44,21 @@ import cointoss.util.arithmetic.Primitives;
 import cointoss.util.array.DoubleList;
 import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -336,7 +335,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     double now = e.get(1).getX();
 
                     if (prev != now) {
-                        axisX.scroll.setValue(Math.min(1, axisX.scroll.getValue() + (now - prev) * 0.001));
+                        double max = axisX.computeVisibleMaxValue();
+                        double min = axisX.computeVisibleMinValue();
+                        double prevValue = axisX.getValueForPosition(prev);
+                        double nowValue = axisX.getValueForPosition(now);
+                        double ratio = (nowValue - prevValue) / (max - min);
+                        System.out.println(ratio);
+                        axisX.scroll.setValue(Math.min(1, axisX.scroll.getValue() - ratio));
                     }
                 });
 
@@ -893,7 +898,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         layoutCandleLatest.layout(() -> {
             chart.ticker.to(ticker -> {
-                if (ticker.ticks.isEmpty() || chart.showRealtimeUpdate.is(false)) {
+                if (ticker.ticks.isEmpty() || chart.showRealtimeUpdate.is(FALSE) || chart.showIndicator.is(FALSE)) {
                     return;
                 }
 

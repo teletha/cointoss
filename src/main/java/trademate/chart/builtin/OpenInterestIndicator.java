@@ -95,5 +95,9 @@ public class OpenInterestIndicator extends PlotScript {
         Style ratio = () -> {
             stroke.color("#eee");
         };
+
+        Style bsratio = () -> {
+            stroke.color("#e59");
+        };
     }
 }
