@@ -169,7 +169,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
     /** Flag whether candle chart should layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
+    final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
     /** Flag whether orderbook should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
@@ -339,7 +339,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         double logicalDuration = axisX.logicalMaxValue.get() - axisX.logicalMinValue.get();
                         double movedDuration = visibleDuration / candles.widthProperty().get() * (now - prev);
                         double ratio = movedDuration / (logicalDuration * (1 - axisX.scroll.getVisibleAmount()));
-                        axisX.scroll.setValue(Math.min(1, axisX.scroll.getValue() - ratio));
+                        axisX.scroll.setValue(Math.max(0, Math.min(1, axisX.scroll.getValue() - ratio)));
                     }
                 });
 
