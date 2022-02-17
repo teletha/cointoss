@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.1.0](https://www.github.com/teletha/cointoss/compare/v1.0.0...v1.1.0) (2022-02-17)
+
+
+### Features
+
+* Add BTC/USD(T) markets on FTX. ([dc9108a](https://www.github.com/teletha/cointoss/commit/dc9108a784b1c9230bdb2e5256b50fd211f873f7))
+* Chart can scrolls on chart. ([bc17a00](https://www.github.com/teletha/cointoss/commit/bc17a00fc1c92ce4fdf05ac76c4c9a5f02ef790b))
+* Chart is draggable. ([fa1107f](https://www.github.com/teletha/cointoss/commit/fa1107f8cda99e0f2a3087bb2b5519062f9ea157))
+* Drop wave trend indicator. ([578ab1f](https://www.github.com/teletha/cointoss/commit/578ab1fc01f09106bb4b5a809eb919e2eaf7eeb9))
+* Smooth chart scroll. ([4b7ba00](https://www.github.com/teletha/cointoss/commit/4b7ba003ef2dfd994f746dfd2ea397b9e2a359ae))
+* Suggest interval value smartly on bot parameter. ([e413c54](https://www.github.com/teletha/cointoss/commit/e413c54dc6bb03bde05d9cbaca1ff4526df58661))
+
+
+### Bug Fixes
+
+* Accept invalid response on Binance. ([ab94cfc](https://www.github.com/teletha/cointoss/commit/ab94cfc3171ad18e39cc41af6c4186e9631ee73e))
+* Accept the invalid response in Bitmex. ([cac7546](https://www.github.com/teletha/cointoss/commit/cac7546c9a48de1fba4de3656fbdf8490206a37c))
+* Format console output. ([deca9b4](https://www.github.com/teletha/cointoss/commit/deca9b465214f52d1cc998ae7784a1b327c7e8f7))
+* Reduce memory usage. ([4bd6d57](https://www.github.com/teletha/cointoss/commit/4bd6d57689436f8e5980a53624eb67c6c5c683f4))
+* Update sinobu. ([f8bf41c](https://www.github.com/teletha/cointoss/commit/f8bf41ca4079852d9b331e3eae45bb33c60ad98b))
+
 ## 1.0.0 (2022-02-04)
 
 
