@@ -8,10 +8,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="k">
-		<header class="Z">
-			<h1 class="l" date="2022-02-16" ver="1.0.0"><code>Cointoss</code></h1>
-			<nav class="W"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="I">
+		<header class="P">
+			<h1 class="i" date="2022-02-17" ver="1.0.0"><code>Cointoss</code></h1>
+			<nav class="J"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -20,7 +20,7 @@
 					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="i" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="W" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -28,82 +28,82 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="Y">
-			<nav class="H">
+		<main class="K">
+			<nav class="T">
 				<div></div>
 			</nav>
-			<article class="N" id="Article">
-				<section class="d"><code class="e">cointoss.volume</code>
-					<h2 class="Class g"><code class="R">PriceRangedVolumePeriod</code></h2>
-					<div class="b"></div>
+			<article class="f" id="Article">
+				<section class="H"><code class="X">cointoss.volume</code>
+					<h2 class="Class a"><code class="b">PriceRangedVolumePeriod</code></h2>
+					<div class="k"></div>
 				</section>
-				<section class="d" id="startTime">
-					<h2 class="X"><i class="FINAL"><i class="PUBLIC"></i></i><code class="R">startTime</code><i class="S"><code class="return">long</code></i></h2><span class="B"><p>The starting time of this period. (epoch second)</p>
+				<section class="H" id="startTime">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="b">startTime</code><i class="Y"><code class="return">long</code></i></h2><span class="B"><p>The starting time of this period. (epoch second)</p>
 					</span></section>
-				<section class="d" id="max()">
-					<h2 class="X"><i class="PUBLIC"></i><code class="R">max</code><code class="j">()</code><i class="S"><code>float</code></i></h2>
-					<table class="a">
-						<tr class="h">
+				<section class="H" id="max()">
+					<h2 class="U"><i class="PUBLIC"></i><code class="b">max</code><code class="N">()</code><i class="Y"><code>float</code></i></h2>
+					<table class="h">
+						<tr class="V">
 							<td><code>float</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the maximum volumes in this session.</p>
 					</span></section>
-				<section class="d" id="volumeAt(float)">
-					<h2 class="X"><i class="PUBLIC"></i><code class="R">volumeAt</code><code class="j">(<code>float</code> <code class="parameterName">price</code>)</code><i class="S"><code>float</code></i></h2>
-					<table class="a">
-						<tr class="K">
+				<section class="H" id="volumeAt(float)">
+					<h2 class="U"><i class="PUBLIC"></i><code class="b">volumeAt</code><code class="N">(<code>float</code> <code class="parameterName">price</code>)</code><i class="Y"><code>float</code></i></h2>
+					<table class="h">
+						<tr class="M">
 							<td><code>float</code> <code>price</code></td>
 							<td><span><p>A target price (NOT price range). It is round to the suitable price range
             automatically.</p>
 								</span></td>
 						</tr>
-						<tr class="h">
+						<tr class="V">
 							<td><code>float</code></td>
 							<td><span><p>A price ranged valume.</p>
 								</span></td>
 						</tr>
 					</table><span class="B"><p>Get price ranged volume by price.</p>
 					</span></section>
-				<section class="d" id="aggregateBySize(int)">
-					<h2 class="X"><i class="PUBLIC"></i><code class="R">aggregateBySize</code><code class="j">(<code>int</code> <code class="parameterName">groupSize</code>)</code><i class="S"><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></i></h2>
-					<table class="a">
-						<tr class="K">
+				<section class="H" id="aggregateBySize(int)">
+					<h2 class="U"><i class="PUBLIC"></i><code class="b">aggregateBySize</code><code class="N">(<code>int</code> <code class="parameterName">groupSize</code>)</code><i class="Y"><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></i></h2>
+					<table class="h">
+						<tr class="M">
 							<td><code>int</code> <code>groupSize</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="V">
 							<td><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute the grouped price-ranged-volume data.</p>
 					</span></section>
-				<section class="d" id="aggregateByPrice(cointoss.util.arithmetic.Num)">
-					<h2 class="X"><i class="PUBLIC"></i><code class="R">aggregateByPrice</code><code class="j">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">range</code>)</code><i class="S"><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></i></h2>
-					<table class="a">
-						<tr class="K">
+				<section class="H" id="aggregateByPrice(cointoss.util.arithmetic.Num)">
+					<h2 class="U"><i class="PUBLIC"></i><code class="b">aggregateByPrice</code><code class="N">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">range</code>)</code><i class="Y"><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></i></h2>
+					<table class="h">
+						<tr class="M">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>range</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="V">
 							<td><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute the grouped price-ranged-volume data.</p>
 					</span></section>
 			</article>
-			<aside class="P" id="SubNavi">
-				<div class="M">
-					<h5 class="c">Fields</h5>
+			<aside class="l" id="SubNavi">
+				<div class="e">
+					<h5 class="L">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#startTime">startTime</a></code><i class="J"><code class="return">long</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#startTime">startTime</a></code><i class="Q"><code class="return">long</code></i></li>
 					</ul>
-					<h5 class="c">Methods</h5>
+					<h5 class="L">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#max()">max</a></code><code class="j">()</code><i class="J"><code>float</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#volumeAt(float)">volumeAt</a></code><code class="j">(<code>float</code> <code class="parameterName">price</code>)</code><i class="J"><code>float</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#aggregateBySize(int)">aggregateBySize</a></code><code class="j">(<code>int</code> <code class="parameterName">groupSize</code>)</code><i class="J"><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#aggregateByPrice(cointoss.util.arithmetic.Num)">aggregateByPrice</a></code><code class="j">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">range</code>)</code><i class="J"><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#max()">max</a></code><code class="N">()</code><i class="Q"><code>float</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#volumeAt(float)">volumeAt</a></code><code class="N">(<code>float</code> <code class="parameterName">price</code>)</code><i class="Q"><code>float</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#aggregateBySize(int)">aggregateBySize</a></code><code class="N">(<code>int</code> <code class="parameterName">groupSize</code>)</code><i class="Q"><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.html#aggregateByPrice(cointoss.util.arithmetic.Num)">aggregateByPrice</a></code><code class="N">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">range</code>)</code><i class="Q"><code><a href="api/cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes.html">GroupedVolumes</a></code></i></li>
 					</ul>
 				</div>
 			</aside>
