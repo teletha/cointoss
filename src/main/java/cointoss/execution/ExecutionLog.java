@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static psychopath.Option.*;
+import static psychopath.Option.ATOMIC_WRITE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -289,8 +289,9 @@ public class ExecutionLog {
      * @return
      */
     public final synchronized Signal<Execution> from(ZonedDateTime start, LogType... type) {
+        ZonedDateTime startDay = repository.firstZDT();
         ZonedDateTime endDay = repository.lastZDT();
-        ZonedDateTime startDay = Chrono.between(repository.firstZDT(), start, endDay).truncatedTo(ChronoUnit.DAYS);
+        startDay = Chrono.between(startDay, start, endDay).truncatedTo(ChronoUnit.DAYS);
 
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))

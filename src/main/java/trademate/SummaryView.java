@@ -25,7 +25,7 @@ import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
-public class SummuryView extends View {
+public class SummaryView extends View {
 
     private UIScrollPane scroll;
 
@@ -57,7 +57,7 @@ public class SummuryView extends View {
 
     interface style extends StyleDSL {
         Style table = () -> {
-            display.height(1000, px);
+            display.height.fill();
         };
 
         Style name = () -> {
@@ -88,21 +88,7 @@ public class SummuryView extends View {
                         .map(e -> e.price)
                         .on(Viewtify.UIThread));
 
-        priceForBuy.text(CommonText.Buy)
-                .modelBySignal(m -> m.orderBook.shorts.predictTakingPrice(size.observing())
-                        .throttle(throttle, MILLISECONDS)
-                        .on(Viewtify.UIThread)
-                        .retry());
-
-        priceForSell.text(CommonText.Sell)
-                .modelBySignal(m -> m.orderBook.longs.predictTakingPrice(size.observing())
-                        .throttle(throttle, MILLISECONDS)
-                        .on(Viewtify.UIThread)
-                        .retry());
-
-        MarketServiceProvider.availableMarketServices().to(service -> {
-            table.addItemAtLast(Market.of(service));
-        });
+        MarketServiceProvider.availableMarketServices().map(Market::of).to(table::addItemAtLast);
 
         table.query().addQuery(en("Type"), MarketType.class, m -> m.service.setting.type);
     }

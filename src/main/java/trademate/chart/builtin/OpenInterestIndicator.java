@@ -29,7 +29,7 @@ public class OpenInterestIndicator extends PlotScript {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        if (market.service.exchange != Exchange.BinanceF && market.service.exchange != Exchange.Bitfinex && market.service.exchange != Exchange.Bybit) {
+        if (market.service.exchange != Exchange.BinanceF && market.service.exchange != Exchange.Bitfinex) {
             return;
         }
 

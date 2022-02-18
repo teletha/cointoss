@@ -9,7 +9,12 @@
  */
 package trademate;
 
+import java.util.LinkedList;
+
 import cointoss.Market;
+import cointoss.MarketService;
+import cointoss.market.bitfinex.Bitfinex;
+import cointoss.market.ftx.FTX;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -18,6 +23,7 @@ import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
 import viewtify.Viewtify;
+import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
@@ -49,12 +55,9 @@ public class TradeTester extends View {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
         // DockSystem.register("Order").contents(OrderView.class).closable(false);
-        DockSystem.register("Summury").contents(SummuryView.class).closable(false);
+        // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
-        // ========================================================
-        // Create Tab for each Markets
-        // ========================================================
         // MarketService service = Binance.FUTURE_BTCUSD_210625;
         // UITab tab = DockSystem.register(service.id())
         // .closable(false)
@@ -63,21 +66,18 @@ public class TradeTester extends View {
         //
         // tab.load();
 
-        // MarketService service2 = FTX.EOS_PERP;
-        // tab = DockSystem.register(service2.id())
-        // .closable(false)
-        // .text(service2.marketReadableName)
-        // .contents(ui -> new TradingView(ui, service2));
-        //
-        // tab.load();
-        //
-        // MarketService service3 = Bitfinex.ETH_USD;
-        // tab = DockSystem.register(service3.id())
-        // .closable(false)
-        // .text(service3.marketReadableName)
-        // .contents(ui -> new TradingView(ui, service3));
-        //
-        // tab.load();
+        MarketService service2 = FTX.EOS_PERP;
+        UITab tab = DockSystem.register(service2.id)
+                .closable(false)
+                .text(service2.marketName)
+                .contents(ui -> new TradingView(ui, service2));
+
+        tab.load();
+
+        MarketService service3 = Bitfinex.ETH_USD;
+        tab = DockSystem.register(service3.id).closable(false).text(service3.marketName).contents(ui -> new TradingView(ui, service3));
+
+        tab.load();
         //
         // MarketService service4 = GMO.XRP;
         // tab = DockSystem.register(service4.id())
@@ -94,6 +94,27 @@ public class TradeTester extends View {
         // .contents(ui -> new TradingView(ui, service5));
         //
         // tab.load();
+    }
+
+    /**
+     * Load in parallel for each exchange.
+     */
+    private static class LoadingQueue {
+
+        private final LinkedList<UITab> tabs = new LinkedList();
+
+        private UITab loading;
+
+        /**
+         * {@link TradeMate} will automatically initialize in the background if any tab has not been
+         * activated yet.
+         */
+        private final synchronized void tryLoading() {
+            if (loading == null && !tabs.isEmpty()) {
+                loading = tabs.remove(0);
+                Viewtify.inUI(loading::load);
+            }
+        }
     }
 
     /**

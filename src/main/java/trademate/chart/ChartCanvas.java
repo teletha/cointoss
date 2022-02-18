@@ -331,20 +331,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .buffer(2, 1)
                 .takeUntil(when(User.MouseRelease).take(e -> e.getButton() == MouseButton.PRIMARY))
                 .repeat()
-                .to(e -> {
-                    double prev = e.get(0).getX();
-                    double now = e.get(1).getX();
-
-                    if (prev != now) {
-                        double visibleDuration = axisX.computeVisibleMaxValue() - axisX.computeVisibleMinValue();
-                        double logicalDuration = axisX.logicalMaxValue.get() - axisX.logicalMinValue.get();
-                        double movedDuration = visibleDuration / candles.widthProperty().get() * (now - prev);
-                        double ratio = movedDuration / (logicalDuration * (1 - axisX.scroll.getVisibleAmount()));
-                        if (ratio != 0 && Double.isFinite(ratio)) {
-                            axisX.scroll.setValue(Primitives.between(0, axisX.scroll.getValue() - ratio, 1));
-                        }
-                    }
-                });
+                .to(this::scrollByDrag);
 
         configIndicator();
         visualizeOrderPrice();
@@ -356,6 +343,21 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         getChildren()
                 .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+    }
+
+    private void scrollByDrag(List<MouseEvent> e) {
+        double prev = e.get(0).getX();
+        double now = e.get(1).getX();
+
+        if (prev != now) {
+            double visibleDuration = axisX.computeVisibleMaxValue() - axisX.computeVisibleMinValue();
+            double logicalDuration = axisX.logicalMaxValue.get() - axisX.logicalMinValue.get();
+            double movedDuration = visibleDuration / candles.widthProperty().get() * (now - prev);
+            double ratio = movedDuration / (logicalDuration * (1 - axisX.scroll.getVisibleAmount()));
+            if (ratio != 0 && Double.isFinite(ratio)) {
+                axisX.scroll.setValue(Primitives.between(0, axisX.scroll.getValue() - ratio, 1));
+            }
+        }
     }
 
     private Signal userInterfaceModification() {

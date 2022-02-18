@@ -9,6 +9,7 @@
  */
 package trademate;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -144,6 +145,10 @@ public class TradeMate extends View {
         private static Signal<String> random() {
             return Chrono.minutes().map(v -> words.get(random.nextInt(words.size())));
         }
+    }
+
+    @Managed(Singleton.class)
+    private static class SelectedMarket extends ArrayList<MarketService> {
     }
 
     /**
