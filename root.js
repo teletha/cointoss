@@ -1873,7 +1873,7 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "SummuryView",
+			"name": "SummaryView",
 			"packageName": "trademate",
 			"type": "Class"
 		},
@@ -2042,6 +2042,13 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "TradingView",
+			"packageName": "trademate",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "TradingViewCoordinator",
 			"packageName": "trademate",
 			"type": "Class"
 		},
