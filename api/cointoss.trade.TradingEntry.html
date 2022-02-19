@@ -8,10 +8,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="M">
-		<header class="Z">
-			<h1 class="h" date="2022-02-19" ver="1.1.0"><code>Cointoss</code></h1>
-			<nav class="I"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="Z">
+		<header class="W">
+			<h1 class="I" date="2022-02-19" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="J"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -20,7 +20,7 @@
 					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="l" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="V" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -28,14 +28,14 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="J">
+		<main class="i">
 			<nav class="g">
 				<div></div>
 			</nav>
-			<article class="V" id="Article">
-				<section class="a"><code class="W">cointoss.trade</code>
-					<h2 class="Functional T"><code class="b">TradingEntry</code></h2>
-					<div class="Y">
+			<article class="b" id="Article">
+				<section class="L"><code class="j">cointoss.trade</code>
+					<h2 class="Functional e"><code class="N">TradingEntry</code></h2>
+					<div class="Q">
 						<ul class="C G">
 							<li><code><a href="api/cointoss.trade.bot.Arbitrager.html">Arbitrager</a></code></li>
 							<li><code><a href="api/cointoss.trade.bot.CrossOrder.html">CrossOrder</a></code></li>
@@ -46,46 +46,46 @@
 						</ul>
 					</div>
 				</section>
-				<section class="a" id="entry(cointoss.Directional,long)">
-					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="b">entry</code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>)</code><i class="f"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="H">
-						<tr class="S">
+				<section class="L" id="entry(cointoss.Directional,long)">
+					<h2 class="X"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="N">entry</code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>)</code><i class="H"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="a">
+						<tr class="O">
 							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 								</span></td>
 						</tr>
-						<tr class="S">
+						<tr class="O">
+							<td><code>long</code> <code>size</code></td>
+							<td><span><p>This entry&#39;s size.</p>
+								</span></td>
+						</tr>
+						<tr class="f">
+							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
+							<td><span><p>Chainable API.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.OrderStrategy.Takable.html">Takable</a></code> 
+ <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
+					</span></section>
+				<section class="L" id="entry(cointoss.Directional,long,java.util.function.Consumer)">
+					<h2 class="X"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="N">entry</code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="H"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="a">
+						<tr class="O">
+							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
+							<td><span><p>This entry&#39;s direction.</p>
+								</span></td>
+						</tr>
+						<tr class="O">
 							<td><code>long</code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 								</span></td>
 						</tr>
 						<tr class="O">
-							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
-							<td><span><p>Chainable API.</p>
-								</span></td>
-						</tr>
-					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.OrderStrategy.Takable.html">Takable</a></code> 
- <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
-					</span></section>
-				<section class="a" id="entry(cointoss.Directional,long,java.util.function.Consumer)">
-					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="b">entry</code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="f"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="H">
-						<tr class="S">
-							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
-							<td><span><p>This entry&#39;s direction.</p>
-								</span></td>
-						</tr>
-						<tr class="S">
-							<td><code>long</code> <code>size</code></td>
-							<td><span><p>This entry&#39;s size.</p>
-								</span></td>
-						</tr>
-						<tr class="S">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code>declaration</code></td>
 							<td><span><p>This entry&#39;s order strategy.</p>
 								</span></td>
 						</tr>
-						<tr class="O">
+						<tr class="f">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 								</span></td>
@@ -93,46 +93,46 @@
 					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.OrderStrategy.Takable.html">Takable</a></code> 
  <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 					</span></section>
-				<section class="a" id="entry(cointoss.Directional,double)">
-					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="b">entry</code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>)</code><i class="f"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="H">
-						<tr class="S">
+				<section class="L" id="entry(cointoss.Directional,double)">
+					<h2 class="X"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="N">entry</code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>)</code><i class="H"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="a">
+						<tr class="O">
 							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 								</span></td>
 						</tr>
-						<tr class="S">
+						<tr class="O">
+							<td><code>double</code> <code>size</code></td>
+							<td><span><p>This entry&#39;s size.</p>
+								</span></td>
+						</tr>
+						<tr class="f">
+							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
+							<td><span><p>Chainable API.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.OrderStrategy.Takable.html">Takable</a></code> 
+ <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
+					</span></section>
+				<section class="L" id="entry(cointoss.Directional,double,java.util.function.Consumer)">
+					<h2 class="X"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="N">entry</code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="H"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="a">
+						<tr class="O">
+							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
+							<td><span><p>This entry&#39;s direction.</p>
+								</span></td>
+						</tr>
+						<tr class="O">
 							<td><code>double</code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 								</span></td>
 						</tr>
 						<tr class="O">
-							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
-							<td><span><p>Chainable API.</p>
-								</span></td>
-						</tr>
-					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.OrderStrategy.Takable.html">Takable</a></code> 
- <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
-					</span></section>
-				<section class="a" id="entry(cointoss.Directional,double,java.util.function.Consumer)">
-					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="b">entry</code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="f"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="H">
-						<tr class="S">
-							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
-							<td><span><p>This entry&#39;s direction.</p>
-								</span></td>
-						</tr>
-						<tr class="S">
-							<td><code>double</code> <code>size</code></td>
-							<td><span><p>This entry&#39;s size.</p>
-								</span></td>
-						</tr>
-						<tr class="S">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code>declaration</code></td>
 							<td><span><p>This entry&#39;s order strategy.</p>
 								</span></td>
 						</tr>
-						<tr class="O">
+						<tr class="f">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 								</span></td>
@@ -140,46 +140,46 @@
 					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.OrderStrategy.Takable.html">Takable</a></code> 
  <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 					</span></section>
-				<section class="a" id="entry(cointoss.Directional,cointoss.util.arithmetic.Num)">
-					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="b">entry</code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>)</code><i class="f"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="H">
-						<tr class="S">
+				<section class="L" id="entry(cointoss.Directional,cointoss.util.arithmetic.Num)">
+					<h2 class="X"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="N">entry</code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>)</code><i class="H"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="a">
+						<tr class="O">
 							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 								</span></td>
 						</tr>
-						<tr class="S">
+						<tr class="O">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>size</code></td>
+							<td><span><p>This entry&#39;s size.</p>
+								</span></td>
+						</tr>
+						<tr class="f">
+							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
+							<td><span><p>Chainable API.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.OrderStrategy.Takable.html">Takable</a></code> 
+ <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
+					</span></section>
+				<section class="L" id="entry(cointoss.Directional,cointoss.util.arithmetic.Num,java.util.function.Consumer)">
+					<h2 class="X"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="N">entry</code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="H"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="a">
+						<tr class="O">
+							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
+							<td><span><p>This entry&#39;s direction.</p>
+								</span></td>
+						</tr>
+						<tr class="O">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 								</span></td>
 						</tr>
 						<tr class="O">
-							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
-							<td><span><p>Chainable API.</p>
-								</span></td>
-						</tr>
-					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.OrderStrategy.Takable.html">Takable</a></code> 
- <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
-					</span></section>
-				<section class="a" id="entry(cointoss.Directional,cointoss.util.arithmetic.Num,java.util.function.Consumer)">
-					<h2 class="c"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="b">entry</code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="f"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="H">
-						<tr class="S">
-							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>directional</code></td>
-							<td><span><p>This entry&#39;s direction.</p>
-								</span></td>
-						</tr>
-						<tr class="S">
-							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>size</code></td>
-							<td><span><p>This entry&#39;s size.</p>
-								</span></td>
-						</tr>
-						<tr class="S">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code>declaration</code></td>
 							<td><span><p>This entry&#39;s order strategy.</p>
 								</span></td>
 						</tr>
-						<tr class="O">
+						<tr class="f">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 								</span></td>
@@ -188,16 +188,16 @@
  <code><a href="api/cointoss.order.OrderStrategy.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 					</span></section>
 			</article>
-			<aside class="P" id="SubNavi">
-				<div class="i">
-					<h5 class="N">Methods</h5>
+			<aside class="T" id="SubNavi">
+				<div class="M">
+					<h5 class="d">Methods</h5>
 					<ul>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,long)">entry</a></code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,long,java.util.function.Consumer)">entry</a></code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,double)">entry</a></code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,double,java.util.function.Consumer)">entry</a></code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,cointoss.util.arithmetic.Num)">entry</a></code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,cointoss.util.arithmetic.Num,java.util.function.Consumer)">entry</a></code><code class="d">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,long)">entry</a></code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>)</code><i class="c"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,long,java.util.function.Consumer)">entry</a></code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="c"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,double)">entry</a></code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>)</code><i class="c"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,double,java.util.function.Consumer)">entry</a></code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="c"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,cointoss.util.arithmetic.Num)">entry</a></code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>)</code><i class="c"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(cointoss.Directional,cointoss.util.arithmetic.Num,java.util.function.Consumer)">entry</a></code><code class="S">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">directional</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.OrderStrategy.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="c"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
 					</ul>
 				</div>
 			</aside>
