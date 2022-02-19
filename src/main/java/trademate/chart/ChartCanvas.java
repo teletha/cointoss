@@ -283,22 +283,21 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
-                .layoutBy(chart.ticker.observe()
-                        .switchMap(ticker -> ticker.open.startWithNull().throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutCandleLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.market.observe()
-                        .switchMap(market -> market.timeline.startWithNull().throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
+                        .switchMap(market -> market.timeline.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutOrderbook.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe()
-                        .flatMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
+                        .switchMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
 
         layoutPriceRangedVolume.layoutBy(chartAxisModification())
@@ -498,15 +497,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         }
                     }
                 });
-    }
-
-    /**
-     * Visualize the market name.
-     */
-    private void visualizeMarketName() {
-        chart.market.observe().to(m -> {
-            marketName.clear().fillText(m.service.id, chartInfoLeftPadding, marketName.fontSize());
-        });
     }
 
     /**
@@ -720,11 +710,19 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
+     * Visualize the market name.
+     */
+    private void visualizeMarketName() {
+        chart.market.observe().to(m -> {
+            marketName.clear().fillText(m.service.id, chartInfoLeftPadding, marketName.fontSize());
+        });
+    }
+
+    /**
      * Visualize realtime market-related info.
      */
     private void visualizeMarketInfo() {
-        chart.market.observing()
-                .skipNull()
+        chart.market.observe()
                 .switchMap(m -> m.tickers.latest.observe())
                 .switchOn(chart.showRealtimeUpdate.observing())
                 .throttle(1000, TimeUnit.MILLISECONDS)
