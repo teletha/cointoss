@@ -12,11 +12,9 @@ package trademate.chart;
 import java.text.Normalizer.Form;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import org.controlsfx.glyphfont.FontAwesome;
 
@@ -25,6 +23,8 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -90,9 +90,6 @@ public class ChartView extends View {
     public final Variable<Boolean> showRealtimeUpdate = Variable.of(false);
 
     /** The chart configuration. */
-    public final Variable<Boolean> showChart = Variable.of(true);
-
-    /** The chart configuration. */
     public final Variable<Boolean> showIndicator = Variable.of(true);
 
     /** The additional scripts. */
@@ -147,7 +144,7 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.initialize(Span.values()).sort(Comparator.reverseOrder());
+        span.initialize(Span.Hour1, List.of(Span.values())).sort(Comparator.reverseOrder());
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())

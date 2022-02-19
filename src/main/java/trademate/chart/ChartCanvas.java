@@ -11,7 +11,7 @@ package trademate.chart;
 
 import static cointoss.Direction.*;
 import static java.lang.Boolean.*;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -20,22 +20,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -60,6 +44,21 @@ import cointoss.util.arithmetic.Primitives;
 import cointoss.util.array.DoubleList;
 import cointoss.volume.PriceRangedVolumePeriod;
 import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -182,10 +181,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LayoutAssistant layoutPriceRangedVolumeLatest = new LayoutAssistant(this);
 
     /** Chart UI */
-    private final EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout).bindSizeTo(this);
+    private EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout).bindSizeTo(this);
 
     /** Chart UI */
-    private final EnhancedCanvas candleLatest = new EnhancedCanvas().visibleWhen(layoutCandleLatest.canLayout).bindSizeTo(this);
+    private EnhancedCanvas candleLatest = new EnhancedCanvas().visibleWhen(layoutCandleLatest.canLayout).bindSizeTo(this);
 
     /** Chart UI */
     private final EnhancedCanvas orderbook = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
@@ -214,7 +213,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas chartInfo = new EnhancedCanvas().bindSizeTo(this);
+    private EnhancedCanvas chartInfo = new EnhancedCanvas().bindSizeTo(this);
 
     /** Chart UI */
     private final EnhancedCanvas marketName = new EnhancedCanvas().size(180, 30).font(18, FontWeight.BOLD).fillColor(BaseColor);
@@ -223,7 +222,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final EnhancedCanvas marketInfo = new EnhancedCanvas().bindSizeTo(this).font(11, FontWeight.BOLD).fillColor(BaseColor);
 
     /** Chart UI */
-    private final EnhancedCanvas supporter = new EnhancedCanvas().bindSizeTo(this);
+    private EnhancedCanvas supporter = new EnhancedCanvas().bindSizeTo(this);
 
     /** The script registry. */
     private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
@@ -299,7 +298,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.open.startWithNull().throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
-                .layoutWhile(chart.showChart.observing());
+                .layoutWhile(chart.showRealtimeUpdate.observing());
         layoutCandleLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
@@ -377,6 +376,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     @Override
     public Object ui() {
         return this;
+    }
+
+    public void dispose() {
+        candles = null;
+        candleLatest = null;
+        chartInfo = null;
+        supporter = null;
     }
 
     /**

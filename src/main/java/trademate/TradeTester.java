@@ -13,8 +13,7 @@ import java.util.LinkedList;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.bitfinex.Bitfinex;
-import cointoss.market.ftx.FTX;
+import cointoss.market.MarketServiceProvider;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
@@ -58,26 +57,12 @@ public class TradeTester extends View {
         // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
-        // MarketService service = Binance.FUTURE_BTCUSD_210625;
-        // UITab tab = DockSystem.register(service.id())
-        // .closable(false)
-        // .text(service.marketReadableName)
-        // .contents(ui -> new TradingView(ui, service));
-        //
-        // tab.load();
+        MarketServiceProvider.availableMarketServices().take(MarketService::supportHistoricalTrade).take(22).to(service -> {
+            UITab tab = DockSystem.register(service.id).closable(false).text(service.id).contents(ui -> new TradingView(ui, service));
 
-        MarketService service2 = FTX.EOS_PERP;
-        UITab tab = DockSystem.register(service2.id)
-                .closable(false)
-                .text(service2.marketName)
-                .contents(ui -> new TradingView(ui, service2));
+            TradingViewCoordinator.requestLoading(service, tab);
+        });
 
-        tab.load();
-
-        MarketService service3 = Bitfinex.ETH_USD;
-        tab = DockSystem.register(service3.id).closable(false).text(service3.marketName).contents(ui -> new TradingView(ui, service3));
-
-        tab.load();
         //
         // MarketService service4 = GMO.XRP;
         // tab = DockSystem.register(service4.id())

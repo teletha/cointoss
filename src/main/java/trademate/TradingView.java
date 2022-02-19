@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -25,7 +25,6 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.util.arithmetic.Primitives;
 import kiss.Disposable;
-import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 import stylist.Style;
@@ -99,11 +98,7 @@ public class TradingView extends View {
     protected void initialize() {
         tab.style("multiline");
 
-        Viewtify.observing(tab.selectedProperty()).to(v -> {
-            chart.showRealtimeUpdate.set(v);
-            chart.showChart.set(v);
-        });
-
+        Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
         Viewtify.inWorker(() -> {
             isLoading.set(true);
             boolean update = chart.showRealtimeUpdate.exact();
@@ -115,7 +110,7 @@ public class TradingView extends View {
 
             updateTab();
 
-            I.make(TradeMate.class).finishLoading(service, tab);
+            TradingViewCoordinator.finishLoading(service, tab);
         });
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));

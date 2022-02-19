@@ -9,15 +9,11 @@
  */
 package trademate;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -71,7 +67,7 @@ public class TradeMate extends View {
         MarketServiceProvider.availableMarketServices().take(MarketService::supportHistoricalTrade).to(service -> {
             UITab tab = DockSystem.register(service.id).closable(false).text(service.id).contents(ui -> new TradingView(ui, service));
 
-            requestLoading(service, tab);
+            TradingViewCoordinator.requestLoading(service, tab);
         });
 
         // ========================================================
@@ -80,57 +76,6 @@ public class TradeMate extends View {
         Chrono.seconds().map(Chrono.DateDayTime::format).combineLatest(Wisdom.random()).on(Viewtify.UIThread).to(v -> {
             stage().v.setTitle(v.ⅰ + "  " + v.ⅱ);
         });
-    }
-
-    /** Load in parallel for each {@link Exchange}. */
-    private final ConcurrentHashMap<Exchange, LoadingQueue> loadings = new ConcurrentHashMap();
-
-    /**
-     * Register the specified market in the loading queue.
-     * 
-     * @param service
-     * @param tab
-     */
-    private final void requestLoading(MarketService service, UITab tab) {
-        LoadingQueue queue = loadings.computeIfAbsent(service.exchange, key -> new LoadingQueue());
-        queue.tabs.add(tab);
-        queue.tryLoading();
-    }
-
-    /**
-     * Unregister the specified market from the loading queue.
-     * 
-     * @param service
-     */
-    public final void finishLoading(MarketService service, UITab tab) {
-        LoadingQueue queue = loadings.get(service.exchange);
-        queue.tabs.remove(tab);
-
-        if (queue.loading == tab) {
-            queue.loading = null;
-            queue.tryLoading();
-        }
-    }
-
-    /**
-     * Load in parallel for each exchange.
-     */
-    private static class LoadingQueue {
-
-        private final LinkedList<UITab> tabs = new LinkedList();
-
-        private UITab loading;
-
-        /**
-         * {@link TradeMate} will automatically initialize in the background if any tab has not been
-         * activated yet.
-         */
-        private final synchronized void tryLoading() {
-            if (loading == null && !tabs.isEmpty()) {
-                loading = tabs.remove(0);
-                Viewtify.inUI(loading::load);
-            }
-        }
     }
 
     /**
@@ -145,10 +90,6 @@ public class TradeMate extends View {
         private static Signal<String> random() {
             return Chrono.minutes().map(v -> words.get(random.nextInt(words.size())));
         }
-    }
-
-    @Managed(Singleton.class)
-    private static class SelectedMarket extends ArrayList<MarketService> {
     }
 
     /**
