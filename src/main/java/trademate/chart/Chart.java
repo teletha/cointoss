@@ -9,23 +9,24 @@
  */
 package trademate.chart;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleFunction;
 
-import cointoss.ticker.Span;
-import cointoss.ticker.Tick;
-import cointoss.ticker.Ticker;
-import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
+
+import cointoss.ticker.Span;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import cointoss.util.arithmetic.Num;
 import kiss.Signal;
 import kiss.Variable;
 import trademate.setting.StaticConfig;
@@ -57,7 +58,7 @@ public class Chart extends Region {
     private final ChartView chart;
 
     /** The actual graph drawer. */
-    private ChartCanvas canvas;
+    private final ChartCanvas canvas;
 
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this);
@@ -67,6 +68,7 @@ public class Chart extends Region {
      */
     public Chart(ChartView chart) {
         this.chart = chart;
+        this.canvas = new ChartCanvas(chart, axisX, axisY);
 
         layoutChart.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
@@ -96,29 +98,14 @@ public class Chart extends Region {
 
         observeStartAndFinish(axisX.scroll.valueProperty()).merge(observeStartAndFinish(axisX.scroll.visibleAmountProperty())).to(e -> {
             chart.showIndicator.set(e);
-            if (canvas != null) canvas.layoutCandle.layoutForcely();
+            canvas.layoutCandle.layoutForcely();
         });
         observeStartAndFinish(axisY.scroll.valueProperty()).merge(observeStartAndFinish(axisY.scroll.visibleAmountProperty())).to(e -> {
             chart.showIndicator.set(e);
-            if (canvas != null) canvas.layoutCandle.layoutForcely();
+            canvas.layoutCandle.layoutForcely();
         });
 
-        getChildren().addAll(axisX, axisY);
-
-        chart.showRealtimeUpdate.observing().on(Viewtify.UIThread).to(show -> {
-            if (show) {
-                System.out.println("Create canvas " + chart.market);
-                canvas = new ChartCanvas(chart, axisX, axisY);
-                getChildren().add(canvas);
-            } else {
-                if (canvas != null) {
-                    System.out.println("Dispose canvas " + chart.market);
-                    canvas.dispose();
-                    getChildren().remove(canvas);
-                    canvas = null;
-                }
-            }
-        });
+        getChildren().addAll(canvas, axisX, axisY);
     }
 
     private Signal<Boolean> observeStartAndFinish(DoubleProperty property) {
@@ -135,7 +122,7 @@ public class Chart extends Region {
      */
     public final void layoutForcely() {
         layoutChart.layoutForcely();
-        if (canvas != null) canvas.layoutCandle.layoutForcely();
+        canvas.layoutCandle.layoutForcely();
     }
 
     /**
@@ -164,10 +151,8 @@ public class Chart extends Region {
             axisY.layout();
 
             // layout chart
-            if (canvas != null) {
-                canvas.resizeRelocate(x, y, mainWidth, mainHeight);
-                canvas.layoutChildren();
-            }
+            canvas.resizeRelocate(x, y, mainWidth, mainHeight);
+            canvas.layoutChildren();
         });
     }
 
