@@ -280,44 +280,34 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
 
-        chart.market.observe().to(m -> {
-            marketName.clear().fillText(m.service.id, chartInfoLeftPadding, marketName.fontSize());
-        });
-
-        chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
-            plotters = plottersCache.getUnchecked(v);
-            scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
-        });
-
-        chart.showRealtimeUpdate.observe().take(true).on(Viewtify.UIThread).to(() -> {
-            layoutCandle.requestLayout();
-            layoutCandleLatest.requestLayout();
-        });
-
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.open.startWithNull().throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
+
         layoutCandleLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.startWithNull().throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
+
         layoutOrderbook.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe()
                         .flatMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
+
         layoutPriceRangedVolume.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
+                .layoutBy(chart.ticker.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
                         .observe(), chart.orderbookPriceRange.observe())
                 .layoutBy(chart.ticker.observe().switchMap(t -> t.open))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
+
         layoutPriceRangedVolumeLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
@@ -325,39 +315,19 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(2, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
-        // scroll on chart
-        when(User.Scroll).to(axisX::fireEvent);
-        when(User.MouseDrag).take(MouseEvent::isPrimaryButtonDown)
-                .buffer(2, 1)
-                .takeUntil(when(User.MouseRelease).take(e -> e.getButton() == MouseButton.PRIMARY))
-                .repeat()
-                .to(this::scrollByDrag);
-
         configIndicator();
+        configScript();
+        scrollChartByDrag();
         visualizeOrderPrice();
         visualizeLatestPrice();
         visualizeMouseTrack();
         visualizeSFDPrice();
         visualizePriceSupporter();
+        visualizeMarketName();
         visualizeMarketInfo();
 
         getChildren()
                 .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
-    }
-
-    private void scrollByDrag(List<MouseEvent> e) {
-        double prev = e.get(0).getX();
-        double now = e.get(1).getX();
-
-        if (prev != now) {
-            double visibleDuration = axisX.computeVisibleMaxValue() - axisX.computeVisibleMinValue();
-            double logicalDuration = axisX.logicalMaxValue.get() - axisX.logicalMinValue.get();
-            double movedDuration = visibleDuration / candles.widthProperty().get() * (now - prev);
-            double ratio = movedDuration / (logicalDuration * (1 - axisX.scroll.getVisibleAmount()));
-            if (ratio != 0 && Double.isFinite(ratio)) {
-                axisX.scroll.setValue(Primitives.between(0, axisX.scroll.getValue() - ratio, 1));
-            }
-        }
     }
 
     private Signal userInterfaceModification() {
@@ -492,6 +462,50 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     drawChartInfo(tick);
                 }
             });
+        });
+    }
+
+    /**
+     * Config script setting.
+     */
+    private void configScript() {
+        chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
+            plotters = plottersCache.getUnchecked(v);
+            scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
+        });
+    }
+
+    /**
+     * Make chart scrollable by mouse drag.
+     */
+    private void scrollChartByDrag() {
+        when(User.Scroll).to(axisX::fireEvent);
+        when(User.MouseDrag).take(MouseEvent::isPrimaryButtonDown)
+                .buffer(2, 1)
+                .takeUntil(when(User.MouseRelease).take(e -> e.getButton() == MouseButton.PRIMARY))
+                .repeat()
+                .to(e -> {
+                    double prev = e.get(0).getX();
+                    double now = e.get(1).getX();
+
+                    if (prev != now) {
+                        double visibleDuration = axisX.computeVisibleMaxValue() - axisX.computeVisibleMinValue();
+                        double logicalDuration = axisX.logicalMaxValue.get() - axisX.logicalMinValue.get();
+                        double movedDuration = visibleDuration / candles.widthProperty().get() * (now - prev);
+                        double ratio = movedDuration / (logicalDuration * (1 - axisX.scroll.getVisibleAmount()));
+                        if (ratio != 0 && Double.isFinite(ratio)) {
+                            axisX.scroll.setValue(Primitives.between(0, axisX.scroll.getValue() - ratio, 1));
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Visualize the market name.
+     */
+    private void visualizeMarketName() {
+        chart.market.observe().to(m -> {
+            marketName.clear().fillText(m.service.id, chartInfoLeftPadding, marketName.fontSize());
         });
     }
 

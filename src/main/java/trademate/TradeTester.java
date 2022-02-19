@@ -9,8 +9,6 @@
  */
 package trademate;
 
-import java.util.LinkedList;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
@@ -79,27 +77,6 @@ public class TradeTester extends View {
         // .contents(ui -> new TradingView(ui, service5));
         //
         // tab.load();
-    }
-
-    /**
-     * Load in parallel for each exchange.
-     */
-    private static class LoadingQueue {
-
-        private final LinkedList<UITab> tabs = new LinkedList();
-
-        private UITab loading;
-
-        /**
-         * {@link TradeMate} will automatically initialize in the background if any tab has not been
-         * activated yet.
-         */
-        private final synchronized void tryLoading() {
-            if (loading == null && !tabs.isEmpty()) {
-                loading = tabs.remove(0);
-                Viewtify.inUI(loading::load);
-            }
-        }
     }
 
     /**

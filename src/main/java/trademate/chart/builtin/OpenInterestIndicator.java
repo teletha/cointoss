@@ -62,12 +62,12 @@ public class OpenInterestIndicator extends PlotScript {
                 double entry = volume + deltaOI / 2d;
                 double exit = volume - deltaOI / 2d;
 
-                return new double[] {entry, exit, (entry / exit - 1d) * 1000d};
+                return new double[] {entry, exit};
             });
 
             in(PlotArea.HighNarrow, () -> {
                 line(0, style.ratioBase);
-                line(entryAndExit.dmap(x -> x[2]).scale(2).name("EER"), style.ratio);
+                line(entryAndExit.dmap(x -> (x[0] / x[1] - 1d) * 1000d).scale(2).name("EER"), style.ratio);
             });
 
             in(PlotArea.LowNarrow, () -> {
