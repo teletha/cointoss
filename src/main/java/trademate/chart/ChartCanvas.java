@@ -280,45 +280,39 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
 
-        Signal<Market> markets = chart.market.observe();
-        Signal<Ticker> tickers = chart.ticker.observe();
-        Signal<CandleType> candleType = chart.candleType.observe();
-        Signal<PriceRangedVolumeType> pricedVolumeType = chart.pricedVolumeType.observe();
-        Signal<Num> orderbookPriceRange = chart.orderbookPriceRange.observe();
-        Signal<Boolean> showRealtimeUpdate = chart.showRealtimeUpdate.observing();
-        Signal<Boolean> showPricedVolume = chart.showPricedVolume.observing();
-        Signal<Boolean> showCandle = chart.showCandle.observe();
-        Signal<Boolean> showOrderbook = chart.showOrderbook.observing();
-
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
-                .layoutBy(candleType, tickers, showCandle)
-                .layoutBy(tickers.switchMap(ticker -> ticker.open.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
-                .layoutWhile(showRealtimeUpdate);
+                .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
+                .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutCandleLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
-                .layoutBy(candleType, tickers, showCandle)
-                .layoutBy(markets.switchMap(market -> market.timeline.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
-                .layoutWhile(showRealtimeUpdate);
+                .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
+                .layoutBy(chart.market.observe()
+                        .switchMap(market -> market.timeline.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
+                .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutOrderbook.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
-                .layoutBy(tickers, showOrderbook)
-                .layoutBy(markets.switchMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
-                .layoutWhile(showRealtimeUpdate, showOrderbook);
+                .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
+                .layoutBy(chart.market.observe()
+                        .switchMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
+                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
 
         layoutPriceRangedVolume.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
-                .layoutBy(tickers, showPricedVolume, pricedVolumeType, orderbookPriceRange)
-                .layoutBy(tickers.switchMap(t -> t.open))
-                .layoutWhile(showRealtimeUpdate, showPricedVolume);
+                .layoutBy(chart.ticker.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
+                        .observe(), chart.orderbookPriceRange.observe())
+                .layoutBy(chart.ticker.observe().switchMap(t -> t.open))
+                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
         layoutPriceRangedVolumeLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
-                .layoutBy(tickers, markets, showPricedVolume, pricedVolumeType, orderbookPriceRange)
-                .layoutBy(markets.switchMap(m -> m.timeline.throttle(2, TimeUnit.SECONDS)))
-                .layoutWhile(showRealtimeUpdate, showPricedVolume);
+                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
+                        .observe(), chart.orderbookPriceRange.observe())
+                .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(2, TimeUnit.SECONDS)))
+                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
         configIndicator();
         configScript();
@@ -792,7 +786,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void drawCandle() {
         layoutCandle.layout(() -> {
             chart.ticker.to(ticker -> {
-                System.out.println("Draw candle 3 " + chart.market.v);
                 // estimate visible range
                 chart.ticker.map(v -> v.ticks.last()).map(t -> t.openTime - ticker.span.seconds).to(end -> {
                     long start = (long) axisX.computeVisibleMinValue();
@@ -823,8 +816,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     double height = candles.getHeight();
                     DoubleList valueX = new DoubleList((int) tickSize);
                     Indicator<double[]> candle = candleType.candles.apply(ticker);
-                    System.out.println("Draw candle " + chart.market.v + "        " + Chrono.systemBySeconds(start) + "   " + Chrono
-                            .systemBySeconds(end) + "   " + tickSize + "   " + width + "  ");
 
                     ticker.ticks.query(start, end).to(tick -> {
                         double[] values = candle.valueAt(tick);

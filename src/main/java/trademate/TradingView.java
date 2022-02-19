@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -101,15 +101,15 @@ public class TradingView extends View {
         Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
         Viewtify.inWorker(() -> {
             isLoading.set(true);
+            boolean update = chart.showRealtimeUpdate.exact();
             chart.showRealtimeUpdate.set(false);
             chart.market.set(market);
             market.readLog(log -> log.fromLast(5, LogType.Fast));
-            chart.showRealtimeUpdate.set(tab.isSelected());
+            chart.showRealtimeUpdate.set(update);
             isLoading.set(false);
 
             updateTab();
 
-            System.out.println("Read log " + service.id);
             TradingViewCoordinator.finishLoading(service, tab);
         });
 
