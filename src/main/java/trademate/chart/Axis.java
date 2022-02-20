@@ -141,9 +141,9 @@ public class Axis extends Region {
         double range = computeVisibleMaxValue() - computeVisibleMinValue();
 
         if (visibleMaxRange.get() <= range) {
-            zoom(currentAmount * (visibleMaxRange.get() / range));
+            zoom(currentAmount * (visibleMaxRange.get() / range), scroll.getValue());
         } else if (range <= visibleMinRange.get()) {
-            zoom(currentAmount * (visibleMinRange.get() / range));
+            zoom(currentAmount * (visibleMinRange.get() / range), scroll.getValue());
         }
     }
 
@@ -153,7 +153,19 @@ public class Axis extends Region {
      * @param e
      */
     public void zoom(ScrollEvent e) {
-        zoom(scroll.getVisibleAmount() + e.getDeltaY() / e.getMultiplierY() / ZoomDivision);
+        double value = getValueForPosition(e.getX());
+
+        double lmax = logicalMaxValue.doubleValue();
+        double lmin = logicalMinValue.doubleValue();
+        double lratio = (value - lmin) / (lmax - lmin);
+
+        double vmax = computeVisibleMaxValue();
+        double vmin = computeVisibleMinValue();
+        double vratio = (value - vmin) / (vmax - vmin);
+
+        double ratio = (lratio + vratio) / 2;
+
+        zoom(scroll.getVisibleAmount() + e.getDeltaY() / e.getMultiplierY() / ZoomDivision, ratio);
     }
 
     /**
@@ -161,10 +173,14 @@ public class Axis extends Region {
      * 
      * @param newAmount
      */
-    public void zoom(double newAmount) {
+    private void zoom(double newAmount, double newValue) {
         newAmount = Primitives.between(0, newAmount, 1);
 
         double currentAmount = scroll.getVisibleAmount();
+        if (currentAmount == newAmount) {
+            return;
+        }
+
         double range = computeVisibleMaxValue() - computeVisibleMinValue();
 
         if (currentAmount < newAmount) {
@@ -178,6 +194,8 @@ public class Axis extends Region {
                 return;
             }
         }
+
+        scroll.setValue(newValue);
         scroll.setVisibleAmount(newAmount);
     }
 

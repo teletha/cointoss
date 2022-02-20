@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -29,7 +28,6 @@ import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
@@ -515,7 +513,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Make chart scrollable by mouse drag.
      */
     private void makeChartScrollable() {
-        when(User.Scroll).to((Consumer<ScrollEvent>) axisX::zoom);
+        when(User.Scroll).to(e -> {
+            axisX.zoom(e);
+        });
         when(User.MouseDrag).take(MouseEvent::isPrimaryButtonDown)
                 .buffer(2, 1)
                 .takeUntil(when(User.MouseRelease).take(e -> e.getButton() == MouseButton.PRIMARY))
