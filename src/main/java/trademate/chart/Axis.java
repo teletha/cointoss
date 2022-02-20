@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
-import cointoss.util.arithmetic.Primitives;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -30,6 +29,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
+
+import cointoss.util.arithmetic.Primitives;
 import kiss.Disposable;
 import kiss.Variable;
 import stylist.Style;
@@ -39,8 +40,8 @@ import viewtify.ui.helper.StyleHelper;
 
 public class Axis extends Region {
 
-    /** The default zoom size. */
-    private static final int ZoomSize = 200;
+    /** The zoom division. */
+    private static final int ZoomDivision = 100;
 
     /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
@@ -127,14 +128,9 @@ public class Axis extends Region {
         scroll.setMin(0);
         scroll.setMax(1);
         scroll.setVisibleAmount(1);
-        scroll.setUnitIncrement(1d / ZoomSize);
+        scroll.setUnitIncrement(1d / ZoomDivision);
 
         getChildren().addAll(tickLabels, scroll);
-
-        // zoom function
-        addEventHandler(ScrollEvent.SCROLL, e -> {
-            zoom(scroll.getVisibleAmount() + e.getDeltaY() / e.getMultiplierY() / ZoomSize);
-        });
     }
 
     /**
@@ -152,11 +148,22 @@ public class Axis extends Region {
     }
 
     /**
+     * Zoom by scroll.
+     * 
+     * @param e
+     */
+    public void zoom(ScrollEvent e) {
+        zoom(scroll.getVisibleAmount() + e.getDeltaY() / e.getMultiplierY() / ZoomDivision);
+    }
+
+    /**
      * Increment or decrement zooming.
      * 
      * @param newAmount
      */
     public void zoom(double newAmount) {
+        newAmount = Primitives.between(0, newAmount, 1);
+
         double currentAmount = scroll.getVisibleAmount();
         double range = computeVisibleMaxValue() - computeVisibleMinValue();
 

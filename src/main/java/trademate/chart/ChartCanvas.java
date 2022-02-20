@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -28,6 +29,7 @@ import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
@@ -170,7 +172,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
     /** Flag whether candle chart should layout on the next rendering phase or not. */
-    final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
+    private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
     /** Flag whether orderbook should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
@@ -318,7 +320,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         configIndicator();
         configScript();
-        scrollChartByDrag();
+        makeChartDraggable();
         visualizeOrderPrice();
         visualizeLatestPrice();
         visualizeMouseTrack();
@@ -513,8 +515,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * Make chart scrollable by mouse drag.
      */
-    private void scrollChartByDrag() {
-        when(User.Scroll).to(axisX::fireEvent);
+    private void makeChartDraggable() {
+        when(User.Scroll).to((Consumer<ScrollEvent>) axisX::zoom);
         when(User.MouseDrag).take(MouseEvent::isPrimaryButtonDown)
                 .buffer(2, 1)
                 .takeUntil(when(User.MouseRelease).take(e -> e.getButton() == MouseButton.PRIMARY))
@@ -605,7 +607,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             Disposable dispose = Disposable.empty();
             when(User.MouseDrag).take(RightButton).to(dragged -> {
-                drawSupporterArea(pressed, dragged);
+                drawPriceSupporter(pressed, dragged);
             }, dispose);
 
             when(User.MouseRelease).take(RightButton).take(1).to(released -> {
@@ -618,7 +620,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         });
     }
 
-    private void drawSupporterArea(MouseEvent start, MouseEvent end) {
+    private void drawPriceSupporter(MouseEvent start, MouseEvent end) {
         double startX = start.getX();
         double startY = start.getY();
         double endX = end.getX();

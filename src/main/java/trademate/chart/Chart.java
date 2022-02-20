@@ -98,11 +98,7 @@ public class Chart extends Region {
 
         observeStartAndFinish(axisX.scroll.valueProperty()).merge(observeStartAndFinish(axisX.scroll.visibleAmountProperty())).to(e -> {
             chart.showIndicator.set(e);
-            layoutForcely();
-        });
-        observeStartAndFinish(axisY.scroll.valueProperty()).merge(observeStartAndFinish(axisY.scroll.visibleAmountProperty())).to(e -> {
-            chart.showIndicator.set(e);
-            layoutForcely();
+            canvas.layoutCandle.layoutForcely();
         });
 
         getChildren().addAll(canvas, axisX, axisY);
