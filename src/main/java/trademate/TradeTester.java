@@ -55,7 +55,7 @@ public class TradeTester extends View {
         // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
-        MarketServiceProvider.availableMarketServices().take(MarketService::supportHistoricalTrade).take(22).to(service -> {
+        MarketServiceProvider.availableMarketServices().take(MarketService::supportHistoricalTrade).take(5).to(service -> {
             UITab tab = DockSystem.register(service.id).closable(false).text(service.id).contents(ui -> new TradingView(ui, service));
 
             TradingViewCoordinator.requestLoading(service, tab);

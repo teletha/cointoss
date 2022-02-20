@@ -182,48 +182,42 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LayoutAssistant layoutPriceRangedVolumeLatest = new LayoutAssistant(this);
 
     /** Chart UI */
-    private final EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout).bindSizeTo(this);
+    private final EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout);
 
     /** Chart UI */
-    private final EnhancedCanvas candleLatest = new EnhancedCanvas().visibleWhen(layoutCandleLatest.canLayout).bindSizeTo(this);
+    private final EnhancedCanvas candleLatest = new EnhancedCanvas().visibleWhen(layoutCandleLatest.canLayout);
 
     /** Chart UI */
-    private final EnhancedCanvas orderbook = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
-            .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
-            .font(8)
-            .textBaseLine(VPos.CENTER);
+    private final EnhancedCanvas orderbook = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout).font(8).textBaseLine(VPos.CENTER);
 
     /** Chart UI */
     private final EnhancedCanvas orderbookDigit = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
-            .bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
             .font(8)
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
     private final EnhancedCanvas priceRangedVolume = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolume.canLayout)
-            .bindSizeTo(this)
             .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
             .font(8)
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
     private final EnhancedCanvas priceRangedVolumeLatest = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolumeLatest.canLayout)
-            .bindSizeTo(this)
             .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
             .font(8)
             .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas chartInfo = new EnhancedCanvas().bindSizeTo(this);
+    private final EnhancedCanvas chartInfo = new EnhancedCanvas();
 
     /** Chart UI */
-    private final EnhancedCanvas marketName = new EnhancedCanvas().size(180, 30).font(18, FontWeight.BOLD).fillColor(BaseColor);
+    private final EnhancedCanvas marketName = new EnhancedCanvas().font(18, FontWeight.BOLD).fillColor(BaseColor);
 
     /** Chart UI */
-    private final EnhancedCanvas marketInfo = new EnhancedCanvas().bindSizeTo(this).font(11, FontWeight.BOLD).fillColor(BaseColor);
+    private final EnhancedCanvas marketInfo = new EnhancedCanvas().font(11, FontWeight.BOLD).fillColor(BaseColor);
 
     /** Chart UI */
-    private final EnhancedCanvas supporter = new EnhancedCanvas().bindSizeTo(this);
+    private final EnhancedCanvas supporter = new EnhancedCanvas();
 
     /** The script registry. */
     private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
@@ -314,6 +308,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(2, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
+        chart.showRealtimeUpdate.observing().on(Viewtify.UIThread).to(show -> {
+            if (show) {
+                onShow();
+            } else {
+                onHide();
+            }
+        });
+
         configIndicator();
         configScript();
         scrollChartByDrag();
@@ -346,6 +348,40 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     @Override
     public Object ui() {
         return this;
+    }
+
+    /**
+     * Invoke when the canvas is shown.
+     */
+    private void onShow() {
+        candles.bindSizeTo(this);
+        candleLatest.bindSizeTo(this);
+        orderbook.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this);
+        orderbookDigit.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this);
+        priceRangedVolume.bindSizeTo(this);
+        priceRangedVolumeLatest.bindSizeTo(this);
+        chartInfo.bindSizeTo(this);
+        marketName.size(180, 30);
+        marketInfo.bindSizeTo(this);
+        supporter.bindSizeTo(this);
+
+        chart.chart.layoutForcely();
+    }
+
+    /**
+     * Invoke when the canvas is hidden.
+     */
+    private void onHide() {
+        candles.clear().size(0, 0);
+        candleLatest.clear().size(0, 0);
+        orderbook.clear().size(0, 0);
+        orderbookDigit.clear().size(0, 0);
+        priceRangedVolume.clear().size(0, 0);
+        priceRangedVolumeLatest.clear().size(0, 0);
+        chartInfo.clear().size(0, 0);
+        marketName.clear().size(0, 0);
+        marketInfo.clear().size(0, 0);
+        supporter.clear().size(0, 0);
     }
 
     /**
