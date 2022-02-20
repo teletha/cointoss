@@ -320,7 +320,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         configIndicator();
         configScript();
-        makeChartDraggable();
+        makeChartScrollable();
         visualizeOrderPrice();
         visualizeLatestPrice();
         visualizeMouseTrack();
@@ -340,8 +340,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     private Observable[] chartAxisModification() {
-        return new DoubleProperty[] {axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty(), axisY.scroll.valueProperty(),
-                axisY.scroll.visibleAmountProperty()};
+        return new DoubleProperty[] {axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty()};
     }
 
     /**
@@ -515,7 +514,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * Make chart scrollable by mouse drag.
      */
-    private void makeChartDraggable() {
+    private void makeChartScrollable() {
         when(User.Scroll).to((Consumer<ScrollEvent>) axisX::zoom);
         when(User.MouseDrag).take(MouseEvent::isPrimaryButtonDown)
                 .buffer(2, 1)
@@ -534,6 +533,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             axisX.scroll.setValue(Primitives.between(0, axisX.scroll.getValue() - ratio, 1));
                         }
                     }
+                });
+
+        // reduce drawing chart on scroll
+        Viewtify.observe(axisX.scroll.valueProperty())
+                .merge(Viewtify.observe(axisX.scroll.visibleAmountProperty()))
+                .debounce(150, MILLISECONDS, true)
+                .toggle(Boolean.FALSE, Boolean.TRUE)
+                .to(show -> {
+                    chart.showIndicator.set(show);
+                    if (show) layoutCandle.layoutForcely();
                 });
     }
 
