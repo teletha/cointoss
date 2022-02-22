@@ -15,6 +15,7 @@ import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.data.OpenInterest;
+import cointoss.util.arithmetic.Primitives;
 import cointoss.util.feather.FeatherStore;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -67,7 +68,7 @@ public class OpenInterestIndicator extends PlotScript {
 
             in(PlotArea.HighNarrow, () -> {
                 line(0, style.ratioBase);
-                line(entryAndExit.dmap(x -> (x[0] / x[1] - 1d) * 1000d).scale(2).name("EER"), style.ratio);
+                line(entryAndExit.dmap(x -> Primitives.between(-3, x[0] / x[1] - 1d, 3)).scale(4).name("EER"), style.ratio);
             });
 
             in(PlotArea.LowNarrow, () -> {
