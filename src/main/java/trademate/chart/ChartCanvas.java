@@ -324,7 +324,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeMouseTrack();
         visualizeSFDPrice();
         visualizePriceSupporter();
-        visualizeMarketName();
         visualizeMarketInfo();
 
         getChildren()
@@ -720,7 +719,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Visualize latest price in chart.
      */
     private void visualizeLatestPrice() {
-        chart.market.observing() //
+        chart.market.observing()
                 .skipNull()
                 .switchMap(m -> m.tickers.latest.observing().map(Execution::price))
                 .switchOn(chart.showRealtimeUpdate.observing())
@@ -757,30 +756,26 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Visualize the market name.
-     */
-    private void visualizeMarketName() {
-        chart.market.observe().to(m -> {
-            marketName.clear().fillText(m.service.id, chartInfoLeftPadding, marketName.fontSize());
-        });
-    }
-
-    /**
      * Visualize realtime market-related info.
      */
     private void visualizeMarketInfo() {
-        chart.market.observe()
-                .switchMap(m -> m.tickers.latest.observe())
+        chart.market.observing() //
+                .skipNull()
+                .switchOn(chart.showRealtimeUpdate.observing())
+                .on(Viewtify.UIThread)
+                .to(m -> {
+                    marketName.clear().fillText(m.service.id, chartInfoLeftPadding, marketName.fontSize());
+                });
+
+        chart.market.observing()
+                .skipNull()
+                .switchMap(m -> m.tickers.latest.observing())
                 .switchOn(chart.showRealtimeUpdate.observing())
                 .throttle(1000, TimeUnit.MILLISECONDS)
                 .on(Viewtify.UIThread)
                 .to(e -> {
                     CurrencySetting base = chart.market.v.service.setting.base;
-                    GraphicsContext c = marketInfo.getGraphicsContext2D();
-
-                    double width = marketInfo.getWidth();
-                    double height = marketInfo.getHeight();
-                    c.clearRect(0, 0, width, height);
+                    GraphicsContext c = marketInfo.clear().getGraphicsContext2D();
 
                     c.setFill(BaseColor);
                     c.fillText(DelayLabel.v, chartInfoLeftPadding, 35);
