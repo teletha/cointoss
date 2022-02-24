@@ -278,6 +278,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
+                .layoutBy(Theme.$.buy.observe(), Theme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutCandleLatest.layoutBy(chartAxisModification())
@@ -285,6 +286,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
+                .layoutBy(Theme.$.buy.observe(), Theme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutOrderbook.layoutBy(chartAxisModification())
@@ -292,6 +294,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
+                .layoutBy(Theme.$.buy.observe(), Theme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
 
         layoutPriceRangedVolume.layoutBy(chartAxisModification())
@@ -688,14 +691,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Notify by price.
-     * 
-     * @param e
-     */
-    private void notifyByIndicator(MouseEvent e) {
-    }
-
-    /**
      * Visualize order price in chart.
      */
     private void visualizeOrderPrice() {
@@ -1010,8 +1005,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Draw chart info.
      */
     private void drawChartInfo(Tick tick) {
-        GraphicsContext gc = chartInfo.getGraphicsContext2D();
-        gc.clearRect(0, 0, chartInfo.getWidth(), chartInfo.getHeight());
+        GraphicsContext gc = chartInfo.clear().getGraphicsContext2D();
         gc.setFont(InfoFont);
 
         int base = chart.market.v.service.setting.base.scale;

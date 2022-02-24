@@ -9,13 +9,14 @@
  */
 package trademate;
 
-import static javafx.scene.paint.Color.*;
+import static javafx.scene.paint.Color.rgb;
 
 import java.util.List;
 
+import javafx.scene.paint.Color;
+
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
-import javafx.scene.paint.Color;
 import kiss.I;
 import viewtify.model.Model;
 
@@ -34,7 +35,7 @@ public class Theme extends Model<Theme> {
     public static final Theme ByBit = new Theme("Bybit").buy.with(rgb(121, 184, 61)).sell.with(rgb(201, 56, 96));
 
     /** Built-in Theme */
-    public static final Theme KuromaChart = new Theme("Kuroma Chart").buy.with(rgb(62, 179, 112)).sell.with(rgb(233, 84, 107));
+    public static final Theme FTX = new Theme("FTX").buy.with(rgb(38, 166, 154)).sell.with(rgb(239, 83, 80));
 
     /* Long position color. */
     public final Preference<Color> buy = initialize(rgb(251, 189, 42));
@@ -105,10 +106,6 @@ public class Theme extends Model<Theme> {
      * @return
      */
     public static List<Theme> builtins() {
-        return I.signal(Theme.class.getFields())
-                .take(field -> field.getType() == Theme.class)
-                .map(field -> field.get(null))
-                .as(Theme.class)
-                .toList();
+        return List.of($, Binance, Bitflyer, ByBit, FTX);
     }
 }
