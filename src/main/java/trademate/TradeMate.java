@@ -35,10 +35,6 @@ import viewtify.ui.dock.DockSystem;
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
 
-    static {
-        Viewtify.Terminator.add(EfficientWebSocket::shutdownNow);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -99,9 +95,14 @@ public class TradeMate extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application().logging((msg, error) -> {
-            I.error(msg);
-            I.error(error);
-        }).use(Theme.Dark).icon("icon/app.png").activate(TradeMate.class);
+        Viewtify.application() //
+                .logging((msg, error) -> {
+                    I.error(msg);
+                    I.error(error);
+                })
+                .use(Theme.Dark)
+                .icon("icon/app.png")
+                .onTerminating(EfficientWebSocket::shutdownNow)
+                .activate(TradeMate.class);
     }
 }

@@ -11,6 +11,7 @@ package trademate;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
@@ -27,10 +28,6 @@ import viewtify.ui.dock.DockSystem;
 
 @Managed(value = Singleton.class)
 public class TradeTester extends View {
-
-    static {
-        Viewtify.Terminator.add(EfficientWebSocket::shutdownNow);
-    }
 
     /**
      * {@inheritDoc}
@@ -55,11 +52,18 @@ public class TradeTester extends View {
         // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
-        MarketServiceProvider.availableMarketServices().take(MarketService::supportHistoricalTrade).take(1).to(service -> {
-            UITab tab = DockSystem.register(service.id).closable(false).text(service.id).contents(ui -> new TradingView(ui, service));
+        MarketServiceProvider.availableMarketServices()
+                .take(MarketService::supportHistoricalTrade)
+                .take(x -> x.exchange == Exchange.Bybit)
+                .take(1)
+                .to(service -> {
+                    UITab tab = DockSystem.register(service.id)
+                            .closable(false)
+                            .text(service.id)
+                            .contents(ui -> new TradingView(ui, service));
 
-            TradingViewCoordinator.requestLoading(service, tab);
-        });
+                    TradingViewCoordinator.requestLoading(service, tab);
+                });
 
         //
         // MarketService service4 = GMO.XRP;
@@ -90,6 +94,11 @@ public class TradeTester extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application().logging(I::error).use(Theme.Dark).icon("icon/tester.png").activate(TradeTester.class);
+        Viewtify.application()
+                .logging(I::error)
+                .use(Theme.Dark)
+                .icon("icon/tester.png")
+                .onTerminating(EfficientWebSocket::shutdownNow)
+                .activate(TradeTester.class);
     }
 }
