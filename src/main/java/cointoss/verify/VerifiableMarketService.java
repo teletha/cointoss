@@ -111,7 +111,7 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public ExecutionLogRepository externalRepository() {
-        return external;
+        return external == null ? ExecutionLogRepository.NOP : external;
     }
 
     /**

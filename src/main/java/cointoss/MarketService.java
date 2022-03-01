@@ -164,10 +164,10 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public Signal<Execution> searchInitialExecution() {
         ExecutionLogRepository external = externalRepository();
-        if (external == null) {
-            return executionLatest().flatMap(latest -> searchInitialExecution(1, latest));
-        } else {
+        if (external.exist()) {
             return external.first().flatMap(external::convert).first();
+        } else {
+            return executionLatest().flatMap(latest -> searchInitialExecution(1, latest));
         }
     }
 
@@ -206,12 +206,12 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public Signal<Execution> searchNearestExecution(ZonedDateTime target) {
         ExecutionLogRepository external = externalRepository();
-        if (external == null) {
+        if (external.exist()) {
+            return external.convert(target).first();
+        } else {
             return executionLatest().concatMap(latest -> executionsBefore(latest.id))
                     .buffer()
                     .flatMap(list -> searchNearestExecution(target, list.get(0), list.get(list.size() - 1), 0));
-        } else {
-            return external.convert(target).first();
         }
     }
 
@@ -407,7 +407,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     public ExecutionLogRepository externalRepository() {
-        return null;
+        return ExecutionLogRepository.NOP;
     }
 
     /**

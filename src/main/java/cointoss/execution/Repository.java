@@ -16,6 +16,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import cointoss.MarketService;
 import cointoss.util.Chrono;
+import kiss.Managed;
 import kiss.Signal;
 import kiss.Storable;
 import psychopath.Directory;
@@ -31,22 +32,28 @@ class Repository implements Storable<Repository> {
     private final MarketService service;
 
     /** The last scan date-time in local repository. */
-    public LocalDate localScanLatest = LocalDate.of(1970, 1, 1);
+    @Managed
+    private LocalDate localScanLatest = LocalDate.of(1970, 1, 1);
 
     /** The oldest cache. */
-    public LocalDate localFirst;
+    @Managed
+    private LocalDate localFirst;
 
     /** The latest cache. */
-    public LocalDate localLast;
+    @Managed
+    private LocalDate localLast;
 
     /** The last scan date-time in external repository. */
-    public LocalDate externalScanLatest = LocalDate.of(1970, 1, 1);
+    @Managed
+    private LocalDate externalScanLatest = LocalDate.of(1970, 1, 1);
 
     /** The oldest cache. */
-    public LocalDate externalFirst;
+    @Managed
+    private LocalDate externalFirst;
 
     /** The latest cache. */
-    public LocalDate externalLast;
+    @Managed
+    private LocalDate externalLast;
 
     /**
      * Initialize.
@@ -66,30 +73,24 @@ class Repository implements Storable<Repository> {
      */
     private void scanLocalRepository() {
         LocalDate now = LocalDate.now(Chrono.UTC);
-
         if (now.isAfter(localScanLatest)) {
-            LocalDate[] dates = new LocalDate[2];
+            String[] files = root.asJavaFile().list();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].startsWith("execution")) {
+                    localFirst = LocalDate.parse(files[i].subSequence(9, 17), Chrono.DateCompact);
+                    break;
+                }
+            }
 
-            root.walkFile("execution*.*og")
-                    .map(file -> LocalDate.parse(file.name().subSequence(9, 17), Chrono.DateCompact))
-                    .effectOnce(date -> {
-                        dates[0] = date;
-                        dates[1] = date;
-                    })
-                    .to(date -> {
-                        if (date.isBefore(dates[0])) {
-                            dates[0] = date;
-                        } else if (date.isAfter(dates[1])) {
-                            dates[1] = date;
-                        }
-                    }, e -> {
-                        // ignore
-                    }, () -> {
-                        localFirst = dates[0];
-                        localLast = dates[1];
-                        localScanLatest = now;
-                        store();
-                    });
+            for (int i = files.length - 1; 0 <= i; i--) {
+                if (files[i].startsWith("execution")) {
+                    localLast = LocalDate.parse(files[i].subSequence(9, 17), Chrono.DateCompact);
+                    break;
+                }
+            }
+
+            localScanLatest = now;
+            store();
         }
     }
 
@@ -99,15 +100,14 @@ class Repository implements Storable<Repository> {
     private void scanExternalRepository() {
         ExecutionLogRepository external = service.externalRepository();
 
-        if (external == null) {
+        if (!external.exist()) {
             return;
         }
 
         LocalDate now = LocalDate.now(Chrono.UTC);
+        LocalDate[] dates = new LocalDate[2];
 
         if (now.isAfter(externalScanLatest)) {
-            LocalDate[] dates = new LocalDate[2];
-
             external.collect().map(ZonedDateTime::toLocalDate).effectOnce(date -> {
                 dates[0] = date;
                 dates[1] = date;

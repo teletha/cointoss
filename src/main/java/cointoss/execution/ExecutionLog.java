@@ -677,13 +677,7 @@ public class ExecutionLog {
 
                 return readNormal();
             } else {
-                ExecutionLogRepository external = service.externalRepository();
-
-                if (external != null && Chrono.within(repository.externalFirst, date, repository.externalLast)) {
-                    return readExternalRepository(external);
-                }
-
-                return I.signal();
+                return readExternalRepository(service.externalRepository());
             }
         }
 
@@ -1053,7 +1047,7 @@ public class ExecutionLog {
 
             // imcompleted or no normal log
             ExecutionLogRepository external = service.externalRepository();
-            if (external != null && external.has(date)) {
+            if (external.has(date)) {
                 readExternalRepository(external).waitForTerminate().to(I.NoOP, I::error, () -> convertNormalToCompact(async));
                 return true;
             }

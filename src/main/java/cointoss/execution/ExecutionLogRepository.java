@@ -14,9 +14,23 @@ import java.time.ZonedDateTime;
 
 import cointoss.MarketService;
 import cointoss.util.Chrono;
+import kiss.I;
 import kiss.Signal;
 
 public abstract class ExecutionLogRepository {
+
+    public static final ExecutionLogRepository NOP = new ExecutionLogRepository(null) {
+
+        @Override
+        public Signal<Execution> convert(ZonedDateTime date) {
+            return I.signal();
+        }
+
+        @Override
+        public Signal<ZonedDateTime> collect() {
+            return I.signal();
+        }
+    };
 
     /** The target service. */
     protected final MarketService service;
@@ -26,6 +40,10 @@ public abstract class ExecutionLogRepository {
      */
     protected ExecutionLogRepository(MarketService service) {
         this.service = service;
+    }
+
+    public final boolean exist() {
+        return service != null;
     }
 
     /**
