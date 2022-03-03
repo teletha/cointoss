@@ -10,6 +10,8 @@
 package cointoss.util.feather;
 
 import java.lang.reflect.Array;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -61,7 +63,10 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
     private long first = Long.MAX_VALUE;
 
     /** The date-time of last item. */
-    private long last = -1;
+    private long last = 0;
+
+    /** The bulk data source. */
+    private LongFunction<Signal<E>> bulk;
 
     /**
      * Create the store for timeseries data.
@@ -102,6 +107,17 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     @Override
     public void vandalize() {
+    }
+
+    /**
+     * Enable the data source.
+     * 
+     * @param bulk
+     * @return Chainable API.
+     */
+    public FeatherStore<E> enableBulkDataSupplier(LongFunction<Signal<E>> bulk) {
+        this.bulk = bulk;
+        return this;
     }
 
     /**
@@ -364,7 +380,6 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
 
         long[] index = index(timestamp);
         OnHeap<E> segment = supply(index[0]);
-
         if (segment == null) {
             return null;
         }
@@ -417,7 +432,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
 
         if (disk == null) {
             first = Long.MAX_VALUE;
-            last = -1;
+            last = 0;
         } else {
             first = disk.startTime();
             last = disk.endTime();
@@ -634,24 +649,35 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
             }
         }
 
-        // Original Data Source
-        // if (supplier != null) {
-        // Signal<E> supply = supplier.apply(startTime);
-        // if (supply != null) {
-        // long endTime = startTime + segmentDuration;
-        //
-        // OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
-        // indexed.put(startTime, heap);
-        // tryEvict(startTime);
-        // supply.to(item -> {
-        // long timestamp = item.seconds();
-        // if (startTime <= timestamp && timestamp < endTime) {
-        // heap.set((int) index(timestamp)[1], item);
-        // }
-        // });
-        // return heap;
-        // }
-        // }
+        // Bulk Data Source
+        if (bulk != null) {
+            Signal<E> supply = bulk.apply(startTime);
+            if (supply != null) {
+                long[] times = {startTime, startTime + segmentDuration};
+                Deque<OnHeap<E>> heaps = new ArrayDeque();
+                heaps.add(new OnHeap(model, times[0], itemSize));
+                tryEvict(times[0]);
+                indexed.put(times[0], heaps.peekLast());
+
+                supply.to(item -> {
+                    long timestamp = item.seconds();
+                    if (times[0] <= timestamp) {
+                        if (timestamp < times[1]) {
+                            heaps.peekLast().set((int) index(timestamp)[1], item);
+                        } else {
+                            times[0] = times[1];
+                            times[1] = times[0] + segmentDuration;
+                            heaps.add(new OnHeap(model, times[0], itemSize));
+                            tryEvict(times[0]);
+                            indexed.put(times[0], heaps.peekLast());
+
+                            heaps.peekLast().set((int) index(timestamp)[1], item);
+                        }
+                    }
+                });
+                return heaps.peekFirst();
+            }
+        }
 
         // Not Found
         return null;
@@ -690,7 +716,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
 
             if (last < evictableTime + segmentDuration) {
                 OnHeap<E> heap = indexed.lastValue();
-                last = heap == null ? -1 : heap.last().seconds();
+                last = heap == null ? 0 : heap.last().seconds();
             }
         }
     }

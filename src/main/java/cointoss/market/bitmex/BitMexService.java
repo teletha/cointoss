@@ -244,7 +244,7 @@ public class BitMexService extends MarketService {
     protected FeatherStore<OpenInterest> initializeOpenInterest() {
         return FeatherStore.create(OpenInterest.class, Span.Minute5)
                 .enableDiskStore(file("oi.db"))
-                .enableDataSupplier(null, connectOpenInterest());
+                .enableDataSupplier(connectOpenInterest());
     }
 
     /**
