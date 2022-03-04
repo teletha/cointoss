@@ -38,6 +38,10 @@ class FeatherStoreTest {
         return new Value(value);
     }
 
+    private Value value(long value) {
+        return new Value(value);
+    }
+
     private List<Value> values(int... values) {
         return IntStream.of(values).mapToObj(this::value).collect(Collectors.toList());
     }
@@ -129,6 +133,39 @@ class FeatherStoreTest {
         assert store.at(0).value == 2;
         assert store.at(60).value == 60;
         assert store.at(120).value == 156;
+    }
+
+    @Test
+    void merge() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
+        assert store.size() == 0;
+
+        FeatherStore<Value> additions = FeatherStore.create(Value.class, Span.Minute1);
+        additions.store(value(Span.Minute1.segmentSeconds * 0));
+        additions.store(value(Span.Minute1.segmentSeconds * 1));
+        additions.store(value(Span.Minute1.segmentSeconds * 2));
+        additions.store(value(Span.Minute1.segmentSeconds * 3));
+        assert additions.size() == 4;
+
+        store.merge(additions);
+        assert store.size() == 4;
+        assert store.first().value == 0;
+        assert store.last().value == Span.Minute1.segmentSeconds * 3;
+    }
+
+    @Test
+    void mergeNull() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
+
+        Assertions.assertThrows(NullPointerException.class, () -> store.merge(null));
+    }
+
+    @Test
+    void mergeDifferentSpan() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
+        FeatherStore<Value> additions = FeatherStore.create(Value.class, Span.Minute15);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> store.merge(additions));
     }
 
     @Test

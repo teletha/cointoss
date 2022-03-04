@@ -25,6 +25,7 @@ import com.google.common.annotations.VisibleForTesting;
 import cointoss.ticker.Span;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
+import cointoss.util.map.LongMap.LongEntry;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.model.Model;
@@ -365,6 +366,47 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      */
     public void store(Signal<E> items) {
         items.to(e -> store(e));
+    }
+
+    /**
+     * Import time series items from other store.
+     * 
+     * @param other Time series store.
+     */
+    public void merge(FeatherStore<E> other) {
+        if (model != other.model) {
+            throw new IllegalArgumentException("Invalid models [" + model.type + "] and [" + other.model.type + "]");
+        }
+
+        if (itemDuration != other.itemDuration) {
+            throw new IllegalArgumentException("Different time span [" + itemDuration + "] and [" + other.itemDuration + "]");
+        }
+
+        for (LongEntry<OnHeap<E>> entry : other.indexed.longEntrySet()) {
+            tryEvict(entry.getLongKey());
+
+            OnHeap<E> merged = indexed.get(entry.getLongKey());
+            if (merged == null) {
+                indexed.put(entry.getLongKey(), entry.getValue());
+            } else {
+                OnHeap<E> merging = entry.getValue();
+                for (int i = 0; i < merging.items.length; i++) {
+                    E e = merging.items[i];
+                    if (e != null) {
+                        merged.set(i, e);
+                    }
+                }
+            }
+        }
+
+        if (first == Long.MAX_VALUE || other.first < first) {
+            first = other.first;
+        }
+
+        if (last == 0 || last < other.last) {
+            last = other.last;
+        }
+        other.indexed.clear();
     }
 
     /**

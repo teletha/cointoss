@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import cointoss.Direction;
 import cointoss.Market;
+import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
@@ -22,6 +23,9 @@ public final class TickerManager implements Disposable {
 
     /** The latest execution. */
     public final Variable<Execution> latest = Variable.of(Market.BASE);
+
+    /** The associated service. */
+    private final MarketService service;
 
     /** Total of long volume since application startup. */
     double longVolume = 0;
@@ -45,9 +49,18 @@ public final class TickerManager implements Disposable {
     private boolean initialized;
 
     /**
-     * Create {@link TickerManager}.
+     * 
      */
     public TickerManager() {
+        this(null);
+    }
+
+    /**
+     * Create {@link TickerManager}.
+     */
+    public TickerManager(MarketService service) {
+        this.service = service;
+
         for (int i = size - 1; 0 <= i; i--) {
             Ticker ticker = tickers[i] = new Ticker(Span.values()[i], this);
 
@@ -75,6 +88,15 @@ public final class TickerManager implements Disposable {
      */
     public Signal<Ticker> tickers() {
         return I.signal(tickers);
+    }
+
+    public void add(Signal<Execution> additions) {
+        TickerManager manager = new TickerManager(service);
+        additions.to(manager::update);
+
+        for (int i = 0; i < manager.tickers.length; i++) {
+            tickers[i].ticks.merge(manager.tickers[i].ticks);
+        }
     }
 
     /**

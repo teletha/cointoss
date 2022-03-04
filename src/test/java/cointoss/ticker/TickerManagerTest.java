@@ -9,10 +9,7 @@
  */
 package cointoss.ticker;
 
-import static cointoss.ticker.Span.Day7;
-import static cointoss.ticker.Span.Minute1;
-import static cointoss.ticker.Span.Minute15;
-import static cointoss.ticker.Span.Minute5;
+import static cointoss.ticker.Span.*;
 
 import java.time.ZonedDateTime;
 

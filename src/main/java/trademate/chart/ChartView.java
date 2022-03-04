@@ -22,6 +22,7 @@ import javafx.collections.ObservableList;
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
+import cointoss.execution.LogType;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
@@ -194,13 +195,12 @@ public class ChartView extends View {
     }
 
     public void loadPastData() {
-        ZonedDateTime min = Chrono.systemBySeconds(chart.axisX.logicalMinValue.longValue());
-        ZonedDateTime max = Chrono.systemBySeconds(chart.axisX.logicalMaxValue.longValue());
+        ZonedDateTime min = Chrono.utcBySeconds(chart.axisX.logicalMinValue.longValue());
+        ZonedDateTime max = Chrono.utcBySeconds(chart.axisX.logicalMaxValue.longValue());
 
         if (ticker.isPresent()) {
-            ticker.v.ticks.query(min.minusDays(1).toEpochSecond(), min.toEpochSecond()).to(tick -> {
-                System.out.println(tick);
-            });
+            market.v.tickers.add(market.v.service.log.range(min.minusDays(6), min.minusDays(1), LogType.Fast)
+                    .effect(e -> market.v.priceVolume.update(e)));
             chart.layoutForcely();
         }
     }

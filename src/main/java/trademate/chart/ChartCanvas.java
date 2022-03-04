@@ -58,8 +58,8 @@ import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
 import cointoss.util.array.DoubleList;
-import cointoss.volume.PriceRangedVolumePeriod;
-import cointoss.volume.PriceRangedVolumePeriod.GroupedVolumes;
+import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod;
+import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.GroupedVolumes;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -167,7 +167,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LineMark sfdPrice;
 
     /** Flag whether candle chart should layout on the next rendering phase or not. */
-    final LayoutAssistant layoutCandle = new LayoutAssistant(this);
+    private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
     /** Flag whether candle chart should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
@@ -794,6 +794,17 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     c.fillText("(" + Primitives.roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives
                             .roundString(volatilityStats.sigma(2), base.scale) + ")", 85, 65);
                 });
+    }
+
+    /**
+     * 
+     */
+    void layoutForcely() {
+        layoutCandle.layoutForcely();
+        layoutCandleLatest.layoutForcely();
+        layoutOrderbook.layoutForcely();
+        layoutPriceRangedVolume.layoutForcely();
+        layoutPriceRangedVolumeLatest.layoutForcely();
     }
 
     /**

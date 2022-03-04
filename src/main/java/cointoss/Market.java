@@ -174,7 +174,7 @@ public class Market implements Disposable {
      * @return
      */
     protected TickerManager createTickerManager() {
-        return new TickerManager();
+        return new TickerManager(service);
     }
 
     public synchronized Trader trader() {

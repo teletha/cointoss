@@ -21,7 +21,6 @@ import javafx.geometry.Side;
 import javafx.scene.layout.Region;
 
 import cointoss.ticker.Span;
-import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
@@ -100,7 +99,7 @@ public class Chart extends Region {
      */
     public final void layoutForcely() {
         layoutChart.layoutForcely();
-        canvas.layoutCandle.layoutForcely();
+        canvas.layoutForcely();
     }
 
     /**
@@ -178,17 +177,6 @@ public class Chart extends Region {
 
         if (chart.market.isPresent()) {
             Ticker ticker = chart.market.v.tickers.on(span);
-            Tick startTick = ticker.ticks.at(start);
-            Tick endTick = ticker.ticks.at(end);
-
-            if (endTick == null) {
-                endTick = ticker.ticks.last();
-            }
-
-            if (startTick == null) {
-                startTick = endTick;
-            }
-
             ticker.ticks.query(start, end).to(tick -> {
                 max.set(Num.max(max.v, tick.highPrice()));
                 min.set(Num.min(min.v, tick.lowPrice()));
