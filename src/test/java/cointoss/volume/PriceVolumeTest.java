@@ -12,12 +12,14 @@ package cointoss.volume;
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.arithmetic.Num;
+import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod;
 
 class PriceVolumeTest {
 
     @Test
     void volumeAt() {
-        PriceRangedVolumePeriod volume = new PriceRangedVolumePeriod(0, Num.of(2000), Num.of(10));
+        PriceRangedVolumeManager manager = new PriceRangedVolumeManager(Num.of(10));
+        PriceRangedVolumePeriod volume = manager.createPeriod(0, Num.of(2000));
         for (int i = 0; i < 4000; i++) {
             volume.update(Num.of(i), 1);
         }
@@ -29,7 +31,8 @@ class PriceVolumeTest {
 
     @Test
     void volumeAtWithDecimal() {
-        PriceRangedVolumePeriod volume = new PriceRangedVolumePeriod(0, Num.of(0.2), Num.of(0.001));
+        PriceRangedVolumeManager manager = new PriceRangedVolumeManager(Num.of(0.001));
+        PriceRangedVolumePeriod volume = manager.createPeriod(0, Num.of(0.2));
         for (int i = 0; i < 4000; i++) {
             volume.update(Num.of(i * 0.0001), 1);
         }

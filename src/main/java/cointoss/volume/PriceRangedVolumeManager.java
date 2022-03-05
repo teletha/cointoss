@@ -13,6 +13,7 @@ import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.ticker.Tick;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.array.FloatList;
 import cointoss.util.map.ConcurrentNavigableLongMap;
 import cointoss.util.map.LongMap;
 import kiss.I;
@@ -29,14 +30,20 @@ public class PriceRangedVolumeManager {
     /** The volume for sellers. (latest session) */
     private PriceRangedVolumePeriod seller;
 
+    private final int scale;
+
+    private final int tens;
+
     /** The minimum price range. */
-    private final Num priceRange;
+    private final int priceRange;
 
     /**
      * 
      */
     public PriceRangedVolumeManager(Num priceRange) {
-        this.priceRange = priceRange;
+        this.scale = Math.max(0, priceRange.scale());
+        this.tens = (int) Math.pow(10, scale);
+        this.priceRange = Math.round(priceRange.floatValue() * tens);
     }
 
     /**
@@ -55,9 +62,22 @@ public class PriceRangedVolumeManager {
      * @param startPrice A starting price.
      */
     public void start(long startTime, Num startPrice) {
-        buyer = new PriceRangedVolumePeriod(startTime, startPrice, priceRange);
-        seller = new PriceRangedVolumePeriod(startTime, startPrice, priceRange);
+        buyer = new PriceRangedVolumePeriod(startTime, startPrice);
+        seller = new PriceRangedVolumePeriod(startTime, startPrice);
         volumes.put(startTime, new PriceRangedVolumePeriod[] {buyer, seller});
+    }
+
+    /**
+     * Update the current record.
+     * 
+     * @param e
+     */
+    public void add(Execution e) {
+        if (e.direction == Direction.BUY) {
+            buyer.update(e.price, e.size.floatValue());
+        } else {
+            seller.update(e.price, e.size.floatValue());
+        }
     }
 
     /**
@@ -89,5 +109,162 @@ public class PriceRangedVolumeManager {
      */
     public Signal<PriceRangedVolumePeriod[]> past() {
         return I.signal(volumes.values()).skip(1);
+    }
+
+    /**
+     * Expose for test.
+     * 
+     * @param startTime
+     * @param startPrice
+     * @return
+     */
+    PriceRangedVolumePeriod createPeriod(long startTime, Num startPrice) {
+        return new PriceRangedVolumePeriod(startTime, startPrice);
+    }
+
+    public class PriceRangedVolumePeriod {
+
+        /** The starting time of this period. (epoch second) */
+        public final long startTime;
+
+        /** The integral starting price of this period. */
+        private final int startPrice;
+
+        private final FloatList upper = new FloatList();
+
+        private final FloatList lower = new FloatList();
+
+        private PriceRangedVolumePeriod(long startTime, Num startPrice) {
+            this.startTime = startTime;
+            this.startPrice = Math.round(startPrice.floatValue() * tens);
+        }
+
+        /**
+         * Update volume by price.
+         * 
+         * @param price A target price.
+         * @param volume A target volume.
+         */
+        void update(Num price, float volume) {
+            int diff = price.decuple(scale).intValue() - startPrice;
+
+            if (0 <= diff) {
+                upper.increment(diff / priceRange, volume);
+            } else {
+                // Convert a and b to a double, and you can use the division and Math.ceil as you
+                // wanted
+                // it to work. However I strongly discourage the use of this approach, because
+                // double
+                // division can be imprecise and slow.
+                // int offset = (int) Math.ceil(a / b) - 1;
+                //
+                // This is very short, but maybe for some less intuitive. I think this less
+                // intuitive approach would be faster than the double division.
+                // Please note that this doesn't work for b < 0.
+                lower.increment((-diff + priceRange - 1) / priceRange - 1, volume);
+            }
+        }
+
+        /**
+         * Get price ranged volume by price.
+         * 
+         * @param price A target price (NOT price range). It is round to the suitable price range
+         *            automatically.
+         * @return A price ranged valume.
+         */
+        float volumeAt(float price) {
+            int diff = (int) (price * tens) - startPrice;
+
+            if (0 <= diff) {
+                return upper.get(diff / priceRange);
+            } else {
+                // Convert a and b to a double, and you can use the division and Math.ceil as you
+                // wanted
+                // it to work. However I strongly discourage the use of this approach, because
+                // double
+                // division can be imprecise and slow.
+                // int offset = (int) Math.ceil(a / b) - 1;
+                //
+                // This is very short, but maybe for some less intuitive. I think this less
+                // intuitive approach would be faster than the double division.
+                // Please note that this doesn't work for b < 0.
+                return lower.get((-diff + priceRange - 1) / priceRange - 1);
+            }
+        }
+
+        /**
+         * Compute the grouped price-ranged-volume data.
+         * 
+         * @param groupSize
+         * @return
+         */
+        public GroupedVolumes aggregateBySize(int groupSize) {
+            int size = (upper.size() + lower.size()) / groupSize + 1;
+            FloatList prices = new FloatList(size);
+            FloatList volumes = new FloatList(size);
+            float max = 0;
+            float half = priceRange / tens / 2;
+
+            int now = 0;
+            float volume = 0;
+            for (int i = 0, end = lower.size(); i < end; i++) {
+                volume += lower.get(i);
+
+                if (++now == groupSize) {
+                    prices.add((startPrice - i * priceRange) / (float) tens - half);
+                    volumes.add(volume);
+                    max = Math.max(max, volume);
+                    volume = 0;
+                    now = 0;
+                }
+            }
+            for (int i = 0, end = upper.size(); i < end; i++) {
+                volume += upper.get(i);
+
+                if (++now == groupSize) {
+                    prices.add((startPrice + i * priceRange) / (float) tens + half);
+                    volumes.add(volume);
+                    max = Math.max(max, volume);
+                    volume = 0;
+                    now = 0;
+                }
+            }
+            return new GroupedVolumes(startTime, max, prices, volumes);
+        }
+
+        /**
+         * Compute the grouped price-ranged-volume data.
+         * 
+         * @param range
+         * @return
+         */
+        public GroupedVolumes aggregateByPrice(Num range) {
+            return aggregateBySize(Math.max(1, range.multiply(tens).intValue() / priceRange));
+        }
+    }
+
+    /**
+     * 
+     */
+    public static class GroupedVolumes {
+
+        /** The starting time of period. (epoch second) */
+        public final long startTime;
+
+        /** The max volume in this period. */
+        public final float maxVolume;
+
+        /** The price list. */
+        public final FloatList prices;
+
+        /** The volume list. */
+        public final FloatList volumes;
+
+        private GroupedVolumes(long startTime, float maxVolume, FloatList prices, FloatList volumes) {
+            this.startTime = startTime;
+            this.maxVolume = maxVolume;
+            this.prices = prices;
+            this.volumes = volumes;
+        }
     }
 }
