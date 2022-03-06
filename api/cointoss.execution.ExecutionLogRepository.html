@@ -8,10 +8,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="Q">
-		<header class="W">
-			<h1 class="P" date="2022-02-27" ver="1.1.0"><code>Cointoss</code></h1>
-			<nav class="H"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="M">
+		<header class="S">
+			<h1 class="T" date="2022-03-06" ver="1.1.0"><code>Cointoss</code></h1>
+			<nav class="O"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -20,7 +20,7 @@
 					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="Y" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="K" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -28,116 +28,133 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="V">
-			<nav class="U">
+		<main class="H">
+			<nav class="L">
 				<div></div>
 			</nav>
-			<article class="a" id="Article">
-				<section class="g"><code class="K">cointoss.execution</code>
-					<h2 class="AbstractClass i"><code class="N">ExecutionLogRepository</code></h2>
-					<div class="e"></div>
+			<article class="X" id="Article">
+				<section class="W"><code class="a">cointoss.execution</code>
+					<h2 class="AbstractClass e"><code class="h">ExecutionLogRepository</code></h2>
+					<div class="I"></div>
 				</section>
-				<section class="g" id="service">
-					<h2 class="S"><i class="FINAL"><i class="PROTECTED"></i></i><code class="N">service</code><i class="I"><code class="return"><a href="api/cointoss.MarketService.html">MarketService</a></code></i></h2><span class="B"><p>The target service.</p>
+				<section class="W" id="NOP">
+					<h2 class="P"><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code class="h">NOP</code><i class="N"><code class="return"><a href="api/cointoss.execution.ExecutionLogRepository.html">ExecutionLogRepository</a></code></i></h2>
+				</section>
+				<section class="W" id="service">
+					<h2 class="P"><i class="FINAL"><i class="PROTECTED"></i></i><code class="h">service</code><i class="N"><code class="return"><a href="api/cointoss.MarketService.html">MarketService</a></code></i></h2><span class="B"><p>The target service.</p>
 					</span></section>
-				<section class="g" id="ExecutionLogRepository(cointoss.MarketService)">
-					<h2 class="S"><i class="PROTECTED"></i><code class="N">ExecutionLogRepository</code><code class="M">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></h2>
-					<table class="J">
-						<tr class="b">
+				<section class="W" id="ExecutionLogRepository(cointoss.MarketService)">
+					<h2 class="P"><i class="PROTECTED"></i><code class="h">ExecutionLogRepository</code><code class="Q">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></h2>
+					<table class="Y">
+						<tr class="l">
 							<td><code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code>service</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="g" id="first()">
-					<h2 class="S"><i class="FINAL"><i class="PUBLIC"></i></i><code class="N">first</code><code class="M">()</code><i class="I"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
-					<table class="J">
-						<tr class="R">
+				<section class="W" id="exist()">
+					<h2 class="P"><i class="FINAL"><i class="PUBLIC"></i></i><code class="h">exist</code><code class="Q">()</code><i class="N"><code>boolean</code></i></h2>
+					<table class="Y">
+						<tr class="U">
+							<td><code>boolean</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="W" id="first()">
+					<h2 class="P"><i class="FINAL"><i class="PUBLIC"></i></i><code class="h">first</code><code class="Q">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
+					<table class="Y">
+						<tr class="U">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the first day.</p>
 					</span></section>
-				<section class="g" id="collect()">
-					<h2 class="S"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="N">collect</code><code class="M">()</code><i class="I"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
-					<table class="J">
-						<tr class="R">
+				<section class="W" id="collect()">
+					<h2 class="P"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="h">collect</code><code class="Q">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
+					<table class="Y">
+						<tr class="U">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Collect all resource locations.</p>
 					</span></section>
-				<section class="g" id="has(java.time.LocalDate)">
-					<h2 class="S"><i class="FINAL"><i class="PUBLIC"></i></i><code class="N">has</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>)</code><i class="I"><code>boolean</code></i></h2>
-					<table class="J">
-						<tr class="b">
+				<section class="W" id="has(java.time.LocalDate)">
+					<h2 class="P"><i class="FINAL"><i class="PUBLIC"></i></i><code class="h">has</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>)</code><i class="N"><code>boolean</code></i></h2>
+					<table class="Y">
+						<tr class="l">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code>date</code></td>
 							<td></td>
 						</tr>
-						<tr class="R">
+						<tr class="U">
 							<td><code>boolean</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Check if the log for the specified date exists.</p>
 					</span></section>
-				<section class="g" id="has(java.time.ZonedDateTime)">
-					<h2 class="S"><i class="FINAL"><i class="PUBLIC"></i></i><code class="N">has</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="I"><code>boolean</code></i></h2>
-					<table class="J">
-						<tr class="b">
+				<section class="W" id="has(java.time.ZonedDateTime)">
+					<h2 class="P"><i class="FINAL"><i class="PUBLIC"></i></i><code class="h">has</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="N"><code>boolean</code></i></h2>
+					<table class="Y">
+						<tr class="l">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>date</code></td>
 							<td></td>
 						</tr>
-						<tr class="R">
+						<tr class="U">
 							<td><code>boolean</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Check if the log for the specified date exists.</p>
 					</span></section>
-				<section class="g" id="convert(java.time.LocalDate)">
-					<h2 class="S"><i class="FINAL"><i class="PUBLIC"></i></i><code class="N">convert</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>)</code><i class="I"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
-					<table class="J">
-						<tr class="b">
+				<section class="W" id="convert(java.time.LocalDate)">
+					<h2 class="P"><i class="FINAL"><i class="PUBLIC"></i></i><code class="h">convert</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>)</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="Y">
+						<tr class="l">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code>date</code></td>
 							<td></td>
 						</tr>
-						<tr class="R">
+						<tr class="U">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Convert data.</p>
 					</span></section>
-				<section class="g" id="convert(java.time.ZonedDateTime)">
-					<h2 class="S"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="N">convert</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="I"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
-					<table class="J">
-						<tr class="b">
+				<section class="W" id="convert(java.time.ZonedDateTime)">
+					<h2 class="P"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="h">convert</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="Y">
+						<tr class="l">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>date</code></td>
 							<td></td>
 						</tr>
-						<tr class="R">
+						<tr class="U">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Convert data.</p>
 					</span></section>
 			</article>
-			<aside class="Z" id="SubNavi">
-				<div class="f">
-					<h5 class="l">Constructors</h5>
+			<aside class="R" id="SubNavi">
+				<div class="d">
+					<h5 class="V">Constructors</h5>
 					<ul>
-						<li><i class="PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#ExecutionLogRepository(cointoss.MarketService)">ExecutionLogRepository</a></code><code class="M">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></li>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#ExecutionLogRepository(cointoss.MarketService)">ExecutionLogRepository</a></code><code class="Q">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></li>
 					</ul>
-					<h5 class="l">Fields</h5>
+					<h5 class="V">Static Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#service">service</a></code><i class="d"><code class="return"><a href="api/cointoss.MarketService.html">MarketService</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#NOP">NOP</a></code><i class="j"><code class="return"><a href="api/cointoss.execution.ExecutionLogRepository.html">ExecutionLogRepository</a></code></i></li>
 					</ul>
-					<h5 class="l">Methods</h5>
+					<h5 class="V">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#first()">first</a></code><code class="M">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#collect()">collect</a></code><code class="M">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#has(java.time.LocalDate)">has</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>)</code><i class="d"><code>boolean</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#has(java.time.ZonedDateTime)">has</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="d"><code>boolean</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#convert(java.time.LocalDate)">convert</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#convert(java.time.ZonedDateTime)">convert</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#service">service</a></code><i class="j"><code class="return"><a href="api/cointoss.MarketService.html">MarketService</a></code></i></li>
+					</ul>
+					<h5 class="V">Methods</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#exist()">exist</a></code><code class="Q">()</code><i class="j"><code>boolean</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#first()">first</a></code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#collect()">collect</a></code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#has(java.time.LocalDate)">has</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>)</code><i class="j"><code>boolean</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#has(java.time.ZonedDateTime)">has</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="j"><code>boolean</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#convert(java.time.LocalDate)">convert</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html">LocalDate</a></code> <code class="parameterName">date</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.execution.ExecutionLogRepository.html#convert(java.time.ZonedDateTime)">convert</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
 					</ul>
 				</div>
 			</aside>

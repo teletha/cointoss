@@ -1670,14 +1670,14 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "PriceRangedVolumePeriod",
+			"name": "PriceRangedVolumeManager.GroupedVolumes",
 			"packageName": "cointoss.volume",
 			"type": "Class"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "PriceRangedVolumePeriod.GroupedVolumes",
+			"name": "PriceRangedVolumeManager.PriceRangedVolumePeriod",
 			"packageName": "cointoss.volume",
 			"type": "Class"
 		},
