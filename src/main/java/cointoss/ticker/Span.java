@@ -25,6 +25,8 @@ import kiss.Variable;
  */
 public enum Span {
 
+    Second10(10, SECOND_OF_MINUTE, 15, MINUTES, 10, 1), // 6 * 15 * 10 = 900
+
     Minute1(1, MINUTE_OF_HOUR, 4, HOURS, 7, 1), // 60 * 4 * 7 = 1680
 
     Minute5(5, MINUTE_OF_HOUR, 12, HOURS, 12, 1), // 12 * 12 * 12 = 1728

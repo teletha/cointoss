@@ -11,6 +11,7 @@ package trademate;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
@@ -51,11 +52,18 @@ public class TradeTester extends View {
         // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
-        MarketServiceProvider.availableMarketServices().take(MarketService::supportHistoricalTrade).take(1).to(service -> {
-            UITab tab = DockSystem.register(service.id).closable(false).text(service.id).contents(ui -> new TradingView(ui, service));
+        MarketServiceProvider.availableMarketServices()
+                .take(MarketService::supportHistoricalTrade)
+                .take(e -> e.exchange == Exchange.Bybit)
+                .take(1)
+                .to(service -> {
+                    UITab tab = DockSystem.register(service.id)
+                            .closable(false)
+                            .text(service.id)
+                            .contents(ui -> new TradingView(ui, service));
 
-            TradingViewCoordinator.requestLoading(service, tab);
-        });
+                    TradingViewCoordinator.requestLoading(service, tab);
+                });
 
         //
         // MarketService service4 = GMO.XRP;
