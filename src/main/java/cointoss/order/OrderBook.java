@@ -13,9 +13,7 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.UnaryOperator;
 
@@ -23,6 +21,9 @@ import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
+import cointoss.util.map.ConcurrentNavigableDoubleMap;
+import cointoss.util.map.DoubleMap;
+import cointoss.util.map.DoubleMap.DoubleEntry;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
@@ -66,7 +67,7 @@ public class OrderBook {
         this.scaleBase = setting.base.scale;
         this.scaleTarget = setting.target.scale;
         this.takerFee = setting.takerFee;
-        this.group = new GroupedOrderBook(setting.base.minimumSize);
+        this.group = new GroupedOrderBook(setting.base.minimumSize.doubleValue());
     }
 
     // /**
@@ -104,8 +105,8 @@ public class OrderBook {
      * @param range The price range.
      * @return A grouped view.
      */
-    public final Collection<OrderBookPage> groupBy(Num range) {
-        if (range.isPositive() && group.range.isNot(range)) {
+    public final Collection<OrderBookPage> groupBy(double range) {
+        if (0 < range && group.range != range) {
             group = new GroupedOrderBook(range);
         }
         return group.pages.values();
@@ -131,8 +132,8 @@ public class OrderBook {
                 return max;
             }
 
-            Num lowerRounded = Num.max(base.lastKey(), lowerPrice).floor(group.range);
-            Num upperRounded = Num.min(base.firstKey(), upperPrice).floor(group.range);
+            double lowerRounded = Num.max(base.lastKey(), lowerPrice).floor(group.range).doubleValue();
+            double upperRounded = Num.min(base.firstKey(), upperPrice).floor(group.range).doubleValue();
 
             for (OrderBookPage page : group.pages.subMap(upperRounded, true, lowerRounded, true).values()) {
                 if (max.size < page.size) {
@@ -144,8 +145,8 @@ public class OrderBook {
                 return max;
             }
 
-            Num lowerRounded = Num.max(base.firstKey(), lowerPrice).floor(group.range);
-            Num upperRounded = Num.min(base.lastKey(), upperPrice).floor(group.range);
+            double lowerRounded = Num.max(base.firstKey(), lowerPrice).floor(group.range).doubleValue();
+            double upperRounded = Num.min(base.lastKey(), upperPrice).floor(group.range).doubleValue();
 
             for (OrderBookPage page : group.pages.subMap(lowerRounded, true, upperRounded, true).values()) {
                 if (max.size < page.size) {
@@ -165,12 +166,12 @@ public class OrderBook {
         return group.pages.values();
     }
 
-    public final ConcurrentNavigableMap<Num, OrderBookPage> headMap(Num price) {
-        return group.pages.headMap(price, true);
+    public final ConcurrentNavigableDoubleMap<OrderBookPage> headMap(Num price) {
+        return group.pages.headMap(price.doubleValue(), true);
     }
 
-    public final ConcurrentNavigableMap<Num, OrderBookPage> tailMap(Num price) {
-        return group.pages.tailMap(price, true);
+    public final ConcurrentNavigableDoubleMap<OrderBookPage> tailMap(Num price) {
+        return group.pages.tailMap(price.doubleValue(), true);
     }
 
     /**
@@ -381,22 +382,23 @@ public class OrderBook {
     private class GroupedOrderBook {
 
         /** The price range. */
-        private final Num range;
+        private final double range;
 
-        private final ConcurrentSkipListMap<Num, OrderBookPage> pages = new ConcurrentSkipListMap(side.isBuy() ? Comparator.reverseOrder()
-                : Comparator.naturalOrder());
+        private final ConcurrentNavigableDoubleMap<OrderBookPage> pages = side.isBuy() ? DoubleMap.createReversedMap()
+                : DoubleMap.createSortedMap();
 
         /**
          * Build {@link GroupedOrderBook}.
          * 
          * @param range A price range to group.
          */
-        private GroupedOrderBook(Num range) {
-            this.range = Objects.requireNonNull(range);
+        private GroupedOrderBook(double range) {
+            this.range = range;
 
             // grouping the current boards
             for (OrderBookPage board : base.values()) {
                 update(board.price, board.size);
+
             }
         }
 
@@ -407,13 +409,13 @@ public class OrderBook {
          * @param size
          */
         private void update(Num price, double size) {
-            price = price.floor(range);
+            double p = price.doubleValue() - price.doubleValue() % range;
 
-            OrderBookPage page = pages.computeIfAbsent(price, key -> new OrderBookPage(key, 0, side.isBuy() ? Num.ZERO : range));
+            OrderBookPage page = pages.computeIfAbsent(p, key -> new OrderBookPage(Num.of(key), 0, side.isBuy() ? 0 : range));
             page.size += size;
 
             if (Primitives.roundDecimal(page.size, scaleTarget, RoundingMode.DOWN) <= 0) {
-                pages.remove(price);
+                pages.remove(p);
             }
         }
 
@@ -424,12 +426,19 @@ public class OrderBook {
          */
         private void fix(Num hint) {
             if (!pages.isEmpty()) {
-                hint = hint.floor(range);
+                double h = hint.doubleValue() - hint.doubleValue() % range;
 
-                Entry<Num, OrderBookPage> entry = pages.firstEntry();
-                while (entry != null && entry.getKey().isGreaterThan(side, hint)) {
-                    pages.pollFirstEntry();
-                    entry = pages.firstEntry();
+                DoubleEntry<OrderBookPage> entry = pages.firstEntry();
+                if (side.isBuy()) {
+                    while (entry != null && entry.getKey() > h) {
+                        pages.pollFirstEntry();
+                        entry = pages.firstEntry();
+                    }
+                } else {
+                    while (entry != null && entry.getKey() < h) {
+                        pages.pollFirstEntry();
+                        entry = pages.firstEntry();
+                    }
                 }
             }
         }

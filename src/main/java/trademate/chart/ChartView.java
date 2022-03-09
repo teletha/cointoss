@@ -185,8 +185,8 @@ public class ChartView extends View {
                 .tooltip(en("Display a grouped board with a specified price range."))
                 .enableWhen(showOrderbook.isSelected())
                 .observing(e -> e.combineLatest(market.observe()), v -> {
-                    v.ⅱ.orderBook.longs.groupBy(v.ⅰ);
-                    v.ⅱ.orderBook.shorts.groupBy(v.ⅰ);
+                    v.ⅱ.orderBook.longs.groupBy(v.ⅰ.doubleValue());
+                    v.ⅱ.orderBook.shorts.groupBy(v.ⅰ.doubleValue());
                 });
 
         pricedVolumeType.initialize(PriceRangedVolumeType.values()).enableWhen(showPricedVolume.isSelected());

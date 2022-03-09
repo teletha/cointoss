@@ -20,13 +20,13 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
     public float size;
 
     /** The price range. */
-    private final Num range;
+    private final double range;
 
     /**
      * For I#make.
      */
     OrderBookPage() {
-        range = Num.ZERO;
+        range = 0;
     }
 
     /**
@@ -36,7 +36,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * @param size A total size.
      */
     public OrderBookPage(Num price, float size) {
-        this(price, size, Num.ZERO);
+        this(price, size, 0);
     }
 
     /**
@@ -45,7 +45,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * @param price A price.
      * @param size A total size.
      */
-    OrderBookPage(Num price, float size, Num range) {
+    OrderBookPage(Num price, float size, double range) {
         this.price = price;
         this.size = size;
         this.range = range;

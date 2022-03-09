@@ -15,6 +15,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.SplittableRandom;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.DoubleBinaryOperator;
 import java.util.stream.IntStream;
 
@@ -157,17 +158,26 @@ public class Num extends Arithmetic<Num> {
         }
     }
 
+    private static final ConcurrentHashMap<String, Num> C = new ConcurrentHashMap();
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Num create(String value) {
+        Num num = C.get(value);
+        if (num != null) {
+            return num;
+        }
+
         int length = value.length();
         if (length <= 18) {
             int index = value.indexOf('.');
             if (index == -1) {
                 try {
-                    return create(Long.parseLong(value));
+                    Num n = create(Long.parseLong(value));
+                    C.put(value, n);
+                    return n;
                 } catch (NumberFormatException e) {
                     // parse as exponential expression
                 }
@@ -245,7 +255,9 @@ public class Num extends Arithmetic<Num> {
                         // scale
                         // = (textLength - pointIndex) - (textLength - lastDigitIndex) - exp
                         // = lastDigitIndex - pointIndex - exp
-                        return new Num(negative ? result : -result, lastDigitIndex - Math.max(0, index) - parseInt(value, i + 1, length));
+                        Num n = new Num(negative ? result : -result, lastDigitIndex - Math.max(0, index) - parseInt(value, i + 1, length));
+                        C.put(value, n);
+                        return n;
                     } else {
                         // fallback
                         return create(new BigDecimal(value, CONTEXT));
