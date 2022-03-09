@@ -67,7 +67,7 @@ public class OrderBook {
         this.scaleBase = setting.base.scale;
         this.scaleTarget = setting.target.scale;
         this.takerFee = setting.takerFee;
-        this.group = new GroupedOrderBook(setting.base.minimumSize.doubleValue());
+        this.group = new GroupedOrderBook(setting.base.minimumSize.floatValue());
     }
 
     // /**
@@ -105,7 +105,7 @@ public class OrderBook {
      * @param range The price range.
      * @return A grouped view.
      */
-    public final Collection<OrderBookPage> groupBy(double range) {
+    public final Collection<OrderBookPage> groupBy(float range) {
         if (0 < range && range != group.range) {
             group = new GroupedOrderBook(range);
         }
@@ -388,7 +388,7 @@ public class OrderBook {
     private class GroupedOrderBook {
 
         /** The price range. */
-        private final double range;
+        private final float range;
 
         private final ConcurrentNavigableDoubleMap<OrderBookPage> pages = side.isBuy() ? DoubleMap.createReversedMap()
                 : DoubleMap.createSortedMap();
@@ -398,7 +398,7 @@ public class OrderBook {
          * 
          * @param range A price range to group.
          */
-        private GroupedOrderBook(double range) {
+        private GroupedOrderBook(float range) {
             this.range = range;
 
             // grouping the current boards
