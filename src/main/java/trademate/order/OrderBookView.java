@@ -154,15 +154,15 @@ public class OrderBookView extends View {
         return () -> {
             if (list == longList) {
                 list.selectedItem().to(unit -> {
-                    Num min = unit.price;
-                    Num max = min.plus(priceRange.value());
+                    double min = unit.price;
+                    Num max = priceRange.value().plus(min);
                     Num best = book.longs.computeBestPrice(max, Num.of(3), Num.ONE);
                     // view.builder.orderPrice.value(best.toString());
                 });
             } else {
                 list.selectedItem().to(unit -> {
-                    Num min = unit.price;
-                    Num best = book.shorts.computeBestPrice(min, Num.of(3), Num.ONE);
+                    double min = unit.price;
+                    Num best = book.shorts.computeBestPrice(Num.of(min), Num.of(3), Num.ONE);
                     // view.builder.orderPrice.value(best.toString());
                 });
             }
@@ -192,7 +192,7 @@ public class OrderBookView extends View {
             double size = Primitives.roundDecimal(e.size, scale);
             double range = Math.min(width, size);
             Num pr = priceRange.value();
-            Num price = isShort && pr.isNot(minSize) ? e.price.plus(pr) : e.price;
+            double price = isShort && pr.isNot(minSize) ? e.price + pr.doubleValue() : e.price;
 
             GraphicsContext c = canvas.getGraphicsContext2D();
             c.clearRect(0, 0, width, height);

@@ -205,9 +205,9 @@ public class BitMexService extends MarketService {
         OrderBookPageChanges change = new OrderBookPageChanges();
         for (JSON page : pages) {
             long id = Long.parseLong(page.text("id"));
-            Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
+            double price = instrumentTickSize.doubleValue() * ((100000000L * marketId) - id);
             JSON sizeElement = page.get("size");
-            float size = sizeElement == null ? 0 : sizeElement.as(Float.class) / price.floatValue();
+            float size = sizeElement == null ? 0 : sizeElement.as(Float.class) / (float) price;
 
             if (page.text("side").charAt(0) == 'B') {
                 change.bids.add(new OrderBookPage(price, size));

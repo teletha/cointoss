@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Currency;
 import cointoss.MarketSetting;
-import cointoss.util.arithmetic.Num;
 import cointoss.verify.VerifiableMarketService;
 
 class OrderBookManagerTest {
@@ -114,6 +113,6 @@ class OrderBookManagerTest {
      * @return
      */
     private List<OrderBookPage> page(float price, float size) {
-        return List.of(new OrderBookPage(Num.of(price), size));
+        return List.of(new OrderBookPage(price, size));
     }
 }

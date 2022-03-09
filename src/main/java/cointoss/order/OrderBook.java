@@ -11,10 +11,8 @@ package cointoss.order;
 
 import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.UnaryOperator;
 
 import cointoss.Direction;
@@ -46,7 +44,7 @@ public class OrderBook {
     private final UnaryOperator<Num> takerFee;
 
     /** The base boards. */
-    private final ConcurrentSkipListMap<Num, OrderBookPage> base;
+    private final ConcurrentNavigableDoubleMap<OrderBookPage> base;
 
     /** The grouped order book. */
     private GroupedOrderBook group;
@@ -63,7 +61,7 @@ public class OrderBook {
      */
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
-        this.base = new ConcurrentSkipListMap(side.isBuy() ? Comparator.reverseOrder() : Comparator.naturalOrder());
+        this.base = side.isBuy() ? DoubleMap.createReversedMap() : DoubleMap.createSortedMap();
         this.scaleBase = setting.base.scale;
         this.scaleTarget = setting.target.scale;
         this.takerFee = setting.takerFee;
@@ -121,7 +119,7 @@ public class OrderBook {
      * @return
      */
     public final OrderBookPage findLargestOrder(Num lowerPrice, Num upperPrice) {
-        OrderBookPage max = new OrderBookPage(lowerPrice, 0, group.range);
+        OrderBookPage max = new OrderBookPage(lowerPrice.doubleValue(), 0, group.range);
 
         if (base.isEmpty()) {
             return max;
@@ -132,8 +130,8 @@ public class OrderBook {
                 return max;
             }
 
-            Num lowerRounded = Num.max(base.lastKey(), lowerPrice).floor(group.range);
-            Num upperRounded = Num.min(base.firstKey(), upperPrice).floor(group.range);
+            Num lowerRounded = Num.max(Num.of(base.lastDoubleKey()), lowerPrice).floor(group.range);
+            Num upperRounded = Num.min(Num.of(base.firstDoubleKey()), upperPrice).floor(group.range);
 
             for (OrderBookPage page : group.pages.subMap(upperRounded.doubleValue(), true, lowerRounded.doubleValue(), true).values()) {
                 if (max.size < page.size) {
@@ -145,8 +143,8 @@ public class OrderBook {
                 return max;
             }
 
-            Num lowerRounded = Num.max(base.firstKey(), lowerPrice).floor(group.range);
-            Num upperRounded = Num.min(base.lastKey(), upperPrice).floor(group.range);
+            Num lowerRounded = Num.max(Num.of(base.firstDoubleKey()), lowerPrice).floor(group.range);
+            Num upperRounded = Num.min(Num.of(base.lastDoubleKey()), upperPrice).floor(group.range);
 
             for (OrderBookPage page : group.pages.subMap(lowerRounded.doubleValue(), true, upperRounded.doubleValue(), true).values()) {
                 if (max.size < page.size) {
@@ -199,7 +197,7 @@ public class OrderBook {
 
         for (OrderBookPage page : base.values()) {
             double decrease = Math.min(page.size, remaining);
-            total += decrease * page.price.doubleValue();
+            total += decrease * page.price;
             remaining -= decrease;
 
             if (remaining <= 0) {
@@ -307,13 +305,26 @@ public class OrderBook {
      * @return A computed best price.
      */
     public final Num computeBestPrice(Num start, Num threshold, Num diff) {
+        return computeBestPrice(start.doubleValue(), threshold, diff);
+    }
+
+    /**
+     * Compute the best price with your conditions (start price, threashold volume and diff price).
+     * 
+     * @param start A start price.
+     * @param threshold A threashold volume.
+     * @param diff A difference price.
+     * @return A computed best price.
+     */
+    final Num computeBestPrice(double start, Num threshold, Num diff) {
         Num total = Num.ZERO;
+        boolean buy = side.isBuy();
         for (OrderBookPage board : base.values()) {
-            if (board.price.isLessThanOrEqual(side, start)) {
+            if (buy ? board.price <= start : board.price >= start) {
                 total = total.plus(board.size);
 
                 if (total.isGreaterThanOrEqual(threshold)) {
-                    return board.price.plus(side, diff);
+                    return Num.of(board.price).plus(side, diff);
                 }
             }
         }
@@ -325,11 +336,11 @@ public class OrderBook {
      * 
      * @param hint A price hint.
      */
-    public void fix(Num hint) {
+    public void fix(double hint) {
         if (!base.isEmpty()) {
-            Num price = base.firstKey();
+            double price = base.firstDoubleKey();
 
-            while (price != null && price.isGreaterThan(side, hint)) {
+            while (side.isBuy() ? price > hint : price < hint) {
                 OrderBookPage removed = base.remove(price);
 
                 group.update(price, removed.size * -1);
@@ -338,7 +349,7 @@ public class OrderBook {
                 if (base.isEmpty()) {
                     break;
                 } else {
-                    price = base.firstKey();
+                    price = base.firstDoubleKey();
                 }
             }
         }
@@ -376,10 +387,8 @@ public class OrderBook {
         updating.accept(this);
     }
 
-    private static double floor(Num value, double base, int scale) {
-        double v = value.doubleValue();
-
-        return Primitives.roundDecimal(v - v % base, scale);
+    private static double floor(double value, double base, int scale) {
+        return Primitives.roundDecimal(value - value % base, scale);
     }
 
     /**
@@ -413,10 +422,10 @@ public class OrderBook {
          * @param price
          * @param size
          */
-        private void update(Num price, double size) {
+        private void update(double price, double size) {
             double p = floor(price, range, scaleBase);
 
-            OrderBookPage page = pages.computeIfAbsent(p, key -> new OrderBookPage(Num.of(key), 0, side.isBuy() ? 0 : range));
+            OrderBookPage page = pages.computeIfAbsent(p, key -> new OrderBookPage(key, 0, side.isBuy() ? 0 : range));
             page.size += size;
 
             if (Primitives.roundDecimal(page.size, scaleTarget, RoundingMode.DOWN) <= 0) {
@@ -429,7 +438,7 @@ public class OrderBook {
          * 
          * @param hint A price hint.
          */
-        private void fix(Num hint) {
+        private void fix(double hint) {
             if (!pages.isEmpty()) {
                 double h = floor(hint, range, scaleBase);
 

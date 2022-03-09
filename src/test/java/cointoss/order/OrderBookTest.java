@@ -39,30 +39,30 @@ class OrderBookTest {
 
         // add
         book.update(unit(1000, 1));
-        assert at(0, list).price.is(1000);
+        assert at(0, list).price == 1000;
 
         book.update(unit(1002, 1));
-        assert at(0, list).price.is(1002);
-        assert at(1, list).price.is(1000);
+        assert at(0, list).price == 1002;
+        assert at(1, list).price == 1000;
 
         book.update(unit(1001, 1));
-        assert at(0, list).price.is(1002);
-        assert at(1, list).price.is(1001);
+        assert at(0, list).price == 1002;
+        assert at(1, list).price == 1001;
         assert at(1, list).size == 1d;
-        assert at(2, list).price.is(1000);
+        assert at(2, list).price == 1000;
 
         // replace
         book.update(unit(1001, 2));
-        assert at(0, list).price.is(1002);
-        assert at(1, list).price.is(1001);
+        assert at(0, list).price == 1002;
+        assert at(1, list).price == 1001;
         assert at(1, list).size == 2d;
-        assert at(2, list).price.is(1000);
+        assert at(2, list).price == 1000;
 
         // remove
         book.update(unit(1000, 0));
         assert list.size() == 2;
-        assert at(0, list).price.is(1002);
-        assert at(1, list).price.is(1001);
+        assert at(0, list).price == 1002;
+        assert at(1, list).price == 1001;
     }
 
     @Test
@@ -71,30 +71,30 @@ class OrderBookTest {
         Collection<OrderBookPage> list = book.groupBy(1);
 
         book.update(unit(1000, 1));
-        assert at(0, list).price.is(1000);
+        assert at(0, list).price == 1000;
 
         book.update(unit(1002, 1));
-        assert at(0, list).price.is(1000);
-        assert at(1, list).price.is(1002);
+        assert at(0, list).price == 1000;
+        assert at(1, list).price == 1002;
 
         book.update(unit(1001, 1));
-        assert at(0, list).price.is(1000);
-        assert at(1, list).price.is(1001);
+        assert at(0, list).price == 1000;
+        assert at(1, list).price == 1001;
         assert at(1, list).size == 1d;
-        assert at(2, list).price.is(1002);
+        assert at(2, list).price == 1002;
 
         // replace
         book.update(unit(1001, 2));
-        assert at(0, list).price.is(1000);
-        assert at(1, list).price.is(1001);
+        assert at(0, list).price == 1000;
+        assert at(1, list).price == 1001;
         assert at(1, list).size == 2d;
-        assert at(2, list).price.is(1002);
+        assert at(2, list).price == 1002;
 
         // remove
         book.update(unit(1000, 0));
         assert list.size() == 2;
-        assert at(0, list).price.is(1001);
-        assert at(1, list).price.is(1002);
+        assert at(0, list).price == 1001;
+        assert at(1, list).price == 1002;
     }
 
     @Test
@@ -111,21 +111,21 @@ class OrderBookTest {
         assert list.size() == 6;
 
         // fix error
-        book.fix(Num.of(1006));
+        book.fix(1006);
         assertList(list, 0, 1006, 1, 1);
         assertList(list, 1, 1005, 1, 2);
         assertList(list, 2, 1004, 1, 3);
         assert list.size() == 5;
 
         // fix error : multiple
-        book.fix(Num.of(1004));
+        book.fix(1004);
         assertList(list, 0, 1004, 1, 1);
         assertList(list, 1, 1003, 1, 2);
         assertList(list, 2, 1000, 1, 3);
         assert list.size() == 3;
 
         // fix error : not exits
-        book.fix(Num.of(1002));
+        book.fix(1002);
         assertList(list, 0, 1000, 1, 1);
         assert list.size() == 1;
     }
@@ -144,15 +144,15 @@ class OrderBookTest {
         assert list.size() == 6;
 
         // fix error
-        book.fix(Num.of(1001));
+        book.fix(1001);
         assert list.size() == 5;
 
         // fix error : multiple
-        book.fix(Num.of(1003));
+        book.fix(1003);
         assert list.size() == 3;
 
         // fix error : not exits
-        book.fix(Num.of(1005));
+        book.fix(1005);
         assert list.size() == 1;
     }
 
@@ -223,23 +223,23 @@ class OrderBookTest {
         assert book.groupBy(10).size() == 6;
 
         // fix error
-        book.fix(Num.of(1051));
+        book.fix(1051);
         assert book.groupBy(10).size() == 5;
 
         // fix error : remaining
-        book.fix(Num.of(1050));
+        book.fix(1050);
         assert book.groupBy(10).size() == 5;
 
         // fix error : multiple
-        book.fix(Num.of(1038));
+        book.fix(1038);
         assert book.groupBy(10).size() == 3;
 
         // fix error : overlap
-        book.fix(Num.of(1030));
+        book.fix(1030);
         assert book.groupBy(10).size() == 2;
 
         // fix error : not exist
-        book.fix(Num.of(1010));
+        book.fix(1010);
         assert book.groupBy(10).size() == 1;
     }
 
@@ -261,23 +261,23 @@ class OrderBookTest {
         assert book.groupBy(10).size() == 6;
 
         // fix error
-        book.fix(Num.of(1010));
+        book.fix(1010);
         assert book.groupBy(10).size() == 5;
 
         // fix error : remaining
-        book.fix(Num.of(1011));
+        book.fix(1011);
         assert book.groupBy(10).size() == 5;
 
         // fix error : multiple
-        book.fix(Num.of(1031));
+        book.fix(1031);
         assert book.groupBy(10).size() == 3;
 
         // fix error : overlap
-        book.fix(Num.of(1038));
+        book.fix(1038);
         assert book.groupBy(10).size() == 2;
 
         // fix error : not exist
-        book.fix(Num.of(1050));
+        book.fix(1050);
         assert book.groupBy(10).size() == 1;
     }
 
@@ -384,7 +384,7 @@ class OrderBookTest {
     private void assertList(Collection<OrderBookPage> list, int index, int price, int size, int total) {
         OrderBookPage unit = at(index, list);
         assert unit.size == size;
-        assert unit.price.is(price);
+        assert unit.price == price;
     }
 
     /**
@@ -398,7 +398,7 @@ class OrderBookTest {
     private void assertList(Collection<OrderBookPage> list, int index, int price, int size, int total, int rangedPrice) {
         OrderBookPage unit = at(index, list);
         assert unit.size == size;
-        assert unit.price.is(price);
+        assert unit.price == price;
         assert unit.rangedPrice() == rangedPrice;
     }
 
@@ -410,6 +410,6 @@ class OrderBookTest {
      * @return
      */
     private List<OrderBookPage> unit(int price, int size) {
-        return Collections.singletonList(new OrderBookPage(Num.of(price), size));
+        return Collections.singletonList(new OrderBookPage(price, size));
     }
 }

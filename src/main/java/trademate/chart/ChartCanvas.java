@@ -1415,7 +1415,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // collect buyer pages
             for (OrderBookPage page : market.orderBook.longs.ascendingPages()) {
-                if (visibleMin < page.price.doubleValue()) {
+                if (visibleMin < page.price) {
                     buyerMaxSize = Math.max(buyerMaxSize, page.size);
                     buyers.add(page);
                 } else {
@@ -1425,7 +1425,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // collect seller pages
             for (OrderBookPage page : market.orderBook.shorts.ascendingPages()) {
-                if (page.price.doubleValue() < visibleMax) {
+                if (page.price < visibleMax) {
                     sellerMaxSize = Math.max(sellerMaxSize, page.size);
                     sellers.add(page);
                 } else {

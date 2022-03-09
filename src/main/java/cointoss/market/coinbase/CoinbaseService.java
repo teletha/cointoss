@@ -153,7 +153,7 @@ public class CoinbaseService extends MarketService {
 
             for (JSON ask : root.find("changes", "*")) {
                 Direction side = ask.get(Direction.class, "0");
-                Num price = ask.get(Num.class, "1");
+                double price = ask.get(double.class, "1");
                 float size = ask.get(float.class, "2");
                 if (side == Direction.BUY) {
                     changes.bids.add(new OrderBookPage(price, size));

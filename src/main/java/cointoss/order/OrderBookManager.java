@@ -53,8 +53,8 @@ public class OrderBookManager implements Disposable {
             longs.update(board.bids);
         }));
         service.add(fixPageByPrice.to(price -> {
-            shorts.fix(price);
-            longs.fix(price);
+            shorts.fix(price.doubleValue());
+            longs.fix(price.doubleValue());
         }));
     }
 
@@ -77,7 +77,7 @@ public class OrderBookManager implements Disposable {
         if (shorts.best.isAbsent() || longs.best.isAbsent()) {
             return 0;
         } else {
-            return shorts.best.v.price.doubleValue() - longs.best.v.price.doubleValue();
+            return shorts.best.v.price - longs.best.v.price;
         }
     }
 

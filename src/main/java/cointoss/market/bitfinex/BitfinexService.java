@@ -156,7 +156,7 @@ public class BitfinexService extends MarketService {
             OrderBookPageChanges change = new OrderBookPageChanges();
 
             for (JSON data : json.find("*")) {
-                Num price = data.get(Num.class, "0");
+                double price = data.get(Double.class, "0");
                 float size = data.get(Float.class, "2");
 
                 if (0 < size) {

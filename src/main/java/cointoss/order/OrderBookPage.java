@@ -9,12 +9,10 @@
  */
 package cointoss.order;
 
-import cointoss.util.arithmetic.Num;
-
 public final class OrderBookPage implements Comparable<OrderBookPage> {
 
     /** The board price. */
-    public Num price;
+    public double price;
 
     /** The board size. */
     public float size;
@@ -35,7 +33,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * @param price A price.
      * @param size A total size.
      */
-    public OrderBookPage(Num price, float size) {
+    public OrderBookPage(double price, float size) {
         this(price, size, 0);
     }
 
@@ -45,7 +43,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * @param price A price.
      * @param size A total size.
      */
-    OrderBookPage(Num price, float size, float range) {
+    OrderBookPage(double price, float size, float range) {
         this.price = price;
         this.size = size;
         this.range = range;
@@ -59,7 +57,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * @return
      */
     public double rangedPrice() {
-        return price.doubleValue() + range;
+        return price + range;
     }
 
     /**
@@ -67,14 +65,14 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      */
     @Override
     public int compareTo(OrderBookPage o) {
-        return price.compareTo(o.price);
+        return Double.compare(price, o.price);
     }
 
     /**
      * Expose to test.
      */
     boolean is(double price, double size) {
-        return this.price.is(price) && size == size;
+        return this.price == price && size == size;
     }
 
     /**

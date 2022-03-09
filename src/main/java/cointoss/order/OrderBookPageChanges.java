@@ -88,22 +88,22 @@ public class OrderBookPageChanges {
         if (scale == -1) {
             for (int i = 0; i < bidSize; i++) {
                 JSON e = bids.get(i);
-                changes.bids.add(new OrderBookPage(e.get(Num.class, priceKey), Float.parseFloat(e.text(sizeKey))));
+                changes.bids.add(new OrderBookPage(Double.parseDouble(e.text(priceKey)), Float.parseFloat(e.text(sizeKey))));
             }
             for (int i = 0; i < askSize; i++) {
                 JSON e = asks.get(i);
-                changes.asks.add(new OrderBookPage(e.get(Num.class, priceKey), Float.parseFloat(e.text(sizeKey))));
+                changes.asks.add(new OrderBookPage(Double.parseDouble(e.text(priceKey)), Float.parseFloat(e.text(sizeKey))));
             }
         } else {
             for (int i = 0; i < bidSize; i++) {
                 JSON e = bids.get(i);
-                Num price = e.get(Num.class, priceKey);
+                double price = Double.parseDouble(e.text(priceKey));
                 Num size = e.get(Num.class, sizeKey).divide(price).scale(scale);
                 changes.bids.add(new OrderBookPage(price, size.floatValue()));
             }
             for (int i = 0; i < askSize; i++) {
                 JSON e = asks.get(i);
-                Num price = e.get(Num.class, priceKey);
+                double price = Double.parseDouble(e.text(priceKey));
                 Num size = e.get(Num.class, sizeKey).divide(price).scale(scale);
                 changes.asks.add(new OrderBookPage(price, size.floatValue()));
             }
@@ -131,7 +131,7 @@ public class OrderBookPageChanges {
      * @return
      */
     public static OrderBookPageChanges singleBuy(Num price, float size) {
-        return new OrderBookPageChanges(Collections.singletonList(new OrderBookPage(price, size)), EMPTY_LIST);
+        return new OrderBookPageChanges(Collections.singletonList(new OrderBookPage(price.doubleValue(), size)), EMPTY_LIST);
     }
 
     /**
@@ -142,6 +142,6 @@ public class OrderBookPageChanges {
      * @return
      */
     public static OrderBookPageChanges singleSell(Num price, float size) {
-        return new OrderBookPageChanges(EMPTY_LIST, Collections.singletonList(new OrderBookPage(price, size)));
+        return new OrderBookPageChanges(EMPTY_LIST, Collections.singletonList(new OrderBookPage(price.doubleValue(), size)));
     }
 }
