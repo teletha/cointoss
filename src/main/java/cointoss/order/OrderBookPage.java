@@ -58,8 +58,8 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * 
      * @return
      */
-    public Num rangedPrice() {
-        return price.plus(range);
+    public double rangedPrice() {
+        return price.doubleValue() + range;
     }
 
     /**

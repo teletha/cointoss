@@ -399,7 +399,7 @@ class OrderBookTest {
         OrderBookPage unit = at(index, list);
         assert unit.size == size;
         assert unit.price.is(price);
-        assert unit.rangedPrice().is(rangedPrice);
+        assert unit.rangedPrice() == rangedPrice;
     }
 
     /**
