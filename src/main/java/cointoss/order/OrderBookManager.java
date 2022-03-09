@@ -17,7 +17,6 @@ import cointoss.MarketService;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
 import kiss.Signal;
-import kiss.Variable;
 
 public class OrderBookManager implements Disposable {
 
@@ -26,9 +25,6 @@ public class OrderBookManager implements Disposable {
 
     /** BID */
     public final OrderBook longs;
-
-    /** The current spread. */
-    public final Variable<Num> spread = Variable.of(Num.ZERO);
 
     /**
      * Expose to test.
@@ -46,7 +42,6 @@ public class OrderBookManager implements Disposable {
     public OrderBookManager(MarketService service, Signal<Num> fixPageByPrice) {
         this.shorts = new OrderBook(service.setting, Direction.SELL);
         this.longs = new OrderBook(service.setting, Direction.BUY);
-        shorts.best.observe().combineLatest(longs.best.observe()).to(v -> spread.set(v.ⅰ.price.minus(v.ⅱ.price)));
 
         // orderbook management
         service.add(service.orderBookRealtimely().to(board -> {
@@ -78,11 +73,11 @@ public class OrderBookManager implements Disposable {
      * 
      * @return
      */
-    public Num spread() {
+    public double spread() {
         if (shorts.best.isAbsent() || longs.best.isAbsent()) {
-            return Num.ZERO;
+            return 0;
         } else {
-            return shorts.best.v.price.minus(longs.best.v.price);
+            return shorts.best.v.price.doubleValue() - longs.best.v.price.doubleValue();
         }
     }
 

@@ -781,10 +781,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     c.setFill(diff < 0 || 1000 < diff ? WarningColor : BaseColor);
                     c.fillText(diff + "ms", 50, 35);
 
-                    Num spread = chart.market.v.orderBook.spread();
+                    double spread = chart.market.v.orderBook.spread();
                     Num range = base.minimumSize.multiply(100);
-                    c.setFill(spread.isLessThan(range) ? BaseColor : WarningColor);
-                    c.fillText(spread.toString(), 50, 50);
+                    c.setFill(spread < range.doubleValue() ? BaseColor : WarningColor);
+                    c.fillText(Primitives.roundString(spread, base.scale), 50, 50);
 
                     OnlineStats volatilityStats = chart.ticker.v.spreadStats;
                     double volatility = chart.ticker.v.ticks.last().spread();
