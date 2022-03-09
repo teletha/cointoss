@@ -67,7 +67,7 @@ public class OrderBook {
         this.scaleBase = setting.base.scale;
         this.scaleTarget = setting.target.scale;
         this.takerFee = setting.takerFee;
-        this.group = new GroupedOrderBook(setting.base.minimumSize);
+        this.group = new GroupedOrderBook(setting.base.minimumSize.doubleValue());
     }
 
     // /**
@@ -105,8 +105,8 @@ public class OrderBook {
      * @param range The price range.
      * @return A grouped view.
      */
-    public final Collection<OrderBookPage> groupBy(Num range) {
-        if (range.isPositive() && group.range.isNot(range)) {
+    public final Collection<OrderBookPage> groupBy(double range) {
+        if (0 < range && range != group.range) {
             group = new GroupedOrderBook(range);
         }
         return group.pages.values();
@@ -376,11 +376,10 @@ public class OrderBook {
         updating.accept(this);
     }
 
-    private static double floor(Num value, Num base, int scale) {
+    private static double floor(Num value, double base, int scale) {
         double v = value.doubleValue();
-        double b = base.doubleValue();
 
-        return Primitives.roundDecimal(v - v % b, scale);
+        return Primitives.roundDecimal(v - v % base, scale);
     }
 
     /**
@@ -389,7 +388,7 @@ public class OrderBook {
     private class GroupedOrderBook {
 
         /** The price range. */
-        private final Num range;
+        private final double range;
 
         private final ConcurrentNavigableDoubleMap<OrderBookPage> pages = side.isBuy() ? DoubleMap.createReversedMap()
                 : DoubleMap.createSortedMap();
@@ -399,8 +398,8 @@ public class OrderBook {
          * 
          * @param range A price range to group.
          */
-        private GroupedOrderBook(Num range) {
-            this.range = Objects.requireNonNull(range);
+        private GroupedOrderBook(double range) {
+            this.range = range;
 
             // grouping the current boards
             for (OrderBookPage board : base.values()) {
@@ -417,7 +416,7 @@ public class OrderBook {
         private void update(Num price, double size) {
             double p = floor(price, range, scaleBase);
 
-            OrderBookPage page = pages.computeIfAbsent(p, key -> new OrderBookPage(Num.of(key), 0, side.isBuy() ? Num.ZERO : range));
+            OrderBookPage page = pages.computeIfAbsent(p, key -> new OrderBookPage(Num.of(key), 0, side.isBuy() ? 0 : range));
             page.size += size;
 
             if (Primitives.roundDecimal(page.size, scaleTarget, RoundingMode.DOWN) <= 0) {

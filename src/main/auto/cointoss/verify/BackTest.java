@@ -691,8 +691,8 @@ public class BackTest implements BackTestModel {
          * 
          * @return The next assignable model.
          */
-        default Next fast() {
-            return type(LogType.Fast);
+        default Next normal() {
+            return type(LogType.Normal);
         }
 
         /**
@@ -700,8 +700,8 @@ public class BackTest implements BackTestModel {
          * 
          * @return The next assignable model.
          */
-        default Next normal() {
-            return type(LogType.Normal);
+        default Next fast() {
+            return type(LogType.Fast);
         }
     }
 

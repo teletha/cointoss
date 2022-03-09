@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static cointoss.util.arithmetic.Num.*;
+import static cointoss.util.arithmetic.Num.ONE;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -35,7 +35,7 @@ class OrderBookTest {
     @Test
     void buy() {
         OrderBook book = new OrderBook(setting, Direction.BUY);
-        Collection<OrderBookPage> list = book.groupBy(Num.ONE);
+        Collection<OrderBookPage> list = book.groupBy(1);
 
         // add
         book.update(unit(1000, 1));
@@ -68,7 +68,7 @@ class OrderBookTest {
     @Test
     void sell() {
         OrderBook book = new OrderBook(setting, Direction.SELL);
-        Collection<OrderBookPage> list = book.groupBy(Num.ONE);
+        Collection<OrderBookPage> list = book.groupBy(1);
 
         book.update(unit(1000, 1));
         assert at(0, list).price.is(1000);
@@ -100,7 +100,7 @@ class OrderBookTest {
     @Test
     void buyFix() {
         OrderBook book = new OrderBook(setting, Direction.BUY);
-        Collection<OrderBookPage> list = book.groupBy(Num.ONE);
+        Collection<OrderBookPage> list = book.groupBy(1);
 
         book.update(unit(1007, 1));
         book.update(unit(1006, 1));
@@ -133,7 +133,7 @@ class OrderBookTest {
     @Test
     void sellFix() {
         OrderBook book = new OrderBook(setting, Direction.SELL);
-        Collection<OrderBookPage> list = book.groupBy(Num.ONE);
+        Collection<OrderBookPage> list = book.groupBy(1);
 
         book.update(unit(1007, 1));
         book.update(unit(1004, 1));
@@ -161,48 +161,48 @@ class OrderBookTest {
         OrderBook book = new OrderBook(setting, Direction.BUY);
 
         book.update(unit(1000, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1000);
+        assertList(book.groupBy(10), 0, 1000, 1, 1, 1000);
 
         // add
         book.update(unit(1009, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 2, 2, 1000);
+        assertList(book.groupBy(10), 0, 1000, 2, 2, 1000);
 
         // minus
         book.update(unit(1000, 0));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1000);
+        assertList(book.groupBy(10), 0, 1000, 1, 1, 1000);
 
         // next group
         book.update(unit(1010, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1, 1010);
-        assertList(book.groupBy(Num.TEN), 1, 1000, 1, 2, 1000);
+        assertList(book.groupBy(10), 0, 1010, 1, 1, 1010);
+        assertList(book.groupBy(10), 1, 1000, 1, 2, 1000);
 
         // remove
         book.update(unit(1009, 0));
-        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1, 1010);
+        assertList(book.groupBy(10), 0, 1010, 1, 1, 1010);
     }
 
     @Test
     void sellGroup() {
         OrderBook book = new OrderBook(setting, Direction.SELL);
         book.update(unit(1000, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1010);
+        assertList(book.groupBy(10), 0, 1000, 1, 1, 1010);
 
         // add
         book.update(unit(1009, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 2, 2, 1010);
+        assertList(book.groupBy(10), 0, 1000, 2, 2, 1010);
 
         // minus
         book.update(unit(1000, 0));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1010);
+        assertList(book.groupBy(10), 0, 1000, 1, 1, 1010);
 
         // next group
         book.update(unit(1010, 1));
-        assertList(book.groupBy(Num.TEN), 1, 1010, 1, 2, 1020);
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1010);
+        assertList(book.groupBy(10), 1, 1010, 1, 2, 1020);
+        assertList(book.groupBy(10), 0, 1000, 1, 1, 1010);
 
         // remove
         book.update(unit(1009, 0));
-        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1, 1020);
+        assertList(book.groupBy(10), 0, 1010, 1, 1, 1020);
     }
 
     @Test
@@ -220,27 +220,27 @@ class OrderBookTest {
         book.update(unit(1024, 1));
         book.update(unit(1001, 1));
         book.update(unit(1000, 1));
-        assert book.groupBy(Num.TEN).size() == 6;
+        assert book.groupBy(10).size() == 6;
 
         // fix error
         book.fix(Num.of(1051));
-        assert book.groupBy(Num.TEN).size() == 5;
+        assert book.groupBy(10).size() == 5;
 
         // fix error : remaining
         book.fix(Num.of(1050));
-        assert book.groupBy(Num.TEN).size() == 5;
+        assert book.groupBy(10).size() == 5;
 
         // fix error : multiple
         book.fix(Num.of(1038));
-        assert book.groupBy(Num.TEN).size() == 3;
+        assert book.groupBy(10).size() == 3;
 
         // fix error : overlap
         book.fix(Num.of(1030));
-        assert book.groupBy(Num.TEN).size() == 2;
+        assert book.groupBy(10).size() == 2;
 
         // fix error : not exist
         book.fix(Num.of(1010));
-        assert book.groupBy(Num.TEN).size() == 1;
+        assert book.groupBy(10).size() == 1;
     }
 
     @Test
@@ -258,27 +258,27 @@ class OrderBookTest {
         book.update(unit(1010, 1));
         book.update(unit(1001, 1));
         book.update(unit(1000, 1));
-        assert book.groupBy(Num.TEN).size() == 6;
+        assert book.groupBy(10).size() == 6;
 
         // fix error
         book.fix(Num.of(1010));
-        assert book.groupBy(Num.TEN).size() == 5;
+        assert book.groupBy(10).size() == 5;
 
         // fix error : remaining
         book.fix(Num.of(1011));
-        assert book.groupBy(Num.TEN).size() == 5;
+        assert book.groupBy(10).size() == 5;
 
         // fix error : multiple
         book.fix(Num.of(1031));
-        assert book.groupBy(Num.TEN).size() == 3;
+        assert book.groupBy(10).size() == 3;
 
         // fix error : overlap
         book.fix(Num.of(1038));
-        assert book.groupBy(Num.TEN).size() == 2;
+        assert book.groupBy(10).size() == 2;
 
         // fix error : not exist
         book.fix(Num.of(1050));
-        assert book.groupBy(Num.TEN).size() == 1;
+        assert book.groupBy(10).size() == 1;
     }
 
     @Test
