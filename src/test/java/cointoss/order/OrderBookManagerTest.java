@@ -13,14 +13,20 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.Currency;
+import cointoss.MarketSetting;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.VerifiableMarketService;
 
 class OrderBookManagerTest {
 
+    private VerifiableMarketService service = new VerifiableMarketService(MarketSetting.with.derivative()
+            .target(Currency.UNKNOWN.minimumSize(1).scale(1))
+            .base(Currency.UNKNOWN.minimumSize(1).scale(1)));
+
     @Test
     void findLargestOrderFromLongOnly() {
-        OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
+        OrderBookManager manager = new OrderBookManager(service);
         manager.longs.update(page(10, 5));
         manager.longs.update(page(13, 1));
         manager.longs.update(page(15, 2));
@@ -32,7 +38,7 @@ class OrderBookManagerTest {
 
     @Test
     void findLargestOrderFromLongOnlyWithMultipleLargest() {
-        OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
+        OrderBookManager manager = new OrderBookManager(service);
         manager.longs.update(page(10, 2));
         manager.longs.update(page(13, 4));
         manager.longs.update(page(15, 2));
@@ -44,7 +50,7 @@ class OrderBookManagerTest {
 
     @Test
     void findLargestOrderFromShortOnly() {
-        OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
+        OrderBookManager manager = new OrderBookManager(service);
         manager.shorts.update(page(10, 5));
         manager.shorts.update(page(13, 1));
         manager.shorts.update(page(15, 2));
@@ -56,7 +62,7 @@ class OrderBookManagerTest {
 
     @Test
     void findLargestOrderFromShortOnlyWithMultipleLargest() {
-        OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
+        OrderBookManager manager = new OrderBookManager(service);
         manager.shorts.update(page(10, 2));
         manager.shorts.update(page(13, 4));
         manager.shorts.update(page(15, 2));
@@ -68,7 +74,7 @@ class OrderBookManagerTest {
 
     @Test
     void findLargestOrder() {
-        OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
+        OrderBookManager manager = new OrderBookManager(service);
         manager.shorts.update(page(20, 3));
         manager.shorts.update(page(19, 1));
         manager.shorts.update(page(18, 2));
@@ -85,7 +91,7 @@ class OrderBookManagerTest {
 
     @Test
     void findLargestOrderWithMultipleLargest() {
-        OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
+        OrderBookManager manager = new OrderBookManager(service);
         manager.shorts.update(page(20, 3));
         manager.shorts.update(page(19, 1));
         manager.shorts.update(page(18, 2));

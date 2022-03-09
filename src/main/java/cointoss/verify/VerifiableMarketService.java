@@ -100,6 +100,13 @@ public class VerifiableMarketService extends MarketService {
     }
 
     /**
+     * @param setting
+     */
+    public VerifiableMarketService(MarketSetting setting) {
+        super(Exchange.TestNet, "TestableMarket", setting);
+    }
+
+    /**
      * 
      */
     public VerifiableMarketService(MarketService delegation) {
