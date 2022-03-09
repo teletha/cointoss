@@ -24,16 +24,16 @@ public final class Tick implements TemporalData {
     public final long openTime;
 
     /** Open price of the period */
-    public final Num openPrice;
+    public final double openPrice;
 
     /** Close price of the period. */
-    Num closePrice;
+    double closePrice;
 
     /** Max price of the period */
-    Num highPrice;
+    double highPrice;
 
     /** Min price of the period */
-    Num lowPrice;
+    double lowPrice;
 
     /** Snapshot of long volume at tick initialization. */
     double longVolume;
@@ -48,14 +48,14 @@ public final class Tick implements TemporalData {
     double shortLosscutVolume;
 
     /** The source ticker. */
-    private Ticker ticker;
+    Ticker ticker;
 
     /**
      * Empty Dummt Tick.
      */
     private Tick() {
         this.openTime = 0;
-        this.openPrice = closePrice = highPrice = lowPrice = Num.ZERO;
+        this.openPrice = closePrice = highPrice = lowPrice = 0;
     }
 
     /**
@@ -66,6 +66,17 @@ public final class Tick implements TemporalData {
      * @param ticker The data source.
      */
     Tick(long startEpochSeconds, Num open, Ticker ticker) {
+        this(startEpochSeconds, open.doubleValue(), ticker);
+    }
+
+    /**
+     * New {@link Tick}.
+     * 
+     * @param startEpochSeconds A start time of period.
+     * @param open A open price.
+     * @param ticker The data source.
+     */
+    Tick(long startEpochSeconds, double open, Ticker ticker) {
         this.openTime = startEpochSeconds;
         this.openPrice = this.highPrice = this.lowPrice = open;
 
@@ -97,7 +108,7 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num openPrice() {
+    public double openPrice() {
         return openPrice;
     }
 
@@ -106,8 +117,8 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num closePrice() {
-        return ticker == null ? closePrice : ticker.manager.latest.v.price;
+    public double closePrice() {
+        return ticker == null ? closePrice : ticker.manager.latest.v.price.doubleValue();
     }
 
     /**
@@ -115,7 +126,7 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num highPrice() {
+    public double highPrice() {
         return highPrice;
     }
 
@@ -124,7 +135,7 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num lowPrice() {
+    public double lowPrice() {
         return lowPrice;
     }
 
@@ -133,9 +144,9 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num upperPrice() {
-        Num close = closePrice();
-        return openPrice.isLessThan(close) ? close : openPrice;
+    public double upperPrice() {
+        double close = closePrice();
+        return openPrice < close ? close : openPrice;
     }
 
     /**
@@ -143,9 +154,9 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num lowerPrice() {
-        Num close = closePrice();
-        return openPrice.isLessThan(close) ? openPrice : close;
+    public double lowerPrice() {
+        double close = closePrice();
+        return openPrice < close ? openPrice : close;
     }
 
     /**
@@ -154,18 +165,8 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num heikinPrice() {
-        return highPrice.plus(lowPrice).plus(openPrice).plus(closePrice()).divide(Num.FOUR);
-    }
-
-    /**
-     * Heikin price (sometimes called the pivot point) refers to the arithmetic average of the high,
-     * low, and closing prices for this {@link Tick}.
-     * 
-     * @return The tick related value.
-     */
-    public double heikinDoublePrice() {
-        return (highPrice.doubleValue() + lowPrice.doubleValue() + openPrice.doubleValue() + closePrice().doubleValue()) / 4;
+    public double heikinPrice() {
+        return (highPrice + lowPrice + openPrice + closePrice()) / 4;
     }
 
     /**
@@ -174,18 +175,8 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num typicalPrice() {
-        return highPrice.plus(lowPrice).plus(closePrice()).divide(Num.THREE);
-    }
-
-    /**
-     * Typical price (sometimes called the pivot point) refers to the arithmetic average of the
-     * high, low, and closing prices for this {@link Tick}.
-     * 
-     * @return The tick related value.
-     */
-    public double typicalDoublePrice() {
-        return (highPrice.doubleValue() + lowPrice.doubleValue() + closePrice().doubleValue()) / 3;
+    public double typicalPrice() {
+        return (highPrice + lowPrice + closePrice()) / 3;
     }
 
     /**
@@ -194,18 +185,8 @@ public final class Tick implements TemporalData {
      * 
      * @return The tick related value.
      */
-    public Num medianPrice() {
-        return highPrice.plus(lowPrice).divide(Num.TWO);
-    }
-
-    /**
-     * Median price (sometimes called the high-low price) refers to the arithmetic average of the
-     * high and low prices for this {@link Tick}.
-     * 
-     * @return The tick related value.
-     */
-    public double medianDoublePrice() {
-        return (highPrice.doubleValue() + lowPrice.doubleValue()) / 2;
+    public double medianPrice() {
+        return (highPrice + lowPrice) / 2;
     }
 
     /**
@@ -254,17 +235,8 @@ public final class Tick implements TemporalData {
      * 
      * @return
      */
-    public Num spread() {
-        return highPrice().minus(lowPrice());
-    }
-
-    /**
-     * Compute the spread in prices.
-     * 
-     * @return
-     */
-    public double spreadDouble() {
-        return highPrice().doubleValue() - lowPrice().doubleValue();
+    public double spread() {
+        return highPrice() - lowPrice();
     }
 
     /**
@@ -272,10 +244,10 @@ public final class Tick implements TemporalData {
      */
     synchronized void freeze() {
         if (ticker != null) {
-            ticker.spreadStats.add(spreadDouble());
+            ticker.spreadStats.add(spread());
             ticker.buyVolumeStats.add(longVolume());
             ticker.sellVolumeStats.add(shortVolume());
-            ticker.typicalStats.add(typicalDoublePrice());
+            ticker.typicalStats.add(typicalPrice());
 
             closePrice = closePrice();
             longVolume = longVolume();
@@ -292,7 +264,7 @@ public final class Tick implements TemporalData {
      * @return
      */
     public boolean isBull() {
-        return openPrice.isLessThan(closePrice());
+        return openPrice < closePrice();
     }
 
     /**
@@ -301,7 +273,7 @@ public final class Tick implements TemporalData {
      * @return
      */
     public boolean isBear() {
-        return openPrice.isGreaterThan(closePrice());
+        return openPrice > closePrice();
     }
 
     /**

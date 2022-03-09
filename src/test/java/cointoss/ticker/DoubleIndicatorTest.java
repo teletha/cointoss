@@ -24,7 +24,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void valueAt() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(ticker.ticks.at(sec * 0)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(sec * 1)) == 2d;
         assert indicator.valueAt(ticker.ticks.at(sec * 2)) == 3d;
@@ -37,7 +37,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         Ticker lower = manager.on(Span.Minute1);
         long sec = lower.span.seconds;
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(lower.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(lower.ticks.at(2 * sec)) == 1d;
         assert indicator.valueAt(lower.ticks.at(4 * sec)) == 1d;
@@ -52,8 +52,8 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void combine() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
-        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
+        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice);
+        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice);
         Indicator<Ⅱ<Double, Double>> indicator = open.combine(low);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).equals(I.pair(1d, 1d));
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).equals(I.pair(2d, 2d));
@@ -66,7 +66,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void map() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        Indicator<Num> indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).map(v -> Num.of(v));
+        Indicator<Num> indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).map(v -> Num.of(v));
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).is(1);
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).is(2);
         assert indicator.valueAt(ticker.ticks.at(2 * sec)).is(3);
@@ -78,8 +78,8 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void mapWith() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
-        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
+        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice);
+        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice);
         Indicator<Num> indicator = open.map(low, (o, l) -> Num.of(o).plus(l));
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).is(2);
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).is(4);
@@ -92,9 +92,9 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void mapWith2() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
-        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
-        DoubleIndicator high = DoubleIndicator.build(ticker, tick -> tick.highPrice.doubleValue());
+        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice);
+        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice);
+        DoubleIndicator high = DoubleIndicator.build(ticker, tick -> tick.highPrice);
         Indicator<Num> indicator = open.map(low, high, (o, l, h) -> Num.of(o).plus(l).plus(h));
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).is(3);
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).is(6);
@@ -107,7 +107,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void mapToDouble() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).dmap(v -> v + 1);
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).dmap(v -> v + 1);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 2d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 3d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 4d;
@@ -119,8 +119,8 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void mapToDoubleWith() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
-        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
+        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice);
+        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice);
         DoubleIndicator indicator = open.dmap(low, (o, l) -> o + l);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 2d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 4d;
@@ -137,7 +137,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> {
             count.incrementAndGet();
-            return tick.openPrice.doubleValue();
+            return tick.openPrice;
         });
 
         DoubleIndicator memo = indicator.memoize();
@@ -167,7 +167,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void scale() {
         Ticker ticker = ticker(Span.Minute5, 1.23, 2.34, 3.45, 4.56, 5.67);
         long sec = ticker.span.seconds;
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).scale(1);
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).scale(1);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1.2d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 2.3d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 3.4d;
@@ -179,14 +179,14 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void sma() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).sma(2);
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).sma(2);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 1.5d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 2.5d;
         assert indicator.valueAt(ticker.ticks.at(3 * sec)) == 3.5d;
         assert indicator.valueAt(ticker.ticks.at(4 * sec)) == 4.5d;
 
-        indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).sma(4);
+        indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).sma(4);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 1.5d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 2d;
@@ -198,14 +198,14 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void ema() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).ema(2);
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).ema(2);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 1.6666666666666665;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 2.5555555555555554d;
         assert indicator.valueAt(ticker.ticks.at(3 * sec)) == 3.518518518518518d;
         assert indicator.valueAt(ticker.ticks.at(4 * sec)) == 4.506172839506172d;
 
-        indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).ema(4);
+        indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).ema(4);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 1.4d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 2.04d;
@@ -217,14 +217,14 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void mma() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).mma(2);
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).mma(2);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 1.5d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 2.25d;
         assert indicator.valueAt(ticker.ticks.at(3 * sec)) == 3.125d;
         assert indicator.valueAt(ticker.ticks.at(4 * sec)) == 4.0625d;
 
-        indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).mma(4);
+        indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).mma(4);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 1.25d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 1.6875d;
@@ -236,14 +236,14 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void wma() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).wma(2);
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).wma(2);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 1.6666666666666667d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 2.6666666666666667d;
         assert indicator.valueAt(ticker.ticks.at(3 * sec)) == 3.6666666666666667d;
         assert indicator.valueAt(ticker.ticks.at(4 * sec)) == 4.6666666666666667d;
 
-        indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).wma(4);
+        indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).wma(4);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 1.6666666666666667d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 2.3333333333333333d;
@@ -257,7 +257,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
         long sec = ticker.span.seconds;
         Tick tick2 = ticker.ticks.at(2 * sec);
 
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.closePrice().doubleValue()).memoize();
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.closePrice()).memoize();
         assert indicator.valueAt(tick2) == 3d;
 
         // update latest price

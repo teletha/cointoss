@@ -23,8 +23,7 @@ import javafx.scene.layout.Region;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
-import kiss.Variable;
+import cointoss.util.arithmetic.Primitives;
 import trademate.setting.StaticConfig;
 import viewtify.ui.helper.LayoutAssistant;
 
@@ -75,7 +74,7 @@ public class Chart extends Region {
 
         // configure axis label
         chart.market.observe().to(m -> {
-            DoubleFunction<String> readablePrice = p -> Num.of(p).scale(m.service.setting.base.scale).toString();
+            DoubleFunction<String> readablePrice = p -> Primitives.roundString(p, m.service.setting.base.scale);
             DoubleFunction<String> readableTime = seconds -> {
                 ZonedDateTime time = Chrono.systemBySeconds((long) seconds);
                 int hour = time.getHour() * 60 * 60 - time.getOffset().getTotalSeconds();
@@ -155,8 +154,7 @@ public class Chart extends Region {
      * Set y-axis range.
      */
     private void setAxisYRange() {
-        Variable<Num> max = Variable.of(Num.MIN);
-        Variable<Num> min = Variable.of(Num.MAX);
+        double[] minmax = {Double.MAX_VALUE, Double.MIN_VALUE};
 
         long start = (long) axisX.computeVisibleMinValue();
         long end = (long) axisX.computeVisibleMaxValue();
@@ -178,13 +176,15 @@ public class Chart extends Region {
         if (chart.market.isPresent()) {
             Ticker ticker = chart.market.v.tickers.on(span);
             ticker.ticks.query(start, end).to(tick -> {
-                max.set(Num.max(max.v, tick.highPrice()));
-                min.set(Num.min(min.v, tick.lowPrice()));
+                double high = tick.highPrice();
+                double low = tick.lowPrice();
+                if (low < minmax[0]) minmax[0] = low;
+                if (minmax[1] < high) minmax[1] = high;
             });
         }
 
-        Num margin = max.v.minus(min).multiply(Num.of(0.5));
-        axisY.logicalMaxValue.set(max.v.plus(margin).doubleValue());
-        axisY.logicalMinValue.set(min.v.minus(margin).doubleValue());
+        double margin = (minmax[1] - minmax[0]) * 0.5d;
+        axisY.logicalMaxValue.set(minmax[1] + margin);
+        axisY.logicalMinValue.set(minmax[0] - margin);
     }
 }

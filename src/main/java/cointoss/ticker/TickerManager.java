@@ -174,7 +174,7 @@ public final class TickerManager implements Disposable {
      */
     private void updateHighPrice(Ticker ticker, Num price) {
         if (price.isGreaterThan(ticker.current.highPrice)) {
-            ticker.current.highPrice = price;
+            ticker.current.highPrice = price.doubleValue();
 
             for (Ticker upper : ticker.uppers) {
                 updateHighPrice(upper, price);
@@ -190,7 +190,7 @@ public final class TickerManager implements Disposable {
      */
     private void updateLowPrice(Ticker ticker, Num price) {
         if (price.isLessThan(ticker.current.lowPrice)) {
-            ticker.current.lowPrice = price;
+            ticker.current.lowPrice = price.doubleValue();
 
             for (Ticker upper : ticker.uppers) {
                 updateLowPrice(upper, price);

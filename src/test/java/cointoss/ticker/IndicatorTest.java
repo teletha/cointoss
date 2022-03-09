@@ -24,7 +24,7 @@ class IndicatorTest extends TickerTestSupport {
     void valueAt() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> Num.of(tick.openPrice));
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).is(1);
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).is(2);
         assert indicator.valueAt(ticker.ticks.at(2 * sec)).is(3);
@@ -37,7 +37,7 @@ class IndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         Ticker lower = manager.on(Span.Minute1);
         long sec = lower.span.seconds;
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> Num.of(tick.openPrice));
         assert indicator.valueAt(lower.ticks.at(0 * sec)).is(1);
         assert indicator.valueAt(lower.ticks.at(2 * sec)).is(1);
         assert indicator.valueAt(lower.ticks.at(4 * sec)).is(1);
@@ -53,7 +53,7 @@ class IndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         Indicator<Double> volume = Indicator.build(ticker, tick -> tick.longVolume());
-        Indicator<Integer> low = Indicator.build(ticker, tick -> tick.lowPrice.intValue());
+        Indicator<Integer> low = Indicator.build(ticker, tick -> (int) tick.lowPrice);
         Indicator<Ⅱ<Double, Integer>> indicator = volume.combine(low);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).equals(I.pair(1d, 1));
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).equals(I.pair(2d, 2));
@@ -66,7 +66,7 @@ class IndicatorTest extends TickerTestSupport {
     void map() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick).map(Tick::openPrice);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick).map(Tick::openPrice).map(Num::of);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).is(1);
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).is(2);
         assert indicator.valueAt(ticker.ticks.at(2 * sec)).is(3);
@@ -78,8 +78,8 @@ class IndicatorTest extends TickerTestSupport {
     void mapWith() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
-        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
+        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice).map(Num::of);
+        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice).map(Num::of);
         Indicator<Num> indicator = open.map(low, Num::plus);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).is(2);
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).is(4);
@@ -92,9 +92,9 @@ class IndicatorTest extends TickerTestSupport {
     void mapWith2() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
-        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
-        Indicator<Num> high = Indicator.build(ticker, tick -> tick.highPrice);
+        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice).map(Num::of);
+        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice).map(Num::of);
+        Indicator<Num> high = Indicator.build(ticker, tick -> tick.highPrice).map(Num::of);
         Indicator<Num> indicator = open.map(low, high, (o, l, h) -> o.plus(l).plus(h));
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).is(3);
         assert indicator.valueAt(ticker.ticks.at(1 * sec)).is(6);
@@ -107,7 +107,7 @@ class IndicatorTest extends TickerTestSupport {
     void mapToDouble() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        DoubleIndicator indicator = Indicator.build(ticker, tick -> tick).dmap(t -> t.openPrice.doubleValue());
+        DoubleIndicator indicator = Indicator.build(ticker, tick -> tick).dmap(t -> t.openPrice);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 2d;
         assert indicator.valueAt(ticker.ticks.at(2 * sec)) == 3d;
@@ -119,8 +119,8 @@ class IndicatorTest extends TickerTestSupport {
     void mapToDoubleWith() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
-        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
-        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
+        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice).map(Num::of);
+        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice).map(Num::of);
         DoubleIndicator indicator = open.dmap(low, (o, l) -> o.plus(l).doubleValue());
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 2d;
         assert indicator.valueAt(ticker.ticks.at(1 * sec)) == 4d;
@@ -138,7 +138,7 @@ class IndicatorTest extends TickerTestSupport {
         Indicator<Num> indicator = Indicator.build(ticker, tick -> {
             count.incrementAndGet();
             return tick.openPrice;
-        });
+        }).map(Num::of);
 
         Indicator<Num> memo = indicator.memoize();
         memo.valueAt(ticker.ticks.at(0 * sec));
@@ -166,7 +166,7 @@ class IndicatorTest extends TickerTestSupport {
     @Test
     void avoidMultiMemo() {
         Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).map(Num::of);
         Indicator<Num> memoized = indicator.memoize();
         assert memoized != indicator;
         assert memoized == memoized.memoize();
@@ -178,7 +178,7 @@ class IndicatorTest extends TickerTestSupport {
         long sec = ticker.span.seconds;
         Tick tick2 = ticker.ticks.at(2 * sec);
 
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.closePrice()).memoize();
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.closePrice()).map(Num::of).memoize();
         assert indicator.valueAt(tick2).is(3);
 
         // update latest price

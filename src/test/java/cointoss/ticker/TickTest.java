@@ -16,13 +16,13 @@ class TickTest extends TickerTestSupport {
     @Test
     void typicalPrice() {
         Tick tick = tick(Span.Minute5, 10, 15, 4, 8);
-        assert tick.typicalPrice().is(9);
+        assert tick.typicalPrice() == 9;
     }
 
     @Test
     void medianPrice() {
         Tick tick = tick(Span.Minute5, 10, 15, 4, 8);
-        assert tick.medianPrice().is(9.5);
+        assert tick.medianPrice() == 9.5;
     }
 
     @Test
@@ -46,18 +46,18 @@ class TickTest extends TickerTestSupport {
     @Test
     void upperPrice() {
         Tick bear = tick(Span.Minute5, 10, 15, 4, 8);
-        assert bear.upperPrice().is(10);
+        assert bear.upperPrice() == 10;
 
         Tick bull = tick(Span.Minute5, 10, 15, 4, 15);
-        assert bull.upperPrice().is(15);
+        assert bull.upperPrice() == 15;
     }
 
     @Test
     void lowerPrice() {
         Tick bear = tick(Span.Minute5, 10, 15, 4, 8);
-        assert bear.lowerPrice().is(8);
+        assert bear.lowerPrice() == 8;
 
         Tick bull = tick(Span.Minute5, 10, 15, 4, 15);
-        assert bull.lowerPrice().is(10);
+        assert bull.lowerPrice() == 10;
     }
 }

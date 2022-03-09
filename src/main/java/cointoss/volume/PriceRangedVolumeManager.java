@@ -61,7 +61,7 @@ public class PriceRangedVolumeManager {
      * @param startTime A starting time.
      * @param startPrice A starting price.
      */
-    public void start(long startTime, Num startPrice) {
+    public void start(long startTime, double startPrice) {
         buyer = new PriceRangedVolumePeriod(startTime, startPrice);
         seller = new PriceRangedVolumePeriod(startTime, startPrice);
         volumes.put(startTime, new PriceRangedVolumePeriod[] {buyer, seller});
@@ -118,7 +118,7 @@ public class PriceRangedVolumeManager {
      * @param startPrice
      * @return
      */
-    PriceRangedVolumePeriod createPeriod(long startTime, Num startPrice) {
+    PriceRangedVolumePeriod createPeriod(long startTime, double startPrice) {
         return new PriceRangedVolumePeriod(startTime, startPrice);
     }
 
@@ -134,9 +134,9 @@ public class PriceRangedVolumeManager {
 
         private final FloatList lower = new FloatList();
 
-        private PriceRangedVolumePeriod(long startTime, Num startPrice) {
+        private PriceRangedVolumePeriod(long startTime, double startPrice) {
             this.startTime = startTime;
-            this.startPrice = Math.round(startPrice.floatValue() * tens);
+            this.startPrice = Math.round((float) startPrice * tens);
         }
 
         /**

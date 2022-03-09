@@ -9,7 +9,7 @@
  */
 package trademate.chart.builtin;
 
-import static cointoss.ticker.Span.*;
+import static cointoss.ticker.Span.Minute1;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
@@ -42,7 +42,7 @@ public class TraderVisualizer extends PlotScript {
             for (Trader trader : market.traders) {
                 Snapshot snapshot = trader.snapshotAt(tick.openTime);
                 realized = realized.plus(snapshot.realizedProfit());
-                unrealized = unrealized.plus(snapshot.unrealizedProfit(tick.openPrice));
+                unrealized = unrealized.plus(snapshot.unrealizedProfit(Num.of(tick.openPrice)));
                 longSize = longSize.plus(snapshot.longSize);
                 shortSize = shortSize.plus(snapshot.shortSize);
             }

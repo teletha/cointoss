@@ -787,7 +787,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     c.fillText(spread.toString(), 50, 50);
 
                     OnlineStats volatilityStats = chart.ticker.v.spreadStats;
-                    double volatility = chart.ticker.v.ticks.last().spreadDouble();
+                    double volatility = chart.ticker.v.ticks.last().spread();
                     c.setFill(volatilityStats.calculateSigma(volatility) <= 2 ? BaseColor : WarningColor);
                     c.fillText(Primitives.roundString(volatility, base.scale), 50, 65);
                     c.setFill(BaseColor);
@@ -971,10 +971,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 Tick tick = ticker.ticks.last();
 
                 double x = axisX.getPositionForValue(tick.openTime);
-                double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
-                double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
-                double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
-                double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
+                double open = axisY.getPositionForValue(tick.openPrice);
+                double close = axisY.getPositionForValue(tick.closePrice());
+                double high = axisY.getPositionForValue(tick.highPrice());
+                double low = axisY.getPositionForValue(tick.lowPrice());
 
                 if (chart.showCandle.is(true)) {
                     gc.setStroke(chart.candleType.value().coordinator.apply(tick));
@@ -1021,10 +1021,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         int base = chart.market.v.service.setting.base.scale;
         String date = Chrono.systemByMills(tick.openTime * 1000).format(Chrono.DateTime);
-        String open = CommonText.OpenPrice + " " + tick.openPrice.scale(base);
-        String high = CommonText.HighPrice + " " + tick.highPrice().scale(base);
-        String low = CommonText.LowPrice + " " + tick.lowPrice().scale(base);
-        String close = CommonText.ClosePrice + " " + tick.closePrice().scale(base);
+        String open = CommonText.OpenPrice + " " + Primitives.roundString(tick.openPrice, base);
+        String high = CommonText.HighPrice + " " + Primitives.roundString(tick.highPrice(), base);
+        String low = CommonText.LowPrice + " " + Primitives.roundString(tick.lowPrice(), base);
+        String close = CommonText.ClosePrice + " " + Primitives.roundString(tick.closePrice(), base);
 
         int y = chartInfoHeight + chartInfoTopPadding;
         gc.setFill(InfoColor);

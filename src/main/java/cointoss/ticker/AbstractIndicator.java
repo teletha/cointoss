@@ -372,7 +372,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
 
         Self memo = build((tick, created) -> {
             if (count[0] == 0) return valueAt(tick);
-            if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, created::valueAt);
+            if (tick.ticker != null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, created::valueAt);
 
             try {
                 return cache.get(tick, () -> calculator.apply(tick, t -> {

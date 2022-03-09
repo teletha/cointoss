@@ -12,7 +12,7 @@ package trademate.chart.builtin;
 import static cointoss.ticker.Span.*;
 
 import cointoss.Market;
-import cointoss.ticker.NumIndicator;
+import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
@@ -45,7 +45,7 @@ public class SMAIndicator extends PlotScript {
     }
 
     private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {
-        line(NumIndicator.build(ticker, Tick::closePrice).sma(days).scale(base).name(ticker.span.toString()), style);
+        line(DoubleIndicator.build(ticker, Tick::closePrice).sma(days).scale(base).name(ticker.span.toString()), style);
     }
 
     /**

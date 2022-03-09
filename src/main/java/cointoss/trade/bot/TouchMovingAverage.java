@@ -10,19 +10,15 @@
 package cointoss.trade.bot;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import cointoss.Direction;
 import cointoss.Market;
-import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import kiss.Signal;
 
 public class TouchMovingAverage extends Trader {
 
@@ -39,59 +35,61 @@ public class TouchMovingAverage extends Trader {
     protected void declareStrategy(Market market, Funds fund) {
         Span span = Span.Hour4;
         Ticker ticker = market.tickers.on(span);
-        NumIndicator sma = NumIndicator.build(ticker, tick -> tick.highPrice()).sma(21);
-
-        Signal<Tick> up = market.tickers.on(Span.Minute5).close.map(e -> e.closePrice())
-                .plug(breakup(sma::valueAtLast))
-                .map(v -> ticker.ticks.last())
-                .diff()
-                .take(now -> {
-                    List<Tick> list = ticker.ticks.query(now, o -> o.max(tickSize).before()).toList();
-                    if (list.size() < tickSize || list.stream().anyMatch(tick -> tick.highPrice().isGreaterThan(sma.valueAt(tick)))) {
-                        return false;
-                    }
-                    return true;
-                });
-
-        Signal<Tick> down = market.tickers.on(Span.Minute5).close.map(e -> e.lowerPrice())
-                .plug(breakdown(sma::valueAtLast))
-                .map(v -> ticker.ticks.last())
-                .diff()
-                .take(now -> {
-                    List<Tick> list = ticker.ticks.query(now, o -> o.max(tickSize).before()).toList();
-                    if (list.size() < tickSize || list.stream().anyMatch(tick -> tick.lowerPrice().isLessThan(sma.valueAt(tick)))) {
-                        return false;
-                    }
-                    return true;
-                });
-
-        when(up, tick -> {
-            trade(new Scenario() {
-
-                @Override
-                protected void entry() {
-                    entry(Direction.SELL, 1);
-                }
-
-                @Override
-                protected void exit() {
-                    exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
-                }
-            });
-        });
-
-        when(down, tick -> {
-            trade(new Scenario() {
-                @Override
-                protected void entry() {
-                    entry(Direction.BUY, 1);
-                }
-
-                @Override
-                protected void exit() {
-                    exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
-                }
-            });
-        });
+        // NumIndicator sma = NumIndicator.build(ticker, tick -> tick.highPrice()).sma(21);
+        //
+        // Signal<Tick> up = market.tickers.on(Span.Minute5).close.map(e -> e.closePrice())
+        // .plug(breakup(sma::valueAtLast))
+        // .map(v -> ticker.ticks.last())
+        // .diff()
+        // .take(now -> {
+        // List<Tick> list = ticker.ticks.query(now, o -> o.max(tickSize).before()).toList();
+        // if (list.size() < tickSize || list.stream().anyMatch(tick ->
+        // tick.highPrice().isGreaterThan(sma.valueAt(tick)))) {
+        // return false;
+        // }
+        // return true;
+        // });
+        //
+        // Signal<Tick> down = market.tickers.on(Span.Minute5).close.map(e -> e.lowerPrice())
+        // .plug(breakdown(sma::valueAtLast))
+        // .map(v -> ticker.ticks.last())
+        // .diff()
+        // .take(now -> {
+        // List<Tick> list = ticker.ticks.query(now, o -> o.max(tickSize).before()).toList();
+        // if (list.size() < tickSize || list.stream().anyMatch(tick ->
+        // tick.lowerPrice().isLessThan(sma.valueAt(tick)))) {
+        // return false;
+        // }
+        // return true;
+        // });
+        //
+        // when(up, tick -> {
+        // trade(new Scenario() {
+        //
+        // @Override
+        // protected void entry() {
+        // entry(Direction.SELL, 1);
+        // }
+        //
+        // @Override
+        // protected void exit() {
+        // exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
+        // }
+        // });
+        // });
+        //
+        // when(down, tick -> {
+        // trade(new Scenario() {
+        // @Override
+        // protected void entry() {
+        // entry(Direction.BUY, 1);
+        // }
+        //
+        // @Override
+        // protected void exit() {
+        // exitAtRiskRewardRatio(riskRewardRatio, Span.Hour4);
+        // }
+        // });
+        // });
     }
 }

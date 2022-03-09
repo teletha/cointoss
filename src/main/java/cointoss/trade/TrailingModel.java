@@ -13,7 +13,6 @@ import java.util.function.Function;
 
 import cointoss.Market;
 import cointoss.ticker.Span;
-import cointoss.ticker.Tick;
 import cointoss.util.arithmetic.Num;
 import icy.manipulator.Icy;
 import kiss.Signal;
@@ -79,6 +78,6 @@ abstract class TrailingModel {
 
     @Icy.Overload("update")
     private Function<Market, Signal<Num>> update(Span span) {
-        return market -> market.open(span).map(Tick::openPrice);
+        return market -> market.open(span).map(tick -> Num.of(tick.openPrice));
     }
 }

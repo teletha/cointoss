@@ -17,7 +17,6 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.util.arithmetic.Num;
 import kiss.Variable;
 import trademate.Theme;
 import viewtify.util.FXUtils;
@@ -63,12 +62,12 @@ public enum CandleType {
     }
 
     private static Color price(Tick tick) {
-        Num open = tick.openPrice;
-        Num close = tick.closePrice();
+        double open = tick.openPrice;
+        double close = tick.closePrice();
 
-        if (open.isLessThan(close)) {
+        if (open < close) {
             return Theme.$.buy.v;
-        } else if (open.isGreaterThan(close)) {
+        } else if (open > close) {
             return Theme.$.sell.v;
         } else {
             return CandleType.Same;
@@ -89,18 +88,18 @@ public enum CandleType {
     }
 
     private static Color priceVolume(Tick tick) {
-        Num open = tick.openPrice;
-        Num close = tick.closePrice();
+        double open = tick.openPrice;
+        double close = tick.closePrice();
         double buy = tick.longVolume();
         double sell = tick.shortVolume();
 
-        if (open.isLessThan(close)) {
+        if (open < close) {
             if (buy >= sell) {
                 return Theme.$.buy.v;
             } else {
                 return CandleType.BuyT.v;
             }
-        } else if (open.isGreaterThan(close)) {
+        } else if (open > close) {
             if (buy >= sell) {
                 return CandleType.SellT.v;
             } else {
@@ -116,14 +115,14 @@ public enum CandleType {
     }
 
     private static Color priceVolumeWeight(Tick tick) {
-        Num open = tick.openPrice;
-        Num close = tick.closePrice();
+        double open = tick.openPrice;
+        double close = tick.closePrice();
         double buy = tick.longVolume();
         double sell = tick.shortVolume();
 
-        if (open.isLessThan(close)) {
+        if (open < close) {
             return Theme.$.buy.v.deriveColor(0, buy / sell, 1, 1);
-        } else if (open.isGreaterThan(close)) {
+        } else if (open > close) {
             return Theme.$.sell.v.deriveColor(0, sell / buy, 1, 1);
         } else {
             return CandleType.Same;

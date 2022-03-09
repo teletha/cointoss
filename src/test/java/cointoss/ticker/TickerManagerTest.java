@@ -42,7 +42,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.ticks.first().highPrice.is(100);
+            assert ticker.ticks.first().highPrice == 100;
         });
 
         // update
@@ -51,26 +51,26 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {
-            assert ticker.ticks.first().highPrice.is(300);
-            assert ticker.ticks.last().highPrice.is(300);
+            assert ticker.ticks.first().highPrice == 300;
+            assert ticker.ticks.last().highPrice == 300;
         });
         manager.tickers().take(ticker -> ticker.span == Minute1).to(ticker -> {
-            assert ticker.ticks.first().highPrice.is(100);
-            assert ticker.ticks.last().highPrice.is(200);
+            assert ticker.ticks.first().highPrice == 100;
+            assert ticker.ticks.last().highPrice == 200;
         });
 
         // update and validate
         manager.update(Execution.with.buy(1).price(300).date(Base.plusMinutes(3)));
-        assert manager.on(Minute5).ticks.last().highPrice.is(300);
-        assert manager.on(Minute5).ticks.last().highPrice.is(300);
+        assert manager.on(Minute5).ticks.last().highPrice == 300;
+        assert manager.on(Minute5).ticks.last().highPrice == 300;
         // update and validate
         manager.update(Execution.with.buy(1).price(400).date(Base.plusMinutes(4)));
-        assert manager.on(Minute5).ticks.last().highPrice.is(400);
-        assert manager.on(Minute5).ticks.last().highPrice.is(400);
+        assert manager.on(Minute5).ticks.last().highPrice == 400;
+        assert manager.on(Minute5).ticks.last().highPrice == 400;
         // update and validate
         manager.update(Execution.with.buy(1).price(500).date(Base.plusMinutes(5)));
-        assert manager.on(Minute5).ticks.last().highPrice.is(500);
-        assert manager.on(Minute5).ticks.last().highPrice.is(500);
+        assert manager.on(Minute5).ticks.last().highPrice == 500;
+        assert manager.on(Minute5).ticks.last().highPrice == 500;
     }
 
     @Test
@@ -80,7 +80,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.ticks.first().lowPrice.is(300);
+            assert ticker.ticks.first().lowPrice == 300;
         });
 
         // update
@@ -89,26 +89,26 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {
-            assert ticker.ticks.first().lowPrice.is(100);
-            assert ticker.ticks.last().lowPrice.is(100);
+            assert ticker.ticks.first().lowPrice == 100;
+            assert ticker.ticks.last().lowPrice == 100;
         });
         manager.tickers().take(ticker -> ticker.span == Minute1).to(ticker -> {
-            assert ticker.ticks.first().lowPrice.is(300);
-            assert ticker.ticks.last().lowPrice.is(200);
+            assert ticker.ticks.first().lowPrice == 300;
+            assert ticker.ticks.last().lowPrice == 200;
         });
 
         // update and validate
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(3)));
-        assert manager.on(Minute5).ticks.last().lowPrice.is(30);
-        assert manager.on(Minute5).ticks.last().lowPrice.is(30);
+        assert manager.on(Minute5).ticks.last().lowPrice == 30;
+        assert manager.on(Minute5).ticks.last().lowPrice == 30;
         // update and validate
         manager.update(Execution.with.buy(1).price(20).date(Base.plusMinutes(4)));
-        assert manager.on(Minute5).ticks.last().lowPrice.is(20);
-        assert manager.on(Minute5).ticks.last().lowPrice.is(20);
+        assert manager.on(Minute5).ticks.last().lowPrice == 20;
+        assert manager.on(Minute5).ticks.last().lowPrice == 20;
         // update and validate
         manager.update(Execution.with.buy(1).price(10).date(Base.plusMinutes(5)));
-        assert manager.on(Minute5).ticks.last().lowPrice.is(10);
-        assert manager.on(Minute5).ticks.last().lowPrice.is(10);
+        assert manager.on(Minute5).ticks.last().lowPrice == 10;
+        assert manager.on(Minute5).ticks.last().lowPrice == 10;
     }
 
     @Test
@@ -118,7 +118,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.ticks.first().openPrice.is(300);
+            assert ticker.ticks.first().openPrice == 300;
         });
 
         // update
@@ -127,12 +127,12 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {
-            assert ticker.ticks.first().openPrice.is(300);
-            assert ticker.ticks.last().openPrice.is(300);
+            assert ticker.ticks.first().openPrice == 300;
+            assert ticker.ticks.last().openPrice == 300;
         });
         manager.tickers().take(ticker -> ticker.span == Minute1).to(ticker -> {
-            assert ticker.ticks.first().openPrice.is(300);
-            assert ticker.ticks.last().openPrice.is(200);
+            assert ticker.ticks.first().openPrice == 300;
+            assert ticker.ticks.last().openPrice == 200;
         });
     }
 
@@ -143,7 +143,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.ticks.first().closePrice().is(300);
+            assert ticker.ticks.first().closePrice() == 300;
         });
 
         // update
@@ -152,12 +152,12 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {
-            assert ticker.ticks.first().closePrice().is(200);
-            assert ticker.ticks.last().closePrice().is(200);
+            assert ticker.ticks.first().closePrice() == 200;
+            assert ticker.ticks.last().closePrice() == 200;
         });
         manager.tickers().take(ticker -> ticker.span == Minute1).to(ticker -> {
-            assert ticker.ticks.first().closePrice().is(300);
-            assert ticker.ticks.last().closePrice().is(200);
+            assert ticker.ticks.first().closePrice() == 300;
+            assert ticker.ticks.last().closePrice() == 200;
         });
     }
 
@@ -236,40 +236,40 @@ class TickerManagerTest {
 
         Ticker ticker = manager.on(Minute1);
         Tick tick = ticker.ticks.at(BaseSec);
-        assert tick.openPrice().is(10);
-        assert tick.closePrice().is(10);
-        assert tick.highPrice().is(10);
-        assert tick.lowPrice().is(10);
+        assert tick.openPrice() == 10;
+        assert tick.closePrice() == 10;
+        assert tick.highPrice() == 10;
+        assert tick.lowPrice() == 10;
 
         tick = ticker.ticks.at(BaseSec + 60);
-        assert tick.openPrice().is(10);
-        assert tick.closePrice().is(10);
-        assert tick.highPrice().is(10);
-        assert tick.lowPrice().is(10);
+        assert tick.openPrice() == 10;
+        assert tick.closePrice() == 10;
+        assert tick.highPrice() == 10;
+        assert tick.lowPrice() == 10;
 
         tick = ticker.ticks.at(BaseSec + 2 * 60);
-        assert tick.openPrice().is(10);
-        assert tick.closePrice().is(10);
-        assert tick.highPrice().is(10);
-        assert tick.lowPrice().is(10);
+        assert tick.openPrice() == 10;
+        assert tick.closePrice() == 10;
+        assert tick.highPrice() == 10;
+        assert tick.lowPrice() == 10;
 
         tick = ticker.ticks.at(BaseSec + 3 * 60);
-        assert tick.openPrice().is(10);
-        assert tick.closePrice().is(10);
-        assert tick.highPrice().is(10);
-        assert tick.lowPrice().is(10);
+        assert tick.openPrice() == 10;
+        assert tick.closePrice() == 10;
+        assert tick.highPrice() == 10;
+        assert tick.lowPrice() == 10;
 
         tick = ticker.ticks.at(BaseSec + 4 * 60);
-        assert tick.openPrice().is(10);
-        assert tick.closePrice().is(10);
-        assert tick.highPrice().is(10);
-        assert tick.lowPrice().is(10);
+        assert tick.openPrice() == 10;
+        assert tick.closePrice() == 10;
+        assert tick.highPrice() == 10;
+        assert tick.lowPrice() == 10;
 
         tick = ticker.ticks.at(BaseSec + 5 * 60);
-        assert tick.openPrice().is(30);
-        assert tick.closePrice().is(30);
-        assert tick.highPrice().is(30);
-        assert tick.lowPrice().is(30);
+        assert tick.openPrice() == 30;
+        assert tick.closePrice() == 30;
+        assert tick.highPrice() == 30;
+        assert tick.lowPrice() == 30;
     }
 
     @Test
