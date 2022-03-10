@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.2.0](https://www.github.com/teletha/cointoss/compare/v1.1.0...v1.2.0) (2022-03-10)
+
+
+### Features
+
+* Add 10 sec span. ([d23828f](https://www.github.com/teletha/cointoss/commit/d23828f9a1806b841bbe265bd28e8c494274283b))
+* Add buld data supplier on FeatherStore. ([a1aa7c1](https://www.github.com/teletha/cointoss/commit/a1aa7c122461c2554616bbd6cb57008ef3992ad6))
+* Add FTX theme. ([f9ae373](https://www.github.com/teletha/cointoss/commit/f9ae3736b2b5a5491c8473f5798636138c720750))
+* OrderBookPage uses Num no longer. ([728a795](https://www.github.com/teletha/cointoss/commit/728a79507b53cdd75dadf9d395cb8c3b735cc076))
+* Reduce memory usage for grouped order books. ([0fee178](https://www.github.com/teletha/cointoss/commit/0fee178f83ff29fbf20211886f4f08ee3422eeeb))
+* Reduce the amount of vram usage hugely. ([247cd8d](https://www.github.com/teletha/cointoss/commit/247cd8d04786b5ddd0a3c82d8b212b298173e9fe))
+* Reduce usage of Num in GroupedOrderBook. ([f9c3818](https://www.github.com/teletha/cointoss/commit/f9c3818eca020d2dce9dc35a8e1e69b717145eee))
+* Tick uses Num no longer. ([a70c912](https://www.github.com/teletha/cointoss/commit/a70c912e1d6adc0a5b973a35b87f2a925a03ba50))
+
+
+### Bug Fixes
+
+* Don't draw market info. ([6f37cb5](https://www.github.com/teletha/cointoss/commit/6f37cb51e782b6a2c430f8042625898e4d0f9dd7))
+* Make scanning logs more faster. ([023d91d](https://www.github.com/teletha/cointoss/commit/023d91deaa9350dbd8ebcd98802263e21664f4a4))
+* Reduce memory usage in OrderBook's range. ([dcff044](https://www.github.com/teletha/cointoss/commit/dcff0447f5cd395c2542e290c4055099ca09d45f))
+* Reduce usage of Num in GroupedOrderBook. ([bf3f688](https://www.github.com/teletha/cointoss/commit/bf3f688d9db93a15e3e7fa4515d4a9c2086d9cc4))
+* Reduce usage of Num in GroupedOrderBook. ([651a2ad](https://www.github.com/teletha/cointoss/commit/651a2ad02eef787a59fce60c2cc3330a9e10e07d))
+* Reduce usage of Num in OrderBookManager. ([5a1102d](https://www.github.com/teletha/cointoss/commit/5a1102d6fccc45094c9b4a6728d49d5e2c4ecb6f))
+* Reduce usage of Num in OrderBookPage. ([d305999](https://www.github.com/teletha/cointoss/commit/d305999a99d3228f73e127062e425c69525841c4))
+* Y-axis is no longer able to zoom. ([d8019ce](https://www.github.com/teletha/cointoss/commit/d8019cee9d4408131922ce879394fcdcecb30afd))
+
 ## [1.1.0](https://www.github.com/teletha/cointoss/compare/v1.0.0...v1.1.0) (2022-02-17)
 
 
