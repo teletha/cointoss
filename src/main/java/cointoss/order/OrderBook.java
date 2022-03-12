@@ -455,8 +455,18 @@ public class OrderBook {
             }
         }
 
-        if (base.isEmpty() == false) {
+        int size = base.size();
+        if (0 < size) {
             best.set(base.firstEntry().getValue());
+
+            if (5000 < size) {
+                for (int i = 0; i < 50; i++) {
+                    OrderBookPage removed = base.pollLastEntry().getValue();
+                    if (grouped != null) {
+                        updateGroup(removed.price, removed.size * -1);
+                    }
+                }
+            }
         }
         updating.accept(this);
     }
