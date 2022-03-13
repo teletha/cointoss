@@ -7,14 +7,15 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.order;
+package cointoss.orderbook;
 
-import static cointoss.order.OrderBookChanges.*;
+import static cointoss.orderbook.OrderBookChanges.*;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Currency;
 import cointoss.MarketSetting;
+import cointoss.orderbook.OrderBookManager;
 import cointoss.verify.VerifiableMarketService;
 
 class OrderBookManagerTest {

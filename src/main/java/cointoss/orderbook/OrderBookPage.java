@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.order;
+package cointoss.orderbook;
 
 public final class OrderBookPage implements Comparable<OrderBookPage> {
 

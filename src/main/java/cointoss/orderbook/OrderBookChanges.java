@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.order;
+package cointoss.orderbook;
 
 import java.util.List;
 

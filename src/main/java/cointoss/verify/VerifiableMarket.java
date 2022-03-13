@@ -19,7 +19,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderBookManager;
+import cointoss.orderbook.OrderBookManager;
 import kiss.Signal;
 
 public class VerifiableMarket extends Market {

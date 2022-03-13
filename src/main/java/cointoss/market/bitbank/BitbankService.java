@@ -22,7 +22,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookChanges;
+import cointoss.orderbook.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;

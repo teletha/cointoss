@@ -49,7 +49,7 @@ import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
-import cointoss.order.OrderBookPage;
+import cointoss.orderbook.OrderBookPage;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;

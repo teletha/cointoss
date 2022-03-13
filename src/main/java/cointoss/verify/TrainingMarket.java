@@ -10,7 +10,7 @@
 package cointoss.verify;
 
 import cointoss.Market;
-import cointoss.order.OrderBookManager;
+import cointoss.orderbook.OrderBookManager;
 import cointoss.ticker.TickerManager;
 import cointoss.volume.PriceRangedVolumeManager;
 

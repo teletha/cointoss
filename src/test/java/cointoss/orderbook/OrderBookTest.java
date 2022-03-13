@@ -7,9 +7,9 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.order;
+package cointoss.orderbook;
 
-import static cointoss.order.OrderBookChanges.*;
+import static cointoss.orderbook.OrderBookChanges.*;
 import static cointoss.util.arithmetic.Num.ONE;
 
 import java.util.Collection;
@@ -21,6 +21,8 @@ import com.google.common.collect.Iterables;
 import cointoss.Currency;
 import cointoss.Direction;
 import cointoss.MarketSetting;
+import cointoss.orderbook.OrderBook;
+import cointoss.orderbook.OrderBookPage;
 import cointoss.util.arithmetic.Num;
 
 class OrderBookTest {

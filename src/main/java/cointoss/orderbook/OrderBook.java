@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.order;
+package cointoss.orderbook;
 
 import java.math.RoundingMode;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import java.util.function.UnaryOperator;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
-import cointoss.order.OrderBookChanges.Listener;
+import cointoss.orderbook.OrderBookChanges.Listener;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
 import cointoss.util.map.ConcurrentNavigableDoubleMap;
