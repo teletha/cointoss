@@ -171,9 +171,15 @@ public class GMOService extends MarketService {
      * @return
      */
     private OrderBookPageChanges createOrderBook(JSON root) {
-        OrderBookPageChanges changes = OrderBookPageChanges.byJSON(root.find("bids", "*"), root.find("asks", "*"), "price", "size");
-        changes.clearInside = true;
-        return changes;
+        return OrderBookPageChanges.byJSON(root.find("bids", "*"), root.find("asks", "*"), "price", "size");
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        GMO.BTC_DERIVATIVE.orderBookRealtimely(true).to(book -> {
+            System.out.println(book);
+        });
+
+        Thread.sleep(1000 * 60 * 10);
     }
 
     /**
@@ -200,6 +206,14 @@ public class GMOService extends MarketService {
     @Override
     public ExecutionLogRepository externalRepository() {
         return new OfficialRepository(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean supportOrderBookFix() {
+        return true;
     }
 
     /**

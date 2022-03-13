@@ -228,9 +228,7 @@ public class BybitService extends MarketService {
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "orderBook/L2?symbol=" + marketName).map(pages -> {
-            OrderBookPageChanges change = new OrderBookPageChanges();
-            pages.find("result", "*").forEach(e -> convertOrderBook(change, e));
-            return change;
+            return convertOrderBook(pages.find("result", "*"));
         });
     }
 
@@ -240,16 +238,11 @@ public class BybitService extends MarketService {
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderBook_200.100ms", marketName)).map(pages -> {
-            OrderBookPageChanges change = new OrderBookPageChanges();
-
-            String type = pages.text("type");
-            if (type.charAt(0) == 's') {
-                pages.find("data", "*").forEach(e -> convertOrderBook(change, e));
+            if (pages.text("type").charAt(0) == 's') {
+                return convertOrderBook(pages.find("data", "*"));
             } else {
-                pages.find("data", "*", "*").forEach(e -> convertOrderBook(change, e));
+                return convertOrderBook(pages.find("data", "*", "*"));
             }
-
-            return change;
         });
     }
 
@@ -259,13 +252,16 @@ public class BybitService extends MarketService {
      * @param changes
      * @param e
      */
-    private void convertOrderBook(OrderBookPageChanges changes, JSON e) {
-        double price = Double.parseDouble(e.text("price"));
-        String sizeValue = e.text("size");
-        float size = sizeValue == null ? 0 : Float.parseFloat(sizeValue) / (float) price;
+    private OrderBookPageChanges convertOrderBook(List<JSON> items) {
+        OrderBookPageChanges changes = OrderBookPageChanges.byHint(items.size());
+        for (JSON item : items) {
+            double price = Double.parseDouble(item.text("price"));
+            String sizeValue = item.text("size");
+            float size = sizeValue == null ? 0 : Float.parseFloat(sizeValue) / (float) price;
 
-        List<OrderBookPage> books = e.text("side").charAt(0) == 'B' ? changes.bids : changes.asks;
-        books.add(new OrderBookPage(price, size));
+            changes.add(item.text("side").charAt(0) == 'B', price, size);
+        }
+        return changes;
     }
 
     /**

@@ -25,7 +25,6 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
@@ -198,22 +197,18 @@ public class BitMexService extends MarketService {
     /**
      * Convert json to {@link OrderBookPageChanges}.
      * 
-     * @param pages
+     * @param items
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(List<JSON> pages) {
-        OrderBookPageChanges change = new OrderBookPageChanges();
-        for (JSON page : pages) {
-            long id = Long.parseLong(page.text("id"));
+    private OrderBookPageChanges convertOrderBook(List<JSON> items) {
+        OrderBookPageChanges change = OrderBookPageChanges.byHint(items.size());
+        for (JSON item : items) {
+            long id = Long.parseLong(item.text("id"));
             double price = instrumentTickSize.doubleValue() * ((100000000L * marketId) - id);
-            JSON sizeElement = page.get("size");
+            JSON sizeElement = item.get("size");
             float size = sizeElement == null ? 0 : sizeElement.as(Float.class) / (float) price;
 
-            if (page.text("side").charAt(0) == 'B') {
-                change.bids.add(new OrderBookPage(price, size));
-            } else {
-                change.asks.add(new OrderBookPage(price, size));
-            }
+            change.add(item.text("side").charAt(0) == 'B', price, size);
         }
         return change;
     }

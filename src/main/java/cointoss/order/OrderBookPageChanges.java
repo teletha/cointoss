@@ -9,53 +9,56 @@
  */
 package cointoss.order;
 
-import static java.util.Collections.EMPTY_LIST;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
+import cointoss.Direction;
 import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 
-public class OrderBookPageChanges {
+public abstract class OrderBookPageChanges {
 
     /**
-     * The specific API does not tell you the information that the quantity has reached zero, so you
-     * should erase any existing data that is within the range of the retrieved data.
-     */
-    public boolean clearInside = false;
-
-    /** The list of long orders. */
-    public final List<OrderBookPage> bids;
-
-    /** The list of short orders. */
-    public final List<OrderBookPage> asks;
-
-    /**
-     *  
-     */
-    public OrderBookPageChanges() {
-        this(new ArrayList(4), new ArrayList(4));
-    }
-
-    /**
-     * Initialization.
+     * Compute the best ask price.
      * 
-     * @param bids
-     * @param asks
+     * @return
      */
-    private OrderBookPageChanges(List<OrderBookPage> bids, List<OrderBookPage> asks) {
-        this.bids = bids;
-        this.asks = asks;
-    }
+    public abstract double bestAsk();
 
     /**
-     * {@inheritDoc}
+     * Compute the best bid price.
+     * 
+     * @return
      */
-    @Override
-    public String toString() {
-        return "OrderBookChange [bids=" + bids + ", asks=" + asks + "]";
+    public abstract double bestBid();
+
+    /**
+     * Iterate all {@link OrderBookPage} for the specified {@link Direction}.
+     * 
+     * @param side
+     * @param process
+     */
+    public abstract void each(Direction side, Consumer<OrderBookPage> process);
+
+    /**
+     * Add the change of orderbook.
+     * 
+     * @param bid
+     * @param price
+     * @param size
+     */
+    public abstract void add(boolean bid, double price, float size);
+
+    /**
+     * Helper method to create {@link OrderBookPageChanges} by size.
+     * 
+     * @param size
+     * @return
+     */
+    public static OrderBookPageChanges byHint(int size) {
+        return size == 1 ? new Single() : new Multi(size);
     }
 
     /**
@@ -83,29 +86,30 @@ public class OrderBookPageChanges {
     public static OrderBookPageChanges byJSON(List<JSON> bids, List<JSON> asks, String priceKey, String sizeKey, int scale) {
         int bidSize = bids.size();
         int askSize = asks.size();
-        OrderBookPageChanges changes = byHint(bidSize, askSize);
+        int sum = bidSize + askSize;
+        OrderBookPageChanges changes = sum == 1 ? new Single() : new Multi(sum);
 
         if (scale == -1) {
             for (int i = 0; i < bidSize; i++) {
                 JSON e = bids.get(i);
-                changes.bids.add(new OrderBookPage(Double.parseDouble(e.text(priceKey)), Float.parseFloat(e.text(sizeKey))));
+                changes.add(true, Double.parseDouble(e.text(priceKey)), Float.parseFloat(e.text(sizeKey)));
             }
             for (int i = 0; i < askSize; i++) {
                 JSON e = asks.get(i);
-                changes.asks.add(new OrderBookPage(Double.parseDouble(e.text(priceKey)), Float.parseFloat(e.text(sizeKey))));
+                changes.add(false, Double.parseDouble(e.text(priceKey)), Float.parseFloat(e.text(sizeKey)));
             }
         } else {
             for (int i = 0; i < bidSize; i++) {
                 JSON e = bids.get(i);
                 double price = Double.parseDouble(e.text(priceKey));
                 Num size = e.get(Num.class, sizeKey).divide(price).scale(scale);
-                changes.bids.add(new OrderBookPage(price, size.floatValue()));
+                changes.add(true, price, size.floatValue());
             }
             for (int i = 0; i < askSize; i++) {
                 JSON e = asks.get(i);
                 double price = Double.parseDouble(e.text(priceKey));
                 Num size = e.get(Num.class, sizeKey).divide(price).scale(scale);
-                changes.asks.add(new OrderBookPage(price, size.floatValue()));
+                changes.add(false, price, size.floatValue());
             }
         }
 
@@ -113,35 +117,156 @@ public class OrderBookPageChanges {
     }
 
     /**
-     * Build the optimized {@link OrderBookPageChanges}.
-     * 
-     * @param bids An amount of bids.
-     * @param asks An amount of asks.
-     * @return
-     */
-    public static OrderBookPageChanges byHint(int bids, int asks) {
-        return new OrderBookPageChanges(bids == 0 ? EMPTY_LIST : new ArrayList(bids), asks == 0 ? EMPTY_LIST : new ArrayList(asks));
-    }
-
-    /**
      * Build the optimized {@link OrderBookPageChanges} for bid.
      * 
      * @param price A requested price.
      * @param size A requested size.
      * @return
      */
-    public static OrderBookPageChanges singleBuy(Num price, float size) {
-        return new OrderBookPageChanges(Collections.singletonList(new OrderBookPage(price.doubleValue(), size)), EMPTY_LIST);
+    public static OrderBookPageChanges singleBid(double price, float size) {
+        Single change = new Single();
+        change.add(true, price, size);
+        return change;
     }
 
     /**
-     * Build the optimized {@link OrderBookPageChanges} for bid.
+     * Build the optimized {@link OrderBookPageChanges} for ask.
      * 
      * @param price A requested price.
      * @param size A requested size.
      * @return
      */
-    public static OrderBookPageChanges singleSell(Num price, float size) {
-        return new OrderBookPageChanges(EMPTY_LIST, Collections.singletonList(new OrderBookPage(price.doubleValue(), size)));
+    public static OrderBookPageChanges singleAsk(double price, float size) {
+        Single change = new Single();
+        change.add(false, price, size);
+        return change;
+    }
+
+    /**
+     * Optimized single orderbook change.
+     */
+    private static class Single extends OrderBookPageChanges {
+
+        /** Bid or Ask */
+        private boolean bid;
+
+        /** Change of orderbook. */
+        private OrderBookPage page;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double bestAsk() {
+            return bid ? -1 : page.price;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double bestBid() {
+            return bid ? page.price : -1;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void each(Direction side, Consumer<OrderBookPage> process) {
+            if ((side == Direction.BUY) == bid) {
+                process.accept(page);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void add(boolean bid, double price, float size) {
+            this.bid = bid;
+            this.page = new OrderBookPage(price, size);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "OrderBookChange [" + page + "]";
+        }
+    }
+
+    /**
+     * Multiple change container.
+     */
+    private static class Multi extends OrderBookPageChanges {
+
+        /** Size of bids. */
+        private int bidSize;
+
+        /** Size of asks. */
+        private int askSize;
+
+        /** Actual container. */
+        private final OrderBookPage[] pages;
+
+        /**
+         * Initialization.
+         */
+        private Multi(int size) {
+            pages = (OrderBookPage[]) Array.newInstance(OrderBookPage.class, size);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double bestAsk() {
+            return askSize == 0 ? -1 : pages[pages.length - 1].price;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double bestBid() {
+            return bidSize == 0 ? -1 : pages[0].price;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void each(Direction side, Consumer<OrderBookPage> process) {
+            if (side == Direction.BUY) {
+                for (int i = 0; i < bidSize; i++) {
+                    process.accept(pages[i]);
+                }
+            } else {
+                for (int i = 0; i < askSize; i++) {
+                    process.accept(pages[bidSize + i]);
+                }
+            }
+        }
+
+        @Override
+        public void add(boolean bid, double price, float size) {
+            OrderBookPage page = new OrderBookPage(price, size);
+
+            if (bid) {
+                pages[bidSize++] = page;
+            } else {
+                pages[pages.length - 1 - askSize++] = page;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "OrderBookChange " + Arrays.toString(pages);
+        }
     }
 }

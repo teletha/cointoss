@@ -45,12 +45,12 @@ public class OrderBookManager implements Disposable {
 
         // orderbook management
         service.add(service.orderBookRealtimely().to(board -> {
-            if (board.clearInside) {
-                shorts.fix(board.asks.get(board.asks.size() - 1).price);
-                longs.fix(board.bids.get(board.bids.size() - 1).price);
+            if (service.supportOrderBookFix()) {
+                shorts.fix(board.bestAsk());
+                longs.fix(board.bestBid());
             }
-            shorts.update(board.asks);
-            longs.update(board.bids);
+            shorts.update(board);
+            longs.update(board);
         }));
         service.add(fixPageByPrice.to(price -> {
             shorts.fix(price.doubleValue());

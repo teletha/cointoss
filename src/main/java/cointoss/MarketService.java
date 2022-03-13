@@ -504,6 +504,17 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Checking support for the realtime orderbook fixing. The specific API does not tell you the
+     * information that the quantity has reached zero, so you should erase any existing data that is
+     * within the range of the retrieved data.
+     * 
+     * @return
+     */
+    public boolean supportOrderBookFix() {
+        return false;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

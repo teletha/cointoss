@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
@@ -24,7 +25,6 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
@@ -153,17 +153,14 @@ public class BitfinexService extends MarketService {
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "book/t" + marketName + "/P1?len=100").map(json -> {
-            OrderBookPageChanges change = new OrderBookPageChanges();
+            List<JSON> items = json.find("*");
+            OrderBookPageChanges change = OrderBookPageChanges.byHint(items.size());
 
-            for (JSON data : json.find("*")) {
-                double price = data.get(Double.class, "0");
-                float size = data.get(Float.class, "2");
+            for (JSON item : items) {
+                double price = item.get(Double.class, "0");
+                float size = item.get(Float.class, "2");
 
-                if (0 < size) {
-                    change.bids.add(new OrderBookPage(price, size));
-                } else {
-                    change.asks.add(new OrderBookPage(price, -size));
-                }
+                change.add(0 < size, price, size);
             }
             return change;
         });
@@ -179,13 +176,13 @@ public class BitfinexService extends MarketService {
                 .skip(e -> e.has("1", "hb")) // skip heartbeat
                 .map(json -> {
                     JSON data = json.get("1");
-                    Num price = data.get(Num.class, "0");
-                    float size = data.get(float.class, "2");
+                    double price = Double.parseDouble(data.text("0"));
+                    float size = Float.parseFloat(data.text("2"));
 
                     if (0 < size) {
-                        return OrderBookPageChanges.singleBuy(price, size);
+                        return OrderBookPageChanges.singleBid(price, size);
                     } else {
-                        return OrderBookPageChanges.singleSell(price, -size);
+                        return OrderBookPageChanges.singleAsk(price, -size);
                     }
                 });
     }

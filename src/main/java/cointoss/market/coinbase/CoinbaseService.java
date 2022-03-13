@@ -25,7 +25,6 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.EfficientWebSocket;
@@ -149,17 +148,15 @@ public class CoinbaseService extends MarketService {
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("level2", marketName)).map(root -> {
-            OrderBookPageChanges changes = new OrderBookPageChanges();
+            List<JSON> items = root.find("changes", "*");
+            OrderBookPageChanges changes = OrderBookPageChanges.byHint(items.size());
 
-            for (JSON ask : root.find("changes", "*")) {
-                Direction side = ask.get(Direction.class, "0");
-                double price = ask.get(double.class, "1");
-                float size = ask.get(float.class, "2");
-                if (side == Direction.BUY) {
-                    changes.bids.add(new OrderBookPage(price, size));
-                } else {
-                    changes.asks.add(new OrderBookPage(price, size));
-                }
+            for (JSON item : items) {
+                Direction side = item.get(Direction.class, "0");
+                double price = Double.parseDouble(item.text("1"));
+                float size = Float.parseFloat(item.text("2"));
+
+                changes.add(side == Direction.BUY, price, size);
             }
 
             return changes;

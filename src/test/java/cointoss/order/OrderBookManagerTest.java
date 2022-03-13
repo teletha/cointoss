@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import java.util.List;
+import static cointoss.order.OrderBookPageChanges.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,11 +26,11 @@ class OrderBookManagerTest {
     @Test
     void findLargestOrderFromLongOnly() {
         OrderBookManager manager = new OrderBookManager(service);
-        manager.longs.update(page(10, 5));
-        manager.longs.update(page(13, 1));
-        manager.longs.update(page(15, 2));
-        manager.longs.update(page(18, 4));
-        manager.longs.update(page(20, 3));
+        manager.longs.update(singleBid(10, 5));
+        manager.longs.update(singleBid(13, 1));
+        manager.longs.update(singleBid(15, 2));
+        manager.longs.update(singleBid(18, 4));
+        manager.longs.update(singleBid(20, 3));
 
         assert manager.findLargestOrder(10, 20).is(10, 5);
     }
@@ -38,11 +38,11 @@ class OrderBookManagerTest {
     @Test
     void findLargestOrderFromLongOnlyWithMultipleLargest() {
         OrderBookManager manager = new OrderBookManager(service);
-        manager.longs.update(page(10, 2));
-        manager.longs.update(page(13, 4));
-        manager.longs.update(page(15, 2));
-        manager.longs.update(page(18, 4));
-        manager.longs.update(page(20, 3));
+        manager.longs.update(singleBid(10, 2));
+        manager.longs.update(singleBid(13, 4));
+        manager.longs.update(singleBid(15, 2));
+        manager.longs.update(singleBid(18, 4));
+        manager.longs.update(singleBid(20, 3));
 
         assert manager.findLargestOrder(10, 20).is(18, 4);
     }
@@ -50,11 +50,11 @@ class OrderBookManagerTest {
     @Test
     void findLargestOrderFromShortOnly() {
         OrderBookManager manager = new OrderBookManager(service);
-        manager.shorts.update(page(10, 5));
-        manager.shorts.update(page(13, 1));
-        manager.shorts.update(page(15, 2));
-        manager.shorts.update(page(18, 4));
-        manager.shorts.update(page(20, 3));
+        manager.shorts.update(singleAsk(10, 5));
+        manager.shorts.update(singleAsk(13, 1));
+        manager.shorts.update(singleAsk(15, 2));
+        manager.shorts.update(singleAsk(18, 4));
+        manager.shorts.update(singleAsk(20, 3));
 
         assert manager.findLargestOrder(10, 20).is(10, 5);
     }
@@ -62,11 +62,11 @@ class OrderBookManagerTest {
     @Test
     void findLargestOrderFromShortOnlyWithMultipleLargest() {
         OrderBookManager manager = new OrderBookManager(service);
-        manager.shorts.update(page(10, 2));
-        manager.shorts.update(page(13, 4));
-        manager.shorts.update(page(15, 2));
-        manager.shorts.update(page(18, 4));
-        manager.shorts.update(page(20, 3));
+        manager.shorts.update(singleAsk(10, 2));
+        manager.shorts.update(singleAsk(13, 4));
+        manager.shorts.update(singleAsk(15, 2));
+        manager.shorts.update(singleAsk(18, 4));
+        manager.shorts.update(singleAsk(20, 3));
 
         assert manager.findLargestOrder(10, 20).is(13, 4);
     }
@@ -74,16 +74,16 @@ class OrderBookManagerTest {
     @Test
     void findLargestOrder() {
         OrderBookManager manager = new OrderBookManager(service);
-        manager.shorts.update(page(20, 3));
-        manager.shorts.update(page(19, 1));
-        manager.shorts.update(page(18, 2));
-        manager.shorts.update(page(17, 8));
-        manager.shorts.update(page(16, 3));
-        manager.longs.update(page(15, 2));
-        manager.longs.update(page(14, 1));
-        manager.longs.update(page(13, 5));
-        manager.longs.update(page(12, 4));
-        manager.longs.update(page(10, 3));
+        manager.shorts.update(singleAsk(20, 3));
+        manager.shorts.update(singleAsk(19, 1));
+        manager.shorts.update(singleAsk(18, 2));
+        manager.shorts.update(singleAsk(17, 8));
+        manager.shorts.update(singleAsk(16, 3));
+        manager.longs.update(singleBid(15, 2));
+        manager.longs.update(singleBid(14, 1));
+        manager.longs.update(singleBid(13, 5));
+        manager.longs.update(singleBid(12, 4));
+        manager.longs.update(singleBid(10, 3));
 
         assert manager.findLargestOrder(10, 20).is(17, 8);
     }
@@ -91,28 +91,17 @@ class OrderBookManagerTest {
     @Test
     void findLargestOrderWithMultipleLargest() {
         OrderBookManager manager = new OrderBookManager(service);
-        manager.shorts.update(page(20, 3));
-        manager.shorts.update(page(19, 1));
-        manager.shorts.update(page(18, 2));
-        manager.shorts.update(page(17, 8));
-        manager.shorts.update(page(16, 3));
-        manager.longs.update(page(15, 2));
-        manager.longs.update(page(14, 1));
-        manager.longs.update(page(13, 5));
-        manager.longs.update(page(12, 8));
-        manager.longs.update(page(10, 3));
+        manager.shorts.update(singleAsk(20, 3));
+        manager.shorts.update(singleAsk(19, 1));
+        manager.shorts.update(singleAsk(18, 2));
+        manager.shorts.update(singleAsk(17, 8));
+        manager.shorts.update(singleAsk(16, 3));
+        manager.longs.update(singleBid(15, 2));
+        manager.longs.update(singleBid(14, 1));
+        manager.longs.update(singleBid(13, 5));
+        manager.longs.update(singleBid(12, 8));
+        manager.longs.update(singleBid(10, 3));
 
         assert manager.findLargestOrder(10, 20).is(12, 8);
-    }
-
-    /**
-     * Build order.
-     * 
-     * @param price
-     * @param size
-     * @return
-     */
-    private List<OrderBookPage> page(float price, float size) {
-        return List.of(new OrderBookPage(price, size));
     }
 }

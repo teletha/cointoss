@@ -11,7 +11,6 @@ package cointoss.order;
 
 import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
@@ -428,12 +427,12 @@ public class OrderBook {
     }
 
     /**
-     * Update orders.
+     * Update orderbook.
      * 
-     * @param units
+     * @param changes
      */
-    public void update(List<OrderBookPage> units) {
-        for (OrderBookPage board : units) {
+    public void update(OrderBookPageChanges changes) {
+        changes.each(side, board -> {
             if (board.size == 0d) {
                 // remove
                 OrderBookPage removed = base.remove(board.price);
@@ -453,14 +452,14 @@ public class OrderBook {
                     }
                 }
             }
-        }
+        });
 
         int size = base.size();
         if (0 < size) {
             best.set(base.firstEntry().getValue());
 
             if (5000 < size) {
-                for (int i = 0; i < 50; i++) {
+                for (int i = 0; i < 250; i++) {
                     OrderBookPage removed = base.pollLastEntry().getValue();
                     if (grouped != null) {
                         updateGroup(removed.price, removed.size * -1);
