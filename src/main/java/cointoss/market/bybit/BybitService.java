@@ -239,8 +239,10 @@ public class BybitService extends MarketService {
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderBook_200.100ms", marketName)).map(pages -> {
             if (pages.text("type").charAt(0) == 's') {
+                // snapshot at first response
                 return convertOrderBook(pages.find("data", "*"));
             } else {
+                // delta at following responses
                 return convertOrderBook(pages.find("data", "*", "*"));
             }
         });
@@ -255,11 +257,13 @@ public class BybitService extends MarketService {
     private OrderBookChanges convertOrderBook(List<JSON> items) {
         OrderBookChanges changes = OrderBookChanges.byHint(items.size());
         for (JSON item : items) {
-            double price = Double.parseDouble(item.text("price"));
-            String sizeValue = item.text("size");
-            float size = sizeValue == null ? 0 : Float.parseFloat(sizeValue) / (float) price;
-
-            changes.add(item.text("side").charAt(0) == 'B', price, size);
+            String priceText = item.text("price");
+            if (priceText != null) {
+                double price = Double.parseDouble(priceText);
+                String sizeText = item.text("size");
+                float size = sizeText == null ? 0 : Float.parseFloat(sizeText) / (float) price;
+                changes.add(item.text("side").charAt(0) == 'B', price, size);
+            }
         }
         return changes;
     }
