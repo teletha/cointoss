@@ -277,20 +277,19 @@ class FeatherStoreTest {
             store.store(value(base * i));
         }
 
-        assert store.existOnHeap(value(base * 14));
+        assert store.existOnHeap(value(base * 2)) == false;
+        assert store.existOnHeap(value(base * 8)) == false;
+        assert store.existOnHeap(value(base * 14)) == false;
         assert store.existOnHeap(value(base * 15));
         assert store.existOnHeap(value(base * 16));
         assert store.existOnHeap(value(base * 17));
         assert store.existOnHeap(value(base * 18));
         assert store.existOnHeap(value(base * 19));
         assert store.existOnHeap(value(base * 20));
-        assert store.existOnHeap(value(base * 2)) == false;
-        assert store.existOnHeap(value(base * 8)) == false;
-        assert store.existOnHeap(value(base * 13)) == false;
 
         assert store.at(base * 2).value == base * 2;
         assert store.existOnHeap(value(base * 14)) == false;
-        assert store.existOnHeap(value(base * 15));
+        assert store.existOnHeap(value(base * 15)) == false;
         assert store.existOnHeap(value(base * 16));
         assert store.existOnHeap(value(base * 17));
         assert store.existOnHeap(value(base * 18));

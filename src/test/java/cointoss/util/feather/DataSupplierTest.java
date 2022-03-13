@@ -61,6 +61,6 @@ class DataSupplierTest {
         assert store.size() == 1440;
 
         assert store.at(86400).value == 86400;
-        assert store.size() == 1680; // max size of in-memory
+        assert store.size() == 1440; // max size of in-memory
     }
 }
