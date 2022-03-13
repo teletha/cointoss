@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="S">
+		<header class="k">
+			<h1 class="f" date="2022-03-13" ver="1.2.0"><code>Cointoss</code></h1>
+			<nav class="Z"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="i" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="R">
+			<nav class="b">
+				<div></div>
+			</nav>
+			<article class="c" id="Article">
+				<section class="V"><code class="Q">cointoss.orderbook</code>
+					<h2 class="Class a"><code class="P">OrderBook</code></h2>
+					<div class="N">
+						<ul class="C F">
+							<li><code><a href="api/cointoss.orderbook.OrderBookChanges.Listener.html">Listener</a></code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="V" id="best">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">best</code><i class="l"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2><span class="B"><p>The best order.</p>
+					</span></section>
+				<section class="V" id="update">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">update</code><i class="l"><code class="return">kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></h2>
+				</section>
+				<section class="V" id="bestSize()">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">bestSize</code><code class="W">()</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="V" id="groupBy(float)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">groupBy</code><code class="W">(<code>float</code> <code class="parameterName">range</code>)</code><i class="l"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html">Collection</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>float</code> <code>range</code></td>
+							<td><span><p>The price range.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html">Collection</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></td>
+							<td><span><p>A grouped view.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Get the grouped view of this <code><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code>.</p>
+					</span></section>
+				<section class="V" id="findLargestOrder(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">findLargestOrder</code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">lowerPrice</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">upperPrice</code>)</code><i class="l"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>lowerPrice</code></td>
+							<td></td>
+						</tr>
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>upperPrice</code></td>
+							<td></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>It finds the largest order in the currently selected OrderBook within the specified price
+ range.</p>
+					</span></section>
+				<section class="V" id="ascendingPages()">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">ascendingPages</code><code class="W">()</code><i class="l"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Iterable.html">Iterable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
+					<table class="j">
+						<tr class="U">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Iterable.html">Iterable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Iterate all pages of the current selected grouped view by ascending order.</p>
+					</span></section>
+				<section class="V" id="headMap(cointoss.util.arithmetic.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">headMap</code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>)</code><i class="l"><code><a href="api/cointoss.util.map.ConcurrentNavigableDoubleMap.html">ConcurrentNavigableDoubleMap</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>price</code></td>
+							<td></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.map.ConcurrentNavigableDoubleMap.html">ConcurrentNavigableDoubleMap</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="V" id="tailMap(cointoss.util.arithmetic.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">tailMap</code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>)</code><i class="l"><code><a href="api/cointoss.util.map.ConcurrentNavigableDoubleMap.html">ConcurrentNavigableDoubleMap</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>price</code></td>
+							<td></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.map.ConcurrentNavigableDoubleMap.html">ConcurrentNavigableDoubleMap</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="V" id="predictTakingPrice(long)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="W">(<code>long</code> <code class="parameterName">size</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>long</code> <code>size</code></td>
+							<td><span><p>A taking size.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A predicted price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Predict the taking price.</p>
+					</span></section>
+				<section class="V" id="predictTakingPrice(double)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="W">(<code>double</code> <code class="parameterName">size</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>double</code> <code>size</code></td>
+							<td><span><p>A taking size.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A predicted price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Predict the taking price.</p>
+					</span></section>
+				<section class="V" id="predictTakingPrice(java.lang.String)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="W">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code>size</code></td>
+							<td><span><p>A taking size.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A predicted price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Predict the taking price.</p>
+					</span></section>
+				<section class="V" id="predictTakingPrice(cointoss.util.arithmetic.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>size</code></td>
+							<td><span><p>A taking size.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A predicted price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Predict the taking price.</p>
+					</span></section>
+				<section class="V" id="predictTakingPrice(kiss.Variable)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="W">(<code>kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">size</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code>size</code></td>
+							<td><span><p>A taking size.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A predicted price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Predict the taking price.</p>
+					</span></section>
+				<section class="V" id="predictTakingPrice(kiss.Signal)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="W">(<code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">size</code>)</code><i class="l"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code>size</code></td>
+							<td><span><p>A taking size.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td><span><p>A predicted price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Predict the taking price.</p>
+					</span></section>
+				<section class="V" id="predictRealTakingPrice(kiss.Signal)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictRealTakingPrice</code><code class="W">(<code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">size</code>)</code><i class="l"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code>size</code></td>
+							<td><span><p>A taking size.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
+							<td><span><p>A predicted price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Predict the real taking price.</p>
+					</span></section>
+				<section class="V" id="predictMakingPrice(cointoss.util.arithmetic.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictMakingPrice</code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>size</code></td>
+							<td><span><p>A threshold size.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A predicted price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Predict the making price.</p>
+					</span></section>
+				<section class="V" id="computeBestPrice(cointoss.util.arithmetic.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">computeBestPrice</code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>diff</code></td>
+							<td><span><p>A difference price.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A computed best price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Compute the best price with your conditions (diff price).</p>
+					</span></section>
+				<section class="V" id="computeBestPrice(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">computeBestPrice</code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>threshold</code></td>
+							<td><span><p>A threashold volume.</p>
+								</span></td>
+						</tr>
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>diff</code></td>
+							<td><span><p>A difference price.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A computed best price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Compute the best price with your conditions (threashold volume and diff price).</p>
+					</span></section>
+				<section class="V" id="computeBestPrice(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">computeBestPrice</code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">start</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="l"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>start</code></td>
+							<td><span><p>A start price.</p>
+								</span></td>
+						</tr>
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>threshold</code></td>
+							<td><span><p>A threashold volume.</p>
+								</span></td>
+						</tr>
+						<tr class="H">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>diff</code></td>
+							<td><span><p>A difference price.</p>
+								</span></td>
+						</tr>
+						<tr class="U">
+							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
+							<td><span><p>A computed best price.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Compute the best price with your conditions (start price, threashold volume and diff price).</p>
+					</span></section>
+				<section class="V" id="fix(double)">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">fix</code><code class="W">(<code>double</code> <code class="parameterName">hint</code>)</code><i class="l"><code>void</code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>double</code> <code>hint</code></td>
+							<td><span><p>A price hint.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Fix error price.</p>
+					</span></section>
+				<section class="V" id="update(cointoss.orderbook.OrderBookChanges)">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">update</code><code class="W">(<code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code> <code class="parameterName">changes</code>)</code><i class="l"><code>void</code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code> <code>changes</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Update orderbook.</p>
+					</span></section>
+				<section class="V" id="change(double,float)">
+					<h2 class="M"><i class="OVERRIDE PUBLIC"></i><code class="P">change</code><code class="W">(<code>double</code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code><i class="l"><code>void</code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>double</code> <code>price</code></td>
+							<td></td>
+						</tr>
+						<tr class="H">
+							<td><code>float</code> <code>size</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</article>
+			<aside class="O" id="SubNavi">
+				<div class="Y">
+					<h5 class="h">Fields</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#best">best</a></code><i class="J"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#update">update</a></code><i class="J"><code class="return">kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></li>
+					</ul>
+					<h5 class="h">Methods</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#bestSize()">bestSize</a></code><code class="W">()</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#groupBy(float)">groupBy</a></code><code class="W">(<code>float</code> <code class="parameterName">range</code>)</code><i class="J"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html">Collection</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#findLargestOrder(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">findLargestOrder</a></code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">lowerPrice</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">upperPrice</code>)</code><i class="J"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#ascendingPages()">ascendingPages</a></code><code class="W">()</code><i class="J"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Iterable.html">Iterable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#headMap(cointoss.util.arithmetic.Num)">headMap</a></code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>)</code><i class="J"><code><a href="api/cointoss.util.map.ConcurrentNavigableDoubleMap.html">ConcurrentNavigableDoubleMap</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#tailMap(cointoss.util.arithmetic.Num)">tailMap</a></code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>)</code><i class="J"><code><a href="api/cointoss.util.map.ConcurrentNavigableDoubleMap.html">ConcurrentNavigableDoubleMap</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(long)">predictTakingPrice</a></code><code class="W">(<code>long</code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(double)">predictTakingPrice</a></code><code class="W">(<code>double</code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(java.lang.String)">predictTakingPrice</a></code><code class="W">(<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(cointoss.util.arithmetic.Num)">predictTakingPrice</a></code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(kiss.Variable)">predictTakingPrice</a></code><code class="W">(<code>kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(kiss.Signal)">predictTakingPrice</a></code><code class="W">(<code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">size</code>)</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictRealTakingPrice(kiss.Signal)">predictRealTakingPrice</a></code><code class="W">(<code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">size</code>)</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictMakingPrice(cointoss.util.arithmetic.Num)">predictMakingPrice</a></code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(cointoss.util.arithmetic.Num)">computeBestPrice</a></code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">computeBestPrice</a></code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">computeBestPrice</a></code><code class="W">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">start</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="J"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#fix(double)">fix</a></code><code class="W">(<code>double</code> <code class="parameterName">hint</code>)</code><i class="J"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#update(cointoss.orderbook.OrderBookChanges)">update</a></code><code class="W">(<code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code> <code class="parameterName">changes</code>)</code><i class="J"><code>void</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#change(double,float)">change</a></code><code class="W">(<code>double</code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code><i class="J"><code>void</code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

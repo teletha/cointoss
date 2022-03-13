@@ -21,6 +21,7 @@ const root = {
 		"cointoss.market.huobi",
 		"cointoss.market.liquid",
 		"cointoss.order",
+		"cointoss.orderbook",
 		"cointoss.ticker",
 		"cointoss.ticker.data",
 		"cointoss.trade",
@@ -1468,35 +1469,35 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderBook",
-			"packageName": "cointoss.order",
+			"packageName": "cointoss.orderbook",
 			"type": "Class"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderBookChanges",
-			"packageName": "cointoss.order",
+			"packageName": "cointoss.orderbook",
 			"type": "AbstractClass"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderBookChanges.Listener",
-			"packageName": "cointoss.order",
+			"packageName": "cointoss.orderbook",
 			"type": "Functional"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderBookManager",
-			"packageName": "cointoss.order",
+			"packageName": "cointoss.orderbook",
 			"type": "Class"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderBookPage",
-			"packageName": "cointoss.order",
+			"packageName": "cointoss.orderbook",
 			"type": "Class"
 		},
 		{

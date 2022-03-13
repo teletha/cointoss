@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script async="true" src="highlight.js" type="module"></script>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="S">
+		<header class="k">
+			<h1 class="f" date="2022-03-13" ver="1.2.0"><code>Cointoss</code></h1>
+			<nav class="Z"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="i" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="R">
+			<nav class="b">
+				<div></div>
+			</nav>
+			<article class="c" id="Article">
+				<section class="V"><code class="Q">cointoss.orderbook</code>
+					<h2 class="Class a"><code class="P">OrderBookPage</code></h2>
+					<div class="N">
+						<ul class="C F">
+							<li><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Comparable.html">Comparable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="V" id="price">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">price</code><i class="l"><code class="return">double</code></i></h2><span class="B"><p>The board price.</p>
+					</span></section>
+				<section class="V" id="size">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">size</code><i class="l"><code class="return">float</code></i></h2><span class="B"><p>The board size.</p>
+					</span></section>
+				<section class="V" id="OrderBookPage(double,float)">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">OrderBookPage</code><code class="W">(<code>double</code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code>double</code> <code>price</code></td>
+							<td><span><p>A price.</p>
+								</span></td>
+						</tr>
+						<tr class="H">
+							<td><code>float</code> <code>size</code></td>
+							<td><span><p>A total size.</p>
+								</span></td>
+						</tr>
+					</table><span class="B"><p>Simple Builder.</p>
+					</span></section>
+				<section class="V" id="rangedPrice()">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">rangedPrice</code><code class="W">()</code><i class="l"><code>double</code></i></h2>
+					<table class="j">
+						<tr class="U">
+							<td><code>double</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Get the terminal price if you are representing a price range. In the buyboard, it represents
+ the lowest price in the price range, and in the sellboard, it represents the highest price in
+ the price range.</p>
+					</span></section>
+				<section class="V" id="compareTo(cointoss.orderbook.OrderBookPage)">
+					<h2 class="M"><i class="OVERRIDE PUBLIC"></i><code class="P">compareTo</code><code class="W">(<code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code> <code class="parameterName">o</code>)</code><i class="l"><code>int</code></i></h2>
+					<table class="j">
+						<tr class="H">
+							<td><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code> <code>o</code></td>
+							<td></td>
+						</tr>
+						<tr class="U">
+							<td><code>int</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="V" id="toString()">
+					<h2 class="M"><i class="OVERRIDE PUBLIC"></i><code class="P">toString</code><code class="W">()</code><i class="l"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="j">
+						<tr class="U">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</article>
+			<aside class="O" id="SubNavi">
+				<div class="Y">
+					<h5 class="h">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookPage.html#OrderBookPage(double,float)">OrderBookPage</a></code><code class="W">(<code>double</code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code></li>
+					</ul>
+					<h5 class="h">Fields</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookPage.html#price">price</a></code><i class="J"><code class="return">double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookPage.html#size">size</a></code><i class="J"><code class="return">float</code></i></li>
+					</ul>
+					<h5 class="h">Methods</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookPage.html#rangedPrice()">rangedPrice</a></code><code class="W">()</code><i class="J"><code>double</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookPage.html#compareTo(cointoss.orderbook.OrderBookPage)">compareTo</a></code><code class="W">(<code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code> <code class="parameterName">o</code>)</code><i class="J"><code>int</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookPage.html#toString()">toString</a></code><code class="W">()</code><i class="J"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>
