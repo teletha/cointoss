@@ -164,6 +164,7 @@ public abstract class OrderBookChanges {
         /** Change of orderbook. */
         private double price;
 
+        /** Change of orderbook. */
         private float size;
 
         /**
@@ -214,9 +215,10 @@ public abstract class OrderBookChanges {
         /** Size of asks. */
         private int askSize;
 
-        /** Actual container. */
+        /** Price container */
         private final double[] prices;
 
+        /** Size container */
         private final float[] sizes;
 
         /**
