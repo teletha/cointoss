@@ -26,6 +26,12 @@ public class OrderBookManager implements Disposable {
     /** BID */
     public final OrderBook longs;
 
+    /** The initial price range. */
+    private final float initialRange;
+
+    /** The price range for group. */
+    private float range;
+
     /**
      * Expose to test.
      * 
@@ -42,6 +48,7 @@ public class OrderBookManager implements Disposable {
     public OrderBookManager(MarketService service, Signal<Num> fixPageByPrice) {
         this.shorts = new OrderBook(service.setting, Direction.SELL);
         this.longs = new OrderBook(service.setting, Direction.BUY);
+        this.initialRange = this.range = service.setting.base.minimumSize.floatValue();
 
         // orderbook management
         service.add(service.orderBookRealtimely().to(board -> {
@@ -66,6 +73,26 @@ public class OrderBookManager implements Disposable {
      */
     public OrderBook by(Directional side) {
         return side.isBuy() ? longs : shorts;
+    }
+
+    /**
+     * @param range
+     */
+    public void groupBy(float range) {
+        this.range = range <= initialRange ? initialRange : range;
+        shorts.groupBy(this.range);
+        longs.groupBy(this.range);
+    }
+
+    /**
+     * Get the terminal price if you are representing a price range. In the buyboard, it represents
+     * the lowest price in the price range, and in the sellboard, it represents the highest price in
+     * the price range.
+     * 
+     * @return
+     */
+    public double ranged() {
+        return range;
     }
 
     /**

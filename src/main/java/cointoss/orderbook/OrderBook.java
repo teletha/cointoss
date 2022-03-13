@@ -109,7 +109,7 @@ public class OrderBook implements Listener {
      * @param range The price range.
      * @return A grouped view.
      */
-    public final Collection<OrderBookPage> groupBy(float range) {
+    Collection<OrderBookPage> groupBy(float range) {
         if (range <= initialRange) {
             grouped = null;
         } else if (this.range != range) {
@@ -146,7 +146,7 @@ public class OrderBook implements Listener {
     private void updateGroup(double price, double size) {
         double p = floor(price, range, scaleBase);
 
-        OrderBookPage page = grouped.computeIfAbsent(p, key -> new OrderBookPage(key, 0, side.isBuy() ? 0 : range));
+        OrderBookPage page = grouped.computeIfAbsent(p, key -> new OrderBookPage(key, 0));
         page.size += size;
 
         if (Primitives.roundDecimal(page.size, scaleTarget, RoundingMode.DOWN) <= 0) {
@@ -187,7 +187,7 @@ public class OrderBook implements Listener {
      * @return
      */
     public final OrderBookPage findLargestOrder(Num lowerPrice, Num upperPrice) {
-        OrderBookPage max = new OrderBookPage(lowerPrice.doubleValue(), 0, range);
+        OrderBookPage max = new OrderBookPage(lowerPrice.doubleValue(), 0);
 
         if (base.isEmpty()) {
             return max;

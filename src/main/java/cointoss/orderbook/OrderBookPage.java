@@ -9,7 +9,7 @@
  */
 package cointoss.orderbook;
 
-public final class OrderBookPage implements Comparable<OrderBookPage> {
+public final class OrderBookPage {
 
     /** The board price. */
     public double price;
@@ -17,14 +17,10 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
     /** The board size. */
     public float size;
 
-    /** The price range. */
-    private final float range;
-
     /**
      * For I#make.
      */
     OrderBookPage() {
-        range = 0;
     }
 
     /**
@@ -33,39 +29,9 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * @param price A price.
      * @param size A total size.
      */
-    public OrderBookPage(double price, float size) {
-        this(price, size, 0);
-    }
-
-    /**
-     * Simple Builder.
-     * 
-     * @param price A price.
-     * @param size A total size.
-     */
-    OrderBookPage(double price, float size, float range) {
+    OrderBookPage(double price, float size) {
         this.price = price;
         this.size = size;
-        this.range = range;
-    }
-
-    /**
-     * Get the terminal price if you are representing a price range. In the buyboard, it represents
-     * the lowest price in the price range, and in the sellboard, it represents the highest price in
-     * the price range.
-     * 
-     * @return
-     */
-    public double rangedPrice() {
-        return price + range;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(OrderBookPage o) {
-        return Double.compare(price, o.price);
     }
 
     /**

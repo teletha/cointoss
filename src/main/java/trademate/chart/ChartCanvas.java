@@ -583,7 +583,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             .findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
 
                     if (largest != null && orderbookBar != null) {
-                        double price = largest.rangedPrice();
+                        double price = largest.price + m.orderBook.ranged();
                         double position = axisY.getPositionForValue(price);
                         orderbookDigit.clear()
                                 .strokeColor(Theme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL))
@@ -1455,6 +1455,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double upper = max * 0.75;
             double start = orderbook.getWidth();
             double lastPosition = 0;
+            double range = chart.market.v.orderBook.ranged();
             int hideSize = chart.orderbookHideSize.value();
 
             GraphicsContext gc = orderbook.getGraphicsContext2D();
@@ -1466,7 +1467,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     continue; // hiding
                 }
 
-                double position = axisY.getPositionForValue(page.rangedPrice());
+                double position = axisY.getPositionForValue(page.price + range);
                 double width = start - page.size * scale;
                 gc.strokeLine(start, position, width, position);
                 if (page.size > upper && Math.abs(lastPosition - position) > 8) {
