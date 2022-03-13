@@ -1490,7 +1490,7 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderBookPageChanges",
 			"packageName": "cointoss.order",
-			"type": "Class"
+			"type": "AbstractClass"
 		},
 		{
 			"modifiers": {
