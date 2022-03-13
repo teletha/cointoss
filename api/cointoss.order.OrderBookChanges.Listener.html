@@ -33,39 +33,33 @@
 				<div></div>
 			</nav>
 			<article class="H" id="Article">
-				<section class="d"><code class="P">cointoss.market.liquid</code>
-					<h2 class="Class a"><code class="U">Liquid</code></h2>
+				<section class="d"><code class="P">cointoss.order</code>
+					<h2 class="Functional a"><code class="U">OrderBookChanges.Listener</code></h2>
 					<div class="l">
-						<ul class="C E">
-							<li><code><a href="api/cointoss.market.MarketServiceProvider.html">MarketServiceProvider</a></code></li>
+						<ul class="C G">
+							<li><code><a href="api/cointoss.order.OrderBook.html">OrderBook</a></code></li>
 						</ul>
-						<ul class="C F">
-							<li><code>kiss.Extensible</code></li>
-						</ul>
-					</div>
-				</section>
-				<section class="d" id="Liquid()">
-					<h2 class="V"><i class="PUBLIC"></i><code class="U">Liquid</code><code class="h">()</code></h2>
-				</section>
-				<section class="d" id="account()">
-					<h2 class="V"><i class="OVERRIDE PUBLIC"></i><code class="U">account</code><code class="h">()</code><i class="j"><code><a href="api/cointoss.market.MarketAccount.html">MarketAccount</a></code></i></h2>
+					</div><span class="B"><p>Special listener for the modification of orderbook pages.</p>
+					</span></section>
+				<section class="d" id="change(double,float)">
+					<h2 class="V"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="U">change</code><code class="h">(<code>double</code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code><i class="j"><code>void</code></i></h2>
 					<table class="N">
-						<tr class="L">
-							<td><code><a href="api/cointoss.market.MarketAccount.html">MarketAccount</a></code></td>
+						<tr class="K">
+							<td><code>double</code> <code>price</code></td>
 							<td></td>
 						</tr>
-					</table>
-				</section>
+						<tr class="K">
+							<td><code>float</code> <code>size</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Invoke when orderbook is changed.</p>
+					</span></section>
 			</article>
 			<aside class="O" id="SubNavi">
 				<div class="S">
-					<h5 class="e">Constructors</h5>
-					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.market.liquid.Liquid.html#Liquid()">Liquid</a></code><code class="h">()</code></li>
-					</ul>
 					<h5 class="e">Methods</h5>
 					<ul>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.liquid.Liquid.html#account()">account</a></code><code class="h">()</code><i class="R"><code><a href="api/cointoss.market.MarketAccount.html">MarketAccount</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderBookChanges.Listener.html#change(double,float)">change</a></code><code class="h">(<code>double</code> <code class="parameterName">price</code>, <code>float</code> <code class="parameterName">size</code>)</code><i class="R"><code>void</code></i></li>
 					</ul>
 				</div>
 			</aside>

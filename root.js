@@ -1474,6 +1474,20 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "OrderBookChanges",
+			"packageName": "cointoss.order",
+			"type": "AbstractClass"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "OrderBookChanges.Listener",
+			"packageName": "cointoss.order",
+			"type": "Functional"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderBookManager",
 			"packageName": "cointoss.order",
 			"type": "Class"
@@ -1484,13 +1498,6 @@ const root = {
 			"name": "OrderBookPage",
 			"packageName": "cointoss.order",
 			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderBookPageChanges",
-			"packageName": "cointoss.order",
-			"type": "AbstractClass"
 		},
 		{
 			"modifiers": {
