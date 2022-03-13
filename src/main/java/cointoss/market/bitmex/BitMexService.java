@@ -25,7 +25,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
@@ -180,7 +180,7 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.find("*")));
     }
 
@@ -188,20 +188,20 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderBookL2", marketName))
                 .map(json -> json.find("data", "*"))
                 .map(this::convertOrderBook);
     }
 
     /**
-     * Convert json to {@link OrderBookPageChanges}.
+     * Convert json to {@link OrderBookChanges}.
      * 
      * @param items
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(List<JSON> items) {
-        OrderBookPageChanges change = OrderBookPageChanges.byHint(items.size());
+    private OrderBookChanges convertOrderBook(List<JSON> items) {
+        OrderBookChanges change = OrderBookChanges.byHint(items.size());
         for (JSON item : items) {
             long id = Long.parseLong(item.text("id"));
             double price = instrumentTickSize.doubleValue() * ((100000000L * marketId) - id);

@@ -9,16 +9,13 @@
  */
 package cointoss.order;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 
-public abstract class OrderBookPageChanges {
+public abstract class OrderBookChanges {
 
     /**
      * Compute the best ask price.
@@ -40,7 +37,7 @@ public abstract class OrderBookPageChanges {
      * @param side
      * @param process
      */
-    public abstract void each(Direction side, Consumer<OrderBookPage> process);
+    public abstract void each(Direction side, Listener process);
 
     /**
      * Add the change of orderbook.
@@ -52,17 +49,17 @@ public abstract class OrderBookPageChanges {
     public abstract void add(boolean bid, double price, float size);
 
     /**
-     * Helper method to create {@link OrderBookPageChanges} by size.
+     * Helper method to create {@link OrderBookChanges} by size.
      * 
      * @param size
      * @return
      */
-    public static OrderBookPageChanges byHint(int size) {
+    public static OrderBookChanges byHint(int size) {
         return size == 1 ? new Single() : new Multi(size);
     }
 
     /**
-     * Helper method to build the optimized {@link OrderBookPageChanges} from simple JSON data set.
+     * Helper method to build the optimized {@link OrderBookChanges} from simple JSON data set.
      * 
      * @param bids A bid data.
      * @param asks An ask data.
@@ -70,12 +67,12 @@ public abstract class OrderBookPageChanges {
      * @param sizeKey The size key on json.
      * @return
      */
-    public static OrderBookPageChanges byJSON(List<JSON> bids, List<JSON> asks, String priceKey, String sizeKey) {
+    public static OrderBookChanges byJSON(List<JSON> bids, List<JSON> asks, String priceKey, String sizeKey) {
         return byJSON(bids, asks, priceKey, sizeKey, -1);
     }
 
     /**
-     * Helper method to build the optimized {@link OrderBookPageChanges} from simple JSON data set.
+     * Helper method to build the optimized {@link OrderBookChanges} from simple JSON data set.
      * 
      * @param bids A bid data.
      * @param asks An ask data.
@@ -83,11 +80,11 @@ public abstract class OrderBookPageChanges {
      * @param sizeKey The size key on json.
      * @return
      */
-    public static OrderBookPageChanges byJSON(List<JSON> bids, List<JSON> asks, String priceKey, String sizeKey, int scale) {
+    public static OrderBookChanges byJSON(List<JSON> bids, List<JSON> asks, String priceKey, String sizeKey, int scale) {
         int bidSize = bids.size();
         int askSize = asks.size();
         int sum = bidSize + askSize;
-        OrderBookPageChanges changes = sum == 1 ? new Single() : new Multi(sum);
+        OrderBookChanges changes = sum == 1 ? new Single() : new Multi(sum);
 
         if (scale == -1) {
             for (int i = 0; i < bidSize; i++) {
@@ -117,48 +114,64 @@ public abstract class OrderBookPageChanges {
     }
 
     /**
-     * Build the optimized {@link OrderBookPageChanges} for bid.
+     * Build the optimized {@link OrderBookChanges} for bid.
      * 
      * @param price A requested price.
      * @param size A requested size.
      * @return
      */
-    public static OrderBookPageChanges singleBid(double price, float size) {
+    public static OrderBookChanges singleBid(double price, float size) {
         Single change = new Single();
         change.add(true, price, size);
         return change;
     }
 
     /**
-     * Build the optimized {@link OrderBookPageChanges} for ask.
+     * Build the optimized {@link OrderBookChanges} for ask.
      * 
      * @param price A requested price.
      * @param size A requested size.
      * @return
      */
-    public static OrderBookPageChanges singleAsk(double price, float size) {
+    public static OrderBookChanges singleAsk(double price, float size) {
         Single change = new Single();
         change.add(false, price, size);
         return change;
     }
 
     /**
+     * Special listener for the modification of orderbook pages.
+     */
+    public interface Listener {
+
+        /**
+         * Invoke when orderbook is changed.
+         * 
+         * @param price
+         * @param size
+         */
+        void change(double price, float size);
+    }
+
+    /**
      * Optimized single orderbook change.
      */
-    private static class Single extends OrderBookPageChanges {
+    private static class Single extends OrderBookChanges {
 
         /** Bid or Ask */
         private boolean bid;
 
         /** Change of orderbook. */
-        private OrderBookPage page;
+        private double price;
+
+        private float size;
 
         /**
          * {@inheritDoc}
          */
         @Override
         public double bestAsk() {
-            return bid ? -1 : page.price;
+            return bid ? -1 : price;
         }
 
         /**
@@ -166,16 +179,16 @@ public abstract class OrderBookPageChanges {
          */
         @Override
         public double bestBid() {
-            return bid ? page.price : -1;
+            return bid ? price : -1;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void each(Direction side, Consumer<OrderBookPage> process) {
+        public void each(Direction side, Listener process) {
             if ((side == Direction.BUY) == bid) {
-                process.accept(page);
+                process.change(price, size);
             }
         }
 
@@ -185,22 +198,15 @@ public abstract class OrderBookPageChanges {
         @Override
         public void add(boolean bid, double price, float size) {
             this.bid = bid;
-            this.page = new OrderBookPage(price, size);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "OrderBookChange [" + page + "]";
+            this.price = price;
+            this.size = size;
         }
     }
 
     /**
      * Multiple change container.
      */
-    private static class Multi extends OrderBookPageChanges {
+    private static class Multi extends OrderBookChanges {
 
         /** Size of bids. */
         private int bidSize;
@@ -209,13 +215,16 @@ public abstract class OrderBookPageChanges {
         private int askSize;
 
         /** Actual container. */
-        private final OrderBookPage[] pages;
+        private final double[] prices;
+
+        private final float[] sizes;
 
         /**
          * Initialization.
          */
         private Multi(int size) {
-            pages = (OrderBookPage[]) Array.newInstance(OrderBookPage.class, size);
+            prices = new double[size];
+            sizes = new float[size];
         }
 
         /**
@@ -223,7 +232,7 @@ public abstract class OrderBookPageChanges {
          */
         @Override
         public double bestAsk() {
-            return askSize == 0 ? -1 : pages[pages.length - 1].price;
+            return askSize == 0 ? -1 : prices[prices.length - 1];
         }
 
         /**
@@ -231,42 +240,34 @@ public abstract class OrderBookPageChanges {
          */
         @Override
         public double bestBid() {
-            return bidSize == 0 ? -1 : pages[0].price;
+            return bidSize == 0 ? -1 : prices[0];
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void each(Direction side, Consumer<OrderBookPage> process) {
+        public void each(Direction side, Listener process) {
             if (side == Direction.BUY) {
                 for (int i = 0; i < bidSize; i++) {
-                    process.accept(pages[i]);
+                    process.change(prices[i], sizes[i]);
                 }
             } else {
                 for (int i = 0; i < askSize; i++) {
-                    process.accept(pages[bidSize + i]);
+                    process.change(prices[bidSize + i], sizes[bidSize + i]);
                 }
             }
         }
 
         @Override
         public void add(boolean bid, double price, float size) {
-            OrderBookPage page = new OrderBookPage(price, size);
-
             if (bid) {
-                pages[bidSize++] = page;
+                prices[bidSize] = price;
+                sizes[bidSize++] = size;
             } else {
-                pages[pages.length - 1 - askSize++] = page;
+                prices[prices.length - 1 - askSize] = price;
+                sizes[sizes.length - 1 - askSize++] = size;
             }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "OrderBookChange " + Arrays.toString(pages);
         }
     }
 }

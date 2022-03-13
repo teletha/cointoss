@@ -25,7 +25,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
@@ -151,10 +151,10 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "book/t" + marketName + "/P1?len=100").map(json -> {
             List<JSON> items = json.find("*");
-            OrderBookPageChanges change = OrderBookPageChanges.byHint(items.size());
+            OrderBookChanges change = OrderBookChanges.byHint(items.size());
 
             for (JSON item : items) {
                 double price = item.get(Double.class, "0");
@@ -170,7 +170,7 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("book", marketName))
                 .skip(1) // skip snapshot
                 .skip(e -> e.has("1", "hb")) // skip heartbeat
@@ -180,9 +180,9 @@ public class BitfinexService extends MarketService {
                     float size = Float.parseFloat(data.text("2"));
 
                     if (0 < size) {
-                        return OrderBookPageChanges.singleBid(price, size);
+                        return OrderBookChanges.singleBid(price, size);
                     } else {
-                        return OrderBookPageChanges.singleAsk(price, -size);
+                        return OrderBookChanges.singleAsk(price, -size);
                     }
                 });
     }

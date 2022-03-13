@@ -28,7 +28,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
@@ -220,7 +220,7 @@ public class FTXService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "markets/" + marketName + "/orderbook?depth=100").map(json -> createOrderBook(json.get("result")));
     }
 
@@ -228,18 +228,18 @@ public class FTXService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderbook", marketName)).map(json -> createOrderBook(json.get("data")));
     }
 
     /**
-     * Convert JSON to {@link OrderBookPageChanges}.
+     * Convert JSON to {@link OrderBookChanges}.
      * 
      * @param array
      * @return
      */
-    private OrderBookPageChanges createOrderBook(JSON pages) {
-        return OrderBookPageChanges.byJSON(pages.find("bids", "*"), pages.find("asks", "*"), "0", "1");
+    private OrderBookChanges createOrderBook(JSON pages) {
+        return OrderBookChanges.byJSON(pages.find("bids", "*"), pages.find("asks", "*"), "0", "1");
     }
 
     /**

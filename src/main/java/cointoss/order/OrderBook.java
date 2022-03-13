@@ -16,6 +16,7 @@ import java.util.function.UnaryOperator;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
+import cointoss.order.OrderBookChanges.Listener;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
 import cointoss.util.map.ConcurrentNavigableDoubleMap;
@@ -25,7 +26,7 @@ import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
 
-public class OrderBook {
+public class OrderBook implements Listener {
 
     /** The best order. */
     public final Variable<OrderBookPage> best = Variable.empty();
@@ -431,28 +432,8 @@ public class OrderBook {
      * 
      * @param changes
      */
-    public void update(OrderBookPageChanges changes) {
-        changes.each(side, board -> {
-            if (board.size == 0d) {
-                // remove
-                OrderBookPage removed = base.remove(board.price);
-
-                if (removed != null && grouped != null) {
-                    updateGroup(removed.price, removed.size * -1);
-                }
-            } else {
-                // add
-                OrderBookPage previous = base.put(board.price, board);
-
-                if (grouped != null) {
-                    if (previous == null) {
-                        updateGroup(board.price, board.size);
-                    } else {
-                        updateGroup(board.price, board.size - previous.size);
-                    }
-                }
-            }
-        });
+    public void update(OrderBookChanges changes) {
+        changes.each(side, this);
 
         int size = base.size();
         if (0 < size) {
@@ -468,6 +449,32 @@ public class OrderBook {
             }
         }
         updating.accept(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void change(double price, float size) {
+        if (size == 0d) {
+            // remove
+            OrderBookPage removed = base.remove(price);
+
+            if (removed != null && grouped != null) {
+                updateGroup(removed.price, removed.size * -1);
+            }
+        } else {
+            // add
+            OrderBookPage previous = base.put(price, new OrderBookPage(price, size));
+
+            if (grouped != null) {
+                if (previous == null) {
+                    updateGroup(price, size);
+                } else {
+                    updateGroup(price, size - previous.size);
+                }
+            }
+        }
     }
 
     private static double floor(double value, double base, int scale) {

@@ -33,7 +33,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -152,7 +152,7 @@ public class GMOService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "orderbooks?symbol=" + marketName).map(e -> createOrderBook(e.get("data")));
     }
 
@@ -160,18 +160,18 @@ public class GMOService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderbooks", marketName)).map(this::createOrderBook);
     }
 
     /**
-     * Convert json to {@link OrderBookPageChanges}.
+     * Convert json to {@link OrderBookChanges}.
      * 
      * @param root
      * @return
      */
-    private OrderBookPageChanges createOrderBook(JSON root) {
-        return OrderBookPageChanges.byJSON(root.find("bids", "*"), root.find("asks", "*"), "price", "size");
+    private OrderBookChanges createOrderBook(JSON root) {
+        return OrderBookChanges.byJSON(root.find("bids", "*"), root.find("asks", "*"), "price", "size");
     }
 
     public static void main(String[] args) throws InterruptedException {

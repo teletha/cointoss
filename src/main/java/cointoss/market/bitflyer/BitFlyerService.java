@@ -40,7 +40,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
@@ -466,20 +466,20 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return rest("GET", API.Public, "/v1/board?product_code=" + marketName)
-                .map(e -> OrderBookPageChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "price", "size"));
+                .map(e -> OrderBookChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "price", "size"));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("lightning_board_", marketName)).map(root -> {
             JSON e = root.get("params").get("message");
 
-            return OrderBookPageChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "price", "size");
+            return OrderBookChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "price", "size");
         });
     }
 

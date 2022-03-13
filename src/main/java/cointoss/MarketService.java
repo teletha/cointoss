@@ -26,7 +26,7 @@ import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.order.OrderState;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
@@ -317,14 +317,14 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return
      */
-    public abstract Signal<OrderBookPageChanges> orderBook();
+    public abstract Signal<OrderBookChanges> orderBook();
 
     /**
      * Acquire order book in realtime. This is infinitely.
      * 
      * @return A shared realtime order books.
      */
-    public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely() {
+    public final synchronized Signal<OrderBookChanges> orderBookRealtimely() {
         return orderBookRealtimely(true);
     }
 
@@ -334,7 +334,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @param autoReconnect Need to reconnect automatically.
      * @return A shared realtime order books.
      */
-    public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely(boolean autoReconnect) {
+    public final synchronized Signal<OrderBookChanges> orderBookRealtimely(boolean autoReconnect) {
         return orderBook().concat(connectOrderBookRealtimely())
                 .effectOnObserve(disposer::add)
                 .retry(autoReconnect ? retryPolicy(500, "OrderBookRealtimely") : null);
@@ -345,7 +345,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return A realtime order books.
      */
-    protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
+    protected abstract Signal<OrderBookChanges> connectOrderBookRealtimely();
 
     public Signal<Liquidation> liquidations(ZonedDateTime startExcluded, ZonedDateTime endExcluded) {
         return I.signal();

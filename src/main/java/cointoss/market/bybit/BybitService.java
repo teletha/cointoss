@@ -32,7 +32,7 @@ import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.order.OrderBookPage;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
@@ -226,7 +226,7 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "orderBook/L2?symbol=" + marketName).map(pages -> {
             return convertOrderBook(pages.find("result", "*"));
         });
@@ -236,7 +236,7 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderBook_200.100ms", marketName)).map(pages -> {
             if (pages.text("type").charAt(0) == 's') {
                 return convertOrderBook(pages.find("data", "*"));
@@ -252,8 +252,8 @@ public class BybitService extends MarketService {
      * @param changes
      * @param e
      */
-    private OrderBookPageChanges convertOrderBook(List<JSON> items) {
-        OrderBookPageChanges changes = OrderBookPageChanges.byHint(items.size());
+    private OrderBookChanges convertOrderBook(List<JSON> items) {
+        OrderBookChanges changes = OrderBookChanges.byHint(items.size());
         for (JSON item : items) {
             double price = Double.parseDouble(item.text("price"));
             String sizeValue = item.text("size");

@@ -16,7 +16,7 @@ import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderBookManager;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.util.EfficientWebSocket;
@@ -161,7 +161,7 @@ public class TrainingMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return backend.orderBook();
     }
 
@@ -169,7 +169,7 @@ public class TrainingMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return delegateInternal(Signal.class, "connectOrderBookRealtimely");
     }
 

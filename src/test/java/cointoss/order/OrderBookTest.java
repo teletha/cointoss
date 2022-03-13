@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static cointoss.order.OrderBookPageChanges.*;
+import static cointoss.order.OrderBookChanges.*;
 import static cointoss.util.arithmetic.Num.ONE;
 
 import java.util.Collection;

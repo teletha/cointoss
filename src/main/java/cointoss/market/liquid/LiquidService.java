@@ -20,7 +20,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -141,7 +141,7 @@ public class LiquidService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "order_books?pair=" + marketName).map(this::createOrderBook);
     }
 
@@ -149,18 +149,18 @@ public class LiquidService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderbook", marketName)).map(json -> createOrderBook(json.get("1")));
     }
 
     /**
-     * Convert JSON to {@link OrderBookPageChanges}.
+     * Convert JSON to {@link OrderBookChanges}.
      * 
      * @param array
      * @return
      */
-    private OrderBookPageChanges createOrderBook(JSON pages) {
-        return OrderBookPageChanges.byJSON(pages.find("bids", "*"), pages.find("asks", "*"), "0", "1");
+    private OrderBookChanges createOrderBook(JSON pages) {
+        return OrderBookChanges.byJSON(pages.find("bids", "*"), pages.find("asks", "*"), "0", "1");
     }
 
     /**

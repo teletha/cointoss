@@ -27,7 +27,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.ticker.data.OpenInterest;
@@ -148,7 +148,7 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "depth?symbol=" + marketName + "&limit=" + (setting.type.isDerivative() ? "1000" : "5000"))
                 .map(e -> createOrderBook(e, "bids", "asks"));
     }
@@ -157,18 +157,18 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("depth", marketName)).map(json -> createOrderBook(json.get("data"), "b", "a"));
     }
 
     /**
-     * Convert JSON to {@link OrderBookPageChanges}.
+     * Convert JSON to {@link OrderBookChanges}.
      * 
      * @param array
      * @return
      */
-    private OrderBookPageChanges createOrderBook(JSON pages, String bidName, String askName) {
-        return OrderBookPageChanges
+    private OrderBookChanges createOrderBook(JSON pages, String bidName, String askName) {
+        return OrderBookChanges
                 .byJSON(pages.find(bidName, "*"), pages.find(askName, "*"), "0", "1", isDelivery ? setting.target.scale : -1);
     }
 

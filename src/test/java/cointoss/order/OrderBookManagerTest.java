@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static cointoss.order.OrderBookPageChanges.*;
+import static cointoss.order.OrderBookChanges.*;
 
 import org.junit.jupiter.api.Test;
 

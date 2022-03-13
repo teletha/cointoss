@@ -25,7 +25,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
@@ -137,19 +137,19 @@ public class CoinbaseService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "products/" + marketName + "/book?level=2")
-                .map(e -> OrderBookPageChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "0", "1"));
+                .map(e -> OrderBookChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "0", "1"));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("level2", marketName)).map(root -> {
             List<JSON> items = root.find("changes", "*");
-            OrderBookPageChanges changes = OrderBookPageChanges.byHint(items.size());
+            OrderBookChanges changes = OrderBookChanges.byHint(items.size());
 
             for (JSON item : items) {
                 Direction side = item.get(Direction.class, "0");

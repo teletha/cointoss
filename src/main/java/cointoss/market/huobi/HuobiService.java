@@ -23,7 +23,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -173,10 +173,10 @@ public class HuobiService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", "market/depth?symbol=" + marketName + "&type=step0").map(json -> {
             JSON tick = json.get("tick");
-            return OrderBookPageChanges.byJSON(tick.find("bids", "*"), tick.find("asks", "*"), "0", "1");
+            return OrderBookChanges.byJSON(tick.find("bids", "*"), tick.find("asks", "*"), "0", "1");
         });
     }
 
@@ -191,10 +191,10 @@ public class HuobiService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("depth.step1", marketName)).map(json -> {
             JSON tick = json.get("tick");
-            return OrderBookPageChanges.byJSON(tick.find("bids", "*"), tick.find("asks", "*"), "0", "1");
+            return OrderBookChanges.byJSON(tick.find("bids", "*"), tick.find("asks", "*"), "0", "1");
         });
     }
 

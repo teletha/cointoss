@@ -22,7 +22,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.order.OrderBookPageChanges;
+import cointoss.order.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -160,10 +160,10 @@ public class BitbankService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookPageChanges> orderBook() {
+    public Signal<OrderBookChanges> orderBook() {
         return call("GET", marketName + "/depth").map(root -> {
             JSON e = root.get("data");
-            return OrderBookPageChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "0", "1");
+            return OrderBookChanges.byJSON(e.find("bids", "*"), e.find("asks", "*"), "0", "1");
         });
     }
 
@@ -171,10 +171,10 @@ public class BitbankService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
+    protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("depth_diff", marketName)).map(root -> {
             JSON e = root.get("message").get("data");
-            return OrderBookPageChanges.byJSON(e.find("b", "*"), e.find("a", "*"), "0", "1");
+            return OrderBookChanges.byJSON(e.find("b", "*"), e.find("a", "*"), "0", "1");
         });
     }
 
