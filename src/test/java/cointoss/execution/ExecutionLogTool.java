@@ -17,7 +17,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.binance.Binance;
+import cointoss.market.bybit.Bybit;
 import cointoss.util.Chrono;
 import kiss.I;
 
@@ -27,7 +27,7 @@ import kiss.I;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        repairLog(Binance.FUTURE_BTC_USDT, Chrono.utc(2022, 2, 4));
+        restoreNormal(Bybit.BTC_USD, Chrono.utc(2022, 3, 12));
     }
 
     /**

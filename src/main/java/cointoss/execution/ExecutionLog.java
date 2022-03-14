@@ -677,7 +677,7 @@ public class ExecutionLog {
 
                 return readNormal();
             } else {
-                return readExternalRepository(service.externalRepository());
+                return readExternalRepository(service.externalRepository()).recover(e -> I.signal());
             }
         }
 

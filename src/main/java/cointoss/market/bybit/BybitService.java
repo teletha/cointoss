@@ -85,83 +85,14 @@ public class BybitService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         long[] context = new long[3];
 
-        return this.searchServerID(Support.computeDateTime(startId))
-                .map(e -> e.get(long.class, "id"))
-                .flatMap(v -> I.signal(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).map(index -> v + 1000 * index))
-                .concatMap(id -> call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + id))
-                .takeWhile(e -> e.find("result", "0").size() != 0)
-                .flatIterable(e -> e.find("result", "*"))
-                .map(e -> {
-                    Direction side = e.get(Direction.class, "side");
-                    Num price = e.get(Num.class, "price");
-                    Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-                    ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
+        return call("GET", "trading-records?symbol=" + marketName + "&limit=1000").flatIterable(e -> e.find("result", "*")).map(e -> {
+            Direction side = e.get(Direction.class, "side");
+            Num price = e.get(Num.class, "price");
+            Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
+            ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
 
-                    return Support.createExecution(side, size, price, date, context);
-                });
-    }
-
-    /**
-     * Search by server ID.
-     * 
-     * @param target
-     * @return
-     */
-    private Signal<JSON> searchServerID(ZonedDateTime target) {
-        return call("GET", "trading-records?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("result", "*"))
-                .concatMap(latest -> {
-                    long id = latest.get(long.class, "id");
-                    long time = time(latest);
-                    return searchServerID(target.toInstant().toEpochMilli(), time, id, id - 1000);
-                });
-    }
-
-    /**
-     * Search by server ID.
-     * 
-     * @param targetTime
-     * @param currentID
-     * @param count
-     * @return
-     */
-    private Signal<JSON> searchServerID(long targetTime, long baseTime, long baseID, long currentID) {
-        return call("GET", "trading-records?symbol=" + marketName + "&limit=1000&from=" + currentID).concatMap(root -> {
-            List<JSON> executions = root.find("result", "*");
-
-            if (executions.isEmpty()) {
-                return I.signal();
-            }
-
-            JSON first = executions.get(0);
-            long firstTime = time(first);
-
-            JSON last = executions.get(executions.size() - 1);
-            long lastTime = time(last);
-
-            if (firstTime <= targetTime && targetTime <= lastTime) {
-                return I.signal(executions).skip(e -> time(e) < targetTime).first();
-            } else {
-                long firstID = first.get(long.class, "id");
-                double timeDistance = baseTime - firstTime; // use double to avoid auto rounding
-                double idDistance = baseID - firstID;
-                double targetDistance = firstTime - targetTime; // use double to avoid auto rounding
-                double mod = targetDistance / timeDistance;
-                long diff = Math.round(idDistance * mod);
-                long estimatedTargetID = diff != 0 ? firstID - diff : firstTime < targetTime ? firstID + 1000 : firstID - 1000;
-
-                return searchServerID(targetTime, firstTime, firstID, estimatedTargetID);
-            }
-        }).first();
-    }
-
-    /**
-     * Parse date-time.
-     * 
-     * @param json
-     * @return
-     */
-    private long time(JSON json) {
-        return ZonedDateTime.parse(json.text("time"), TimeFormat).toInstant().toEpochMilli();
+            return Support.createExecution(side, size, price, date, context);
+        }).take(e -> startId <= e.id && e.id <= endId);
     }
 
     /**
@@ -373,7 +304,6 @@ public class BybitService extends MarketService {
             long[] context = new long[3];
 
             Signal<String[]> signal = I.http(uri, InputStream.class)
-                    .effectOnError(e -> e.printStackTrace())
                     .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
                     .effectOnComplete(parser::stopParsing);
 

@@ -55,7 +55,7 @@ public class TradeTester extends View {
         MarketServiceProvider.availableMarketServices()
                 .take(MarketService::supportHistoricalTrade)
                 .take(e -> e.exchange == Exchange.Bybit)
-                .take(3)
+                .take(1)
                 .to(service -> {
                     UITab tab = DockSystem.register(service.id)
                             .closable(false)
