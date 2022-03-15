@@ -285,8 +285,11 @@ public class BitfinexService extends MarketService {
 
         public String key;
 
-        /** For book topic. */
-        public String len = "250";
+        /** Special for book topic. */
+        public String length = "250";
+
+        /** Special for book topic. */
+        public String freq = "F1";
 
         private Topic(String channel, String symbol) {
             super(channel + symbol);
