@@ -54,7 +54,7 @@ public class TradeTester extends View {
 
         MarketServiceProvider.availableMarketServices()
                 .take(MarketService::supportHistoricalTrade)
-                .take(e -> e.exchange == Exchange.Bybit)
+                .take(e -> e.exchange == Exchange.BinanceF)
                 .take(1)
                 .to(service -> {
                     UITab tab = DockSystem.register(service.id)
@@ -65,22 +65,7 @@ public class TradeTester extends View {
                     TradingViewCoordinator.requestLoading(service, tab);
                 });
 
-        //
-        // MarketService service4 = GMO.XRP;
-        // tab = DockSystem.register(service4.id())
-        // .closable(false)
-        // .text(service4.marketReadableName)
-        // .contents(ui -> new TradingView(ui, service4));
-        //
-        // tab.load();
-        //
-        // MarketService service5 = Bitbank.XLM_JPY;
-        // tab = DockSystem.register(service5.id())
-        // .closable(false)
-        // .text(service5.marketReadableName)
-        // .contents(ui -> new TradingView(ui, service5));
-        //
-        // tab.load();
+        DockSystem.validate();
     }
 
     /**

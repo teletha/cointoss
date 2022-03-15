@@ -65,6 +65,7 @@ public class TradeMate extends View {
 
             TradingViewCoordinator.requestLoading(service, tab);
         });
+        DockSystem.validate();
 
         // ========================================================
         // Clock in Title bar
