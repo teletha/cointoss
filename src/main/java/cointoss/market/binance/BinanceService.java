@@ -19,6 +19,7 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cointoss.Currency;
@@ -149,7 +150,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<OrderBookChanges> orderBook() {
-        return call("GET", "depth?symbol=" + marketName + "&limit=" + (setting.type.isDerivative() ? "1000" : "5000"))
+        return call("GET", "depth?symbol=" + marketName + "&limit=" + (setting.type.isDerivative() ? "1000" : "1000"))
                 .map(e -> createOrderBook(e, "bids", "asks"));
     }
 
@@ -158,7 +159,8 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("depth", marketName)).map(json -> createOrderBook(json.get("data"), "b", "a"));
+        return clientRealtimely().subscribe(new Topic("depth" + (setting.type.isSpot() ? "" : "@500ms"), marketName))
+                .map(json -> createOrderBook(json.get("data"), "b", "a"));
     }
 
     /**
@@ -173,8 +175,8 @@ public class BinanceService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ((BinanceService) Binance.FUTURE_MKR_USDT).retrieveOpenInterest(ZonedDateTime.now().minusDays(25), 500).to(e -> {
-            System.out.println(e);
+        ((BinanceService) Binance.FUTURE_BTC_USDT).orderBookRealtimely().buffer(1, TimeUnit.SECONDS).to(e -> {
+            System.out.println(e.size());
         });
 
         Thread.sleep(1000 * 10);
