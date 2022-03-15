@@ -147,7 +147,7 @@ public class CoinbaseService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("level2", marketName)).map(root -> {
+        return clientRealtimely().subscribe(new Topic("level2_50", marketName)).map(root -> {
             List<JSON> items = root.find("changes", "*");
             OrderBookChanges changes = OrderBookChanges.byHint(items.size());
 
@@ -188,7 +188,7 @@ public class CoinbaseService extends MarketService {
         public List<String> channels = new ArrayList();
 
         private Topic(String channel, String market) {
-            super((channel.equals("level2") ? "l2update" : channel) + ":" + market);
+            super((channel.equals("level2_50") ? "l2update" : channel) + ":" + market);
 
             product_ids.add(market);
             channels.add(channel);
