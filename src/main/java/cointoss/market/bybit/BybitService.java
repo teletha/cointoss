@@ -264,6 +264,14 @@ public class BybitService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean supportRecentExecutionOnly() {
+        return true;
+    }
+
+    /**
      * 
      */
     private static class OfficialRepository extends ExecutionLogRepository {

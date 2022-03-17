@@ -180,7 +180,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         long middle = (start + end.id) / 2;
         I.info(this + " searches for the initial execution log. [" + start + " ~ " + middle + " ~ " + end.date + "]");
 
-        return executionsBefore(middle).buffer().skipError().or(List.of()).flatMap(result -> {
+        return executionsBefore(middle).buffer().or(List.of()).recover(List.of()).flatMap(result -> {
             int size = result.size();
             if (size == 0) {
                 // Since there is no log prior to the middle ID, we can assume that
@@ -501,6 +501,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public boolean supportHistoricalTrade() {
         return true;
+    }
+
+    /**
+     * Indicates whether the trade record that can be retrieved is the most recent one only.
+     * 
+     * @return
+     */
+    public boolean supportRecentExecutionOnly() {
+        return false;
     }
 
     /**

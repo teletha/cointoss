@@ -58,6 +58,36 @@ public final class BitFlyer extends MarketServiceProvider {
             .targetWithdrawingFee(size -> Num.of("0.005"))
             .baseWithdrawingFee(JPYWithdrawFee));
 
+    public static final MarketService MONA_JPY = new BitFlyerService("MONA_JPY", MarketSetting.with.spot()
+            .target(Currency.MONA.minimumSize(0.1).scale(8))
+            .base(Currency.JPY.minimumSize(0.001).scale(3))
+            .priceRangeModifier(100)
+            .acquirableExecutionSize(AcquirableSize)
+            .executionLogger(BitFlyerLogger.class)
+            .takerFee(size -> size.multiply("0.0001"))
+            .targetWithdrawingFee(size -> Num.of("0.005"))
+            .baseWithdrawingFee(JPYWithdrawFee));
+
+    public static final MarketService XRP_JPY = new BitFlyerService("XRP_JPY", MarketSetting.with.spot()
+            .target(Currency.XRP.minimumSize(0.1).scale(6))
+            .base(Currency.JPY.minimumSize(0.01).scale(2))
+            .priceRangeModifier(10)
+            .acquirableExecutionSize(AcquirableSize)
+            .executionLogger(BitFlyerLogger.class)
+            .takerFee(size -> size.multiply("0.0001"))
+            .targetWithdrawingFee(size -> Num.of("0.005"))
+            .baseWithdrawingFee(JPYWithdrawFee));
+
+    public static final MarketService XLM_JPY = new BitFlyerService("XLM_JPY", MarketSetting.with.spot()
+            .target(Currency.XLM.minimumSize(0.1).scale(6))
+            .base(Currency.JPY.minimumSize(0.001).scale(3))
+            .priceRangeModifier(100)
+            .acquirableExecutionSize(AcquirableSize)
+            .executionLogger(BitFlyerLogger.class)
+            .takerFee(size -> size.multiply("0.0001"))
+            .targetWithdrawingFee(size -> Num.of("0.005"))
+            .baseWithdrawingFee(JPYWithdrawFee));
+
     /**
      * {@inheritDoc}
      */

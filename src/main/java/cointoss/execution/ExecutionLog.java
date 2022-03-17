@@ -321,8 +321,7 @@ public class ExecutionLog {
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
             long cacheId = lastCache().estimateLastID();
-            long startId = fromId != -1 ? fromId
-                    : cacheId != -1 ? cacheId : service.searchInitialExecution().map(e -> e.id).waitForTerminate().to().exact();
+            long startId = fromId != -1 ? fromId : cacheId != -1 ? cacheId : service.searchInitialExecution().map(e -> e.id).to().next();
             Num coefficient = Num.ONE;
             ArrayDeque<Execution> rests = new ArrayDeque(size);
             while (!disposer.isDisposed()) {
@@ -386,7 +385,7 @@ public class ExecutionLog {
                     }
                 } else {
                     // REST API returns empty execution
-                    if (startId < buffer.realtimeFirstId()) {
+                    if (startId < buffer.realtimeFirstId() && !service.supportRecentExecutionOnly()) {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
@@ -676,8 +675,10 @@ public class ExecutionLog {
                 repair(true);
 
                 return readNormal();
-            } else {
+            } else if (service.externalRepository() != ExecutionLogRepository.NOP) {
                 return readExternalRepository(service.externalRepository()).recover(e -> I.signal());
+            } else {
+                return I.signal();
             }
         }
 
@@ -1009,12 +1010,14 @@ public class ExecutionLog {
         long estimateLastID() {
             if (existCompact()) {
                 return readCompact().last().to().exact().id;
-            } else {
+            } else if (existNormal()) {
                 try (NormalLog reader = new NormalLog(normal)) {
                     return reader.lastID();
                 } catch (Exception e) {
                     throw I.quiet(e);
                 }
+            } else {
+                return -1;
             }
         }
 

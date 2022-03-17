@@ -19,7 +19,7 @@ import kiss.I;
 public final class Bybit extends MarketServiceProvider {
 
     /** Limitation */
-    static final int AcquirableSize = 10000;
+    static final int AcquirableSize = 1000;
 
     public static final MarketService BTC_USD = new BybitService("BTCUSD", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(1).scale(5))
