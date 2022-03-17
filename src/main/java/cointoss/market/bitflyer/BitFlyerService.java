@@ -562,7 +562,7 @@ public class BitFlyerService extends MarketService {
                         .$(input("#Password", account.loginPassword.exact()))
                         .$(click("#login_btn"))
                         .$(awaitContentLoading())
-                        .$(detour("https://lightning.bitflyer.jp/Home/TwoFactorAuth", w -> {
+                        .$(detour("https://lightning.bitflyer.com/Home/TwoFactorAuth", w -> {
                             return browser.click("form > label")
                                     .$(inputByHuman("#ConfirmationCode", translate("Enter the two-step verification code provided by Bitflyer.")))
                                     .$(click("form > button"))
