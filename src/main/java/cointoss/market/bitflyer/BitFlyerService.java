@@ -557,7 +557,7 @@ public class BitFlyerService extends MarketService {
         // Use your browser to log in and obtain a session ID.
         static {
             Viewtify.browser(browser -> {
-                browser.load("https://lightning.bitflyer.jp")
+                browser.load("https://lightning.bitflyer.com")
                         .$(input("#LoginId", account.loginId.exact()))
                         .$(input("#Password", account.loginPassword.exact()))
                         .$(click("#login_btn"))
