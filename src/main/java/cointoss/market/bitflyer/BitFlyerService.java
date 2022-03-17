@@ -154,7 +154,7 @@ public class BitFlyerService extends MarketService {
                     .flatIterable(json -> json.find(String.class, "child_order_acceptance_id"));
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
-            request.account_id = account.accountId.v;
+            request.account_id = Session.accountId;
             request.ord_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
@@ -177,7 +177,7 @@ public class BitFlyerService extends MarketService {
     public Signal<Order> cancel(Order order) {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
-        cancel.account_id = account.accountId.v;
+        cancel.account_id = Session.accountId;
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
@@ -554,27 +554,33 @@ public class BitFlyerService extends MarketService {
         /** The session ID (may be null). */
         private static String id;
 
+        private static String accountId;
+
         // Use your browser to log in and obtain a session ID.
         static {
-            Viewtify.browser(browser -> {
-                browser.load("https://lightning.bitflyer.com")
-                        .$(input("#LoginId", account.loginId.exact()))
-                        .$(input("#Password", account.loginPassword.exact()))
-                        .$(click("#login_btn"))
-                        .$(awaitContentLoading())
-                        .$(detour("https://lightning.bitflyer.com/Home/TwoFactorAuth", w -> {
-                            return browser.click("form > label")
-                                    .$(inputByHuman("#ConfirmationCode", translate("Enter the two-step verification code provided by Bitflyer.")))
-                                    .$(click("form > button"))
-                                    .$(awaitContentLoading());
-                        }))
-                        .to(() -> {
-                            browser.cookie(sessionKey).to(c -> id = c.getValue());
-                            browser.stage().get().close();
+            if (account.loginId.isPresent() && account.loginPassword.isPresent()) {
+                Viewtify.browser(browser -> {
+                    browser.load("https://lightning.bitflyer.com")
+                            .$(input("#LoginId", account.loginId.exact()))
+                            .$(input("#Password", account.loginPassword.exact()))
+                            .$(click("#login_btn"))
+                            .$(awaitContentLoading())
+                            .$(detour("https://lightning.bitflyer.com/Home/TwoFactorAuth", w -> {
+                                return browser.click("form > label")
+                                        .$(inputByHuman("#ConfirmationCode", translate("Enter the two-step verification code provided by Bitflyer.")))
+                                        .$(click("form > button"))
+                                        .$(awaitContentLoading());
+                            }))
+                            .to(() -> {
+                                browser.cookie(sessionKey).to(c -> id = c.getValue());
+                                browser.attribute("body", "data-account").to(c -> accountId = c);
+                                browser.dispose();
+                                browser.stage().get().close();
 
-                            maintain();
-                        });
-            });
+                                maintain();
+                            });
+                });
+            }
         }
 
         /**
@@ -587,7 +593,7 @@ public class BitFlyerService extends MarketService {
                         .header("Cookie", sessionKey + "=" + Session.id)
                         .header("X-Requested-With", "XMLHttpRequest")
                         .POST(BodyPublishers
-                                .ofString("{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
+                                .ofString("{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + Session.accountId + "\",\"lang\":\"ja\"}"));
 
                 Network.rest(builder, LIMITER, 1).to(I.NoOP);
             });
@@ -728,7 +734,7 @@ public class BitFlyerService extends MarketService {
     private class WebRequest {
 
         /** Generic parameter */
-        public String account_id = account.accountId.v;
+        public String account_id = Session.accountId;
 
         /** Generic parameter */
         public String product_code = marketName;

@@ -74,6 +74,7 @@
 		"Password": "パスワード",
 		"Period": "期間",
 		"Please enter a positive number.": "正の数を入力してください。",
+		"Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.com/developer).": "[ BitFlyer](https://lightning.bitflyer.com/developer) によって提供される公開 API を使用するには、 API キーと API 秘密鍵を入手してください。",
 		"Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).": "[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。",
 		"Please input a positive number.": "正数を入力してください。",
 		"Position": "ポジション",

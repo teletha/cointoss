@@ -33,10 +33,6 @@ public class BitFlyerSetting extends View {
 
     private UIText<String> loginPassword;
 
-    private UIText<String> accountId;
-
-    private UIText<String> accountToken;
-
     private UICheckBox loginBackground;
 
     class view extends ViewDSL implements FormStyles, SettingStyles {
@@ -45,7 +41,7 @@ public class BitFlyerSetting extends View {
             $(vbox, () -> {
                 $(vbox, Block, () -> {
                     label("BitFlyer", Heading);
-                    label(en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer)."), Description);
+                    label(en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.com/developer)."), Description);
                     form("API Key", apiKey);
                     form("API Secret", apiSecret);
 
@@ -54,8 +50,6 @@ public class BitFlyerSetting extends View {
                     label(en("WARNING : This setting will allow all operations on your account."), Description, Warning);
                     form("Login ID", loginId);
                     form(en("Password"), loginPassword);
-                    form(en("Account ID"), accountId);
-                    form(en("Account Token"), accountToken);
                     form(en("Login explicitly"), loginBackground);
                 });
             });
@@ -71,7 +65,5 @@ public class BitFlyerSetting extends View {
         apiSecret.sync(account.apiSecret).masking(true);
         loginId.sync(account.loginId);
         loginPassword.sync(account.loginPassword).masking(true);
-        accountId.sync(account.accountId).masking(true);
-        accountToken.sync(account.accountToken).masking(true);
     }
 }

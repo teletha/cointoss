@@ -26,12 +26,6 @@ public class BitFlyerAccount extends MarketAccount<BitFlyerAccount> {
     /** The login password. */
     public final Variable<String> loginPassword = Variable.empty();
 
-    /** The account id. */
-    public final Variable<String> accountId = Variable.empty();
-
-    /** The account token. */
-    public final Variable<String> accountToken = Variable.empty();
-
     /**
      * Hide constructor.
      */
