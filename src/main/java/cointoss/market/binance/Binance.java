@@ -21,6 +21,11 @@ public final class Binance extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 1000;
 
+    public static final MarketService BNB_USDT = new BinanceService("BNBUSDT", MarketSetting.with.spot()
+            .target(Currency.BNB.minimumSize(0.001))
+            .base(Currency.USDT.minimumSize(0.1))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService BTC_USDT = new BinanceService("BTCUSDT", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
@@ -38,6 +43,16 @@ public final class Binance extends MarketServiceProvider {
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService FTT_USDT = new BinanceService("FTTUSDT", MarketSetting.with.spot()
+            .target(Currency.FTT.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService GMT_USDT = new BinanceService("GMTUSDT", MarketSetting.with.spot()
+            .target(Currency.GMT.minimumSize(0.1))
+            .base(Currency.USDT.minimumSize(0.00001))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService LINK_USDT = new BinanceService("LINKUSDT", MarketSetting.with.spot()
             .target(Currency.LINK.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
@@ -45,6 +60,11 @@ public final class Binance extends MarketServiceProvider {
 
     public static final MarketService SRM_USDT = new BinanceService("SRMUSDT", MarketSetting.with.spot()
             .target(Currency.SRM.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService UNI_USDT = new BinanceService("UNIUSDT", MarketSetting.with.spot()
+            .target(Currency.UNI.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 

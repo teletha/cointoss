@@ -764,6 +764,8 @@ public enum Currency {
 
     GT("GT", "Gatechain Token"),
 
+    GMT("GMT", "Green Metaverse Token"),
+
     FTT("FTT", "FTX Token"),
 
     YFI("YFI", "Yearn.Finance Token"),
