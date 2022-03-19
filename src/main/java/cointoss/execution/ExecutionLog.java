@@ -16,7 +16,9 @@ import static psychopath.Option.ATOMIC_WRITE;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -361,7 +363,7 @@ public class ExecutionLog {
                         }
 
                         long latestId = rests.peekLast().id;
-                        if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId) {
+                        if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId || service.supportRecentExecutionOnly()) {
                             // REST API has caught up with the real-time API,
                             // we must switch to realtime API.
                             buffer.switchToRealtime(latestId, observer);
@@ -784,6 +786,8 @@ public class ExecutionLog {
                     }));
         }
 
+        private AsynchronousFileChannel lockChannel;
+
         /**
          * Write all queued executions to log file.
          */
@@ -792,49 +796,84 @@ public class ExecutionLog {
                 return;
             }
 
-            root.lock().recover(e -> e.as(OverlappingFileLockException.class).mapTo(null)).to(o -> {
-                long lastID = estimateLastID();
+            // The first thing to do is to find out if you have already acquired the right to write
+            // logs. If FileLock is acquired every time the log is written, a memory leak will
+            // occur. You may think that you can just release the lock each time, but this program
+            // must hold the lock until it exits, and for the reasons described in the FileLock
+            // Javadoc, it cannot release the lock.
+            //
+            // ======================= From FileLock Javadoc =======================
+            // On some systems, closing a channel releases all locks held by the Java virtual
+            // machine on the underlying file regardless of whether the locks were acquired via that
+            // channel or via another channel open on the same file. It is strongly recommended
+            // that, within a program, a unique channel be used to acquire all locks on any given
+            // file.
+            // =============================================================
+            if (lockChannel != null) {
+                writeActually();
+                return;
+            }
 
-                // switch buffer
-                LinkedList<Execution> remaining = queue;
-                queue = new LinkedList();
+            try {
+                lockChannel = AsynchronousFileChannel.open(root.file(".lock").asJavaPath(), CREATE, WRITE);
+                FileLock lock = lockChannel.tryLock();
 
-                // build text
-                StringBuilder text = new StringBuilder();
+                if (lock == null) {
+                    // another program has already acquired the right to write to the log
 
-                for (Execution e : remaining) {
-                    if (lastID < e.id) {
-                        text.append(e).append("\r\n");
+                    // remove older execution from memory cache
+                    long lastID = estimateLastID();
+                    Iterator<Execution> iterator = queue.iterator();
+                    while (iterator.hasNext()) {
+                        Execution e = iterator.next();
+
+                        if (e.id <= lastID) {
+                            iterator.remove();
+                        }
                     }
+                } else {
+                    writeActually();
                 }
-                remaining.clear(); // immediately
+            } catch (OverlappingFileLockException e) {
+                writeActually();
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
 
-                if (text.isEmpty()) {
-                    return;
+        /**
+         * Write all queued executions to log file.
+         */
+        private void writeActually() {
+            long lastID = estimateLastID();
+
+            // switch buffer
+            LinkedList<Execution> remaining = queue;
+            queue = new LinkedList();
+
+            // build text
+            StringBuilder text = new StringBuilder();
+
+            for (Execution e : remaining) {
+                if (lastID < e.id) {
+                    text.append(e).append("\r\n");
                 }
+            }
+            remaining.clear(); // immediately
 
-                // write normal log
-                try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
-                    channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
+            if (text.isEmpty()) {
+                return;
+            }
 
-                    aggregateWritingLog.accept(service);
-                    repository.updateLocal(date);
-                } catch (Throwable e) {
-                    throw I.quiet(e);
-                }
-            }, npe -> {
-                long lastID = estimateLastID();
+            // write normal log
+            try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
+                channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
 
-                // remove older execution from memory cache
-                Iterator<Execution> iterator = queue.iterator();
-                while (iterator.hasNext()) {
-                    Execution e = iterator.next();
-
-                    if (e.id <= lastID) {
-                        iterator.remove();
-                    }
-                }
-            });
+                aggregateWritingLog.accept(service);
+                repository.updateLocal(date);
+            } catch (Throwable e) {
+                throw I.quiet(e);
+            }
         }
 
         /**

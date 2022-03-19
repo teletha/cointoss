@@ -19,7 +19,6 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cointoss.Currency;
@@ -175,11 +174,8 @@ public class BinanceService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ((BinanceService) Binance.FUTURE_BTC_USDT).orderBookRealtimely().buffer(1, TimeUnit.SECONDS).to(e -> {
-            System.out.println(e.size());
+        Binance.BNB_USDT.log.fromToday().to(e -> {
         });
-
-        Thread.sleep(1000 * 10);
     }
 
     /**
