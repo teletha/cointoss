@@ -174,7 +174,7 @@ public class BinanceService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Binance.BNB_USDT.log.fromToday().to(e -> {
+        Binance.LINK_USDT.log.fromToday().to(e -> {
         });
     }
 

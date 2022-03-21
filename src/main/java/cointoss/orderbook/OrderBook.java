@@ -44,7 +44,7 @@ public class OrderBook implements Listener {
     private final UnaryOperator<Num> takerFee;
 
     /** The base boards. */
-    private final ConcurrentNavigableDoubleMap<OrderBookPage> base;
+    final ConcurrentNavigableDoubleMap<OrderBookPage> base;
 
     /** The initial price range. */
     private final float initialRange;
@@ -439,8 +439,8 @@ public class OrderBook implements Listener {
         if (0 < size) {
             best.set(base.firstEntry().getValue());
 
-            if (5000 < size) {
-                for (int i = 0; i < 250; i++) {
+            if (500 < size) {
+                for (int i = 0; i < 100; i++) {
                     OrderBookPage removed = base.pollLastEntry().getValue();
                     if (grouped != null) {
                         updateGroup(removed.price, removed.size * -1);

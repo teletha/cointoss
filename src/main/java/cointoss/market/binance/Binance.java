@@ -21,7 +21,7 @@ public final class Binance extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 1000;
 
-    static final MarketService BNB_USDT = new BinanceService("BNBUSDT", MarketSetting.with.spot()
+    public static final MarketService BNB_USDT = new BinanceService("BNBUSDT", MarketSetting.with.spot()
             .target(Currency.BNB.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.1))
             .acquirableExecutionSize(AcquirableSize));
@@ -53,7 +53,7 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.00001))
             .acquirableExecutionSize(AcquirableSize));
 
-    static final MarketService LINK_USDT = new BinanceService("LINKUSDT", MarketSetting.with.spot()
+    public static final MarketService LINK_USDT = new BinanceService("LINKUSDT", MarketSetting.with.spot()
             .target(Currency.LINK.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
