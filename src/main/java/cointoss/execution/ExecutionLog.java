@@ -548,6 +548,9 @@ public class ExecutionLog {
         /** The writing execution queue. */
         private LinkedList<Execution> queue = new LinkedList();
 
+        /** The lock file. */
+        private AsynchronousFileChannel lockChannel;
+
         /**
          * @param date
          */
@@ -785,8 +788,6 @@ public class ExecutionLog {
                         I.info("Donwload external log " + service + " [" + date + "] " + stopwatch.stop().elapsed());
                     }));
         }
-
-        private AsynchronousFileChannel lockChannel;
 
         /**
          * Write all queued executions to log file.

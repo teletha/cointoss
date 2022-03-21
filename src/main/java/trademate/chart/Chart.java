@@ -163,8 +163,6 @@ public class Chart extends Region {
         Span span;
         if (1 < duration / 86400 /* 60x60x24 */) {
             span = Span.Day1;
-        } else if (1 < duration / 28800 /* 60x60x8 */) {
-            span = Span.Hour8;
         } else if (1 < duration / 3600 /* 60x60 */) {
             span = Span.Hour1;
         } else if (1 < duration / 300 /* 60x5 */) {
