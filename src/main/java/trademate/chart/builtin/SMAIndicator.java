@@ -37,7 +37,6 @@ public class SMAIndicator extends PlotScript {
         line(ticker, shortDays, base, style.shortSMA);
         line(market.tickers.on(Minute5), shortDays, base, style.SMA5M);
         line(market.tickers.on(Minute15), shortDays, base, style.SMA15M);
-        line(market.tickers.on(Minute30), shortDays, base, style.SMA30M);
         line(market.tickers.on(Hour1), shortDays, base, style.SMA1H);
         line(market.tickers.on(Hour4), shortDays, base, style.SMA4H);
         line(ticker, longDays, base, style.longSMA);
