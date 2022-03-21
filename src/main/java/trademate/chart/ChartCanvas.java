@@ -677,7 +677,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
         }
 
-        Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
+        Num price = Num.of(axisY.getValueForPosition(clickedPosition)).scale(chart.market.v.service.setting.base.scale);
         TickLable label = notifyPrice.createLabel(price);
 
         label.add(chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
