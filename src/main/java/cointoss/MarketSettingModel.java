@@ -69,6 +69,14 @@ interface MarketSettingModel {
     }
 
     /**
+     * Get the maximum orderbook size in one side.
+     */
+    @Icy.Property
+    default int orderbookMaxSize() {
+        return 3000;
+    }
+
+    /**
      * Configure max acquirable execution size per one request.
      * 
      * @return

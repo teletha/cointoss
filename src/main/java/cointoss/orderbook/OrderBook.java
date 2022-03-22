@@ -44,7 +44,10 @@ public class OrderBook implements Listener {
     private final UnaryOperator<Num> takerFee;
 
     /** The base boards. */
-    final ConcurrentNavigableDoubleMap<OrderBookPage> base;
+    private final ConcurrentNavigableDoubleMap<OrderBookPage> base;
+
+    /** The max size of orderbook. */
+    private final int maxSize;
 
     /** The initial price range. */
     private final float initialRange;
@@ -71,33 +74,9 @@ public class OrderBook implements Listener {
         this.scaleBase = setting.base.scale;
         this.scaleTarget = setting.target.scale;
         this.takerFee = setting.takerFee;
+        this.maxSize = setting.orderbookMaxSize();
         this.initialRange = this.range = setting.base.minimumSize.floatValue();
     }
-
-    // /**
-    // * Set book operation thread.
-    // *
-    // * @param operator
-    // */
-    // public final void operateOn(Consumer<Runnable> operator) {
-    // if (operator != null) {
-    // this.operator = operator;
-    // }
-    // }
-    //
-    // /**
-    // * Replace the order book management container with your container.
-    // *
-    // * @param replacer A list replacer.
-    // * @return
-    // */
-    // public final void replaceBy(UnaryOperator<List<OrderBookPage>> replacer) {
-    // if (replacer != null) {
-    // this.replacer = replacer;
-    //
-    // group.pages = replacer.apply(group.pages);
-    // }
-    // }
 
     public final Num bestSize() {
         return Num.of(Primitives.roundDecimal(best.v.size, scaleTarget));
@@ -439,8 +418,8 @@ public class OrderBook implements Listener {
         if (0 < size) {
             best.set(base.firstEntry().getValue());
 
-            if (500 < size) {
-                for (int i = 0; i < 100; i++) {
+            if (maxSize < size) {
+                for (int i = Math.min(500, size - maxSize); 0 < i; i--) {
                     OrderBookPage removed = base.pollLastEntry().getValue();
                     if (grouped != null) {
                         updateGroup(removed.price, removed.size * -1);

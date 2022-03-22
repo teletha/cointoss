@@ -66,6 +66,9 @@ public class MarketSetting implements MarketSettingModel {
     private static final MethodHandle priceRangeModifierUpdater = updater("priceRangeModifier");
 
     /** The final property updater. */
+    private static final MethodHandle orderbookMaxSizeUpdater = updater("orderbookMaxSize");
+
+    /** The final property updater. */
     private static final MethodHandle acquirableExecutionSizeUpdater = updater("acquirableExecutionSize");
 
     /** The final property updater. */
@@ -99,6 +102,9 @@ public class MarketSetting implements MarketSettingModel {
     public final int priceRangeModifier;
 
     /** The exposed property. */
+    public final int orderbookMaxSize;
+
+    /** The exposed property. */
     public final int acquirableExecutionSize;
 
     /** The exposed property. */
@@ -125,6 +131,7 @@ public class MarketSetting implements MarketSettingModel {
         this.base = null;
         this.targetCurrencyBidSizes = cointoss.MarketSettingModel.super.targetCurrencyBidSizes();
         this.priceRangeModifier = cointoss.MarketSettingModel.super.priceRangeModifier();
+        this.orderbookMaxSize = cointoss.MarketSettingModel.super.orderbookMaxSize();
         this.acquirableExecutionSize = cointoss.MarketSettingModel.super.acquirableExecutionSize();
         this.executionLogger = cointoss.MarketSettingModel.super.executionLogger();
         this.takerFee = cointoss.MarketSettingModel.super.takerFee();
@@ -301,6 +308,36 @@ public class MarketSetting implements MarketSettingModel {
     private final void setPriceRangeModifier(int value) {
         try {
             priceRangeModifierUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /** Get the maximum orderbook size in one side. */
+    @Override
+    public final int orderbookMaxSize() {
+        return this.orderbookMaxSize;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of orderbookMaxSize property.
+     */
+    @SuppressWarnings("unused")
+    private final int getOrderbookMaxSize() {
+        return this.orderbookMaxSize;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of orderbookMaxSize property to assign.
+     */
+    private final void setOrderbookMaxSize(int value) {
+        try {
+            orderbookMaxSizeUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -523,6 +560,7 @@ public class MarketSetting implements MarketSettingModel {
         builder.append("base=").append(base).append(", ");
         builder.append("targetCurrencyBidSizes=").append(targetCurrencyBidSizes).append(", ");
         builder.append("priceRangeModifier=").append(priceRangeModifier).append(", ");
+        builder.append("orderbookMaxSize=").append(orderbookMaxSize).append(", ");
         builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
         builder.append("executionLogger=").append(executionLogger).append(", ");
         builder.append("takerFee=").append(takerFee).append(", ");
@@ -539,7 +577,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, acquirableExecutionSize, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
+        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, orderbookMaxSize, acquirableExecutionSize, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
     }
 
     /**
@@ -559,6 +597,7 @@ public class MarketSetting implements MarketSettingModel {
         if (!Objects.equals(base, other.base)) return false;
         if (!Objects.equals(targetCurrencyBidSizes, other.targetCurrencyBidSizes)) return false;
         if (priceRangeModifier != other.priceRangeModifier) return false;
+        if (orderbookMaxSize != other.orderbookMaxSize) return false;
         if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
         if (!Objects.equals(takerFee, other.takerFee)) return false;
@@ -592,17 +631,6 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
-            Åssignable o = new Åssignable();
-            o.spot();
-            return o;
-        }
-
-        /**
-         * Create new {@link MarketSetting} with the specified type property.
-         * 
-         * @return The next assignable model.
-         */
         public ÅssignableTarget<ÅssignableBase<Self>> derivative() {
             Åssignable o = new Åssignable();
             o.derivative();
@@ -617,6 +645,17 @@ public class MarketSetting implements MarketSettingModel {
         public ÅssignableTarget<ÅssignableBase<Self>> future() {
             Åssignable o = new Åssignable();
             o.future();
+            return o;
+        }
+
+        /**
+         * Create new {@link MarketSetting} with the specified type property.
+         * 
+         * @return The next assignable model.
+         */
+        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
+            Åssignable o = new Åssignable();
+            o.spot();
             return o;
         }
     }
@@ -642,15 +681,6 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        default Next spot() {
-            return type(cointoss.MarketType.SPOT);
-        }
-
-        /**
-         * Assign type property.
-         * 
-         * @return The next assignable model.
-         */
         default Next derivative() {
             return type(cointoss.MarketType.DERIVATIVE);
         }
@@ -662,6 +692,15 @@ public class MarketSetting implements MarketSettingModel {
          */
         default Next future() {
             return type(cointoss.MarketType.FUTURE);
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next spot() {
+            return type(cointoss.MarketType.SPOT);
         }
     }
 
@@ -732,6 +771,17 @@ public class MarketSetting implements MarketSettingModel {
          */
         default Next priceRangeModifier(int value) {
             ((MarketSetting) this).setPriceRangeModifier(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign orderbookMaxSize property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next orderbookMaxSize(int value) {
+            ((MarketSetting) this).setOrderbookMaxSize(value);
             return (Next) this;
         }
 
@@ -823,6 +873,7 @@ public class MarketSetting implements MarketSettingModel {
         static final String Base = "base";
         static final String TargetCurrencyBidSizes = "targetCurrencyBidSizes";
         static final String PriceRangeModifier = "priceRangeModifier";
+        static final String OrderbookMaxSize = "orderbookMaxSize";
         static final String AcquirableExecutionSize = "acquirableExecutionSize";
         static final String ExecutionLogger = "executionLogger";
         static final String TakerFee = "takerFee";

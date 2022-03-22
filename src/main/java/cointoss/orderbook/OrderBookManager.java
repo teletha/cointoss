@@ -58,10 +58,6 @@ public class OrderBookManager implements Disposable {
             }
             shorts.update(board);
             longs.update(board);
-
-            if (500 < longs.base.size()) {
-                System.out.println(service.id + "    " + longs.base.size());
-            }
         }));
         service.add(fixPageByPrice.to(price -> {
             shorts.fix(price.doubleValue());
