@@ -11,6 +11,7 @@ package cointoss.trade;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Deque;
@@ -478,7 +479,8 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return The expected profit and loss.
      */
     public final Num predictProfit() {
-        return profit(market.orderBook.by(this).predictTakingPrice(remainingSize()));
+        Num profit = profit(market.orderBook.by(this).predictTakingPrice(remainingSize()));
+        return profit.scale(market.service.setting.base.scale, profit.isPositiveOrZero() ? RoundingMode.FLOOR : RoundingMode.CEILING);
     }
 
     /**
