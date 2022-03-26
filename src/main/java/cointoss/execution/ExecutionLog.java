@@ -281,7 +281,7 @@ public class ExecutionLog {
      * Clear all fast log.
      */
     public final void clearRepositoryInfo() {
-        root.delete("repository.json");
+        root.file("repository.json").delete();
     }
 
     /**
