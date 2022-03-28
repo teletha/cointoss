@@ -37,6 +37,9 @@ public class Theme extends Model<Theme> {
     /** Built-in Theme */
     public static final Theme FTX = new Theme("FTX").buy.with(rgb(38, 166, 154)).sell.with(rgb(239, 83, 80));
 
+    /** Built-in Theme */
+    public static final Theme Mono = new Theme("Mono").buy.with(rgb(110, 110, 110)).sell.with(rgb(230, 230, 230));
+
     /* Long position color. */
     public final Preference<Color> buy = initialize(rgb(251, 189, 42));
 
@@ -106,6 +109,6 @@ public class Theme extends Model<Theme> {
      * @return
      */
     public static List<Theme> builtins() {
-        return List.of($, Binance, Bitflyer, ByBit, FTX);
+        return List.of($, Binance, Bitflyer, ByBit, FTX, Mono);
     }
 }
