@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.3.0](https://www.github.com/teletha/cointoss/compare/v1.2.0...v1.3.0) (2022-03-28)
+
+
+### Features
+
+* Add BTCUSD(T)0930 market on Binance and FTX. ([e90b699](https://www.github.com/teletha/cointoss/commit/e90b699ef605fff2b4e28203c01abc91a8cc31a8))
+* Add mono color theme. ([9568af1](https://www.github.com/teletha/cointoss/commit/9568af1cca181e0c7eed21389fdcd1c17bfb1dde))
+* Add USDT pair for BNB, FTT, GMT and UNI on Binance. ([dad01e8](https://www.github.com/teletha/cointoss/commit/dad01e8d66936cf8cc4fa436bb57bf8bb1fd0626))
+* Add XRP, XLM and MON on bitflyer's spot market. ([56577e5](https://www.github.com/teletha/cointoss/commit/56577e536e62fd24d24d9cffeb5cf152daf8f797))
+* Configurable orderbook size. ([5635952](https://www.github.com/teletha/cointoss/commit/563595210eca927f11ed97cde0885e8484dd1a34))
+* Drop span for  8 hours. ([4bead2a](https://www.github.com/teletha/cointoss/commit/4bead2af637bb965505959d0f733a90e865fb7c0))
+* Drop span for 30 minutes. ([64e2bcb](https://www.github.com/teletha/cointoss/commit/64e2bcb1fa19f550f28a02429d56b0fe8e3773fc))
+* Limit orderbook size. ([0f49de4](https://www.github.com/teletha/cointoss/commit/0f49de44c1dbe83601f6984044de7a69b01cdf67))
+* Optimize memory and performance for orderbook related system. ([23be455](https://www.github.com/teletha/cointoss/commit/23be4550b22102b4e5f6d0aee84381db8cb4e53a))
+
+
+### Bug Fixes
+
+* Bitflyer's session maintainer was broken. ([108efa3](https://www.github.com/teletha/cointoss/commit/108efa3a92e5242fc7545b46337f781540bbd84e))
+* Bybit's orderbook was broken. ([1fb6e0d](https://www.github.com/teletha/cointoss/commit/1fb6e0d140e6c18c766a850400b993dccd3177d6))
+* Chart draws the price notifier on the correct position. ([5f22064](https://www.github.com/teletha/cointoss/commit/5f22064fe8aa9f4d3989f3a3b5660e6ebb9b689e))
+* Decrease the amount of ticks. ([2badea6](https://www.github.com/teletha/cointoss/commit/2badea69a5a2bc4c9ee93f2ae7554e0e31d49777))
+* Display the rounded profit and loss. ([3fad0a6](https://www.github.com/teletha/cointoss/commit/3fad0a6c1adab220788d9e02eef6e99c5c73e97b))
+* Get the account id automatically. ([007914c](https://www.github.com/teletha/cointoss/commit/007914c1bdb41a05aaf549f37bab81db0d024607))
+* Memory leak on writing log. ([0541732](https://www.github.com/teletha/cointoss/commit/05417328dfa8a435d38c17b896902a996bb802fb))
+* Optimize orderbook change. ([65469b6](https://www.github.com/teletha/cointoss/commit/65469b6a7584ea844164a2d44a50ddefad0b2cea))
+* Reduce memory usage. ([311a914](https://www.github.com/teletha/cointoss/commit/311a91456c0cafcdd11909265317e8f2bcefb149))
+* Reduce orderbook size. ([7458989](https://www.github.com/teletha/cointoss/commit/7458989608668532e264cb2423f241825ef31dfa))
+* Reduce the number of target spans on SMA indicator. ([e231796](https://www.github.com/teletha/cointoss/commit/e2317968d49bca4bd0d0cc69e1e8ed6634fd0fa9))
+* Reduce update timing on BinanceF's orderbook. ([5546b49](https://www.github.com/teletha/cointoss/commit/5546b49f2f65ac2c4f769ad3e4f9ad8d98512b40))
+* Reduce update timing on Bitfinex's orderbook. ([80ecc4d](https://www.github.com/teletha/cointoss/commit/80ecc4dcf500a652e01fca46154462e3c0ce131f))
+* Reduce update timing on Coinbase's orderbook. ([73ac5fe](https://www.github.com/teletha/cointoss/commit/73ac5fec8663f2578d8a7c0513fabd47a3eeba02))
+* Update Bybit. ([e351f76](https://www.github.com/teletha/cointoss/commit/e351f76977c1dd943bf9d54d67606894b1dc2295))
+
 ## [1.2.0](https://www.github.com/teletha/cointoss/compare/v1.1.0...v1.2.0) (2022-03-10)
 
 
