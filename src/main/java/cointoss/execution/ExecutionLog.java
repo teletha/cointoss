@@ -495,34 +495,12 @@ public class ExecutionLog {
     /**
      * Read log from the specified start to end.
      * 
-     * @return
-     */
-    public final Signal<Execution> rangeAll(LogType... type) {
-        return range(repository.firstZDT(), repository.lastZDT(), type);
-    }
-
-    /**
-     * Read log from the specified start to end.
-     * 
      * @param start
      * @param end
      * @return
      */
     public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end, LogType... type) {
         return I.signal(start).recurse(day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end)).flatMap(day -> at(day, type));
-    }
-
-    /**
-     * Read log from the specified start to end.
-     * 
-     * @param days
-     * @return
-     */
-    public final Signal<Execution> rangeRandom(int days, LogType... type) {
-        ZonedDateTime first = repository.firstZDT();
-        long range = ChronoUnit.DAYS.between(first, repository.lastZDT().minusDays(days + 1));
-        long offset = Num.random(0L, range).longValue();
-        return range(first.plusDays(offset), first.plusDays(offset + days), type);
     }
 
     /**

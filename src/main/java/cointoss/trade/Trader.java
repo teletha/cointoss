@@ -52,6 +52,9 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
     /** The registered options. */
     private final List options = new ArrayList();
 
+    /** The trader name. */
+    private String name;
+
     /** The market. */
     private Market market;
 
@@ -74,9 +77,9 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
         boolean backtest = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
                 .walk(stream -> stream.filter(frame -> frame.getClassName().contains("BackTestModel")).findFirst().isPresent());
 
-        String loggerName = name() + (backtest ? "-BackTest" : "-Trading");
-        I.env(loggerName + ".append", backtest);
-        I.env(loggerName + ".dir", ".log/trading/" + name());
+        name = getClass().getSimpleName() + (backtest ? "-BackTest" : "-Trading");
+        I.env(name + ".append", backtest);
+        I.env(name + ".dir", ".log/trading/" + name());
 
         scenarios.clear();
         setHoldSize(Num.ZERO);
@@ -104,7 +107,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
      * @return An identical trader name.
      */
     public final String name() {
-        return getClass().getSimpleName();
+        return name;
     }
 
     /**

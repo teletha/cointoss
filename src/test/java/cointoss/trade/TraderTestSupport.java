@@ -11,6 +11,7 @@ package cointoss.trade;
 
 import static java.time.temporal.ChronoUnit.*;
 
+import java.lang.System.Logger.Level;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
@@ -58,6 +59,8 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         market.service.clear();
 
         base = market.service.now();
+
+        I.env(name() + ".file", Level.OFF);
     }
 
     /**
