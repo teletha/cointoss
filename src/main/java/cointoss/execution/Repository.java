@@ -9,9 +9,6 @@
  */
 package cointoss.execution;
 
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
@@ -77,13 +74,6 @@ class Repository implements Storable<Repository> {
     private void scanLocalRepository() {
         LocalDate now = LocalDate.now(Chrono.UTC);
         if (now.isAfter(localScanLatest)) {
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(root.asJavaPath(), "execution*log")) {
-                stream.forEach(path -> {
-
-                });
-            } catch (Exception e) {
-                // ignore
-            }
             String[] files = root.asJavaFile().list();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
