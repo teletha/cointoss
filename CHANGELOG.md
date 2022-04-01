@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.3.1](https://www.github.com/teletha/cointoss/compare/v1.3.0...v1.3.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* Test never generate entry log. ([cecf3a7](https://www.github.com/teletha/cointoss/commit/cecf3a79ca6d2e8c1195565b49600f8c0c96515f))
+* update binance ([804c4cc](https://www.github.com/teletha/cointoss/commit/804c4cc2404f78a003c290f6f9814d68f6f74ac2))
+
 ## [1.3.0](https://www.github.com/teletha/cointoss/compare/v1.2.0...v1.3.0) (2022-03-28)
 
 
