@@ -34,6 +34,8 @@ public enum Currency {
 
     ARS("ARS", "Argentine Peso"),
 
+    ASTR("ASTR", "Astar"),
+
     ATOM("ATOM", "Cosmos"),
 
     AUD("AUD", "Australian Dollar"),
@@ -175,6 +177,8 @@ public enum Currency {
     GHs("GHS", "Gigahashes per second"),
 
     GIP("GIP", "Gibraltar Pound"),
+
+    GLMR("GLMR", "Glimmer"),
 
     GMD("GMD", "Gambian Dalasi"),
 
