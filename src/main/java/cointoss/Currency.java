@@ -582,6 +582,8 @@ public enum Currency {
 
     AVA("AVA", "Travala.com"),
 
+    AVAX("AVAX", "Avalanche"),
+
     SYS("SYS", "Syscoin"),
 
     BNT("BNT", "Bancor"),

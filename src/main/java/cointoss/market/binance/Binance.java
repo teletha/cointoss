@@ -68,6 +68,11 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService SOL_USDT = new BinanceService("SOLUSDT", MarketSetting.with.spot()
+            .target(Currency.SOL.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService SRM_USDT = new BinanceService("SRMUSDT", MarketSetting.with.spot()
             .target(Currency.SRM.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.01))

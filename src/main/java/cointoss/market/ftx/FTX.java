@@ -36,6 +36,11 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.0005))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService AVAX_PERP = new FTXService("AVAX-PERP", MarketSetting.with.derivative()
+            .target(Currency.AVAX.minimumSize(0.1))
+            .base(Currency.USD.minimumSize(0.001))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService BNB_PERP = new FTXService("BNB-PERP", MarketSetting.with.derivative()
             .target(Currency.BNB.minimumSize(0.1))
             .base(Currency.USD.minimumSize(0.0005))
@@ -75,6 +80,16 @@ public final class FTX extends MarketServiceProvider {
 
     public static final MarketService LINK_PERP = new FTXService("LINK-PERP", MarketSetting.with.derivative()
             .target(Currency.LINK.minimumSize(0.1))
+            .base(Currency.USD.minimumSize(0.0005))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService LUNA_PERP = new FTXService("LUNA-PERP", MarketSetting.with.derivative()
+            .target(Currency.LUNA.minimumSize(0.1))
+            .base(Currency.USD.minimumSize(0.001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService SOL_PERP = new FTXService("SOL-PERP", MarketSetting.with.derivative()
+            .target(Currency.SOL.minimumSize(0.01))
             .base(Currency.USD.minimumSize(0.0005))
             .acquirableExecutionSize(AcquirableSize));
 
