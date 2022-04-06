@@ -11,18 +11,10 @@ package cointoss.volume;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.ticker.Tick;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.array.FloatList;
-import cointoss.util.map.ConcurrentNavigableLongMap;
-import cointoss.util.map.LongMap;
-import kiss.I;
-import kiss.Signal;
 
 public class PriceRangedVolumeManager {
-
-    /** The time-based cache. */
-    private final ConcurrentNavigableLongMap<PriceRangedVolumePeriod[]> volumes = LongMap.createReversedMap();
 
     /** The volume for buyers. (latest session) */
     private PriceRangedVolumePeriod buyer;
@@ -47,45 +39,16 @@ public class PriceRangedVolumeManager {
     }
 
     /**
-     * End the current record and start a new one.
-     * 
-     * @param tick A starting point.
-     */
-    public void start(Tick tick) {
-        start(tick.openTime, tick.openPrice);
-    }
-
-    /**
-     * End the current record and start a new one.
-     * 
-     * @param startTime A starting time.
-     * @param startPrice A starting price.
-     */
-    public void start(long startTime, double startPrice) {
-        buyer = new PriceRangedVolumePeriod(startTime, startPrice);
-        seller = new PriceRangedVolumePeriod(startTime, startPrice);
-        volumes.put(startTime, new PriceRangedVolumePeriod[] {buyer, seller});
-    }
-
-    /**
-     * Update the current record.
-     * 
-     * @param e
-     */
-    public void add(Execution e) {
-        if (e.direction == Direction.BUY) {
-            buyer.update(e.price, e.size.floatValue());
-        } else {
-            seller.update(e.price, e.size.floatValue());
-        }
-    }
-
-    /**
      * Update the current record.
      * 
      * @param e
      */
     public void update(Execution e) {
+        if (buyer == null) {
+            buyer = new PriceRangedVolumePeriod(e.price.floatValue());
+            seller = new PriceRangedVolumePeriod(e.price.floatValue());
+        }
+
         if (e.direction == Direction.BUY) {
             buyer.update(e.price, e.size.floatValue());
         } else {
@@ -103,29 +66,16 @@ public class PriceRangedVolumeManager {
     }
 
     /**
-     * Retrieve all past records (without the latest).
-     * 
-     * @return
-     */
-    public Signal<PriceRangedVolumePeriod[]> past() {
-        return I.signal(volumes.values()).skip(1);
-    }
-
-    /**
      * Expose for test.
      * 
-     * @param startTime
      * @param startPrice
      * @return
      */
-    PriceRangedVolumePeriod createPeriod(long startTime, double startPrice) {
-        return new PriceRangedVolumePeriod(startTime, startPrice);
+    PriceRangedVolumePeriod createPeriod(double startPrice) {
+        return new PriceRangedVolumePeriod(startPrice);
     }
 
     public class PriceRangedVolumePeriod {
-
-        /** The starting time of this period. (epoch second) */
-        public final long startTime;
 
         /** The integral starting price of this period. */
         private final int startPrice;
@@ -134,8 +84,7 @@ public class PriceRangedVolumeManager {
 
         private final FloatList lower = new FloatList();
 
-        private PriceRangedVolumePeriod(long startTime, double startPrice) {
-            this.startTime = startTime;
+        private PriceRangedVolumePeriod(double startPrice) {
             this.startPrice = Math.round((float) startPrice * tens);
         }
 
@@ -229,7 +178,7 @@ public class PriceRangedVolumeManager {
                     now = 0;
                 }
             }
-            return new GroupedVolumes(startTime, max, prices, volumes);
+            return new GroupedVolumes(max, prices, volumes);
         }
 
         /**
@@ -248,9 +197,6 @@ public class PriceRangedVolumeManager {
      */
     public static class GroupedVolumes {
 
-        /** The starting time of period. (epoch second) */
-        public final long startTime;
-
         /** The max volume in this period. */
         public final float maxVolume;
 
@@ -260,8 +206,7 @@ public class PriceRangedVolumeManager {
         /** The volume list. */
         public final FloatList volumes;
 
-        private GroupedVolumes(long startTime, float maxVolume, FloatList prices, FloatList volumes) {
-            this.startTime = startTime;
+        private GroupedVolumes(float maxVolume, FloatList prices, FloatList volumes) {
             this.maxVolume = maxVolume;
             this.prices = prices;
             this.volumes = volumes;

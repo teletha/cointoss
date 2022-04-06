@@ -176,9 +176,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
 
     /** Flag whether price-ranged volume should layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutPriceRangedVolume = new LayoutAssistant(this);
-
-    /** Flag whether price-ranged volume should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutPriceRangedVolumeLatest = new LayoutAssistant(this);
 
     /** Chart UI */
@@ -192,12 +189,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Chart UI */
     private final EnhancedCanvas orderbookDigit = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
-            .font(8)
-            .textBaseLine(VPos.CENTER);
-
-    /** Chart UI */
-    private final EnhancedCanvas priceRangedVolume = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolume.canLayout)
-            .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
             .font(8)
             .textBaseLine(VPos.CENTER);
 
@@ -297,13 +288,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(Theme.$.buy.observe(), Theme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
 
-        layoutPriceRangedVolume.layoutBy(chartAxisModification())
-                .layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
-                        .observe(), chart.orderbookPriceRange.observe())
-                .layoutBy(chart.ticker.observe().switchMap(t -> t.open))
-                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
-
         layoutPriceRangedVolumeLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
@@ -330,7 +314,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeMarketInfo();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolume, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     private Signal userInterfaceModification() {
@@ -359,7 +343,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         candleLatest.bindSizeTo(this);
         orderbook.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this);
         orderbookDigit.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this);
-        priceRangedVolume.bindSizeTo(this);
         priceRangedVolumeLatest.bindSizeTo(this);
         chartInfo.bindSizeTo(this);
         marketName.size(180, 30);
@@ -377,7 +360,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         candleLatest.clear().size(0, 0);
         orderbook.clear().size(0, 0);
         orderbookDigit.clear().size(0, 0);
-        priceRangedVolume.clear().size(0, 0);
         priceRangedVolumeLatest.clear().size(0, 0);
         chartInfo.clear().size(0, 0);
         marketName.clear().size(0, 0);
@@ -803,7 +785,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layoutForcely();
         layoutCandleLatest.layoutForcely();
         layoutOrderbook.layoutForcely();
-        layoutPriceRangedVolume.layoutForcely();
         layoutPriceRangedVolumeLatest.layoutForcely();
     }
 
@@ -1081,19 +1062,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Draw priced volumes on chart.
      */
     private void drawPriceVolume() {
-        layoutPriceRangedVolume.layout(() -> {
-            priceRangedVolume.clear();
-
-            chart.market.to(m -> {
-                m.priceVolume.past().to(volumes -> {
-                    if (volumes[0] != null) {
-                        PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
-                        bar.drawOn(priceRangedVolume);
-                    }
-                });
-            });
-        });
-
         layoutPriceRangedVolumeLatest.layout(() -> {
             priceRangedVolumeLatest.clear();
 
@@ -1512,7 +1480,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double scale = widthForPeriod / max * type.scale();
 
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            double start = axisX.getPositionForValue(longs.startTime);
+            double start = 30;
 
             for (int i = 0, size = longs.prices.size(); i < size; i++) {
                 double position = axisY.getPositionForValue(longs.prices.get(i));
