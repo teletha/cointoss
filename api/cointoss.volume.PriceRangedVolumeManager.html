@@ -8,10 +8,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="K">
-		<header class="V">
-			<h1 class="d" date="2022-04-06" ver="1.3.0"><code>Cointoss</code></h1>
-			<nav class="i"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="P">
+		<header class="T">
+			<h1 class="V" date="2022-04-06" ver="1.3.0"><code>Cointoss</code></h1>
+			<nav class="H"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com//teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -20,7 +20,7 @@
 					</svg>Activity</a><a href="https://github.com//teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="h" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="a" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -28,100 +28,53 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="U">
-			<nav class="N">
+		<main class="M">
+			<nav class="e">
 				<div></div>
 			</nav>
-			<article class="W" id="Article">
-				<section class="Z"><code class="Q">cointoss.volume</code>
-					<h2 class="Class I"><code class="l">PriceRangedVolumeManager</code></h2>
-					<div class="g"></div>
+			<article class="L" id="Article">
+				<section class="X"><code class="i">cointoss.volume</code>
+					<h2 class="Class d"><code class="l">PriceRangedVolumeManager</code></h2>
+					<div class="J"></div>
 				</section>
-				<section class="Z" id="PriceRangedVolumeManager(cointoss.util.arithmetic.Num)">
-					<h2 class="Y"><i class="PUBLIC"></i><code class="l">PriceRangedVolumeManager</code><code class="b">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">priceRange</code>)</code></h2>
-					<table class="R">
-						<tr class="S">
+				<section class="X" id="PriceRangedVolumeManager(cointoss.util.arithmetic.Num)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="l">PriceRangedVolumeManager</code><code class="Z">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">priceRange</code>)</code></h2>
+					<table class="N">
+						<tr class="Y">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>priceRange</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="Z" id="start(cointoss.ticker.Tick)">
-					<h2 class="Y"><i class="PUBLIC"></i><code class="l">start</code><code class="b">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code> <code class="parameterName">tick</code>)</code><i class="X"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="S">
-							<td><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code> <code>tick</code></td>
-							<td><span><p>A starting point.</p>
-								</span></td>
-						</tr>
-					</table><span class="B"><p>End the current record and start a new one.</p>
-					</span></section>
-				<section class="Z" id="start(long,double)">
-					<h2 class="Y"><i class="PUBLIC"></i><code class="l">start</code><code class="b">(<code>long</code> <code class="parameterName">startTime</code>, <code>double</code> <code class="parameterName">startPrice</code>)</code><i class="X"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="S">
-							<td><code>long</code> <code>startTime</code></td>
-							<td><span><p>A starting time.</p>
-								</span></td>
-						</tr>
-						<tr class="S">
-							<td><code>double</code> <code>startPrice</code></td>
-							<td><span><p>A starting price.</p>
-								</span></td>
-						</tr>
-					</table><span class="B"><p>End the current record and start a new one.</p>
-					</span></section>
-				<section class="Z" id="add(cointoss.execution.Execution)">
-					<h2 class="Y"><i class="PUBLIC"></i><code class="l">add</code><code class="b">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">e</code>)</code><i class="X"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="S">
+				<section class="X" id="update(cointoss.execution.Execution)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="l">update</code><code class="Z">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">e</code>)</code><i class="g"><code>void</code></i></h2>
+					<table class="N">
+						<tr class="Y">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>e</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Update the current record.</p>
 					</span></section>
-				<section class="Z" id="update(cointoss.execution.Execution)">
-					<h2 class="Y"><i class="PUBLIC"></i><code class="l">update</code><code class="b">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">e</code>)</code><i class="X"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="S">
-							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>e</code></td>
-							<td></td>
-						</tr>
-					</table><span class="B"><p>Update the current record.</p>
-					</span></section>
-				<section class="Z" id="latest()">
-					<h2 class="Y"><i class="PUBLIC"></i><code class="l">latest</code><code class="b">()</code><i class="X"><code array="fix"><a href="api/cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.html">PriceRangedVolumePeriod</a></code></i></h2>
-					<table class="R">
-						<tr class="e">
+				<section class="X" id="latest()">
+					<h2 class="j"><i class="PUBLIC"></i><code class="l">latest</code><code class="Z">()</code><i class="g"><code array="fix"><a href="api/cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.html">PriceRangedVolumePeriod</a></code></i></h2>
+					<table class="N">
+						<tr class="h">
 							<td><code array="fix"><a href="api/cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.html">PriceRangedVolumePeriod</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Retrieve the latest record.</p>
 					</span></section>
-				<section class="Z" id="past()">
-					<h2 class="Y"><i class="PUBLIC"></i><code class="l">past</code><code class="b">()</code><i class="X"><code>kiss.Signal<code class="parameters"><code array="fix"><a href="api/cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.html">PriceRangedVolumePeriod</a></code></code></code></i></h2>
-					<table class="R">
-						<tr class="e">
-							<td><code>kiss.Signal<code class="parameters"><code array="fix"><a href="api/cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.html">PriceRangedVolumePeriod</a></code></code></code></td>
-							<td></td>
-						</tr>
-					</table><span class="B"><p>Retrieve all past records (without the latest).</p>
-					</span></section>
 			</article>
-			<aside class="O" id="SubNavi">
-				<div class="k">
-					<h5 class="a">Constructors</h5>
+			<aside class="I" id="SubNavi">
+				<div class="K">
+					<h5 class="Q">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#PriceRangedVolumeManager(cointoss.util.arithmetic.Num)">PriceRangedVolumeManager</a></code><code class="b">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">priceRange</code>)</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#PriceRangedVolumeManager(cointoss.util.arithmetic.Num)">PriceRangedVolumeManager</a></code><code class="Z">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">priceRange</code>)</code></li>
 					</ul>
-					<h5 class="a">Methods</h5>
+					<h5 class="Q">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#start(cointoss.ticker.Tick)">start</a></code><code class="b">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code> <code class="parameterName">tick</code>)</code><i class="L"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#start(long,double)">start</a></code><code class="b">(<code>long</code> <code class="parameterName">startTime</code>, <code>double</code> <code class="parameterName">startPrice</code>)</code><i class="L"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#add(cointoss.execution.Execution)">add</a></code><code class="b">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">e</code>)</code><i class="L"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#update(cointoss.execution.Execution)">update</a></code><code class="b">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">e</code>)</code><i class="L"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#latest()">latest</a></code><code class="b">()</code><i class="L"><code array="fix"><a href="api/cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.html">PriceRangedVolumePeriod</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#past()">past</a></code><code class="b">()</code><i class="L"><code>kiss.Signal<code class="parameters"><code array="fix"><a href="api/cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.html">PriceRangedVolumePeriod</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#update(cointoss.execution.Execution)">update</a></code><code class="Z">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">e</code>)</code><i class="O"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.volume.PriceRangedVolumeManager.html#latest()">latest</a></code><code class="Z">()</code><i class="O"><code array="fix"><a href="api/cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod.html">PriceRangedVolumePeriod</a></code></i></li>
 					</ul>
 				</div>
 			</aside>
