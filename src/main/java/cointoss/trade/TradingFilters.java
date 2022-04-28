@@ -54,6 +54,19 @@ public interface TradingFilters {
     }
 
     /**
+     * Provides a filter that allows only when the value exceeds the specified value.
+     * 
+     * @param threshold
+     * @return A value transition filter.
+     */
+    default Function<Signal<Double>, Signal<Double>> breakupDouble(Supplier<Double> threshold) {
+        return s -> s.take(0d, (previous, current) -> {
+            double num = threshold.get();
+            return previous < num && current >= num;
+        });
+    }
+
+    /**
      * Provides a filter that allows only when the value falls below the specified value.
      * 
      * @param threshold
@@ -113,6 +126,19 @@ public interface TradingFilters {
         return s -> s.take(Num.ZERO, (previous, current) -> {
             Num num = threshold.get();
             return previous.isGreaterThan(num) && current.isLessThanOrEqual(num);
+        });
+    }
+
+    /**
+     * Provides a filter that allows only when the value falls below the specified value.
+     * 
+     * @param threshold
+     * @return A value transition filter.
+     */
+    default Function<Signal<Double>, Signal<Double>> breakdownDouble(Supplier<Double> threshold) {
+        return s -> s.take(0d, (previous, current) -> {
+            double num = threshold.get();
+            return previous > num && current <= num;
         });
     }
 
