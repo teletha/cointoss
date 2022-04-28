@@ -222,7 +222,7 @@ public class OrderBuilder extends View {
             $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
 
-        side.text(Side).model(Order.class, Order::direction).render((label, side) -> label.text(side).color(Theme.colorBy(side)));
+        side.text(Side).model(Order.class, Order::direction).render((label, order, side) -> label.text(side).color(Theme.colorBy(side)));
         amount.text(Amount).modelByVar(Order.class, o -> o.observeExecutedSizeNow().map(s -> o.size.minus(s)).to());
         price.text(Price).model(Order.class, o -> o.price);
 

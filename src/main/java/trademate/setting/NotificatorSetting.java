@@ -9,9 +9,10 @@
  */
 package trademate.setting;
 
+import javafx.util.Duration;
+
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Primitives;
-import javafx.util.Duration;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -129,12 +130,12 @@ class NotificatorSetting extends View {
         // For Notifications
         notifications.items(notificator.types()).simplify();
         name.modelByVar(n -> n.name);
-        desktop.text(en("Desktop")).renderAsCheckBox(notify -> notify.onDesktop, UICheckBox::sync);
-        line.text(en("LINE")).renderAsCheckBox(notify -> notify.onLine, (ui, model) -> {
-            ui.sync(model).disableWhen(notificator.lineAccessToken, String::isEmpty);
+        desktop.text(en("Desktop")).renderAsCheckBox(notify -> notify.ⅰ.onDesktop, UICheckBox::sync);
+        line.text(en("LINE")).renderAsCheckBox(notify -> notify.ⅰ.onLine, (ui, model, disposer) -> {
+            ui.sync(model, disposer).disableWhen(notificator.lineAccessToken, String::isEmpty);
         });
-        sound.text(en("Sound")).renderAsComboBox(notify -> notify.onSound, (ui, model) -> {
-            ui.items(Sound.values()).sync(model).when(User.Action, () -> ui.value().play());
+        sound.text(en("Sound")).renderAsComboBox(notify -> notify.ⅰ.onSound, (ui, model, disposer) -> {
+            ui.items(Sound.values()).sync(model, disposer).when(User.Action, () -> ui.value().play());
         });
 
         // For Sound

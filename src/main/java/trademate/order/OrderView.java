@@ -13,13 +13,14 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
+import javafx.scene.control.SelectionMode;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
-import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Variable;
@@ -285,7 +286,7 @@ public class OrderView extends View {
         // ===============================================
         profitAndLoss.text(Profit)
                 .modelBySignal(scenario -> current.orderBook.by(scenario).best.observing().map(page -> scenario.predictProfit()))
-                .render((ui, profit) -> ui.text(profit).color(Theme.colorBy(profit)));
+                .render((ui, scenario, profit) -> ui.text(profit).color(Theme.colorBy(profit)));
     }
 
     private Num estimateSize() {
