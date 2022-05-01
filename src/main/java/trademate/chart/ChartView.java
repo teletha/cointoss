@@ -179,7 +179,7 @@ public class ChartView extends View {
                 .tooltip(en("Display only boards that are larger than the specified size."))
                 .enableWhen(showOrderbook.isSelected());
         orderbookPriceRange.initializeLazy(market.observe().map(m -> m.service.setting.base.minimumSize))
-                .acceptPositiveNumberInput()
+                .acceptPositiveDecimalInput()
                 .normalizeInput(Form.NFKC)
                 .maximumInput(6)
                 .tooltip(en("Display a grouped board with a specified price range."))

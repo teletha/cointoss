@@ -246,8 +246,8 @@ public class OrderView extends View {
         makerBuyText.text(en("Make Buying")).color(Theme.$.buy);
 
         trainingMode.text(en("Demo Trade")).initialize(true);
-        orderSize.value(Num.of("0.5")).normalizeInput(Form.NFKC).acceptPositiveNumberInput();
-        orderThresholdSize.value(Num.of("3")).normalizeInput(Form.NFKC).acceptPositiveNumberInput();
+        orderSize.value(Num.of("0.5")).normalizeInput(Form.NFKC).acceptPositiveDecimalInput();
+        orderThresholdSize.value(Num.of("3")).normalizeInput(Form.NFKC).acceptPositiveDecimalInput();
         history.text(en("Full History"))
                 .initialize(false)
                 .observing(all -> table.take(all ? Scenario::isNotCancelled : Scenario::isActive));

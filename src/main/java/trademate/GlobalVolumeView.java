@@ -9,13 +9,7 @@
  */
 package trademate;
 
-import static cointoss.Currency.BTC;
-import static cointoss.Currency.COMP;
-import static cointoss.Currency.DOGE;
-import static cointoss.Currency.EOS;
-import static cointoss.Currency.ETH;
-import static cointoss.Currency.SRM;
-import static cointoss.Currency.XRP;
+import static cointoss.Currency.*;
 import static trademate.FXColorPalettes.Pastel10;
 
 import java.text.Normalizer.Form;
@@ -25,13 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import cointoss.Currency;
-import cointoss.MarketService;
-import cointoss.market.Exchange;
-import cointoss.market.MarketServiceProvider;
-import cointoss.util.arithmetic.Primitives;
-import cointoss.util.ring.RingBuffer;
-import cointoss.volume.GlobalVolume;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.Styleable;
@@ -39,6 +26,14 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+
+import cointoss.Currency;
+import cointoss.MarketService;
+import cointoss.market.Exchange;
+import cointoss.market.MarketServiceProvider;
+import cointoss.util.arithmetic.Primitives;
+import cointoss.util.ring.RingBuffer;
+import cointoss.volume.GlobalVolume;
 import kiss.I;
 import kiss.Variable;
 import stylist.Style;
@@ -251,7 +246,7 @@ public class GlobalVolumeView extends View {
             name.text(target.code);
             volumeLong.color(Theme.$.buy);
             volumeShort.color(Theme.$.sell);
-            threshold.acceptPositiveNumberInput().normalizeInput(Form.NFKD).initialize("0");
+            threshold.acceptPositiveDecimalInput().normalizeInput(Form.NFKD).initialize("0");
         }
 
         private void update() {

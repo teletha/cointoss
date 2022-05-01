@@ -160,14 +160,14 @@ public class OrderBuilder extends View {
 
         orderSize.initialize("0")
                 .normalizeInput(Form.NFKC)
-                .acceptPositiveNumberInput()
+                .acceptPositiveDecimalInput()
                 .verifyBy(Verifier.PositiveNumber)
                 .when(User.Scroll, changeBy(orderSizeAmount));
         orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 
         orderPrice.initialize("0")
                 .normalizeInput(Form.NFKC)
-                .acceptPositiveNumberInput()
+                .acceptPositiveDecimalInput()
                 .when(User.Scroll, changeBy(orderPriceAmount))
                 .when(User.MiddleClick, () -> {
                     orderPrice.value(view.market.tickers.latest.v.price.toString());
@@ -185,7 +185,7 @@ public class OrderBuilder extends View {
         orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.of(1000));
         orderPriceInterval.initialize("0")
                 .normalizeInput(Form.NFKC)
-                .acceptPositiveNumberInput()
+                .acceptPositiveDecimalInput()
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount));
 
         optimizeThreshold.initialize(Num.range(0, 200));

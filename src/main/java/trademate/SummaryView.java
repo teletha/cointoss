@@ -78,7 +78,7 @@ public class SummaryView extends View {
     @Override
     protected void initialize() {
         long throttle = 500;
-        size.initialize(Num.ONE).acceptPositiveNumberInput();
+        size.initialize(Num.ONE).acceptPositiveDecimalInput();
 
         name.text(CommonText.Market).model(m -> m.service.formattedId).filterable(true);
 
