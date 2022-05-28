@@ -83,11 +83,6 @@ public final class FTX extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.0005))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService LUNA_PERP = new FTXService("LUNA-PERP", MarketSetting.with.derivative()
-            .target(Currency.LUNA.minimumSize(0.1))
-            .base(Currency.USD.minimumSize(0.001))
-            .acquirableExecutionSize(AcquirableSize));
-
     public static final MarketService SOL_PERP = new FTXService("SOL-PERP", MarketSetting.with.derivative()
             .target(Currency.SOL.minimumSize(0.01))
             .base(Currency.USD.minimumSize(0.0005))
