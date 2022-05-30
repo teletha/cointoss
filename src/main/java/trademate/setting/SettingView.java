@@ -9,9 +9,6 @@
  */
 package trademate.setting;
 
-import java.util.List;
-
-import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import kiss.Variable;
@@ -19,9 +16,9 @@ import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIScrollPane;
+import viewtify.ui.UISelectPane;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.helper.User;
 
 @Managed(value = Singleton.class)
 public class SettingView extends View {
@@ -38,23 +35,14 @@ public class SettingView extends View {
 
     private final Variable<View> main = Variable.empty();
 
+    UISelectPane selection;
+
     /**
      * UI definition.
      */
     class view extends ViewDSL implements SettingStyles {
         {
-            $(hbox, () -> {
-                $(vbox, style.categoryView, () -> {
-                    $(appearance, style.categoryLabel);
-                    $(chart, style.categoryLabel);
-                    $(notification, style.categoryLabel);
-                    $(bitflyer, style.categoryLabel);
-                });
-
-                $(scroll, () -> {
-                    $(main);
-                });
-            });
+            $(selection, style.select);
         }
     }
 
@@ -63,23 +51,25 @@ public class SettingView extends View {
      */
     interface style extends StyleDSL {
 
-        Style categoryView = () -> {
-            padding.top(40, px).right(20, px);
-        };
-
-        Style categoryLabel = () -> {
-            display.minWidth(200, px).height(20, px);
-            padding.vertical(10, px).left(40, px);
-            cursor.pointer();
-            font.size(16, px);
-
-            $.hover(() -> {
-                background.color("derive(-fx-base, 15%)");
+        Style select = () -> {
+            $.select(".select-buttons", () -> {
+                padding.top(40, px).right(20, px);
             });
-        };
 
-        Style selectedLabel = () -> {
-            background.color("derive(-fx-base, 6%)");
+            $.select(".select-button", () -> {
+                display.minWidth(200, px).height(20, px);
+                padding.vertical(10, px).left(40, px);
+                cursor.pointer();
+                font.size(16, px);
+
+                $.hover(() -> {
+                    background.color("derive(-fx-base, 15%)");
+                });
+
+                $.with(".selected", () -> {
+                    background.color("derive(-fx-base, 6%)");
+                });
+            });
         };
     }
 
@@ -88,22 +78,10 @@ public class SettingView extends View {
      */
     @Override
     protected void initialize() {
-        appearance.text(en("Appearance")).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
-        chart.text(en("Chart")).when(User.MouseClick, () -> select(chart, ChartSetting.class));
-        notification.text(en("Notification")).when(User.MouseClick, () -> select(notification, NotificatorSetting.class));
-        bitflyer.text(en("Bitflyer")).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
-
-        select(appearance, AppearanceSetting.class);
-    }
-
-    private void select(UILabel selected, Class<? extends View> view) {
-        for (UILabel label : List.of(appearance, chart, notification, bitflyer)) {
-            if (label == selected) {
-                label.style(style.selectedLabel);
-            } else {
-                label.unstyle(style.selectedLabel);
-            }
-        }
-        main.set(I.make(view));
+        selection.add(ui -> ui.text(en("Appearance")), AppearanceSetting.class)
+                .add(ui -> ui.text(en("Chart")), ChartSetting.class)
+                .add(ui -> ui.text(en("Notification")), NotificatorSetting.class)
+                .add(ui -> ui.text(en("Bitflyer")), BitFlyerSetting.class)
+                .selectAt(0);
     }
 }
