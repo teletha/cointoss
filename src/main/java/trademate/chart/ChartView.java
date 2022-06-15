@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
@@ -27,6 +24,8 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
