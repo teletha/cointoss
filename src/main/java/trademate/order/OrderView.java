@@ -227,7 +227,6 @@ public class OrderView extends View {
                 });
 
         Commands.TakeSell.shortcut(Key.Q).contribute(this::takeSelling);
-        Commands.Clear.shortcut(Key.W).contribute(this::clear);
         Commands.TakeBuy.shortcut(Key.E).contribute(this::takeBuying);
         Commands.MakeSell.shortcut(Key.A).contribute(this::makeSelling);
         Commands.Cancel.shortcut(Key.S).contribute(this::cancel);
