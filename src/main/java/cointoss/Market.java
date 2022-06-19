@@ -29,6 +29,7 @@ import cointoss.order.OrderStrategy.Orderable;
 import cointoss.orderbook.OrderBookManager;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
@@ -334,6 +335,16 @@ public class Market implements Disposable {
      */
     public final Signal<Tick> close(Span span) {
         return tickers.on(span).close;
+    }
+
+    /**
+     * Shortcut method for {@link Tick} timing.
+     * 
+     * @param span A target time span.
+     * @return A tick stream.
+     */
+    public final Ticker ticker(Span span) {
+        return tickers.on(span);
     }
 
     /**

@@ -9,21 +9,19 @@
  */
 package cointoss.verify;
 
-import cointoss.execution.LogType;
-import cointoss.market.ftx.FTX;
-import cointoss.trade.bot.TouchMovingAverage;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.trade.bot.RandomWalker;
 
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
-        BackTest.with.service(FTX.BTC_PERP)
+        BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2021, 11, 19)
                 .end(2021, 11, 29)
-                .traders(new TouchMovingAverage())
+                .traders(new RandomWalker())
                 .fast()
-                .detail(true)
+                .detail(false)
                 .initialBaseCurrency(3000000)
-                .type(LogType.Normal)
                 .run();
 
         // ZonedDateTime start = Chrono.utc(2022, 1, 10);
