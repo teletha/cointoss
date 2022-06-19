@@ -244,7 +244,7 @@ public class OrderView extends View {
         makerBuy.textV(makerBuyText, makerBuyPrice).color(Theme.$.buy).when(User.Action, Commands.MakeBuy);
         makerBuyText.text(en("Make Buying")).color(Theme.$.buy);
 
-        trainingMode.text(en("Demo Trade")).initialize(true);
+        trainingMode.text(en("Demo Trade")).initialize(true).disable(true);
         orderSize.value(Num.of("0.5")).normalizeInput(Form.NFKC).acceptPositiveDecimalInput();
         orderThresholdSize.value(Num.of("3")).normalizeInput(Form.NFKC).acceptPositiveDecimalInput();
         history.text(en("Full History"))
