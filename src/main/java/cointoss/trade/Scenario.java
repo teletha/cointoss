@@ -9,14 +9,13 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -39,7 +38,7 @@ import kiss.Variable;
 /**
  * Declarative entry and exit definition.
  */
-public abstract class Scenario extends ScenarioBase implements Directional, Disposable, TradingEntry {
+public abstract class Scenario extends ScenarioBase implements Directional, Disposable, TradingEntry, TradingExit {
 
     /** The scenario direction. */
     private Directional directional;
@@ -105,6 +104,14 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         disposerForExit.dispose();
         log("Dispose exit.");
         state.set(OrderState.COMPLETED);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Market market() {
+        return market;
     }
 
     /**
@@ -264,112 +271,9 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     protected abstract void exit();
 
     /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param span
+     * {@inheritDoc}
      */
-    public final void exitAfter(Span span) {
-        exitAfter(span.seconds, TimeUnit.SECONDS);
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param time
-     * @param unit
-     */
-    public final void exitAfter(long time, TimeUnit unit) {
-        exitWhen(I.schedule(time, 0, unit, false, market.service.scheduler()).first(), Orderable::take);
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
-    public final void exitAt(long price) {
-        exitAt(Num.of(price));
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
-    public final void exitAt(double price) {
-        exitAt(Num.of(price));
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
-    public final void exitAt(Num price) {
-        exitAt(Variable.of(price));
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
-    public final void exitAt(Variable<Num> price) {
-        exitAt(price, entryPrice.isLessThan(directional, price) ? s -> s.make(price) : s -> s.take());
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
-    public final void exitAt(Trailing price) {
-        exitAt(price, Orderable::take);
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
-    public final void exitAt(long price, Consumer<Orderable> strategy) {
-        exitAt(Num.of(price), strategy);
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
-    public final void exitAt(double price, Consumer<Orderable> strategy) {
-        exitAt(Num.of(price), strategy);
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
-    public final void exitAt(Num price, Consumer<Orderable> strategy) {
-        exitAt(Variable.of(price), strategy);
-    }
-
-    /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
-     */
+    @Override
     public final void exitAt(Variable<Num> price, Consumer<Orderable> strategy) {
         Disposable disposer;
         if (entryPrice.isLessThan(directional, price)) {
@@ -393,38 +297,9 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     /**
-     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
-     * control.
-     * 
-     * @param price An exit price.
+     * {@inheritDoc}
      */
-    public final void exitAt(Trailing price, Consumer<Orderable> strategy) {
-        Num max = entryPrice.plus(this, price.profit);
-        Variable<Num> trailedPrice = Variable.of(entryPrice.minus(this, price.losscut));
-
-        price.update.apply(market).to(current -> {
-            Num trailing = Num.max(this, trailedPrice.v, current.minus(this, price.losscut));
-            trailedPrice.set(Num.min(this, trailing, max));
-        });
-
-        exitAt(trailedPrice, strategy);
-    }
-
-    /**
-     * Declare exit order
-     * 
-     * @param timing
-     */
-    public final void exitWhen(Signal<?> timing) {
-        exitWhen(timing, Orderable::take);
-    }
-
-    /**
-     * Declare exit order
-     * 
-     * @param timing
-     * @param strategy
-     */
+    @Override
     public final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
         disposerForExit.add(timing.first().to(() -> {
             if (!isExitTerminated()) {

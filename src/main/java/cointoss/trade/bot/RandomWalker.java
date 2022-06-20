@@ -9,6 +9,8 @@
  */
 package cointoss.trade.bot;
 
+import static cointoss.ticker.Span.*;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.ticker.Span;
@@ -31,19 +33,7 @@ public class RandomWalker extends Trader {
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        when(market.open(Span.Hour1), () -> {
-            trade(new Scenario() {
-
-                @Override
-                protected void exit() {
-                }
-
-                @Override
-                protected void entry() {
-                }
-            });
-        });
-        when(market.open(Span.Hour1), x -> trade(new Scenario() {
+        when(market.open(Hour1), x -> trade(new Scenario() {
 
             @Override
             protected void entry() {
@@ -52,7 +42,7 @@ public class RandomWalker extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(Trailing.with.losscut(20000).profit(30000).update(Span.Second10));
+                exitAt(Trailing.with.losscut(20000).profit(40000).update(Span.Second10));
                 // exitAtRiskRewardRatio(0.8, Span.Hour4);
             }
         }));

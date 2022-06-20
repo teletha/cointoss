@@ -113,6 +113,14 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
      * {@inheritDoc}
      */
     @Override
+    public Market market() {
+        return market;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void vandalize() {
         scenarios.forEach(Scenario::dispose);
         scenarios.clear();

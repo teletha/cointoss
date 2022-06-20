@@ -12,12 +12,20 @@ package cointoss.trade;
 import java.util.function.Consumer;
 
 import cointoss.Directional;
+import cointoss.Market;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.util.arithmetic.Num;
 
 public interface TradingEntry {
+
+    /**
+     * The current market.
+     * 
+     * @return
+     */
+    Market market();
 
     /**
      * We will order with the specified quantity. Use the return the {@link Takable} &
