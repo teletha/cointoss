@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.arithmetic.Num.HUNDRED;
+import static cointoss.util.arithmetic.Num.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -253,25 +253,31 @@ public class TradingStats {
             }
 
             String time = duration.truncatedTo(ChronoUnit.MILLIS).toString().substring(2).toLowerCase();
-            builder.append("実行時間\t").append(time).append(EOL);
+            builder.append("期間　\t")
+                    .append(Chrono.Date.format(startDate))
+                    .append(" ～ ")
+                    .append(Chrono.Date.format(endDate))
+                    .append("\t実行時間 ")
+                    .append(time)
+                    .append(EOL);
             builder.append("枚数  \t現在").append(holdCurrentSize.toString()).append("  \t最大").append(holdMaxSize.toString()).append(EOL);
-            builder.append("時間  \t").append(holdTime.toString()).append(EOL);
+            builder.append("時間  \t").append(holdTime.toString()).append(EOL).append(EOL);
             builder.append("利幅  \t").append(profitRange.toString()).append(EOL);
             builder.append("含利幅 \t").append(unrealizedProfitRange.toString()).append(EOL);
             builder.append("損幅  \t").append(lossRange.toString()).append(EOL);
-            builder.append("含損幅 \t").append(unrealizedLossRange.toString()).append(EOL);
-            builder.append("総合  \t").append(profitAndLoss.toString());
-            builder.append(" 勝率")
+            builder.append("含損幅 \t").append(unrealizedLossRange.toString()).append(EOL).append(EOL);
+            builder.append("総合  \t").append(profitAndLoss.toString()).append(EOL);
+            builder.append("勝率 ")
                     .append(winningRate().toString())
-                    .append("% PF")
+                    .append("%  PF")
                     .append(profitFactor().toString())
-                    .append(" DD")
+                    .append("  DD")
                     .append(drawDownRatio.multiply(100).toString())
-                    .append("% 総数")
+                    .append("%  総数")
                     .append(String.valueOf(total))
-                    .append(" 決済")
+                    .append("  決済")
                     .append(String.valueOf(terminated))
-                    .append(" 未決済")
+                    .append("  未決済")
                     .append(String.valueOf(active))
                     .append(EOL);
         } catch (IOException e) {

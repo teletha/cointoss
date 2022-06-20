@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
 
@@ -581,5 +582,20 @@ public class Chrono {
             }
         }
         return hasNext ? expression.concat(":") : expression;
+    }
+
+    /**
+     * Pick up the one date by random.
+     * 
+     * @param start
+     * @param end
+     * @return
+     */
+    public static ZonedDateTime randomDate(ZonedDateTime start, ZonedDateTime end) {
+        if (start.isBefore(end)) {
+            return start.plusDays(RandomUtils.nextLong(0, Duration.between(start, end).toDays()));
+        } else {
+            return end.plusDays(RandomUtils.nextLong(0, Duration.between(end, start).toDays()));
+        }
     }
 }

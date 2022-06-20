@@ -13,11 +13,9 @@ import static cointoss.ticker.Span.*;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.ticker.Span;
 import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import cointoss.trade.Trailing;
 
 public class RandomWalker extends Trader {
 
@@ -33,35 +31,19 @@ public class RandomWalker extends Trader {
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        when(market.open(Hour1), x -> trade(new Scenario() {
+        when(market.open(Hour4), x -> trade(new Scenario() {
 
             @Override
             protected void entry() {
-                entry(Direction.random(), 0.2);
+                Direction dir = Direction.random();
+
+                entry(dir, 0.2, o -> o.make(market.tickers.latest.v.price.minus(dir, 300)));
             }
 
             @Override
             protected void exit() {
-                exitAt(Trailing.with.losscut(20000).profit(40000).update(Span.Second10));
-                // exitAtRiskRewardRatio(0.8, Span.Hour4);
+                exitAt(entryPrice.minus(this, 10000));
             }
         }));
-    }
-
-    class Random extends Scenario {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void entry() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void exit() {
-        }
     }
 }

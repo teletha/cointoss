@@ -273,15 +273,18 @@ public class NumStats {
      */
     @Override
     public String toString() {
-        return new StringBuilder().append("最小 ")
-                .append(padding(formatter.apply(min)))
-                .append("\t最大 ")
-                .append(padding(formatter.apply(max)))
-                .append("\t平均 ")
-                .append(padding(formatter.apply(mean)))
-                .append("\t合計 ")
+        StringBuilder builder = new StringBuilder();
+        builder.append("合計 ")
                 .append(padding(formatter.apply(total)))
-                .toString();
+                .append("\t平均　")
+                .append(padding(formatter.apply(mean)))
+                .append("\t(")
+                .append(formatter.apply(min))
+                .append("～")
+                .append(formatter.apply(max))
+                .append(")");
+
+        return builder.toString();
     }
 
     /**

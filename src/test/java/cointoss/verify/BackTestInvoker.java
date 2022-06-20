@@ -16,8 +16,8 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2021, 11, 19)
-                .end(2021, 11, 29)
+                .startRandom()
+                .endDuration(365)
                 .traders(new RandomWalker())
                 .fast()
                 .detail(false)

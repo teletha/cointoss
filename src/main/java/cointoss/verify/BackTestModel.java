@@ -20,6 +20,7 @@ import cointoss.MarketService;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.ConsoleAnalyzer;
 import cointoss.analyze.TradingStats;
+import cointoss.execution.ExecutionLog;
 import cointoss.execution.LogType;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
@@ -56,6 +57,21 @@ interface BackTestModel {
     }
 
     /**
+     * Set the start date.
+     * 
+     * @return
+     */
+    @Icy.Overload("start")
+    private ZonedDateTime startRandom() {
+        ExecutionLog log = service().log;
+
+        ZonedDateTime start = log.firstCacheDate();
+        ZonedDateTime end = log.lastCacheDate();
+
+        return Chrono.randomDate(start, end);
+    }
+
+    /**
      * Set the end date.
      * 
      * @return
@@ -71,6 +87,16 @@ interface BackTestModel {
     @Icy.Overload("end")
     private ZonedDateTime end(int year, int month, int day) {
         return Chrono.utc(LocalDate.of(year, month, day));
+    }
+
+    /**
+     * Set the end date.
+     * 
+     * @return
+     */
+    @Icy.Overload("end")
+    private ZonedDateTime endDuration(int day) {
+        return start().plusDays(day);
     }
 
     /**

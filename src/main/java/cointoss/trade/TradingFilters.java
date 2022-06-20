@@ -9,9 +9,12 @@
  */
 package cointoss.trade;
 
+import java.time.ZonedDateTime;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import cointoss.ticker.Tick;
 import cointoss.util.arithmetic.Num;
 import kiss.Signal;
 
@@ -19,6 +22,33 @@ import kiss.Signal;
  * Define Chart Domain Specific Filters.
  */
 public interface TradingFilters {
+
+    /**
+     * Timezone restriction.
+     */
+    Predicate<Tick> InNewYorkTime = tick -> {
+        ZonedDateTime time = tick.date();
+        int hour = time.getHour();
+        return 12 <= hour && hour < 21;
+    };
+
+    /**
+     * Timezone restriction.
+     */
+    Predicate<Tick> InTokyoTime = tick -> {
+        ZonedDateTime time = tick.date();
+        int hour = time.getHour();
+        return 0 <= hour && hour < 8;
+    };
+
+    /**
+     * Timezone restriction.
+     */
+    Predicate<Tick> InLondonTime = tick -> {
+        ZonedDateTime time = tick.date();
+        int hour = time.getHour();
+        return 7 <= hour && hour < 17;
+    };
 
     /**
      * Provides a filter that allows only when the value exceeds the specified value.

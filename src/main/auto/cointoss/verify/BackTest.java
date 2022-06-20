@@ -57,7 +57,13 @@ public class BackTest implements BackTestModel {
     private static final MethodHandle start$1860699197= invoker("start", int.class, int.class, int.class);
 
     /** The overload or intercept method invoker. */
+    private static final MethodHandle startRandom$1= invoker("startRandom");
+
+    /** The overload or intercept method invoker. */
     private static final MethodHandle end$1860699197= invoker("end", int.class, int.class, int.class);
+
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle endDuration$101354429= invoker("endDuration", int.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle initialBaseCurrency$912239839= invoker("initialBaseCurrency", double.class);
@@ -553,6 +559,19 @@ public class BackTest implements BackTestModel {
                 throw quiet(e);
             }
         }
+
+        /**
+         * Set the start date.
+         *  
+         *  @return
+         */
+        default Next startRandom() {
+            try {
+                return start((ZonedDateTime) startRandom$1.invoke(this));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+        }
     }
 
     /**
@@ -579,6 +598,19 @@ public class BackTest implements BackTestModel {
         default Next end(int year, int month, int day) {
             try {
                 return end((ZonedDateTime) end$1860699197.invoke(this, year, month, day));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+        }
+
+        /**
+         * Set the end date.
+         *  
+         *  @return
+         */
+        default Next endDuration(int day) {
+            try {
+                return end((ZonedDateTime) endDuration$101354429.invoke(this, day));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -691,8 +723,8 @@ public class BackTest implements BackTestModel {
          * 
          * @return The next assignable model.
          */
-        default Next fast() {
-            return type(LogType.Fast);
+        default Next normal() {
+            return type(LogType.Normal);
         }
 
         /**
@@ -700,8 +732,8 @@ public class BackTest implements BackTestModel {
          * 
          * @return The next assignable model.
          */
-        default Next normal() {
-            return type(LogType.Normal);
+        default Next fast() {
+            return type(LogType.Fast);
         }
     }
 
