@@ -97,7 +97,7 @@ public class TradeMate extends View {
 
         // activate application
         Viewtify.application() //
-                .logging((msg, error) -> {
+                .error((msg, error) -> {
                     I.error(msg);
                     I.error(error);
                 })

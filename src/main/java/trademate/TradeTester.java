@@ -80,7 +80,7 @@ public class TradeTester extends View {
 
         // activate application
         Viewtify.application()
-                .logging(I::error)
+                .error(I::error)
                 .use(Theme.Dark)
                 .icon("icon/tester.png")
                 .onTerminating(EfficientWebSocket::shutdownNow)
