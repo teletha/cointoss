@@ -75,8 +75,8 @@ class NotificatorSetting extends View {
     private UIButton lineTest;
 
     interface style extends StyleDSL {
-        Style Types = () -> {
-            display.height(190, px);
+        Style NotificationTypeTable = () -> {
+            display.minHeight(185, px).maxHeight(185, px);
         };
     }
 
@@ -89,7 +89,7 @@ class NotificatorSetting extends View {
                 // Notification Types
                 $(vbox, Block, () -> {
                     label(en("Notification Type"), Heading);
-                    $(notifications, style.Types, () -> {
+                    $(notifications, style.NotificationTypeTable, () -> {
                         $(name, FormLabel);
                         $(desktop);
                         $(line);
@@ -135,7 +135,7 @@ class NotificatorSetting extends View {
             ui.sync(model, disposer).disableWhen(notificator.lineAccessToken, String::isEmpty);
         });
         sound.text(en("Sound")).renderAsComboBox(notify -> notify.ⅰ.onSound, (ui, model, disposer) -> {
-            ui.items(Sound.values()).sync(model, disposer).when(User.Action, () -> ui.value().play());
+            ui.items(Sound.values()).sync(model, disposer);
         });
 
         // For Sound

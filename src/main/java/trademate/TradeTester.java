@@ -74,8 +74,6 @@ public class TradeTester extends View {
      * @throws InterruptedException
      */
     public static void main(String[] args) throws InterruptedException {
-        Thread.sleep(1000 * 10);
-
         I.load(Market.class);
 
         // activate application
