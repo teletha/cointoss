@@ -76,7 +76,7 @@ class NotificatorSetting extends View {
 
     interface style extends StyleDSL {
         Style NotificationTypeTable = () -> {
-            display.minHeight(185, px).maxHeight(185, px);
+            display.minHeight(210, px).maxHeight(210, px);
         };
     }
 
