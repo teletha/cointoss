@@ -34,7 +34,7 @@
 			</nav>
 			<article class="e" id="Article">
 				<section class="T"><code class="I">cointoss.trade.bot</code>
-					<h2 class="Class S"><code class="K">TouchMovingAverage</code></h2>
+					<h2 class="Class S"><code class="K">TrendFollow</code></h2>
 					<div class="Z">
 						<ul class="C E">
 							<li><code><a href="api/cointoss.trade.Trader.html">Trader</a></code></li>
@@ -49,14 +49,17 @@
 						</ul>
 					</div>
 				</section>
-				<section class="T" id="tickSize">
-					<h2 class="Q"><i class="PUBLIC"></i><code class="K">tickSize</code><i class="P"><code class="return">int</code></i></h2>
+				<section class="T" id="size">
+					<h2 class="Q"><i class="PUBLIC"></i><code class="K">size</code><i class="P"><code class="return">double</code></i></h2>
 				</section>
-				<section class="T" id="riskRewardRatio">
-					<h2 class="Q"><i class="PUBLIC"></i><code class="K">riskRewardRatio</code><i class="P"><code class="return">double</code></i></h2>
+				<section class="T" id="big">
+					<h2 class="Q"><i class="PUBLIC"></i><code class="K">big</code><i class="P"><code class="return"><a href="api/cointoss.ticker.Span.html">Span</a></code></i></h2>
 				</section>
-				<section class="T" id="TouchMovingAverage()">
-					<h2 class="Q"><i class="PUBLIC"></i><code class="K">TouchMovingAverage</code><code class="l">()</code></h2>
+				<section class="T" id="small">
+					<h2 class="Q"><i class="PUBLIC"></i><code class="K">small</code><i class="P"><code class="return"><a href="api/cointoss.ticker.Span.html">Span</a></code></i></h2>
+				</section>
+				<section class="T" id="TrendFollow()">
+					<h2 class="Q"><i class="PUBLIC"></i><code class="K">TrendFollow</code><code class="l">()</code></h2>
 				</section>
 				<section class="T" id="declareStrategy(cointoss.Market,cointoss.trade.Funds)">
 					<h2 class="Q"><i class="OVERRIDE PROTECTED"></i><code class="K">declareStrategy</code><code class="l">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code> <code class="parameterName">fund</code>)</code><i class="P"><code>void</code></i></h2>
@@ -76,16 +79,17 @@
 				<div class="b">
 					<h5 class="U">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.trade.bot.TouchMovingAverage.html#TouchMovingAverage()">TouchMovingAverage</a></code><code class="l">()</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.trade.bot.TrendFollow.html#TrendFollow()">TrendFollow</a></code><code class="l">()</code></li>
 					</ul>
 					<h5 class="U">Fields</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.trade.bot.TouchMovingAverage.html#tickSize">tickSize</a></code><i class="V"><code class="return">int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.trade.bot.TouchMovingAverage.html#riskRewardRatio">riskRewardRatio</a></code><i class="V"><code class="return">double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.trade.bot.TrendFollow.html#size">size</a></code><i class="V"><code class="return">double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.trade.bot.TrendFollow.html#big">big</a></code><i class="V"><code class="return"><a href="api/cointoss.ticker.Span.html">Span</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.trade.bot.TrendFollow.html#small">small</a></code><i class="V"><code class="return"><a href="api/cointoss.ticker.Span.html">Span</a></code></i></li>
 					</ul>
 					<h5 class="U">Methods</h5>
 					<ul>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.trade.bot.TouchMovingAverage.html#declareStrategy(cointoss.Market,cointoss.trade.Funds)">declareStrategy</a></code><code class="l">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code> <code class="parameterName">fund</code>)</code><i class="V"><code>void</code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.trade.bot.TrendFollow.html#declareStrategy(cointoss.Market,cointoss.trade.Funds)">declareStrategy</a></code><code class="l">(<code><a href="api/cointoss.Market.html">Market</a></code> <code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code> <code class="parameterName">fund</code>)</code><i class="V"><code>void</code></i></li>
 					</ul>
 				</div>
 			</aside>

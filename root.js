@@ -1727,6 +1727,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "RandomWalker",
+			"packageName": "cointoss.trade.bot",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "RetryPolicy",
 			"packageName": "cointoss.util",
 			"type": "Class"
@@ -2021,16 +2028,16 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "TradingAction",
+			"name": "TradingEntry",
 			"packageName": "cointoss.trade",
-			"type": "Class"
+			"type": "Interface"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "TradingEntry",
+			"name": "TradingExit",
 			"packageName": "cointoss.trade",
-			"type": "Functional"
+			"type": "Interface"
 		},
 		{
 			"modifiers": {
@@ -2115,6 +2122,13 @@ const root = {
 			"name": "Trend",
 			"packageName": "cointoss.ticker",
 			"type": "Enum"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "TrendFollow",
+			"packageName": "cointoss.trade.bot",
+			"type": "Class"
 		},
 		{
 			"modifiers": {
