@@ -17,6 +17,7 @@ import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
+import trademate.order.OrderView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
@@ -48,14 +49,14 @@ public class TradeTester extends View {
     protected void initialize() {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Setting").contents(SettingView.class).closable(false);
-        // DockSystem.register("Order").contents(OrderView.class).closable(false);
+        DockSystem.register("Order").contents(OrderView.class).closable(false);
         // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 
         MarketServiceProvider.availableMarketServices()
                 .take(MarketService::supportHistoricalTrade)
                 .take(e -> e.exchange == Exchange.BitFlyer)
-                .take(1)
+                .skip(5)
                 .to(service -> {
                     UITab tab = DockSystem.register(service.id)
                             .closable(false)

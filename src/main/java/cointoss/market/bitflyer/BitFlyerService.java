@@ -9,8 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static kiss.I.translate;
+import static java.util.concurrent.TimeUnit.*;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.math.RoundingMode;
@@ -139,15 +139,16 @@ public class BitFlyerService extends MarketService {
     public Signal<String> request(Order order) {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
+        System.out.println(order.price);
 
         if (forTest || Session.id == null) {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
-            request.price = order.price.intValue();
+            request.price = order.price;
             request.product_code = marketName;
             request.side = order.direction().name();
-            request.size = order.size.doubleValue();
+            request.size = order.size;
             request.time_in_force = order.quantityCondition.abbreviation;
 
             call = rest("POST", API.Private, "/v1/me/sendchildorder", I.write(request))
@@ -158,10 +159,10 @@ public class BitFlyerService extends MarketService {
             request.ord_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
-            request.price = order.price.intValue();
+            request.price = order.price;
             request.product_code = marketName;
             request.side = order.direction().name();
-            request.size = order.size.doubleValue();
+            request.size = order.size;
             request.time_in_force = order.quantityCondition.abbreviation;
 
             call = rest("POST", API.Internal, "/trade/sendorder", I.write(request)).map(json -> json.get("data").text("order_ref_id"));
@@ -612,9 +613,9 @@ public class BitFlyerService extends MarketService {
 
         public String side;
 
-        public int price;
+        public Num price;
 
-        public double size;
+        public Num size;
 
         public int minute_to_expire;
 
@@ -675,9 +676,9 @@ public class BitFlyerService extends MarketService {
 
         public String side;
 
-        public int price;
+        public Num price;
 
-        public double size;
+        public Num size;
 
         public double minute_to_expire;
 
