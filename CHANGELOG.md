@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.4.0](https://www.github.com/teletha/cointoss/compare/v1.3.0...v1.4.0) (2022-07-19)
+
+
+### Features
+
+* Add ASTR and GLMR spot market on Binance. ([f67048f](https://www.github.com/teletha/cointoss/commit/f67048f0e860bbbf292017181af0559e64d51b03))
+* Add SOL, AVAX, LUNA markets on Binance and FTX. ([1084f5d](https://www.github.com/teletha/cointoss/commit/1084f5daa9c8146f31f2d5aca25d146f96f2aa5c))
+* TradingExit interface. ([9d73976](https://www.github.com/teletha/cointoss/commit/9d73976a0b2aeecc9c16f2e2d6a92d7f5bb7eb36))
+* TradingFilter provides timezone restrictions. ([d36c64f](https://www.github.com/teletha/cointoss/commit/d36c64f8b064ae6c6f108b4d4f2e471105739e52))
+
+
+### Bug Fixes
+
+* Bitflyer order size. ([48bdd1b](https://www.github.com/teletha/cointoss/commit/48bdd1b6df39f8f5611ea055554e71e596f1ac0f))
+* PriceVolume is not timescalable now. ([d28bc4c](https://www.github.com/teletha/cointoss/commit/d28bc4c401c7210157a37eabb321cf7776cf1b29))
+* Remove LUNA market on FTX. ([c6ab51f](https://www.github.com/teletha/cointoss/commit/c6ab51fc6ce453aabf1156a8b9897972810982ed))
+* Setting UI is broken. ([a9b5aeb](https://www.github.com/teletha/cointoss/commit/a9b5aeb4c27863f37d996da3e853089ca8f1283a))
+* Test never generate entry log. ([cecf3a7](https://www.github.com/teletha/cointoss/commit/cecf3a79ca6d2e8c1195565b49600f8c0c96515f))
+* update binance ([804c4cc](https://www.github.com/teletha/cointoss/commit/804c4cc2404f78a003c290f6f9814d68f6f74ac2))
+* update market on binancef and ftx. ([9549abc](https://www.github.com/teletha/cointoss/commit/9549abcd5ad281c546e80b09af1ee02ca289c350))
+* Update sinobu. ([886bff1](https://www.github.com/teletha/cointoss/commit/886bff19af69c1419f107768ef00bbcf260b066f))
+* update viewtify ([47ea505](https://www.github.com/teletha/cointoss/commit/47ea50569ede23aebd2328a69092feba87e59de4))
+* update viewtify ([36c4f13](https://www.github.com/teletha/cointoss/commit/36c4f136b6122d2c76a6f9d85d30114e0526d1a6))
+
 ## [1.3.0](https://www.github.com/teletha/cointoss/compare/v1.2.0...v1.3.0) (2022-03-28)
 
 
