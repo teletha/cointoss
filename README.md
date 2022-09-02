@@ -7,7 +7,12 @@
 </p>
 
 
-## About The Project
+## Summary
+
+<p align="right"><a href="#top">back to top</a></p>
+
+
+## Usage
 
 <p align="right"><a href="#top">back to top</a></p>
 
@@ -23,7 +28,7 @@ OpenJDK 64-Bit Server VM (build 16+36-2231, mixed mode, sharing)
 ```
 <p align="right"><a href="#top">back to top</a></p>
 
-## Using in your build
+## Install
 For any code snippet below, please substitute the version given with the version of Cointoss you wish to use.
 #### [Maven](https://maven.apache.org/)
 Add JitPack repository at the end of repositories element in your build.xml:
@@ -44,14 +49,12 @@ Add it into in the dependencies element like so:
 #### [Gradle](https://gradle.org/)
 Add JitPack repository at the end of repositories in your build.gradle:
 ```gradle
-repositories {
-    maven { url "https://jitpack.io" }
+repositories } url "https://jitpack.io" }
 }
 ```
 Add it into the dependencies section like so:
 ```gradle
-dependencies {
-    implementation 'com.github.teletha:cointoss:1.3.0'
+dependencies :cointoss:1.3.0'
 }
 ```
 #### [SBT](https://www.scala-sbt.org/)
@@ -101,7 +104,7 @@ If you think something might be a bug, but you're not sure, ask on StackOverflow
 <p align="right"><a href="#top">back to top</a></p>
 
 
-## Built with
+## Dependency
 Cointoss depends on the following products on runtime.
 * [altfx-1.1.1](https://mvnrepository.com/artifact/com.github.teletha/altfx/1.1.1)
 * [commons-lang3-3.12.0](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.12.0)
@@ -109,39 +112,23 @@ Cointoss depends on the following products on runtime.
 * [controlsfx-11.1.1](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.1.1)
 * [failureaccess-1.0.1](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.1)
 * [guava-31.1-jre](https://mvnrepository.com/artifact/com.google.guava/guava/31.1-jre)
-* [javafx-base-19-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-base/19-ea+8)
-* [javafx-base-19-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-base/19-ea+8)
-* [javafx-controls-19-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/19-ea+8)
-* [javafx-controls-19-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/19-ea+8)
-* [javafx-graphics-19-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/19-ea+8)
-* [javafx-graphics-19-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/19-ea+8)
-* [javafx-media-19-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-media/19-ea+8)
-* [javafx-media-19-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-media/19-ea+8)
-* [javafx-web-19-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-web/19-ea+8)
-* [javafx-web-19-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-web/19-ea+8)
+* [javafx-base-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-base/20-ea+2)
+* [javafx-base-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-base/20-ea+2)
+* [javafx-controls-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/20-ea+2)
+* [javafx-controls-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/20-ea+2)
+* [javafx-graphics-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/20-ea+2)
+* [javafx-graphics-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/20-ea+2)
+* [javafx-media-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-media/20-ea+2)
+* [javafx-media-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-media/20-ea+2)
+* [javafx-web-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-web/20-ea+2)
+* [javafx-web-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-web/20-ea+2)
 * [openjfx-monocle-jdk-12.0.1+2](https://mvnrepository.com/artifact/org.testfx/openjfx-monocle/jdk-12.0.1+2)
 * [psychopath-1.6.0](https://mvnrepository.com/artifact/com.github.teletha/psychopath/1.6.0)
-* [sinobu-2.16.0](https://mvnrepository.com/artifact/com.github.teletha/sinobu/2.16.0)
+* [sinobu-2.20.0](https://mvnrepository.com/artifact/com.github.teletha/sinobu/2.20.0)
 * [stylist-1.4.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.4.0)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
 * [viewtify-2.5.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.5.0)
 * [zstd-jni-1.5.2-3](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.2-3)
-
-Cointoss depends on the following products on test.
-* [HttpClientMock-1.0.0](https://mvnrepository.com/artifact/com.pgs-soft/HttpClientMock/1.0.0)
-* [antibug-1.3.0](https://mvnrepository.com/artifact/com.github.teletha/antibug/1.3.0)
-* [apiguardian-api-1.1.2](https://mvnrepository.com/artifact/org.apiguardian/apiguardian-api/1.1.2)
-* [byte-buddy-1.12.12](https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy/1.12.12)
-* [byte-buddy-agent-1.12.12](https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-agent/1.12.12)
-* [decimal4j-1.0.3](https://mvnrepository.com/artifact/org.decimal4j/decimal4j/1.0.3)
-* [hamcrest-all-1.3](https://mvnrepository.com/artifact/org.hamcrest/hamcrest-all/1.3)
-* [junit-jupiter-api-5.9.0-M1](https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api/5.9.0-M1)
-* [junit-jupiter-engine-5.9.0-M1](https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine/5.9.0-M1)
-* [junit-jupiter-params-5.9.0-M1](https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params/5.9.0-M1)
-* [junit-platform-commons-1.9.0-M1](https://mvnrepository.com/artifact/org.junit.platform/junit-platform-commons/1.9.0-M1)
-* [junit-platform-engine-1.9.0-M1](https://mvnrepository.com/artifact/org.junit.platform/junit-platform-engine/1.9.0-M1)
-* [junit-platform-launcher-1.9.0-M1](https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher/1.9.0-M1)
-* [opentest4j-1.2.0](https://mvnrepository.com/artifact/org.opentest4j/opentest4j/1.2.0)
 <p align="right"><a href="#top">back to top</a></p>
 
 
