@@ -9,7 +9,7 @@
  */
 package cointoss.market.binance;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -135,6 +135,7 @@ public class BinanceService extends MarketService {
         Num price = e.get(Num.class, "p");
         if (isDelivery) size = size.divide(price).scale(setting.target.scale);
         ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
+        e.has("ok", true);
 
         return Execution.with.direction(side, size)
                 .id(id)
