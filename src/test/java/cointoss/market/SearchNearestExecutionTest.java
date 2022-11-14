@@ -18,7 +18,6 @@ import cointoss.market.bitfinex.Bitfinex;
 import cointoss.market.bitmex.BitMex;
 import cointoss.market.bybit.Bybit;
 import cointoss.market.coinbase.Coinbase;
-import cointoss.market.ftx.FTX;
 import cointoss.util.Chrono;
 
 @Disabled
@@ -46,13 +45,6 @@ class SearchNearestExecutionTest {
     @Timeout(value = 15)
     void bybit() {
         assert Bybit.BTC_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 16067808009190000L;
-    }
-
-    @Test
-    @Timeout(value = 15)
-    void ftx() {
-        // need to normalize padding
-        assert FTX.BTC_PERP.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id / 10 * 10 == 1606780799000L;
     }
 
     @Test

@@ -18,7 +18,6 @@ import cointoss.market.bitfinex.Bitfinex;
 import cointoss.market.bitmex.BitMex;
 import cointoss.market.bybit.Bybit;
 import cointoss.market.coinbase.Coinbase;
-import cointoss.market.ftx.FTX;
 
 @Disabled
 class SearchInitialExecutionTest {
@@ -45,12 +44,6 @@ class SearchInitialExecutionTest {
     @Timeout(value = 10)
     void bybit() {
         assert Bybit.BTC_USD.searchInitialExecution().waitForTerminate().to().exact().id == 15698880007190000L;
-    }
-
-    @Test
-    @Timeout(value = 10)
-    void ftx() {
-        assert FTX.BTC_PERP.searchInitialExecution().waitForTerminate().to().exact().id == 1551788809000L;
     }
 
     @Test
