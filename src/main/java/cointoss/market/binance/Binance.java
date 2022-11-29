@@ -48,11 +48,6 @@ public final class Binance extends MarketServiceProvider {
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService FTT_USDT = new BinanceService("FTTUSDT", MarketSetting.with.spot()
-            .target(Currency.FTT.minimumSize(0.01))
-            .base(Currency.USDT.minimumSize(0.01))
-            .acquirableExecutionSize(AcquirableSize));
-
     public static final MarketService GLMR_USDT = new BinanceService("GLMRUSDT", MarketSetting.with.spot()
             .target(Currency.GLMR.minimumSize(0.1))
             .base(Currency.USDT.minimumSize(0.0001))
@@ -70,11 +65,6 @@ public final class Binance extends MarketServiceProvider {
 
     public static final MarketService SOL_USDT = new BinanceService("SOLUSDT", MarketSetting.with.spot()
             .target(Currency.SOL.minimumSize(0.01))
-            .base(Currency.USDT.minimumSize(0.01))
-            .acquirableExecutionSize(AcquirableSize));
-
-    public static final MarketService SRM_USDT = new BinanceService("SRMUSDT", MarketSetting.with.spot()
-            .target(Currency.SRM.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
