@@ -11,7 +11,7 @@ package cointoss.util.feather;
 
 import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -105,13 +105,13 @@ public abstract class DataCodec<T> implements Extensible {
         private AutoDataCodec(Model<T> model) {
             this.type = model.type;
 
+            int i = 0;
             int width = 0;
-            List<Property> properties = model.properties();
+            Collection<Property> properties = model.properties();
             this.readers = new BiFunction[properties.size()];
             this.writers = new BiConsumer[properties.size()];
 
-            for (int i = 0; i < properties.size(); i++) {
-                Property property = properties.get(i);
+            for (Property property : properties) {
                 Class c = property.model.type;
                 if (c == boolean.class) {
                     width += 1;
@@ -177,6 +177,7 @@ public abstract class DataCodec<T> implements Extensible {
                 } else {
                     throw new IllegalArgumentException("Unspported property type [" + c.getName() + "] on " + model.type.getName() + ".");
                 }
+                i++;
             }
             this.size = width;
         }
