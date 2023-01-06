@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://docs.oracle.com/en/java/javase/17/"><img src="https://img.shields.io/badge/Java-Release%2017-green"/></a>
+    <a href="https://docs.oracle.com/en/java/javase/19/"><img src="https://img.shields.io/badge/Java-Release%2019-green"/></a>
     <span>&nbsp;</span>
     <a href="https://jitpack.io/#teletha/cointoss"><img src="https://img.shields.io/jitpack/v/github/teletha/cointoss?label=Repository&color=green"></a>
     <span>&nbsp;</span>
@@ -18,7 +18,7 @@
 
 
 ## Prerequisites
-Cointoss runs on all major operating systems and requires only [Java version 17](https://docs.oracle.com/en/java/javase/17/) or later to run.
+Cointoss runs on all major operating systems and requires only [Java version 19](https://docs.oracle.com/en/java/javase/19/) or later to run.
 To check, please run `java -version` from the command line interface. You should see something like this:
 ```
 > java -version
@@ -49,12 +49,14 @@ Add it into in the dependencies element like so:
 #### [Gradle](https://gradle.org/)
 Add JitPack repository at the end of repositories in your build.gradle:
 ```gradle
-repositories } url "https://jitpack.io" }
+repositories {
+    maven { url "https://jitpack.io" }
 }
 ```
 Add it into the dependencies section like so:
 ```gradle
-dependencies :cointoss:1.3.0'
+dependencies {
+    implementation 'com.github.teletha:cointoss:1.3.0'
 }
 ```
 #### [SBT](https://www.scala-sbt.org/)
@@ -109,31 +111,32 @@ Cointoss depends on the following products on runtime.
 * [altfx-1.1.1](https://mvnrepository.com/artifact/com.github.teletha/altfx/1.1.1)
 * [commons-lang3-3.12.0](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.12.0)
 * [commons-net-3.7.2](https://mvnrepository.com/artifact/commons-net/commons-net/3.7.2)
-* [controlsfx-11.1.1](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.1.1)
+* [controlsfx-11.1.2](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.1.2)
 * [failureaccess-1.0.1](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.1)
 * [guava-31.1-jre](https://mvnrepository.com/artifact/com.google.guava/guava/31.1-jre)
-* [javafx-base-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-base/20-ea+2)
-* [javafx-base-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-base/20-ea+2)
-* [javafx-controls-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/20-ea+2)
-* [javafx-controls-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/20-ea+2)
-* [javafx-graphics-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/20-ea+2)
-* [javafx-graphics-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/20-ea+2)
-* [javafx-media-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-media/20-ea+2)
-* [javafx-media-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-media/20-ea+2)
-* [javafx-web-20-ea+2](https://mvnrepository.com/artifact/org.openjfx/javafx-web/20-ea+2)
-* [javafx-web-20-ea+2-win](https://mvnrepository.com/artifact/org.openjfx/javafx-web/20-ea+2)
+* [javafx-base-20-ea+11](https://mvnrepository.com/artifact/org.openjfx/javafx-base/20-ea+11)
+* [javafx-base-20-ea+11-win](https://mvnrepository.com/artifact/org.openjfx/javafx-base/20-ea+11)
+* [javafx-controls-20-ea+11](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/20-ea+11)
+* [javafx-controls-20-ea+11-win](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/20-ea+11)
+* [javafx-graphics-20-ea+11](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/20-ea+11)
+* [javafx-graphics-20-ea+11-win](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/20-ea+11)
+* [javafx-media-20-ea+11](https://mvnrepository.com/artifact/org.openjfx/javafx-media/20-ea+11)
+* [javafx-media-20-ea+11-win](https://mvnrepository.com/artifact/org.openjfx/javafx-media/20-ea+11)
+* [javafx-web-20-ea+11](https://mvnrepository.com/artifact/org.openjfx/javafx-web/20-ea+11)
+* [javafx-web-20-ea+11-win](https://mvnrepository.com/artifact/org.openjfx/javafx-web/20-ea+11)
+* [lycoris-1.0.0](https://mvnrepository.com/artifact/com.github.teletha/lycoris/1.0.0)
 * [openjfx-monocle-jdk-12.0.1+2](https://mvnrepository.com/artifact/org.testfx/openjfx-monocle/jdk-12.0.1+2)
 * [psychopath-1.6.0](https://mvnrepository.com/artifact/com.github.teletha/psychopath/1.6.0)
-* [sinobu-2.20.0](https://mvnrepository.com/artifact/com.github.teletha/sinobu/2.20.0)
-* [stylist-1.4.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.4.0)
+* [sinobu-3.1.0](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.1.0)
+* [stylist-1.7.3](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.7.3)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
-* [viewtify-2.5.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.5.0)
-* [zstd-jni-1.5.2-3](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.2-3)
+* [viewtify-2.6.3](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.6.3)
+* [zstd-jni-1.5.2-5](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.2-5)
 <p align="right"><a href="#top">back to top</a></p>
 
 
 ## License
-Copyright (C) 2022 The COINTOSS Development Team
+Copyright (C) 2023 The COINTOSS Development Team
 
 MIT License
 
