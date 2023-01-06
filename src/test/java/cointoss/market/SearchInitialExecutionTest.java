@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
-import cointoss.market.binance.Binance;
 import cointoss.market.bitfinex.Bitfinex;
 import cointoss.market.bitmex.BitMex;
 import cointoss.market.bybit.Bybit;
@@ -32,12 +31,6 @@ class SearchInitialExecutionTest {
     @Timeout(value = 10)
     void coinbase() {
         assert Coinbase.ETHUSD.searchInitialExecution().waitForTerminate().to().exact().id == 1;
-    }
-
-    @Test
-    @Timeout(value = 10)
-    void binance() {
-        assert Binance.FUTURE_BTCUSD_221230.searchInitialExecution().waitForTerminate().to().exact().id == 1;
     }
 
     @Test
