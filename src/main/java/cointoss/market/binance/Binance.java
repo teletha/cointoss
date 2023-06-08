@@ -21,11 +21,6 @@ public final class Binance extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 1000;
 
-    public static final MarketService ASTR_USDT = new BinanceService("ASTRUSDT", MarketSetting.with.spot()
-            .target(Currency.ASTR.minimumSize(0.1))
-            .base(Currency.USDT.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
-
     public static final MarketService BNB_USDT = new BinanceService("BNBUSDT", MarketSetting.with.spot()
             .target(Currency.BNB.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.1))
@@ -35,11 +30,6 @@ public final class Binance extends MarketServiceProvider {
             .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
             .priceRangeModifier(500)
-            .acquirableExecutionSize(AcquirableSize));
-
-    public static final MarketService EOS_USDT = new BinanceService("EOSUSDT", MarketSetting.with.spot()
-            .target(Currency.EOS.minimumSize(0.01))
-            .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService ETH_USDT = new BinanceService("ETHUSDT", MarketSetting.with.spot()
@@ -92,11 +82,6 @@ public final class Binance extends MarketServiceProvider {
 
     public static final MarketService FUTURE_COMP_USDT = new BinanceService("COMPUSDT", MarketSetting.with.derivative()
             .target(Currency.COMP.minimumSize(0.001))
-            .base(Currency.USDT.minimumSize(0.01))
-            .acquirableExecutionSize(AcquirableSize));
-
-    public static final MarketService FUTURE_MKR_USDT = new BinanceService("MKRUSDT", MarketSetting.with.derivative()
-            .target(Currency.MKR.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
