@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import viewtify.Command;
+import viewtify.keys.Command;
 
 public enum TradeMateCommand implements Command<TradeMateCommand> {
     OpenSetting, OpenBacktest;

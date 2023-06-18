@@ -9,11 +9,11 @@
  */
 package trademate.order;
 
-import static trademate.CommonText.*;
+import static trademate.CommonText.Amount;
+import static trademate.CommonText.Price;
+import static trademate.CommonText.Profit;
 
 import java.text.Normalizer.Form;
-
-import javafx.scene.control.SelectionMode;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -21,6 +21,7 @@ import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
+import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Variable;
@@ -28,9 +29,9 @@ import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
 import trademate.Theme;
-import viewtify.Command;
-import viewtify.Key;
 import viewtify.Viewtify;
+import viewtify.keys.Command;
+import viewtify.keys.Key;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
