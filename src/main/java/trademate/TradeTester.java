@@ -61,7 +61,7 @@ public class TradeTester extends View {
                     UITab tab = DockSystem.register(service.id)
                             .closable(false)
                             .text(service.id)
-                            .contents(ui -> new TradingView(ui, service));
+                            .contentsLazy(ui -> new TradingView(ui, service));
 
                     TradingViewCoordinator.requestLoading(service, tab);
                 });

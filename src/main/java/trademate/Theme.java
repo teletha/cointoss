@@ -18,9 +18,9 @@ import javafx.scene.paint.Color;
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
-import viewtify.model.Model;
+import viewtify.model.PreferenceModel;
 
-public class Theme extends Model<Theme> {
+public class Theme extends PreferenceModel<Theme> {
 
     /** The current theme. */
     public static final Theme $ = I.make(Theme.class);

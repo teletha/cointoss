@@ -16,10 +16,10 @@ import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Variable;
-import viewtify.model.Model;
+import viewtify.model.PreferenceModel;
 import viewtify.ui.toast.Toast;
 
-public class Notificator extends Model<Notificator> {
+public class Notificator extends PreferenceModel<Notificator> {
 
     /** The defined type. */
     public final Notify longTrend = new Notify("Long Trend");
@@ -61,7 +61,7 @@ public class Notificator extends Model<Notificator> {
     /**
      * 
      */
-    public static class Notify extends Model<Notify> {
+    public static class Notify extends PreferenceModel<Notify> {
 
         /** Showing desktop notification. */
         final @Managed Preference<Boolean> onDesktop = initialize(false);
