@@ -31,10 +31,10 @@ import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
-import viewtify.ui.toast.Toast;
 import viewtify.util.Corner;
 import viewtify.util.Icon;
 import viewtify.util.ScreenSelector;
+import viewtify.util.Toast;
 
 @Managed(Singleton.class)
 class NotificatorSetting extends View {

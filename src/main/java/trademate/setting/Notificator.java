@@ -17,7 +17,7 @@ import kiss.I;
 import kiss.Managed;
 import kiss.Variable;
 import viewtify.model.PreferenceModel;
-import viewtify.ui.toast.Toast;
+import viewtify.util.Toast;
 
 public class Notificator extends PreferenceModel<Notificator> {
 
