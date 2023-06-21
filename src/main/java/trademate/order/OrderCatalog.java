@@ -25,7 +25,7 @@ import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
-import trademate.Theme;
+import trademate.ChartTheme;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.ui.UITableColumn;
@@ -77,7 +77,7 @@ public class OrderCatalog extends View {
             $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
 
-        side.text(Side).model(Order.class, Order::direction).render((label, order, side) -> label.text(side).color(Theme.colorBy(side)));
+        side.text(Side).model(Order.class, Order::direction).render((label, order, side) -> label.text(side).color(ChartTheme.colorBy(side)));
         amount.text(Amount).modelByVar(Order.class, o -> o.observeExecutedSize().map(s -> o.size.minus(s)).to());
         price.text(Price).model(Order.class, o -> o.price);
 

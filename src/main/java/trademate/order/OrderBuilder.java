@@ -35,7 +35,7 @@ import kiss.WiseConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
-import trademate.Theme;
+import trademate.ChartTheme;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.style.FormStyles;
@@ -135,7 +135,7 @@ public class OrderBuilder extends View {
                     form(en("Variances"), FormInputMin, orderDivideSize, orderDivideIntervalAmount);
                     form(en("Price Interval"), FormInputMin, orderPriceInterval, orderPriceIntervalAmount);
                     form(en("Threshold"), FormInputMin, optimizeThreshold);
-                    form(FormButton, orderLimitShort.color(Theme.$.sell), orderLimitLong.color(Theme.$.buy));
+                    form(FormButton, orderLimitShort.color(ChartTheme.$.sell), orderLimitLong.color(ChartTheme.$.buy));
                     form(FormButton, orderCancel);
                     form(en("Position"), FormInputMin, positionSize);
 
@@ -211,7 +211,7 @@ public class OrderBuilder extends View {
         }
 
         view.market.orders.compoundSize.observing().on(Viewtify.UIThread).to(position -> {
-            positionSize.text(position).color(position.isPositiveOrZero() ? Theme.$.buy : Theme.$.sell);
+            positionSize.text(position).color(position.isPositiveOrZero() ? ChartTheme.$.buy : ChartTheme.$.sell);
         });
 
         bot.text("Active Bot").observe().take(1).to(v -> {
@@ -222,7 +222,7 @@ public class OrderBuilder extends View {
             $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
 
-        side.text(Side).model(Order.class, Order::direction).render((label, order, side) -> label.text(side).color(Theme.colorBy(side)));
+        side.text(Side).model(Order.class, Order::direction).render((label, order, side) -> label.text(side).color(ChartTheme.colorBy(side)));
         amount.text(Amount).modelByVar(Order.class, o -> o.observeExecutedSizeNow().map(s -> o.size.minus(s)).to());
         price.text(Price).model(Order.class, o -> o.price);
 

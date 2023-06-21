@@ -28,7 +28,7 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
-import trademate.Theme;
+import trademate.ChartTheme;
 import viewtify.Viewtify;
 import viewtify.keys.Command;
 import viewtify.keys.Key;
@@ -234,16 +234,16 @@ public class OrderView extends View {
         Commands.MakeBuy.shortcut(Key.D).contribute(this::makeBuying);
 
         clear.text(en("Clear")).when(User.Action, Commands.Clear);
-        takerSell.textV(takerSellText, takerSellPrice).color(Theme.$.sell).when(User.Action, Commands.TakeSell);
-        takerSellText.text(en("Take Selling")).color(Theme.$.sell);
-        takerBuy.textV(takerBuyText, takerBuyPrice).color(Theme.$.buy).when(User.Action, Commands.TakeBuy);
-        takerBuyText.text(en("Take Buying")).color(Theme.$.buy);
+        takerSell.textV(takerSellText, takerSellPrice).color(ChartTheme.$.sell).when(User.Action, Commands.TakeSell);
+        takerSellText.text(en("Take Selling")).color(ChartTheme.$.sell);
+        takerBuy.textV(takerBuyText, takerBuyPrice).color(ChartTheme.$.buy).when(User.Action, Commands.TakeBuy);
+        takerBuyText.text(en("Take Buying")).color(ChartTheme.$.buy);
 
         cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
-        makerSell.textV(makerSellText, makerSellPrice).color(Theme.$.sell).when(User.Action, Commands.MakeSell);
-        makerSellText.text(en("Make Selling")).color(Theme.$.sell);
-        makerBuy.textV(makerBuyText, makerBuyPrice).color(Theme.$.buy).when(User.Action, Commands.MakeBuy);
-        makerBuyText.text(en("Make Buying")).color(Theme.$.buy);
+        makerSell.textV(makerSellText, makerSellPrice).color(ChartTheme.$.sell).when(User.Action, Commands.MakeSell);
+        makerSellText.text(en("Make Selling")).color(ChartTheme.$.sell);
+        makerBuy.textV(makerBuyText, makerBuyPrice).color(ChartTheme.$.buy).when(User.Action, Commands.MakeBuy);
+        makerBuyText.text(en("Make Buying")).color(ChartTheme.$.buy);
 
         trainingMode.text(en("Demo Trade")).initialize(true).disable(false);
         orderSize.value(Num.of("0.5")).normalizeInput(Form.NFKC).acceptPositiveDecimalInput();
@@ -272,7 +272,7 @@ public class OrderView extends View {
         // ===============================================
         entryPrice.text(Price)
                 .modelBySignal(Scenario::observeEntryPriceNow)
-                .render((ui, scenario, price) -> ui.text(price).color(Theme.colorBy(scenario)));
+                .render((ui, scenario, price) -> ui.text(price).color(ChartTheme.colorBy(scenario)));
         entrySize.text(Amount).modelBySignal(Scenario::observeEntryExecutedSizeNow).render((ui, scenario, size) -> ui.text(size));
 
         // ===============================================
@@ -286,7 +286,7 @@ public class OrderView extends View {
         // ===============================================
         profitAndLoss.text(Profit)
                 .modelBySignal(scenario -> current.orderBook.by(scenario).best.observing().map(page -> scenario.predictProfit()))
-                .render((ui, scenario, profit) -> ui.text(profit).color(Theme.colorBy(profit)));
+                .render((ui, scenario, profit) -> ui.text(profit).color(ChartTheme.colorBy(profit)));
     }
 
     private Num estimateSize() {

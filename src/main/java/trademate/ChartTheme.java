@@ -20,25 +20,25 @@ import cointoss.util.arithmetic.Num;
 import kiss.I;
 import viewtify.model.PreferenceModel;
 
-public class Theme extends PreferenceModel<Theme> {
+public class ChartTheme extends PreferenceModel<ChartTheme> {
 
     /** The current theme. */
-    public static final Theme $ = I.make(Theme.class);
+    public static final ChartTheme $ = I.make(ChartTheme.class);
 
     /** Built-in Theme */
-    public static final Theme Binance = new Theme("Binance").buy.with(rgb(2, 192, 118)).sell.with(rgb(248, 73, 96));
+    public static final ChartTheme Binance = new ChartTheme("Binance").buy.with(rgb(2, 192, 118)).sell.with(rgb(248, 73, 96));
 
     /** Built-in Theme */
-    public static final Theme Bitflyer = new Theme("Bitflyer").buy.with(rgb(251, 189, 42)).sell.with(rgb(247, 105, 77));
+    public static final ChartTheme Bitflyer = new ChartTheme("Bitflyer").buy.with(rgb(251, 189, 42)).sell.with(rgb(247, 105, 77));
 
     /** Built-in Theme */
-    public static final Theme ByBit = new Theme("Bybit").buy.with(rgb(121, 184, 61)).sell.with(rgb(201, 56, 96));
+    public static final ChartTheme ByBit = new ChartTheme("Bybit").buy.with(rgb(121, 184, 61)).sell.with(rgb(201, 56, 96));
 
     /** Built-in Theme */
-    public static final Theme FTX = new Theme("FTX").buy.with(rgb(38, 166, 154)).sell.with(rgb(239, 83, 80));
+    public static final ChartTheme FTX = new ChartTheme("FTX").buy.with(rgb(38, 166, 154)).sell.with(rgb(239, 83, 80));
 
     /** Built-in Theme */
-    public static final Theme Mono = new Theme("Mono").buy.with(rgb(110, 110, 110)).sell.with(rgb(230, 230, 230));
+    public static final ChartTheme Mono = new ChartTheme("Mono").buy.with(rgb(110, 110, 110)).sell.with(rgb(230, 230, 230));
 
     /* Long position color. */
     public final Preference<Color> buy = initialize(rgb(251, 189, 42));
@@ -46,26 +46,26 @@ public class Theme extends PreferenceModel<Theme> {
     /* Short position color. */
     public final Preference<Color> sell = initialize(rgb(247, 105, 77));
 
-    /** The name of this {@link Theme}. */
+    /** The name of this {@link ChartTheme}. */
     public final String name;
 
     /**
      * Hide Constructor.
      */
-    private Theme() {
+    private ChartTheme() {
         this("Custom");
     }
 
     /**
      * Hide Constructor.
      */
-    private Theme(String name) {
+    private ChartTheme(String name) {
         this.name = name;
         if (name.equals("Custom")) restore().auto();
     }
 
     /**
-     * Apply this {@link Theme}.
+     * Apply this {@link ChartTheme}.
      */
     public void apply() {
         if ($ != this) {
@@ -89,7 +89,7 @@ public class Theme extends PreferenceModel<Theme> {
      * @return
      */
     public static Color colorBy(Directional direction) {
-        Theme theme = I.make(Theme.class);
+        ChartTheme theme = I.make(ChartTheme.class);
         return direction.isBuy() ? theme.buy.v : theme.sell.v;
     }
 
@@ -99,16 +99,16 @@ public class Theme extends PreferenceModel<Theme> {
      * @return
      */
     public static Color colorBy(Num num) {
-        Theme theme = I.make(Theme.class);
+        ChartTheme theme = I.make(ChartTheme.class);
         return num.isPositiveOrZero() ? theme.buy.v : theme.sell.v;
     }
 
     /**
-     * List up all built-in {@link Theme}s.
+     * List up all built-in {@link ChartTheme}s.
      * 
      * @return
      */
-    public static List<Theme> builtins() {
+    public static List<ChartTheme> builtins() {
         return List.of($, Binance, Bitflyer, ByBit, FTX, Mono);
     }
 }

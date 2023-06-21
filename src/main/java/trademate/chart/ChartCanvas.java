@@ -67,7 +67,7 @@ import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
 import trademate.CommonText;
-import trademate.Theme;
+import trademate.ChartTheme;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.setting.Notificator;
@@ -269,7 +269,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
-                .layoutBy(Theme.$.buy.observe(), Theme.$.sell.observe())
+                .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutCandleLatest.layoutBy(chartAxisModification())
@@ -277,7 +277,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(market -> market.timeline.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
-                .layoutBy(Theme.$.buy.observe(), Theme.$.sell.observe())
+                .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutOrderbook.layoutBy(chartAxisModification())
@@ -285,7 +285,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
-                .layoutBy(Theme.$.buy.observe(), Theme.$.sell.observe())
+                .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
 
         layoutPriceRangedVolumeLatest.layoutBy(chartAxisModification())
@@ -568,7 +568,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         double price = largest.price + m.orderBook.ranged();
                         double position = axisY.getPositionForValue(price);
                         orderbookDigit.clear()
-                                .strokeColor(Theme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL))
+                                .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL))
                                 .strokeText((int) largest.size, orderbookDigit
                                         .getWidth() - largest.size * orderbookBar.scale - 15, position);
                     }
@@ -1408,8 +1408,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * Draw orderbooks on chart' side.
          */
         private void draw() {
-            draw(buyers, buyerMaxSize, Theme.colorBy(Direction.BUY));
-            draw(sellers, sellerMaxSize, Theme.colorBy(Direction.SELL));
+            draw(buyers, buyerMaxSize, ChartTheme.colorBy(Direction.BUY));
+            draw(sellers, sellerMaxSize, ChartTheme.colorBy(Direction.SELL));
         }
 
         /**
