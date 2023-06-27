@@ -43,8 +43,8 @@ public class CoincheckService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws-api.coincheck.com/").extractId(json -> {
         String first = json.text("0");
-        if (Character.isDigit(first.charAt(0))) {
-            return "trades-" + json.text("1");
+        if (first.isEmpty()) {
+            return "trades-" + json.get("0").text("2");
         } else {
             return "orderbook-" + first;
         }
@@ -71,12 +71,12 @@ public class CoincheckService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        return clientRealtimely().subscribe(new Topic("trades", marketName)).map(e -> {
-            Direction side = e.get(Direction.class, "4");
-            Num size = e.get(Num.class, "3");
-            Num price = e.get(Num.class, "2");
-            ZonedDateTime date = Chrono.utcNow();
-            long id = e.get(long.class, "0");
+        return clientRealtimely().subscribe(new Topic("trades", marketName)).flatIterable(e -> e.find("*")).map(e -> {
+            ZonedDateTime date = Chrono.utcBySeconds(e.get(long.class, "0"));
+            long id = e.get(long.class, "1");
+            Num price = e.get(Num.class, "3");
+            Num size = e.get(Num.class, "4");
+            Direction side = e.get(Direction.class, "5");
 
             return Execution.with.direction(side, size).price(price).id(id).date(date);
         });
