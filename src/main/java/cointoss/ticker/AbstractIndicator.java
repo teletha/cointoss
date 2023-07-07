@@ -20,7 +20,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import cointoss.util.arithmetic.Num;
-import cointoss.util.function.ToDoubleTriFunction;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
@@ -28,6 +27,7 @@ import kiss.WiseBiFunction;
 import kiss.WiseTriFunction;
 import kiss.Ⅱ;
 import kiss.Ⅲ;
+import primavera.function.ToDoubleTriFunction;
 
 public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Self>> {
 

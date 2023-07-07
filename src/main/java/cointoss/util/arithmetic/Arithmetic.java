@@ -15,10 +15,10 @@ import java.text.NumberFormat;
 import java.util.function.DoubleBinaryOperator;
 
 import cointoss.Directional;
-import cointoss.util.function.DoublePentaFunction;
-import cointoss.util.function.DoubleTetraFunction;
-import cointoss.util.function.DoubleTriFunction;
 import kiss.Variable;
+import primavera.function.DoublePentaFunction;
+import primavera.function.DoubleTetraFunction;
+import primavera.function.DoubleTriFunction;
 
 @SuppressWarnings("serial")
 public abstract class Arithmetic<Self extends Arithmetic> extends Number implements Comparable<Self> {

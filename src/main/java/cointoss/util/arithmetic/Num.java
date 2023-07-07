@@ -23,9 +23,6 @@ import com.google.common.math.DoubleMath;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.util.function.DoublePentaFunction;
-import cointoss.util.function.DoubleTetraFunction;
-import cointoss.util.function.DoubleTriFunction;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
@@ -33,6 +30,9 @@ import kiss.Managed;
 import kiss.Signal;
 import kiss.Singleton;
 import kiss.Variable;
+import primavera.function.DoublePentaFunction;
+import primavera.function.DoubleTetraFunction;
+import primavera.function.DoubleTriFunction;
 
 /**
  * A signed real number with arbitrary precision that cannot be changed.

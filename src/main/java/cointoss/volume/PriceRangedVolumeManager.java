@@ -12,7 +12,7 @@ package cointoss.volume;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.util.arithmetic.Num;
-import cointoss.util.array.FloatList;
+import primavera.array.FloatList;
 
 public class PriceRangedVolumeManager {
 

@@ -16,8 +16,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.ticker.Span;
-import cointoss.util.array.IntList;
 import kiss.Signal;
+import primavera.array.IntList;
 
 class QueryTest extends FeatherStoreTestBase {
 

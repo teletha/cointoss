@@ -23,12 +23,12 @@ import java.util.function.Predicate;
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.ticker.Span;
-import cointoss.util.map.ConcurrentNavigableLongMap;
-import cointoss.util.map.LongMap;
-import cointoss.util.map.LongMap.LongEntry;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.model.Model;
+import primavera.map.ConcurrentNavigableLongMap;
+import primavera.map.LongMap;
+import primavera.map.LongMap.LongEntry;
 import psychopath.File;
 
 public final class FeatherStore<E extends TemporalData> implements Disposable {
