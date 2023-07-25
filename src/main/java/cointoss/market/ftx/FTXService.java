@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -38,7 +37,6 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
-import cointoss.util.arithmetic.Primitives;
 import cointoss.util.feather.FeatherStore;
 import kiss.I;
 import kiss.JSON;
@@ -285,43 +283,6 @@ public class FTXService extends MarketService {
                 .takeAt(i -> i % 10 == 0)
                 .concatMap(time -> call("GET", "openInterest?symbol=" + marketName))
                 .map(e -> OpenInterest.with.date(Chrono.utcByMills(e.get(long.class, "time"))).size(e.get(float.class, "openInterest")));
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        double[] volume = new double[3];
-        double[] previousOISize = {0};
-
-        FTX.BTC_PERP.executionsRealtimely().to(e -> {
-            if (e.isBuy()) {
-                volume[0] += e.size.doubleValue();
-                volume[2] += e.size.doubleValue() * e.price.doubleValue();
-            } else {
-                volume[1] += e.size.doubleValue();
-                volume[2] += e.size.doubleValue() * e.price.doubleValue();
-            }
-        });
-        I.schedule(1, 1, TimeUnit.SECONDS, true)
-                .take(360 * 5)
-                .waitForTerminate()
-                .concatMap(x -> ((FTXService) FTX.BTC_PERP).provideOpenInterest(10))
-                .diff((p, n) -> p.size == n.size)
-                .to(e -> {
-                    double deltaOI = e.size - previousOISize[0];
-                    double total = volume[0] + volume[1];
-                    double entry = total + deltaOI / 2d;
-                    double exit = total - deltaOI / 2d;
-
-                    System.out.println(Chrono.utcNow() + "    " + e + "  B:" + Primitives.roundString(volume[0], 6) + "   S:" + Primitives
-                            .roundString(volume[1], 6) + "   Total:" + Primitives
-                                    .roundString(volume[0] + volume[1], 6) + "   AvePrice:" + Primitives
-                                            .roundString(volume[2] / total, 2) + "  Entry:" + Primitives
-                                                    .roundString(entry, 2) + "    Exit:" + Primitives.roundString(exit, 2));
-                    volume[0] = 0;
-                    volume[1] = 0;
-                    volume[2] = 0;
-                    previousOISize[0] = e.size;
-                });
-
     }
 
     // /**
