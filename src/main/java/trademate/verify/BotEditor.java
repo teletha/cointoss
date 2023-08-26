@@ -20,20 +20,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.collect.Sets;
-
-import cointoss.trade.Trader;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Sets;
+
+import cointoss.trade.Trader;
 import kiss.I;
+import kiss.Model;
+import kiss.Property;
 import kiss.Ⅱ;
-import kiss.model.Model;
-import kiss.model.Property;
 import viewtify.style.FormStyles;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboCheckBox;

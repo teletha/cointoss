@@ -21,8 +21,8 @@ import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.Extensible;
 import kiss.I;
-import kiss.model.Model;
-import kiss.model.Property;
+import kiss.Model;
+import kiss.Property;
 
 /**
  * Data serializer and deserializer which can convert data from/to bytes.

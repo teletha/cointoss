@@ -24,8 +24,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.ticker.Span;
 import kiss.Disposable;
+import kiss.Model;
 import kiss.Signal;
-import kiss.model.Model;
 import primavera.map.ConcurrentNavigableLongMap;
 import primavera.map.LongMap;
 import primavera.map.LongMap.LongEntry;
