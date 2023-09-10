@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
@@ -24,8 +27,6 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -105,7 +106,7 @@ public class ChartView extends View {
                 $(ui(chart));
                 $(hbox, style.configBox, () -> {
                     $(span, style.span);
-                    $(config);
+                    $(config, style.config);
                 });
 
                 $(load, style.load);
@@ -122,8 +123,12 @@ public class ChartView extends View {
         };
 
         Style configBox = () -> {
-            display.maxWidth(130, px).maxHeight(26, px);
+            display.maxWidth(152, px).maxHeight(26, px);
             position.top(0, px).right(54, px);
+        };
+
+        Style config = () -> {
+            padding.horizontal(8, px).top(6, px).bottom(5, px);
         };
 
         Style load = () -> {
