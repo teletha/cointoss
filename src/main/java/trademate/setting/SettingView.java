@@ -15,7 +15,6 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.ui.UILabel;
-import viewtify.ui.UIScrollPane;
 import viewtify.ui.UISelectPane;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -30,8 +29,6 @@ public class SettingView extends View {
     private UILabel notification;
 
     private UILabel bitflyer;
-
-    private UIScrollPane scroll;
 
     private final Variable<View> main = Variable.empty();
 

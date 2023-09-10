@@ -24,7 +24,6 @@ import kiss.Singleton;
 import psychopath.Locator;
 import trademate.order.OrderView;
 import trademate.setting.SettingView;
-import trademate.setting.TradeMateSetting;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
 import viewtify.ui.UITab;
@@ -95,15 +94,12 @@ public class TradeMate extends View {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        TradeMateSetting setting = I.make(TradeMateSetting.class);
-
         // activate application
         Viewtify.application() //
                 .error((msg, error) -> {
                     I.error(msg);
                     I.error(error);
                 })
-                .use(setting.theme.v)
                 .icon("icon/app.png")
                 .onTerminating(EfficientWebSocket::shutdownNow)
                 .activate(TradeMate.class);

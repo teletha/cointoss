@@ -1,5 +1,6 @@
 {
 	"messages": {
+		"": "",
 		"Access Token": "アクセストークン",
 		"Access Token Test": "アクセス トークン テスト",
 		"Account ID": "アカウントID",
@@ -20,6 +21,7 @@
 		"Close": "終値",
 		"Color Combination": "配色",
 		"Color Coordinate": "配色",
+		"Color Scheme": "配色",
 		"Count": "注文数",
 		"Current": "カレント",
 		"Date": "日付",

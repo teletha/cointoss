@@ -9,26 +9,19 @@
  */
 package trademate.setting;
 
-import java.util.Locale;
-
-import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import trademate.CommonText;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.UIComboBox;
-import viewtify.ui.UIFontPicker;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.view.AppearanceSettingView;
 
 @Managed(value = Singleton.class)
 public class AppearanceSetting extends View {
 
-    UIComboBox<viewtify.Theme> colors;
-
-    UIComboBox<Locale> language;
-
-    UIFontPicker font;
+    AppearanceSettingView appearance;
 
     UIComboBox<trademate.ChartTheme> themes;
 
@@ -41,9 +34,7 @@ public class AppearanceSetting extends View {
             $(vbox, () -> {
                 $(vbox, Block, () -> {
                     label(en("General"), Heading);
-                    form(en("Color Coordinate"), colors);
-                    form(en("Language"), language);
-                    form(en("Font"), font);
+                    $(appearance);
                 });
                 $(vbox, Block, () -> {
                     label(en("Chart Color"), Heading);
@@ -60,15 +51,6 @@ public class AppearanceSetting extends View {
      */
     @Override
     protected void initialize() {
-        TradeMateSetting setting = I.make(TradeMateSetting.class);
-
-        colors.items(viewtify.Theme.values()).sync(setting.theme);
-        language.items(Locale.ENGLISH, Locale.JAPANESE, Locale.CHINESE)
-                .render(lang -> lang.getDisplayLanguage(lang))
-                .renderSelected(lang -> lang.getDisplayLanguage(lang))
-                .select(Locale.forLanguageTag(I.Lang.exact()))
-                .observing(lang -> I.Lang.set(lang.getLanguage()));
-
         themes.initialize(trademate.ChartTheme.builtins()).observe(trademate.ChartTheme::apply);
         buy.sync(trademate.ChartTheme.$.buy);
         sell.sync(trademate.ChartTheme.$.sell);
