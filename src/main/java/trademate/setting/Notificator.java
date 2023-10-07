@@ -19,7 +19,7 @@ import kiss.Variable;
 import viewtify.model.PreferenceModel;
 import viewtify.util.Toast;
 
-public class Notificator extends PreferenceModel<Notificator> {
+public class Notificator extends PreferenceModel {
 
     /** The defined type. */
     public final Notify longTrend = new Notify("Long Trend");
@@ -61,7 +61,7 @@ public class Notificator extends PreferenceModel<Notificator> {
     /**
      * 
      */
-    public static class Notify extends PreferenceModel<Notify> {
+    public static class Notify extends PreferenceModel {
 
         /** Showing desktop notification. */
         final @Managed Preference<Boolean> onDesktop = initialize(false);
