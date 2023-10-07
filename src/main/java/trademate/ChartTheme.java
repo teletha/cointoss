@@ -18,9 +18,9 @@ import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
 import javafx.scene.paint.Color;
 import kiss.I;
-import viewtify.model.PreferenceModel;
+import viewtify.model.Preferences;
 
-public class ChartTheme extends PreferenceModel {
+public class ChartTheme extends Preferences {
 
     /** The current theme. */
     public static final ChartTheme $ = I.make(ChartTheme.class);
