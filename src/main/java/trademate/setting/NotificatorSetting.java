@@ -31,10 +31,10 @@ import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
+import viewtify.ui.toast.Toast;
 import viewtify.util.Corner;
 import viewtify.util.Icon;
 import viewtify.util.ScreenSelector;
-import viewtify.util.Toast;
 
 @Managed(Singleton.class)
 class NotificatorSetting extends View {
@@ -115,7 +115,7 @@ class NotificatorSetting extends View {
                 // LINE
                 $(vbox, Block, () -> {
                     label(en("LINE Notification"), Heading);
-                    label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), Description);
+                    label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), SettingStyles.Description);
                     form(en("Access Token"), lineAccessToken, lineTest);
                 });
             });
