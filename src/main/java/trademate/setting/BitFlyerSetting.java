@@ -11,15 +11,12 @@ package trademate.setting;
 
 import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
-import kiss.Managed;
-import kiss.Singleton;
 import viewtify.style.FormStyles;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
-@Managed(value = Singleton.class)
 public class BitFlyerSetting extends View {
 
     /** The account info. */

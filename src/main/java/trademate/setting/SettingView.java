@@ -9,8 +9,6 @@
  */
 package trademate.setting;
 
-import kiss.Managed;
-import kiss.Singleton;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -19,7 +17,6 @@ import viewtify.ui.UISelectPane;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
-@Managed(value = Singleton.class)
 public class SettingView extends View {
 
     private UILabel appearance;

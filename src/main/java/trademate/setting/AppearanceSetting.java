@@ -9,8 +9,6 @@
  */
 package trademate.setting;
 
-import kiss.Managed;
-import kiss.Singleton;
 import trademate.CommonText;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.UIComboBox;
@@ -18,7 +16,6 @@ import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.view.AppearanceSettingView;
 
-@Managed(value = Singleton.class)
 public class AppearanceSetting extends View {
 
     AppearanceSettingView appearance;

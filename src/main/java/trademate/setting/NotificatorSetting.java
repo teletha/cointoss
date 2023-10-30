@@ -9,34 +9,24 @@
  */
 package trademate.setting;
 
-import javafx.util.Duration;
-
 import cointoss.util.Network;
-import cointoss.util.arithmetic.Primitives;
 import kiss.I;
-import kiss.Managed;
-import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.setting.Notificator.Notify;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
-import viewtify.ui.UIComboBox;
 import viewtify.ui.UISlider;
-import viewtify.ui.UISpinner;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
-import viewtify.ui.toast.Toast;
-import viewtify.util.Corner;
+import viewtify.ui.toast.ToastSettingView;
 import viewtify.util.Icon;
-import viewtify.util.ScreenSelector;
 
-@Managed(Singleton.class)
 class NotificatorSetting extends View {
 
     /** The notificator. */
@@ -57,16 +47,7 @@ class NotificatorSetting extends View {
     private UISlider soundMasterVolume;;
 
     /** The desktop configuration UI. */
-    private UISpinner<Duration> desktopDuration;
-
-    /** The desktop configuration UI. */
-    private UIComboBox<ScreenSelector> desktopMonitor;
-
-    /** The desktop configuration UI. */
-    private UIComboBox<Corner> desktopPosition;
-
-    /** The desktop configuration UI. */
-    private UISpinner<Integer> desktopNumber;
+    private ToastSettingView toast;
 
     /** The LINE configuration UI. */
     private UIText<String> lineAccessToken;
@@ -106,10 +87,7 @@ class NotificatorSetting extends View {
                 // Desktop
                 $(vbox, Block, () -> {
                     label(en("Desktop Notification"), Heading);
-                    form(en("Display Monitor"), desktopMonitor);
-                    form(en("Display Location"), desktopPosition);
-                    form(en("Display Time"), desktopDuration);
-                    form(en("Number of Displays"), desktopNumber);
+                    $(toast);
                 });
 
                 // LINE
@@ -140,14 +118,6 @@ class NotificatorSetting extends View {
 
         // For Sound
         soundMasterVolume.snapToTicks(true).showTickLabels(true).showTickMarks(true).sync(notificator.masterVolume);
-
-        // For Desktop
-        desktopMonitor.items(ScreenSelector.values()).sync(Toast.setting.screen);
-        desktopPosition.items(Corner.values()).sync(Toast.setting.area);
-        desktopDuration.items(1, 30, Duration::minutes)
-                .sync(Toast.setting.autoHide)
-                .format(duration -> Primitives.roundString(duration.toMinutes(), 0) + en("mins"));
-        desktopNumber.items(1, 15, Integer::valueOf).sync(Toast.setting.max);
 
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken).masking(true);

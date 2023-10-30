@@ -9,12 +9,9 @@
  */
 package trademate.setting;
 
-import kiss.Managed;
-import kiss.Singleton;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
-@Managed(value = Singleton.class)
 public class ChartSetting extends View {
 
     interface style extends SettingStyles {
