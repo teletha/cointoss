@@ -71,10 +71,10 @@ class NotificatorSetting extends View {
                 $(vbox, Block, () -> {
                     label(en("Notification Type"), Heading);
                     $(notifications, style.NotificationTypeTable, () -> {
-                        $(name, FormLabel);
+                        $(name, Label);
                         $(desktop);
                         $(line);
-                        $(sound, FormInput);
+                        $(sound, Input);
                     });
                 });
 

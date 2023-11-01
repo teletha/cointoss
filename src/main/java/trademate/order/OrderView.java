@@ -135,21 +135,21 @@ public class OrderView extends View {
 
     class view extends ViewDSL {
         {
-            $(container, FormStyles.FormLabelMin, () -> {
-                $(hbox, FormStyles.FormRow, () -> {
-                    $(takerSell, FormStyles.FormInputMin);
-                    $(clear, FormStyles.FormInputMin);
-                    $(takerBuy, FormStyles.FormInputMin);
+            $(container, FormStyles.LabelMin, () -> {
+                $(hbox, FormStyles.Row, () -> {
+                    $(takerSell, FormStyles.InputMin);
+                    $(clear, FormStyles.InputMin);
+                    $(takerBuy, FormStyles.InputMin);
                 });
 
-                $(hbox, FormStyles.FormRow, () -> {
-                    $(makerSell, FormStyles.FormInputMin);
-                    $(cancel, FormStyles.FormInputMin);
-                    $(makerBuy, FormStyles.FormInputMin);
+                $(hbox, FormStyles.Row, () -> {
+                    $(makerSell, FormStyles.InputMin);
+                    $(cancel, FormStyles.InputMin);
+                    $(makerBuy, FormStyles.InputMin);
                 });
 
-                form(en("Market"), FormStyles.FormInput, market, trainingMode);
-                form(Amount, FormStyles.FormInputMin, orderSize, orderThresholdSize, history);
+                form(en("Market"), FormStyles.Input, market, trainingMode);
+                form(Amount, FormStyles.InputMin, orderSize, orderThresholdSize, history);
 
                 $(table, style.table, () -> {
                     $(entryPrice, style.Wide);

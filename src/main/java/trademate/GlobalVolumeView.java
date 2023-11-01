@@ -205,7 +205,7 @@ public class GlobalVolumeView extends View {
         class view extends ViewDSL {
             {
                 $(vbox, () -> {
-                    $(hbox, FormStyles.FormRow, () -> {
+                    $(hbox, FormStyles.Row, () -> {
                         $(name, style.info);
                         $(volumeLong, style.info);
                         $(volumeShort, style.info);

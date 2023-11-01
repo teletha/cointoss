@@ -168,8 +168,8 @@ public class ChartView extends View {
                 $(vbox, () -> {
                     form("Candle Type", showCandle, candleType);
                     form("Latest Price", showLatestPrice);
-                    form("Orderbook", FormStyles.FormInputMin, showOrderbook, orderbookPriceRange, orderbookHideSize);
-                    form("Priced Volume", FormStyles.FormInputMin, showPricedVolume, pricedVolumeType);
+                    form("Orderbook", FormStyles.InputMin, showOrderbook, orderbookPriceRange, orderbookHideSize);
+                    form("Priced Volume", FormStyles.InputMin, showPricedVolume, pricedVolumeType);
                 });
             }
         });

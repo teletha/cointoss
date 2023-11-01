@@ -155,7 +155,7 @@ public class BotEditor extends View {
          */
         class view extends ViewDSL {
             {
-                form(StringUtils.capitalize(property.name), FormStyles.FormInputMin, createUI(property));
+                form(StringUtils.capitalize(property.name), FormStyles.InputMin, createUI(property));
             }
         }
 
