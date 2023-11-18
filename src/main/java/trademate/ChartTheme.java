@@ -14,16 +14,16 @@ import static javafx.scene.paint.Color.rgb;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javafx.scene.paint.Color;
+
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
-import javafx.scene.paint.Color;
-import kiss.I;
 import viewtify.model.Preferences;
 
 public class ChartTheme extends Preferences {
 
     /** The current theme. */
-    public static final ChartTheme $ = I.make(ChartTheme.class);
+    public static final ChartTheme $ = Preferences.of(ChartTheme.class);
 
     /** Built-in Theme */
     public static final ChartTheme Binance = new ChartTheme("Binance", theme -> {
@@ -108,7 +108,7 @@ public class ChartTheme extends Preferences {
      * @return
      */
     public static Color colorBy(Directional direction) {
-        ChartTheme theme = I.make(ChartTheme.class);
+        ChartTheme theme = Preferences.of(ChartTheme.class);
         return direction.isBuy() ? theme.buy.v : theme.sell.v;
     }
 
@@ -118,7 +118,7 @@ public class ChartTheme extends Preferences {
      * @return
      */
     public static Color colorBy(Num num) {
-        ChartTheme theme = I.make(ChartTheme.class);
+        ChartTheme theme = Preferences.of(ChartTheme.class);
         return num.isPositiveOrZero() ? theme.buy.v : theme.sell.v;
     }
 
