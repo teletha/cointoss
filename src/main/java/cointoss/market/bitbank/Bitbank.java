@@ -11,6 +11,9 @@ package cointoss.market.bitbank;
 
 import java.util.function.UnaryOperator;
 
+import cointoss.Currency;
+import cointoss.MarketService;
+import cointoss.MarketSetting;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.arithmetic.Num;
@@ -24,59 +27,53 @@ public final class Bitbank extends MarketServiceProvider {
 
     private static final UnaryOperator<Num> withdrawJPY = size -> Num.of("770");
 
-    // public static final MarketService BTC_JPY = new BitbankService("btc_jpy",
-    // MarketSetting.with.spot()
-    // .target(Currency.BTC.minimumSize(0.0001))
-    // .base(Currency.JPY.minimumSize(1))
-    // .priceRangeModifier(500)
-    // .takerFee(taking)
-    // .makerFee(making)
-    // .baseWithdrawingFee(withdrawJPY)
-    // .targetWithdrawingFee(size -> Num.of("0.001")));
-    //
-    // public static final MarketService ETH_JPY = new BitbankService("eth_jpy",
-    // MarketSetting.with.spot()
-    // .target(Currency.ETH.minimumSize(0.0001))
-    // .base(Currency.JPY.minimumSize(1))
-    // .priceRangeModifier(100)
-    // .takerFee(taking)
-    // .makerFee(making)
-    // .baseWithdrawingFee(withdrawJPY)
-    // .targetWithdrawingFee(size -> Num.of("0.005")));
-    //
-    // public static final MarketService LTC_JPY = new BitbankService("ltc_jpy",
-    // MarketSetting.with.spot()
-    // .target(Currency.LTC.minimumSize(0.0001))
-    // .base(Currency.JPY.minimumSize(0.1))
-    // .takerFee(taking)
-    // .makerFee(making)
-    // .baseWithdrawingFee(withdrawJPY)
-    // .targetWithdrawingFee(size -> Num.of("0.001")));
-    //
-    // public static final MarketService MONA_JPY = new BitbankService("mona_jpy",
-    // MarketSetting.with.spot()
-    // .target(Currency.MONA.minimumSize(0.0001))
-    // .base(Currency.JPY.minimumSize(0.001))
-    // .takerFee(taking)
-    // .makerFee(making));
-    //
-    // public static final MarketService XLM_JPY = new BitbankService("xlm_jpy",
-    // MarketSetting.with.spot()
-    // .target(Currency.XLM.minimumSize(0.0001))
-    // .base(Currency.JPY.minimumSize(0.001))
-    // .takerFee(taking)
-    // .makerFee(making)
-    // .baseWithdrawingFee(withdrawJPY)
-    // .targetWithdrawingFee(size -> Num.of("0.01")));
-    //
-    // public static final MarketService XRP_JPY = new BitbankService("xrp_jpy",
-    // MarketSetting.with.spot()
-    // .target(Currency.XRP.minimumSize(0.0001))
-    // .base(Currency.JPY.minimumSize(0.001))
-    // .takerFee(taking)
-    // .makerFee(making)
-    // .baseWithdrawingFee(withdrawJPY)
-    // .targetWithdrawingFee(size -> Num.of("0.15")));
+    public static final MarketService BTC_JPY = new BitbankService("btc_jpy", MarketSetting.with.spot()
+            .target(Currency.BTC.minimumSize(0.0001))
+            .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(500)
+            .takerFee(taking)
+            .makerFee(making)
+            .baseWithdrawingFee(withdrawJPY)
+            .targetWithdrawingFee(size -> Num.of("0.001")));
+
+    public static final MarketService ETH_JPY = new BitbankService("eth_jpy", MarketSetting.with.spot()
+            .target(Currency.ETH.minimumSize(0.0001))
+            .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(100)
+            .takerFee(taking)
+            .makerFee(making)
+            .baseWithdrawingFee(withdrawJPY)
+            .targetWithdrawingFee(size -> Num.of("0.005")));
+
+    public static final MarketService LTC_JPY = new BitbankService("ltc_jpy", MarketSetting.with.spot()
+            .target(Currency.LTC.minimumSize(0.0001))
+            .base(Currency.JPY.minimumSize(0.1))
+            .takerFee(taking)
+            .makerFee(making)
+            .baseWithdrawingFee(withdrawJPY)
+            .targetWithdrawingFee(size -> Num.of("0.001")));
+
+    public static final MarketService MONA_JPY = new BitbankService("mona_jpy", MarketSetting.with.spot()
+            .target(Currency.MONA.minimumSize(0.0001))
+            .base(Currency.JPY.minimumSize(0.001))
+            .takerFee(taking)
+            .makerFee(making));
+
+    public static final MarketService XLM_JPY = new BitbankService("xlm_jpy", MarketSetting.with.spot()
+            .target(Currency.XLM.minimumSize(0.0001))
+            .base(Currency.JPY.minimumSize(0.001))
+            .takerFee(taking)
+            .makerFee(making)
+            .baseWithdrawingFee(withdrawJPY)
+            .targetWithdrawingFee(size -> Num.of("0.01")));
+
+    public static final MarketService XRP_JPY = new BitbankService("xrp_jpy", MarketSetting.with.spot()
+            .target(Currency.XRP.minimumSize(0.0001))
+            .base(Currency.JPY.minimumSize(0.001))
+            .takerFee(taking)
+            .makerFee(making)
+            .baseWithdrawingFee(withdrawJPY)
+            .targetWithdrawingFee(size -> Num.of("0.15")));
 
     /**
      * {@inheritDoc}
