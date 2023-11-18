@@ -177,7 +177,7 @@ public class CoincheckService extends MarketService {
             builder = HttpRequest.newBuilder(URI.create("https://coincheck.com/api/" + path));
         }
 
-        return Network.rest(builder, Limit, client()).retry(retryPolicy(10, "Coincheck RESTCall"));
+        return Network.rest(builder, Limit, client()).retry(retryPolicy(retryMax, "Coincheck RESTCall"));
     }
 
     /**

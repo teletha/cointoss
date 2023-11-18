@@ -173,7 +173,7 @@ public class CoinbaseService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.pro.coinbase.com/" + path));
 
-        return Network.rest(builder, LIMITER, client()).retry(retryPolicy(10, exchange + " RESTCall"));
+        return Network.rest(builder, LIMITER, client()).retry(retryPolicy(retryMax, exchange + " RESTCall"));
     }
 
     /**

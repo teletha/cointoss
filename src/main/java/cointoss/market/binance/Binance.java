@@ -38,15 +38,17 @@ public final class Binance extends MarketServiceProvider {
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService GLMR_USDT = new BinanceService("GLMRUSDT", MarketSetting.with.spot()
-            .target(Currency.GLMR.minimumSize(0.1))
-            .base(Currency.USDT.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
-
-    public static final MarketService GMT_USDT = new BinanceService("GMTUSDT", MarketSetting.with.spot()
-            .target(Currency.GMT.minimumSize(0.1))
-            .base(Currency.USDT.minimumSize(0.00001))
-            .acquirableExecutionSize(AcquirableSize));
+    // public static final MarketService GLMR_USDT = new BinanceService("GLMRUSDT",
+    // MarketSetting.with.spot()
+    // .target(Currency.GLMR.minimumSize(0.1))
+    // .base(Currency.USDT.minimumSize(0.0001))
+    // .acquirableExecutionSize(AcquirableSize));
+    //
+    // public static final MarketService GMT_USDT = new BinanceService("GMTUSDT",
+    // MarketSetting.with.spot()
+    // .target(Currency.GMT.minimumSize(0.1))
+    // .base(Currency.USDT.minimumSize(0.00001))
+    // .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService LINK_USDT = new BinanceService("LINKUSDT", MarketSetting.with.spot()
             .target(Currency.LINK.minimumSize(0.01))
@@ -58,10 +60,11 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService UNI_USDT = new BinanceService("UNIUSDT", MarketSetting.with.spot()
-            .target(Currency.UNI.minimumSize(0.01))
-            .base(Currency.USDT.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
+    // public static final MarketService UNI_USDT = new BinanceService("UNIUSDT",
+    // MarketSetting.with.spot()
+    // .target(Currency.UNI.minimumSize(0.01))
+    // .base(Currency.USDT.minimumSize(0.0001))
+    // .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService XRP_USDT = new BinanceService("XRPUSDT", MarketSetting.with.spot()
             .target(Currency.XRP.minimumSize(0.1))
@@ -85,10 +88,11 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService FUTURE_UNI_USDT = new BinanceService("UNIUSDT", MarketSetting.with.derivative()
-            .target(Currency.UNI.minimumSize(1))
-            .base(Currency.USDT.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
+    // public static final MarketService FUTURE_UNI_USDT = new BinanceService("UNIUSDT",
+    // MarketSetting.with.derivative()
+    // .target(Currency.UNI.minimumSize(1))
+    // .base(Currency.USDT.minimumSize(0.0001))
+    // .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService FUTURE_DOGE_USDT = new BinanceService("DOGEUSDT", MarketSetting.with.derivative()
             .target(Currency.DOGE.minimumSize(1))

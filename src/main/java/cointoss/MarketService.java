@@ -46,6 +46,8 @@ import psychopath.Locator;
 
 public abstract class MarketService implements Comparable<MarketService>, Disposable {
 
+    public static final int retryMax = 10;
+
     /** The exchange. */
     public final Exchange exchange;
 
@@ -136,7 +138,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public final synchronized Signal<Execution> executionsRealtimely(boolean autoReconnect) {
         return connectExecutionRealtimely().effectOnObserve(disposer::add)
-                .retry(autoReconnect ? retryPolicy(500, "ExecutionRealtimely") : null);
+                .retry(autoReconnect ? retryPolicy(retryMax, "ExecutionRealtimely") : null);
     }
 
     /**
@@ -300,7 +302,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A event stream of order state.
      */
     public final synchronized Signal<Order> ordersRealtimely() {
-        return connectOrdersRealtimely().effectOnObserve(disposer::add).retry(retryPolicy(500, "OrderRealtimely"));
+        return connectOrdersRealtimely().effectOnObserve(disposer::add).retry(retryPolicy(retryMax, "OrderRealtimely"));
     }
 
     /**
@@ -337,7 +339,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     public final synchronized Signal<OrderBookChanges> orderBookRealtimely(boolean autoReconnect) {
         return orderBook().concat(connectOrderBookRealtimely())
                 .effectOnObserve(disposer::add)
-                .retry(autoReconnect ? retryPolicy(500, "OrderBookRealtimely") : null);
+                .retry(autoReconnect ? retryPolicy(retryMax, "OrderBookRealtimely") : null);
     }
 
     /**
@@ -357,7 +359,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A shared realtime order books.
      */
     public final synchronized Signal<Liquidation> liquidationRealtimely() {
-        return this.connectLiquidation().effectOnObserve(disposer::add).retry(retryPolicy(500, "Liquidation"));
+        return this.connectLiquidation().effectOnObserve(disposer::add).retry(retryPolicy(retryMax, "Liquidation"));
     }
 
     /**
@@ -489,7 +491,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public RetryPolicy retryPolicy(int max, String name) {
         return RetryPolicy.with.limit(max)
-                .delayLinear(Duration.ofSeconds(5))
+                .delayLinear(Duration.ofMinutes(1))
                 .scheduler(scheduler())
                 .name(name == null || name.length() == 0 ? null : id + " : " + name);
     }

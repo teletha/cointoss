@@ -10,7 +10,9 @@
 package cointoss.execution;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
 import static psychopath.Option.ATOMIC_WRITE;
 
 import java.io.IOException;
@@ -403,7 +405,7 @@ public class ExecutionLog {
                 }
             }
             return disposer;
-        }).effectOnError(e -> e.printStackTrace()).retry(service.retryPolicy(500, "ExecutionLog"));
+        }).effectOnError(e -> e.printStackTrace()).retry(service.retryPolicy(MarketService.retryMax, "ExecutionLog"));
     }
 
     /**
