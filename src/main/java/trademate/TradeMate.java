@@ -23,13 +23,13 @@ import kiss.Signal;
 import kiss.Singleton;
 import psychopath.Locator;
 import trademate.order.OrderView;
-import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
+import viewtify.ui.view.PreferencesView;
 
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
@@ -51,7 +51,7 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        DockSystem.register("Setting").contents(SettingView.class).closable(false);
+        DockSystem.register("Setting").contents(PreferencesView.class).closable(false);
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Global Volume").contents(GlobalVolumeView.class).closable(false);
         DockSystem.register("Order").contents(OrderView.class).closable(false);

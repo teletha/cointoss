@@ -11,13 +11,14 @@ package trademate.setting;
 
 import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
+import kiss.Variable;
 import viewtify.style.FormStyles;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIText;
-import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.view.PreferenceViewBase;
 
-public class BitFlyerSetting extends View {
+public class BitFlyerSetting extends PreferenceViewBase {
 
     /** The account info. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
@@ -32,23 +33,26 @@ public class BitFlyerSetting extends View {
 
     private UICheckBox loginBackground;
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Variable<String> category() {
+        return en("BitFlyer");
+    }
+
     class view extends ViewDSL implements FormStyles, SettingStyles {
 
         {
             $(vbox, () -> {
-                $(vbox, Block, () -> {
-                    label("BitFlyer", Heading);
-                    label(en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.com/developer)."), SettingStyles.Description);
-                    form("API Key", apiKey);
-                    form("API Secret", apiSecret);
+                label(en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.com/developer)."), SettingStyles.Description);
+                form("API Key", apiKey);
+                form("API Secret", apiSecret);
 
-                    label(en("Usage of Private API"), Heading);
-                    label(en("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically."), SettingStyles.Description);
-                    label(en("WARNING : This setting will allow all operations on your account."), SettingStyles.Description, Warning);
-                    form("Login ID", loginId);
-                    form(en("Password"), loginPassword);
-                    form(en("Login explicitly"), loginBackground);
-                });
+                description(en("Usage of Private API"), en("We will try to speed up trading by using private API. TradeMate acquires the account specific infomation(e.g. session id) by logging in automatically."), en("WARNING : This setting will allow all operations on your account."));
+                form("Login ID", loginId);
+                form(en("Password"), loginPassword);
+                form(en("Login explicitly"), loginBackground);
             });
         }
     }

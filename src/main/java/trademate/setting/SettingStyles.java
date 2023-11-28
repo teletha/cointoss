@@ -9,7 +9,10 @@
  */
 package trademate.setting;
 
-import static stylist.StyleDSL.*;
+import static stylist.StyleDSL.$;
+import static stylist.StyleDSL.font;
+import static stylist.StyleDSL.padding;
+import static stylist.StyleDSL.px;
 
 import stylist.Style;
 import stylist.StyleDeclarable;
@@ -17,20 +20,15 @@ import stylist.value.Numeric;
 
 public interface SettingStyles extends StyleDeclarable {
 
-    Numeric blockSpace = new Numeric(35, px);
-
-    Style Block = () -> {
-        padding.bottom(blockSpace);
-        border.bottom.width(2, px).color($.rgb(40, 40, 40));
-    };
+    Numeric blockSpace = new Numeric(25, px);
 
     Style Heading = () -> {
-        padding.top(blockSpace).bottom(5, px);
-        font.size(16, px);
+        padding.top(blockSpace).bottom(10, px);
+        font.size(14, px);
     };
 
     Style Description = () -> {
-        padding.top(2, px).bottom(7, px);
+        padding.bottom(5, px);
     };
 
     Style Warning = () -> {

@@ -11,6 +11,7 @@ package trademate.setting;
 
 import cointoss.util.Network;
 import kiss.I;
+import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.setting.Notificator.Notify;
@@ -21,13 +22,13 @@ import viewtify.ui.UISlider;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.UIText;
-import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 import viewtify.ui.toast.ToastSettingView;
+import viewtify.ui.view.PreferenceViewBase;
 import viewtify.util.Icon;
 
-class NotificatorSetting extends View {
+class NotificatorSetting extends PreferenceViewBase {
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
@@ -55,9 +56,17 @@ class NotificatorSetting extends View {
     /** The LINE configuration UI. */
     private UIButton lineTest;
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Variable<String> category() {
+        return en("Event");
+    }
+
     interface style extends StyleDSL {
         Style NotificationTypeTable = () -> {
-            display.minHeight(210, px).maxHeight(210, px);
+            display.maxHeight(228, px);
         };
     }
 
@@ -68,7 +77,7 @@ class NotificatorSetting extends View {
         {
             $(vbox, () -> {
                 // Notification Types
-                $(vbox, Block, () -> {
+                $(vbox, () -> {
                     label(en("Notification Type"), Heading);
                     $(notifications, style.NotificationTypeTable, () -> {
                         $(name, Label);
@@ -79,22 +88,23 @@ class NotificatorSetting extends View {
                 });
 
                 // Sound
-                $(vbox, Block, () -> {
+                $(vbox, () -> {
                     label(en("Sound Notification"), Heading);
                     form(en("Volume Level"), soundMasterVolume);
                 });
 
                 // Desktop
-                $(vbox, Block, () -> {
+                $(vbox, () -> {
                     label(en("Desktop Notification"), Heading);
                     $(toast);
                 });
 
                 // LINE
-                $(vbox, Block, () -> {
+                $(vbox, () -> {
                     label(en("LINE Notification"), Heading);
                     label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), SettingStyles.Description);
-                    form(en("Access Token"), lineAccessToken, lineTest);
+                    form(en("Access Token"), lineAccessToken);
+                    form(en("Test message sending"), lineTest);
                 });
             });
         }

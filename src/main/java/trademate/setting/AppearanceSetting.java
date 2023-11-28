@@ -9,14 +9,15 @@
  */
 package trademate.setting;
 
+import kiss.Variable;
 import trademate.CommonText;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.UIComboBox;
-import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.view.AppearanceSettingView;
+import viewtify.ui.view.PreferenceViewBase;
 
-public class AppearanceSetting extends View {
+public class AppearanceSetting extends PreferenceViewBase {
 
     AppearanceSettingView appearance;
 
@@ -26,19 +27,20 @@ public class AppearanceSetting extends View {
 
     UIColorPicker sell;
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Variable<String> category() {
+        return en("Chart");
+    }
+
     class view extends ViewDSL implements SettingStyles {
         {
             $(vbox, () -> {
-                $(vbox, Block, () -> {
-                    label(en("General"), Heading);
-                    $(appearance);
-                });
-                $(vbox, Block, () -> {
-                    label(en("Chart Color"), Heading);
-                    form(en("Theme"), themes);
-                    form(CommonText.Buy, buy);
-                    form(CommonText.Sell, sell);
-                });
+                form(en("Theme"), themes);
+                form(CommonText.Buy, buy);
+                form(CommonText.Sell, sell);
             });
         }
     }

@@ -18,7 +18,6 @@ import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import trademate.order.OrderView;
-import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
 import viewtify.Viewtify;
@@ -26,6 +25,7 @@ import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
+import viewtify.ui.view.PreferencesView;
 
 @Managed(value = Singleton.class)
 public class TradeTester extends View {
@@ -48,7 +48,7 @@ public class TradeTester extends View {
     @Override
     protected void initialize() {
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
-        DockSystem.register("Setting").contents(SettingView.class).closable(false);
+        DockSystem.register("Setting").contents(PreferencesView.class).closable(false);
         DockSystem.register("Order").contents(OrderView.class).closable(false);
         // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
