@@ -45,11 +45,11 @@ public class BitFlyerSetting extends PreferenceViewBase {
 
         {
             $(vbox, () -> {
-                label(en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.com/developer)."), SettingStyles.Description);
+                title(en("Usage of Public API"), en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.com/developer)."));
                 form("API Key", apiKey);
                 form("API Secret", apiSecret);
 
-                description(en("Usage of Private API"), en("We will try to speed up trading by using private API. TradeMate acquires the account specific infomation(e.g. session id) by logging in automatically."), en("WARNING : This setting will allow all operations on your account."));
+                title(en("Usage of Private API"), en("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically."), en("WARNING : This setting will allow all operations on your account."));
                 form("Login ID", loginId);
                 form(en("Password"), loginPassword);
                 form(en("Login explicitly"), loginBackground);

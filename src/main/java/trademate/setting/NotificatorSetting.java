@@ -28,7 +28,7 @@ import viewtify.ui.toast.ToastSettingView;
 import viewtify.ui.view.PreferenceViewBase;
 import viewtify.util.Icon;
 
-class NotificatorSetting extends PreferenceViewBase {
+public class NotificatorSetting extends PreferenceViewBase {
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
@@ -77,35 +77,26 @@ class NotificatorSetting extends PreferenceViewBase {
         {
             $(vbox, () -> {
                 // Notification Types
-                $(vbox, () -> {
-                    label(en("Notification Type"), Heading);
-                    $(notifications, style.NotificationTypeTable, () -> {
-                        $(name, Label);
-                        $(desktop);
-                        $(line);
-                        $(sound, Input);
-                    });
+                title(en("Notification Type"));
+                $(notifications, style.NotificationTypeTable, () -> {
+                    $(name, Label);
+                    $(desktop);
+                    $(line);
+                    $(sound, Input);
                 });
 
                 // Sound
-                $(vbox, () -> {
-                    label(en("Sound Notification"), Heading);
-                    form(en("Volume Level"), soundMasterVolume);
-                });
+                title(en("Sound Notification"));
+                form(en("Volume Level"), soundMasterVolume);
 
                 // Desktop
-                $(vbox, () -> {
-                    label(en("Desktop Notification"), Heading);
-                    $(toast);
-                });
+                title(en("Desktop Notification"));
+                $(toast);
 
                 // LINE
-                $(vbox, () -> {
-                    label(en("LINE Notification"), Heading);
-                    label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), SettingStyles.Description);
-                    form(en("Access Token"), lineAccessToken);
-                    form(en("Test message sending"), lineTest);
-                });
+                title(en("LINE Notification"), en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."));
+                form(en("Access Token"), lineAccessToken);
+                form(en("Test message sending"), lineTest);
             });
         }
     }
@@ -127,7 +118,7 @@ class NotificatorSetting extends PreferenceViewBase {
         });
 
         // For Sound
-        soundMasterVolume.snapToTicks(true).showTickLabels(true).showTickMarks(true).sync(notificator.masterVolume);
+        soundMasterVolume.sync(notificator.masterVolume);
 
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken).masking(true);

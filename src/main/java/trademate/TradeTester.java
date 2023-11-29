@@ -18,9 +18,13 @@ import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import trademate.order.OrderView;
+import trademate.setting.AppearanceSetting;
+import trademate.setting.BitFlyerSetting;
+import trademate.setting.NotificatorSetting;
 import trademate.verify.BackTestView;
 import viewtify.Theme;
 import viewtify.Viewtify;
+import viewtify.keys.KeyBindingSettingView;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -47,8 +51,11 @@ public class TradeTester extends View {
      */
     @Override
     protected void initialize() {
+        PreferencesView preferences = new PreferencesView();
+        preferences.add(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class);
+
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
-        DockSystem.register("Setting").contents(PreferencesView.class).closable(false);
+        DockSystem.register("Setting").contents(preferences).closable(false);
         DockSystem.register("Order").contents(OrderView.class).closable(false);
         // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);

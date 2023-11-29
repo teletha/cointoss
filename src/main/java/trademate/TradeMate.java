@@ -23,8 +23,12 @@ import kiss.Signal;
 import kiss.Singleton;
 import psychopath.Locator;
 import trademate.order.OrderView;
+import trademate.setting.AppearanceSetting;
+import trademate.setting.BitFlyerSetting;
+import trademate.setting.NotificatorSetting;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
+import viewtify.keys.KeyBindingSettingView;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -51,7 +55,10 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        DockSystem.register("Setting").contents(PreferencesView.class).closable(false);
+        PreferencesView preferences = new PreferencesView();
+        preferences.add(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class);
+
+        DockSystem.register("Setting").contents(preferences).closable(false);
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Global Volume").contents(GlobalVolumeView.class).closable(false);
         DockSystem.register("Order").contents(OrderView.class).closable(false);

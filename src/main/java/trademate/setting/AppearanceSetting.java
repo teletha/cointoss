@@ -32,12 +32,16 @@ public class AppearanceSetting extends PreferenceViewBase {
      */
     @Override
     public Variable<String> category() {
-        return en("Chart");
+        return en("Appearance and Language");
     }
 
     class view extends ViewDSL implements SettingStyles {
         {
             $(vbox, () -> {
+                title(en("General"));
+                $(appearance);
+
+                title(en("Related to chart"));
                 form(en("Theme"), themes);
                 form(CommonText.Buy, buy);
                 form(CommonText.Sell, sell);
