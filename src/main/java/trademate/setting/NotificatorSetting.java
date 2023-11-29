@@ -66,7 +66,13 @@ public class NotificatorSetting extends PreferenceViewBase {
 
     interface style extends StyleDSL {
         Style NotificationTypeTable = () -> {
-            display.height(255, px);
+            display.maxHeight(225, px);
+        };
+
+        Style name = () -> {
+            display.width(150, px);
+            text.align.left();
+            padding.left(10, px);
         };
     }
 
@@ -78,8 +84,8 @@ public class NotificatorSetting extends PreferenceViewBase {
             $(vbox, () -> {
                 // Notification Types
                 title(en("Notification Type"));
-                $(notifications, FormStyles.Row, style.NotificationTypeTable, () -> {
-                    $(name, Label);
+                $(notifications, style.NotificationTypeTable, () -> {
+                    $(name, style.name);
                     $(desktop);
                     $(line);
                     $(sound, Input);
@@ -107,7 +113,7 @@ public class NotificatorSetting extends PreferenceViewBase {
     @Override
     protected void initialize() {
         // For Notifications
-        notifications.items(notificator.types()).simplify();
+        notifications.items(notificator.types());
         name.modelByVar(n -> n.name);
         desktop.text(en("Desktop")).renderAsCheckBox(notify -> notify.ⅰ.onDesktop, UICheckBox::sync);
         line.text(en("LINE")).renderAsCheckBox(notify -> notify.ⅰ.onLine, (ui, model, disposer) -> {
