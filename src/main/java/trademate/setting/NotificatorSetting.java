@@ -66,7 +66,7 @@ public class NotificatorSetting extends PreferenceViewBase {
 
     interface style extends StyleDSL {
         Style NotificationTypeTable = () -> {
-            display.maxHeight(228, px);
+            display.height(255, px);
         };
     }
 
@@ -78,7 +78,7 @@ public class NotificatorSetting extends PreferenceViewBase {
             $(vbox, () -> {
                 // Notification Types
                 title(en("Notification Type"));
-                $(notifications, style.NotificationTypeTable, () -> {
+                $(notifications, FormStyles.Row, style.NotificationTypeTable, () -> {
                     $(name, Label);
                     $(desktop);
                     $(line);
