@@ -13,7 +13,7 @@ import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
 import kiss.Variable;
 import viewtify.style.FormStyles;
-import viewtify.ui.UICheckBox;
+import viewtify.ui.UICheckSwitch;
 import viewtify.ui.UIText;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.view.PreferenceViewBase;
@@ -31,7 +31,7 @@ public class BitFlyerSetting extends PreferenceViewBase {
 
     private UIText<String> loginPassword;
 
-    private UICheckBox loginBackground;
+    private UICheckSwitch loginBackground;
 
     /**
      * {@inheritDoc}
@@ -52,7 +52,7 @@ public class BitFlyerSetting extends PreferenceViewBase {
                 title(en("Usage of Private API"), en("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically."), en("WARNING : This setting will allow all operations on your account."));
                 form("Login ID", loginId);
                 form(en("Password"), loginPassword);
-                form(en("Login explicitly"), loginBackground);
+                form(en("Login explicitly"), FormStyles.InputMin, loginBackground);
             });
         }
     }
