@@ -31,7 +31,7 @@ public class AppearanceSetting extends PreferenceViewBase {
      * {@inheritDoc}
      */
     @Override
-    public Variable<String> category() {
+    public Variable<String> title() {
         return en("Appearance and Language");
     }
 
