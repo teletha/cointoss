@@ -22,13 +22,13 @@ import viewtify.ui.UISlider;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.UIText;
+import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 import viewtify.ui.toast.ToastSettingView;
-import viewtify.ui.view.PreferenceViewBase;
 import viewtify.util.Icon;
 
-public class NotificatorSetting extends PreferenceViewBase {
+public class NotificatorSetting extends View {
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);

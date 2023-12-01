@@ -13,11 +13,11 @@ import kiss.Variable;
 import trademate.CommonText;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.UIComboBox;
+import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.view.AppearanceSettingView;
-import viewtify.ui.view.PreferenceViewBase;
 
-public class AppearanceSetting extends PreferenceViewBase {
+public class AppearanceSetting extends View {
 
     AppearanceSettingView appearance;
 

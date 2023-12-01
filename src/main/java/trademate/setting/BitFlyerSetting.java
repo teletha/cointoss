@@ -15,10 +15,10 @@ import kiss.Variable;
 import viewtify.style.FormStyles;
 import viewtify.ui.UICheckSwitch;
 import viewtify.ui.UIText;
+import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.view.PreferenceViewBase;
 
-public class BitFlyerSetting extends PreferenceViewBase {
+public class BitFlyerSetting extends View {
 
     /** The account info. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
