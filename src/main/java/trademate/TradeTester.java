@@ -29,7 +29,7 @@ import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
-import viewtify.ui.view.PreferencesView;
+import viewtify.ui.view.PreferenceView;
 
 @Managed(value = Singleton.class)
 public class TradeTester extends View {
@@ -51,7 +51,7 @@ public class TradeTester extends View {
      */
     @Override
     protected void initialize() {
-        PreferencesView preferences = new PreferencesView();
+        PreferenceView preferences = new PreferenceView();
         preferences.add(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class);
 
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
