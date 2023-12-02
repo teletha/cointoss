@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.4.0](https://github.com/teletha/cointoss/compare/v1.3.0...v1.4.0) (2023-12-02)
+
+
+### Features
+
+* Add ASTR and GLMR spot market on Binance. ([f67048f](https://github.com/teletha/cointoss/commit/f67048f0e860bbbf292017181af0559e64d51b03))
+* Add global setting. ([63ca6ae](https://github.com/teletha/cointoss/commit/63ca6ae6178a8934c52390fbbc09a32a04f7f020))
+* Add SOL, AVAX, LUNA markets on Binance and FTX. ([1084f5d](https://github.com/teletha/cointoss/commit/1084f5daa9c8146f31f2d5aca25d146f96f2aa5c))
+* Purge primitive collections as primavera. ([e8866e5](https://github.com/teletha/cointoss/commit/e8866e54a8eb550bff2b5ecad11decd85e5eb4de))
+* TradingExit interface. ([9d73976](https://github.com/teletha/cointoss/commit/9d73976a0b2aeecc9c16f2e2d6a92d7f5bb7eb36))
+* TradingFilter provides timezone restrictions. ([d36c64f](https://github.com/teletha/cointoss/commit/d36c64f8b064ae6c6f108b4d4f2e471105739e52))
+* update binance market ([9cf0c88](https://github.com/teletha/cointoss/commit/9cf0c88a1d27262558f06a4323e7b19ff5561bb5))
+
+
+### Bug Fixes
+
+* Bitflyer order size. ([48bdd1b](https://github.com/teletha/cointoss/commit/48bdd1b6df39f8f5611ea055554e71e596f1ac0f))
+* Decrease the number of retry. ([ce24257](https://github.com/teletha/cointoss/commit/ce242571f2e91491f2105299d15ec378eba2874c))
+* Drop all FTX markets. ([91caecf](https://github.com/teletha/cointoss/commit/91caecf69f27d9e8c00a71ad1c3991832228dc42))
+* Memory leak. ([6b40fa2](https://github.com/teletha/cointoss/commit/6b40fa23d43fc792acb68dbf2c6b8cb7ff09a2cd))
+* PriceVolume is not timescalable now. ([d28bc4c](https://github.com/teletha/cointoss/commit/d28bc4c401c7210157a37eabb321cf7776cf1b29))
+* Remove LUNA market on FTX. ([c6ab51f](https://github.com/teletha/cointoss/commit/c6ab51fc6ce453aabf1156a8b9897972810982ed))
+* Setting UI is broken. ([a9b5aeb](https://github.com/teletha/cointoss/commit/a9b5aeb4c27863f37d996da3e853089ca8f1283a))
+* Test never generate entry log. ([cecf3a7](https://github.com/teletha/cointoss/commit/cecf3a79ca6d2e8c1195565b49600f8c0c96515f))
+* update binance ([804c4cc](https://github.com/teletha/cointoss/commit/804c4cc2404f78a003c290f6f9814d68f6f74ac2))
+* update binance pair ([c1ef48b](https://github.com/teletha/cointoss/commit/c1ef48ba1bb350eaaefd26270b19037f4425c748))
+* update future market ([9f2da2f](https://github.com/teletha/cointoss/commit/9f2da2f150f21935431f06df7cf3d962ac087fe7))
+* update market on binancef and ftx. ([9549abc](https://github.com/teletha/cointoss/commit/9549abcd5ad281c546e80b09af1ee02ca289c350))
+* update sinobu ([7f1e63c](https://github.com/teletha/cointoss/commit/7f1e63cd7d4d20597c9de9528711ac7c588354c5))
+* update sinobu ([76d0425](https://github.com/teletha/cointoss/commit/76d04254d26d5f8ef217c3ea9ac7250ccd80b7a7))
+* Update sinobu. ([886bff1](https://github.com/teletha/cointoss/commit/886bff19af69c1419f107768ef00bbcf260b066f))
+* update view ([2b967c3](https://github.com/teletha/cointoss/commit/2b967c31abc35bb2e0318cc374e8baadde6f111f))
+* update viewtify ([5d84fd2](https://github.com/teletha/cointoss/commit/5d84fd23660344083a8bc24e3904e70fa1a902fb))
+* update viewtify ([8a9ba5c](https://github.com/teletha/cointoss/commit/8a9ba5c3eb0d7ceaae015dbaf44b88228de167be))
+* update viewtify ([de53b2f](https://github.com/teletha/cointoss/commit/de53b2fcd173aee823bcecc5cba341fcf61b7d6e))
+* update viewtify ([dfa017c](https://github.com/teletha/cointoss/commit/dfa017c40f427234f8b52bf5ca7b3f0b35c0ab85))
+* update viewtify ([6ed46d9](https://github.com/teletha/cointoss/commit/6ed46d9be79c05d951677fe74d13aba575b7eecb))
+* update viewtify ([849c0de](https://github.com/teletha/cointoss/commit/849c0de74c80539b6ed78d245a66c10077c9e20e))
+* update viewtify ([47ea505](https://github.com/teletha/cointoss/commit/47ea50569ede23aebd2328a69092feba87e59de4))
+* update viewtify ([36c4f13](https://github.com/teletha/cointoss/commit/36c4f136b6122d2c76a6f9d85d30114e0526d1a6))
+* Websocket api of coincheck is broken. ([3c9a39e](https://github.com/teletha/cointoss/commit/3c9a39e4e64b8535d45d66da5923e582ed08f5f7))
+
 ## [1.3.0](https://www.github.com/teletha/cointoss/compare/v1.2.0...v1.3.0) (2022-03-28)
 
 
