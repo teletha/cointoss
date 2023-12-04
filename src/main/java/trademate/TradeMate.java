@@ -29,7 +29,7 @@ import trademate.setting.NotificatorSetting;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
 import viewtify.keys.KeyBindingSettingView;
-import viewtify.prference.PreferenceView;
+import viewtify.preference.PreferenceView;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javafx.scene.paint.Color;
-import viewtify.prference.Preferences;
+import viewtify.preference.Preferences;
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
 
