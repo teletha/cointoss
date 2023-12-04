@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javafx.scene.paint.Color;
-
+import viewtify.prference.Preferences;
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
-import viewtify.model.Preferences;
 
 public class ChartTheme extends Preferences {
 

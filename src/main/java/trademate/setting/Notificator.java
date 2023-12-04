@@ -16,7 +16,7 @@ import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Variable;
-import viewtify.model.Preferences;
+import viewtify.prference.Preferences;
 import viewtify.ui.toast.Toast;
 
 public class Notificator extends Preferences {

@@ -29,11 +29,11 @@ import trademate.setting.NotificatorSetting;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
 import viewtify.keys.KeyBindingSettingView;
+import viewtify.prference.PreferenceView;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
-import viewtify.ui.view.PreferenceView;
 
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
