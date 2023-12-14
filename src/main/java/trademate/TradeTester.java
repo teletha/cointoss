@@ -54,7 +54,7 @@ public class TradeTester extends View {
     protected void initialize() {
         PreferenceView preferences = new PreferenceView();
         preferences
-                .add(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
+                .manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
 
         DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
         DockSystem.register("Setting").contents(preferences).closable(false);
