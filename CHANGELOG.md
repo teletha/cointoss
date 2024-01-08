@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.1](https://github.com/teletha/cointoss/compare/v1.4.0...v1.4.1) (2024-01-08)
+
+
+### Bug Fixes
+
+* update ci process ([0e8454a](https://github.com/teletha/cointoss/commit/0e8454ae3f173976adf4a71b7a7fb991a2e9d9d0))
+* update license ([4c162bf](https://github.com/teletha/cointoss/commit/4c162bf8a20cedb9310c241a67826131cf2fb8ff))
+* update viewtify ([2c9c609](https://github.com/teletha/cointoss/commit/2c9c6093d2561adf95fc914dff36db03478bdd1a))
+
 ## [1.4.0](https://github.com/teletha/cointoss/compare/v1.3.0...v1.4.0) (2023-12-02)
 
 
