@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up JDK
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: zulu
         java-version: 19
@@ -23,15 +23,26 @@ jobs:
     - name: Build artifact and site
       run: |
         if [ -e "bee" ]; then
-          source bee install doc:site
+          source bee install doc:site maven:pom ci:readme ci:license
         else
           version=$(curl -SsL https://git.io/stable-bee)
           curl -SsL -o bee-${version}.jar https://jitpack.io/com/github/teletha/bee/${version}/bee-${version}.jar
-          java -javaagent:bee-${version}.jar -cp bee-${version}.jar bee.Bee install
+          java -javaagent:bee-${version}.jar -cp bee-${version}.jar bee.Bee install doc:site maven:pom ci:readme ci:license
         fi
 
+    - name: Deploy site
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: target/site
+
     - name: Request Releasing
-      uses: GoogleCloudPlatform/release-please-action@v3
+      uses: GoogleCloudPlatform/release-please-action@v4
       with:
         release-type: simple
         package-name: cointoss
+
+    - name: Auto commit
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: update repository info
