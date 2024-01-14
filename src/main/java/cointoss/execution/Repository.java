@@ -74,25 +74,15 @@ class Repository implements Storable<Repository> {
     private void scanLocalRepository() {
         LocalDate now = LocalDate.now(Chrono.UTC);
         if (now.isAfter(localScanLatest)) {
-            String[] files = root.asJavaFile().list();
-            if (files != null) {
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].startsWith("execution")) {
-                        localFirst = LocalDate.parse(files[i].subSequence(9, 17), Chrono.DateCompact);
-                        break;
-                    }
-                }
 
-                for (int i = files.length - 1; 0 <= i; i--) {
-                    if (files[i].startsWith("execution")) {
-                        localLast = LocalDate.parse(files[i].subSequence(9, 17), Chrono.DateCompact);
-                        break;
-                    }
-                }
-
-                localScanLatest = now;
-                store();
-            }
+            root.walkFile("execution*.{log,clog}")
+                    .effectOnce(x -> localFirst = LocalDate.parse(x.base().subSequence(9, 17), Chrono.DateCompact))
+                    .last()
+                    .to(x -> localLast = LocalDate.parse(x.base().subSequence(9, 17), Chrono.DateCompact), e -> {
+                    }, () -> {
+                        localScanLatest = now;
+                        store();
+                    });
         }
     }
 
