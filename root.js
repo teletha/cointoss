@@ -28,12 +28,7 @@ const root = {
 		"cointoss.trade.bot",
 		"cointoss.util",
 		"cointoss.util.arithmetic",
-		"cointoss.util.array",
 		"cointoss.util.feather",
-		"cointoss.util.function",
-		"cointoss.util.map",
-		"cointoss.util.ring",
-		"cointoss.util.set",
 		"cointoss.verify",
 		"cointoss.volume",
 		"trademate",
@@ -418,16 +413,16 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ChartSetting",
-			"packageName": "trademate.setting",
-			"type": "Class"
+			"name": "ChartStyles",
+			"packageName": "trademate.chart",
+			"type": "Interface"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ChartStyles",
-			"packageName": "trademate.chart",
-			"type": "Interface"
+			"name": "ChartTheme",
+			"packageName": "trademate",
+			"type": "Class"
 		},
 		{
 			"modifiers": {
@@ -495,48 +490,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ConcurrentDoubleMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ConcurrentIntMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ConcurrentLongMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ConcurrentNavigableDoubleMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ConcurrentNavigableIntMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ConcurrentNavigableLongMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "ConsoleAnalyzer",
 			"packageName": "cointoss.analyze",
 			"type": "Class"
@@ -589,69 +542,6 @@ const root = {
 			"name": "DoubleIndicator",
 			"packageName": "cointoss.ticker",
 			"type": "AbstractClass"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoubleList",
-			"packageName": "cointoss.util.array",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoubleMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoubleMap.DoubleComparator",
-			"packageName": "cointoss.util.map",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoubleMap.DoubleEntry",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoublePentaFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoubleRingBuffer",
-			"packageName": "cointoss.util.ring",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoubleSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoubleTetraFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DoubleTriFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
 		},
 		{
 			"modifiers": {
@@ -803,13 +693,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "FTX",
-			"packageName": "cointoss.market.ftx",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "FTXAccount",
 			"packageName": "cointoss.market.ftx",
 			"type": "Class"
@@ -847,13 +730,6 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "FinnhubService",
 			"packageName": "cointoss.market.finnhub",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "FloatList",
-			"packageName": "cointoss.util.array",
 			"type": "Class"
 		},
 		{
@@ -939,69 +815,6 @@ const root = {
 			"name": "Indicators",
 			"packageName": "cointoss.ticker",
 			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntList",
-			"packageName": "cointoss.util.array",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntMap.IntComparator",
-			"packageName": "cointoss.util.map",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntMap.IntEntry",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntPentaFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntRingBuffer",
-			"packageName": "cointoss.util.ring",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntTetraFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "IntTriFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
 		},
 		{
 			"modifiers": {
@@ -1104,69 +917,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongList",
-			"packageName": "cointoss.util.array",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongMap.LongComparator",
-			"packageName": "cointoss.util.map",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongMap.LongEntry",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongPentaFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongRingBuffer",
-			"packageName": "cointoss.util.ring",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongTetraFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LongTriFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Market",
 			"packageName": "cointoss",
 			"type": "Class"
@@ -1265,48 +1015,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "NavigableDoubleMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "NavigableDoubleSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "NavigableIntMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "NavigableIntSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "NavigableLongMap",
-			"packageName": "cointoss.util.map",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "NavigableLongSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Network",
 			"packageName": "cointoss.util",
 			"type": "Class"
@@ -1322,6 +1030,13 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Notificator.Notify",
+			"packageName": "trademate.setting",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "NotificatorSetting",
 			"packageName": "trademate.setting",
 			"type": "Class"
 		},
@@ -1769,13 +1484,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "RingBuffer",
-			"packageName": "cointoss.util.ring",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "SFD",
 			"packageName": "cointoss.market.bitflyer",
 			"type": "Enum"
@@ -1832,37 +1540,9 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "SettingView",
-			"packageName": "trademate.setting",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "SignalSynchronizer",
 			"packageName": "cointoss.util",
 			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "SortedDoubleSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "SortedIntSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "SortedLongSet",
-			"packageName": "cointoss.util.set",
-			"type": "Interface"
 		},
 		{
 			"modifiers": {
@@ -1898,13 +1578,6 @@ const root = {
 			"name": "TemporalData",
 			"packageName": "cointoss.util.feather",
 			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Theme",
-			"packageName": "trademate",
-			"type": "Class"
 		},
 		{
 			"modifiers": {
@@ -1947,27 +1620,6 @@ const root = {
 			"name": "TimestampBasedMarketServiceSupporter",
 			"packageName": "cointoss.market",
 			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ToDoubleTriFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ToIntTriFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ToLongTriFunction",
-			"packageName": "cointoss.util.function",
-			"type": "Functional"
 		},
 		{
 			"modifiers": {

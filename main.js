@@ -1,3 +1,12 @@
+/*
+ * Copyright (C) 2023 The JAVADNG Development Team
+ *
+ * Licensed under the MIT License (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          https://opensource.org/licenses/MIT
+ */
 import { Mimic as $ } from "./mimic.js"
 import hljs from "./highlight.js"
 
@@ -8,13 +17,14 @@ const
 	prefix = import.meta.url.substring(location.protocol.length + location.host.length + 2, import.meta.url.length - 7),
 	user = JSON.parse(localStorage.getItem("user")) || {},
 	save = () => localStorage.setItem("user", JSON.stringify(user))
+hljs.configure({ignoreUnescapedHTML: true})
+history.scrollRestoration = "manual"
 	
 // =====================================================
 // View Mode
 // =====================================================
 $("html").add(user.theme)
 $("#light,#dark").on("click", e => save($("html").reset(user.theme = e.currentTarget.id)))
-
 
 // =====================================================
 // Dynamic Navigation Indicator
@@ -24,7 +34,6 @@ const navi = new IntersectionObserver(e => {
 	if (0 < e.length) {
 		const i = e.reduce((a, b) => a.intersectionRation > b.intersectionRatio ? a : b);
 		if (i) {
-			console.log(i.target.id, i.intersectionRatio);
 			$("#DocNavi .now").remove("now");
 			$(`#DocNavi a[href$='#${i.target.id}']`).add("now");
 		}
@@ -40,26 +49,26 @@ function FlashMan({ paged, cacheSize = 20, preload = "mouseover", preview = "sec
 		set.filter(x => x.isIntersecting && !x.target.init && (x.target.init = true)).forEach(x => {
 			for (let q in previews) x.target.querySelectorAll(q).forEach(e => previews[q](e))
 		})
-	}, { rootMargin: "80px", threshold: 0.3 });
+	}, { rootMargin: "80px 0px", threshold: 0.3 });
 
 	// This is the state immediately after a page change has been requested by a user operation.
-	function changed() {
+	function changed(poped) {
 		if (path == location.pathname) {
 			if (hash != location.hash) {
 				hash = location.hash;
-				hashed();
+				hashed(poped, true);
 			}
 		} else {
 			path = location.pathname;
 			hash = location.hash;
-			load(path);
+			load(path, poped, false);
 		}
 	}
 
 	// Reads the contents of the specified path into the cache. If it is already cached or currently being read, it will be ignored.
-	function load(p) {
+	function load(p, poped, same) {
 		if (cache.has(p)) {
-			if (path == p) update(cache.get(p))
+			if (path == p) update(cache.get(p), poped, same)
 		} else if (!loading.has(p)) {
 			loading.add(p)
 			fetch(p)
@@ -67,33 +76,40 @@ function FlashMan({ paged, cacheSize = 20, preload = "mouseover", preview = "sec
 				.then(html => {
 					loading.delete(p)
 					cache.set(p, html)
-					if (path == p) update(html)
+					if (path == p) update(html, poped, same)
 					if (cacheSize < cache.size) cache.delete(cache.keys().next().value)
 				})
 		}
 	}
 
-	function update(text) {
-		if (text) {
-			$("article").html(text.substring(text.indexOf(">", text.indexOf("<article")) + 1, text.lastIndexOf("</article>")));
-			$("aside").html(text.substring(text.indexOf(">", text.indexOf("<aside")) + 1, text.lastIndexOf("</aside>")));
-		}
-		paged();
-		$(preview).each(e => observer.observe(e));
-		hashed();
+	function update(text, poped, same) {
+		if (poped !== undefined || same !== undefined) $("article").add("fadeout")
+		setTimeout(() => {
+			if (text) {
+				$("article").html(text.substring(text.indexOf(">", text.indexOf("<article")) + 1, text.lastIndexOf("</article>")));
+				$("aside").html(text.substring(text.indexOf(">", text.indexOf("<aside")) + 1, text.lastIndexOf("</aside>"))); 
+			}
+			paged();
+			$(preview).each(e => observer.observe(e));
+			hashed(poped, same)
+			$("article").remove("fadeout")
+		}, 300)
 	}
 
-	function hashed() {
-		// scroll to top or #hash
-		if (location.hash == "") {
-			setTimeout(() => window.scrollTo(0, 0), 200); // wait rendering
-		} else {
-			location.replace(location.href);
-		}
+	// Scroll into view automatically when hash is changed
+	function hashed(poped, same) {
+		let h = location.hash?.substring(1)
+		window.scrollTo({
+			top: !same && poped ? localStorage.getItem(location.pathname) || 0 : h ? document.getElementById(h).offsetTop : 0,
+			left: 0,
+			behavior: same ? "smooth":"instant"
+		})
 	}
 
 	// Detect all URL changes
-	window.addEventListener("popstate", v => changed())
+	window.addEventListener("popstate", v => {
+		changed(true)
+	})
 	document.addEventListener("DOMContentLoaded", v => { update(); cache.set(location.pathname, document.documentElement.outerHTML) })
 	document.addEventListener("click", v => {
 		let e = v.target.closest("a");
@@ -104,6 +120,10 @@ function FlashMan({ paged, cacheSize = 20, preload = "mouseover", preview = "sec
 			}
 			v.preventDefault()
 		}
+	})
+	// Detect scroll position
+	window.addEventListener("scroll", v => {
+		localStorage.setItem(location.pathname, window.scrollY)
 	})
 	// Preloader
 	document.addEventListener(preload, v => {
