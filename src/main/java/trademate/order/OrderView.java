@@ -135,7 +135,7 @@ public class OrderView extends View {
 
     class view extends ViewDSL {
         {
-            $(container, FormStyles.LabelMin, () -> {
+            $(container, () -> {
                 $(hbox, FormStyles.Row, () -> {
                     $(takerSell, FormStyles.InputMin);
                     $(clear, FormStyles.InputMin);

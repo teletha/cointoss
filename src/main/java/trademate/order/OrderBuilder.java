@@ -9,18 +9,18 @@
  */
 package trademate.order;
 
-import static trademate.CommonText.*;
+import static trademate.CommonText.Amount;
+import static trademate.CommonText.Buy;
+import static trademate.CommonText.Cancel;
+import static trademate.CommonText.Price;
+import static trademate.CommonText.Sell;
+import static trademate.CommonText.Side;
 
 import java.math.RoundingMode;
 import java.text.Normalizer.Form;
 import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
-
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableRow;
-import javafx.scene.input.ScrollEvent;
 
 import cointoss.Direction;
 import cointoss.market.bitflyer.BitFlyer;
@@ -29,6 +29,10 @@ import cointoss.order.Order;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.util.arithmetic.Num;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
+import javafx.scene.input.ScrollEvent;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;
@@ -129,7 +133,7 @@ public class OrderBuilder extends View {
     class View extends ViewDSL implements FormStyles {
         {
             $(OrderBuilder.this.scroll, () -> {
-                $(vbox, S.Root, LabelMin, () -> {
+                $(vbox, S.Root, () -> {
                     form(Amount, InputMin, orderSize, orderSizeAmount);
                     form(Price, InputMin, orderPrice, orderPriceAmount);
                     form(en("Variances"), InputMin, orderDivideSize, orderDivideIntervalAmount);
@@ -222,7 +226,9 @@ public class OrderBuilder extends View {
             $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
 
-        side.text(Side).model(Order.class, Order::direction).render((label, order, side) -> label.text(side).color(ChartTheme.colorBy(side)));
+        side.text(Side)
+                .model(Order.class, Order::direction)
+                .render((label, order, side) -> label.text(side).color(ChartTheme.colorBy(side)));
         amount.text(Amount).modelByVar(Order.class, o -> o.observeExecutedSizeNow().map(s -> o.size.minus(s)).to());
         price.text(Price).model(Order.class, o -> o.price);
 

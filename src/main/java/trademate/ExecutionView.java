@@ -41,7 +41,7 @@ public class ExecutionView extends View {
     class view extends ViewDSL implements FormStyles {
 
         {
-            $(vbox, style.root, LabelMin, () -> {
+            $(vbox, style.root, () -> {
                 form(en("Delay"), delay);
 
                 // $(hbox, () -> {
