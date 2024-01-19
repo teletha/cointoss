@@ -21,7 +21,7 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "antibug").atTest();
         require("com.pgs-soft", "HttpClientMock").atTest();
         require("org.apache.commons", "commons-lang3");
-        require("commons-net", "commons-net", "3.7.2");
+        require("commons-net", "commons-net");
         require("com.google.guava", "guava");
         unrequire("com.google.code.findbugs", "jsr305");
         unrequire("com.google.errorprone", "error_prone_annotations");
