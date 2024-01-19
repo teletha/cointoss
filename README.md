@@ -108,10 +108,10 @@ If you think something might be a bug, but you're not sure, ask on StackOverflow
 
 ## Dependency
 Cointoss depends on the following products on runtime.
-* [altfx-1.2.0](https://mvnrepository.com/artifact/com.github.teletha/altfx/1.2.0)
+* [altfx-1.3.0](https://mvnrepository.com/artifact/com.github.teletha/altfx/1.3.0)
 * [commons-lang3-3.14.0](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.14.0)
 * [commons-net-3.7.2](https://mvnrepository.com/artifact/commons-net/commons-net/3.7.2)
-* [conjure-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/conjure/1.1.0)
+* [conjure-1.1.1](https://mvnrepository.com/artifact/com.github.teletha/conjure/1.1.1)
 * [controlsfx-11.2.0](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.0)
 * [failureaccess-1.0.2](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.2)
 * [guava-33.0.0-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.0.0-jre)
@@ -132,7 +132,7 @@ Cointoss depends on the following products on runtime.
 * [sinobu-3.9.1](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.9.1)
 * [stylist-1.10.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.10.0)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
-* [viewtify-2.18.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.18.0)
+* [viewtify-2.19.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.19.0)
 * [zstd-jni-1.5.5-11](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.5-11)
 <p align="right"><a href="#top">back to top</a></p>
 
