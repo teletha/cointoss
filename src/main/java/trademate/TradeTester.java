@@ -56,9 +56,9 @@ public class TradeTester extends View {
         preferences
                 .manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
 
-        DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
-        DockSystem.register("Setting").contents(preferences).closable(false);
-        DockSystem.register("Order").contents(OrderView.class).closable(false);
+        DockSystem.register("BackTest").contents(BackTestView.class).text(en("BackTest")).closable(false);
+        DockSystem.register("Setting").contents(preferences).text(en("Setting")).closable(false);
+        DockSystem.register("Order").contents(OrderView.class).text(en("Order")).closable(false);
         // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
         // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
 

@@ -135,9 +135,9 @@ public class OrderView extends View {
 
     class view extends ViewDSL {
         {
-            $(container, () -> {
-                form(FormStyles.Column3, takerSell, clear, takerBuy);
-                form(FormStyles.Column3, makerSell, cancel, makerBuy);
+            $(container, FormStyles.Label70, FormStyles.LabelCenter, () -> {
+                form(style.buttons, takerSell, clear, takerBuy);
+                form(style.buttons, makerSell, cancel, makerBuy);
                 form(en("Market"), FormStyles.Column5, market, trainingMode);
                 form(Amount, FormStyles.Column3, orderSize, orderThresholdSize, history);
 
@@ -154,8 +154,13 @@ public class OrderView extends View {
 
     interface style extends StyleDSL {
 
+        Style buttons = () -> {
+            display.width(66, px).minHeight(45, px).height(45, px);
+        };
+
         Style table = () -> {
             text.unselectable();
+            display.maxHeight(200, px);
         };
 
         ValueStyle<OrderState> State = state -> {

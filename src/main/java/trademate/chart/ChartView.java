@@ -164,9 +164,9 @@ public class ChartView extends View {
 
         config.text(FontAwesome.Glyph.GEAR).popup(new ViewDSL() {
             {
-                $(vbox, () -> {
-                    form("Candle Type", showCandle, candleType);
-                    form("Latest Price", showLatestPrice);
+                $(vbox, FormStyles.Label90, FormStyles.LabelCenter, () -> {
+                    form("Candle Type", FormStyles.Column3, showCandle, candleType);
+                    form("Latest Price", FormStyles.Column3 ,showLatestPrice);
                     form("Orderbook", FormStyles.Column3, showOrderbook, orderbookPriceRange, orderbookHideSize);
                     form("Priced Volume", FormStyles.Column3, showPricedVolume, pricedVolumeType);
                 });

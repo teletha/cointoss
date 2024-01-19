@@ -60,10 +60,10 @@ public class TradeMate extends View {
         preferences
                 .manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
 
-        DockSystem.register("Setting").contents(preferences).closable(false);
-        DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
-        DockSystem.register("Global Volume").contents(GlobalVolumeView.class).closable(false);
-        DockSystem.register("Order").contents(OrderView.class).closable(false);
+        DockSystem.register("Setting").contents(preferences).closable(false).text(en("Setting"));
+        DockSystem.register("BackTest").contents(BackTestView.class).closable(false).text(en("Back Test"));
+        DockSystem.register("Global Volume").contents(GlobalVolumeView.class).closable(false).text(en("Global Volume"));
+        DockSystem.register("Order").contents(OrderView.class).closable(false).text(en("Order"));
 
         // ========================================================
         // Create Tab for each Marketsjj
