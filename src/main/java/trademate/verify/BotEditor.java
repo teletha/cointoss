@@ -20,17 +20,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Sets;
 
 import cointoss.trade.Trader;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kiss.I;
 import kiss.Model;
 import kiss.Property;
@@ -155,7 +154,7 @@ public class BotEditor extends View {
          */
         class view extends ViewDSL {
             {
-                form(StringUtils.capitalize(property.name), FormStyles.InputMin, createUI(property));
+                form(StringUtils.capitalize(property.name), FormStyles.Column3, createUI(property));
             }
         }
 

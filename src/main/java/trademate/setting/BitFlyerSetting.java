@@ -52,7 +52,7 @@ public class BitFlyerSetting extends View {
                 title(en("Usage of Private API"), en("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically."), en("WARNING : This setting will allow all operations on your account."));
                 form("Login ID", loginId);
                 form(en("Password"), loginPassword);
-                form(en("Login explicitly"), FormStyles.InputMin, loginBackground);
+                form(en("Login explicitly"), FormStyles.Column3, loginBackground);
             });
         }
     }

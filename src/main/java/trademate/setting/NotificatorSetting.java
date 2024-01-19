@@ -88,7 +88,7 @@ public class NotificatorSetting extends View {
                     $(name, style.name);
                     $(desktop);
                     $(line);
-                    $(sound, Input);
+                    $(sound, FormStyles.Column5);
                 });
 
                 // Sound

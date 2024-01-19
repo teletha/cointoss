@@ -134,14 +134,14 @@ public class OrderBuilder extends View {
         {
             $(OrderBuilder.this.scroll, () -> {
                 $(vbox, S.Root, () -> {
-                    form(Amount, InputMin, orderSize, orderSizeAmount);
-                    form(Price, InputMin, orderPrice, orderPriceAmount);
-                    form(en("Variances"), InputMin, orderDivideSize, orderDivideIntervalAmount);
-                    form(en("Price Interval"), InputMin, orderPriceInterval, orderPriceIntervalAmount);
-                    form(en("Threshold"), InputMin, optimizeThreshold);
-                    form(Button, orderLimitShort.color(ChartTheme.$.sell), orderLimitLong.color(ChartTheme.$.buy));
-                    form(Button, orderCancel);
-                    form(en("Position"), InputMin, positionSize);
+                    form(Amount, FormStyles.Column3, orderSize, orderSizeAmount);
+                    form(Price, FormStyles.Column3, orderPrice, orderPriceAmount);
+                    form(en("Variances"), FormStyles.Column3, orderDivideSize, orderDivideIntervalAmount);
+                    form(en("Price Interval"), FormStyles.Column3, orderPriceInterval, orderPriceIntervalAmount);
+                    form(en("Threshold"), FormStyles.Column3, optimizeThreshold);
+                    form(FormStyles.Column2, orderLimitShort.color(ChartTheme.$.sell), orderLimitLong.color(ChartTheme.$.buy));
+                    form(FormStyles.Column2, orderCancel);
+                    form(en("Position"), FormStyles.Column3, positionSize);
 
                     $(table, S.Catalog, () -> {
                         $(side, S.Narrow);
