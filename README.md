@@ -110,7 +110,7 @@ If you think something might be a bug, but you're not sure, ask on StackOverflow
 Cointoss depends on the following products on runtime.
 * [altfx-1.3.0](https://mvnrepository.com/artifact/com.github.teletha/altfx/1.3.0)
 * [commons-lang3-3.14.0](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.14.0)
-* [commons-net-3.7.2](https://mvnrepository.com/artifact/commons-net/commons-net/3.7.2)
+* [commons-net-3.10.0](https://mvnrepository.com/artifact/commons-net/commons-net/3.10.0)
 * [conjure-1.1.1](https://mvnrepository.com/artifact/com.github.teletha/conjure/1.1.1)
 * [controlsfx-11.2.0](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.0)
 * [failureaccess-1.0.2](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.2)
