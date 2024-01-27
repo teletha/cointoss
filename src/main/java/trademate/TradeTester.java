@@ -23,6 +23,7 @@ import trademate.setting.NotificatorSetting;
 import viewtify.Viewtify;
 import viewtify.keys.KeyBindingSettingView;
 import viewtify.preference.PreferenceView;
+import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
@@ -60,15 +61,15 @@ public class TradeTester extends View {
 
         MarketServiceProvider.availableMarketServices()
                 .take(MarketService::supportHistoricalTrade)
-                .take(e -> e.exchange == Exchange.Binance)
+                .take(e -> e.exchange == Exchange.Bybit)
                 .take(1)
                 .to(service -> {
-                    // UITab tab = DockSystem.register(service.id)
-                    // .closable(false)
-                    // .text(service.id)
-                    // .contentsLazy(ui -> new TradingView(ui, service));
-                    //
-                    // TradingViewCoordinator.requestLoading(service, tab);
+                    UITab tab = DockSystem.register(service.id)
+                            .closable(false)
+                            .text(service.id)
+                            .contentsLazy(ui -> new TradingView(ui, service));
+
+                    TradingViewCoordinator.requestLoading(service, tab);
                 });
 
         DockSystem.validate();

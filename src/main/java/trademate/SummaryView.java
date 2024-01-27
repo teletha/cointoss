@@ -86,28 +86,14 @@ public class SummaryView extends View {
         price.text(CommonText.Price)
                 .modelBySignal(m -> m.service.executionLatest()
                         .concat(m.service.executionsRealtimely().throttle(throttle, MILLISECONDS))
-                        .map(e -> e.price)
-                        .on(Viewtify.UIThread));
+                        .map(e -> e.price));
 
         table.query().addQuery(en("Type"), MarketType.class, m -> m.service.setting.type);
 
         MarketServiceProvider.availableMarketServices()
-                .skip(x -> x.exchange == Exchange.Bybit)
-                .skip(x -> x.exchange == Exchange.BitBank)
-                // .skip(x -> x.exchange == Exchange.Binance)
-                .skip(x -> x.exchange == Exchange.BinanceF)
-                .skip(x -> x.exchange == Exchange.Bitfinex)
-                .skip(x -> x.exchange == Exchange.BitFlyer)
-                .skip(x -> x.exchange == Exchange.BitMEX)
-                .skip(x -> x.exchange == Exchange.Coinbase)
-                .skip(x -> x.exchange == Exchange.FTX)
-                .skip(x -> x.exchange == Exchange.Huobi)
-                .skip(x -> x.exchange == Exchange.GMO)
+                .take(x -> x.exchange == Exchange.Bybit)
                 .on(Viewtify.WorkerThread)
                 .map(Market::of)
-                .to(x -> {
-                    System.out.println(x);
-                    table.addItemAtLast(x);
-                });
+                .to(table::addItemAtLast);
     }
 }

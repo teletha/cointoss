@@ -16,7 +16,6 @@ import java.net.http.HttpRequest.Builder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -52,9 +51,6 @@ public class BybitService extends MarketService {
 
     private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
-    /** The realtime data format */
-    private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]X");
-
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
 
@@ -85,14 +81,17 @@ public class BybitService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         long[] context = new long[3];
 
-        return call("GET", "trading-records?symbol=" + marketName + "&limit=1000").flatIterable(e -> e.find("result", "*")).map(e -> {
-            Direction side = e.get(Direction.class, "side");
-            Num price = e.get(Num.class, "price");
-            Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-            ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
+        return call("GET", "market/recent-trade?symbol=" + marketName + "&category=linear&limit=1000")
+                .flatIterable(e -> e.find("result", "list", "*"))
+                .map(e -> {
+                    Direction side = e.get(Direction.class, "side");
+                    Num price = e.get(Num.class, "price");
+                    Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
+                    ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "time"));
 
-            return Support.createExecution(side, size, price, date, context);
-        }).take(e -> startId <= e.id && e.id <= endId);
+                    return Support.createExecution(side, size, price, date, context);
+                })
+                .take(e -> startId <= e.id && e.id <= endId);
     }
 
     /**
@@ -117,7 +116,8 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "trading-records?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("result", "*"))
+        return call("GET", "market/recent-trade?symbol=" + marketName + "&category=linear&limit=1")
+                .flatIterable(e -> e.find("result", "list", "*"))
                 .map(json -> convert(json, new long[3]));
     }
 
@@ -139,8 +139,8 @@ public class BybitService extends MarketService {
     private Execution convert(JSON e, long[] context) {
         Direction side = e.get(Direction.class, "side");
         Num price = e.get(Num.class, "price");
-        Num size = e.get(Num.class, "qty").divide(price).scale(setting.target.scale);
-        ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
+        Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
+        ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "time"));
 
         return Support.createExecution(side, size, price, date, context);
     }
@@ -158,7 +158,7 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<OrderBookChanges> orderBook() {
-        return call("GET", "orderBook/L2?symbol=" + marketName).map(pages -> {
+        return call("GET", "market/orderbook?symbol=" + marketName + "&limit=200").map(pages -> {
             return convertOrderBook(pages.find("result", "*"));
         });
     }
@@ -214,10 +214,11 @@ public class BybitService extends MarketService {
      * @return
      */
     private Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
-        return call("GET", "open-interest?symbol=" + marketName + "&period=5min&limit=200").flatIterable(e -> e.find("result", "$"))
+        return call("GET", "market/open-interest?symbol=" + marketName + "&category=linear&intervalTime=5min&limit=200")
+                .flatIterable(e -> e.find("result", "list", "$"))
                 .map(e -> {
-                    float size = e.get(float.class, "open_interest");
-                    ZonedDateTime date = Chrono.utcBySeconds(e.get(long.class, "timestamp"));
+                    float size = e.get(float.class, "openInterest");
+                    ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "timestamp"));
                     OpenInterest oi = OpenInterest.with.date(date).size(size);
                     return oi;
                 })
@@ -250,7 +251,7 @@ public class BybitService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Builder builder = HttpRequest.newBuilder(URI.create("https://api.bybit.com/v2/public/" + path));
+        Builder builder = HttpRequest.newBuilder(URI.create("https://api.bybit.com/v5/" + path));
 
         return Network.rest(builder, Limit, client()).retry(retryPolicy(retryMax, "Bybit RESTCall"));
     }
@@ -408,5 +409,13 @@ public class BybitService extends MarketService {
         protected void buildUnsubscribeMessage(Topic topic) {
             topic.op = "unsubscribe";
         }
+    }
+
+    public static void mai1n(String[] args) throws InterruptedException {
+        Bybit.BTC_USD.orderBook().waitForTerminate().to(x -> {
+            System.out.println(x);
+        }, e -> {
+            e.printStackTrace();
+        });
     }
 }
