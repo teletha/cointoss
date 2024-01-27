@@ -17,16 +17,12 @@ import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import trademate.order.OrderView;
 import trademate.setting.AppearanceSetting;
 import trademate.setting.BitFlyerSetting;
 import trademate.setting.NotificatorSetting;
-import trademate.verify.BackTestView;
-import viewtify.Theme;
 import viewtify.Viewtify;
 import viewtify.keys.KeyBindingSettingView;
 import viewtify.preference.PreferenceView;
-import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
@@ -56,23 +52,23 @@ public class TradeTester extends View {
         preferences
                 .manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
 
-        DockSystem.register("BackTest").contents(BackTestView.class).text(en("BackTest")).closable(false);
-        DockSystem.register("Setting").contents(preferences).text(en("Setting")).closable(false);
-        DockSystem.register("Order").contents(OrderView.class).text(en("Order")).closable(false);
-        // DockSystem.register("Summary").contents(SummaryView.class).closable(false);
-        // DockSystem.register("Global").contents(GlobalVolumeView.class).closable(false);
+        // DockSystem.register("BackTest").contentsLazy(BackTestView.class).text(en("BackTest")).closable(false);
+        DockSystem.register("Setting").contentsLazy(tab -> preferences).text(en("Setting")).closable(false);
+        // DockSystem.register("Order").contentsLazy(OrderView.class).text(en("Order")).closable(false);
+        DockSystem.register("Summary").contentsLazy(SummaryView.class).text("一覧").closable(false);
+        // DockSystem.register("Global").contentsLazy(GlobalVolumeView.class).text("流動性").closable(false);
 
         MarketServiceProvider.availableMarketServices()
                 .take(MarketService::supportHistoricalTrade)
-                .take(e -> e.exchange == Exchange.BitFlyer)
-                .skip(5)
+                .take(e -> e.exchange == Exchange.Binance)
+                .take(1)
                 .to(service -> {
-                    UITab tab = DockSystem.register(service.id)
-                            .closable(false)
-                            .text(service.id)
-                            .contentsLazy(ui -> new TradingView(ui, service));
-
-                    TradingViewCoordinator.requestLoading(service, tab);
+                    // UITab tab = DockSystem.register(service.id)
+                    // .closable(false)
+                    // .text(service.id)
+                    // .contentsLazy(ui -> new TradingView(ui, service));
+                    //
+                    // TradingViewCoordinator.requestLoading(service, tab);
                 });
 
         DockSystem.validate();
@@ -87,9 +83,11 @@ public class TradeTester extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application()
-                .error(I::error)
-                .use(Theme.Dark)
+        Viewtify.application() //
+                .error((msg, error) -> {
+                    I.error(msg);
+                    I.error(error);
+                })
                 .icon("icon/tester.png")
                 .onTerminating(EfficientWebSocket::shutdownNow)
                 .activate(TradeTester.class);

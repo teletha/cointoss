@@ -9,7 +9,7 @@
  */
 package cointoss.market.gmo;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -54,7 +54,7 @@ public class GMOService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(334, MILLISECONDS);
+    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(120, MILLISECONDS);
 
     /** The API limit. */
     private static final APILimiter REPOSITORY_LIMITER = APILimiter.with.limit(2).refresh(100, MILLISECONDS);
@@ -174,7 +174,7 @@ public class GMOService extends MarketService {
         return OrderBookChanges.byJSON(root.find("bids", "*"), root.find("asks", "*"), "price", "size");
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main2(String[] args) throws InterruptedException {
         GMO.BTC_DERIVATIVE.orderBookRealtimely(true).to(book -> {
             System.out.println(book);
         });

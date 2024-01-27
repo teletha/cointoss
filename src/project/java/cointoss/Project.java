@@ -30,6 +30,10 @@ public class Project extends bee.api.Project {
         unrequire("org.checkerframework", "checker-qual");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
+        require("io.fair-acc", "chartfx");
+        // chartfx requires old jafafx, so override it
+        require("org.openjfx", "javafx-base");
+        require("org.openjfx", "javafx-controls");
         require("org.decimal4j", "decimal4j").atTest();
         // require("org.nd4j", "nd4j-native-platform");
         // require("org.deeplearning4j", "rl4j-core");
