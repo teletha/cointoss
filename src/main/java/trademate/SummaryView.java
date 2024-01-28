@@ -13,7 +13,6 @@ import static java.util.concurrent.TimeUnit.*;
 
 import cointoss.Market;
 import cointoss.MarketType;
-import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.arithmetic.Num;
 import stylist.Style;
@@ -90,10 +89,6 @@ public class SummaryView extends View {
 
         table.query().addQuery(en("Type"), MarketType.class, m -> m.service.setting.type);
 
-        MarketServiceProvider.availableMarketServices()
-                .take(x -> x.exchange == Exchange.Bybit)
-                .on(Viewtify.WorkerThread)
-                .map(Market::of)
-                .to(table::addItemAtLast);
+        MarketServiceProvider.availableMarketServices().on(Viewtify.WorkerThread).map(Market::of).to(table::addItemAtLast);
     }
 }
