@@ -37,9 +37,6 @@ import viewtify.update.UpdateSettingView;
 @Managed(value = Singleton.class)
 public class TradeTester extends View {
 
-    private final List<View> pages = List.of(new SummaryView(), new BackTestView(), new PreferenceView()
-            .manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class));
-
     /**
      * {@inheritDoc}
      */
@@ -60,15 +57,20 @@ public class TradeTester extends View {
         // DockSystem.register("Order").contentsLazy(OrderView.class).text(en("Order")).closable(false);
         // DockSystem.register("Global").contentsLazy(GlobalVolumeView.class).text("流動性").closable(false);
 
-        MarketServiceProvider.availableMarketServices()
-                .take(MarketService::supportHistoricalTrade)
-                .take(e -> e.exchange == Exchange.Bybit)
-                .take(1)
-                .to(service -> {
-                    UITab tab = DockSystem.register(service.id).text(service.id).contentsLazy(ui -> new TradingView(ui, service));
+        DockSystem.registerLayout(() -> {
+            MarketServiceProvider.availableMarketServices()
+                    .take(MarketService::supportHistoricalTrade)
+                    .take(e -> e.exchange == Exchange.Bybit)
+                    .take(1)
+                    .to(service -> {
+                        UITab tab = DockSystem.register(service.id).text(service.id).contentsLazy(ui -> new TradingView(ui, service));
 
-                    TradingViewCoordinator.requestLoading(service, tab);
-                });
+                        TradingViewCoordinator.requestLoading(service, tab);
+                    });
+        });
+
+        List<View> pages = List.of(new SummaryView(), new BackTestView(), new PreferenceView()
+                .manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class));
 
         DockSystem.registerMenu(icon -> {
             icon.text(FontAwesome.Glyph.BARS).behaveLikeButton().context(menus -> {
@@ -82,8 +84,6 @@ public class TradeTester extends View {
                 menus.menu(en("Exit")).action(Viewtify.application()::deactivate);
             });
         });
-
-        DockSystem.validate();
     }
 
     private void buildPage(View view) {
