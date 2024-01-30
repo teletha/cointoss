@@ -21,18 +21,13 @@ import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import trademate.setting.AppearanceSetting;
-import trademate.setting.BitFlyerSetting;
-import trademate.setting.NotificatorSetting;
+import trademate.dock.TradeMateDockRegister;
+import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
-import viewtify.keys.KeyBindingSettingView;
-import viewtify.preference.PreferenceView;
-import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
-import viewtify.update.UpdateSettingView;
 
 @Managed(value = Singleton.class)
 public class TradeTester extends View {
@@ -54,28 +49,28 @@ public class TradeTester extends View {
      */
     @Override
     protected void initialize() {
+        TradeMateDockRegister docks = I.make(TradeMateDockRegister.class);
+
         // DockSystem.register("Order").contentsLazy(OrderView.class).text(en("Order")).closable(false);
         // DockSystem.register("Global").contentsLazy(GlobalVolumeView.class).text("流動性").closable(false);
 
         DockSystem.registerLayout(() -> {
+            docks.registerIndependentViews();
+
             MarketServiceProvider.availableMarketServices()
                     .take(MarketService::supportHistoricalTrade)
                     .take(e -> e.exchange == Exchange.Bybit)
                     .take(1)
-                    .to(service -> {
-                        UITab tab = DockSystem.register(service.id).text(service.id).contentsLazy(ui -> new TradingView(ui, service));
-
-                        TradingViewCoordinator.requestLoading(service, tab);
-                    });
+                    .to(docks::trade);
         });
 
-        List<View> pages = List.of(new SummaryView(), new BackTestView(), new PreferenceView()
-                .manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class));
+        List<View> pages = List.of(new SummaryView(), new BackTestView(), new SettingView());
 
         DockSystem.registerMenu(icon -> {
             icon.text(FontAwesome.Glyph.BARS).behaveLikeButton().context(menus -> {
                 menus.menu(en("Open new page"), views -> {
-                    for (View page : pages) {
+
+                    for (View page : docks.queryIndependentViews()) {
                         views.menu(page.title()).disableWhen(DockSystem.isOpened(page.id())).action(() -> buildPage(page));
                     }
                 });
