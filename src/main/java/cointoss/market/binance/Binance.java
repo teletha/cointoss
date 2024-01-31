@@ -12,6 +12,7 @@ package cointoss.market.binance;
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
@@ -112,6 +113,14 @@ public final class Binance extends MarketServiceProvider {
     // .base(Currency.USD.minimumSize(0.1))
     // .priceRangeModifier(500)
     // .acquirableExecutionSize(AcquirableSize));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.Binance;
+    }
 
     /**
      * {@inheritDoc}

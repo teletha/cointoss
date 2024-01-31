@@ -14,23 +14,23 @@ import trademate.GlobalVolumeView;
 import trademate.SummaryView;
 import trademate.TradingView;
 import trademate.TradingViewCoordinator;
-import trademate.setting.SettingView;
+import trademate.setting.TradeMatePreferenceView;
 import viewtify.ui.UITab;
 import viewtify.ui.dock.DockRegister;
 import viewtify.ui.dock.DockSystem;
 
 public class TradeMateDockRegister extends DockRegister {
 
-    public void volumes() {
-        register(new GlobalVolumeView());
+    public void volumes(GlobalVolumeView view) {
+        register(view);
     }
 
-    public void summary() {
-        register(new SummaryView());
+    public void summary(SummaryView view) {
+        register(view);
     }
 
-    public void setting() {
-        register(new SettingView());
+    public void setting(TradeMatePreferenceView view) {
+        register(view);
     }
 
     public void trade(MarketService service) {

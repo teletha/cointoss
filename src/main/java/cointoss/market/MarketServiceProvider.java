@@ -10,6 +10,7 @@
 package cointoss.market;
 
 import java.lang.reflect.Modifier;
+import java.util.Comparator;
 import java.util.List;
 
 import cointoss.Market;
@@ -32,6 +33,7 @@ public abstract class MarketServiceProvider implements Extensible {
             .take(field -> MarketService.class.isAssignableFrom(field.getType()))
             .map(field -> field.get(null))
             .as(MarketService.class)
+            .sort(Comparator.comparing(x -> x.marketName))
             .toList();
 
     /**
@@ -50,6 +52,13 @@ public abstract class MarketServiceProvider implements Extensible {
     }
 
     /**
+     * Get the associated {@link Exchange}.
+     * 
+     * @return
+     */
+    public abstract Exchange exchange();
+
+    /**
      * Get the market account infomation.
      * 
      * @return
@@ -62,7 +71,7 @@ public abstract class MarketServiceProvider implements Extensible {
      * @return
      */
     public static final Signal<MarketServiceProvider> availableProviders() {
-        return I.signal(I.find(MarketServiceProvider.class));
+        return I.signal(I.find(MarketServiceProvider.class)).sort(Comparator.comparing(MarketServiceProvider::exchange));
     }
 
     /**

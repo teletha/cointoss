@@ -12,6 +12,7 @@ package cointoss.market.bitmex;
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
@@ -36,6 +37,14 @@ public final class BitMex extends MarketServiceProvider {
             .target(Currency.XRP.minimumSize(0.00001))
             .base(Currency.USD.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.BitMEX;
+    }
 
     /**
      * {@inheritDoc}

@@ -12,6 +12,7 @@ package cointoss.market.huobi;
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
@@ -25,6 +26,14 @@ public final class Huobi extends MarketServiceProvider {
             .target(Currency.BTC.minimumSize(0.000001))
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.Huobi;
+    }
 
     /**
      * {@inheritDoc}

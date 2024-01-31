@@ -14,6 +14,7 @@ import java.util.function.UnaryOperator;
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.arithmetic.Num;
@@ -74,6 +75,14 @@ public final class Bitbank extends MarketServiceProvider {
             .makerFee(making)
             .baseWithdrawingFee(withdrawJPY)
             .targetWithdrawingFee(size -> Num.of("0.15")));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.BitBank;
+    }
 
     /**
      * {@inheritDoc}

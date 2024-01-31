@@ -22,7 +22,7 @@ import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import trademate.dock.TradeMateDockRegister;
-import trademate.setting.SettingView;
+import trademate.setting.TradeMatePreferenceView;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
 import viewtify.ui.View;
@@ -55,24 +55,36 @@ public class TradeTester extends View {
         // DockSystem.register("Global").contentsLazy(GlobalVolumeView.class).text("流動性").closable(false);
 
         DockSystem.registerLayout(() -> {
-            docks.registerIndependentViews();
-
-            MarketServiceProvider.availableMarketServices()
-                    .take(MarketService::supportHistoricalTrade)
-                    .take(e -> e.exchange == Exchange.Bybit)
-                    .take(1)
-                    .to(docks::trade);
+            DockSystem.register("Order", tab -> tab);
         });
+        MarketServiceProvider.availableMarketServices()
+                .take(MarketService::supportHistoricalTrade)
+                .take(e -> e.exchange == Exchange.Bybit)
+                .take(1)
+                .to(docks::trade);
 
-        List<View> pages = List.of(new SummaryView(), new BackTestView(), new SettingView());
+        List<View> pages = List.of(new SummaryView(), new BackTestView(), new TradeMatePreferenceView());
 
         DockSystem.registerMenu(icon -> {
             icon.text(FontAwesome.Glyph.BARS).behaveLikeButton().context(menus -> {
                 menus.menu(en("Open new page"), views -> {
-
-                    for (View page : docks.queryIndependentViews()) {
-                        views.menu(page.title()).disableWhen(DockSystem.isOpened(page.id())).action(() -> buildPage(page));
-                    }
+                    // for (View page : docks.queryIndependentViews()) {
+                    // views.menu(page.title()).disableWhen(DockSystem.isOpened(page.id())).action(()
+                    // -> buildPage(page));
+                    // }
+                });
+                menus.menu(en("Open market"), sub -> {
+                    MarketServiceProvider.availableProviders().to(provider -> {
+                        sub.menu(provider.exchange().name(), nest -> {
+                            provider.markets().forEach(market -> {
+                                nest.menu(market.marketName).disableWhen(DockSystem.isOpened(market.id)).action(() -> {
+                                    DockSystem.register(market.id)
+                                            .text(market.formattedId)
+                                            .contentsLazy(tab -> new TradingView(tab, market));
+                                });
+                            });
+                        });
+                    });
                 });
                 menus.separator();
                 menus.menu(en("Reboot")).action(Viewtify.application()::reactivate);

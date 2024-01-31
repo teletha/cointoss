@@ -14,6 +14,7 @@ import java.util.function.UnaryOperator;
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.arithmetic.Num;
@@ -79,6 +80,14 @@ public final class GMO extends MarketServiceProvider {
             .target(Currency.XRP.minimumSize(10))
             .base(Currency.JPY.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.GMO;
+    }
 
     /**
      * {@inheritDoc}

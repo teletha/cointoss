@@ -14,6 +14,7 @@ import java.util.function.UnaryOperator;
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.arithmetic.Num;
@@ -33,6 +34,14 @@ public final class Coincheck extends MarketServiceProvider {
             .acquirableExecutionSize(AcquirableSize)
             .targetWithdrawingFee(size -> Num.of("0.001"))
             .baseWithdrawingFee(withdrawJPY));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.Coincheck;
+    }
 
     /**
      * {@inheritDoc}

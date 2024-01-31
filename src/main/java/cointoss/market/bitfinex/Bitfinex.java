@@ -12,6 +12,7 @@ package cointoss.market.bitfinex;
 import cointoss.Currency;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
@@ -52,6 +53,14 @@ public final class Bitfinex extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.01))
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.Bitfinex;
+    }
 
     /**
      * {@inheritDoc}

@@ -9,6 +9,7 @@
  */
 package cointoss.market.ftx;
 
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
@@ -178,6 +179,14 @@ final class FTX extends MarketServiceProvider {
     // .target(Currency.ETH.minimumSize(0.001))
     // .base(Currency.USD.minimumSize(0.1))
     // .acquirableExecutionSize(AcquirableSize));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.FTX;
+    }
 
     /**
      * {@inheritDoc}

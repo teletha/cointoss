@@ -11,11 +11,21 @@ package trademate.setting;
 
 import viewtify.keys.KeyBindingSettingView;
 import viewtify.preference.PreferenceView;
+import viewtify.ui.dock.DockSystem;
+import viewtify.ui.dock.Dockable;
 import viewtify.update.UpdateSettingView;
 
-public class SettingView extends PreferenceView {
+public class TradeMatePreferenceView extends PreferenceView implements Dockable {
 
-    public SettingView() {
+    public TradeMatePreferenceView() {
         manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void registerDock() {
+        DockSystem.register(id()).text(title()).contentsLazy(tab -> this);
     }
 }

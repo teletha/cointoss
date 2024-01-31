@@ -16,6 +16,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionDeltaLogger;
+import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.arithmetic.Num;
@@ -87,6 +88,14 @@ public final class BitFlyer extends MarketServiceProvider {
             .takerFee(size -> size.multiply("0.0001"))
             .targetWithdrawingFee(size -> Num.of("0.005"))
             .baseWithdrawingFee(JPYWithdrawFee));
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Exchange exchange() {
+        return Exchange.BitFlyer;
+    }
 
     /**
      * {@inheritDoc}
