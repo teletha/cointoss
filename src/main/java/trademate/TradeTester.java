@@ -9,24 +9,19 @@
  */
 package trademate;
 
-import java.util.List;
-
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
-import cointoss.MarketService;
-import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import trademate.dock.TradeMateDockRegister;
-import trademate.setting.TradeMatePreferenceView;
-import trademate.verify.BackTestView;
 import viewtify.Viewtify;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.dock.DockItem;
 import viewtify.ui.dock.DockSystem;
 
 @Managed(value = Singleton.class)
@@ -51,36 +46,25 @@ public class TradeTester extends View {
     protected void initialize() {
         TradeMateDockRegister docks = I.make(TradeMateDockRegister.class);
 
-        // DockSystem.register("Order").contentsLazy(OrderView.class).text(en("Order")).closable(false);
-        // DockSystem.register("Global").contentsLazy(GlobalVolumeView.class).text("流動性").closable(false);
-
         DockSystem.registerLayout(() -> {
-            DockSystem.register("Order", tab -> tab);
+            docks.summary();
+            docks.volumes();
+            docks.tester();
         });
-        MarketServiceProvider.availableMarketServices()
-                .take(MarketService::supportHistoricalTrade)
-                .take(e -> e.exchange == Exchange.Bybit)
-                .take(1)
-                .to(docks::trade);
-
-        List<View> pages = List.of(new SummaryView(), new BackTestView(), new TradeMatePreferenceView());
 
         DockSystem.registerMenu(icon -> {
             icon.text(FontAwesome.Glyph.BARS).behaveLikeButton().context(menus -> {
                 menus.menu(en("Open new page"), views -> {
-                    // for (View page : docks.queryIndependentViews()) {
-                    // views.menu(page.title()).disableWhen(DockSystem.isOpened(page.id())).action(()
-                    // -> buildPage(page));
-                    // }
+                    for (DockItem item : docks.queryIndependentDocks()) {
+                        menus.menu(item.title).disableWhen(DockSystem.isOpened(item.id)).action(item.registration);
+                    }
                 });
                 menus.menu(en("Open market"), sub -> {
                     MarketServiceProvider.availableProviders().to(provider -> {
                         sub.menu(provider.exchange().name(), nest -> {
-                            provider.markets().forEach(market -> {
-                                nest.menu(market.marketName).disableWhen(DockSystem.isOpened(market.id)).action(() -> {
-                                    DockSystem.register(market.id)
-                                            .text(market.formattedId)
-                                            .contentsLazy(tab -> new TradingView(tab, market));
+                            provider.markets().forEach(service -> {
+                                nest.menu(service.marketName).disableWhen(DockSystem.isOpened(service.id)).action(() -> {
+                                    docks.trade(service);
                                 });
                             });
                         });
@@ -91,11 +75,6 @@ public class TradeTester extends View {
                 menus.menu(en("Exit")).action(Viewtify.application()::deactivate);
             });
         });
-    }
-
-    private void buildPage(View view) {
-        DockSystem.register(view.id()).text(view.title()).contentsLazy(tab -> view);
-        DockSystem.select(view.id());
     }
 
     /**
