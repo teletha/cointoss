@@ -13,9 +13,9 @@ import viewtify.keys.KeyBindingSettingView;
 import viewtify.preference.PreferenceView;
 import viewtify.update.UpdateSettingView;
 
-public class TradeMatePreferenceView extends PreferenceView {
+public class SettingView extends PreferenceView {
 
-    public TradeMatePreferenceView() {
+    public SettingView() {
         manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
     }
 }
