@@ -27,29 +27,36 @@ import viewtify.ui.UITab;
 import viewtify.ui.dock.DockItem;
 import viewtify.ui.dock.DockRegister;
 import viewtify.ui.dock.DockSystem;
+import viewtify.ui.dock.DockType;
 
 public class TradeMateDockRegister extends DockRegister {
 
+    @DockType(OrderView.class)
     public void order() {
         register(OrderView.class);
     }
 
+    @DockType(BackTestView.class)
     public void tester() {
         register(BackTestView.class);
     }
 
+    @DockType(GlobalVolumeView.class)
     public void volumes() {
         register(GlobalVolumeView.class);
     }
 
+    @DockType(SummaryView.class)
     public void summary() {
         register(SummaryView.class);
     }
 
+    @DockType(SettingView.class)
     public void setting() {
         register(SettingView.class);
     }
 
+    @DockType(TradingView.class)
     public void trade(MarketService service) {
         UITab tab = DockSystem.register("Trade " + service.id).text(service.id).contentsLazy(ui -> new TradingView(ui, service));
 
