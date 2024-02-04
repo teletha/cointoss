@@ -14,7 +14,7 @@ import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import trademate.dock.TradeMateDockRegister;
+import trademate.dock.TradeMateDockProvider;
 import viewtify.Viewtify;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -40,7 +40,7 @@ public class TradeTester extends View {
      */
     @Override
     protected void initialize() {
-        TradeMateDockRegister docks = I.make(TradeMateDockRegister.class);
+        TradeMateDockProvider docks = I.make(TradeMateDockProvider.class);
 
         docks.registerLayout();
         docks.registerMenu();

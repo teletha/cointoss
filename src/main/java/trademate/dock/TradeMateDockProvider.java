@@ -14,7 +14,6 @@ import org.controlsfx.glyphfont.FontAwesome;
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
-import kiss.Variable;
 import trademate.GlobalVolumeView;
 import trademate.SummaryView;
 import trademate.TradingView;
@@ -23,61 +22,28 @@ import trademate.order.OrderView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
-import viewtify.ui.UITab;
-import viewtify.ui.dock.DockItem;
-import viewtify.ui.dock.DockRegister;
+import viewtify.ui.dock.Dock;
+import viewtify.ui.dock.DockProvider;
 import viewtify.ui.dock.DockSystem;
-import viewtify.ui.dock.DockType;
+import viewtify.ui.dock.TypedDock;
 
-public class TradeMateDockRegister extends DockRegister {
+public class TradeMateDockProvider extends DockProvider {
 
-    @DockType(OrderView.class)
-    public void order() {
-        register(OrderView.class);
-    }
+    public final Dock order = Dock.of(OrderView.class);
 
-    @DockType(BackTestView.class)
-    public void tester() {
-        register(BackTestView.class);
-    }
+    public final Dock tester = Dock.of(BackTestView.class);
 
-    @DockType(GlobalVolumeView.class)
-    public void volumes() {
-        register(GlobalVolumeView.class);
-    }
+    public final Dock volumes = Dock.of(GlobalVolumeView.class);
 
-    @DockType(SummaryView.class)
-    public void summary() {
-        register(SummaryView.class);
-    }
+    public final Dock summary = Dock.of(SummaryView.class);
 
-    @DockType(SettingView.class)
-    public void setting() {
-        register(SettingView.class);
-    }
+    public final Dock setting = Dock.of(SettingView.class);
 
-    @DockType(TradingView.class)
-    public void trade(MarketService service) {
-        UITab tab = DockSystem.register("Trade " + service.id).text(service.id).contentsLazy(ui -> new TradingView(ui, service));
+    public final TypedDock<MarketService> trade = TypedDock.<MarketService> with().id("Trade").registration((tab, service) -> {
+        tab.text(service.id).contentsLazy(ui -> new TradingView(tab, service));
 
         TradingViewCoordinator.requestLoading(service, tab);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean queryBy(String id) {
-        if (id.startsWith("Trade ")) {
-            Variable<MarketService> service = MarketServiceProvider.by(id.substring(6));
-            if (service.isPresent()) {
-                trade(service.exact());
-                return true;
-            }
-        }
-
-        return super.queryBy(id);
-    }
+    });
 
     /**
      * Register dock menu.
@@ -86,8 +52,8 @@ public class TradeMateDockRegister extends DockRegister {
         DockSystem.registerMenu(icon -> {
             icon.text(FontAwesome.Glyph.BARS).behaveLikeButton().context(menus -> {
                 menus.menu(I.translate("Open new page"), sub -> {
-                    for (DockItem item : queryIndependentDocks()) {
-                        sub.menu(item.title()).disableWhen(DockSystem.isOpened(item.id())).action(item.registration());
+                    for (Dock item : queryIndependentDocks()) {
+                        sub.menu(item.title()).disableWhen(DockSystem.isOpened(item.id())).action(item::register);
                     }
                 });
                 menus.menu(I.translate("Open market"), sub -> {
@@ -95,7 +61,7 @@ public class TradeMateDockRegister extends DockRegister {
                         sub.menu(provider.exchange().name(), nest -> {
                             provider.markets().forEach(service -> {
                                 nest.menu(service.marketName).disableWhen(DockSystem.isOpened("Trade " + service.id)).action(() -> {
-                                    trade(service);
+                                    trade.register(service);
                                 });
                             });
                         });
@@ -113,9 +79,9 @@ public class TradeMateDockRegister extends DockRegister {
      */
     public void registerLayout() {
         DockSystem.initializeLayout(() -> {
-            tester();
-            volumes();
-            summary();
+            tester.register();
+            volumes.register();
+            summary.register();
         });
     }
 }
