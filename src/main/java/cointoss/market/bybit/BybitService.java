@@ -55,7 +55,7 @@ public class BybitService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bybit.com/realtime")
+    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bybit.com/v5/public/spot")
             .extractId(json -> json.text("topic"));
 
     /**
@@ -101,11 +101,11 @@ public class BybitService extends MarketService {
     protected Signal<Execution> connectExecutionRealtimely() {
         long[] context = new long[3];
 
-        return clientRealtimely().subscribe(new Topic("trade", marketName)).flatIterable(json -> json.find("data", "*")).map(e -> {
-            Direction side = e.get(Direction.class, "side");
-            Num price = e.get(Num.class, "price");
-            Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
-            ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("trade_time_ms")));
+        return clientRealtimely().subscribe(new Topic("publicTrade", marketName)).flatIterable(json -> json.find("data", "*")).map(e -> {
+            Direction side = e.get(Direction.class, "S");
+            Num price = e.get(Num.class, "p");
+            Num size = e.get(Num.class, "v").divide(price).scale(setting.target.scale);
+            ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
 
             return Support.createExecution(side, size, price, date, context);
         });
@@ -168,7 +168,7 @@ public class BybitService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("orderBook_200.100ms", marketName)).map(pages -> {
+        return clientRealtimely().subscribe(new Topic("orderbook.200", marketName)).map(pages -> {
             if (pages.text("type").charAt(0) == 's') {
                 // snapshot at first response
                 return convertOrderBook(pages.find("data", "*"));
@@ -177,6 +177,16 @@ public class BybitService extends MarketService {
                 return convertOrderBook(pages.find("data", "*", "*"));
             }
         });
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Bybit.BTC_USDT.executionsRealtimely().to(x -> {
+            System.out.println(x);
+        }, e -> {
+            e.printStackTrace();
+        });
+
+        Thread.sleep(1000 * 30);
     }
 
     /**
@@ -390,16 +400,7 @@ public class BybitService extends MarketService {
          */
         @Override
         protected boolean verifySubscribedReply(JSON reply) {
-            if (reply.text("success").equals("true")) {
-                JSON req = reply.get("request");
-                if (req.text("op").equals("subscribe")) {
-                    List<JSON> channel = req.find("args", "0");
-                    if (channel.size() == 1) {
-                        return channel.get(0).as(String.class).equals(args.get(0));
-                    }
-                }
-            }
-            return false;
+            return reply.text("success").equals("true") && reply.text("op").equals("subscribe");
         }
 
         /**
@@ -409,13 +410,5 @@ public class BybitService extends MarketService {
         protected void buildUnsubscribeMessage(Topic topic) {
             topic.op = "unsubscribe";
         }
-    }
-
-    public static void mai1n(String[] args) throws InterruptedException {
-        Bybit.BTC_USD.orderBook().waitForTerminate().to(x -> {
-            System.out.println(x);
-        }, e -> {
-            e.printStackTrace();
-        });
     }
 }

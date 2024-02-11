@@ -76,7 +76,6 @@ public class ExecutionView extends View {
     @Override
     protected void initialize() {
         view.market.tickers.latest.observe()
-                .switchOff(view.isLoading())
                 .switchOn(view.tab.isSelecting())
                 .throttle(1000, TimeUnit.MILLISECONDS)
                 .on(Viewtify.UIThread)

@@ -44,7 +44,7 @@ class SearchNearestExecutionTest {
     @Test
     @Timeout(value = 15)
     void bybit() {
-        assert Bybit.BTC_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 16067808009190000L;
+        assert Bybit.BTC_USDT.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 16067808009190000L;
     }
 
     @Test

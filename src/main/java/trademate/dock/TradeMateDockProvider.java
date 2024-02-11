@@ -15,7 +15,6 @@ import kiss.I;
 import trademate.GlobalVolumeView;
 import trademate.SummaryView;
 import trademate.TradingView;
-import trademate.TradingViewCoordinator;
 import trademate.order.OrderView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
@@ -39,8 +38,6 @@ public class TradeMateDockProvider extends DockProvider {
 
     public final TypedDock<MarketService> trade = TypedDock.<MarketService> with().id("Trade").registration((tab, service) -> {
         tab.text(service.id).contentsLazy(ui -> new TradingView(tab, service));
-
-        TradingViewCoordinator.requestLoading(service, tab);
     });
 
     /**

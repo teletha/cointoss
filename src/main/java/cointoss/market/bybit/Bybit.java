@@ -22,25 +22,25 @@ public final class Bybit extends MarketServiceProvider {
     /** Limitation */
     static final int AcquirableSize = 1000;
 
-    public static final MarketService BTC_USD = new BybitService("BTCUSD", MarketSetting.with.derivative()
+    public static final MarketService BTC_USDT = new BybitService("BTCUSDT", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(1).scale(5))
-            .base(Currency.USD.minimumSize(0.5))
+            .base(Currency.USDT.minimumSize(0.5))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService EOS_USD = new BybitService("EOSUSD", MarketSetting.with.derivative()
+    public static final MarketService EOS_USDT = new BybitService("EOSUSDT", MarketSetting.with.derivative()
             .target(Currency.EOS.minimumSize(1).scale(5))
-            .base(Currency.USD.minimumSize(0.001))
+            .base(Currency.USDT.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService ETH_USD = new BybitService("ETHUSD", MarketSetting.with.derivative()
+    public static final MarketService ETH_USDT = new BybitService("ETHUSDT", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(1).scale(5))
-            .base(Currency.USD.minimumSize(0.05))
+            .base(Currency.USDT.minimumSize(0.05))
             .priceRangeModifier(20)
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService XRP_USD = new BybitService("XRPUSD", MarketSetting.with.derivative()
+    public static final MarketService XRP_USDT = new BybitService("XRPUSDT", MarketSetting.with.derivative()
             .target(Currency.XRP.minimumSize(1).scale(5))
-            .base(Currency.USD.minimumSize(0.0001))
+            .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
     /**

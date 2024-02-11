@@ -45,7 +45,7 @@ public class BitfinexService extends MarketService {
     private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The API limit. */
-    private static final APILimiter LimitForREST = APILimiter.with.limit(20).refresh(Duration.ofMinutes(1));
+    private static final APILimiter LimitForREST = APILimiter.with.limit(12).refresh(Duration.ofMinutes(1));
 
     /** The realtiem communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api-pub.bitfinex.com/ws/2")

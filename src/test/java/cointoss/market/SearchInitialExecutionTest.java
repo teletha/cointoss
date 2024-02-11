@@ -36,7 +36,7 @@ class SearchInitialExecutionTest {
     @Test
     @Timeout(value = 10)
     void bybit() {
-        assert Bybit.BTC_USD.searchInitialExecution().waitForTerminate().to().exact().id == 15698880007190000L;
+        assert Bybit.BTC_USDT.searchInitialExecution().waitForTerminate().to().exact().id == 15698880007190000L;
     }
 
     @Test
