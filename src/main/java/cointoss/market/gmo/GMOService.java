@@ -54,7 +54,7 @@ public class GMOService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(125, MILLISECONDS);
+    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(200, MILLISECONDS);
 
     /** The API limit. */
     private static final APILimiter REPOSITORY_LIMITER = APILimiter.with.limit(2).refresh(100, MILLISECONDS);

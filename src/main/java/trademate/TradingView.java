@@ -15,6 +15,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
+import cointoss.util.Coordinator;
 import cointoss.util.arithmetic.Primitives;
 import kiss.Disposable;
 import stylist.Style;
@@ -87,8 +88,13 @@ public class TradingView extends View {
         tab.style("multiline");
 
         Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
-        chart.market.set(market);
-        updateTab();
+
+        chart.showRealtimeUpdate.set(false);
+        Coordinator.invokeOnFinish(service, () -> {
+            chart.market.set(market);
+            chart.showRealtimeUpdate.set(true);
+            updateTab();
+        });
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));
     }

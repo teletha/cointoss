@@ -9,34 +9,48 @@
  */
 package cointoss.util;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cointoss.MarketService;
+import cointoss.market.Exchange;
+import kiss.I;
 import kiss.WiseConsumer;
+import kiss.WiseRunnable;
+import kiss.Ⅱ;
 import trademate.TradeMate;
 
 public class Coordinator {
 
     /** The waiting queue for each keys. */
-    private static final ConcurrentHashMap<Object, Coordinator> coordinators = new ConcurrentHashMap();
+    private static final ConcurrentHashMap<Exchange, Coordinator> coordinators = new ConcurrentHashMap();
+
+    private static final ConcurrentHashMap<MarketService, List<WiseRunnable>> finishers = new ConcurrentHashMap();
 
     /**
      * Register the specified market in the loading queue.
      * 
-     * @param key
+     * @param service
      * @param task
      */
-    public static void request(Object key, WiseConsumer<Runnable> task) {
-        Coordinator coodinator = coordinators.computeIfAbsent(key, k -> new Coordinator());
-        coodinator.tasks.add(task);
+    public static void request(MarketService service, WiseConsumer<Runnable> task) {
+        Coordinator coodinator = coordinators.computeIfAbsent(service.exchange, k -> new Coordinator());
+        coodinator.tasks.add(I.pair(service, task, new ArrayList()));
         coodinator.tryProcess();
     }
 
+    public static void invokeOnFinish(MarketService service, WiseRunnable finisher) {
+        List<WiseRunnable> list = finishers.computeIfAbsent(service, key -> new ArrayList());
+        list.add(finisher);
+    }
+
     /** The waiting list. */
-    private final LinkedList<WiseConsumer<Runnable>> tasks = new LinkedList();
+    private final LinkedList<Ⅱ<MarketService, WiseConsumer<Runnable>>> tasks = new LinkedList();
 
     /** The current processing task. */
-    private WiseConsumer<Runnable> processing;
+    private Ⅱ<MarketService, WiseConsumer<Runnable>> processing;
 
     /**
      * Hide constructor.
@@ -51,7 +65,12 @@ public class Coordinator {
     private synchronized void tryProcess() {
         if (processing == null && !tasks.isEmpty()) {
             processing = tasks.remove(0);
-            processing.accept(() -> {
+            processing.ⅱ.accept(() -> {
+                List<WiseRunnable> list = finishers.get(processing.ⅰ);
+                if (list != null) {
+                    list.forEach(WiseRunnable::run);
+                    finishers.remove(processing.ⅰ);
+                }
                 processing = null;
                 tryProcess();
             });

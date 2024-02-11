@@ -93,7 +93,7 @@ public class SummaryView extends View {
 
         MarketServiceProvider.availableMarketServices().map(Market::of).on(Viewtify.WorkerThread).to(market -> {
             table.addItemAtLast(market);
-            Coordinator.request(market.service.exchange, next -> {
+            Coordinator.request(market.service, next -> {
                 market.readLog(log -> log.fromLast(7, LogType.Fast));
                 next.run();
             });
