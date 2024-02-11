@@ -11,6 +11,7 @@ package trademate.dock;
 
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
+import kiss.I;
 import trademate.GlobalVolumeView;
 import trademate.SummaryView;
 import trademate.TradingView;
@@ -18,8 +19,10 @@ import trademate.TradingViewCoordinator;
 import trademate.order.OrderView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
+import viewtify.ui.UIContextMenu;
 import viewtify.ui.dock.Dock;
 import viewtify.ui.dock.DockProvider;
+import viewtify.ui.dock.DockSystem;
 import viewtify.ui.dock.TypedDock;
 
 public class TradeMateDockProvider extends DockProvider {
@@ -39,4 +42,22 @@ public class TradeMateDockProvider extends DockProvider {
 
         TradingViewCoordinator.requestLoading(service, tab);
     }).showOnInitial(MarketServiceProvider.by("Binance BTCUSDT").exact());
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void hookMenu(UIContextMenu menus) {
+        menus.menu(I.translate("Open market"), sub -> {
+            MarketServiceProvider.availableProviders().to(provider -> {
+                sub.menu(provider.exchange().name(), nest -> {
+                    provider.markets().forEach(service -> {
+                        nest.menu(service.marketName).disableWhen(DockSystem.isOpened("Trade " + service.id)).action(() -> {
+                            trade.show(service);
+                        });
+                    });
+                });
+            });
+        });
+    }
 }
