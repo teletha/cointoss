@@ -31,7 +31,7 @@ public class TradeMateDockProvider extends DockProvider {
 
     public final Dock tester = Dock.with.view(BackTestView.class).showOnInitial();
 
-    public final Dock volumes = Dock.with.view(GlobalVolumeView.class).showOnInitial().location(loc -> loc.left().ratio(0.3));
+    public final Dock volumes = Dock.with.view(GlobalVolumeView.class).showOnInitial();
 
     public final Dock summary = Dock.with.view(SummaryView.class).showOnInitial();
 
@@ -41,7 +41,7 @@ public class TradeMateDockProvider extends DockProvider {
         tab.text(service.id).contentsLazy(ui -> new TradingView(tab, service));
 
         TradingViewCoordinator.requestLoading(service, tab);
-    }).showOnInitial(MarketServiceProvider.by("Binance BTCUSDT").exact());
+    });
 
     /**
      * {@inheritDoc}
@@ -51,7 +51,7 @@ public class TradeMateDockProvider extends DockProvider {
         menus.menu(I.translate("Open market"), sub -> {
             MarketServiceProvider.availableProviders().to(provider -> {
                 sub.menu(provider.exchange().name(), nest -> {
-                    provider.markets().forEach(service -> {
+                    provider.markets().stream().filter(MarketService::supportHistoricalTrade).forEach(service -> {
                         nest.menu(service.marketName).disableWhen(DockSystem.isOpened("Trade " + service.id)).action(() -> {
                             trade.show(service);
                         });

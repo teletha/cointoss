@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Random;
 
 import cointoss.Market;
-import cointoss.MarketService;
-import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
@@ -22,19 +20,10 @@ import kiss.Managed;
 import kiss.Signal;
 import kiss.Singleton;
 import psychopath.Locator;
-import trademate.order.OrderView;
-import trademate.setting.AppearanceSetting;
-import trademate.setting.BitFlyerSetting;
-import trademate.setting.NotificatorSetting;
-import trademate.verify.BackTestView;
 import viewtify.Viewtify;
-import viewtify.keys.KeyBindingSettingView;
-import viewtify.preference.PreferenceView;
-import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
-import viewtify.update.UpdateSettingView;
 
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
@@ -56,24 +45,7 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        PreferenceView preferences = new PreferenceView();
-        preferences
-                .manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
-
-        DockSystem.register("Setting").contents(preferences).closable(false).text(en("Setting"));
-        DockSystem.register("BackTest").contents(BackTestView.class).closable(false).text(en("Back Test"));
-        DockSystem.register("Global Volume").contents(GlobalVolumeView.class).closable(false).text(en("Global Volume"));
-        DockSystem.register("Order").contents(OrderView.class).closable(false).text(en("Order"));
-
-        // ========================================================
-        // Create Tab for each Markets
-        // ========================================================
-        MarketServiceProvider.availableMarketServices().take(MarketService::supportHistoricalTrade).to(service -> {
-            UITab tab = DockSystem.register(service.id).closable(false).text(service.id).contentsLazy(ui -> new TradingView(ui, service));
-
-            TradingViewCoordinator.requestLoading(service, tab);
-        });
-        DockSystem.validate();
+        DockSystem.initialize();
 
         // ========================================================
         // Clock in Title bar

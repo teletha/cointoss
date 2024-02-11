@@ -180,12 +180,12 @@ public class HuobiService extends MarketService {
         });
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Huobi.BTC_USDT.orderBook().to(e -> {
-            System.out.println(e);
-        });
-        Thread.sleep(1000 * 5);
-    }
+    // public static void main(String[] args) throws InterruptedException {
+    // Huobi.BTC_USDT.orderBook().to(e -> {
+    // System.out.println(e);
+    // });
+    // Thread.sleep(1000 * 5);
+    // }
 
     /**
      * {@inheritDoc}

@@ -9,9 +9,6 @@
  */
 package cointoss.market.huobi;
 
-import cointoss.Currency;
-import cointoss.MarketService;
-import cointoss.MarketSetting;
 import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
@@ -22,10 +19,11 @@ public final class Huobi extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 1000;
 
-    public static final MarketService BTC_USDT = new HuobiService("btcusdt", MarketSetting.with.derivative()
-            .target(Currency.BTC.minimumSize(0.000001))
-            .base(Currency.USDT.minimumSize(0.01))
-            .acquirableExecutionSize(AcquirableSize));
+    // public static final MarketService BTC_USDT = new HuobiService("btcusdt",
+    // MarketSetting.with.derivative()
+    // .target(Currency.BTC.minimumSize(0.000001))
+    // .base(Currency.USDT.minimumSize(0.01))
+    // .acquirableExecutionSize(AcquirableSize));
 
     /**
      * {@inheritDoc}

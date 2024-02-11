@@ -491,7 +491,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public RetryPolicy retryPolicy(int max, String name) {
         return RetryPolicy.with.limit(max)
-                .delay(x -> Duration.ofSeconds(x < 30 ? x * x : 900))
+                .delay(x -> Duration.ofSeconds(x < 30 ? (x + 1) * (x + 1) : 900))
                 .scheduler(scheduler())
                 .name(name == null || name.length() == 0 ? null : id + " : " + name);
     }
