@@ -78,6 +78,6 @@ abstract class TrailingModel {
 
     @Icy.Overload("update")
     private Function<Market, Signal<Num>> update(Span span) {
-        return market -> market.open(span).map(tick -> Num.of(tick.openPrice));
+        return market -> market.tickers.on(span).open.map(tick -> Num.of(tick.openPrice));
     }
 }

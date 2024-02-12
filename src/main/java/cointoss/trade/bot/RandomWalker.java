@@ -31,7 +31,7 @@ public class RandomWalker extends Trader {
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        when(market.open(Hour4), x -> trade(new Scenario() {
+        when(market.tickers.on(Hour4).open, x -> trade(new Scenario() {
 
             @Override
             protected void entry() {

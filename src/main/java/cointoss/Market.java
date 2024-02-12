@@ -308,36 +308,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Shortcut method for {@link Tick} open timing.
-     * 
-     * @param span A target time span.
-     * @return A tick stream.
-     */
-    public final Signal<Tick> open(Span span) {
-        return tickers.on(span).open;
-    }
-
-    /**
-     * Shortcut method for {@link Tick} close timing.
-     * 
-     * @param span A target time span.
-     * @return A tick stream.
-     */
-    public final Signal<Tick> close(Span span) {
-        return tickers.on(span).close;
-    }
-
-    /**
-     * Shortcut method for {@link Tick} timing.
-     * 
-     * @param span A target time span.
-     * @return A tick stream.
-     */
-    public final Ticker ticker(Span span) {
-        return tickers.on(span);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

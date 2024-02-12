@@ -34,7 +34,7 @@ public class CrossOrder extends Trader {
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        when(market.open(span), v -> trade(new Scenario() {
+        when(market.tickers.on(span).open, v -> trade(new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.random(), size);
