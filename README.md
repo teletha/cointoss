@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://docs.oracle.com/en/java/javase/19/"><img src="https://img.shields.io/badge/Java-Release%2019-green"/></a>
+    <a href="https://docs.oracle.com/en/java/javase/21/"><img src="https://img.shields.io/badge/Java-Release%2021-green"/></a>
     <span>&nbsp;</span>
     <a href="https://jitpack.io/#teletha/cointoss"><img src="https://img.shields.io/jitpack/v/github/teletha/cointoss?label=Repository&color=green"></a>
     <span>&nbsp;</span>
@@ -18,7 +18,7 @@
 
 
 ## Prerequisites
-Cointoss runs on all major operating systems and requires only [Java version 19](https://docs.oracle.com/en/java/javase/19/) or later to run.
+Cointoss runs on all major operating systems and requires only [Java version 21](https://docs.oracle.com/en/java/javase/21/) or later to run.
 To check, please run `java -version` from the command line interface. You should see something like this:
 ```
 > java -version
@@ -127,16 +127,16 @@ Cointoss depends on the following products on runtime.
 * [ikonli-fontawesome-pack-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome-pack/12.3.1)
 * [ikonli-fontawesome5-pack-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome5-pack/12.3.1)
 * [ikonli-javafx-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-javafx/12.3.1)
-* [javafx-base-22-ea+16](https://mvnrepository.com/artifact/org.openjfx/javafx-base/22-ea+16)
-* [javafx-base-22-ea+16-linux](https://mvnrepository.com/artifact/org.openjfx/javafx-base/22-ea+16)
-* [javafx-controls-22-ea+16](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/22-ea+16)
-* [javafx-controls-22-ea+16-linux](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/22-ea+16)
-* [javafx-graphics-22-ea+16](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/22-ea+16)
-* [javafx-graphics-22-ea+16-linux](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/22-ea+16)
-* [javafx-media-22-ea+16](https://mvnrepository.com/artifact/org.openjfx/javafx-media/22-ea+16)
-* [javafx-media-22-ea+16-linux](https://mvnrepository.com/artifact/org.openjfx/javafx-media/22-ea+16)
-* [javafx-web-22-ea+16](https://mvnrepository.com/artifact/org.openjfx/javafx-web/22-ea+16)
-* [javafx-web-22-ea+16-linux](https://mvnrepository.com/artifact/org.openjfx/javafx-web/22-ea+16)
+* [javafx-base-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-base/23-ea+3)
+* [javafx-base-23-ea+3-win](https://mvnrepository.com/artifact/org.openjfx/javafx-base/23-ea+3)
+* [javafx-controls-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/23-ea+3)
+* [javafx-controls-23-ea+3-win](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/23-ea+3)
+* [javafx-graphics-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/23-ea+3)
+* [javafx-graphics-23-ea+3-win](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/23-ea+3)
+* [javafx-media-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-media/23-ea+3)
+* [javafx-media-23-ea+3-win](https://mvnrepository.com/artifact/org.openjfx/javafx-media/23-ea+3)
+* [javafx-web-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-web/23-ea+3)
+* [javafx-web-23-ea+3-win](https://mvnrepository.com/artifact/org.openjfx/javafx-web/23-ea+3)
 * [lycoris-1.0.0](https://mvnrepository.com/artifact/com.github.teletha/lycoris/1.0.0)
 * [math-11.3.0](https://mvnrepository.com/artifact/io.fair-acc/math/11.3.0)
 * [openjfx-monocle-jdk-12.0.1+2](https://mvnrepository.com/artifact/org.testfx/openjfx-monocle/jdk-12.0.1+2)
