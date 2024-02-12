@@ -15,7 +15,6 @@ const root = {
 		"cointoss.market.bybit",
 		"cointoss.market.coinbase",
 		"cointoss.market.coincheck",
-		"cointoss.market.finnhub",
 		"cointoss.market.ftx",
 		"cointoss.market.gmo",
 		"cointoss.market.huobi",
@@ -34,6 +33,7 @@ const root = {
 		"trademate",
 		"trademate.chart",
 		"trademate.chart.builtin",
+		"trademate.dock",
 		"trademate.order",
 		"trademate.setting",
 		"trademate.verify"
@@ -497,6 +497,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Coordinator",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "CrossOrder",
 			"packageName": "cointoss.trade.bot",
 			"type": "Class"
@@ -721,29 +728,8 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "FinnhubAccount",
-			"packageName": "cointoss.market.finnhub",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "FinnhubService",
-			"packageName": "cointoss.market.finnhub",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Funds",
 			"packageName": "cointoss.trade",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Funnhub",
-			"packageName": "cointoss.market.finnhub",
 			"type": "Class"
 		},
 		{
@@ -1540,6 +1526,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "SettingView",
+			"packageName": "trademate.setting",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "SignalSynchronizer",
 			"packageName": "cointoss.util",
 			"type": "Class"
@@ -1645,6 +1638,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "TradeMateDockProvider",
+			"packageName": "trademate.dock",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "TradeTester",
 			"packageName": "trademate",
 			"type": "Class"
@@ -1709,13 +1709,6 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "TradingView",
-			"packageName": "trademate",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "TradingViewCoordinator",
 			"packageName": "trademate",
 			"type": "Class"
 		},
