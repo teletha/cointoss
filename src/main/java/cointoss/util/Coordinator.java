@@ -21,6 +21,7 @@ import kiss.WiseConsumer;
 import kiss.WiseRunnable;
 import kiss.Ⅱ;
 import trademate.TradeMate;
+import viewtify.Viewtify;
 
 public class Coordinator {
 
@@ -36,9 +37,11 @@ public class Coordinator {
      * @param task
      */
     public static void request(MarketService service, WiseConsumer<Runnable> task) {
-        Coordinator coodinator = coordinators.computeIfAbsent(service.exchange, k -> new Coordinator());
-        coodinator.tasks.add(I.pair(service, task, new ArrayList()));
-        coodinator.tryProcess();
+        Viewtify.inWorker(() -> {
+            Coordinator coodinator = coordinators.computeIfAbsent(service.exchange, k -> new Coordinator());
+            coodinator.tasks.add(I.pair(service, task, new ArrayList()));
+            coodinator.tryProcess();
+        });
     }
 
     public static void invokeOnFinish(MarketService service, WiseRunnable finisher) {

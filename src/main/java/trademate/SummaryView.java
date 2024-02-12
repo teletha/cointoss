@@ -11,11 +11,9 @@ package trademate;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import cointoss.Market;
+import cointoss.MarketService;
 import cointoss.MarketType;
-import cointoss.execution.LogType;
 import cointoss.market.MarketServiceProvider;
-import cointoss.util.Coordinator;
 import cointoss.util.arithmetic.Num;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -33,15 +31,15 @@ public class SummaryView extends View {
 
     private UIText<Num> size;
 
-    private UITableView<Market> table;
+    private UITableView<MarketService> table;
 
-    private UITableColumn<Market, String> name;
+    private UITableColumn<MarketService, String> name;
 
-    private UITableColumn<Market, Num> price;
+    private UITableColumn<MarketService, Num> price;
 
-    private UITableColumn<Market, Num> priceForBuy;
+    private UITableColumn<MarketService, Num> priceForBuy;
 
-    private UITableColumn<Market, Num> priceForSell;
+    private UITableColumn<MarketService, Num> priceForSell;
 
     class view extends ViewDSL {
         {
@@ -79,24 +77,19 @@ public class SummaryView extends View {
      */
     @Override
     protected void initialize() {
-        long throttle = 500;
         size.initialize(Num.ONE).acceptPositiveDecimalInput();
 
-        name.text(CommonText.Market).model(m -> m.service.formattedId).filterable(true);
+        name.text(CommonText.Market).model(service -> service.formattedId).filterable(true);
 
         price.text(CommonText.Price)
-                .modelBySignal(m -> m.service.executionLatest()
-                        .concat(m.service.executionsRealtimely().throttle(throttle, MILLISECONDS))
+                .modelBySignal(service -> service.executionLatest()
+                        .concat(service.executionsRealtimely().throttle(500, MILLISECONDS))
                         .map(e -> e.price));
 
-        table.query().addQuery(en("Type"), MarketType.class, m -> m.service.setting.type);
+        table.query().addQuery(en("Type"), MarketType.class, service -> service.setting.type);
 
-        MarketServiceProvider.availableMarketServices().map(Market::of).on(Viewtify.WorkerThread).to(market -> {
-            table.addItemAtLast(market);
-            Coordinator.request(market.service, next -> {
-                market.readLog(log -> log.fromLast(7, LogType.Fast));
-                next.run();
-            });
+        MarketServiceProvider.availableMarketServices().on(Viewtify.WorkerThread).to(service -> {
+            table.addItemAtLast(service);
         });
     }
 }

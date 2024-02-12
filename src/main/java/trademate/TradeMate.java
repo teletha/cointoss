@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Random;
 
 import cointoss.Market;
+import cointoss.MarketService;
+import cointoss.execution.LogType;
+import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
@@ -53,6 +56,14 @@ public class TradeMate extends View {
         Chrono.seconds().map(Chrono.DateDayTime::format).combineLatest(Wisdom.random()).on(Viewtify.UIThread).to(v -> {
             stage().v.setTitle(v.ⅰ.substring(5) + "  " + v.ⅱ);
         });
+
+        MarketServiceProvider.availableProviders()
+                .on(Viewtify.WorkerThread)
+                .flatIterable(MarketServiceProvider::markets)
+                .take(MarketService::supportHistoricalTrade)
+                .to(service -> {
+                    service.log.fromToday(LogType.Fast).to();
+                });
     }
 
     /**

@@ -27,9 +27,6 @@ import cointoss.order.Order;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.orderbook.OrderBookManager;
-import cointoss.ticker.Span;
-import cointoss.ticker.Tick;
-import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
@@ -57,6 +54,9 @@ public class Market implements Disposable {
 
     /** The target market servicce. */
     public final MarketService service;
+
+    /** The execution manager. */
+    public final ExecutionLog log;
 
     /** The order manager. */
     public final OrderManager orders;
@@ -114,6 +114,7 @@ public class Market implements Disposable {
      */
     protected Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
+        this.log = service.log;
         this.orders = createOrderManager();
         this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();
@@ -220,22 +221,6 @@ public class Market implements Disposable {
      */
     public final Signal<Order> request(Order order) {
         return orders.request(order);
-    }
-
-    /**
-     * Order with specified direction and quantity. You can also declaratively describe the ordering
-     * strategy. If you do not describe the ordering strategy, it will be processed as a market
-     * order.
-     * 
-     * @param directional A dirction of the order.
-     * @param size A quantity of the order.
-     * @param declaration Your order strategy.
-     * @return Returns all the {@link Order}s used in this strategy. Complete event occurs when all
-     *         strategies are performed. (Note: not when all orders are completed but when the
-     *         strategy is completed)
-     */
-    public final Signal<Order> request(Directional directional, long size, Consumer<Orderable> declaration) {
-        return request(directional, Num.of(size), declaration);
     }
 
     /**

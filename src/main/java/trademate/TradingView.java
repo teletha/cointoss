@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.*;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.execution.LogType;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.util.Coordinator;
@@ -90,10 +91,14 @@ public class TradingView extends View {
         Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
 
         chart.showRealtimeUpdate.set(false);
-        Coordinator.invokeOnFinish(service, () -> {
+        Coordinator.request(service, next -> {
+            Market.of(service).readLog(x -> x.fromLast(7, LogType.Fast));
+
             chart.market.set(market);
             chart.showRealtimeUpdate.set(true);
             updateTab();
+
+            next.run();
         });
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));
