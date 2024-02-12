@@ -349,7 +349,7 @@ class VerifiableMarketTest {
             assert order.isNotCanceled();
             assert order.isNotCompleted();
 
-            market.cancel(order).to();
+            market.orders.cancel(order).to();
             assert order.isCanceled();
             assert order.isNotCompleted();
 

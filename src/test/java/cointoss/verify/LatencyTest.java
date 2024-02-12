@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +57,7 @@ class LatencyTest {
             market.perform(Execution.with.buy(1).price(11), 3);
             assert order.isNotCanceled();
 
-            Variable<Order> result = market.cancel(order).to();
+            Variable<Order> result = market.orders.cancel(order).to();
 
             // after 0 sec, order isn't canceled yet
             market.perform(Execution.with.buy(1).price(11), 0);

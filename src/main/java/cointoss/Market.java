@@ -282,16 +282,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Shorthand for {@link OrderManager#cancel(Order)}.
-     * 
-     * @param order A order to cancel.
-     * @return A order cancel process.
-     */
-    public final Signal<Order> cancel(Order order) {
-        return orders.cancel(order);
-    }
-
-    /**
      * Create new price signal.
      * 
      * @param price

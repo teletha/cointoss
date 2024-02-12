@@ -449,7 +449,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      */
     private void cancelEntry() {
         for (Order order : last().entries) {
-            market.cancel(order).to(I.NoOP);
+            market.orders.cancel(order).to(I.NoOP);
         }
     }
 
@@ -458,7 +458,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      */
     private void cancelExit() {
         for (Order order : last().exits) {
-            market.cancel(order).to(I.NoOP);
+            market.orders.cancel(order).to(I.NoOP);
         }
     }
 }

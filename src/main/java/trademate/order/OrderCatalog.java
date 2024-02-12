@@ -14,13 +14,12 @@ import static trademate.CommonText.*;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableRow;
-
 import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.arithmetic.Num;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
 import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -77,7 +76,9 @@ public class OrderCatalog extends View {
             $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
 
-        side.text(Side).model(Order.class, Order::direction).render((label, order, side) -> label.text(side).color(ChartTheme.colorBy(side)));
+        side.text(Side)
+                .model(Order.class, Order::direction)
+                .render((label, order, side) -> label.text(side).color(ChartTheme.colorBy(side)));
         amount.text(Amount).modelByVar(Order.class, o -> o.observeExecutedSize().map(s -> o.size.minus(s)).to());
         price.text(Price).model(Order.class, o -> o.price);
 
@@ -119,7 +120,7 @@ public class OrderCatalog extends View {
      */
     private void cancel(Order order) {
         Viewtify.inWorker(() -> {
-            view.market.cancel(order).to(o -> {
+            view.market.orders.cancel(order).to(o -> {
             });
         });
     }

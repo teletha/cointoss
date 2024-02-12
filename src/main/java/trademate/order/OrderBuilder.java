@@ -9,12 +9,7 @@
  */
 package trademate.order;
 
-import static trademate.CommonText.Amount;
-import static trademate.CommonText.Buy;
-import static trademate.CommonText.Cancel;
-import static trademate.CommonText.Price;
-import static trademate.CommonText.Sell;
-import static trademate.CommonText.Side;
+import static trademate.CommonText.*;
 
 import java.math.RoundingMode;
 import java.text.Normalizer.Form;
@@ -323,7 +318,7 @@ public class OrderBuilder extends View {
      */
     private void cancel(Order order) {
         Viewtify.inWorker(() -> {
-            view.market.cancel(order).to(o -> {
+            view.market.orders.cancel(order).to(o -> {
             });
         });
     }

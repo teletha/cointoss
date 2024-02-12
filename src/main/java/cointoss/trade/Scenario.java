@@ -90,7 +90,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      */
     private void disposeEntry() {
         // cancel all remaining entry orders
-        I.signal(entries).take(Order::isNotTerminated).flatMap(market::cancel).to(I.NoOP);
+        I.signal(entries).take(Order::isNotTerminated).flatMap(market.orders::cancel).to(I.NoOP);
         disposerForEntry.dispose();
         log("Dispose entry.");
     }
@@ -100,7 +100,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      */
     private void disposeExit() {
         // cancel all remaining exit orders
-        I.signal(exits).take(Order::isNotTerminated).flatMap(market::cancel).to(I.NoOP);
+        I.signal(exits).take(Order::isNotTerminated).flatMap(market.orders::cancel).to(I.NoOP);
         disposerForExit.dispose();
         log("Dispose exit.");
         state.set(OrderState.COMPLETED);
