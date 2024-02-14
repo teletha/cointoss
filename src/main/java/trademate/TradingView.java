@@ -92,7 +92,7 @@ public class TradingView extends View {
 
         chart.showRealtimeUpdate.set(false);
         Coordinator.request(service, next -> {
-            Market.of(service).readLog(x -> x.fromLast(7, LogType.Fast));
+            market.readLog(x -> x.fromLast(7, LogType.Fast));
 
             chart.market.set(market);
             chart.showRealtimeUpdate.set(true);
@@ -130,5 +130,14 @@ public class TradingView extends View {
     @Override
     protected String name() {
         return TradingView.class.getSimpleName() + View.IDSeparator + service.id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose() {
+        tab.dispose();
+        chart.dispose();
     }
 }

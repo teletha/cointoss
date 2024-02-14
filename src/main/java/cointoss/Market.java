@@ -280,6 +280,8 @@ public class Market implements Disposable {
         }
     }
 
+    private boolean initialized;
+
     /**
      * Read {@link Execution} log.
      * 
@@ -287,8 +289,10 @@ public class Market implements Disposable {
      * @return
      */
     public final Market readLog(Function<ExecutionLog, Signal<Execution>> log) {
-        service.add(log.apply(service.log).to(timelineObservers));
-
+        if (!initialized) {
+            initialized = true;
+            service.add(log.apply(service.log).to(timelineObservers));
+        }
         return this;
     }
 

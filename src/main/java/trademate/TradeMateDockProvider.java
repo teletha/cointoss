@@ -7,14 +7,11 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package trademate.dock;
+package trademate;
 
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
-import trademate.GlobalVolumeView;
-import trademate.SummaryView;
-import trademate.TradingView;
 import trademate.order.OrderView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
