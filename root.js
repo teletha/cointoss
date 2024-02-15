@@ -33,7 +33,6 @@ const root = {
 		"trademate",
 		"trademate.chart",
 		"trademate.chart.builtin",
-		"trademate.dock",
 		"trademate.order",
 		"trademate.setting",
 		"trademate.verify"
@@ -1639,7 +1638,7 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "TradeMateDockProvider",
-			"packageName": "trademate.dock",
+			"packageName": "trademate",
 			"type": "Class"
 		},
 		{
