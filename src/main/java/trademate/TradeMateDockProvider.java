@@ -31,7 +31,7 @@ public class TradeMateDockProvider extends DockProvider {
 
     public final Dock summary = Dock.with.view(SummaryView.class).showOnInitial();
 
-    public final Dock setting = Dock.with.view(SettingView.class);
+    public final Dock setting = Dock.with.view(SettingView.class).location(o -> o.window(750, 600, false));
 
     public final TypedDock<MarketService> trade = TypedDock.<MarketService> with().id("Trade").registration((tab, service) -> {
         tab.text(service.id).contentsLazy(ui -> new TradingView(tab, service));
