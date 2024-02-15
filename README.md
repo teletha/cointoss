@@ -147,7 +147,7 @@ Cointoss depends on the following products on runtime.
 * [slf4j-api-2.0.9](https://mvnrepository.com/artifact/org.slf4j/slf4j-api/2.0.9)
 * [stylist-1.10.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.10.0)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
-* [viewtify-2.20.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.20.0)
+* [viewtify-2.22.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.22.0)
 * [zstd-jni-1.5.5-11](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.5-11)
 <p align="right"><a href="#top">back to top</a></p>
 
