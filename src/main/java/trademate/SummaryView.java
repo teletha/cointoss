@@ -88,7 +88,7 @@ public class SummaryView extends View {
 
         table.query().addQuery(en("Type"), MarketType.class, service -> service.setting.type);
 
-        MarketServiceProvider.availableMarketServices().on(Viewtify.WorkerThread).to(service -> {
+        MarketServiceProvider.availableMarketServices().on(Viewtify.UIThread).to(service -> {
             table.addItemAtLast(service);
         });
     }
