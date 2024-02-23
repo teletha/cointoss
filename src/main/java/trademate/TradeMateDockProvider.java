@@ -45,7 +45,7 @@ public class TradeMateDockProvider extends DockProvider {
         menus.menu(I.translate("Open market"), sub -> {
             MarketServiceProvider.availableProviders().to(provider -> {
                 sub.menu(provider.exchange().name(), nest -> {
-                    provider.markets().stream().filter(MarketService::supportHistoricalTrade).forEach(service -> {
+                    provider.markets().stream().forEach(service -> {
                         nest.menu(service.marketName).disableWhen(DockSystem.isOpened("Trade " + service.id)).action(() -> {
                             trade.show(service);
                         });

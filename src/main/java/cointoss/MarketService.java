@@ -497,15 +497,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * Checking support for historical trade.
-     * 
-     * @return
-     */
-    public boolean supportHistoricalTrade() {
-        return true;
-    }
-
-    /**
      * Indicates whether the trade record that can be retrieved is the most recent one only.
      * 
      * @return

@@ -17,9 +17,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
+import cointoss.execution.LogType;
 import cointoss.market.Exchange;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.util.APILimiter;
@@ -71,7 +73,7 @@ public class CoincheckService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        return clientRealtimely().subscribe(new Topic("trades", marketName)).flatIterable(e -> e.find("*")).map(e -> {
+        return clientRealtimely().subscribe(new Topic("trades", marketName)).flatIterable(e -> e.find("$")).map(e -> {
             ZonedDateTime date = Chrono.utcBySeconds(e.get(long.class, "0"));
             long id = e.get(long.class, "1");
             Num price = e.get(Num.class, "3");
@@ -89,7 +91,7 @@ public class CoincheckService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         long[] context = new long[3];
 
-        return this.call("PRIVATE", "orders/completes?pair=" + marketName + "&last_id=" + (startId + 52))
+        return this.call("GET", "trades?pair=" + marketName + "&starting_after=" + startId + "&limit=10000")
                 .flatIterable(e -> e.find("completes", "$"))
                 .map(json -> createExecution(json, context));
     }
@@ -103,6 +105,22 @@ public class CoincheckService extends MarketService {
                 .map(json -> createExecution(json, new long[3]));
     }
 
+    public static void main(String[] args) {
+        I.load(Market.class);
+
+        // Coincheck.BTC_JPY.executionsRealtimely().waitForTerminate().to(x -> {
+        // System.out.println(x);
+        // });
+        Market market = Market.of(Coincheck.BTC_JPY);
+        market.readLog(x -> x.fromToday(LogType.Fast));
+
+        try {
+            Thread.sleep(1000 * 60 * 20);
+        } catch (InterruptedException e) {
+            throw I.quiet(e);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -112,7 +130,7 @@ public class CoincheckService extends MarketService {
 
         Signal<JSON> multiples = I.signal();
         for (int i = 4; 0 <= i; i--) {
-            multiples = multiples.concat(call("PRIVATE", "orders/completes?pair=" + marketName + "&last_id=" + (id - 50 * i))
+            multiples = multiples.concat(call("GET", "trades?pair=" + marketName + "&ending_beforeID=" + (id - 50 * i))
                     .flatIterable(e -> e.find("completes", "$")));
         }
 
@@ -184,8 +202,8 @@ public class CoincheckService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public boolean supportHistoricalTrade() {
-        return false;
+    public boolean supportRecentExecutionOnly() {
+        return true;
     }
 
     /**
