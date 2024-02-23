@@ -16,8 +16,6 @@ const root = {
 		"cointoss.market.coinbase",
 		"cointoss.market.coincheck",
 		"cointoss.market.gmo",
-		"cointoss.market.huobi",
-		"cointoss.market.liquid",
 		"cointoss.order",
 		"cointoss.orderbook",
 		"cointoss.ticker",
@@ -754,27 +752,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Huobi",
-			"packageName": "cointoss.market.huobi",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "HuobiAccount",
-			"packageName": "cointoss.market.huobi",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "HuobiService",
-			"packageName": "cointoss.market.huobi",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Indicator",
 			"packageName": "cointoss.ticker",
 			"type": "AbstractClass"
@@ -792,27 +769,6 @@ const root = {
 			"name": "Latency",
 			"packageName": "cointoss.verify",
 			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Liquid",
-			"packageName": "cointoss.market.liquid",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LiquidAccount",
-			"packageName": "cointoss.market.liquid",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LiquidService",
-			"packageName": "cointoss.market.liquid",
-			"type": "Class"
 		},
 		{
 			"modifiers": {
