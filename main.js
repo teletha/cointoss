@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The JAVADNG Development Team
+ * Copyright (C) 2024 The JAVADNG Development Team
  *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ import hljs from "./highlight.js"
 // =====================================================
 const
 	prefix = import.meta.url.substring(location.protocol.length + location.host.length + 2, import.meta.url.length - 7),
-	user = JSON.parse(localStorage.getItem("user")) || {},
+	user = JSON.parse(localStorage.getItem("user")) || {"theme": "light"},
 	save = () => localStorage.setItem("user", JSON.stringify(user))
 hljs.configure({ignoreUnescapedHTML: true})
 history.scrollRestoration = "manual"
@@ -49,7 +49,7 @@ function FlashMan({ paged, cacheSize = 20, preload = "mouseover", preview = "sec
 		set.filter(x => x.isIntersecting && !x.target.init && (x.target.init = true)).forEach(x => {
 			for (let q in previews) x.target.querySelectorAll(q).forEach(e => previews[q](e))
 		})
-	}, { rootMargin: "80px 0px", threshold: 0.3 });
+	}, { rootMargin: "60px 0px"});
 
 	// This is the state immediately after a page change has been requested by a user operation.
 	function changed(poped) {

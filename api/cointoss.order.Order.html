@@ -1,16 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
 		<title>Cointoss API</title>
 		<base href="../"/>
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="l">
-		<header class="R">
-			<h1 class="f" date="Use saved searches to filter your results more quickly" ver="1.4.0"><code>Cointoss</code></h1>
-			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="i">
+		<header class="b">
+			<h1 class="a" date="2023-12-02" ver="1.4.0"><code>Cointoss</code></h1>
+			<nav class="c"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -19,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="b" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="V" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -27,14 +31,14 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="c">
-			<nav class="X">
+		<main class="X">
+			<nav class="N">
 				<div></div>
 			</nav>
-			<article class="U" id="Article">
-				<section class="K"><code class="h">cointoss.order</code>
-					<h2 class="Class P"><code class="J">Order</code></h2>
-					<div class="H">
+			<article class="g" id="Article">
+				<section class="W"><code class="K">cointoss.order</code>
+					<h2 class="Class k"><code class="Y">Order</code></h2>
+					<div class="e">
 						<ul class="C E">
 							<li><code><a href="api/cointoss.order.OrderModel.html">OrderModel</a></code></li>
 						</ul>
@@ -43,275 +47,275 @@
 							<li><code><a href="api/cointoss.Directional.html">Directional</a></code></li>
 						</ul>
 					</div><span class="B"><p>Generated model for <code><a href="api/cointoss.order.OrderModel.html">OrderModel</a></code>.</p>
-					</span></section>
-				<section class="K" id="direction">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">direction</code><i class="j"><code class="return"><a href="api/cointoss.Direction.html">Direction</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="size">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">size</code><i class="j"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="price">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">price</code><i class="j"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="type">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">type</code><i class="j"><code class="return"><a href="api/cointoss.order.OrderType.html">OrderType</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="quantityCondition">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">quantityCondition</code><i class="j"><code class="return"><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="executedSize">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">executedSize</code><i class="j"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="commission">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">commission</code><i class="j"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="id">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">id</code><i class="j"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="creationTime">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">creationTime</code><i class="j"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="terminationTime">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">terminationTime</code><i class="j"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="state">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">state</code><i class="j"><code class="return"><a href="api/cointoss.order.OrderState.html">OrderState</a></code></i></h2><span class="B"><p>The exposed property.</p>
-					</span></section>
-				<section class="K" id="with">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code class="J">with</code><i class="j"><code class="return"><a href="api/cointoss.order.Order.Ìnstantiator.html">Ìnstantiator</a><code class="parameters"><code>?</code></code></code></i></h2><span class="B"><p>The singleton builder.</p>
-					</span></section>
-				<section class="K" id="Order()">
-					<h2 class="I"><i class="PROTECTED"></i><code class="J">Order</code><code class="Q">()</code></h2><span class="B"><p>HIDE CONSTRUCTOR</p>
-					</span></section>
-				<section class="K" id="direction()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">direction</code><code class="Q">()</code><i class="j"><code><a href="api/cointoss.Direction.html">Direction</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="direction">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">direction</code><i class="O"><code class="return"><a href="api/cointoss.Direction.html">Direction</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="size">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">size</code><i class="O"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="price">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">price</code><i class="O"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="type">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">type</code><i class="O"><code class="return"><a href="api/cointoss.order.OrderType.html">OrderType</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="quantityCondition">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">quantityCondition</code><i class="O"><code class="return"><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="executedSize">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">executedSize</code><i class="O"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="commission">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">commission</code><i class="O"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="id">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">id</code><i class="O"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="creationTime">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">creationTime</code><i class="O"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="terminationTime">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">terminationTime</code><i class="O"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="state">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">state</code><i class="O"><code class="return"><a href="api/cointoss.order.OrderState.html">OrderState</a></code></i></h2><span class="B"><p>The exposed property.</p>
+</span></section>
+				<section class="W" id="with">
+					<h2 class="j"><i class="FINAL"><i class="STATIC PUBLIC"></i></i><code class="Y">with</code><i class="O"><code class="return"><a href="api/cointoss.order.Order.Ìnstantiator.html">Ìnstantiator</a><code class="parameters"><code>?</code></code></code></i></h2><span class="B"><p>The singleton builder.</p>
+</span></section>
+				<section class="W" id="Order()">
+					<h2 class="j"><i class="PROTECTED"></i><code class="Y">Order</code><code class="Z">()</code></h2><span class="B"><p>HIDE CONSTRUCTOR</p>
+</span></section>
+				<section class="W" id="direction()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">direction</code><code class="Z">()</code><i class="O"><code><a href="api/cointoss.Direction.html">Direction</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="api/cointoss.Direction.html">Direction</a></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="K" id="size()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">size</code><code class="Q">()</code><i class="j"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+				<section class="W" id="size()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">size</code><code class="Z">()</code><i class="O"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The initial ordered size.</p>
-					</span></section>
-				<section class="K" id="price()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">price</code><code class="Q">()</code><i class="j"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="price()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">price</code><code class="Z">()</code><i class="O"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>An average price.</p>
-					</span></section>
-				<section class="K" id="type()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">type</code><code class="Q">()</code><i class="j"><code><a href="api/cointoss.order.OrderType.html">OrderType</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="type()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">type</code><code class="Z">()</code><i class="O"><code><a href="api/cointoss.order.OrderType.html">OrderType</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="api/cointoss.order.OrderType.html">OrderType</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The order type.</p>
-					</span></section>
-				<section class="K" id="quantityCondition()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">quantityCondition</code><code class="Q">()</code><i class="j"><code><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="quantityCondition()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">quantityCondition</code><code class="Z">()</code><i class="O"><code><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The quantity conditions enforcement.</p>
-					</span></section>
-				<section class="K" id="executedSize()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">executedSize</code><code class="Q">()</code><i class="j"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="executedSize()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">executedSize</code><code class="Z">()</code><i class="O"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
 							<td><span><p>The executed size.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>Calculate the executed size.</p>
-					</span></section>
-				<section class="K" id="observeExecutedSizeDiff()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeExecutedSizeDiff</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeExecutedSizeDiff()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeExecutedSizeDiff</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property diff.</p>
-					</span></section>
-				<section class="K" id="observeExecutedSize()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeExecutedSize</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeExecutedSize()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeExecutedSize</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property modification.</p>
-					</span></section>
-				<section class="K" id="observeExecutedSizeNow()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeExecutedSizeNow</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeExecutedSizeNow()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeExecutedSizeNow</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property modification with the current value.</p>
-					</span></section>
-				<section class="K" id="commission()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">commission</code><code class="Q">()</code><i class="j"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="commission()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">commission</code><code class="Z">()</code><i class="O"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
 							<td><span><p>The commission.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>The commission.</p>
-					</span></section>
-				<section class="K" id="id()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">id</code><code class="Q">()</code><i class="j"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="id()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">id</code><code class="Z">()</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The order identifier for the specific market.</p>
-					</span></section>
-				<section class="K" id="creationTime()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">creationTime</code><code class="Q">()</code><i class="j"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="creationTime()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">creationTime</code><code class="Z">()</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The requested time of this order.</p>
-					</span></section>
-				<section class="K" id="observeCreationTime()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeCreationTime</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeCreationTime()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeCreationTime</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property modification.</p>
-					</span></section>
-				<section class="K" id="observeCreationTimeNow()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeCreationTimeNow</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeCreationTimeNow()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeCreationTimeNow</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property modification with the current value.</p>
-					</span></section>
-				<section class="K" id="terminationTime()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">terminationTime</code><code class="Q">()</code><i class="j"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="terminationTime()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">terminationTime</code><code class="Z">()</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The termiated time of this order.</p>
-					</span></section>
-				<section class="K" id="observeTerminationTime()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeTerminationTime</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeTerminationTime()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeTerminationTime</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property modification.</p>
-					</span></section>
-				<section class="K" id="observeTerminationTimeNow()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeTerminationTimeNow</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeTerminationTimeNow()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeTerminationTimeNow</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property modification with the current value.</p>
-					</span></section>
-				<section class="K" id="state()">
-					<h2 class="I"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="J">state</code><code class="Q">()</code><i class="j"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="state()">
+					<h2 class="j"><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code class="Y">state</code><code class="Z">()</code><i class="O"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The termiated time of this order.</p>
-					</span></section>
-				<section class="K" id="observeState()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeState</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeState()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeState</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property modification.</p>
-					</span></section>
-				<section class="K" id="observeStateNow()">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">observeStateNow</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="observeStateNow()">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">observeStateNow</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Observe property modification with the current value.</p>
-					</span></section>
+</span></section>
 			</article>
-			<aside class="Z" id="SubNavi">
-				<div class="M">
-					<h5 class="L">Constructors</h5>
+			<aside class="H" id="SubNavi">
+				<div class="S">
+					<h5 class="P">Constructors</h5>
 					<ul>
-						<li><i class="PROTECTED"></i><code><a href="api/cointoss.order.Order.html#Order()">Order</a></code><code class="Q">()</code></li>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.order.Order.html#Order()">Order</a></code><code class="Z">()</code></li>
 					</ul>
-					<h5 class="L">Static Fields</h5>
+					<h5 class="P">Static Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC STATIC"></i></i><code><a href="api/cointoss.order.Order.html#with">with</a></code><i class="T"><code class="return"><a href="api/cointoss.order.Order.Ìnstantiator.html">Ìnstantiator</a><code class="parameters"><code>?</code></code></code></i></li>
+						<li><i class="FINAL"><i class="STATIC PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#with">with</a></code><i class="f"><code class="return"><a href="api/cointoss.order.Order.Ìnstantiator.html">Ìnstantiator</a><code class="parameters"><code>?</code></code></code></i></li>
 					</ul>
-					<h5 class="L">Fields</h5>
+					<h5 class="P">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#direction">direction</a></code><i class="T"><code class="return"><a href="api/cointoss.Direction.html">Direction</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#size">size</a></code><i class="T"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#price">price</a></code><i class="T"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#type">type</a></code><i class="T"><code class="return"><a href="api/cointoss.order.OrderType.html">OrderType</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#quantityCondition">quantityCondition</a></code><i class="T"><code class="return"><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#executedSize">executedSize</a></code><i class="T"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#commission">commission</a></code><i class="T"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#id">id</a></code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#creationTime">creationTime</a></code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#terminationTime">terminationTime</a></code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#state">state</a></code><i class="T"><code class="return"><a href="api/cointoss.order.OrderState.html">OrderState</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#direction">direction</a></code><i class="f"><code class="return"><a href="api/cointoss.Direction.html">Direction</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#size">size</a></code><i class="f"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#price">price</a></code><i class="f"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#type">type</a></code><i class="f"><code class="return"><a href="api/cointoss.order.OrderType.html">OrderType</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#quantityCondition">quantityCondition</a></code><i class="f"><code class="return"><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#executedSize">executedSize</a></code><i class="f"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#commission">commission</a></code><i class="f"><code class="return"><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#id">id</a></code><i class="f"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#creationTime">creationTime</a></code><i class="f"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#terminationTime">terminationTime</a></code><i class="f"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#state">state</a></code><i class="f"><code class="return"><a href="api/cointoss.order.OrderState.html">OrderState</a></code></i></li>
 					</ul>
-					<h5 class="L">Methods</h5>
+					<h5 class="P">Methods</h5>
 					<ul>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#direction()">direction</a></code><code class="Q">()</code><i class="T"><code><a href="api/cointoss.Direction.html">Direction</a></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#size()">size</a></code><code class="Q">()</code><i class="T"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#price()">price</a></code><code class="Q">()</code><i class="T"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#type()">type</a></code><code class="Q">()</code><i class="T"><code><a href="api/cointoss.order.OrderType.html">OrderType</a></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#quantityCondition()">quantityCondition</a></code><code class="Q">()</code><i class="T"><code><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#executedSize()">executedSize</a></code><code class="Q">()</code><i class="T"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeExecutedSizeDiff()">observeExecutedSizeDiff</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeExecutedSize()">observeExecutedSize</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeExecutedSizeNow()">observeExecutedSizeNow</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#commission()">commission</a></code><code class="Q">()</code><i class="T"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#id()">id</a></code><code class="Q">()</code><i class="T"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#creationTime()">creationTime</a></code><code class="Q">()</code><i class="T"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeCreationTime()">observeCreationTime</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeCreationTimeNow()">observeCreationTimeNow</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#terminationTime()">terminationTime</a></code><code class="Q">()</code><i class="T"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeTerminationTime()">observeTerminationTime</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeTerminationTimeNow()">observeTerminationTimeNow</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#state()">state</a></code><code class="Q">()</code><i class="T"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeState()">observeState</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeStateNow()">observeStateNow</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#direction()">direction</a></code><code class="Z">()</code><i class="f"><code><a href="api/cointoss.Direction.html">Direction</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#size()">size</a></code><code class="Z">()</code><i class="f"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#price()">price</a></code><code class="Z">()</code><i class="f"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#type()">type</a></code><code class="Z">()</code><i class="f"><code><a href="api/cointoss.order.OrderType.html">OrderType</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#quantityCondition()">quantityCondition</a></code><code class="Z">()</code><i class="f"><code><a href="api/cointoss.order.QuantityCondition.html">QuantityCondition</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#executedSize()">executedSize</a></code><code class="Z">()</code><i class="f"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeExecutedSizeDiff()">observeExecutedSizeDiff</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeExecutedSize()">observeExecutedSize</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeExecutedSizeNow()">observeExecutedSizeNow</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#commission()">commission</a></code><code class="Z">()</code><i class="f"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#id()">id</a></code><code class="Z">()</code><i class="f"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#creationTime()">creationTime</a></code><code class="Z">()</code><i class="f"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeCreationTime()">observeCreationTime</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeCreationTimeNow()">observeCreationTimeNow</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#terminationTime()">terminationTime</a></code><code class="Z">()</code><i class="f"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeTerminationTime()">observeTerminationTime</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeTerminationTimeNow()">observeTerminationTimeNow</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="OVERRIDE PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#state()">state</a></code><code class="Z">()</code><i class="f"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeState()">observeState</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Order.html#observeStateNow()">observeStateNow</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code></code></code></i></li>
 					</ul>
 				</div>
 			</aside>

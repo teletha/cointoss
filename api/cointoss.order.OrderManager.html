@@ -1,16 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
 		<title>Cointoss API</title>
 		<base href="../"/>
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="l">
-		<header class="R">
-			<h1 class="f" date="Use saved searches to filter your results more quickly" ver="1.4.0"><code>Cointoss</code></h1>
-			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="i">
+		<header class="b">
+			<h1 class="a" date="2023-12-02" ver="1.4.0"><code>Cointoss</code></h1>
+			<nav class="c"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -19,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="b" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="V" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -27,160 +31,160 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="c">
-			<nav class="X">
+		<main class="X">
+			<nav class="N">
 				<div></div>
 			</nav>
-			<article class="U" id="Article">
-				<section class="K"><code class="h">cointoss.order</code>
-					<h2 class="Class P"><code class="J">OrderManager</code></h2>
-					<div class="H"></div>
+			<article class="g" id="Article">
+				<section class="W"><code class="K">cointoss.order</code>
+					<h2 class="Class k"><code class="Y">OrderManager</code></h2>
+					<div class="e"></div>
 				</section>
-				<section class="K" id="items">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">items</code><i class="j"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2><span class="B"><p>The unmodifiable exposed active orders.</p>
-					</span></section>
-				<section class="K" id="added">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">added</code><i class="j"><code class="return">kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2><span class="B"><p>The order adding event.</p>
-					</span></section>
-				<section class="K" id="removed">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">removed</code><i class="j"><code class="return">kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2><span class="B"><p>The order removed event.</p>
-					</span></section>
-				<section class="K" id="compoundSize">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">compoundSize</code><i class="j"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2><span class="B"><p>The compound size and direction (minus means short position).</p>
-					</span></section>
-				<section class="K" id="compoundPrice">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">compoundPrice</code><i class="j"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2><span class="B"><p>The compound average position price.</p>
-					</span></section>
-				<section class="K" id="OrderManager(cointoss.MarketService)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">OrderManager</code><code class="Q">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></h2>
-					<table class="i">
-						<tr class="m">
+				<section class="W" id="items">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">items</code><i class="O"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2><span class="B"><p>The unmodifiable exposed active orders.</p>
+</span></section>
+				<section class="W" id="added">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">added</code><i class="O"><code class="return">kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2><span class="B"><p>The order adding event.</p>
+</span></section>
+				<section class="W" id="removed">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">removed</code><i class="O"><code class="return">kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2><span class="B"><p>The order removed event.</p>
+</span></section>
+				<section class="W" id="compoundSize">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">compoundSize</code><i class="O"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2><span class="B"><p>The compound size and direction (minus means short position).</p>
+</span></section>
+				<section class="W" id="compoundPrice">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">compoundPrice</code><i class="O"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></h2><span class="B"><p>The compound average position price.</p>
+</span></section>
+				<section class="W" id="OrderManager(cointoss.MarketService)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">OrderManager</code><code class="Z">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code>service</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="K" id="manages()">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">manages</code><code class="Q">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="k">
+				<section class="W" id="manages()">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">manages</code><code class="Z">()</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Stream for the current managed <code><a href="api/cointoss.order.Order.html">Order</a></code>s and the incoming <code><a href="api/cointoss.order.Order.html">Order</a></code>s.</p>
-					</span></section>
-				<section class="K" id="request(cointoss.order.Order)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">request</code><code class="Q">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="m">
+</span></section>
+				<section class="W" id="request(cointoss.order.Order)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">request</code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code> <code>order</code></td>
 							<td><span><p>A order to request.</p>
-								</span></td>
+</span></td>
 						</tr>
-						<tr class="k">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td><span><p>A order request process.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>Build the Signal which requests the specified <code><a href="api/cointoss.order.Order.html">Order</a></code> to the market. This
- method DON&#39;T request order, you MUST subscribe Signal. If you want to request
- actually, you can use <code><a href="api/cointoss.order.OrderManager.html#requestNow(Order)">#requestNow(Order)</a></code>.</p>
-					</span></section>
-				<section class="K" id="requestNow(cointoss.order.Order)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">requestNow</code><code class="Q">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
-					<table class="i">
-						<tr class="m">
+method DON&#39;T request order, you MUST subscribe Signal. If you want to request
+actually, you can use <code><a href="api/cointoss.order.OrderManager.html#requestNow(Order)">#requestNow(Order)</a></code>.</p>
+</span></section>
+				<section class="W" id="requestNow(cointoss.order.Order)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">requestNow</code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="O"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code> <code>order</code></td>
 							<td><span><p>A order to request.</p>
-								</span></td>
+</span></td>
 						</tr>
-						<tr class="k">
+						<tr class="M">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code></td>
 							<td><span><p>A requested <code><a href="api/cointoss.order.Order.html">Order</a></code>.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>Request the specified <code><a href="api/cointoss.order.Order.html">Order</a></code> to the market actually.</p>
-					</span></section>
-				<section class="K" id="cancel(cointoss.order.Order)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">cancel</code><code class="Q">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="m">
+</span></section>
+				<section class="W" id="cancel(cointoss.order.Order)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">cancel</code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="O"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code> <code>order</code></td>
 							<td><span><p>A order to cancel.</p>
-								</span></td>
+</span></td>
 						</tr>
-						<tr class="k">
+						<tr class="M">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td><span><p>A order cancel process.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>Build the Signal which cancels the specified <code><a href="api/cointoss.order.Order.html">Order</a></code> from the market. This
- method DON&#39;T cancel order, you MUST subscribe Signal. If you want to cancel actually,
- you can use <code><a href="api/cointoss.order.OrderManager.html#cancelNow(Order)">#cancelNow(Order)</a></code>.</p>
-					</span></section>
-				<section class="K" id="cancelNow(cointoss.order.Order)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">cancelNow</code><code class="Q">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
-					<table class="i">
-						<tr class="m">
+method DON&#39;T cancel order, you MUST subscribe Signal. If you want to cancel actually,
+you can use <code><a href="api/cointoss.order.OrderManager.html#cancelNow(Order)">#cancelNow(Order)</a></code>.</p>
+</span></section>
+				<section class="W" id="cancelNow(cointoss.order.Order)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">cancelNow</code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="O"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code> <code>order</code></td>
 							<td><span><p>A order to request.</p>
-								</span></td>
+</span></td>
 						</tr>
-						<tr class="k">
+						<tr class="M">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code></td>
 							<td><span><p>A canceled <code><a href="api/cointoss.order.Order.html">Order</a></code>.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>Cancel the specified <code><a href="api/cointoss.order.Order.html">Order</a></code> from the market actually.</p>
-					</span></section>
-				<section class="K" id="cancelNowAll()">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">cancelNowAll</code><code class="Q">()</code><i class="j"><code>void</code></i></h2><span class="B"><p>Cancel all orders.</p>
-					</span></section>
-				<section class="K" id="hasActiveOrder()">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">hasActiveOrder</code><code class="Q">()</code><i class="j"><code>boolean</code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="cancelNowAll()">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">cancelNowAll</code><code class="Z">()</code><i class="O"><code>void</code></i></h2><span class="B"><p>Cancel all orders.</p>
+</span></section>
+				<section class="W" id="hasActiveOrder()">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">hasActiveOrder</code><code class="Z">()</code><i class="O"><code>boolean</code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>boolean</code></td>
 							<td><span><p>A result.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>Check the order state.</p>
-					</span></section>
-				<section class="K" id="hasNoActiveOrder()">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">hasNoActiveOrder</code><code class="Q">()</code><i class="j"><code>boolean</code></i></h2>
-					<table class="i">
-						<tr class="k">
+</span></section>
+				<section class="W" id="hasNoActiveOrder()">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">hasNoActiveOrder</code><code class="Z">()</code><i class="O"><code>boolean</code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>boolean</code></td>
 							<td><span><p>A result.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>Check the order state.</p>
-					</span></section>
+</span></section>
 			</article>
-			<aside class="Z" id="SubNavi">
-				<div class="M">
-					<h5 class="L">Constructors</h5>
+			<aside class="H" id="SubNavi">
+				<div class="S">
+					<h5 class="P">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#OrderManager(cointoss.MarketService)">OrderManager</a></code><code class="Q">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#OrderManager(cointoss.MarketService)">OrderManager</a></code><code class="Z">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></li>
 					</ul>
-					<h5 class="L">Fields</h5>
+					<h5 class="P">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#items">items</a></code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#added">added</a></code><i class="T"><code class="return">kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#removed">removed</a></code><i class="T"><code class="return">kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#compoundSize">compoundSize</a></code><i class="T"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#compoundPrice">compoundPrice</a></code><i class="T"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#items">items</a></code><i class="f"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#added">added</a></code><i class="f"><code class="return">kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#removed">removed</a></code><i class="f"><code class="return">kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#compoundSize">compoundSize</a></code><i class="f"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#compoundPrice">compoundPrice</a></code><i class="f"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code></i></li>
 					</ul>
-					<h5 class="L">Methods</h5>
+					<h5 class="P">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#manages()">manages</a></code><code class="Q">()</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#request(cointoss.order.Order)">request</a></code><code class="Q">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#requestNow(cointoss.order.Order)">requestNow</a></code><code class="Q">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="T"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancel(cointoss.order.Order)">cancel</a></code><code class="Q">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="T"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelNow(cointoss.order.Order)">cancelNow</a></code><code class="Q">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="T"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelNowAll()">cancelNowAll</a></code><code class="Q">()</code><i class="T"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#hasActiveOrder()">hasActiveOrder</a></code><code class="Q">()</code><i class="T"><code>boolean</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#hasNoActiveOrder()">hasNoActiveOrder</a></code><code class="Q">()</code><i class="T"><code>boolean</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#manages()">manages</a></code><code class="Z">()</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#request(cointoss.order.Order)">request</a></code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#requestNow(cointoss.order.Order)">requestNow</a></code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="f"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancel(cointoss.order.Order)">cancel</a></code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelNow(cointoss.order.Order)">cancelNow</a></code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="f"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelNowAll()">cancelNowAll</a></code><code class="Z">()</code><i class="f"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#hasActiveOrder()">hasActiveOrder</a></code><code class="Z">()</code><i class="f"><code>boolean</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#hasNoActiveOrder()">hasNoActiveOrder</a></code><code class="Z">()</code><i class="f"><code>boolean</code></i></li>
 					</ul>
 				</div>
 			</aside>

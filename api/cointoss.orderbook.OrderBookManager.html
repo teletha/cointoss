@@ -1,16 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
 		<title>Cointoss API</title>
 		<base href="../"/>
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="l">
-		<header class="R">
-			<h1 class="f" date="Use saved searches to filter your results more quickly" ver="1.4.0"><code>Cointoss</code></h1>
-			<nav class="g"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="i">
+		<header class="b">
+			<h1 class="a" date="2023-12-02" ver="1.4.0"><code>Cointoss</code></h1>
+			<nav class="c"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -19,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="b" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="V" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -27,168 +31,168 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="c">
-			<nav class="X">
+		<main class="X">
+			<nav class="N">
 				<div></div>
 			</nav>
-			<article class="U" id="Article">
-				<section class="K"><code class="h">cointoss.orderbook</code>
-					<h2 class="Class P"><code class="J">OrderBookManager</code></h2>
-					<div class="H">
+			<article class="g" id="Article">
+				<section class="W"><code class="K">cointoss.orderbook</code>
+					<h2 class="Class k"><code class="Y">OrderBookManager</code></h2>
+					<div class="e">
 						<ul class="C F">
 							<li><code>kiss.Disposable</code></li>
 						</ul>
 					</div>
 				</section>
-				<section class="K" id="shorts">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">shorts</code><i class="j"><code class="return"><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></h2><span class="B"><p>ASK</p>
-					</span></section>
-				<section class="K" id="longs">
-					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="J">longs</code><i class="j"><code class="return"><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></h2><span class="B"><p>BID</p>
-					</span></section>
-				<section class="K" id="OrderBookManager(cointoss.MarketService,kiss.Signal)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">OrderBookManager</code><code class="Q">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">fixPageByPrice</code>)</code></h2>
-					<table class="i">
-						<tr class="m">
+				<section class="W" id="shorts">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">shorts</code><i class="O"><code class="return"><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></h2><span class="B"><p>ASK</p>
+</span></section>
+				<section class="W" id="longs">
+					<h2 class="j"><i class="FINAL"><i class="PUBLIC"></i></i><code class="Y">longs</code><i class="O"><code class="return"><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></h2><span class="B"><p>BID</p>
+</span></section>
+				<section class="W" id="OrderBookManager(cointoss.MarketService,kiss.Signal)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">OrderBookManager</code><code class="Z">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">fixPageByPrice</code>)</code></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code>service</code></td>
 							<td></td>
 						</tr>
-						<tr class="m">
+						<tr class="I">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code>fixPageByPrice</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="K" id="by(cointoss.Directional)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">by</code><code class="Q">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">side</code>)</code><i class="j"><code><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></h2>
-					<table class="i">
-						<tr class="m">
+				<section class="W" id="by(cointoss.Directional)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">by</code><code class="Z">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">side</code>)</code><i class="O"><code><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>side</code></td>
 							<td><span><p>A target direction.</p>
-								</span></td>
+</span></td>
 						</tr>
-						<tr class="k">
+						<tr class="M">
 							<td><code><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></td>
 							<td><span><p>The associated <code><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code>.</p>
-								</span></td>
+</span></td>
 						</tr>
 					</table><span class="B"><p>Retrieve the <code><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code> by <code><a href="api/cointoss.Direction.html">Direction</a></code>.</p>
-					</span></section>
-				<section class="K" id="groupBy(float)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">groupBy</code><code class="Q">(<code>float</code> <code class="parameterName">range</code>)</code><i class="j"><code>void</code></i></h2>
-					<table class="i">
-						<tr class="m">
+</span></section>
+				<section class="W" id="groupBy(float)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">groupBy</code><code class="Z">(<code>float</code> <code class="parameterName">range</code>)</code><i class="O"><code>void</code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code>float</code> <code>range</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="K" id="ranged()">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">ranged</code><code class="Q">()</code><i class="j"><code>double</code></i></h2>
-					<table class="i">
-						<tr class="k">
+				<section class="W" id="ranged()">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">ranged</code><code class="Z">()</code><i class="O"><code>double</code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>double</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the terminal price if you are representing a price range. In the buyboard, it represents
- the lowest price in the price range, and in the sellboard, it represents the highest price in
- the price range.</p>
-					</span></section>
-				<section class="K" id="spread()">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">spread</code><code class="Q">()</code><i class="j"><code>double</code></i></h2>
-					<table class="i">
-						<tr class="k">
+the lowest price in the price range, and in the sellboard, it represents the highest price in
+the price range.</p>
+</span></section>
+				<section class="W" id="spread()">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">spread</code><code class="Z">()</code><i class="O"><code>double</code></i></h2>
+					<table class="m">
+						<tr class="M">
 							<td><code>double</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute the current spread.</p>
-					</span></section>
-				<section class="K" id="computeBestPrice(cointoss.Directional,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">computeBestPrice</code><code class="Q">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">side</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="j"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
-					<table class="i">
-						<tr class="m">
+</span></section>
+				<section class="W" id="computeBestPrice(cointoss.Directional,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">computeBestPrice</code><code class="Z">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">side</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="O"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.Directional.html">Directional</a></code> <code>side</code></td>
 							<td></td>
 						</tr>
-						<tr class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>price</code></td>
 							<td></td>
 						</tr>
-						<tr class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>threshold</code></td>
 							<td></td>
 						</tr>
-						<tr class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>diff</code></td>
 							<td></td>
 						</tr>
-						<tr class="k">
+						<tr class="M">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="K" id="findLargestOrder(double,double)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">findLargestOrder</code><code class="Q">(<code>double</code> <code class="parameterName">lowerPrice</code>, <code>double</code> <code class="parameterName">upperPrice</code>)</code><i class="j"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></h2>
-					<table class="i">
-						<tr class="m">
+				<section class="W" id="findLargestOrder(double,double)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">findLargestOrder</code><code class="Z">(<code>double</code> <code class="parameterName">lowerPrice</code>, <code>double</code> <code class="parameterName">upperPrice</code>)</code><i class="O"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code>double</code> <code>lowerPrice</code></td>
 							<td></td>
 						</tr>
-						<tr class="m">
+						<tr class="I">
 							<td><code>double</code> <code>upperPrice</code></td>
 							<td></td>
 						</tr>
-						<tr class="k">
+						<tr class="M">
 							<td><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>It finds the largest order in the currently selected OrderBook within the specified price
- range.</p>
-					</span></section>
-				<section class="K" id="findLargestOrder(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">
-					<h2 class="I"><i class="PUBLIC"></i><code class="J">findLargestOrder</code><code class="Q">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">lowerPrice</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">upperPrice</code>)</code><i class="j"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></h2>
-					<table class="i">
-						<tr class="m">
+range.</p>
+</span></section>
+				<section class="W" id="findLargestOrder(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Y">findLargestOrder</code><code class="Z">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">lowerPrice</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">upperPrice</code>)</code><i class="O"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></h2>
+					<table class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>lowerPrice</code></td>
 							<td></td>
 						</tr>
-						<tr class="m">
+						<tr class="I">
 							<td><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code>upperPrice</code></td>
 							<td></td>
 						</tr>
-						<tr class="k">
+						<tr class="M">
 							<td><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>It finds the largest order in the currently selected OrderBook within the specified price
- range.</p>
-					</span></section>
-				<section class="K" id="vandalize()">
-					<h2 class="I"><i class="OVERRIDE PUBLIC"></i><code class="J">vandalize</code><code class="Q">()</code><i class="j"><code>void</code></i></h2>
+range.</p>
+</span></section>
+				<section class="W" id="vandalize()">
+					<h2 class="j"><i class="OVERRIDE PUBLIC"></i><code class="Y">vandalize</code><code class="Z">()</code><i class="O"><code>void</code></i></h2>
 				</section>
 			</article>
-			<aside class="Z" id="SubNavi">
-				<div class="M">
-					<h5 class="L">Constructors</h5>
+			<aside class="H" id="SubNavi">
+				<div class="S">
+					<h5 class="P">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#OrderBookManager(cointoss.MarketService,kiss.Signal)">OrderBookManager</a></code><code class="Q">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">fixPageByPrice</code>)</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#OrderBookManager(cointoss.MarketService,kiss.Signal)">OrderBookManager</a></code><code class="Z">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>, <code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></code></code> <code class="parameterName">fixPageByPrice</code>)</code></li>
 					</ul>
-					<h5 class="L">Fields</h5>
+					<h5 class="P">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#shorts">shorts</a></code><i class="T"><code class="return"><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#longs">longs</a></code><i class="T"><code class="return"><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#shorts">shorts</a></code><i class="f"><code class="return"><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#longs">longs</a></code><i class="f"><code class="return"><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></li>
 					</ul>
-					<h5 class="L">Methods</h5>
+					<h5 class="P">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#by(cointoss.Directional)">by</a></code><code class="Q">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">side</code>)</code><i class="T"><code><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#groupBy(float)">groupBy</a></code><code class="Q">(<code>float</code> <code class="parameterName">range</code>)</code><i class="T"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#ranged()">ranged</a></code><code class="Q">()</code><i class="T"><code>double</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#spread()">spread</a></code><code class="Q">()</code><i class="T"><code>double</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#computeBestPrice(cointoss.Directional,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">computeBestPrice</a></code><code class="Q">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">side</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="T"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#findLargestOrder(double,double)">findLargestOrder</a></code><code class="Q">(<code>double</code> <code class="parameterName">lowerPrice</code>, <code>double</code> <code class="parameterName">upperPrice</code>)</code><i class="T"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#findLargestOrder(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">findLargestOrder</a></code><code class="Q">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">lowerPrice</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">upperPrice</code>)</code><i class="T"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#vandalize()">vandalize</a></code><code class="Q">()</code><i class="T"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#by(cointoss.Directional)">by</a></code><code class="Z">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">side</code>)</code><i class="f"><code><a href="api/cointoss.orderbook.OrderBook.html">OrderBook</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#groupBy(float)">groupBy</a></code><code class="Z">(<code>float</code> <code class="parameterName">range</code>)</code><i class="f"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#ranged()">ranged</a></code><code class="Z">()</code><i class="f"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#spread()">spread</a></code><code class="Z">()</code><i class="f"><code>double</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#computeBestPrice(cointoss.Directional,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">computeBestPrice</a></code><code class="Z">(<code><a href="api/cointoss.Directional.html">Directional</a></code> <code class="parameterName">side</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">price</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">threshold</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">diff</code>)</code><i class="f"><code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#findLargestOrder(double,double)">findLargestOrder</a></code><code class="Z">(<code>double</code> <code class="parameterName">lowerPrice</code>, <code>double</code> <code class="parameterName">upperPrice</code>)</code><i class="f"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#findLargestOrder(cointoss.util.arithmetic.Num,cointoss.util.arithmetic.Num)">findLargestOrder</a></code><code class="Z">(<code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">lowerPrice</code>, <code><a href="api/cointoss.util.arithmetic.Num.html">Num</a></code> <code class="parameterName">upperPrice</code>)</code><i class="f"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBookManager.html#vandalize()">vandalize</a></code><code class="Z">()</code><i class="f"><code>void</code></i></li>
 					</ul>
 				</div>
 			</aside>

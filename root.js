@@ -15,7 +15,6 @@ const root = {
 		"cointoss.market.bybit",
 		"cointoss.market.coinbase",
 		"cointoss.market.coincheck",
-		"cointoss.market.ftx",
 		"cointoss.market.gmo",
 		"cointoss.market.huobi",
 		"cointoss.market.liquid",
@@ -694,20 +693,6 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "ExecutionView",
 			"packageName": "trademate",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "FTXAccount",
-			"packageName": "cointoss.market.ftx",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "FTXService",
-			"packageName": "cointoss.market.ftx",
 			"type": "Class"
 		},
 		{
