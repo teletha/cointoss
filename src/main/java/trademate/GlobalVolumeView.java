@@ -87,8 +87,6 @@ public class GlobalVolumeView extends View {
 
     private UILabel gmo;
 
-    private UILabel huobi;
-
     class view extends ViewDSL {
         {
             $(scroll, () -> {
@@ -104,7 +102,6 @@ public class GlobalVolumeView extends View {
                         $(bybit, style.name);
                         $(coinbase, style.name);
                         $(gmo, style.name);
-                        $(huobi, style.name);
                     });
                     $(vbox, charts);
                 });
@@ -133,7 +130,6 @@ public class GlobalVolumeView extends View {
         drawSample(bybit, Exchange.Bybit, Pastel10[5]);
         drawSample(coinbase, Exchange.Coinbase, Pastel10[6]);
         drawSample(gmo, Exchange.GMO, Pastel10[8]);
-        drawSample(huobi, Exchange.Huobi, Pastel10[9]);
 
         List<Currency> currencies = List.of(BTC, ETH, XRP, EOS, COMP, SRM, DOGE);
         for (Currency currency : currencies) {
