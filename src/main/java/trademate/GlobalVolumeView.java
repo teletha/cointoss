@@ -9,14 +9,8 @@
  */
 package trademate;
 
-import static cointoss.Currency.BTC;
-import static cointoss.Currency.COMP;
-import static cointoss.Currency.DOGE;
-import static cointoss.Currency.EOS;
-import static cointoss.Currency.ETH;
-import static cointoss.Currency.SRM;
-import static cointoss.Currency.XRP;
-import static trademate.FXColorPalettes.Pastel10;
+import static cointoss.Currency.*;
+import static trademate.FXColorPalettes.*;
 
 import java.text.Normalizer.Form;
 import java.util.HashMap;
@@ -91,8 +85,6 @@ public class GlobalVolumeView extends View {
 
     private UILabel coinbase;
 
-    private UILabel ftx;
-
     private UILabel gmo;
 
     private UILabel huobi;
@@ -111,7 +103,6 @@ public class GlobalVolumeView extends View {
                     $(hbox, () -> {
                         $(bybit, style.name);
                         $(coinbase, style.name);
-                        $(ftx, style.name);
                         $(gmo, style.name);
                         $(huobi, style.name);
                     });
@@ -141,7 +132,6 @@ public class GlobalVolumeView extends View {
         drawSample(bitmex, Exchange.BitMEX, Pastel10[4]);
         drawSample(bybit, Exchange.Bybit, Pastel10[5]);
         drawSample(coinbase, Exchange.Coinbase, Pastel10[6]);
-        drawSample(ftx, Exchange.FTX, Pastel10[7]);
         drawSample(gmo, Exchange.GMO, Pastel10[8]);
         drawSample(huobi, Exchange.Huobi, Pastel10[9]);
 
