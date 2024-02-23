@@ -21,7 +21,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.LogType;
 import cointoss.market.Exchange;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.util.APILimiter;
@@ -91,8 +90,8 @@ public class CoincheckService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         long[] context = new long[3];
 
-        return this.call("GET", "trades?pair=" + marketName + "&starting_after=" + startId + "&limit=10000")
-                .flatIterable(e -> e.find("completes", "$"))
+        return this.call("GET", "trades?pair=" + marketName + "&limit=100")
+                .flatIterable(e -> e.find("data", "*"))
                 .map(json -> createExecution(json, context));
     }
 
@@ -111,14 +110,19 @@ public class CoincheckService extends MarketService {
         // Coincheck.BTC_JPY.executionsRealtimely().waitForTerminate().to(x -> {
         // System.out.println(x);
         // });
-        Market market = Market.of(Coincheck.BTC_JPY);
-        market.readLog(x -> x.fromToday(LogType.Fast));
 
-        try {
-            Thread.sleep(1000 * 60 * 20);
-        } catch (InterruptedException e) {
-            throw I.quiet(e);
-        }
+        Coincheck.BTC_JPY.executions(10, 20).waitForTerminate().to(x -> {
+            System.out.println(x);
+        });
+
+        // Market market = Market.of(Coincheck.BTC_JPY);
+        // market.readLog(x -> x.fromToday(LogType.Fast));
+        //
+        // try {
+        // Thread.sleep(1000 * 60 * 20);
+        // } catch (InterruptedException e) {
+        // throw I.quiet(e);
+        // }
     }
 
     /**
