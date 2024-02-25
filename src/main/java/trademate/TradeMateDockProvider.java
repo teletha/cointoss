@@ -12,7 +12,6 @@ package trademate;
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
-import trademate.chart2.ChartView2;
 import trademate.order.OrderView;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
@@ -31,8 +30,6 @@ public class TradeMateDockProvider extends DockProvider {
     public final Dock volumes = Dock.with.view(GlobalVolumeView.class).showOnInitial();
 
     public final Dock summary = Dock.with.view(SummaryView.class).showOnInitial();
-
-    public final Dock chart = Dock.with.view(ChartView2.class).showOnInitial();
 
     public final Dock setting = Dock.with.view(SettingView.class).location(o -> o.window(750, 600, false));
 
