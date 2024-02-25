@@ -32,7 +32,8 @@ const root = {
 		"trademate.chart.builtin",
 		"trademate.order",
 		"trademate.setting",
-		"trademate.verify"
+		"trademate.verify",
+		"trademate.visualizer"
 	],
 	"types": [
 		{
@@ -466,6 +467,13 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "CoincheckAccount",
+			"packageName": "cointoss.market.coincheck",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "CoincheckDataCollector",
 			"packageName": "cointoss.market.coincheck",
 			"type": "Class"
 		},
@@ -1727,6 +1735,20 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "VerifiableMarketService",
 			"packageName": "cointoss.verify",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Visualizer",
+			"packageName": "trademate.visualizer",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "VisualizerView",
+			"packageName": "trademate.visualizer",
 			"type": "Class"
 		},
 		{
