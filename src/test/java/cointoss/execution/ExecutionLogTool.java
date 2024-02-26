@@ -19,6 +19,7 @@ import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import kiss.I;
+import psychopath.Locator;
 
 /**
  * Migration Tool.
@@ -26,8 +27,25 @@ import kiss.I;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        deleteRepositoryInfo();
-        // restoreNormal(Bybit.BTC_USD, Chrono.utc(2022, 3, 12));
+        I.load(Market.class);
+
+        // deleteRepositoryInfo();
+        changeLayout();
+    }
+
+    public static void changeLayout() {
+        Locator.directory(".log").walkDirectory("*").to(dir -> {
+            dir.walkDirectory("*").to(root -> {
+                root.walkFile("execution*").to(file -> {
+                    String name = file.name();
+                    String year = name.substring(9, 13);
+                    String month = name.substring(13, 15);
+
+                    file.moveTo(root.directory("executions/" + year + "/" + month), o -> o.skipExisting());
+                    System.out.println(dir.name() + root.name() + " " + name);
+                });
+            });
+        });
     }
 
     /**

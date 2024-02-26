@@ -44,6 +44,9 @@ public class Chrono {
     /** The minimum UTC time. */
     public static final ZonedDateTime MIN = ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, UTC);
 
+    /** Reusable format. yyyy/MM */
+    public static final DateTimeFormatter DateFolderFormatter = DateTimeFormatter.ofPattern("yyyy/MM");
+
     /** Reusable format. yyyy-MM-dd */
     public static final DateTimeFormatter Date = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 

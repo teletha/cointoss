@@ -111,9 +111,9 @@ public class CoincheckService extends MarketService {
         // System.out.println(x);
         // });
 
-        Coincheck.BTC_JPY.executions(10, 20).waitForTerminate().to(x -> {
-            System.out.println(x);
-        });
+        // Coincheck.BTC_JPY.executions(10, 20).waitForTerminate().to(x -> {
+        // System.out.println(x);
+        // });
 
         // Market market = Market.of(Coincheck.BTC_JPY);
         // market.readLog(x -> x.fromToday(LogType.Fast));

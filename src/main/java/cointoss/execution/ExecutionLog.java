@@ -9,11 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.WRITE;
-import static psychopath.Option.ATOMIC_WRITE;
+import static java.nio.charset.StandardCharsets.*;
+import static java.nio.file.StandardOpenOption.*;
+import static psychopath.Option.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -276,7 +274,7 @@ public class ExecutionLog {
      * Clear all fast log.
      */
     public final void clearFastCache() {
-        root.delete("*.flog");
+        root.delete("**.flog");
     }
 
     /**
@@ -538,7 +536,9 @@ public class ExecutionLog {
             this.date = date.toLocalDate();
             this.startTime = date.truncatedTo(ChronoUnit.DAYS).toInstant().toEpochMilli();
             this.endTime = startTime + 24 * 60 * 60 * 1000;
-            this.normal = root.file("execution" + Chrono.DateCompact.format(date) + ".log");
+
+            this.normal = root.file("executions/" + Chrono.DateFolderFormatter.format(date) + "/execution" + Chrono.DateCompact
+                    .format(date) + ".log");
         }
 
         /**
