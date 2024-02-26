@@ -22,6 +22,16 @@ public final class Binance extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 1000;
 
+    public static final MarketService AAVE_USDT = new BinanceService("AAVEUSDT", MarketSetting.with.spot()
+            .target(Currency.AAVE.minimumSize(0.001))
+            .base(Currency.USDT.minimumSize(0.01))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService ARB_USDT = new BinanceService("ARBUSDT", MarketSetting.with.spot()
+            .target(Currency.ARB.minimumSize(0.1))
+            .base(Currency.USDT.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService BNB_USDT = new BinanceService("BNBUSDT", MarketSetting.with.spot()
             .target(Currency.BNB.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.1))
@@ -39,21 +49,44 @@ public final class Binance extends MarketServiceProvider {
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize));
 
-    // public static final MarketService GLMR_USDT = new BinanceService("GLMRUSDT",
-    // MarketSetting.with.spot()
-    // .target(Currency.GLMR.minimumSize(0.1))
-    // .base(Currency.USDT.minimumSize(0.0001))
-    // .acquirableExecutionSize(AcquirableSize));
-    //
-    // public static final MarketService GMT_USDT = new BinanceService("GMTUSDT",
-    // MarketSetting.with.spot()
-    // .target(Currency.GMT.minimumSize(0.1))
-    // .base(Currency.USDT.minimumSize(0.00001))
-    // .acquirableExecutionSize(AcquirableSize));
+    public static final MarketService FIL_USDT = new BinanceService("FILUSDT", MarketSetting.with.spot()
+            .target(Currency.FIL.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService GLMR_USDT = new BinanceService("GLMRUSDT", MarketSetting.with.spot()
+            .target(Currency.GLMR.minimumSize(0.1))
+            .base(Currency.USDT.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService GMT_USDT = new BinanceService("GMTUSDT", MarketSetting.with.spot()
+            .target(Currency.GMT.minimumSize(0.1))
+            .base(Currency.USDT.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService LDO_USDT = new BinanceService("LDOUSDT", MarketSetting.with.spot()
+            .target(Currency.LDO.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.001))
+            .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService LINK_USDT = new BinanceService("LINKUSDT", MarketSetting.with.spot()
             .target(Currency.LINK.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService MATIC_USDT = new BinanceService("MATICUSDT", MarketSetting.with.spot()
+            .target(Currency.MATIC.minimumSize(0.1))
+            .base(Currency.USDT.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService OP_USDT = new BinanceService("OPUSDT", MarketSetting.with.spot()
+            .target(Currency.OP.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService SNX_USDT = new BinanceService("SNXUSDT", MarketSetting.with.spot()
+            .target(Currency.SNX.minimumSize(0.1))
+            .base(Currency.USDT.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService SOL_USDT = new BinanceService("SOLUSDT", MarketSetting.with.spot()
@@ -61,9 +94,19 @@ public final class Binance extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService STRK_USDT = new BinanceService("STRKUSDT", MarketSetting.with.spot()
+            .target(Currency.STRK.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.001))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService UNI_USDT = new BinanceService("UNIUSDT", MarketSetting.with.spot()
             .target(Currency.UNI.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService WLD_USDT = new BinanceService("WLDUSDT", MarketSetting.with.spot()
+            .target(Currency.WLD.minimumSize(0.1))
+            .base(Currency.USDT.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService XRP_USDT = new BinanceService("XRPUSDT", MarketSetting.with.spot()
