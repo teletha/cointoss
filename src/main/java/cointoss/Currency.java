@@ -16,6 +16,8 @@ import kiss.I;
 
 public enum Currency {
 
+    AAVE("AAVE", "Aave"),
+
     AED("AED", "United Arab Emirates Dirham"),
 
     AFN("AFN", "Afghan Afghani"),
@@ -30,9 +32,13 @@ public enum Currency {
 
     AOA("AOA", "Angolan Kwanza"),
 
+    APEX("APEX", "ApeX"),
+
     ARN("ARN", "Aeron"),
 
     ARS("ARS", "Argentine Peso"),
+
+    ARB("ARV", "Arbitrum"),
 
     ASTR("ASTR", "Astar"),
 
@@ -95,6 +101,8 @@ public enum Currency {
     BZD("BZD", "Belize Dollar"),
 
     CAD("CAD", "Canadian Dollar"),
+
+    CAKE("CAKE", "PancakeSwap"),
 
     CDF("CDF", "Congolese Franc"),
 
@@ -258,6 +266,8 @@ public enum Currency {
 
     LBP("LBP", "Lebanese Pound"),
 
+    LDO("LDO", "Lodo DAO Token"),
+
     LSK("LSK", "Lisk"),
 
     LKR("LKR", "Sri Lankan Rupee"),
@@ -288,7 +298,7 @@ public enum Currency {
 
     MMK("MMK", "Myanma Kyat"),
 
-    MNT("MNT", "Mongolian Tugrik"),
+    MNT("MNT", "Mantle"),
 
     MOP("MOP", "Macanese Pataca"),
 
@@ -333,6 +343,8 @@ public enum Currency {
     OMG("OMG", "OmiseGO"),
 
     OMR("OMR", "Omani Rial"),
+
+    OP("OP", "Optimism"),
 
     PAB("PAB", "Panamanian Balboa"),
 
@@ -408,6 +420,8 @@ public enum Currency {
 
     STRAT("STRAT", "Stratis"),
 
+    STRK("STRK", "Starknet Token"),
+
     SVC("SVC", "Salvadoran Colón"),
 
     SYP("SYP", "Syrian Pound"),
@@ -468,7 +482,7 @@ public enum Currency {
 
     VUV("VUV", "Vanuatu Vatu"),
 
-    WDC("WDC", "WorldCoin"),
+    WLD("WLD", "Worldcoin"),
 
     WST("WST", "Samoan Tala"),
 
@@ -668,7 +682,7 @@ public enum Currency {
 
     WAN("WAN", "Wanchain"),
 
-    MATIC("MATIC", "Matic Network"),
+    MATIC("MATIC", "Polygon"),
 
     POWR("POWR", "Power Ledger"),
 
@@ -873,17 +887,6 @@ public enum Currency {
     OKB("OKB", "OKB"),
 
     ZRX("ZRX", "0x"),
-
-    // ===================================================================
-    // Derivatives on FTX
-    // ===================================================================
-    FTX_DEFI("DEFI", "Buscket for Defi project tokens on FTX"),
-
-    FTX_ALT("ALT", "Buscket for major alt coins on FTX"),
-
-    FTX_MID("MID", "Buscket for middle alt coins on FTX"),
-
-    FTX_SHIT("SHIT", "Buscket for minor alt coins on FTX"),
 
     // ===================================================================
     // For Test
