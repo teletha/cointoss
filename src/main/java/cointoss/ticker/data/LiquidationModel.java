@@ -14,11 +14,11 @@ import java.time.ZonedDateTime;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
-import cointoss.util.feather.TemporalData;
+import cointoss.util.feather.Timelinable;
 import icy.manipulator.Icy;
 
 @Icy
-interface LiquidationModel extends TemporalData, Directional {
+interface LiquidationModel extends Timelinable, Directional {
 
     /**
      * {@inheritDoc}

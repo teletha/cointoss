@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 import kiss.I;
 import psychopath.File;
@@ -26,15 +25,8 @@ class NormalLog implements AutoCloseable {
      * 
      */
     NormalLog(File file) {
-        this(file.asJavaPath());
-    }
-
-    /**
-     * 
-     */
-    NormalLog(Path file) {
         try {
-            this.file = new RandomAccessFile(file.toFile(), "rw");
+            this.file = new RandomAccessFile(file.create().asJavaFile(), "rw");
         } catch (FileNotFoundException e) {
             throw I.quiet(e);
         }

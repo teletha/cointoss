@@ -46,7 +46,7 @@ class FeatherStoreTest {
         return IntStream.of(values).mapToObj(this::value).collect(Collectors.toList());
     }
 
-    static class Value implements TemporalData {
+    static class Value implements Timelinable {
 
         public long value;
 
@@ -369,7 +369,7 @@ class FeatherStoreTest {
         assert restored.shortValue == primitive.shortValue;
     }
 
-    private static class Primitive implements TemporalData {
+    private static class Primitive implements Timelinable {
         public int intValue;
 
         public long longValue;
@@ -409,7 +409,7 @@ class FeatherStoreTest {
         assert restored.currency == e.currency;
     }
 
-    private static class Enums implements TemporalData {
+    private static class Enums implements Timelinable {
         public MarketType type;
 
         public Currency currency;

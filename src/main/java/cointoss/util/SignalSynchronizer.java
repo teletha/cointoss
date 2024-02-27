@@ -12,7 +12,7 @@ package cointoss.util;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Function;
 
-import cointoss.Timelinable;
+import cointoss.util.feather.Timelinable;
 import kiss.Observer;
 import kiss.Signal;
 

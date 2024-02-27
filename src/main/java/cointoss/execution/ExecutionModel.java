@@ -16,9 +16,9 @@ import java.util.function.LongConsumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
-import cointoss.Timelinable;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
+import cointoss.util.feather.Timelinable;
 import icy.manipulator.Icy;
 
 @Icy(grouping = 2)

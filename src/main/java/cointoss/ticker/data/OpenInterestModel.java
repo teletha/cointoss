@@ -14,11 +14,11 @@ import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
 import cointoss.util.feather.DataCodec;
-import cointoss.util.feather.TemporalData;
+import cointoss.util.feather.Timelinable;
 import icy.manipulator.Icy;
 
 @Icy
-abstract class OpenInterestModel implements TemporalData {
+abstract class OpenInterestModel implements Timelinable {
 
     /**
      * {@inheritDoc}

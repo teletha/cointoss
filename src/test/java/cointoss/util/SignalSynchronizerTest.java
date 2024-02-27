@@ -15,7 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import cointoss.Timelinable;
+import cointoss.util.feather.Timelinable;
 import kiss.I;
 import kiss.Signal;
 

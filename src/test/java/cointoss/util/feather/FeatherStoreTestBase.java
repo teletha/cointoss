@@ -128,7 +128,7 @@ class FeatherStoreTestBase {
     }
 
     @SuppressWarnings("preview")
-    public record Value(int value) implements TemporalData {
+    public record Value(int value) implements Timelinable {
 
         @Override
         public long seconds() {

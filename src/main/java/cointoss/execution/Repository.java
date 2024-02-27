@@ -74,7 +74,7 @@ class Repository implements Storable<Repository> {
      */
     private void scanLocalRepository() {
         LocalDate now = LocalDate.now(Chrono.UTC);
-        if (now.isAfter(localScanLatest) || true) {
+        if (now.isAfter(localScanLatest)) {
             root.walkDirectory("executions/*")
                     .first()
                     .flatMap(year -> year.walkDirectory("*"))

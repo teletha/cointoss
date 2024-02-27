@@ -13,9 +13,9 @@ import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
-import cointoss.util.feather.TemporalData;
+import cointoss.util.feather.Timelinable;
 
-public final class Tick implements TemporalData {
+public final class Tick implements Timelinable {
 
     /** The empty dummy. */
     static final Tick EMPTY = new Tick();

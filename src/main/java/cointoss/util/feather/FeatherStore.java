@@ -31,7 +31,7 @@ import primavera.map.LongMap;
 import primavera.map.LongMap.LongEntry;
 import psychopath.File;
 
-public final class FeatherStore<E extends TemporalData> implements Disposable {
+public final class FeatherStore<E extends Timelinable> implements Disposable {
 
     /** The item type. */
     private final Model<E> model;
@@ -77,7 +77,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param span
      * @return
      */
-    public static <E extends TemporalData> FeatherStore<E> create(Class<E> type, Span span) {
+    public static <E extends Timelinable> FeatherStore<E> create(Class<E> type, Span span) {
         return new FeatherStore<E>(type, span.seconds, (int) (span.segmentSeconds / span.seconds), span.segmentSize);
     }
 
@@ -88,7 +88,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param type
      * @return
      */
-    public static <E extends TemporalData> FeatherStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
+    public static <E extends Timelinable> FeatherStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
         return new FeatherStore<E>(type, itemDuration, itemSize, segmentSize);
     }
 
@@ -636,7 +636,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param option Your options.
      * @return A result.
      */
-    public Signal<E> query(TemporalData start, Consumer<Option>... option) {
+    public Signal<E> query(Timelinable start, Consumer<Option>... option) {
         return query(start.seconds(), option);
     }
 
@@ -648,7 +648,7 @@ public final class FeatherStore<E extends TemporalData> implements Disposable {
      * @param option Your options.
      * @return A result.
      */
-    public Signal<E> query(TemporalData start, TemporalData end, Consumer<Option>... option) {
+    public Signal<E> query(Timelinable start, Timelinable end, Consumer<Option>... option) {
         return query(start.seconds(), end.seconds(), option);
     }
 

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
 import kiss.I;
+import psychopath.Locator;
 
 class NormalLogTest {
 
@@ -42,7 +43,7 @@ class NormalLogTest {
             throw I.quiet(e);
         }
 
-        return new NormalLog(file);
+        return new NormalLog(Locator.file(file));
     }
 
     @Test
