@@ -25,7 +25,7 @@ public final class TickerManager implements Disposable {
     public final Variable<Execution> latest = Variable.of(Market.BASE);
 
     /** The associated service. */
-    private final MarketService service;
+    public final MarketService service;
 
     /** Total of long volume since application startup. */
     double longVolume = 0;
