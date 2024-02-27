@@ -1516,13 +1516,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "TemporalData",
-			"packageName": "cointoss.util.feather",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Tick",
 			"packageName": "cointoss.ticker",
 			"type": "Class"
@@ -1544,16 +1537,9 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "TimeStorable",
-			"packageName": "cointoss.util",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Timelinable",
-			"packageName": "cointoss",
-			"type": "Functional"
+			"packageName": "cointoss.util.feather",
+			"type": "Interface"
 		},
 		{
 			"modifiers": {
