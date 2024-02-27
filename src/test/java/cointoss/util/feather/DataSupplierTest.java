@@ -25,13 +25,13 @@ class DataSupplierTest {
 
     Signal<Value> passive = stream.expose.map(Value::new);
 
-    LongFunction<Signal<Value>> bulk = time -> {
+    LongFunction<Signal<Value>> onDemand = time -> {
         return I.signal(0).recurse(i -> i + 1).take(60 * 24).map(i -> new Value(time + i * 60));
     };
 
     @Test
     void passive() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDataSupplier(passive);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePassiveDataSupplier(passive);
         assert store.size() == 0;
 
         stream.accept(0);
@@ -52,8 +52,8 @@ class DataSupplierTest {
     }
 
     @Test
-    void bulk() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableBulkDataSupplier(bulk);
+    void onDemand() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableOnDemandDataSupplier(onDemand);
         assert store.size() == 0;
 
         assert store.at(0).value == 0;

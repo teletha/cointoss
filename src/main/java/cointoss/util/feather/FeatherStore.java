@@ -116,7 +116,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * @param bulk
      * @return Chainable API.
      */
-    public FeatherStore<E> enableBulkDataSupplier(LongFunction<Signal<E>> bulk) {
+    public FeatherStore<E> enableOnDemandDataSupplier(LongFunction<Signal<E>> bulk) {
         this.bulk = bulk;
         return this;
     }
@@ -127,7 +127,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * @param active
      * @return Chainable API.
      */
-    public FeatherStore<E> enableDataSupplier(LongFunction<Signal<E>> active) {
+    public FeatherStore<E> enableActiveDataSupplier(LongFunction<Signal<E>> active) {
         return enableDataSupplier(active, null);
     }
 
@@ -137,7 +137,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * @param passive
      * @return Chainable API.
      */
-    public FeatherStore<E> enableDataSupplier(Signal<E> passive) {
+    public FeatherStore<E> enablePassiveDataSupplier(Signal<E> passive) {
         return enableDataSupplier(null, passive);
     }
 
@@ -147,7 +147,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * @param passive
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> enableDataSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
+    public FeatherStore<E> enableDataSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
         if (active != null) {
             startActiveSupplier(active, passive);
         } else {

@@ -9,9 +9,9 @@
  */
 package cointoss.util.feather;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-
-import cointoss.util.Chrono;
 
 public interface Timelinable {
 
@@ -21,7 +21,7 @@ public interface Timelinable {
      * @return
      */
     default ZonedDateTime date() {
-        return Chrono.utcBySeconds(seconds());
+        return Instant.ofEpochMilli(mills()).atZone(ZoneId.of("Z"));
     }
 
     /**
