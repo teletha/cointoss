@@ -16,6 +16,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import cointoss.MarketService;
 import cointoss.util.Chrono;
+import kiss.I;
 import kiss.Managed;
 import kiss.Signal;
 import kiss.Storable;
@@ -73,7 +74,7 @@ class Repository implements Storable<Repository> {
      */
     private void scanLocalRepository() {
         LocalDate now = LocalDate.now(Chrono.UTC);
-        if (now.isAfter(localScanLatest)) {
+        if (now.isAfter(localScanLatest) || true) {
             root.walkDirectory("executions/*")
                     .first()
                     .flatMap(year -> year.walkDirectory("*"))
@@ -93,6 +94,8 @@ class Repository implements Storable<Repository> {
                     });
 
             localScanLatest = now;
+
+            I.info("Scan log repository [" + service.formattedId + "] \tfrom " + localFirst + " \tto " + localLast);
             store();
         }
     }
