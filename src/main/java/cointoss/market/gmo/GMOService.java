@@ -174,12 +174,12 @@ public class GMOService extends MarketService {
         return OrderBookChanges.byJSON(root.find("bids", "*"), root.find("asks", "*"), "price", "size");
     }
 
-    public static void main2(String[] args) throws InterruptedException {
-        GMO.BTC_DERIVATIVE.orderBookRealtimely(true).to(book -> {
+    public static void main(String[] args) throws InterruptedException {
+        GMO.BTC_DERIVATIVE.log.fromLast(10).to(book -> {
             System.out.println(book);
         });
 
-        Thread.sleep(1000 * 60 * 10);
+        Thread.sleep(1000 * 30);
     }
 
     /**
@@ -321,7 +321,6 @@ public class GMOService extends MarketService {
             REPOSITORY_LIMITER.acquire();
 
             return I.http(uri, InputStream.class)
-                    .stopError()
                     .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
                     .effectOnComplete(parser::stopParsing);
         }

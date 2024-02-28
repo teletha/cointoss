@@ -68,11 +68,6 @@ public final class Bybit extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService APEX_USDT = new BybitService("APEXUSDT", MarketSetting.with.derivative()
-            .target(Currency.APEX.minimumSize(1).scale(2))
-            .base(Currency.USDT.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
-
     public static final MarketService MNT_USDT = new BybitService("MNTUSDT", MarketSetting.with.derivative()
             .target(Currency.MNT.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.0001))

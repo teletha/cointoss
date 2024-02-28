@@ -293,13 +293,17 @@ public class ExecutionLog {
     public final synchronized Signal<Execution> from(ZonedDateTime start, LogType... type) {
         ZonedDateTime startDay = repository.firstZDT();
         ZonedDateTime endDay = repository.lastZDT();
-        startDay = Chrono.between(startDay, start, endDay).truncatedTo(ChronoUnit.DAYS);
 
-        return I.signal(startDay)
-                .recurse(day -> day.plusDays(1))
-                .takeWhile(day -> day.isBefore(endDay) || day.isEqual(endDay))
-                .concatMap(day -> new Cache(day).read(type))
-                .concat(network(-1).effect(this::cache));
+        return new Signal<ZonedDateTime>((observer, disposer) -> {
+            ZonedDateTime current = Chrono.between(startDay, start, endDay).truncatedTo(ChronoUnit.DAYS);
+            while (!disposer.isDisposed() && (current.isBefore(endDay) || current.isEqual(endDay))) {
+                observer.accept(current);
+                System.out.println(current + "   " + endDay);
+                current = current.plusDays(1);
+            }
+            observer.complete();
+            return disposer;
+        }).concatMap(day -> new Cache(day).read(type)).concat(network(-1).effect(this::cache));
     }
 
     /**
@@ -661,7 +665,7 @@ public class ExecutionLog {
 
                 return readNormal();
             } else if (service.externalRepository() != ExecutionLogRepository.NOP) {
-                return readExternalRepository(service.externalRepository()).recover(e -> I.signal());
+                return readExternalRepository(service.externalRepository());
             } else {
                 return I.signal();
             }

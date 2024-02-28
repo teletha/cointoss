@@ -72,8 +72,6 @@ public final class Ticker implements Disposable {
         this.uppers = new Ticker[span.uppers.length];
         this.ticks = FeatherStore.create(Tick.class, span);
         this.manager = manager;
-        
-        ticks.enableDiskStore(manager.service.file("ticks-" + span.name().toLowerCase() +".db"), );
     }
 
     /**

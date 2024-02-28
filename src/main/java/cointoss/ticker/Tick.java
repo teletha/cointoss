@@ -9,21 +9,16 @@
  */
 package cointoss.ticker;
 
-import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
-import cointoss.util.feather.DataCodec;
 import cointoss.util.feather.Timelinable;
 
 public final class Tick implements Timelinable {
 
     /** The empty dummy. */
     static final Tick EMPTY = new Tick();
-
-    /** The special tick codec. */
-    static final DataCodec<Tick> CODEC = new Codec();
 
     /** Begin time of this tick (epoch second). */
     public final long openTime;
@@ -323,51 +318,5 @@ public final class Tick implements Timelinable {
 
         Tick other = (Tick) obj;
         return openTime == other.openTime;
-    }
-
-    /**
-     * 
-     */
-    static class Codec extends DataCodec<Tick> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int size() {
-            return 0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Tick read(long time, ByteBuffer reader) {
-            double open = reader.getDouble();
-            double close = reader.getDouble();
-            double high = reader.getDouble();
-            double low = reader.getDouble();
-            double longVol = reader.getDouble();
-            double longLoss = reader.getDouble();
-            double shortVol = reader.getDouble();
-            double shortLoss = reader.getDouble();
-
-            return;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void write(Tick item, ByteBuffer writer) {
-            writer.putDouble(item.openPrice)
-                    .putDouble(item.closePrice)
-                    .putDouble(item.highPrice)
-                    .putDouble(item.lowPrice)
-                    .putDouble(item.longVolume)
-                    .putDouble(item.longLosscutVolume)
-                    .putDouble(item.shortVolume)
-                    .putDouble(item.shortLosscutVolume);
-        }
     }
 }
