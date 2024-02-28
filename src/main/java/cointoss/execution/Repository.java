@@ -74,7 +74,7 @@ class Repository implements Storable<Repository> {
      */
     private void scanLocalRepository() {
         LocalDate now = LocalDate.now(Chrono.UTC);
-        if (now.isAfter(localScanLatest)) {
+        if (now.isAfter(localScanLatest) || true) {
             root.walkDirectory("executions/*")
                     .first()
                     .flatMap(year -> year.walkDirectory("*"))
@@ -82,6 +82,11 @@ class Repository implements Storable<Repository> {
                     .flatMap(month -> month.walkFile("execution*.{log,clog}"))
                     .to(day -> {
                         localFirst = LocalDate.parse(day.base().subSequence(9, 17), Chrono.DateCompact);
+
+                        // limit to today
+                        if (localFirst.isAfter(now)) {
+                            localFirst = now;
+                        }
                     });
 
             root.walkDirectory("executions/*")
@@ -91,6 +96,16 @@ class Repository implements Storable<Repository> {
                     .flatMap(month -> month.walkFile("execution*.{log,clog}"))
                     .to(day -> {
                         localLast = LocalDate.parse(day.base().subSequence(9, 17), Chrono.DateCompact);
+
+                        // limit to today
+                        if (localLast.isAfter(now)) {
+                            localLast = now;
+                        }
+
+                        // limit to first
+                        if (localLast.isBefore(localFirst)) {
+                            localLast = localFirst;
+                        }
                     });
 
             localScanLatest = now;
