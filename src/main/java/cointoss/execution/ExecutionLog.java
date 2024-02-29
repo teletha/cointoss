@@ -329,11 +329,13 @@ public class ExecutionLog {
      * @return
      */
     public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end, LogType... type) {
-        return I.signal(start)
+        List<ZonedDateTime> days = I.signal(start)
                 .recurse(day -> day.plusDays(1))
                 .effect(x -> System.out.println(service.formattedId + "  " + x))
                 .takeUntil(day -> day.isEqual(end) || day.isAfter(end))
-                .concatMap(day -> at(day, type));
+                .toList();
+
+        return I.signal(days).concatMap(day -> at(day, type));
     }
 
     /**
