@@ -9,7 +9,7 @@
  */
 package cointoss.market.binance;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -175,7 +175,7 @@ public class BinanceService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Binance.LINK_USDT.log.fromToday().to(e -> {
+        Binance.LINK_USDT.log.fromLast(0).to(e -> {
         });
     }
 

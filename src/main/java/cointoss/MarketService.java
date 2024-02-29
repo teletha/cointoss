@@ -12,11 +12,14 @@ package cointoss;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -39,6 +42,7 @@ import kiss.Decoder;
 import kiss.Disposable;
 import kiss.Encoder;
 import kiss.I;
+import kiss.Observer;
 import kiss.Signal;
 import psychopath.Directory;
 import psychopath.File;
@@ -98,6 +102,210 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         this.scheduler.setKeepAliveTime(30, TimeUnit.SECONDS);
         // this.writable = directory().file(".lock").lock().mapTo(true).recover(false).to().exact();
         this.log = new ExecutionLog(this);
+    }
+
+    /**
+     * Monitor executions from snapshot and realtime.
+     * 
+     * @return
+     */
+    public final Signal<Execution> executions() {
+        return executions(-1);
+    }
+
+    /**
+     * Monitor executions from snapshot and realtime.
+     * 
+     * @return
+     */
+    public Signal<Execution> executions(long fromId) {
+        return new Signal<Execution>((observer, disposer) -> {
+            BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
+
+            // If you connect to the real-time API first, two errors may occur at the same time for
+            // the real-time API and the REST API (because the real-time API is asynchronous). In
+            // that case, there is a possibility that the retry operation may be hindered.
+            // Therefore, the real-time API will connect after the connection of the REST API
+            // is confirmed.
+            // disposer.add(service.executionsRealtimely().to(buffer, observer::error));
+            boolean activeRealtime = false;
+
+            // read from REST API
+            int size = setting.acquirableExecutionSize();
+            long cacheId = log.estimateLastID();
+            long startId = fromId != -1 ? fromId : cacheId != -1 ? cacheId : searchInitialExecution().map(e -> e.id).to().next();
+            Num coefficient = Num.ONE;
+            ArrayDeque<Execution> rests = new ArrayDeque(size);
+            while (!disposer.isDisposed()) {
+                rests.clear();
+
+                long range = Math.round(setting.acquirableExecutionSize * coefficient.doubleValue());
+                executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
+
+                // Since the synchronous REST API did not return an error, it can be determined that
+                // the server is operating normally, so the real-time API is also connected.
+                if (activeRealtime == false) {
+                    activeRealtime = true;
+                    disposer.add(executionsRealtimely(false).to(buffer, observer::error));
+                }
+                int retrieved = rests.size();
+
+                if (retrieved != 0) {
+                    // REST API returns some executions
+                    if (size <= retrieved && coefficient.isGreaterThan(1)) {
+                        // Since there are too many data acquired,
+                        // narrow the data range and get it again.
+                        coefficient = Num
+                                .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
+                        continue;
+                    } else {
+                        I.info(id + " \t" + rests.getFirst().date + " size " + retrieved + "(" + coefficient + ")");
+
+                        for (Execution execution : rests) {
+                            if (!buffer.canSwitch(execution)) {
+                                observer.accept(execution);
+                            } else {
+                                // REST API has caught up with the real-time API,
+                                // we must switch to realtime API.
+                                buffer.switchToRealtime(execution.id, observer);
+                                return disposer;
+                            }
+                        }
+
+                        long latestId = rests.peekLast().id;
+                        if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId || supportRecentExecutionOnly()) {
+                            // REST API has caught up with the real-time API,
+                            // we must switch to realtime API.
+                            buffer.switchToRealtime(latestId, observer);
+                            return disposer;
+                        }
+                        startId = latestId;
+
+                        // The number of acquired data is too small,
+                        // expand the data range slightly from next time.
+                        if (retrieved < size * 0.05) {
+                            coefficient = coefficient.plus("50");
+                        } else if (retrieved < size * 0.1) {
+                            coefficient = coefficient.plus("5");
+                        } else if (retrieved < size * 0.3) {
+                            coefficient = coefficient.plus("2");
+                        } else if (retrieved < size * 0.5) {
+                            coefficient = coefficient.plus("0.5");
+                        } else if (retrieved < size * 0.7) {
+                            coefficient = coefficient.plus("0.1");
+                        }
+                    }
+                } else {
+                    // REST API returns empty execution
+                    if (startId < buffer.realtimeFirstId() && !supportRecentExecutionOnly()) {
+                        // Although there is no data in the current search range,
+                        // since it has not yet reached the latest execution,
+                        // shift the range backward and search again.
+                        startId += range - 1;
+                        coefficient = coefficient.plus("50");
+                        continue;
+                    }
+
+                    // REST API has caught up with the real-time API,
+                    // we must switch to realtime API.
+                    buffer.switchToRealtime(startId, observer);
+                    break;
+                }
+            }
+            return disposer;
+        }).effectOnError(e -> e.printStackTrace()).retry(retryPolicy(MarketService.retryMax, "ExecutionLog"));
+    }
+
+    /**
+     * 
+     */
+    private class BufferFromRestToRealtime implements Observer<Execution> {
+
+        /** The upper error handler. */
+        private final Consumer<? super Throwable> error;
+
+        /** The actual realtime execution buffer. */
+        private ConcurrentLinkedDeque<Execution> realtime = new ConcurrentLinkedDeque();
+
+        /** The execution event receiver. */
+        private Observer<? super Execution> destination = realtime::add;
+
+        /** The no-realtime latest execution id. */
+        private long latestId = -1;
+
+        /**
+         * Build {@link BufferFromRestToRealtime}.
+         * 
+         * @param sequntial
+         */
+        private BufferFromRestToRealtime(Consumer<? super Throwable> error) {
+            this.error = error;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void accept(Execution e) {
+            destination.accept(e);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void error(Throwable e) {
+            error.accept(e);
+        }
+
+        /**
+         * Test whether the specified execution is queued in realtime buffer or not.
+         * 
+         * @param e An execution which is retrieved by REST API.
+         * @return
+         */
+        private boolean canSwitch(Execution e) {
+            // realtime buffer is empty
+            Execution first = realtime.peekFirst();
+            if (first == null) {
+                return false;
+            }
+            return checkEquality(e, first);
+        }
+
+        /**
+         * Switch to realtime API.
+         * 
+         * @param currentId
+         * @param observer
+         */
+        private void switchToRealtime(long currentId, Observer<? super Execution> observer) {
+            while (!realtime.isEmpty()) {
+                ConcurrentLinkedDeque<Execution> buffer = realtime;
+                realtime = new ConcurrentLinkedDeque();
+                latestId = -1;
+                for (Execution e : buffer) {
+                    observer.accept(e);
+                }
+                I.info(id + " \t" + buffer.peek().date + " size " + buffer.size());
+            }
+            destination = observer;
+        }
+
+        /**
+         * Compute the first execution id in realtime buffer.
+         * 
+         * @return
+         */
+        private long realtimeFirstId() {
+            if (!realtime.isEmpty()) {
+                return realtime.peek().id;
+            } else if (0 < latestId) {
+                return latestId;
+            } else {
+                return latestId = executionLatest().map(e -> e.id).waitForTerminate().to().or(-1L);
+            }
+        }
     }
 
     /**

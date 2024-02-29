@@ -21,6 +21,6 @@ public class MarketDevTool {
      */
     public static void collectLog(MarketService service) {
         Market m = Market.of(service);
-        m.readLog(log -> log.fromToday());
+        m.readLog(log -> log.fromLast(0));
     }
 }

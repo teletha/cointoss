@@ -57,7 +57,7 @@ public class TradeMate extends View {
         });
 
         MarketServiceProvider.availableProviders().on(Viewtify.WorkerThread).flatIterable(MarketServiceProvider::markets).to(service -> {
-            service.log.fromToday(LogType.Fast).to();
+            service.log.fromLast(0, LogType.Fast).to();
         });
     }
 

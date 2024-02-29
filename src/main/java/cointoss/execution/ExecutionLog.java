@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -40,7 +38,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
@@ -58,7 +55,6 @@ import cointoss.market.Exchange;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
-import kiss.Observer;
 import kiss.Signal;
 import kiss.Signaling;
 import psychopath.Directory;
@@ -204,6 +200,10 @@ public class ExecutionLog {
         repository.collectLocals(false, false).map(this::cache).to(c -> c.repair(true));
     }
 
+    public final long estimateLastID() {
+        return lastCache().estimateLastID();
+    }
+
     /**
      * Return the first cached date.
      * 
@@ -228,7 +228,7 @@ public class ExecutionLog {
      * @return
      */
     final Cache firstCache() {
-        return new Cache(firstCacheDate());
+        return cache(firstCacheDate());
     }
 
     /**
@@ -237,7 +237,7 @@ public class ExecutionLog {
      * @return
      */
     final Cache lastCache() {
-        return new Cache(lastCacheDate());
+        return cache(lastCacheDate());
     }
 
     /**
@@ -303,111 +303,7 @@ public class ExecutionLog {
             }
             observer.complete();
             return disposer;
-        }).concatMap(day -> new Cache(day).read(type)).concat(network(-1).effect(this::cache));
-    }
-
-    /**
-     * Read date from merket server.
-     * 
-     * @param fromId A starting id.
-     * @return
-     */
-    private Signal<Execution> network(long fromId) {
-        return new Signal<Execution>((observer, disposer) -> {
-            BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
-
-            // If you connect to the real-time API first, two errors may occur at the same time for
-            // the real-time API and the REST API (because the real-time API is asynchronous). In
-            // that case, there is a possibility that the retry operation may be hindered.
-            // Therefore, the real-time API will connect after the connection of the REST API
-            // is confirmed.
-            // disposer.add(service.executionsRealtimely().to(buffer, observer::error));
-            boolean activeRealtime = false;
-
-            // read from REST API
-            int size = service.setting.acquirableExecutionSize();
-            long cacheId = lastCache().estimateLastID();
-            long startId = fromId != -1 ? fromId : cacheId != -1 ? cacheId : service.searchInitialExecution().map(e -> e.id).to().next();
-            Num coefficient = Num.ONE;
-            ArrayDeque<Execution> rests = new ArrayDeque(size);
-            while (!disposer.isDisposed()) {
-                rests.clear();
-
-                long range = Math.round(service.setting.acquirableExecutionSize * coefficient.doubleValue());
-                service.executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
-
-                // Since the synchronous REST API did not return an error, it can be determined that
-                // the server is operating normally, so the real-time API is also connected.
-                if (activeRealtime == false) {
-                    activeRealtime = true;
-                    disposer.add(service.executionsRealtimely(false).to(buffer, observer::error));
-                }
-                int retrieved = rests.size();
-
-                if (retrieved != 0) {
-                    // REST API returns some executions
-                    if (size <= retrieved && coefficient.isGreaterThan(1)) {
-                        // Since there are too many data acquired,
-                        // narrow the data range and get it again.
-                        coefficient = Num
-                                .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
-                        continue;
-                    } else {
-                        I.info(service.id + " \t" + rests.getFirst().date + " size " + retrieved + "(" + coefficient + ")");
-
-                        for (Execution execution : rests) {
-                            if (!buffer.canSwitch(execution)) {
-                                observer.accept(execution);
-                            } else {
-                                // REST API has caught up with the real-time API,
-                                // we must switch to realtime API.
-                                buffer.switchToRealtime(execution.id, observer);
-                                return disposer;
-                            }
-                        }
-
-                        long latestId = rests.peekLast().id;
-                        if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId || service.supportRecentExecutionOnly()) {
-                            // REST API has caught up with the real-time API,
-                            // we must switch to realtime API.
-                            buffer.switchToRealtime(latestId, observer);
-                            return disposer;
-                        }
-                        startId = latestId;
-
-                        // The number of acquired data is too small,
-                        // expand the data range slightly from next time.
-                        if (retrieved < size * 0.05) {
-                            coefficient = coefficient.plus("50");
-                        } else if (retrieved < size * 0.1) {
-                            coefficient = coefficient.plus("5");
-                        } else if (retrieved < size * 0.3) {
-                            coefficient = coefficient.plus("2");
-                        } else if (retrieved < size * 0.5) {
-                            coefficient = coefficient.plus("0.5");
-                        } else if (retrieved < size * 0.7) {
-                            coefficient = coefficient.plus("0.1");
-                        }
-                    }
-                } else {
-                    // REST API returns empty execution
-                    if (startId < buffer.realtimeFirstId() && !service.supportRecentExecutionOnly()) {
-                        // Although there is no data in the current search range,
-                        // since it has not yet reached the latest execution,
-                        // shift the range backward and search again.
-                        startId += range - 1;
-                        coefficient = coefficient.plus("50");
-                        continue;
-                    }
-
-                    // REST API has caught up with the real-time API,
-                    // we must switch to realtime API.
-                    buffer.switchToRealtime(startId, observer);
-                    break;
-                }
-            }
-            return disposer;
-        }).effectOnError(e -> e.printStackTrace()).retry(service.retryPolicy(MarketService.retryMax, "ExecutionLog"));
+        }).concatMap(day -> new Cache(day).read(type)).concat(service.executions().effect(this::cache));
     }
 
     /**
@@ -458,33 +354,6 @@ public class ExecutionLog {
      */
     public final Signal<Execution> at(ZonedDateTime date, LogType... type) {
         return new Cache(date).read(type);
-    }
-
-    /**
-     * Read log from the specified id.
-     * 
-     * @param id
-     */
-    public final Signal<Execution> fromId(long id) {
-        return network(id).effect(this::cache);
-    }
-
-    /**
-     * Read log from the specified date.
-     * 
-     * @return
-     */
-    public final Signal<Execution> fromToday(LogType... type) {
-        return fromLast(0, type);
-    }
-
-    /**
-     * Read log from the specified date.
-     * 
-     * @return
-     */
-    public final Signal<Execution> fromYestaday(LogType... type) {
-        return fromLast(1, type);
     }
 
     /**
@@ -1167,98 +1036,6 @@ public class ExecutionLog {
         @Override
         public String toString() {
             return service + " Log[" + date + "]";
-        }
-    }
-
-    /**
-     * 
-     */
-    private class BufferFromRestToRealtime implements Observer<Execution> {
-
-        /** The upper error handler. */
-        private final Consumer<? super Throwable> error;
-
-        /** The actual realtime execution buffer. */
-        private ConcurrentLinkedDeque<Execution> realtime = new ConcurrentLinkedDeque();
-
-        /** The execution event receiver. */
-        private Observer<? super Execution> destination = realtime::add;
-
-        /** The no-realtime latest execution id. */
-        private long latestId = -1;
-
-        /**
-         * Build {@link BufferFromRestToRealtime}.
-         * 
-         * @param sequntial
-         */
-        private BufferFromRestToRealtime(Consumer<? super Throwable> error) {
-            this.error = error;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void accept(Execution e) {
-            destination.accept(e);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void error(Throwable e) {
-            error.accept(e);
-        }
-
-        /**
-         * Test whether the specified execution is queued in realtime buffer or not.
-         * 
-         * @param e An execution which is retrieved by REST API.
-         * @return
-         */
-        private boolean canSwitch(Execution e) {
-            // realtime buffer is empty
-            Execution first = realtime.peekFirst();
-            if (first == null) {
-                return false;
-            }
-            return service.checkEquality(e, first);
-        }
-
-        /**
-         * Switch to realtime API.
-         * 
-         * @param currentId
-         * @param observer
-         */
-        private void switchToRealtime(long currentId, Observer<? super Execution> observer) {
-            while (!realtime.isEmpty()) {
-                ConcurrentLinkedDeque<Execution> buffer = realtime;
-                realtime = new ConcurrentLinkedDeque();
-                latestId = -1;
-                for (Execution e : buffer) {
-                    observer.accept(e);
-                }
-                I.info(service.id + " \t" + buffer.peek().date + " size " + buffer.size());
-            }
-            destination = observer;
-        }
-
-        /**
-         * Compute the first execution id in realtime buffer.
-         * 
-         * @return
-         */
-        private long realtimeFirstId() {
-            if (!realtime.isEmpty()) {
-                return realtime.peek().id;
-            } else if (0 < latestId) {
-                return latestId;
-            } else {
-                return latestId = service.executionLatest().map(e -> e.id).waitForTerminate().to().or(-1L);
-            }
         }
     }
 }
