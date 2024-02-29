@@ -256,6 +256,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "BinanceFuture",
+			"packageName": "cointoss.market.binance",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "BinanceService",
 			"packageName": "cointoss.market.binance",
 			"type": "Class"
