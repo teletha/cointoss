@@ -865,13 +865,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "MarketDevTool",
-			"packageName": "cointoss.market",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "MarketService",
 			"packageName": "cointoss",
 			"type": "AbstractClass"
