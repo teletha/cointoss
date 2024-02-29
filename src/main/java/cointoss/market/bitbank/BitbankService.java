@@ -37,8 +37,8 @@ public class BitbankService extends MarketService {
 
     private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
-    /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
+    /** The API limit. */
+    private static final APILimiter Limit = APILimiter.with.limit(5).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bitbank.cc/socket.io/")
@@ -88,8 +88,7 @@ public class BitbankService extends MarketService {
                         return executionsAt(day);
                     }
                 })
-                .skipUntil(e -> startMillis < e.mills)
-                .take(1000);
+                .skipUntil(e -> startMillis < e.mills);
     }
 
     /**
@@ -188,7 +187,7 @@ public class BitbankService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://public.bitbank.cc/" + path));
 
-        return Network.rest(builder, Limit, client()).retry(retryPolicy(retryMax, "Bybit RESTCall"));
+        return Network.rest(builder, Limit, client()).retry(retryPolicy(retryMax, "Bitbank RESTCall [" + path + "]"));
     }
 
     /**
@@ -239,7 +238,7 @@ public class BitbankService extends MarketService {
         public Signal<ZonedDateTime> collect() {
             ZonedDateTime today = Chrono.utcToday();
 
-            return I.signal(Chrono.utc(2018, 1, 1)).recurse(day -> day.plusDays(1)).takeWhile(day -> !day.isEqual(today));
+            return I.signal(Chrono.utc(2020, 12, 13)).recurse(day -> day.plusDays(1)).takeWhile(day -> !day.isEqual(today));
         }
 
         /**

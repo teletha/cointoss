@@ -81,6 +81,7 @@ public class TradeMate extends View {
      */
     public static void main(String[] args) {
         I.load(Market.class);
+        I.env("Log", "C:/Cointoss/");
 
         // activate application
         Viewtify.application() //

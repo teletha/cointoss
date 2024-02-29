@@ -19,12 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import cointoss.Currency;
-import cointoss.MarketService;
-import cointoss.market.Exchange;
-import cointoss.market.MarketServiceProvider;
-import cointoss.util.arithmetic.Primitives;
-import cointoss.volume.GlobalVolume;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.Styleable;
@@ -32,6 +26,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+
+import cointoss.Currency;
+import cointoss.MarketService;
+import cointoss.market.Exchange;
+import cointoss.market.MarketServiceProvider;
+import cointoss.util.arithmetic.Primitives;
+import cointoss.volume.GlobalVolume;
 import kiss.I;
 import kiss.Variable;
 import primavera.ring.RingBuffer;

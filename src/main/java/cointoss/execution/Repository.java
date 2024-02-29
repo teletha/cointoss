@@ -65,8 +65,8 @@ class Repository implements Storable<Repository> {
 
         restore();
 
-        scanLocalRepository();
-        scanExternalRepository();
+        MarketService.COMMON_THREADS.submit(this::scanLocalRepository);
+        MarketService.COMMON_THREADS.submit(this::scanExternalRepository);
     }
 
     /**

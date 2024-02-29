@@ -189,7 +189,6 @@ public class ExecutionLog {
         this.root = Objects.requireNonNull(root);
         this.logger = I.make(service.setting.executionLogger());
         this.repository = new Repository(root, service);
-
         this.cache = new Cache(repository.firstZDT());
     }
 

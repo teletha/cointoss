@@ -16,6 +16,8 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +51,9 @@ import psychopath.File;
 import psychopath.Locator;
 
 public abstract class MarketService implements Comparable<MarketService>, Disposable {
+
+    /** The global thread pool. */
+    public static final ExecutorService COMMON_THREADS = Executors.newVirtualThreadPerTaskExecutor();
 
     public static final int retryMax = 10;
 
@@ -648,7 +653,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     public final Directory directory() {
-        return Locator.directory(".log").directory(exchange.name()).directory(marketName.replace(':', '-'));
+        return Locator.directory(I.env("Log", ".log")).directory(exchange.name()).directory(marketName.replace(':', '-'));
     }
 
     /**
