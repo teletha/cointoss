@@ -109,8 +109,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return
      */
-    public final Signal<Execution> executions() {
-        return executions(-1);
+    public final Signal<Execution> executions(boolean enableAutoSave) {
+        return executions(enableAutoSave, -1);
     }
 
     /**
@@ -118,8 +118,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return
      */
-    public Signal<Execution> executions(long fromId) {
-        return new Signal<Execution>((observer, disposer) -> {
+    public Signal<Execution> executions(boolean enableAutoSave, long fromId) {
+        Signal<Execution> signal = new Signal<Execution>((observer, disposer) -> {
             BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
 
             // If you connect to the real-time API first, two errors may occur at the same time for
@@ -214,6 +214,12 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
             }
             return disposer;
         }).effectOnError(e -> e.printStackTrace()).retry(retryPolicy(MarketService.retryMax, "ExecutionLog"));
+
+        if (enableAutoSave) {
+            signal = signal.effect(log::store);
+        }
+
+        return signal;
     }
 
     /**

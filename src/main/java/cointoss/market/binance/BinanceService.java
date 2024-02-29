@@ -174,11 +174,6 @@ public class BinanceService extends MarketService {
                 .byJSON(pages.find(bidName, "*"), pages.find(askName, "*"), "0", "1", isDelivery ? setting.target.scale : -1);
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Binance.LINK_USDT.log.fromLast(0).to(e -> {
-        });
-    }
-
     /**
      * {@inheritDoc}
      */

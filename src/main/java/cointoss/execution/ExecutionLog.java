@@ -285,33 +285,11 @@ public class ExecutionLog {
     }
 
     /**
-     * Read date from the specified date.
-     * 
-     * @param start The start date.
-     * @return
-     */
-    public final synchronized Signal<Execution> from(ZonedDateTime start, LogType... type) {
-        ZonedDateTime startDay = repository.firstZDT();
-        ZonedDateTime endDay = repository.lastZDT();
-
-        return new Signal<ZonedDateTime>((observer, disposer) -> {
-            ZonedDateTime current = Chrono.between(startDay, start, endDay).truncatedTo(ChronoUnit.DAYS);
-            while (!disposer.isDisposed() && (current.isBefore(endDay) || current.isEqual(endDay))) {
-                observer.accept(current);
-                System.out.println(current + "   " + endDay);
-                current = current.plusDays(1);
-            }
-            observer.complete();
-            return disposer;
-        }).concatMap(day -> new Cache(day).read(type)).concat(service.executions().effect(this::cache));
-    }
-
-    /**
      * Store the {@link Execution} to local cache.
      * 
      * @param e An {@link Execution} to store.
      */
-    private void cache(Execution e) {
+    public final void store(Execution e) {
         if (cacheId < e.id) {
             cacheId = e.id;
 
@@ -322,6 +300,40 @@ public class ExecutionLog {
             }
             cache.queue.add(e);
         }
+    }
+
+    /**
+     * Read date from the specified date.
+     * 
+     * @param start The start date.
+     * @return
+     */
+    public final Signal<Execution> from(ZonedDateTime start, LogType... type) {
+        return range(start, lastCacheDate(), type);
+    }
+
+    /**
+     * Read log from the specified date.
+     * 
+     * @return
+     */
+    public final Signal<Execution> fromLast(int days, LogType... type) {
+        return from(Chrono.utcNow().minusDays(days), type);
+    }
+
+    /**
+     * Read log from the specified start to end.
+     * 
+     * @param start
+     * @param end
+     * @return
+     */
+    public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end, LogType... type) {
+        return I.signal(start)
+                .recurse(day -> day.plusDays(1))
+                .effect(x -> System.out.println(service.formattedId + "  " + x))
+                .takeUntil(day -> day.isEqual(end) || day.isAfter(end))
+                .concatMap(day -> at(day, type));
     }
 
     /**
@@ -354,26 +366,6 @@ public class ExecutionLog {
      */
     public final Signal<Execution> at(ZonedDateTime date, LogType... type) {
         return new Cache(date).read(type);
-    }
-
-    /**
-     * Read log from the specified date.
-     * 
-     * @return
-     */
-    public final Signal<Execution> fromLast(int days, LogType... type) {
-        return from(Chrono.utcNow().minusDays(days), type);
-    }
-
-    /**
-     * Read log from the specified start to end.
-     * 
-     * @param start
-     * @param end
-     * @return
-     */
-    public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end, LogType... type) {
-        return I.signal(start).recurse(day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end)).flatMap(day -> at(day, type));
     }
 
     /**

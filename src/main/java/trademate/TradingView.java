@@ -92,7 +92,7 @@ public class TradingView extends View {
 
         chart.showRealtimeUpdate.set(false);
         Coordinator.request(service, next -> {
-            market.readLog(x -> x.fromLast(7, LogType.Fast));
+            market.readLog(x -> x.fromLast(7, LogType.Fast).concat(service.executions(false)));
 
             chart.market.set(market);
             chart.showRealtimeUpdate.set(true);

@@ -174,14 +174,6 @@ public class GMOService extends MarketService {
         return OrderBookChanges.byJSON(root.find("bids", "*"), root.find("asks", "*"), "price", "size");
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        GMO.BTC_DERIVATIVE.log.fromLast(10).to(book -> {
-            System.out.println(book);
-        });
-
-        Thread.sleep(1000 * 30);
-    }
-
     /**
      * Call rest API.
      * 
