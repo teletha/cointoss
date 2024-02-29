@@ -23,8 +23,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringUtils;
-
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogRepository;
@@ -94,8 +92,9 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     protected MarketService(Exchange exchange, String marketName, MarketSetting setting) {
         this.exchange = Objects.requireNonNull(exchange);
         this.marketName = Objects.requireNonNull(marketName);
-        this.id = exchange + " " + marketName.replaceAll("_", "").toUpperCase();
-        this.formattedId = id.replace(exchange + " ", StringUtils.rightPad(exchange.name(), 8) + "\t");
+        String normalized = marketName.replaceAll("_", "").toUpperCase();
+        this.id = exchange + " " + normalized;
+        this.formattedId = String.format("%-10s %s", exchange, normalized);
         this.setting = setting;
         this.scheduler = new ScheduledThreadPoolExecutor(2, task -> {
             Thread thread = new Thread(task);

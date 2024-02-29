@@ -110,7 +110,7 @@ class Repository implements Storable<Repository> {
 
             localScanLatest = now;
 
-            I.info("Scan log repository [" + service.formattedId + "] \tfrom " + localFirst + " \tto " + localLast);
+            I.info("Scan log repository from " + localFirst + " \tto " + localLast + " [" + service.formattedId + "]");
             store();
         }
     }
