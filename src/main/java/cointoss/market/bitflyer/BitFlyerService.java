@@ -489,7 +489,7 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     protected Signal<Liquidation> connectLiquidation() {
-        return this.connectExecutionRealtimely()
+        return this.executionsRealtimely()
                 .take(e -> e.delay == Execution.DelayHuge)
                 .map(e -> Liquidation.with.date(e.date).direction(e.direction.inverse()).size(e.size.doubleValue()).price(e.price));
     }

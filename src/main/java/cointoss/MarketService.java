@@ -81,6 +81,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
 
     private FeatherStore<OpenInterest> openInterest;
 
+    /** The shared stream. */
+    private Signal<Execution> executionRealtimely;
+
+    /** The shared stream. */
+    private Signal<OrderBookChanges> orderbookRealtimely;
+
+    /** The shared stream. */
+    private Signal<Liquidation> liquidationRealtimely;
+
     /** Whether or not the current process has write access to the data. */
     protected boolean writable;
 
@@ -355,8 +364,10 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A shared realtime execution logs.
      */
     public final synchronized Signal<Execution> executionsRealtimely(boolean autoReconnect) {
-        return connectExecutionRealtimely().effectOnObserve(disposer::add)
-                .retry(autoReconnect ? retryPolicy(retryMax, "ExecutionRealtimely") : null);
+        if (executionRealtimely == null) {
+            executionRealtimely = connectExecutionRealtimely().effectOnObserve(disposer::add).share();
+        }
+        return executionRealtimely.retry(autoReconnect ? retryPolicy(retryMax, "ExecutionRealtimely") : null);
     }
 
     /**
@@ -555,9 +566,10 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A shared realtime order books.
      */
     public final synchronized Signal<OrderBookChanges> orderBookRealtimely(boolean autoReconnect) {
-        return orderBook().concat(connectOrderBookRealtimely())
-                .effectOnObserve(disposer::add)
-                .retry(autoReconnect ? retryPolicy(retryMax, "OrderBookRealtimely") : null);
+        if (orderbookRealtimely == null) {
+            orderbookRealtimely = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add).share();
+        }
+        return orderbookRealtimely.retry(autoReconnect ? retryPolicy(retryMax, "OrderBookRealtimely") : null);
     }
 
     /**
@@ -577,7 +589,10 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A shared realtime order books.
      */
     public final synchronized Signal<Liquidation> liquidationRealtimely() {
-        return this.connectLiquidation().effectOnObserve(disposer::add).retry(retryPolicy(retryMax, "Liquidation"));
+        if (liquidationRealtimely == null) {
+            liquidationRealtimely = connectLiquidation().effectOnObserve(disposer::add).retry(retryPolicy(retryMax, "Liquidation")).share();
+        }
+        return liquidationRealtimely;
     }
 
     /**
