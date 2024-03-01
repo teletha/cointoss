@@ -9,11 +9,9 @@
  */
 package trademate.chart;
 
-import static cointoss.Direction.BUY;
-import static cointoss.Direction.SELL;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static cointoss.Direction.*;
+import static java.lang.Boolean.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -72,8 +70,9 @@ import trademate.CommonText;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.setting.Notificator;
-import trademate.setting.StaticConfig;
+import trademate.setting.PerformanceSetting;
 import viewtify.Viewtify;
+import viewtify.preference.Preferences;
 import viewtify.ui.canvas.EnhancedCanvas;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
@@ -82,6 +81,8 @@ import viewtify.ui.helper.UserActionHelper;
 import viewtify.util.FXUtils;
 
 public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
+
+    private static final PerformanceSetting performance = Preferences.of(PerformanceSetting.class);
 
     /** Infomation Font */
     private static final Font InfoFont = Font.font(10.5);
@@ -269,15 +270,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.throttle(performance.refreshRate, System::nanoTime)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutCandleLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
-                .layoutBy(chart.market.observe()
-                        .switchMap(market -> market.timeline.throttle(StaticConfig.drawingThrottle(), MILLISECONDS)))
+                .layoutBy(chart.market.observe().switchMap(market -> market.timeline.throttle(performance.refreshRate, System::nanoTime)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
@@ -319,9 +319,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     private Signal userInterfaceModification() {
-        return Viewtify.observe(widthProperty())
-                .merge(Viewtify.observe(heightProperty()))
-                .debounce(StaticConfig.drawingThrottle(), MILLISECONDS);
+        return Viewtify.observe(widthProperty()).merge(Viewtify.observe(heightProperty())).debounce(performance.refreshRate);
     }
 
     private Observable[] chartAxisModification() {

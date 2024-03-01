@@ -16,6 +16,6 @@ import viewtify.update.UpdateSettingView;
 public class SettingView extends PreferenceView {
 
     public SettingView() {
-        manage(AppearanceSetting.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
+        manage(AppearanceSetting.class, PerformanceSettingView.class, KeyBindingSettingView.class, NotificatorSetting.class, BitFlyerSetting.class, UpdateSettingView.class);
     }
 }

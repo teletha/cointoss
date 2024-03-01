@@ -11,11 +11,18 @@ package trademate;
 
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.util.arithmetic.Primitives;
 import kiss.I;
 import trademate.order.OrderView;
+import trademate.setting.PerformanceSetting;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
+import viewtify.Viewtify;
+import viewtify.preference.Preferences;
 import viewtify.ui.UIContextMenu;
+import viewtify.ui.UITab;
 import viewtify.ui.dock.Dock;
 import viewtify.ui.dock.DockProvider;
 import viewtify.ui.dock.DockSystem;
@@ -35,7 +42,36 @@ public class TradeMateDockProvider extends DockProvider {
 
     public final TypedDock<MarketService> trade = TypedDock.<MarketService> with().id("Trade").registration((tab, service) -> {
         tab.text(service.id).contentsLazy(ui -> new TradingView(tab, service));
+
+        updateTabRealtimely(tab, service);
     });
+
+    /**
+     * Show the current price and more market info.
+     * 
+     * @param tab
+     * @param service
+     */
+    private void updateTabRealtimely(UITab tab, MarketService service) {
+        tab.style("multiline");
+
+        PerformanceSetting performance = Preferences.of(PerformanceSetting.class);
+
+        if (service == BitFlyer.FX_BTC_JPY) {
+            SFD.now() //
+                    .throttle(performance.refreshRate, System::nanoTime)
+                    .diff()
+                    .on(Viewtify.UIThread)
+                    .to(e -> tab.text(service.id + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "), service);
+        } else {
+            service.executionsRealtimely()
+                    .startWith(service.executionLatest())
+                    .throttle(performance.refreshRate, System::nanoTime)
+                    .diff()
+                    .on(Viewtify.UIThread)
+                    .to(e -> tab.text(service.id + "\n" + e.price), service);
+        }
+    }
 
     /**
      * {@inheritDoc}

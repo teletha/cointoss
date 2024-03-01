@@ -9,22 +9,20 @@
  */
 package trademate.chart;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import java.time.ZonedDateTime;
 import java.util.function.DoubleFunction;
-
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.geometry.Insets;
-import javafx.geometry.Side;
-import javafx.scene.layout.Region;
 
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Primitives;
-import trademate.setting.StaticConfig;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Side;
+import javafx.scene.layout.Region;
+import trademate.setting.PerformanceSetting;
+import viewtify.preference.Preferences;
 import viewtify.ui.helper.LayoutAssistant;
 
 public class Chart extends Region {
@@ -64,13 +62,15 @@ public class Chart extends Region {
         this.chart = chart;
         this.canvas = new ChartCanvas(chart, axisX, axisY);
 
+        PerformanceSetting performance = Preferences.of(PerformanceSetting.class);
+
         layoutChart.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe())
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.open.startWithNull())
-                        .throttle(StaticConfig.drawingThrottle(), MILLISECONDS));
+                        .throttle(performance.refreshRate, System::nanoTime));
 
         // configure axis label
         chart.market.observe().to(m -> {

@@ -9,21 +9,14 @@
  */
 package trademate;
 
-import static java.util.concurrent.TimeUnit.*;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
 import cointoss.util.Coordinator;
-import cointoss.util.arithmetic.Primitives;
-import kiss.Disposable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
 import trademate.order.OrderView;
-import trademate.setting.StaticConfig;
 import viewtify.Viewtify;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
@@ -86,8 +79,6 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        tab.style("multiline");
-
         Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
 
         chart.showRealtimeUpdate.set(false);
@@ -96,32 +87,11 @@ public class TradingView extends View {
 
             chart.market.set(market);
             chart.showRealtimeUpdate.set(true);
-            updateTab();
 
             next.run();
         });
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));
-    }
-
-    private void updateTab() {
-        Disposable diposer;
-
-        if (service == BitFlyer.FX_BTC_JPY) {
-            diposer = SFD.now() //
-                    .throttle(StaticConfig.drawingThrottle(), MILLISECONDS)
-                    .diff()
-                    .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.id + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "));
-        } else {
-            diposer = service.executionsRealtimely()
-                    .startWith(service.executionLatest())
-                    .throttle(StaticConfig.drawingThrottle(), MILLISECONDS)
-                    .diff()
-                    .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.id + "\n" + e.price));
-        }
-        service.add(diposer);
     }
 
     /**
