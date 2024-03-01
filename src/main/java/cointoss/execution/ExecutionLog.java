@@ -330,7 +330,6 @@ public class ExecutionLog {
     public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end, LogType... type) {
         List<ZonedDateTime> days = I.signal(start)
                 .recurse(day -> day.plusDays(1))
-                .effect(x -> System.out.println(service.formattedId + "  " + x))
                 .takeUntil(day -> day.isEqual(end) || day.isAfter(end))
                 .toList();
 

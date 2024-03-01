@@ -652,7 +652,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     public final Directory directory() {
-        return Locator.directory(I.env("Log", ".log")).directory(exchange.name()).directory(marketName.replace(':', '-'));
+        return Locator.directory(I.env("MarketLog", ".log")).directory(exchange.name()).directory(marketName.replace(':', '-'));
     }
 
     /**
