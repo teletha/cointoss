@@ -21,6 +21,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -43,21 +59,6 @@ import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
 import cointoss.volume.PriceRangedVolumeManager.GroupedVolumes;
 import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -270,14 +271,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.throttle(performance.refreshRate, System::nanoTime)))
+                .layoutBy(chart.ticker.observe()
+                        .switchMap(ticker -> ticker.open.throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         layoutCandleLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
-                .layoutBy(chart.market.observe().switchMap(market -> market.timeline.throttle(performance.refreshRate, System::nanoTime)))
+                .layoutBy(chart.market.observe()
+                        .switchMap(market -> market.timeline.throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
@@ -319,7 +322,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     private Signal userInterfaceModification() {
-        return Viewtify.observe(widthProperty()).merge(Viewtify.observe(heightProperty())).debounce(performance.refreshRate);
+        return Viewtify.observe(widthProperty())
+                .merge(Viewtify.observe(heightProperty()))
+                .debounce(performance.refreshRate, TimeUnit.MILLISECONDS, false);
     }
 
     private Observable[] chartAxisModification() {

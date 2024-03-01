@@ -13,7 +13,7 @@ import viewtify.preference.Preferences;
 
 public class PerformanceSetting extends Preferences {
 
-    public final LongPreference refreshRate = initialize(2L).requireMin(1).requireMax(1000_000_000);
+    public final LongPreference refreshRate = initialize(2L).requireMin(1).requireMax(1000);
 
     {
         refreshRate.observing().to(x -> {

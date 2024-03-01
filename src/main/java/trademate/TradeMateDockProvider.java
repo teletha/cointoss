@@ -9,6 +9,8 @@
  */
 package trademate;
 
+import java.util.concurrent.TimeUnit;
+
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.bitflyer.BitFlyer;
@@ -59,14 +61,14 @@ public class TradeMateDockProvider extends DockProvider {
 
         if (service == BitFlyer.FX_BTC_JPY) {
             SFD.now() //
-                    .throttle(performance.refreshRate, System::nanoTime)
+                    .throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
                     .diff()
                     .on(Viewtify.UIThread)
                     .to(e -> tab.text(service.id + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "), service);
         } else {
             service.executionsRealtimely()
                     .startWith(service.executionLatest())
-                    .throttle(performance.refreshRate, System::nanoTime)
+                    .throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
                     .diff()
                     .on(Viewtify.UIThread)
                     .to(e -> tab.text(service.id + "\n" + e.price), service);

@@ -11,6 +11,7 @@ package trademate.setting;
 
 import kiss.Variable;
 import viewtify.preference.Preferences;
+import viewtify.style.FormStyles;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -30,7 +31,7 @@ public class PerformanceSettingView extends View {
     class view extends ViewDSL implements SettingStyles {
         {
             $(vbox, () -> {
-                form(en("UI refresh rate (FPS)"), refreshRate);
+                form(en("Drawing frame rate"), FormStyles.Column4, refreshRate);
             });
         }
     }
@@ -42,7 +43,8 @@ public class PerformanceSettingView extends View {
     protected void initialize() {
         PerformanceSetting setting = Preferences.of(PerformanceSetting.class);
 
-        refreshRate.items(1, 2, 5, 10, 16, 25, 33, 60)
-                .sync(setting.refreshRate, x -> Math.round(1000_000_000 / x), v -> (long) Math.round(1000_000_000 / v));
+        refreshRate.items(1, 2, 3, 4, 5, 10, 16, 24, 30, 40, 50, 60, 120)
+                .render(v -> v + " fps")
+                .sync(setting.refreshRate, x -> Math.round(1000 / x), v -> (long) Math.round(1000 / v));
     }
 }
