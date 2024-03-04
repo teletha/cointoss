@@ -12,7 +12,6 @@ package trademate.chart.part;
 import java.util.concurrent.TimeUnit;
 
 import cointoss.CurrencySetting;
-import cointoss.Market;
 import cointoss.analyze.OnlineStats;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
@@ -24,6 +23,7 @@ import kiss.I;
 import kiss.Variable;
 import trademate.chart.ChartCanvas;
 import trademate.chart.ChartView;
+import trademate.setting.PerformanceSetting;
 import viewtify.Viewtify;
 import viewtify.preference.Preferences;
 
@@ -48,19 +48,32 @@ public class MarketInfoPart extends ChartPart {
         super(parent);
 
         canvas.font(11, FontWeight.BOLD).fillColor(Preferences.theme().textMid());
+    }
 
-        layout.layoutBy(chartAxisModification()).layoutBy(userInterfaceModification());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void draw() {
+    }
 
-        Color textColor = Preferences.theme().textMid();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onShown() {
+        super.onShown();
 
-        chart.market.observing()
+        parent.chart.market.observing()
                 .skipNull()
+                .switchOn(parent.chart.showRealtimeUpdate.observing())
                 .switchMap(m -> m.tickers.latest.observing())
-                .switchOn(chart.showRealtimeUpdate.observing())
-                .throttle(1000, TimeUnit.MILLISECONDS)
+                .throttle(Preferences.of(PerformanceSetting.class).refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
                 .on(Viewtify.UIThread)
                 .to(e -> {
-                    CurrencySetting base = chart.market.v.service.setting.base;
+                    Color textColor = Preferences.theme().textMid();
+
+                    CurrencySetting base = parent.chart.market.v.service.setting.base;
                     GraphicsContext c = canvas.clear().getGraphicsContext2D();
 
                     c.setFill(textColor);
@@ -72,33 +85,19 @@ public class MarketInfoPart extends ChartPart {
                     c.setFill(diff < 0 || 1000 < diff ? WarningColor : textColor);
                     c.fillText(diff + "ms", 50, 35);
 
-                    double spread = chart.market.v.orderBook.spread();
+                    double spread = parent.chart.market.v.orderBook.spread();
                     Num range = base.minimumSize.multiply(100);
                     c.setFill(spread < range.doubleValue() ? textColor : WarningColor);
                     c.fillText(Primitives.roundString(spread, base.scale), 50, 50);
 
-                    OnlineStats volatilityStats = chart.ticker.v.spreadStats;
-                    double volatility = chart.ticker.v.ticks.last().spread();
+                    OnlineStats volatilityStats = parent.chart.ticker.v.spreadStats;
+                    double volatility = parent.chart.ticker.v.ticks.last().spread();
                     c.setFill(volatilityStats.calculateSigma(volatility) <= 2 ? textColor : WarningColor);
                     c.fillText(Primitives.roundString(volatility, base.scale), 50, 65);
                     c.setFill(textColor);
                     c.fillText("(" + Primitives.roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives
                             .roundString(volatilityStats.sigma(2), base.scale) + ")", 85, 65);
+                }, e -> e.printStackTrace(), () -> {
                 });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onChangeMarket(Market market) {
-        super.onChangeMarket(market);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void draw() {
     }
 }

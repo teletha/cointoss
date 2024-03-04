@@ -77,14 +77,6 @@ public class OrderBookPart extends ChartPart {
      * {@inheritDoc}
      */
     @Override
-    public void onChangeMarket(Market market) {
-        collect(market);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void onShown() {
         canvas.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, parent);
         digit.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, parent);

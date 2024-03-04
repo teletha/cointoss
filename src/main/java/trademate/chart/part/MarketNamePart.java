@@ -9,9 +9,9 @@
  */
 package trademate.chart.part;
 
-import cointoss.Market;
 import javafx.scene.text.FontWeight;
 import trademate.chart.ChartCanvas;
+import trademate.chart.ChartView;
 import viewtify.Theme;
 import viewtify.preference.Preferences;
 
@@ -20,21 +20,11 @@ public class MarketNamePart extends ChartPart {
     /**
      * @param parent
      */
-    public MarketNamePart(ChartCanvas parent) {
+    public MarketNamePart(ChartCanvas parent, ChartView chart) {
         super(parent);
 
         Theme theme = Preferences.theme();
         canvas.font(20, FontWeight.BOLD).fillColor(theme.textMid());
-
-        layout.layoutBy(chartAxisModification()).layoutBy(userInterfaceModification());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onChangeMarket(Market market) {
-        canvas.size(180, 30).fillText(market.service.id, ChartCanvas.chartInfoLeftPadding, canvas.fontSize());
     }
 
     /**
@@ -42,5 +32,14 @@ public class MarketNamePart extends ChartPart {
      */
     @Override
     public void draw() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onShown() {
+        // canvas.size(180, 30).fillText(parent.chart.market.v.service.id,
+        // ChartCanvas.chartInfoLeftPadding, canvas.fontSize());
     }
 }

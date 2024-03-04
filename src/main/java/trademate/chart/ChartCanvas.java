@@ -108,7 +108,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private static final int chartInfoHorizontalGap = 3;
 
     /** The chart node. */
-    private final ChartView chart;
+    public final ChartView chart;
 
     /** The horizontal axis. (shortcut) */
     public final Axis axisX;
@@ -216,7 +216,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
         parts = List
-                .of(new MarketNamePart(this), new MarketInfoPart(this, chart), new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
+                .of(new MarketNamePart(this, chart), new MarketInfoPart(this, chart), new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
 
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
@@ -233,12 +233,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         .switchMap(market -> market.timeline.throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
-
-        chart.market.observe().to(market -> {
-            for (ChartPart part : parts) {
-                part.onChangeMarket(market);
-            }
-        });
 
         chart.showRealtimeUpdate.observing().on(Viewtify.UIThread).to(show -> {
             if (show) {
