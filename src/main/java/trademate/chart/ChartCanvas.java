@@ -40,6 +40,7 @@ import cointoss.util.arithmetic.Primitives;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -62,6 +63,7 @@ import trademate.ChartTheme;
 import trademate.CommonText;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
+import trademate.chart.part.ChartPart;
 import trademate.chart.part.OrderBookPart;
 import trademate.chart.part.PriceRangedVolumePart;
 import trademate.setting.Notificator;
@@ -163,10 +165,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Flag whether candle chart should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
-    private final OrderBookPart orderbook;
-
-    private final PriceRangedVolumePart rangedVolume;
-
     /** Chart UI */
     private final EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout);
 
@@ -216,6 +214,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             });
 
+    /** The managed parts. */
+    private final List<ChartPart> parts;
+
     /**
      * Chart canvas.
      * 
@@ -236,8 +237,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
-        this.orderbook = new OrderBookPart(this, chart);
-        this.rangedVolume = new PriceRangedVolumePart(this, chart);
+        parts = List.of(new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
 
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
@@ -256,7 +256,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         chart.market.observe().to(market -> {
-            orderbook.onChangeMarket(market);
+            for (ChartPart part : parts) {
+                part.onChangeMarket(market);
+            }
         });
 
         chart.showRealtimeUpdate.observing().on(Viewtify.UIThread).to(show -> {
@@ -277,8 +279,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizePriceSupporter();
         visualizeMarketInfo();
 
-        getChildren()
-                .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, rangedVolume.canvas, orderbook.canvas, orderbook.digit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+        ObservableList<Node> children = getChildren();
+        children.addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice);
+        I.signal(parts).flatIterable(x -> x.managed).to(children::add);
+        children.addAll(candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     private Signal userInterfaceModification() {
@@ -305,8 +309,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void onShow() {
         candles.bindSizeTo(this);
         candleLatest.bindSizeTo(this);
-        orderbook.onShown();
-        rangedVolume.onShown();
+        for (ChartPart part : parts) {
+            part.onShown();
+        }
         chartInfo.bindSizeTo(this);
         marketName.size(180, 30);
         marketInfo.bindSizeTo(this);
@@ -321,8 +326,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void onHide() {
         candles.clear().size(0, 0);
         candleLatest.clear().size(0, 0);
-        orderbook.onHidden();
-        rangedVolume.onHidden();
+        for (ChartPart part : parts) {
+            part.onHidden();
+        }
         chartInfo.clear().size(0, 0);
         marketName.clear().size(0, 0);
         marketInfo.clear().size(0, 0);
@@ -521,7 +527,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     drawChartInfo(tick);
                 }
 
-                orderbook.onMouseMove(x, y);
+                for (ChartPart part : parts) {
+                    part.onMouseMove(x, y);
+                }
             });
         });
 
@@ -535,7 +543,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // clear mouse related info
             chartInfo.clear();
-            orderbook.onMouseExit();
+            for (ChartPart part : parts) {
+                part.onMouseExit();
+            }
         });
     }
 
@@ -733,8 +743,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     void layoutForcely() {
         layoutCandle.layoutForcely();
         layoutCandleLatest.layoutForcely();
-        orderbook.layout.layoutForcely();
-        rangedVolume.layout.layoutForcely();
+        for (ChartPart part : parts) {
+            part.layout.layoutForcely();
+        }
     }
 
     /**
@@ -754,8 +765,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         orderSellPrice.draw();
 
         drawCandle();
-        orderbook.draw();
-        rangedVolume.draw();
+        for (ChartPart part : parts) {
+            part.draw();
+        }
     }
 
     /**

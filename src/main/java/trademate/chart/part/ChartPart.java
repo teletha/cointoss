@@ -36,7 +36,7 @@ public abstract class ChartPart {
     public final EnhancedCanvas canvas;
 
     /** The all managed canvases. */
-    private final List<EnhancedCanvas> managed = new ArrayList();
+    public final List<EnhancedCanvas> managed = new ArrayList();
 
     /**
      * Set up part of the chart.
