@@ -37,12 +37,9 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
-import cointoss.volume.PriceRangedVolumeManager.GroupedVolumes;
-import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
-import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -66,6 +63,7 @@ import trademate.CommonText;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.chart.part.OrderBookPart;
+import trademate.chart.part.PriceRangedVolumePart;
 import trademate.setting.Notificator;
 import trademate.setting.PerformanceSetting;
 import viewtify.Viewtify;
@@ -167,20 +165,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     private final OrderBookPart orderbook;
 
-    /** Flag whether price-ranged volume should layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutPriceRangedVolumeLatest = new LayoutAssistant(this);
+    private final PriceRangedVolumePart rangedVolume;
 
     /** Chart UI */
     private final EnhancedCanvas candles = new EnhancedCanvas().visibleWhen(layoutCandle.canLayout);
 
     /** Chart UI */
     private final EnhancedCanvas candleLatest = new EnhancedCanvas().visibleWhen(layoutCandleLatest.canLayout);
-
-    /** Chart UI */
-    private final EnhancedCanvas priceRangedVolumeLatest = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolumeLatest.canLayout)
-            .strokeColor(Color.WHITESMOKE.deriveColor(0, 1, 1, 0.35))
-            .font(8)
-            .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
     private final EnhancedCanvas chartInfo = new EnhancedCanvas();
@@ -246,6 +237,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
         this.orderbook = new OrderBookPart(this, chart);
+        this.rangedVolume = new PriceRangedVolumePart(this, chart);
 
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
@@ -262,13 +254,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         .switchMap(market -> market.timeline.throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
-
-        layoutPriceRangedVolumeLatest.layoutBy(chartAxisModification())
-                .layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
-                        .observe(), chart.orderbookPriceRange.observe())
-                .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(2, TimeUnit.SECONDS)))
-                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
 
         chart.market.observe().to(market -> {
             orderbook.onChangeMarket(market);
@@ -293,7 +278,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeMarketInfo();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolumeLatest, orderbook.canvas, orderbook.digit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, rangedVolume.canvas, orderbook.canvas, orderbook.digit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     private Signal userInterfaceModification() {
@@ -321,7 +306,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         candles.bindSizeTo(this);
         candleLatest.bindSizeTo(this);
         orderbook.onShown();
-        priceRangedVolumeLatest.bindSizeTo(this);
+        rangedVolume.onShown();
         chartInfo.bindSizeTo(this);
         marketName.size(180, 30);
         marketInfo.bindSizeTo(this);
@@ -337,7 +322,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         candles.clear().size(0, 0);
         candleLatest.clear().size(0, 0);
         orderbook.onHidden();
-        priceRangedVolumeLatest.clear().size(0, 0);
+        rangedVolume.onHidden();
         chartInfo.clear().size(0, 0);
         marketName.clear().size(0, 0);
         marketInfo.clear().size(0, 0);
@@ -749,7 +734,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layoutForcely();
         layoutCandleLatest.layoutForcely();
         orderbook.layout.layoutForcely();
-        layoutPriceRangedVolumeLatest.layoutForcely();
+        rangedVolume.layout.layoutForcely();
     }
 
     /**
@@ -770,7 +755,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         drawCandle();
         orderbook.draw();
-        drawPriceVolume();
+        rangedVolume.draw();
     }
 
     /**
@@ -1002,23 +987,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 x += chartInfoWidth + chartInfoHorizontalGap;
             }
         }
-    }
-
-    /**
-     * Draw priced volumes on chart.
-     */
-    private void drawPriceVolume() {
-        layoutPriceRangedVolumeLatest.layout(() -> {
-            priceRangedVolumeLatest.clear();
-
-            chart.market.to(m -> {
-                PriceRangedVolumePeriod[] volumes = m.priceVolume.latest();
-                if (volumes[0] != null) {
-                    PriceRangedVolumeBar bar = new PriceRangedVolumeBar(volumes);
-                    bar.drawOn(priceRangedVolumeLatest);
-                }
-            });
-        });
     }
 
     /**
@@ -1295,57 +1263,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
                 }
             });
-        }
-    }
-
-    /**
-     * 
-     */
-    private class PriceRangedVolumeBar {
-
-        private GroupedVolumes longs;
-
-        private GroupedVolumes shorts;
-
-        /**
-         * Calculate info.
-         * 
-         * @param market
-         */
-        private PriceRangedVolumeBar(PriceRangedVolumePeriod[] period) {
-            Num range = chart.orderbookPriceRange.value();
-
-            this.longs = period[0].aggregateByPrice(range);
-            this.shorts = period[1].aggregateByPrice(range);
-        }
-
-        /**
-         * Draw price-ranged volumes on chart.
-         * 
-         * @param canvas A target canvas to draw chart.
-         */
-        private void drawOn(EnhancedCanvas canvas) {
-            PriceRangedVolumeType type = chart.pricedVolumeType.value();
-
-            double max = type.max(longs.maxVolume, shorts.maxVolume);
-            double widthForPeriod = Math.min(50, axisX.getLengthForValue(60 * 60 * 8));
-            double scale = widthForPeriod / max * type.scale();
-
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-            double start = 30;
-
-            for (int i = 0, size = longs.prices.size(); i < size; i++) {
-                double position = axisY.getPositionForValue(longs.prices.get(i));
-                float l = longs.volumes.get(i);
-                float s = shorts.volumes.get(i);
-
-                if (type == PriceRangedVolumeType.Both) {
-                    gc.strokeLine(start, position, start + l * scale, position);
-                    gc.strokeLine(start, position, start - s * scale, position);
-                } else {
-                    gc.strokeLine(start, position, start + type.width(l, s) * scale, position);
-                }
-            }
         }
     }
 }

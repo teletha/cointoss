@@ -15,7 +15,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double max(double longVolumes, double shortVolumes) {
+        public double max(double longVolumes, double shortVolumes) {
             return longVolumes + shortVolumes;
         }
 
@@ -23,7 +23,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double width(double longVolumes, double shortVolumes) {
+        public double width(double longVolumes, double shortVolumes) {
             return longVolumes + shortVolumes;
         }
 
@@ -31,7 +31,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double scale() {
+        public double scale() {
             return 0.75;
         }
     },
@@ -41,7 +41,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double max(double longVolumes, double shortVolumes) {
+        public double max(double longVolumes, double shortVolumes) {
             return Math.max(longVolumes, shortVolumes);
         }
 
@@ -49,7 +49,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double width(double longVolumes, double shortVolumes) {
+        public double width(double longVolumes, double shortVolumes) {
             return longVolumes - shortVolumes;
         }
 
@@ -57,7 +57,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double scale() {
+        public double scale() {
             return 1;
         }
     },
@@ -66,7 +66,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double max(double longVolumes, double shortVolumes) {
+        public double max(double longVolumes, double shortVolumes) {
             return Math.max(longVolumes, shortVolumes);
         }
 
@@ -74,7 +74,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double width(double longVolumes, double shortVolumes) {
+        public double width(double longVolumes, double shortVolumes) {
             return longVolumes;
         }
 
@@ -82,7 +82,7 @@ public enum PriceRangedVolumeType {
          * {@inheritDoc}
          */
         @Override
-        double scale() {
+        public double scale() {
             return 0.4;
         }
     };
@@ -94,7 +94,7 @@ public enum PriceRangedVolumeType {
      * @param shortVolumes
      * @return
      */
-    abstract double max(double longVolumes, double shortVolumes);
+    public abstract double max(double longVolumes, double shortVolumes);
 
     /**
      * Compute the visual volume.
@@ -103,10 +103,10 @@ public enum PriceRangedVolumeType {
      * @param shortVolumes
      * @return
      */
-    abstract double width(double longVolumes, double shortVolumes);
+    public abstract double width(double longVolumes, double shortVolumes);
 
     /**
      * Compute the base scale.
      */
-    abstract double scale();
+    public abstract double scale();
 }
