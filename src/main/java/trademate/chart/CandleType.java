@@ -11,12 +11,11 @@ package trademate.chart;
 
 import java.util.function.Function;
 
-import javafx.scene.paint.Color;
-
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import javafx.scene.paint.Color;
 import kiss.Variable;
 import trademate.ChartTheme;
 import viewtify.util.FXUtils;
@@ -51,7 +50,7 @@ public enum CandleType {
     /** The color coordinator. */
     final Function<Tick, Color> coordinator;
 
-    final Function<Ticker, Indicator<double[]>> candles;
+    public final Function<Ticker, Indicator<double[]>> candles;
 
     /**
      * @param coordinator
