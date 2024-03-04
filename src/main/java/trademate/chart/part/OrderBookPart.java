@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import cointoss.Direction;
+import cointoss.Market;
+import cointoss.orderbook.OrderBookPage;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-
-import cointoss.Direction;
-import cointoss.orderbook.OrderBookPage;
 import trademate.ChartTheme;
 import trademate.chart.ChartCanvas;
 import trademate.chart.ChartView;
@@ -40,16 +40,16 @@ public class OrderBookPart extends ChartPart {
     private final ChartView chart;
 
     /** The current diminishing scale. */
-    private final double scale;
+    private double scale;
 
     /** The current orderbook for buyer. */
-    private final List<OrderBookPage> buyers = new ArrayList();
+    private List<OrderBookPage> buyers = new ArrayList();
 
     /** The maximum size on buyers. */
     private double buyerMaxSize = OrderbookBarWidth;
 
     /** The current orderbook for seller. */
-    private final List<OrderBookPage> sellers = new ArrayList();
+    private List<OrderBookPage> sellers = new ArrayList();
 
     /** The maximum size on sellers. */
     private double sellerMaxSize = OrderbookBarWidth;
@@ -64,38 +64,21 @@ public class OrderBookPart extends ChartPart {
 
         canvas.font(8).textBaseLine(VPos.CENTER);
 
-        layout.layoutBy(chart.chartAxisModification())
-                .layoutBy(chart.userInterfaceModification())
+        layout.layoutBy(chartAxisModification())
+                .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe()
                         .switchMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
+    }
 
-        final double visibleMax = chart.chart.axisY.computeVisibleMaxValue();
-        final double visibleMin = chart.chart.axisY.computeVisibleMinValue();
-
-        // collect buyer pages
-        for (OrderBookPage page : chart.market.v.orderBook.longs.ascendingPages()) {
-            if (visibleMin < page.price) {
-                buyerMaxSize = Math.max(buyerMaxSize, page.size);
-                buyers.add(page);
-            } else {
-                break;
-            }
-        }
-
-        // collect seller pages
-        for (OrderBookPage page : chart.market.v.orderBook.shorts.ascendingPages()) {
-            if (page.price < visibleMax) {
-                sellerMaxSize = Math.max(sellerMaxSize, page.size);
-                sellers.add(page);
-            } else {
-                break;
-            }
-        }
-
-        scale = OrderbookBarWidth / Math.max(buyerMaxSize, sellerMaxSize);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onChangeMarket(Market market) {
+        collect(market);
     }
 
     /**
@@ -115,14 +98,16 @@ public class OrderBookPart extends ChartPart {
         // search the nearest and largest order size
         chart.market.to(m -> {
             OrderBookPage largest = m.orderBook
-                    .findLargestOrder(chart.chart.axisY.getValueForPosition(y + 2), chart.chart.axisY.getValueForPosition(y - 2));
+                    .findLargestOrder(parent.axisY.getValueForPosition(y + 2), parent.axisY.getValueForPosition(y - 2));
 
             if (largest != null) {
                 double price = largest.price + m.orderBook.ranged();
-                double position = chart.chart.axisX.getPositionForValue(price);
+                double position = parent.axisY.getPositionForValue(price);
+                int size = (int) largest.size;
+
                 digit.clear()
                         .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL))
-                        .strokeText((int) largest.size, digit.getWidth() - largest.size * scale - 15, position);
+                        .strokeText(size, digit.getWidth() - largest.size * scale - String.valueOf(size).length() * 7, position);
             }
         });
     }
@@ -146,15 +131,14 @@ public class OrderBookPart extends ChartPart {
             digit.setLayoutX(x);
 
             canvas.clear();
-        });
-    }
 
-    /**
-     * Draw orderbooks on chart' side.
-     */
-    private void draw2() {
-        draw(buyers, buyerMaxSize, ChartTheme.colorBy(Direction.BUY));
-        draw(sellers, sellerMaxSize, ChartTheme.colorBy(Direction.SELL));
+            chart.market.to(m -> {
+                collect(m);
+
+                draw(buyers, buyerMaxSize, ChartTheme.colorBy(Direction.BUY));
+                draw(sellers, sellerMaxSize, ChartTheme.colorBy(Direction.SELL));
+            });
+        });
     }
 
     /**
@@ -188,5 +172,35 @@ public class OrderBookPart extends ChartPart {
                 lastPosition = position;
             }
         }
+    }
+
+    private void collect(Market market) {
+        final double visibleMax = parent.axisY.computeVisibleMaxValue();
+        final double visibleMin = parent.axisY.computeVisibleMinValue();
+
+        buyers = new ArrayList();
+        sellers = new ArrayList();
+
+        // collect buyer pages
+        for (OrderBookPage page : market.orderBook.longs.ascendingPages()) {
+            if (visibleMin < page.price) {
+                buyerMaxSize = Math.max(buyerMaxSize, page.size);
+                buyers.add(page);
+            } else {
+                break;
+            }
+        }
+
+        // collect seller pages
+        for (OrderBookPage page : market.orderBook.shorts.ascendingPages()) {
+            if (page.price < visibleMax) {
+                sellerMaxSize = Math.max(sellerMaxSize, page.size);
+                sellers.add(page);
+            } else {
+                break;
+            }
+        }
+
+        scale = OrderbookBarWidth / Math.max(buyerMaxSize, sellerMaxSize);
     }
 }

@@ -11,8 +11,16 @@ package trademate.chart.part;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import cointoss.Market;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import kiss.Signal;
 import trademate.chart.ChartCanvas;
+import trademate.setting.PerformanceSetting;
+import viewtify.Viewtify;
+import viewtify.preference.Preferences;
 import viewtify.ui.canvas.EnhancedCanvas;
 import viewtify.ui.helper.LayoutAssistant;
 
@@ -85,5 +93,21 @@ public abstract class ChartPart {
         // do nothing
     }
 
+    public void onChangeMarket(Market market) {
+        // do nothing
+    }
+
     public abstract void draw();
+
+    protected final Observable[] chartAxisModification() {
+        return new DoubleProperty[] {parent.axisX.scroll.valueProperty(), parent.axisX.scroll.visibleAmountProperty()};
+    }
+
+    protected final Signal userInterfaceModification() {
+        PerformanceSetting performance = Preferences.of(PerformanceSetting.class);
+
+        return Viewtify.observe(parent.widthProperty())
+                .merge(Viewtify.observe(parent.heightProperty()))
+                .debounce(performance.refreshRate, TimeUnit.MILLISECONDS, false);
+    }
 }

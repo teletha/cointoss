@@ -9,18 +9,36 @@
  */
 package trademate.chart;
 
-import static cointoss.Direction.*;
 import static java.lang.Boolean.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
+import cointoss.CurrencySetting;
+import cointoss.Market;
+import cointoss.MarketService;
+import cointoss.analyze.OnlineStats;
+import cointoss.execution.Execution;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.AbstractIndicator;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import cointoss.util.arithmetic.Num;
+import cointoss.util.arithmetic.Primitives;
+import cointoss.volume.PriceRangedVolumeManager.GroupedVolumes;
+import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
@@ -36,29 +54,6 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
-import cointoss.CurrencySetting;
-import cointoss.Direction;
-import cointoss.Market;
-import cointoss.MarketService;
-import cointoss.analyze.OnlineStats;
-import cointoss.execution.Execution;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.orderbook.OrderBookPage;
-import cointoss.ticker.AbstractIndicator;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.ticker.Ticker;
-import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
-import cointoss.util.arithmetic.Primitives;
-import cointoss.volume.PriceRangedVolumeManager.GroupedVolumes;
-import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -70,6 +65,7 @@ import trademate.ChartTheme;
 import trademate.CommonText;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
+import trademate.chart.part.OrderBookPart;
 import trademate.setting.Notificator;
 import trademate.setting.PerformanceSetting;
 import viewtify.Viewtify;
@@ -96,12 +92,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Infomation Color */
     private static final Color BaseColor = Color.rgb(80, 80, 80);
-
-    /** The width orderbook bar graph. */
-    private static final double OrderbookBarWidth = 40;
-
-    /** The width of orderbook size figure. */
-    private static final double OrderbookDigitWidth = 20;
 
     /** The candle width. */
     private static final int BarWidth = 3;
@@ -137,10 +127,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final ChartView chart;
 
     /** The horizontal axis. (shortcut) */
-    private final Axis axisX;
+    public final Axis axisX;
 
     /** The vertical axis. (shortcut) */
-    private final Axis axisY;
+    public final Axis axisY;
 
     /** Chart UI */
     private final LineMark backGridVertical;
@@ -175,8 +165,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Flag whether candle chart should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
-    /** Flag whether orderbook should layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
+    private final OrderBookPart orderbook;
 
     /** Flag whether price-ranged volume should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutPriceRangedVolumeLatest = new LayoutAssistant(this);
@@ -186,14 +175,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Chart UI */
     private final EnhancedCanvas candleLatest = new EnhancedCanvas().visibleWhen(layoutCandleLatest.canLayout);
-
-    /** Chart UI */
-    private final EnhancedCanvas orderbook = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout).font(8).textBaseLine(VPos.CENTER);
-
-    /** Chart UI */
-    private final EnhancedCanvas orderbookDigit = new EnhancedCanvas().visibleWhen(layoutOrderbook.canLayout)
-            .font(8)
-            .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
     private final EnhancedCanvas priceRangedVolumeLatest = new EnhancedCanvas().visibleWhen(layoutPriceRangedVolumeLatest.canLayout)
@@ -244,9 +225,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             });
 
-    /** The latest orderbook layer. */
-    private OrderbookBar orderbookBar;
-
     /**
      * Chart canvas.
      * 
@@ -267,6 +245,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
+        this.orderbook = new OrderBookPart(this, chart);
 
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
@@ -284,20 +263,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
-        layoutOrderbook.layoutBy(chartAxisModification())
-                .layoutBy(userInterfaceModification())
-                .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
-                .layoutBy(chart.market.observe()
-                        .switchMap(b -> b.orderBook.longs.update.merge(b.orderBook.shorts.update).throttle(1, TimeUnit.SECONDS)))
-                .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
-                .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showOrderbook.observing());
-
         layoutPriceRangedVolumeLatest.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.ticker.observe(), chart.market.observe(), chart.showPricedVolume.observe(), chart.pricedVolumeType
                         .observe(), chart.orderbookPriceRange.observe())
                 .layoutBy(chart.market.observe().switchMap(m -> m.timeline.throttle(2, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing(), chart.showPricedVolume.observing());
+
+        chart.market.observe().to(market -> {
+            orderbook.onChangeMarket(market);
+        });
 
         chart.showRealtimeUpdate.observing().on(Viewtify.UIThread).to(show -> {
             if (show) {
@@ -318,7 +293,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeMarketInfo();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolumeLatest, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(backGridVertical, backGridHorizontal, marketName, marketInfo, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, priceRangedVolumeLatest, orderbook.canvas, orderbook.digit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     private Signal userInterfaceModification() {
@@ -345,8 +320,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void onShow() {
         candles.bindSizeTo(this);
         candleLatest.bindSizeTo(this);
-        orderbook.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this);
-        orderbookDigit.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this);
+        orderbook.onShown();
         priceRangedVolumeLatest.bindSizeTo(this);
         chartInfo.bindSizeTo(this);
         marketName.size(180, 30);
@@ -362,8 +336,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void onHide() {
         candles.clear().size(0, 0);
         candleLatest.clear().size(0, 0);
-        orderbook.clear().size(0, 0);
-        orderbookDigit.clear().size(0, 0);
+        orderbook.onHidden();
         priceRangedVolumeLatest.clear().size(0, 0);
         chartInfo.clear().size(0, 0);
         marketName.clear().size(0, 0);
@@ -563,20 +536,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     drawChartInfo(tick);
                 }
 
-                // search the nearest and largest order size
-                chart.market.to(m -> {
-                    OrderBookPage largest = m.orderBook
-                            .findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
-
-                    if (largest != null && orderbookBar != null) {
-                        double price = largest.price + m.orderBook.ranged();
-                        double position = axisY.getPositionForValue(price);
-                        orderbookDigit.clear()
-                                .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL))
-                                .strokeText((int) largest.size, orderbookDigit
-                                        .getWidth() - largest.size * orderbookBar.scale - 15, position);
-                    }
-                });
+                orderbook.onMouseMove(x, y);
             });
         });
 
@@ -590,7 +550,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // clear mouse related info
             chartInfo.clear();
-            orderbookDigit.clear();
+            orderbook.onMouseExit();
         });
     }
 
@@ -788,7 +748,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     void layoutForcely() {
         layoutCandle.layoutForcely();
         layoutCandleLatest.layoutForcely();
-        layoutOrderbook.layoutForcely();
+        orderbook.layout.layoutForcely();
         layoutPriceRangedVolumeLatest.layoutForcely();
     }
 
@@ -809,7 +769,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         orderSellPrice.draw();
 
         drawCandle();
-        drawOrderbook();
+        orderbook.draw();
         drawPriceVolume();
     }
 
@@ -1042,24 +1002,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 x += chartInfoWidth + chartInfoHorizontalGap;
             }
         }
-    }
-
-    /**
-     * Draw orderbooks on chart.
-     */
-    private void drawOrderbook() {
-        layoutOrderbook.layout(() -> {
-            double x = getWidth() - OrderbookBarWidth - OrderbookDigitWidth;
-            orderbook.setLayoutX(x);
-            orderbookDigit.setLayoutX(x);
-
-            orderbook.clear();
-
-            chart.market.to(m -> {
-                orderbookBar = new OrderbookBar(m);
-                orderbookBar.draw();
-            });
-        });
     }
 
     /**
@@ -1353,100 +1295,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
                 }
             });
-        }
-    }
-
-    /**
-     * 
-     */
-    private class OrderbookBar {
-
-        /** The current diminishing scale. */
-        private final double scale;
-
-        /** The current orderbook for buyer. */
-        private final List<OrderBookPage> buyers = new ArrayList();
-
-        /** The maximum size on buyers. */
-        private double buyerMaxSize = OrderbookBarWidth;
-
-        /** The current orderbook for seller. */
-        private final List<OrderBookPage> sellers = new ArrayList();
-
-        /** The maximum size on sellers. */
-        private double sellerMaxSize = OrderbookBarWidth;
-
-        /**
-         * Calculate info.
-         * 
-         * @param market
-         */
-        private OrderbookBar(Market market) {
-            final double visibleMax = axisY.computeVisibleMaxValue();
-            final double visibleMin = axisY.computeVisibleMinValue();
-
-            // collect buyer pages
-            for (OrderBookPage page : market.orderBook.longs.ascendingPages()) {
-                if (visibleMin < page.price) {
-                    buyerMaxSize = Math.max(buyerMaxSize, page.size);
-                    buyers.add(page);
-                } else {
-                    break;
-                }
-            }
-
-            // collect seller pages
-            for (OrderBookPage page : market.orderBook.shorts.ascendingPages()) {
-                if (page.price < visibleMax) {
-                    sellerMaxSize = Math.max(sellerMaxSize, page.size);
-                    sellers.add(page);
-                } else {
-                    break;
-                }
-            }
-
-            scale = OrderbookBarWidth / Math.max(buyerMaxSize, sellerMaxSize);
-        }
-
-        /**
-         * Draw orderbooks on chart' side.
-         */
-        private void draw() {
-            draw(buyers, buyerMaxSize, ChartTheme.colorBy(Direction.BUY));
-            draw(sellers, sellerMaxSize, ChartTheme.colorBy(Direction.SELL));
-        }
-
-        /**
-         * Draw orderbooks on chart' side.
-         * 
-         * @param pages The page info.
-         * @param threshold A range to draw.
-         * @param color Visible color.
-         */
-        private void draw(List<OrderBookPage> pages, double max, Color color) {
-            double upper = max * 0.75;
-            double start = orderbook.getWidth();
-            double lastPosition = 0;
-            double range = chart.market.v.orderBook.ranged();
-            int hideSize = chart.orderbookHideSize.value();
-
-            GraphicsContext gc = orderbook.getGraphicsContext2D();
-            gc.setStroke(color);
-
-            for (int i = 0, size = pages.size(); i < size; i++) {
-                OrderBookPage page = pages.get(i);
-                if (page.size < hideSize) {
-                    continue; // hiding
-                }
-
-                double position = axisY.getPositionForValue(page.price + range);
-                double width = start - page.size * scale;
-                gc.strokeLine(start, position, width, position);
-                if (page.size > upper && Math.abs(lastPosition - position) > 8) {
-                    gc.strokeText(String.valueOf((int) page.size), width - 15, position, OrderbookBarWidth);
-                    lastPosition = position;
-                }
-            }
         }
     }
 

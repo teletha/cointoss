@@ -166,7 +166,7 @@ public class ChartView extends View {
             {
                 $(vbox, FormStyles.Label90, FormStyles.LabelCenter, () -> {
                     form("Candle Type", FormStyles.Column3, showCandle, candleType);
-                    form("Latest Price", FormStyles.Column3 ,showLatestPrice);
+                    form("Latest Price", FormStyles.Column3, showLatestPrice);
                     form("Orderbook", FormStyles.Column3, showOrderbook, orderbookPriceRange, orderbookHideSize);
                     form("Priced Volume", FormStyles.Column3, showPricedVolume, pricedVolumeType);
                 });
