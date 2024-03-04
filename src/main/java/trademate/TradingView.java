@@ -86,7 +86,7 @@ public class TradingView extends View {
             market.readLog(x -> x.fromLast(7, LogType.Fast).concat(service.executions(false)));
 
             chart.market.set(market);
-            chart.showRealtimeUpdate.set(true);
+            chart.showRealtimeUpdate.set(tab.isSelected());
 
             next.run();
         });

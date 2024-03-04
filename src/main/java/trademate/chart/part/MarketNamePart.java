@@ -10,6 +10,7 @@
 package trademate.chart.part;
 
 import javafx.scene.text.FontWeight;
+
 import trademate.chart.ChartCanvas;
 import trademate.chart.ChartView;
 import viewtify.Theme;
@@ -25,6 +26,10 @@ public class MarketNamePart extends ChartPart {
 
         Theme theme = Preferences.theme();
         canvas.font(20, FontWeight.BOLD).fillColor(theme.textMid());
+
+        parent.chart.market.observing().skipNull().switchOn(parent.chart.showRealtimeUpdate.observing()).to(market -> {
+            canvas.size(180, 30).fillText(market.service.id, ChartCanvas.chartInfoLeftPadding, canvas.fontSize());
+        });
     }
 
     /**
@@ -32,14 +37,5 @@ public class MarketNamePart extends ChartPart {
      */
     @Override
     public void draw() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onShown() {
-        // canvas.size(180, 30).fillText(parent.chart.market.v.service.id,
-        // ChartCanvas.chartInfoLeftPadding, canvas.fontSize());
     }
 }

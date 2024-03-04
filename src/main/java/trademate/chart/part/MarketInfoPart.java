@@ -9,20 +9,18 @@
  */
 package trademate.chart.part;
 
-import java.util.concurrent.TimeUnit;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.FontWeight;
 
 import cointoss.CurrencySetting;
 import cointoss.analyze.OnlineStats;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.text.FontWeight;
 import kiss.I;
 import kiss.Variable;
 import trademate.chart.ChartCanvas;
-import trademate.chart.ChartView;
 import trademate.setting.PerformanceSetting;
 import viewtify.Viewtify;
 import viewtify.preference.Preferences;
@@ -44,31 +42,16 @@ public class MarketInfoPart extends ChartPart {
     /**
      * @param parent
      */
-    public MarketInfoPart(ChartCanvas parent, ChartView chart) {
+    public MarketInfoPart(ChartCanvas parent) {
         super(parent);
 
         canvas.font(11, FontWeight.BOLD).fillColor(Preferences.theme().textMid());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void draw() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onShown() {
-        super.onShown();
 
         parent.chart.market.observing()
                 .skipNull()
-                .switchOn(parent.chart.showRealtimeUpdate.observing())
                 .switchMap(m -> m.tickers.latest.observing())
-                .throttle(Preferences.of(PerformanceSetting.class).refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
+                .plug(PerformanceSetting.applyUIRefreshRate())
+                .switchOn(parent.chart.showRealtimeUpdate.observing())
                 .on(Viewtify.UIThread)
                 .to(e -> {
                     Color textColor = Preferences.theme().textMid();
@@ -97,7 +80,13 @@ public class MarketInfoPart extends ChartPart {
                     c.setFill(textColor);
                     c.fillText("(" + Primitives.roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives
                             .roundString(volatilityStats.sigma(2), base.scale) + ")", 85, 65);
-                }, e -> e.printStackTrace(), () -> {
                 });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void draw() {
     }
 }

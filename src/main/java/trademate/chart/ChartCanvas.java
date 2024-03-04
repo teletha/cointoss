@@ -19,6 +19,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -35,20 +50,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -216,7 +217,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
         parts = List
-                .of(new MarketNamePart(this, chart), new MarketInfoPart(this, chart), new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
+                .of(new MarketNamePart(this, chart), new MarketInfoPart(this), new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
 
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
@@ -281,9 +282,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void onShow() {
         candles.bindSizeTo(this);
         candleLatest.bindSizeTo(this);
-        for (ChartPart part : parts) {
-            part.onShown();
-        }
         chartInfo.bindSizeTo(this);
         supporter.bindSizeTo(this);
 
@@ -296,9 +294,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void onHide() {
         candles.clear().size(0, 0);
         candleLatest.clear().size(0, 0);
-        for (ChartPart part : parts) {
-            part.onHidden();
-        }
         chartInfo.clear().size(0, 0);
         supporter.clear().size(0, 0);
     }

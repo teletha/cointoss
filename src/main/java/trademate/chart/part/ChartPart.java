@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
-import kiss.Disposable;
+
 import kiss.Signal;
 import trademate.chart.ChartCanvas;
 import trademate.setting.PerformanceSetting;
@@ -37,9 +37,6 @@ public abstract class ChartPart {
 
     /** The all managed canvases. */
     public final List<EnhancedCanvas> managed = new ArrayList();
-
-    /** The disposer on hidden. */
-    protected Disposable disposeOnHidden = Disposable.empty();
 
     /**
      * Set up part of the chart.
@@ -63,41 +60,25 @@ public abstract class ChartPart {
         // manage the created new canvas automatically
         managed.add(canvas);
 
+        parent.chart.showRealtimeUpdate.observing().to(show -> {
+            if (show) {
+                configurePreferedCanvasSize(canvas);
+            } else {
+                // clear all contents and minimize them to reduce memory usage
+                canvas.clear().size(0, 0);
+            }
+        });
+
         return canvas;
     }
 
     /**
-     * Invoke when the canvas is shown.
+     * Configure your prefered canvas size.
+     * 
+     * @param canvas
      */
-    public void onShown() {
-        for (EnhancedCanvas canvas : managed) {
-            canvas.bindSizeTo(parent);
-        }
-
-        disposeOnHidden = Disposable.empty();
-    }
-
-    /**
-     * Invoke when the canvas is hiddent.
-     */
-    public void onHidden() {
-        // clear all contents and minimize them to reduce memory usage
-        for (EnhancedCanvas canvas : managed) {
-            canvas.clear().size(0, 0);
-        }
-
-        disposeOnHidden.dispose();
-    }
-
-    /**
-     * Invoke when the mouse moves on the parent canvas.
-     */
-    public void onMouseMove(double x, double y) {
-        // do nothing
-    }
-
-    public void onMouseExit() {
-        // do nothing
+    protected void configurePreferedCanvasSize(EnhancedCanvas canvas) {
+        canvas.bindSizeTo(parent);
     }
 
     public abstract void draw();

@@ -15,12 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import cointoss.Direction;
-import cointoss.Market;
-import cointoss.orderbook.OrderBookPage;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+
+import cointoss.Direction;
+import cointoss.Market;
+import cointoss.orderbook.OrderBookPage;
 import trademate.ChartTheme;
 import trademate.chart.ChartCanvas;
 import trademate.chart.ChartView;
@@ -35,7 +36,7 @@ public class OrderBookPart extends ChartPart {
     private static final double OrderbookDigitWidth = 20;
 
     /** Chart UI */
-    public final EnhancedCanvas digit = createCanvas().font(8).textBaseLine(VPos.CENTER);
+    public final EnhancedCanvas canvasDigit = createCanvas();
 
     private final ChartView chart;
 
@@ -63,6 +64,7 @@ public class OrderBookPart extends ChartPart {
         this.chart = chart;
 
         canvas.font(8).textBaseLine(VPos.CENTER);
+        canvasDigit.font(8).textBaseLine(VPos.CENTER);
 
         layout.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
@@ -77,15 +79,10 @@ public class OrderBookPart extends ChartPart {
      * {@inheritDoc}
      */
     @Override
-    public void onShown() {
+    protected void configurePreferedCanvasSize(EnhancedCanvas canvas) {
         canvas.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, parent);
-        digit.bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, parent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void onMouseMove(double x, double y) {
         // search the nearest and largest order size
         chart.market.to(m -> {
@@ -97,19 +94,15 @@ public class OrderBookPart extends ChartPart {
                 double position = parent.axisY.getPositionForValue(price);
                 int size = (int) largest.size;
 
-                digit.clear()
+                canvasDigit.clear()
                         .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL))
-                        .strokeText(size, digit.getWidth() - largest.size * scale - String.valueOf(size).length() * 7, position);
+                        .strokeText(size, canvasDigit.getWidth() - largest.size * scale - String.valueOf(size).length() * 7, position);
             }
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void onMouseExit() {
-        digit.clear();
+        canvasDigit.clear();
     }
 
     /**
@@ -120,7 +113,7 @@ public class OrderBookPart extends ChartPart {
         layout.layout(() -> {
             double x = parent.getWidth() - OrderbookBarWidth - OrderbookDigitWidth;
             canvas.setLayoutX(x);
-            digit.setLayoutX(x);
+            canvasDigit.setLayoutX(x);
 
             canvas.clear();
 

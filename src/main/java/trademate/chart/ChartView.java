@@ -13,29 +13,24 @@ import java.text.Normalizer.Form;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
-import cointoss.execution.Execution;
 import cointoss.execution.LogType;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import kiss.Signal;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
-import trademate.setting.PerformanceSetting;
 import trademate.verify.BackTestView;
-import viewtify.Viewtify;
-import viewtify.preference.Preferences;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
@@ -101,14 +96,6 @@ public class ChartView extends View {
 
     /** The additional scripts. */
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
-
-    public final Signal<Execution> throttledTicks = market.observing()
-            .skipNull()
-            .switchMap(m -> m.tickers.latest.observing())
-            .switchOn(showRealtimeUpdate.observing())
-            .throttle(Preferences.of(PerformanceSetting.class).refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
-            .on(Viewtify.UIThread)
-            .share();
 
     /**
      * UI definition.
