@@ -129,6 +129,7 @@ public class Chart extends Region {
 
             // layout chart
             canvas.resizeRelocate(x, y, mainWidth, mainHeight);
+            System.out.println("Layout chart");
             canvas.layoutChildren();
         });
     }

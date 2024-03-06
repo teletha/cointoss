@@ -212,6 +212,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.mouseTrackHorizontal = new LineMark(axisY, ChartStyles.MouseTrack);
         this.notifyPrice = new LineMark(axisY, ChartStyles.PriceSignal);
         this.latestPrice = new LineMark(axisY, ChartStyles.PriceLatest);
+        this.latestPrice.debug = true;
         this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
@@ -1028,6 +1029,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class LineMark extends Path {
 
+        private boolean debug;
+
         /** The styles. */
         private final Style[] styles;
 
@@ -1038,7 +1041,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private final Axis axis;
 
         /** The layout manager. */
-        private final LayoutAssistant layoutLine = layoutCandle.sub();
+        protected final LayoutAssistant layoutLine = layoutCandle.sub();
 
         /**
          * @param classNames
@@ -1131,8 +1134,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /**
          * Draw mark.
          */
-        private void draw() {
+        protected void draw() {
             layoutLine.layout(() -> {
+                if (debug) {
+                    System.out.println("Start Draw");
+                }
+
                 ObservableList<PathElement> paths = getElements();
                 int pathSize = paths.size();
                 int labelSize = labels.size();
