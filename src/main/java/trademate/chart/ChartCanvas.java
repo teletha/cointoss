@@ -19,6 +19,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -35,20 +50,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -212,7 +213,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.mouseTrackHorizontal = new LineMark(axisY, ChartStyles.MouseTrack);
         this.notifyPrice = new LineMark(axisY, ChartStyles.PriceSignal);
         this.latestPrice = new LineMark(axisY, ChartStyles.PriceLatest);
-        this.latestPrice.debug = true;
         this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
@@ -614,6 +614,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         chart.market.observing()
                 .skipNull()
                 .switchMap(m -> m.tickers.latest.observing().map(Execution::price))
+                .plug(PerformanceSetting.applyUIRefreshRate())
                 .switchOn(chart.showRealtimeUpdate.observing())
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
@@ -1029,8 +1030,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class LineMark extends Path {
 
-        private boolean debug;
-
         /** The styles. */
         private final Style[] styles;
 
@@ -1136,10 +1135,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         protected void draw() {
             layoutLine.layout(() -> {
-                if (debug) {
-                    System.out.println("Start Draw");
-                }
-
                 ObservableList<PathElement> paths = getElements();
                 int pathSize = paths.size();
                 int labelSize = labels.size();
