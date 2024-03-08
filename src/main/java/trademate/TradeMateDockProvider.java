@@ -22,6 +22,7 @@ import trademate.setting.PerformanceSetting;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import viewtify.Viewtify;
+import viewtify.keys.Key;
 import viewtify.preference.Preferences;
 import viewtify.ui.UIContextMenu;
 import viewtify.ui.UITab;
@@ -47,6 +48,11 @@ public class TradeMateDockProvider extends DockProvider {
 
         updateTabRealtimely(tab, service);
     });
+
+    public TradeMateDockProvider() {
+        TradeMateCommand.OpenBacktest.shortcut(Key.F11).contribute(tester::show);
+        TradeMateCommand.OpenSetting.shortcut(Key.F12).contribute(setting::show);
+    }
 
     /**
      * Show the current price and more market info.
