@@ -91,13 +91,6 @@ public class TradeMate extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application() //
-                .error((msg, error) -> {
-                    I.error(msg);
-                    I.error(error);
-                })
-                .icon("icon/app.png")
-                .onTerminating(EfficientWebSocket::shutdownNow)
-                .activate(TradeMate.class);
+        Viewtify.application().icon("icon/app.png").onTerminating(EfficientWebSocket::shutdownNow).activate(TradeMate.class);
     }
 }

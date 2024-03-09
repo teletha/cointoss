@@ -59,14 +59,6 @@ public class TradeTester extends View {
         I.load(Market.class);
 
         // activate application
-        Viewtify.application() //
-                .error((msg, error) -> {
-                    I.error(msg);
-                    I.error(error);
-                    error.printStackTrace();
-                })
-                .icon("icon/tester.png")
-                .onTerminating(EfficientWebSocket::shutdownNow)
-                .activate(TradeTester.class);
+        Viewtify.application().icon("icon/tester.png").onTerminating(EfficientWebSocket::shutdownNow).activate(TradeTester.class);
     }
 }
