@@ -14,6 +14,8 @@ import cointoss.util.EfficientWebSocket;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
+import stylist.Style;
+import stylist.StyleDSL;
 import viewtify.Viewtify;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -22,6 +24,12 @@ import viewtify.ui.dock.DockSystem;
 @Managed(value = Singleton.class)
 public class TradeTester extends View {
 
+    interface style extends StyleDSL {
+        Style root = () -> {
+            display.width(1100, px).height(700, px);
+        };
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -29,7 +37,7 @@ public class TradeTester extends View {
     protected ViewDSL declareUI() {
         return new ViewDSL() {
             {
-                $(DockSystem.UI);
+                $(DockSystem.UI, style.root);
             }
         };
     }

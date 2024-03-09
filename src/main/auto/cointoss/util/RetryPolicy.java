@@ -90,6 +90,9 @@ public class RetryPolicy extends RetryPolicyModel {
     private static final MethodHandle delayUpdater = updater("delay");
 
     /** The final property updater. */
+    private static final MethodHandle delayOnMaintenaceUpdater = updater("delayOnMaintenace");
+
+    /** The final property updater. */
     private static final MethodHandle nameUpdater = updater("name");
 
     /** The final property updater. */
@@ -100,6 +103,9 @@ public class RetryPolicy extends RetryPolicyModel {
 
     /** The exposed property. */
     final LongFunction<Duration> delay;
+
+    /** The exposed property. */
+    final LongFunction<Duration> delayOnMaintenace;
 
     /** The exposed property. */
     final String name;
@@ -113,6 +119,7 @@ public class RetryPolicy extends RetryPolicyModel {
     protected RetryPolicy() {
         this.limit = 0L;
         this.delay = super.delay();
+        this.delayOnMaintenace = super.delayOnMaintenace();
         this.name = super.name();
         this.scheduler = super.scheduler();
     }
@@ -182,6 +189,43 @@ public class RetryPolicy extends RetryPolicyModel {
         }
         try {
             delayUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Set the delay time between trials.
+     *  
+     *  @return
+     */
+    @Override
+    final LongFunction<Duration> delayOnMaintenace() {
+        return this.delayOnMaintenace;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of delayOnMaintenace property.
+     */
+    @SuppressWarnings("unused")
+    private final LongFunction<Duration> getDelayOnMaintenace() {
+        return this.delayOnMaintenace;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of delayOnMaintenace property to assign.
+     */
+    private final void setDelayOnMaintenace(LongFunction<Duration> value) {
+        if (value == null) {
+            value = super.delayOnMaintenace();
+        }
+        try {
+            delayOnMaintenaceUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -269,7 +313,7 @@ public class RetryPolicy extends RetryPolicyModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(limit, delay, name, scheduler);
+        return Objects.hash(limit, delay, delayOnMaintenace, name, scheduler);
     }
 
     /**
@@ -286,6 +330,7 @@ public class RetryPolicy extends RetryPolicyModel {
         RetryPolicy other = (RetryPolicy) o;
         if (limit != other.limit) return false;
         if (!Objects.equals(delay, other.delay)) return false;
+        if (!Objects.equals(delayOnMaintenace, other.delayOnMaintenace)) return false;
         if (!Objects.equals(name, other.name)) return false;
         if (!Objects.equals(scheduler, other.scheduler)) return false;
         return true;
@@ -427,6 +472,17 @@ public class RetryPolicy extends RetryPolicyModel {
         }
 
         /**
+         * Assign delayOnMaintenace property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next delayOnMaintenace(LongFunction<? extends Duration> value) {
+            ((RetryPolicy) this).setDelayOnMaintenace((java.util.function.LongFunction)value);
+            return (Next) this;
+        }
+
+        /**
          * Assign name property.
          * 
          * @param value A new value to assign.
@@ -467,6 +523,7 @@ public class RetryPolicy extends RetryPolicyModel {
     static final class My {
         static final String Limit = "limit";
         static final String Delay = "delay";
+        static final String DelayOnMaintenace = "delayOnMaintenace";
         static final String Name = "name";
         static final String Scheduler = "scheduler";
     }

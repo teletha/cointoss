@@ -21,6 +21,8 @@ import kiss.Managed;
 import kiss.Signal;
 import kiss.Singleton;
 import psychopath.Locator;
+import stylist.Style;
+import stylist.StyleDSL;
 import viewtify.Viewtify;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -29,6 +31,12 @@ import viewtify.ui.dock.DockSystem;
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
 
+    interface style extends StyleDSL {
+        Style root = () -> {
+            display.width(1300, px).height(1000, px);
+        };
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -36,7 +44,7 @@ public class TradeMate extends View {
     protected ViewDSL declareUI() {
         return new ViewDSL() {
             {
-                $(DockSystem.UI);
+                $(DockSystem.UI, style.root);
             }
         };
     }

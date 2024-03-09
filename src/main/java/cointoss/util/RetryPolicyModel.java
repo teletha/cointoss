@@ -17,6 +17,7 @@ import java.util.function.LongFunction;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import cointoss.market.MaintenanceError;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
@@ -63,6 +64,16 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     @Icy.Property
     LongFunction<Duration> delay() {
         return i -> Duration.ZERO;
+    }
+
+    /**
+     * Set the delay time between trials.
+     * 
+     * @return
+     */
+    @Icy.Property
+    LongFunction<Duration> delayOnMaintenace() {
+        return i -> Duration.ofMinutes(10);
     }
 
     /**
@@ -153,7 +164,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             latestRetryTime = now;
 
             Duration duration = Duration.ZERO;
-            LongFunction<Duration> delay = delay();
+            LongFunction<Duration> delay = e instanceof MaintenanceError ? delayOnMaintenace() : delay();
             if (delay != null) {
                 duration = delay.apply(count++);
                 if (10 < duration.toMinutes()) {
