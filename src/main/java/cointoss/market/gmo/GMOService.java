@@ -32,7 +32,7 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
-import cointoss.market.MaintenanceError;
+import cointoss.market.LimitOverflowError;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.util.APILimiter;
@@ -186,7 +186,13 @@ public class GMOService extends MarketService {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path)).timeout(Duration.ofSeconds(60));
         return Network.rest(builder, LIMITER, client()).flatMap(json -> {
             if (json.get(int.class, "status") != 0) {
-                return I.signalError(new MaintenanceError(json.get("messages").get("0").text("message_string") + " [" + path + "]"));
+                String message = json.get("messages").get("0").text("message_string") + " [" + path + "]";
+
+                if (message.contains("Requests are too many")) {
+                    return I.signalError(new LimitOverflowError(message));
+                } else {
+                    return I.signalError(new IllegalAccessError(message));
+                }
             } else {
                 return I.signal(json);
             }

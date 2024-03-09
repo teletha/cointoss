@@ -90,6 +90,9 @@ public class RetryPolicy extends RetryPolicyModel {
     private static final MethodHandle delayUpdater = updater("delay");
 
     /** The final property updater. */
+    private static final MethodHandle delayOnLimitOverflowUpdater = updater("delayOnLimitOverflow");
+
+    /** The final property updater. */
     private static final MethodHandle delayOnMaintenaceUpdater = updater("delayOnMaintenace");
 
     /** The final property updater. */
@@ -103,6 +106,9 @@ public class RetryPolicy extends RetryPolicyModel {
 
     /** The exposed property. */
     final LongFunction<Duration> delay;
+
+    /** The exposed property. */
+    final LongFunction<Duration> delayOnLimitOverflow;
 
     /** The exposed property. */
     final LongFunction<Duration> delayOnMaintenace;
@@ -119,6 +125,7 @@ public class RetryPolicy extends RetryPolicyModel {
     protected RetryPolicy() {
         this.limit = 0L;
         this.delay = super.delay();
+        this.delayOnLimitOverflow = super.delayOnLimitOverflow();
         this.delayOnMaintenace = super.delayOnMaintenace();
         this.name = super.name();
         this.scheduler = super.scheduler();
@@ -189,6 +196,43 @@ public class RetryPolicy extends RetryPolicyModel {
         }
         try {
             delayUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Set the delay time between trials.
+     *  
+     *  @return
+     */
+    @Override
+    final LongFunction<Duration> delayOnLimitOverflow() {
+        return this.delayOnLimitOverflow;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of delayOnLimitOverflow property.
+     */
+    @SuppressWarnings("unused")
+    private final LongFunction<Duration> getDelayOnLimitOverflow() {
+        return this.delayOnLimitOverflow;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of delayOnLimitOverflow property to assign.
+     */
+    private final void setDelayOnLimitOverflow(LongFunction<Duration> value) {
+        if (value == null) {
+            value = super.delayOnLimitOverflow();
+        }
+        try {
+            delayOnLimitOverflowUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -313,7 +357,7 @@ public class RetryPolicy extends RetryPolicyModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(limit, delay, delayOnMaintenace, name, scheduler);
+        return Objects.hash(limit, delay, delayOnLimitOverflow, delayOnMaintenace, name, scheduler);
     }
 
     /**
@@ -330,6 +374,7 @@ public class RetryPolicy extends RetryPolicyModel {
         RetryPolicy other = (RetryPolicy) o;
         if (limit != other.limit) return false;
         if (!Objects.equals(delay, other.delay)) return false;
+        if (!Objects.equals(delayOnLimitOverflow, other.delayOnLimitOverflow)) return false;
         if (!Objects.equals(delayOnMaintenace, other.delayOnMaintenace)) return false;
         if (!Objects.equals(name, other.name)) return false;
         if (!Objects.equals(scheduler, other.scheduler)) return false;
@@ -472,6 +517,17 @@ public class RetryPolicy extends RetryPolicyModel {
         }
 
         /**
+         * Assign delayOnLimitOverflow property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next delayOnLimitOverflow(LongFunction<? extends Duration> value) {
+            ((RetryPolicy) this).setDelayOnLimitOverflow((java.util.function.LongFunction)value);
+            return (Next) this;
+        }
+
+        /**
          * Assign delayOnMaintenace property.
          * 
          * @param value A new value to assign.
@@ -523,6 +579,7 @@ public class RetryPolicy extends RetryPolicyModel {
     static final class My {
         static final String Limit = "limit";
         static final String Delay = "delay";
+        static final String DelayOnLimitOverflow = "delayOnLimitOverflow";
         static final String DelayOnMaintenace = "delayOnMaintenace";
         static final String Name = "name";
         static final String Scheduler = "scheduler";

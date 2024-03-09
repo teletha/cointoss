@@ -17,6 +17,7 @@ import java.util.function.LongFunction;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import cointoss.market.LimitOverflowError;
 import cointoss.market.MaintenanceError;
 import icy.manipulator.Icy;
 import kiss.I;
@@ -64,6 +65,16 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     @Icy.Property
     LongFunction<Duration> delay() {
         return i -> Duration.ZERO;
+    }
+
+    /**
+     * Set the delay time between trials.
+     * 
+     * @return
+     */
+    @Icy.Property
+    LongFunction<Duration> delayOnLimitOverflow() {
+        return i -> Duration.ofMinutes(1);
     }
 
     /**
@@ -164,7 +175,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             latestRetryTime = now;
 
             Duration duration = Duration.ZERO;
-            LongFunction<Duration> delay = e instanceof MaintenanceError ? delayOnMaintenace() : delay();
+            LongFunction<Duration> delay = isMaintenance(e) ? delayOnMaintenace() : isLimitError(e) ? delayOnLimitOverflow() : delay();
             if (delay != null) {
                 duration = delay.apply(count++);
                 if (10 < duration.toMinutes()) {
@@ -180,6 +191,16 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
 
             return duration;
         }, scheduler()).effect(onRetry);
+    }
+
+    private boolean isMaintenance(Throwable e) {
+        String mes = e.getMessage().toLowerCase();
+        return e instanceof MaintenanceError || mes.contains("maintenance");
+    }
+
+    private boolean isLimitError(Throwable e) {
+        String mes = e.getMessage().toLowerCase();
+        return e instanceof LimitOverflowError || mes.contains("ratelimit");
     }
 
     public static WiseFunction<Signal<Throwable>, Signal<?>> comply(long limit) {
