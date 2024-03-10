@@ -20,6 +20,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
@@ -87,13 +88,16 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        ZonedDateTime start = Support.computeDateTime(startId);
+        new Error().printStackTrace();
+
+        ZonedDateTime start = Chrono.max(Support.computeDateTime(startId), ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(2));
         Variable<Long> counter = Variable.of(1L);
         long[] prev = new long[3];
 
         return counter.observing()
                 .concatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
                 .effect(() -> counter.set(v -> v + 1))
+                .effect(x -> System.out.println(formattedId + "   " + counter + "  " + start + "       " + x))
                 .flatIterable(o -> o.find("data", "list", "*"))
                 // The GMO server returns both Taker and Maker histories
                 // alternately, so we have to remove the Maker side.
