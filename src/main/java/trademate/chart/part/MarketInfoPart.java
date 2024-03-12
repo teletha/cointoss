@@ -11,6 +11,7 @@ package trademate.chart.part;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 import cointoss.CurrencySetting;
@@ -45,7 +46,8 @@ public class MarketInfoPart extends ChartPart {
     public MarketInfoPart(ChartCanvas parent) {
         super(parent);
 
-        canvas.font(11, FontWeight.BOLD).fillColor(Preferences.theme().textMid());
+        Font title = Font.font(null, FontWeight.BOLD, 20);
+        Font normal = Font.font(null, FontWeight.BOLD, 11);
 
         parent.chart.market.observing()
                 .skipNull()
@@ -54,32 +56,34 @@ public class MarketInfoPart extends ChartPart {
                 .switchOn(parent.chart.showRealtimeUpdate.observing())
                 .on(Viewtify.UIThread)
                 .to(e -> {
+                    int offset = 80;
+                    int verticalOffset = 35;
                     Color textColor = Preferences.theme().textMid();
 
                     CurrencySetting base = parent.chart.market.v.service.setting.base;
                     GraphicsContext c = canvas.clear().getGraphicsContext2D();
 
+                    c.setFont(title);
                     c.setFill(textColor);
-                    c.fillText(DelayLabel.v, ChartCanvas.chartInfoLeftPadding, 35);
-                    c.fillText(SpreadLabel.v, ChartCanvas.chartInfoLeftPadding, 50);
-                    c.fillText(VolatilityLabel.v, ChartCanvas.chartInfoLeftPadding, 65);
+                    c.fillText(parent.chart.market.v.service.id, ChartCanvas.chartInfoLeftPadding, 20);
+                    c.setFont(normal);
 
                     long diff = Chrono.currentTimeMills() - e.mills;
                     c.setFill(diff < 0 || 1000 < diff ? WarningColor : textColor);
-                    c.fillText(diff + "ms", 50, 35);
+                    c.fillText(DelayLabel.v + " " + diff + "ms", ChartCanvas.chartInfoLeftPadding, verticalOffset);
 
                     double spread = parent.chart.market.v.orderBook.spread();
                     Num range = base.minimumSize.multiply(100);
                     c.setFill(spread < range.doubleValue() ? textColor : WarningColor);
-                    c.fillText(Primitives.roundString(spread, base.scale), 50, 50);
+                    c.fillText(SpreadLabel.v + " " + Primitives
+                            .roundString(spread, base.scale), ChartCanvas.chartInfoLeftPadding + offset, verticalOffset);
 
                     OnlineStats volatilityStats = parent.chart.ticker.v.spreadStats;
                     double volatility = parent.chart.ticker.v.ticks.last().spread();
                     c.setFill(volatilityStats.calculateSigma(volatility) <= 2 ? textColor : WarningColor);
-                    c.fillText(Primitives.roundString(volatility, base.scale), 50, 65);
-                    c.setFill(textColor);
-                    c.fillText("(" + Primitives.roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives
-                            .roundString(volatilityStats.sigma(2), base.scale) + ")", 85, 65);
+                    c.fillText(VolatilityLabel.v + " " + Primitives.roundString(volatility, base.scale) + " (" + Primitives
+                            .roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives.roundString(volatilityStats
+                                    .sigma(2), base.scale) + ")", ChartCanvas.chartInfoLeftPadding + offset * 2, verticalOffset);
                 });
     }
 

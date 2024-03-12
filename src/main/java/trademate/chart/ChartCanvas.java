@@ -63,7 +63,6 @@ import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.chart.part.ChartPart;
 import trademate.chart.part.MarketInfoPart;
-import trademate.chart.part.MarketNamePart;
 import trademate.chart.part.OrderBookPart;
 import trademate.chart.part.PriceRangedVolumePart;
 import trademate.setting.Notificator;
@@ -103,7 +102,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     public static final int chartInfoLeftPadding = 4;
 
     /** The size of chart infomation area. */
-    private static final int chartInfoTopPadding = 19;
+    private static final int chartInfoTopPadding = 35;
 
     /** The size of chart infomation area. */
     private static final int chartInfoHorizontalGap = 3;
@@ -216,8 +215,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
-        parts = List
-                .of(new MarketNamePart(this, chart), new MarketInfoPart(this), new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
+        parts = List.of(new MarketInfoPart(this), new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
 
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())

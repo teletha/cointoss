@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashSet;
 import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
@@ -88,8 +89,6 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        new Error().printStackTrace();
-
         ZonedDateTime start = Chrono.max(Support.computeDateTime(startId), ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(2));
         Variable<Long> counter = Variable.of(1L);
         long[] prev = new long[3];
@@ -97,7 +96,6 @@ public class GMOService extends MarketService {
         return counter.observing()
                 .concatMap(page -> call("GET", "trades?symbol=" + marketName + "&page=" + page))
                 .effect(() -> counter.set(v -> v + 1))
-                .effect(x -> System.out.println(formattedId + "   " + counter + "  " + start + "       " + x))
                 .flatIterable(o -> o.find("data", "list", "*"))
                 // The GMO server returns both Taker and Maker histories
                 // alternately, so we have to remove the Maker side.
@@ -273,7 +271,19 @@ public class GMOService extends MarketService {
         @Override
         public Signal<ZonedDateTime> collect() {
             String uri = "https://api.coin.z.com/data/trades/" + service.marketName + "/";
-            Function<Signal<XML>, Signal<String>> collect = s -> s.flatIterable(x -> x.find("ul li a")).map(XML::text);
+            Function<Signal<XML>, Signal<String>> collect = s -> s.flatIterable(x -> x.find("ul li a"))
+                    .map(XML::text)
+                    .buffer()
+                    .flatMap(x -> {
+                        if (x.isEmpty()) {
+                            return I.signal();
+                        } else {
+                            LinkedHashSet<String> set = new LinkedHashSet();
+                            set.add(x.get(0));
+                            set.add(x.get(x.size() - 1));
+                            return I.signal(set);
+                        }
+                    });
 
             return I.http(uri, XML.class).plug(collect).flatMap(year -> {
                 return I.http(uri + year + "/", XML.class).plug(collect).flatMap(month -> {
