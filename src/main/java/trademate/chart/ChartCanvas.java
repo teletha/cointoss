@@ -14,7 +14,6 @@ import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -28,10 +27,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
 
 import com.google.common.cache.CacheBuilder;
@@ -39,7 +34,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import cointoss.Market;
-import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
@@ -48,7 +42,6 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
 import kiss.Disposable;
 import kiss.I;
@@ -61,17 +54,17 @@ import trademate.ChartTheme;
 import trademate.CommonText;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
+import trademate.chart.line.LineMark;
+import trademate.chart.line.PriceNotify;
 import trademate.chart.part.ChartPart;
 import trademate.chart.part.MarketInfoPart;
 import trademate.chart.part.OrderBookPart;
 import trademate.chart.part.PriceRangedVolumePart;
-import trademate.setting.Notificator;
 import trademate.setting.PerformanceSetting;
 import viewtify.Viewtify;
 import viewtify.preference.Preferences;
 import viewtify.ui.canvas.EnhancedCanvas;
 import viewtify.ui.helper.LayoutAssistant;
-import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
 import viewtify.util.FXUtils;
@@ -129,7 +122,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LineMark mouseTrackHorizontal;
 
     /** Chart UI */
-    private final LineMark notifyPrice;
+    private final PriceNotify notifyPrice;
 
     /** Chart UI */
     private final LineMark latestPrice;
@@ -144,7 +137,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LineMark sfdPrice;
 
     /** Flag whether candle chart should layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
+    public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
     /** Flag whether candle chart should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
@@ -206,15 +199,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.chart = chart;
         this.axisX = axisX;
         this.axisY = axisY;
-        this.backGridVertical = new LineMark(axisX.forGrid, axisX, ChartStyles.BackGrid);
-        this.backGridHorizontal = new LineMark(axisY.forGrid, axisY, ChartStyles.BackGrid);
-        this.mouseTrackVertical = new LineMark(axisX, ChartStyles.MouseTrack);
-        this.mouseTrackHorizontal = new LineMark(axisY, ChartStyles.MouseTrack);
-        this.notifyPrice = new LineMark(axisY, ChartStyles.PriceSignal);
-        this.latestPrice = new LineMark(axisY, ChartStyles.PriceLatest);
-        this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
-        this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
-        this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
+        this.backGridVertical = new LineMark(this, axisX.forGrid, axisX, ChartStyles.BackGrid);
+        this.backGridHorizontal = new LineMark(this, axisY.forGrid, axisY, ChartStyles.BackGrid);
+        this.mouseTrackVertical = new LineMark(this, axisX, ChartStyles.MouseTrack);
+        this.mouseTrackHorizontal = new LineMark(this, axisY, ChartStyles.MouseTrack);
+        this.notifyPrice = new PriceNotify(this);
+        this.latestPrice = new LineMark(this, axisY, ChartStyles.PriceLatest);
+        this.orderBuyPrice = new LineMark(this, axisY, ChartStyles.OrderSupportBuy);
+        this.orderSellPrice = new LineMark(this, axisY, ChartStyles.OrderSupportSell);
+        this.sfdPrice = new LineMark(this, axisY, ChartStyles.PriceSFD);
         parts = List.of(new MarketInfoPart(this), new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
 
         layoutCandle.layoutBy(chartAxisModification())
@@ -520,7 +513,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 if (pressed.getX() != released.getX() || pressed.getY() != released.getY()) {
                     supporter.clear();
                 } else {
-                    notifyByPrice(released);
+                    notifyPrice.notifyByPrice(released);
                 }
             }, dispose);
         });
@@ -552,37 +545,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         gc.strokeText(I.translate("Duration") + "\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), textX, endY + lineY);
         gc.strokeText(I.translate("Spread") + "\t" + Primitives
                 .roundString(Math.abs(upperPrice - lowerPrice), scale), textX, endY + lineY * 2);
-    }
-
-    /**
-     * Notify by price.
-     * 
-     * @param e
-     */
-    private void notifyByPrice(MouseEvent e) {
-        double clickedPosition = e.getY();
-
-        // check price range to add or remove
-        for (TickLable mark : notifyPrice.labels) {
-            double markedPosition = axisY.getPositionForValue(mark.value.get());
-
-            if (Math.abs(markedPosition - clickedPosition) < 5) {
-                notifyPrice.remove(mark);
-                return;
-            }
-        }
-
-        Num price = Num.of(axisY.getValueForPosition(clickedPosition)).scale(chart.market.v.service.setting.base.scale);
-        TickLable label = notifyPrice.createLabel(price);
-
-        label.add(chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
-            notifyPrice.remove(label);
-
-            MarketService service = chart.market.v.service;
-            Num p = exe.price.scale(service.setting.target.scale);
-            String title = "🔊  " + service.id + " " + p;
-            I.make(Notificator.class).priceSignal.notify(title, I.translate("The specified price ({0}) has been reached.", p));
-        }));
     }
 
     /**
@@ -1020,170 +982,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         CandleChart(Indicator<Tick> indicator, Style style) {
             this.indicator = indicator;
-        }
-    }
-
-    /**
-     * 
-     */
-    private class LineMark extends Path {
-
-        /** The styles. */
-        private final Style[] styles;
-
-        /** The model. */
-        private final List<TickLable> labels;
-
-        /** The associated axis. */
-        private final Axis axis;
-
-        /** The layout manager. */
-        protected final LayoutAssistant layoutLine = layoutCandle.sub();
-
-        /**
-         * @param classNames
-         */
-        private LineMark(Axis axis, Style... styles) {
-            this(new CopyOnWriteArrayList(), axis, styles);
-        }
-
-        /**
-         * @param className
-         * @param labels
-         */
-        private LineMark(List<TickLable> labels, Axis axis, Style... styles) {
-            this.styles = styles;
-            this.labels = labels;
-            this.axis = axis;
-
-            StyleHelper.of(this).style(styles);
-        }
-
-        /**
-         * Create new mark.
-         * 
-         * @return
-         */
-        private TickLable createLabel() {
-            return createLabel(null, null);
-        }
-
-        /**
-         * Create new mark.
-         * 
-         * @return
-         */
-        private TickLable createLabel(String description) {
-            return createLabel(null, description);
-        }
-
-        /**
-         * Create new mark.
-         * 
-         * @return
-         */
-        private TickLable createLabel(Num price) {
-            return createLabel(price, null);
-        }
-
-        /**
-         * Create new mark.
-         * 
-         * @return
-         */
-        private TickLable createLabel(Num price, String description) {
-            TickLable label = axis.createLabel(description, styles);
-            if (price != null) label.value.set(price.doubleValue());
-            labels.add(label);
-
-            layoutLine.requestLayout();
-
-            return label;
-        }
-
-        /**
-         * Dispose mark.
-         * 
-         * @param mark
-         */
-        private void remove(TickLable mark) {
-            labels.remove(mark);
-            mark.dispose();
-            layoutLine.requestLayout();
-        }
-
-        /**
-         * Hide all marks.
-         */
-        @SuppressWarnings("unused")
-        private void hide() {
-            layoutLine.requestLayout();
-        }
-
-        /**
-         * Show all marks.
-         */
-        @SuppressWarnings("unused")
-        private void show() {
-            layoutLine.requestLayout();
-        }
-
-        /**
-         * Draw mark.
-         */
-        protected void draw() {
-            layoutLine.layout(() -> {
-                ObservableList<PathElement> paths = getElements();
-                int pathSize = paths.size();
-                int labelSize = labels.size();
-
-                if (pathSize > labelSize * 2) {
-                    paths.remove(labelSize * 2, pathSize);
-                    pathSize = labelSize * 2;
-                }
-
-                for (int i = 0; i < labelSize; i++) {
-                    MoveTo move;
-                    LineTo line;
-
-                    if (i * 2 < pathSize) {
-                        move = (MoveTo) paths.get(i * 2);
-                        line = (LineTo) paths.get(i * 2 + 1);
-                    } else {
-                        move = new MoveTo();
-                        line = new LineTo();
-                        paths.addAll(move, line);
-                    }
-
-                    double value = labels.get(i).position();
-
-                    if (axis.isHorizontal()) {
-                        if (Primitives.within(0, value, ChartCanvas.this.getWidth())) {
-                            move.setX(value);
-                            move.setY(0);
-                            line.setX(value);
-                            line.setY(getHeight());
-                        } else {
-                            move.setX(0);
-                            move.setY(0);
-                            line.setX(0);
-                            line.setY(0);
-                        }
-                    } else {
-                        if (Primitives.within(0, value, ChartCanvas.this.getHeight())) {
-                            move.setX(0);
-                            move.setY(value);
-                            line.setX(getWidth());
-                            line.setY(value);
-                        } else {
-                            move.setX(0);
-                            move.setY(0);
-                            line.setX(0);
-                            line.setY(0);
-                        }
-                    }
-                }
-            });
         }
     }
 }
