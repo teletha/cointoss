@@ -135,6 +135,8 @@ public class BitbankService extends MarketService {
     private Signal<Execution> executionsAt(ZonedDateTime date) {
         long[] previous = new long[3];
 
+        new Error(date.toString()).printStackTrace();
+
         return call("GET", marketName + "/transactions/" + Chrono.DateCompact.format(date))
                 .flatIterable(e -> e.find("data", "transactions", "*"))
                 .map(e -> createExecution(e, previous));

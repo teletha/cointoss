@@ -194,12 +194,20 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     }
 
     private boolean isMaintenance(Throwable e) {
-        String mes = e.getMessage().toLowerCase();
+        String mes = e.getMessage();
+        if (mes == null) {
+            return false;
+        }
+        mes = mes.toLowerCase();
         return e instanceof MaintenanceError || mes.contains("maintenance");
     }
 
     private boolean isLimitError(Throwable e) {
-        String mes = e.getMessage().toLowerCase();
+        String mes = e.getMessage();
+        if (mes == null) {
+            return false;
+        }
+        mes = mes.toLowerCase();
         return e instanceof LimitOverflowError || mes.contains("ratelimit");
     }
 

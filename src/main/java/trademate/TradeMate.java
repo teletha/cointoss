@@ -60,7 +60,7 @@ public class TradeMate extends View {
         // Clock in Title bar
         // ========================================================
         Chrono.seconds().map(Chrono.DateDayTime::format).combineLatest(Wisdom.random()).on(Viewtify.UIThread).to(v -> {
-            stage().v.setTitle(v.ⅰ.substring(5) + "  " + v.ⅱ);
+            stage().v.setTitle(v.ⅰ.substring(5) + "  " + v.ⅱ + " TradeMate");
         });
 
         MarketServiceProvider.availableProviders().on(Viewtify.WorkerThread).flatIterable(MarketServiceProvider::markets).to(service -> {
