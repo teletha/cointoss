@@ -14,6 +14,7 @@ import javafx.scene.input.MouseEvent;
 import cointoss.MarketService;
 import cointoss.util.arithmetic.Num;
 import kiss.I;
+import kiss.Variable;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.ChartCanvas;
 import trademate.chart.ChartStyles;
@@ -21,6 +22,9 @@ import trademate.setting.Notificator;
 import viewtify.Viewtify;
 
 public class PriceNotify extends LineMark {
+
+    /** The reusable translated text. */
+    private static final Variable<String> ALERT = I.translate("Alert Price");
 
     public PriceNotify(ChartCanvas canvas) {
         super(canvas, canvas.axisY, ChartStyles.PriceSignal);
@@ -32,28 +36,20 @@ public class PriceNotify extends LineMark {
      * @param e
      */
     public void notifyByPrice(MouseEvent e) {
-        double clickedPosition = e.getY();
+        double position = e.getY();
 
-        // check price range to add or remove
-        for (TickLable mark : labels) {
-            double markedPosition = canvas.axisY.getPositionForValue(mark.value.get());
+        findLabelByPosition(position).to(this::removeLabel, () -> {
+            Num price = Num.of(canvas.axisY.getValueForPosition(position)).scale(canvas.chart.market.v.service.setting.base.scale);
+            TickLable label = createLabel(price, ALERT.v);
 
-            if (Math.abs(markedPosition - clickedPosition) < 5) {
-                remove(mark);
-                return;
-            }
-        }
+            label.add(canvas.chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
+                removeLabel(label);
 
-        Num price = Num.of(canvas.axisY.getValueForPosition(clickedPosition)).scale(canvas.chart.market.v.service.setting.base.scale);
-        TickLable label = createLabel(price);
-
-        label.add(canvas.chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
-            remove(label);
-
-            MarketService service = canvas.chart.market.v.service;
-            Num p = exe.price.scale(service.setting.target.scale);
-            String title = "🔊  " + service.id + " " + p;
-            I.make(Notificator.class).priceSignal.notify(title, I.translate("The specified price ({0}) has been reached.", p));
-        }));
+                MarketService service = canvas.chart.market.v.service;
+                Num p = exe.price.scale(service.setting.target.scale);
+                String title = "🔊  " + service.id + " " + p;
+                I.make(Notificator.class).priceSignal.notify(title, I.translate("The specified price ({0}) has been reached.", p));
+            }));
+        });
     }
 }

@@ -20,6 +20,7 @@ import javafx.scene.shape.PathElement;
 
 import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
+import kiss.Variable;
 import stylist.Style;
 import trademate.chart.Axis;
 import trademate.chart.Axis.TickLable;
@@ -29,13 +30,14 @@ import viewtify.ui.helper.StyleHelper;
 
 public class LineMark extends Path {
 
+    /** The associated canvas. */
     protected final ChartCanvas canvas;
 
     /** The styles. */
     private final Style[] styles;
 
     /** The model. */
-    protected final List<TickLable> labels;
+    private final List<TickLable> labels;
 
     /** The associated axis. */
     private final Axis axis;
@@ -43,10 +45,24 @@ public class LineMark extends Path {
     /** The layout manager. */
     public final LayoutAssistant layoutLine;
 
+    /**
+     * Create line with label.
+     * 
+     * @param canvas
+     * @param axis
+     * @param styles
+     */
     public LineMark(ChartCanvas canvas, Axis axis, Style... styles) {
         this(canvas, new CopyOnWriteArrayList(), axis, styles);
     }
 
+    /**
+     * Create line with label.
+     * 
+     * @param canvas
+     * @param axis
+     * @param styles
+     */
     public LineMark(ChartCanvas canvas, List<TickLable> labels, Axis axis, Style... styles) {
         this.canvas = canvas;
         this.styles = styles;
@@ -62,7 +78,7 @@ public class LineMark extends Path {
      * 
      * @return
      */
-    public TickLable createLabel() {
+    public final TickLable createLabel() {
         return createLabel(null, null);
     }
 
@@ -71,7 +87,7 @@ public class LineMark extends Path {
      * 
      * @return
      */
-    public TickLable createLabel(String description) {
+    public final TickLable createLabel(String description) {
         return createLabel(null, description);
     }
 
@@ -80,7 +96,7 @@ public class LineMark extends Path {
      * 
      * @return
      */
-    public TickLable createLabel(Num price) {
+    public final TickLable createLabel(Num price) {
         return createLabel(price, null);
     }
 
@@ -89,7 +105,7 @@ public class LineMark extends Path {
      * 
      * @return
      */
-    private TickLable createLabel(Num price, String description) {
+    public final TickLable createLabel(Num price, String description) {
         TickLable label = axis.createLabel(description, styles);
         if (price != null) label.value.set(price.doubleValue());
         labels.add(label);
@@ -100,13 +116,24 @@ public class LineMark extends Path {
     }
 
     /**
-     * Dispose mark.
+     * Remove the registered label.
      * 
-     * @param mark
+     * @param label
      */
-    public void remove(TickLable mark) {
-        labels.remove(mark);
-        mark.dispose();
+    public final void removeLabel(TickLable label) {
+        if (label != null && labels.contains(label)) {
+            label.dispose();
+            labels.remove(label);
+            layoutLine.requestLayout();
+        }
+    }
+
+    /**
+     * Remove all registered labels.
+     */
+    public final void removeAllLabels() {
+        labels.forEach(TickLable::dispose);
+        labels.clear();
         layoutLine.requestLayout();
     }
 
@@ -166,5 +193,32 @@ public class LineMark extends Path {
                 }
             }
         });
+    }
+
+    /***
+     * Find the label near the given position.
+     * 
+     * @param position
+     * @return
+     */
+    protected final Variable<TickLable> findLabelByPosition(double position) {
+        return findLabelByPosition(position, 5);
+    }
+
+    /***
+     * Find the label near the given position.
+     * 
+     * @param position
+     * @return
+     */
+    protected final Variable<TickLable> findLabelByPosition(double position, double threshold) {
+        for (TickLable mark : labels) {
+            double markedPosition = canvas.axisY.getPositionForValue(mark.value.get());
+
+            if (Math.abs(markedPosition - position) < threshold) {
+                return Variable.of(mark);
+            }
+        }
+        return Variable.empty();
     }
 }

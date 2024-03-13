@@ -237,7 +237,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         configIndicator();
         configScript();
         makeChartScrollable();
-        visualizeOrderPrice();
         visualizeLatestPrice();
         visualizeMouseTrack();
         visualizeSFDPrice();
@@ -502,6 +501,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizePriceSupporter() {
         Predicate<MouseEvent> RightButton = e -> e.getButton() == MouseButton.SECONDARY;
 
+        when(User.click(MouseButton.PRIMARY)).to(e -> {
+            System.out.println("Click");
+        });
+
         when(User.MousePress).take(RightButton).to(pressed -> {
 
             Disposable dispose = Disposable.empty();
@@ -548,26 +551,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Visualize order price in chart.
-     */
-    private void visualizeOrderPrice() {
-        chart.market.observe()
-                .switchMap(m -> m.orders.manages())
-                .switchOn(chart.showRealtimeUpdate.observing())
-                .switchOn(chart.showOrderSupport.observing())
-                .on(Viewtify.UIThread)
-                .to(o -> {
-                    LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
-                    TickLable label = mark.createLabel(o.price);
-
-                    o.observeTerminating().on(Viewtify.UIThread).to(e -> {
-                        System.out.println("remove order line " + e);
-                        mark.remove(label);
-                    });
-                });
-    }
-
-    /**
      * Visualize latest price in chart.
      */
     private void visualizeLatestPrice() {
@@ -581,7 +564,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     TickLable latest = latestPrice.createLabel("最新値");
 
                     disposer.add(() -> {
-                        latestPrice.remove(latest);
+                        latestPrice.removeLabel(latest);
                     });
 
                     return price -> latest.value.set(price.doubleValue());
