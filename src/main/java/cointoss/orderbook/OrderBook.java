@@ -366,6 +366,10 @@ public class OrderBook implements Listener {
      * @return A computed best price.
      */
     final Num computeBestPrice(double start, Num threshold, Num diff) {
+        // normalize arguments
+        if (threshold == null) threshold = Num.ZERO;
+        if (diff == null) diff = Num.ZERO;
+
         Num total = Num.ZERO;
         boolean buy = side.isBuy();
         for (OrderBookPage board : base.values()) {
