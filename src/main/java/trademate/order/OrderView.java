@@ -13,13 +13,14 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
+import javafx.scene.control.SelectionMode;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
-import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Variable;
@@ -205,7 +206,7 @@ public class OrderView extends View {
                     disposer = Disposable.empty();
                     disposer.add(m.trader().observeScenario().to(table::addItemAtLast));
                     disposer.add(m.orderBook.longs.best.observing()
-                            .combineLatest(orderSize.observing(), orderThresholdSize.observing())
+                            .combineLatest(orderSize.observing().skipNull(), orderThresholdSize.observing().skipNull())
                             .on(Viewtify.UIThread)
                             .skip(v -> v.ⅱ == null)
                             .to(v -> {
@@ -213,7 +214,7 @@ public class OrderView extends View {
                                 makerBuyPrice.text(m.orderBook.longs.predictMakingPrice(v.ⅲ));
                             }));
                     disposer.add(m.orderBook.shorts.best.observing()//
-                            .combineLatest(orderSize.observing(), orderThresholdSize.observing())
+                            .combineLatest(orderSize.observing().skipNull(), orderThresholdSize.observing().skipNull())
                             .on(Viewtify.UIThread)
                             .skip(v -> v.ⅱ == null)
                             .to(v -> {
