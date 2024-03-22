@@ -82,6 +82,9 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     private FeatherStore<OpenInterest> openInterest;
 
     /** The shared stream. */
+    private Signal<Execution> executionCollector;
+
+    /** The shared stream. */
     private Signal<Execution> executionRealtimely;
 
     /** The shared stream. */
@@ -122,117 +125,111 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return
      */
-    public final Signal<Execution> executions(boolean enableAutoSave) {
-        return executions(enableAutoSave, -1);
-    }
+    public synchronized Signal<Execution> executions() {
+        if (executionCollector == null) {
+            executionCollector = new Signal<Execution>((observer, disposer) -> {
+                BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
 
-    /**
-     * Monitor executions from snapshot and realtime.
-     * 
-     * @return
-     */
-    public Signal<Execution> executions(boolean enableAutoSave, long fromId) {
-        Signal<Execution> signal = new Signal<Execution>((observer, disposer) -> {
-            BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
+                // If you connect to the real-time API first, two errors may occur at the same time
+                // for the real-time API and the REST API (because the real-time API is
+                // asynchronous).
+                // In that case, there is a possibility that the retry operation may be hindered.
+                // Therefore, the real-time API will connect after the connection of the REST API
+                // is confirmed.
+                // disposer.add(service.executionsRealtimely().to(buffer, observer::error));
+                boolean activeRealtime = false;
 
-            // If you connect to the real-time API first, two errors may occur at the same time for
-            // the real-time API and the REST API (because the real-time API is asynchronous). In
-            // that case, there is a possibility that the retry operation may be hindered.
-            // Therefore, the real-time API will connect after the connection of the REST API
-            // is confirmed.
-            // disposer.add(service.executionsRealtimely().to(buffer, observer::error));
-            boolean activeRealtime = false;
+                // read from REST API
+                int size = setting.acquirableExecutionSize();
+                long cacheId = log.estimateLastID();
+                long startId = cacheId != -1 ? cacheId : searchInitialExecution().map(e -> e.id).to().next();
+                Num coefficient = Num.ONE;
+                ArrayDeque<Execution> rests = new ArrayDeque(size);
+                while (!disposer.isDisposed()) {
+                    rests.clear();
 
-            // read from REST API
-            int size = setting.acquirableExecutionSize();
-            long cacheId = log.estimateLastID();
-            long startId = fromId != -1 ? fromId : cacheId != -1 ? cacheId : searchInitialExecution().map(e -> e.id).to().next();
-            Num coefficient = Num.ONE;
-            ArrayDeque<Execution> rests = new ArrayDeque(size);
-            while (!disposer.isDisposed()) {
-                rests.clear();
+                    long range = Math.round(setting.acquirableExecutionSize * coefficient.doubleValue());
+                    executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
 
-                long range = Math.round(setting.acquirableExecutionSize * coefficient.doubleValue());
-                executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
+                    // Since the synchronous REST API did not return an error, it can be determined
+                    // that the server is operating normally, so the real-time API is also
+                    // connected.
+                    if (activeRealtime == false) {
+                        activeRealtime = true;
+                        disposer.add(executionsRealtimely(false).to(buffer, observer::error));
+                    }
+                    int retrieved = rests.size();
 
-                // Since the synchronous REST API did not return an error, it can be determined that
-                // the server is operating normally, so the real-time API is also connected.
-                if (activeRealtime == false) {
-                    activeRealtime = true;
-                    disposer.add(executionsRealtimely(false).to(buffer, observer::error));
-                }
-                int retrieved = rests.size();
+                    if (retrieved != 0) {
+                        // REST API returns some executions
+                        if (size <= retrieved && coefficient.isGreaterThan(1)) {
+                            // Since there are too many data acquired,
+                            // narrow the data range and get it again.
+                            coefficient = Num
+                                    .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
+                            continue;
+                        } else {
+                            I.info(id + " \t" + rests.getFirst().date + " size " + retrieved + "(" + coefficient + ")");
 
-                if (retrieved != 0) {
-                    // REST API returns some executions
-                    if (size <= retrieved && coefficient.isGreaterThan(1)) {
-                        // Since there are too many data acquired,
-                        // narrow the data range and get it again.
-                        coefficient = Num
-                                .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
-                        continue;
-                    } else {
-                        I.info(id + " \t" + rests.getFirst().date + " size " + retrieved + "(" + coefficient + ")");
+                            for (Execution execution : rests) {
+                                if (!buffer.canSwitch(execution)) {
+                                    observer.accept(execution);
+                                } else {
+                                    // REST API has caught up with the real-time API,
+                                    // we must switch to realtime API.
+                                    buffer.switchToRealtime(execution.id, observer);
+                                    return disposer;
+                                }
+                            }
 
-                        for (Execution execution : rests) {
-                            if (!buffer.canSwitch(execution)) {
-                                observer.accept(execution);
-                            } else {
+                            long latestId = rests.peekLast().id;
+                            if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId || supportRecentExecutionOnly()) {
                                 // REST API has caught up with the real-time API,
                                 // we must switch to realtime API.
-                                buffer.switchToRealtime(execution.id, observer);
+                                buffer.switchToRealtime(latestId, observer);
                                 return disposer;
                             }
-                        }
+                            startId = latestId;
 
-                        long latestId = rests.peekLast().id;
-                        if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId || supportRecentExecutionOnly()) {
-                            // REST API has caught up with the real-time API,
-                            // we must switch to realtime API.
-                            buffer.switchToRealtime(latestId, observer);
-                            return disposer;
+                            // The number of acquired data is too small,
+                            // expand the data range slightly from next time.
+                            if (retrieved < size * 0.05) {
+                                coefficient = coefficient.plus("50");
+                            } else if (retrieved < size * 0.1) {
+                                coefficient = coefficient.plus("5");
+                            } else if (retrieved < size * 0.3) {
+                                coefficient = coefficient.plus("2");
+                            } else if (retrieved < size * 0.5) {
+                                coefficient = coefficient.plus("0.5");
+                            } else if (retrieved < size * 0.7) {
+                                coefficient = coefficient.plus("0.1");
+                            }
                         }
-                        startId = latestId;
-
-                        // The number of acquired data is too small,
-                        // expand the data range slightly from next time.
-                        if (retrieved < size * 0.05) {
+                    } else {
+                        // REST API returns empty execution
+                        if (startId < buffer.realtimeFirstId() && !supportRecentExecutionOnly()) {
+                            // Although there is no data in the current search range,
+                            // since it has not yet reached the latest execution,
+                            // shift the range backward and search again.
+                            startId += range - 1;
                             coefficient = coefficient.plus("50");
-                        } else if (retrieved < size * 0.1) {
-                            coefficient = coefficient.plus("5");
-                        } else if (retrieved < size * 0.3) {
-                            coefficient = coefficient.plus("2");
-                        } else if (retrieved < size * 0.5) {
-                            coefficient = coefficient.plus("0.5");
-                        } else if (retrieved < size * 0.7) {
-                            coefficient = coefficient.plus("0.1");
+                            continue;
                         }
-                    }
-                } else {
-                    // REST API returns empty execution
-                    if (startId < buffer.realtimeFirstId() && !supportRecentExecutionOnly()) {
-                        // Although there is no data in the current search range,
-                        // since it has not yet reached the latest execution,
-                        // shift the range backward and search again.
-                        startId += range - 1;
-                        coefficient = coefficient.plus("50");
-                        continue;
-                    }
 
-                    // REST API has caught up with the real-time API,
-                    // we must switch to realtime API.
-                    buffer.switchToRealtime(startId, observer);
-                    break;
+                        // REST API has caught up with the real-time API,
+                        // we must switch to realtime API.
+                        buffer.switchToRealtime(startId, observer);
+                        break;
+                    }
                 }
-            }
-            return disposer;
-        }).effectOnError(e -> e.printStackTrace()).retry(retryPolicy(MarketService.retryMax, "ExecutionLog"));
-
-        if (enableAutoSave) {
-            signal = signal.effect(log::store);
+                return disposer;
+            }) //
+                    .effectOnError(e -> e.printStackTrace())
+                    .retry(retryPolicy(MarketService.retryMax, "ExecutionLog"))
+                    .effect(log::store)
+                    .share();
         }
-
-        return signal;
+        return executionCollector;
     }
 
     /**

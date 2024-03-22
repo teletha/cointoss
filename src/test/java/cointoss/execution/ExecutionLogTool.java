@@ -17,6 +17,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
 import kiss.I;
 
@@ -28,7 +29,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        deleteRepositoryInfo();
+        restoreNormal(BitFlyer.XRP_JPY, ZonedDateTime.now().minusDays(1));
     }
 
     /**

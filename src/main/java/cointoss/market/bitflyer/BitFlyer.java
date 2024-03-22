@@ -64,7 +64,6 @@ public final class BitFlyer extends MarketServiceProvider {
             .base(Currency.JPY.minimumSize(0.001).scale(3))
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize)
-            .executionLogger(BitFlyerLogger.class)
             .takerFee(size -> size.multiply("0.0001"))
             .targetWithdrawingFee(size -> Num.of("0.005"))
             .baseWithdrawingFee(JPYWithdrawFee));
@@ -74,7 +73,6 @@ public final class BitFlyer extends MarketServiceProvider {
             .base(Currency.JPY.minimumSize(0.01).scale(2))
             .priceRangeModifier(10)
             .acquirableExecutionSize(AcquirableSize)
-            .executionLogger(BitFlyerLogger.class)
             .takerFee(size -> size.multiply("0.0001"))
             .targetWithdrawingFee(size -> Num.of("0.005"))
             .baseWithdrawingFee(JPYWithdrawFee));
@@ -84,7 +82,6 @@ public final class BitFlyer extends MarketServiceProvider {
             .base(Currency.JPY.minimumSize(0.001).scale(3))
             .priceRangeModifier(100)
             .acquirableExecutionSize(AcquirableSize)
-            .executionLogger(BitFlyerLogger.class)
             .takerFee(size -> size.multiply("0.0001"))
             .targetWithdrawingFee(size -> Num.of("0.005"))
             .baseWithdrawingFee(JPYWithdrawFee));
