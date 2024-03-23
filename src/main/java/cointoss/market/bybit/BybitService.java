@@ -157,9 +157,20 @@ public class BybitService extends MarketService {
      */
     @Override
     public Signal<OrderBookChanges> orderBook() {
-        return call("GET", "market/orderbook?symbol=" + marketName + "&limit=200").map(pages -> {
-            return convertOrderBook(pages.find("result", "*"));
+        return call("GET", "market/orderbook?category=" + category() + "&symbol=" + marketName + "&limit=200").map(pages -> {
+            JSON result = pages.get("result");
+            return convertOrderBook(result.find("a", "*"), result.find("b", "*"));
         });
+    }
+
+    private String category() {
+        if (setting.type.isDerivative() || setting.type.isFuture()) {
+            return "linear";
+        } else if (setting.type.isSpot()) {
+            return "spot";
+        } else {
+            throw new Error("Unspported type [" + setting.type + "]");
+        }
     }
 
     /**
@@ -168,19 +179,14 @@ public class BybitService extends MarketService {
     @Override
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("orderbook.200", marketName)).map(pages -> {
-            if (pages.text("type").charAt(0) == 's') {
-                // snapshot at first response
-                return convertOrderBook(pages.find("data", "*"));
-            } else {
-                // delta at following responses
-                return convertOrderBook(pages.find("data", "*", "*"));
-            }
+            JSON data = pages.get("data");
+            return convertOrderBook(data.find("a", "*"), data.find("b", "*"));
         });
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Bybit.BTC_USDT.executionsRealtimely().to(x -> {
-            System.out.println(x);
+        Bybit.BTC_USDT.orderBookRealtimely().to(x -> {
+            System.out.println(x.bestBid());
         }, e -> {
             e.printStackTrace();
         });
@@ -194,18 +200,8 @@ public class BybitService extends MarketService {
      * @param changes
      * @param e
      */
-    private OrderBookChanges convertOrderBook(List<JSON> items) {
-        OrderBookChanges changes = OrderBookChanges.byHint(items.size());
-        for (JSON item : items) {
-            String priceText = item.text("price");
-            if (priceText != null) {
-                double price = Double.parseDouble(priceText);
-                String sizeText = item.text("size");
-                float size = sizeText == null ? 0 : Float.parseFloat(sizeText) / (float) price;
-                changes.add(item.text("side").charAt(0) == 'B', price, size);
-            }
-        }
-        return changes;
+    private OrderBookChanges convertOrderBook(List<JSON> asks, List<JSON> bids) {
+        return OrderBookChanges.byJSON(bids, asks, "0", "1");
     }
 
     /**
