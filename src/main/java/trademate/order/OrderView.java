@@ -190,6 +190,7 @@ public class OrderView extends View {
     @Override
     protected void initialize() {
         ActiveMarket.observing()
+                .on(Viewtify.WorkerThread)
                 .effectOnce(container::disableNow)
                 .skipNull()
                 .combineLatest(trainingMode.observing())

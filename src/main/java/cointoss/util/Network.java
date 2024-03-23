@@ -15,12 +15,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
 public class Network {
+
+    /** The global thread pool. */
+    public static final ExecutorService THREADS = Executors.newVirtualThreadPerTaskExecutor();
 
     /**
      * Call REST API.
@@ -33,11 +38,11 @@ public class Network {
      * Call REST API.
      */
     public static Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, int weight, HttpClient... client) {
-        return new Signal<>((observer, disposer) -> {
+        return new Signal<JSON>((observer, disposer) -> {
             if (limiter != null) limiter.acquire(weight);
 
             return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client).to(observer, disposer);
-        });
+        }).subscribeOn(THREADS::submit);
     }
 
     /**

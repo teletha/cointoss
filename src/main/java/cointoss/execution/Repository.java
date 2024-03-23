@@ -16,6 +16,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import cointoss.MarketService;
 import cointoss.util.Chrono;
+import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Signal;
@@ -65,8 +66,8 @@ class Repository implements Storable<Repository> {
 
         restore();
 
-        MarketService.COMMON_THREADS.submit(this::scanLocalRepository);
-        MarketService.COMMON_THREADS.submit(this::scanExternalRepository);
+        Network.THREADS.submit(this::scanLocalRepository);
+        Network.THREADS.submit(this::scanExternalRepository);
     }
 
     /**
