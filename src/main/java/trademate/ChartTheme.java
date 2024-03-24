@@ -9,15 +9,17 @@
  */
 package trademate;
 
-import static javafx.scene.paint.Color.rgb;
+import static javafx.scene.paint.Color.*;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 import javafx.scene.paint.Color;
-import viewtify.preference.Preferences;
+
 import cointoss.Directional;
 import cointoss.util.arithmetic.Num;
+import kiss.Variable;
+import viewtify.preference.Preferences;
 
 public class ChartTheme extends Preferences {
 
@@ -106,9 +108,9 @@ public class ChartTheme extends Preferences {
      * @param direction
      * @return
      */
-    public static Color colorBy(Directional direction) {
+    public static Variable<Color> colorBy(Directional direction) {
         ChartTheme theme = Preferences.of(ChartTheme.class);
-        return direction.isBuy() ? theme.buy.v : theme.sell.v;
+        return direction.isBuy() ? theme.buy : theme.sell;
     }
 
     /**
@@ -116,9 +118,9 @@ public class ChartTheme extends Preferences {
      * 
      * @return
      */
-    public static Color colorBy(Num num) {
+    public static Variable<Color> colorBy(Num num) {
         ChartTheme theme = Preferences.of(ChartTheme.class);
-        return num.isPositiveOrZero() ? theme.buy.v : theme.sell.v;
+        return num.isPositiveOrZero() ? theme.buy : theme.sell;
     }
 
     /**

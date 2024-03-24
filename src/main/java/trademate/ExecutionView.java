@@ -11,11 +11,7 @@ package trademate;
 
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Strings;
-
-import cointoss.execution.Execution;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Primitives;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
@@ -112,12 +108,5 @@ public class ExecutionView extends View {
         // }
         // }
         // }));
-    }
-
-    private void update(UILabel label, Execution e, int scale) {
-        String text = Chrono.system(e.date).format(Chrono.Time) + "  " + Strings.padEnd(e.price.toString(), 5, ' ') + " \t" + Primitives
-                .roundString(e.accumulative, scale);
-
-        label.text(text).color(ChartTheme.colorBy(e));
     }
 }

@@ -17,7 +17,6 @@ import javafx.scene.control.SelectionMode;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.order.OrderState;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
@@ -26,7 +25,6 @@ import kiss.I;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
-import stylist.ValueStyle;
 import trademate.ChartTheme;
 import viewtify.Viewtify;
 import viewtify.keys.Command;
@@ -162,25 +160,16 @@ public class OrderView extends View {
             display.maxHeight(200, px);
         };
 
-        ValueStyle<OrderState> State = state -> {
-            switch (state) {
-            case REQUESTING:
-                $.descendant(() -> {
-                    font.color($.rgb(80, 80, 80));
-                });
-                break;
-
-            default:
-                break;
-            }
-        };
-
         Style Wide = () -> {
             display.width(100, px);
         };
 
         Style Narrow = () -> {
             display.width(65, px);
+        };
+
+        Style XXX = () -> {
+            font.color("pink");
         };
     }
 
@@ -268,8 +257,8 @@ public class OrderView extends View {
         // Entry Part
         // ===============================================
         entryPrice.text(Price)
-                .modelBySignal(Scenario::observeEntryPriceNow)
-                .render((ui, scenario, price) -> ui.text(price).color(ChartTheme.colorBy(scenario)));
+                .modelBySignal(param -> param.observeEntryPriceNow().effect(x -> System.out.println(x)))
+                .render((ui, scenario, price) -> ui.text(price).unstyleAll().color(ChartTheme.colorBy(scenario)));
         entrySize.text(Amount).modelBySignal(Scenario::observeEntryExecutedSizeNow).render((ui, scenario, size) -> ui.text(size));
 
         // ===============================================
