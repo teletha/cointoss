@@ -19,7 +19,6 @@ import cointoss.util.Chrono;
 import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
-import kiss.Signal;
 import kiss.Storable;
 import psychopath.Directory;
 
@@ -208,57 +207,6 @@ class Repository implements Storable<Repository> {
             localLast = date;
             store();
         }
-    }
-
-    /**
-     * Collect all managed date-times.
-     * 
-     * @return
-     */
-    Signal<ZonedDateTime> collectLocals() {
-        return collectLocals(true, true);
-    }
-
-    /**
-     * Collect all managed date-times.
-     * 
-     * @return
-     */
-    Signal<ZonedDateTime> collectLocals(boolean ascending) {
-        return collectLocals(ascending, true);
-    }
-
-    /**
-     * Collect all managed date-times.
-     * 
-     * @param ascending
-     * @param includeToday
-     * @return
-     */
-    Signal<ZonedDateTime> collectLocals(boolean ascending, boolean includeToday) {
-        return new Signal<>((observer, disposer) -> {
-            LocalDate last = !includeToday && localLast.isEqual(LocalDate.now(Chrono.UTC)) ? localLast.minusDays(1) : localLast;
-            LocalDate current = ascending ? localFirst : last;
-
-            while (!disposer.isDisposed()) {
-                observer.accept(Chrono.utc(current));
-
-                if (ascending) {
-                    current = current.plusDays(1);
-                    if (current.isAfter(last)) {
-                        observer.complete();
-                        break;
-                    }
-                } else {
-                    current = current.plusDays(-1);
-                    if (current.isBefore(localFirst)) {
-                        observer.complete();
-                        break;
-                    }
-                }
-            }
-            return disposer;
-        });
     }
 
     /**

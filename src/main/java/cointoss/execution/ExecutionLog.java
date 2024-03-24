@@ -192,13 +192,6 @@ public class ExecutionLog {
         this.cache = new Cache(repository.firstZDT());
     }
 
-    /**
-     * Get a physical checkup on logs.
-     */
-    public final void checkup() {
-        repository.collectLocals(false, false).map(this::cache).to(c -> c.repair(true));
-    }
-
     public final long estimateLastID() {
         return lastCache().estimateLastID();
     }
