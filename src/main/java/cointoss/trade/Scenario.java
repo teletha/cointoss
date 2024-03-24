@@ -484,6 +484,13 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     /**
+     * Cancel all entry orders.
+     */
+    public final void cancelEntries() {
+        entries.forEach(e -> market().orders.cancelNow(e));
+    }
+
+    /**
      * Operate to stop this {@link Scenario} right now.
      */
     public final void stop() {
