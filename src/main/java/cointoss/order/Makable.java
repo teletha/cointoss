@@ -104,4 +104,13 @@ public interface Makable {
     default Cancellable makeBestBuyPrice() {
         return makeBestPrice(Direction.BUY);
     }
+
+    /**
+     * Limit order with the best price by referrencing order books.
+     * 
+     * @return Maker is cancellable.
+     */
+    default Cancellable makeClaster(Num from, Num to) {
+        return makeBestPrice(Direction.BUY);
+    }
 }
