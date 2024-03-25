@@ -57,7 +57,7 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
                 ]
                 """);
 
-        List<Execution> list = service.executions(1, 10).toList();
+        List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
         assert list.size() == 3;
 
         Execution e = list.get(0);
@@ -102,7 +102,7 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
                 ]
                 """);
 
-        Execution e = service.executionLatest().to().exact();
+        Execution e = service.executionLatest().waitForTerminate().to().exact();
         assert e.id == 15954286995100000L;
         assert e.direction == Direction.BUY;
         assert e.price.is(9342.2);

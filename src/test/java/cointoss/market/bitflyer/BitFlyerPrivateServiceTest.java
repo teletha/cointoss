@@ -57,7 +57,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
                 ]
                 """);
 
-        List<Order> list = service.orders(OrderState.ACTIVE).toList();
+        List<Order> list = service.orders(OrderState.ACTIVE).waitForTerminate().toList();
         assert list.size() == 1;
 
         Order order = list.get(0);
@@ -119,7 +119,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
                 ]
                 """);
 
-        List<Order> list = service.orders(OrderState.CANCELED).toList();
+        List<Order> list = service.orders(OrderState.CANCELED).waitForTerminate().toList();
         assert list.size() == 1;
 
         Order order = list.get(0);
@@ -181,7 +181,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
                 ]
                 """);
 
-        List<Order> list = service.orders(OrderState.COMPLETED).toList();
+        List<Order> list = service.orders(OrderState.COMPLETED).waitForTerminate().toList();
         assert list.size() == 1;
 
         Order order = list.get(0);
@@ -261,7 +261,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
                 ]
                 """);
 
-        List<Order> list = service.orders().toList();
+        List<Order> list = service.orders().waitForTerminate().toList();
         assert list.size() == 2;
 
         Order order = list.get(0);

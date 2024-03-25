@@ -59,7 +59,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
                 ]
                 """);
 
-        List<Execution> list = service.executions(1, 10).toList();
+        List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
         assert e.id == 2;
         assert e.direction == Direction.BUY;
@@ -98,7 +98,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
                 ]
                 """);
 
-        Execution e = service.executionLatest().to().exact();
+        Execution e = service.executionLatest().waitForTerminate().to().exact();
         assert e.id == 330337340;
         assert e.direction == Direction.SELL;
         assert e.price.is(9349.96);

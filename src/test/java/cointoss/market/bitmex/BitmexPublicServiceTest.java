@@ -63,7 +63,7 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
                 ]
                 """);
 
-        List<Execution> list = service.executions(1, 10).toList();
+        List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
         assert e.id == 144360343582800000L;
         assert e.direction == Direction.SELL;
@@ -104,7 +104,7 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
                 ]
                 """);
 
-        Execution e = service.executionLatest().to().exact();
+        Execution e = service.executionLatest().waitForTerminate().to().exact();
         assert e.id == 159543566732400000L;
         assert e.direction == Direction.BUY;
         assert e.price.is(9344.5);

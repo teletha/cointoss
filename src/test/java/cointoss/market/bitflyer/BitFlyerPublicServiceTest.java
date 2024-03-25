@@ -58,7 +58,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
                 ]
                 """);
 
-        List<Execution> list = service.executions(1, 10).toList();
+        List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
         assert e.id == 1828074164;
         assert e.direction == Direction.BUY;
@@ -95,7 +95,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
                 ]
                 """);
 
-        Execution e = service.executionLatest().to().exact();
+        Execution e = service.executionLatest().waitForTerminate().to().exact();
         assert e.id == 1828011727;
         assert e.direction == Direction.BUY;
         assert e.price.is(999262);
