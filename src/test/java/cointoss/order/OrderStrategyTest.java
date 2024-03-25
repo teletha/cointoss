@@ -17,7 +17,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
-import cointoss.order.OrderStrategy.Orderable;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signaling;

@@ -11,7 +11,7 @@ package cointoss.trade.extension;
 
 import java.util.function.Consumer;
 
-import cointoss.order.OrderStrategy.Orderable;
+import cointoss.order.Orderable;
 import cointoss.util.arithmetic.Num;
 import kiss.WiseBiConsumer;
 

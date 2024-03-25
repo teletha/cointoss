@@ -13,9 +13,9 @@ import java.util.function.Consumer;
 
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.order.OrderStrategy.Makable;
-import cointoss.order.OrderStrategy.Orderable;
-import cointoss.order.OrderStrategy.Takable;
+import cointoss.order.Makable;
+import cointoss.order.Orderable;
+import cointoss.order.Takable;
 import cointoss.util.arithmetic.Num;
 
 public interface TradingEntry {

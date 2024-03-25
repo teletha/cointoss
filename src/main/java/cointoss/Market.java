@@ -25,7 +25,7 @@ import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderManager;
-import cointoss.order.OrderStrategy.Orderable;
+import cointoss.order.Orderable;
 import cointoss.orderbook.OrderBookManager;
 import cointoss.ticker.TickerManager;
 import cointoss.trade.Funds;
@@ -253,7 +253,7 @@ public class Market implements Disposable {
      */
     public final Signal<Order> request(Directional directional, Num size, Consumer<Orderable> declaration) {
         return new Signal<>((observer, disposer) -> {
-            MarketOrderStrategy strategy = new MarketOrderStrategy();
+            OrderStrategy strategy = new OrderStrategy();
             declaration.accept(strategy);
 
             if (strategy.actions.isEmpty()) {

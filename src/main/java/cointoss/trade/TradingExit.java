@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.order.OrderStrategy.Orderable;
+import cointoss.order.Orderable;
 import cointoss.ticker.Span;
 import cointoss.util.arithmetic.Num;
 import kiss.I;

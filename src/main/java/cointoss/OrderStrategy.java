@@ -14,35 +14,31 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import cointoss.order.Cancellable;
+import cointoss.order.Makable;
 import cointoss.order.Order;
-import cointoss.order.OrderStrategy;
-import cointoss.order.OrderStrategy.Cancellable;
-import cointoss.order.OrderStrategy.Makable;
-import cointoss.order.OrderStrategy.Orderable;
-import cointoss.order.OrderStrategy.Takable;
+import cointoss.order.Orderable;
+import cointoss.order.Takable;
 import cointoss.util.arithmetic.Num;
 import kiss.Observer;
 import kiss.Signal;
 import kiss.WiseTriFunction;
 
-/**
- * 
- */
-class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
+class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
 
     /** The action sequence. */
-    final LinkedList<DescriptableOrderAction> actions = new LinkedList();
+    final LinkedList<OrderAction> actions = new LinkedList();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public OrderStrategy next(Consumer<Orderable> strategy) {
+    public Orderable next(Consumer<Orderable> strategy) {
         if (strategy != null) {
-            actions.add(new DescriptableOrderAction("", (market, direction, size, previous, orders) -> {
+            actions.add((market, direction, size, previous, orders) -> {
                 strategy.accept(this);
                 execute(market, direction, size, previous, orders);
-            }));
+            });
         }
         return this;
     }
@@ -51,15 +47,15 @@ class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
      * {@inheritDoc}
      */
     @Override
-    public OrderStrategy take() {
-        actions.add(new DescriptableOrderAction("Take order.", (market, direction, size, previous, orders) -> {
+    public Orderable take() {
+        actions.add((market, direction, size, previous, orders) -> {
             Order order = Order.with.direction(direction, size);
             orders.accept(order);
 
             market.orders.request(order).to(() -> {
                 execute(market, direction, size, order, orders);
             });
-        }));
+        });
         return this;
     }
 
@@ -68,14 +64,14 @@ class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
      */
     @Override
     public Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price, String description) {
-        actions.add(new DescriptableOrderAction(description, (market, direction, size, previous, orders) -> {
+        actions.add((market, direction, size, previous, orders) -> {
             Order order = Order.with.direction(direction, size).price(price.apply(market, direction, size));
             orders.accept(order);
 
             market.orders.request(order).to(() -> {
                 execute(market, direction, size, order, orders);
             });
-        }));
+        });
         return this;
     }
 
@@ -84,7 +80,7 @@ class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
      */
     @Override
     public Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing, String description) {
-        actions.add(new DescriptableOrderAction(description, (market, direction, size, previous, orders) -> {
+        actions.add((market, direction, size, previous, orders) -> {
             if (previous != null && previous.isNotCompleted()) {
                 timing.apply(market.service.scheduler()).first().to(() -> {
                     if (previous.isNotCompleted()) {
@@ -96,7 +92,7 @@ class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
                     }
                 });
             }
-        }));
+        });
         return this;
     }
 
@@ -108,28 +104,12 @@ class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
      * @param size
      */
     void execute(Market market, Direction direction, Num size, Order previous, Observer<? super Order> observer) {
-        DescriptableOrderAction order = actions.pollFirst();
+        OrderAction order = actions.pollFirst();
 
         if (order == null) {
             observer.complete();
         } else {
-            order.action.execute(market, direction, size, previous, observer);
-        }
-    }
-
-    private class DescriptableOrderAction {
-
-        private final String description;
-
-        private final OrderAction action;
-
-        /**
-         * @param description
-         * @param action
-         */
-        public DescriptableOrderAction(String description, OrderAction action) {
-            this.description = description;
-            this.action = action;
+            order.execute(market, direction, size, previous, observer);
         }
     }
 

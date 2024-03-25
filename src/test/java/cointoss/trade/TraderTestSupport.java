@@ -23,7 +23,7 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderStrategy.Orderable;
+import cointoss.order.Orderable;
 import cointoss.trade.extension.HoldTimePart;
 import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.ScenePart;

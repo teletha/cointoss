@@ -34,7 +34,7 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
-import cointoss.order.OrderStrategy.Orderable;
+import cointoss.order.Orderable;
 import cointoss.util.arithmetic.Num;
 import kiss.Disposable;
 import kiss.Extensible;
