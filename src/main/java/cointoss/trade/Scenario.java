@@ -494,6 +494,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * Operate to stop this {@link Scenario} right now.
      */
     public final void stop() {
+        cancelEntries();
         exitWhen(now());
     }
 

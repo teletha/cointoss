@@ -13,13 +13,12 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
-import javafx.scene.control.SelectionMode;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
+import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Variable;
@@ -218,6 +217,7 @@ public class OrderView extends View {
         Commands.MakeSell.shortcut(Key.A).contribute(this::makeSelling);
         Commands.Cancel.shortcut(Key.S).contribute(this::cancel);
         Commands.MakeBuy.shortcut(Key.D).contribute(this::makeBuying);
+        Commands.SelectAll.shortcut(Key.A.ctrl()).contribute(this::selectAll);
 
         clear.text(en("Clear")).when(User.Action, Commands.Clear);
         takerSell.textV(takerSellText, takerSellPrice).color(ChartTheme.$.sell).when(User.Action, Commands.TakeSell);
@@ -258,16 +258,20 @@ public class OrderView extends View {
         // ===============================================
         // Entry Part
         // ===============================================
-        entryPrice.text(Price)
-                .modelBySignal(param -> param.observeEntryPriceNow().effect(x -> System.out.println(x)))
+        entryPrice.text(EntryPrice)
+                .modelBySignal(param -> param.observeEntryPriceNow())
                 .render((ui, scenario, price) -> ui.text(price).unstyleAll().color(ChartTheme.colorBy(scenario)));
-        entrySize.text(Amount).modelBySignal(Scenario::observeEntryExecutedSizeNow).render((ui, scenario, size) -> ui.text(size));
+        entrySize.text(Amount)
+                .modelBySignal(Scenario::observeEntryExecutedSizeNow)
+                .render((ui, scenario, size) -> ui.text(size + " / " + scenario.entrySize));
 
         // ===============================================
         // Exit Part
         // ===============================================
-        exitPrice.text(Price).modelBySignal(Scenario::observeExitPriceNow).render((ui, scenario, price) -> ui.text(price));
-        exitSize.text(Amount).modelBySignal(Scenario::observeExitExecutedSizeNow).render((ui, scenario, size) -> ui.text(size));
+        exitPrice.text(ExitPrice).modelBySignal(Scenario::observeExitPriceNow).render((ui, scenario, price) -> ui.text(price));
+        exitSize.text(Amount)
+                .modelBySignal(Scenario::observeExitExecutedSizeNow)
+                .render((ui, scenario, size) -> ui.text(size + " / " + scenario.exitSize));
 
         // ===============================================
         // Analyze Part
@@ -311,6 +315,14 @@ public class OrderView extends View {
         }
     }
 
+    private void makeClusterBuying() {
+        if (current != null) {
+            current.trader()
+                    .entry(Direction.BUY, estimateSize(), s -> s
+                            .make(current.orderBook.longs.predictMakingPrice(orderThresholdSize.value())));
+        }
+    }
+
     private void makeSelling() {
         if (current != null) {
             current.trader()
@@ -325,10 +337,16 @@ public class OrderView extends View {
         }
     }
 
+    private void selectAll() {
+        if (current != null) {
+            table.selectAll();
+        }
+    }
+
     /**
      * 
      */
     private enum Commands implements Command<Commands> {
-        TakeBuy, Clear, TakeSell, MakeBuy, Cancel, MakeSell;
+        TakeBuy, Clear, TakeSell, MakeBuy, Cancel, MakeSell, SelectAll;
     }
 }

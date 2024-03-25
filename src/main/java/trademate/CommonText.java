@@ -26,6 +26,10 @@ public interface CommonText {
 
     Variable<String> Price = I.translate("Price");
 
+    Variable<String> EntryPrice = I.translate("Entry Price");
+
+    Variable<String> ExitPrice = I.translate("Exit Price");
+
     Variable<String> Amount = I.translate("Amount");
 
     Variable<String> Profit = I.translate("Profit");
