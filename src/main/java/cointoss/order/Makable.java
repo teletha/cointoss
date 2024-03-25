@@ -47,7 +47,7 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable make(Num price) {
-        return make((market, direction, size) -> price, "Make order at the specified price.");
+        return make((market, direction, size) -> price);
     }
 
     /**
@@ -66,17 +66,7 @@ public interface Makable {
      * @param price
      * @return
      */
-    default Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price) {
-        return make(price, "Make order at the specified price.");
-    }
-
-    /**
-     * Build your limit order by the current market infomation.
-     * 
-     * @param price
-     * @return
-     */
-    Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price, String description);
+    Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price);
 
     /**
      * Limit order with the best price by referrencing order books.
@@ -84,8 +74,7 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable makeBestPrice() {
-        return make((market, direction, price) -> market.orderBook.by(direction)
-                .computeBestPrice(market.service.setting.base.minimumSize), "Make order at the best price.");
+        return make((market, direction, price) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base.minimumSize));
     }
 
     /**
@@ -95,8 +84,7 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable makeBestPrice(Direction direction) {
-        return make((market, d, price) -> market.orderBook.by(direction)
-                .computeBestPrice(market.service.setting.base.minimumSize), "Make order at the bast price by side.");
+        return make((market, d, price) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base.minimumSize));
     }
 
     /**

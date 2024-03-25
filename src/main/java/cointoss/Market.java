@@ -256,10 +256,6 @@ public class Market implements Disposable {
             OrderStrategy strategy = new OrderStrategy();
             declaration.accept(strategy);
 
-            if (strategy.actions.isEmpty()) {
-                strategy.take();
-            }
-
             strategy.execute(this, directional.direction(), size, null, observer);
 
             return disposer;

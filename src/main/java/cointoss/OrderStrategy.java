@@ -27,7 +27,7 @@ import kiss.WiseTriFunction;
 class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
 
     /** The action sequence. */
-    final LinkedList<OrderAction> actions = new LinkedList();
+    private final LinkedList<OrderAction> actions = new LinkedList();
 
     /**
      * {@inheritDoc}
@@ -63,7 +63,7 @@ class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
      * {@inheritDoc}
      */
     @Override
-    public Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price, String description) {
+    public Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price) {
         actions.add((market, direction, size, previous, orders) -> {
             Order order = Order.with.direction(direction, size).price(price.apply(market, direction, size));
             orders.accept(order);
