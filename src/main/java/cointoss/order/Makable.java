@@ -125,8 +125,8 @@ public interface Makable {
      * 
      * @return Maker is cancellable.
      */
-    default Cancellable makeClaster(double from, double to, Division division) {
-        return makeClaster(Num.of(from), Num.of(to), division);
+    default Cancellable makeCluster(double from, double to, Division division) {
+        return makeCluster(Num.of(from), Num.of(to), division);
     }
 
     /**
@@ -134,7 +134,7 @@ public interface Makable {
      * 
      * @return Maker is cancellable.
      */
-    default Cancellable makeClaster(Num from, Num to, Division division) {
+    default Cancellable makeCluster(Num from, Num to, Division division) {
         return makeOrder((market, direction, size) -> {
             List<Order> orders = new ArrayList();
             Num diff = from.minus(to).divide(division.size - 1);

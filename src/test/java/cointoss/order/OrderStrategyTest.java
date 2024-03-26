@@ -175,7 +175,7 @@ class OrderStrategyTest {
 
     @Test
     void makeLinearCluster() {
-        List<Order> orders = market.request(BUY, 4, s -> s.makeClaster(10, 7, Division.Linear4)).toList();
+        List<Order> orders = market.request(BUY, 4, s -> s.makeCluster(10, 7, Division.Linear4)).toList();
         assert orders.size() == 4;
 
         Order order0 = orders.get(0);
@@ -216,7 +216,7 @@ class OrderStrategyTest {
     @Test
     @PowerAssertOff
     void cancelLinearCluster() {
-        List<Order> orders = market.request(BUY, 4, s -> s.makeClaster(10, 7, Division.Linear4).cancelAfter(2, SECONDS)).toList();
+        List<Order> orders = market.request(BUY, 4, s -> s.makeCluster(10, 7, Division.Linear4).cancelAfter(2, SECONDS)).toList();
         assert orders.size() == 4;
 
         Order order0 = orders.get(0);
