@@ -286,6 +286,19 @@ public final class OrderManager {
     }
 
     /**
+     * Build the {@link Signal} which requests all specified {@link Order} to the market. This
+     * method DON'T request order, you MUST subscribe {@link Signal}. If you want to request
+     * actually, you can use {@link #requestNow(Order)}.
+     * 
+     * @param orders A list of order to request.
+     * @return A order request process.
+     * @see #requestNow(List)
+     */
+    public Signal<Order> request(List<Order> orders) {
+        return I.signal(orders).flatMap(this::request);
+    }
+
+    /**
      * Request the specified {@link Order} to the market actually.
      * 
      * @param order A order to request.
@@ -296,6 +309,19 @@ public final class OrderManager {
         request(order).to(I.NoOP);
 
         return order;
+    }
+
+    /**
+     * Request all specified {@link Order} to the market actually.
+     * 
+     * @param orders A list of order to request.
+     * @return A list of requested {@link Order}.
+     * @see #request(Order)
+     */
+    public List<Order> requestNow(List<Order> orders) {
+        request(orders).to(I.NoOP);
+
+        return orders;
     }
 
     /**
@@ -321,6 +347,19 @@ public final class OrderManager {
     }
 
     /**
+     * Build the {@link Signal} which cancels all specified {@link Order} from the market. This
+     * method DON'T cancel order, you MUST subscribe {@link Signal}. If you want to cancel actually,
+     * you can use {@link #cancelNow(Order)}.
+     * 
+     * @param orders A list of orders to cancel.
+     * @return A order cancel process.
+     * @see #cancelNow(List)
+     */
+    public Signal<Order> cancel(List<Order> orders) {
+        return I.signal(orders).flatMap(this::cancel);
+    }
+
+    /**
      * Cancel the specified {@link Order} from the market actually.
      * 
      * @param order A order to request.
@@ -331,6 +370,18 @@ public final class OrderManager {
         cancel(order).to(I.NoOP);
 
         return order;
+    }
+
+    /**
+     * Cancel all specified {@link Order} from the market actually.
+     * 
+     * @param orders A list of orders to cancel.
+     * @return A list of canceled {@link Order}.
+     * @see #cancel(List)
+     */
+    public List<Order> cancelNow(List<Order> orders) {
+        cancel(orders).to(I.NoOP);
+        return orders;
     }
 
     /**

@@ -9,6 +9,9 @@
  */
 package cointoss.order;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.util.arithmetic.Num;
@@ -68,7 +71,8 @@ public interface Makable {
      * @return
      */
     default Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price) {
-        return makeOrder((makert, direction, size) -> Order.with.direction(direction, size).price(price.apply(makert, direction, size)));
+        return makeOrder((makert, direction, size) -> I
+                .list(Order.with.direction(direction, size).price(price.apply(makert, direction, size))));
     }
 
     /**
@@ -77,7 +81,7 @@ public interface Makable {
      * @param order The order builder.
      * @return
      */
-    Cancellable makeOrder(WiseTriFunction<Market, Direction, Num, Order> order);
+    Cancellable makeOrder(WiseTriFunction<Market, Direction, Num, List<Order>> order);
 
     /**
      * Limit order with the best price by referrencing order books.
@@ -131,14 +135,13 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable makeClaster(Num from, Num to, Division division) {
-        Cancellable[] cancels = new Cancellable[division.size];
-        Num diff = from.minus(to).divide(division.size - 1);
-        for (int i = 0; i < division.size; i++) {
-            int index = i;
-            cancels[i] = makeOrder((market, direction, size) -> {
-                return Order.with.direction(direction, size.multiply(division.weights[index])).price(from.minus(diff.multiply(index)));
-            });
-        }
-        return I.bundle(cancels);
+        return makeOrder((market, direction, size) -> {
+            List<Order> orders = new ArrayList();
+            Num diff = from.minus(to).divide(division.size - 1);
+            for (int i = 0; i < division.size; i++) {
+                orders.add(Order.with.direction(direction, size.multiply(division.weights[i])).price(from.minus(diff.multiply(i))));
+            }
+            return orders;
+        });
     }
 }

@@ -21,8 +21,11 @@ import cointoss.order.Order;
 import cointoss.order.Orderable;
 import cointoss.order.Takable;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
+import kiss.WiseConsumer;
+import kiss.WiseRunnable;
 import kiss.WiseTriFunction;
 
 class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
@@ -50,39 +53,7 @@ class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
     @Override
     public Orderable take() {
         actions.add((market, direction, size, previous, orders) -> {
-            Order order = Order.with.direction(direction, size);
-            orders.accept(order);
-
-            market.orders.request(order).to(() -> {
-                execute(market, direction, size, order, orders);
-            });
-        });
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price) {
-        actions.add((market, direction, size, previous, orders) -> {
-            Order order = Order.with.direction(direction, size).price(price.apply(market, direction, size));
-            orders.accept(order);
-
-            market.orders.request(order).to(() -> {
-                execute(market, direction, size, order, orders);
-            });
-        });
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Cancellable makeOrder(WiseTriFunction<Market, Direction, Num, Order> price) {
-        actions.add((market, direction, size, previous, orders) -> {
-            List<Order> order = List.of(price.apply(market, direction, size));
+            List<Order> order = I.list(Order.with.direction(direction, size));
             order.forEach(orders::accept);
 
             market.orders.request(order).to(() -> {
@@ -96,22 +67,53 @@ class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
      * {@inheritDoc}
      */
     @Override
-    public Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing, String description) {
+    public Cancellable makeOrder(WiseTriFunction<Market, Direction, Num, List<Order>> price) {
         actions.add((market, direction, size, previous, orders) -> {
-            if (previous != null && previous.isNotCompleted()) {
-                timing.apply(market.service.scheduler()).first().to(() -> {
-                    if (previous.isNotCompleted()) {
-                        market.orders.cancel(previous).to(() -> {
-                            System.out.println("Try cancel " + previous);
-                            if (previous.remainingSize().isPositive()) {
-                                execute(market, direction, previous.remainingSize(), null, orders);
-                            }
-                        });
-                    }
-                });
-            }
+            List<Order> order = price.apply(market, direction, size);
+            order.forEach(orders::accept);
+
+            market.orders.request(order).last().to(() -> {
+                execute(market, direction, size, order, orders);
+            });
         });
         return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing, String description) {
+        actions.add((market, direction, size, previous, orders) -> {
+            processIncompleted(previous, () -> {
+                timing.apply(market.service.scheduler()).first().to(() -> {
+                    processIncompleted(previous, () -> {
+                        market.orders.cancel(previous).last().to(() -> {
+                            processRemaining(previous, remaining -> {
+                                execute(market, direction, remaining, previous, orders);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+        return this;
+    }
+
+    private void processIncompleted(List<Order> orders, WiseRunnable process) {
+        orders.removeIf(Order::isCompleted);
+
+        if (!orders.isEmpty()) {
+            process.run();
+        }
+    }
+
+    private void processRemaining(List<Order> orders, WiseConsumer<Num> process) {
+        orders.removeIf(o -> o.remainingSize().isNegativeOrZero());
+
+        if (!orders.isEmpty()) {
+            I.signal(orders).scan(() -> Num.ZERO, (x, o) -> x.plus(o.remainingSize())).last().to(process::accept);
+        }
     }
 
     /**
