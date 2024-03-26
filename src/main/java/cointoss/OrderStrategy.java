@@ -10,6 +10,7 @@
 package cointoss;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -79,12 +80,29 @@ class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
      * {@inheritDoc}
      */
     @Override
+    public Cancellable makeOrder(WiseTriFunction<Market, Direction, Num, Order> price) {
+        actions.add((market, direction, size, previous, orders) -> {
+            List<Order> order = List.of(price.apply(market, direction, size));
+            order.forEach(orders::accept);
+
+            market.orders.request(order).to(() -> {
+                execute(market, direction, size, order, orders);
+            });
+        });
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Orderable cancelWhen(Function<ScheduledExecutorService, Signal<?>> timing, String description) {
         actions.add((market, direction, size, previous, orders) -> {
             if (previous != null && previous.isNotCompleted()) {
                 timing.apply(market.service.scheduler()).first().to(() -> {
                     if (previous.isNotCompleted()) {
                         market.orders.cancel(previous).to(() -> {
+                            System.out.println("Try cancel " + previous);
                             if (previous.remainingSize().isPositive()) {
                                 execute(market, direction, previous.remainingSize(), null, orders);
                             }
@@ -103,7 +121,7 @@ class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
      * @param direction
      * @param size
      */
-    void execute(Market market, Direction direction, Num size, Order previous, Observer<? super Order> observer) {
+    void execute(Market market, Direction direction, Num size, List<Order> previous, Observer<? super Order> observer) {
         OrderAction order = actions.pollFirst();
 
         if (order == null) {
@@ -127,6 +145,6 @@ class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
          * @param order The previous order.
          * @param observer A event observer.
          */
-        void execute(Market market, Direction direction, Num num, Order order, Observer<? super Order> observer);
+        void execute(Market market, Direction direction, Num num, List<Order> order, Observer<? super Order> observer);
     }
 }

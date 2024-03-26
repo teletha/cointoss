@@ -12,6 +12,7 @@ package cointoss.order;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.util.arithmetic.Num;
+import kiss.I;
 import kiss.Variable;
 import kiss.WiseTriFunction;
 
@@ -63,10 +64,20 @@ public interface Makable {
     /**
      * Build your limit order by the current market infomation.
      * 
-     * @param price
+     * @param price The price builder.
      * @return
      */
-    Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price);
+    default Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price) {
+        return makeOrder((makert, direction, size) -> Order.with.direction(direction, size).price(price.apply(makert, direction, size)));
+    }
+
+    /**
+     * Build your limit order by the current market infomation.
+     * 
+     * @param order The order builder.
+     * @return
+     */
+    Cancellable makeOrder(WiseTriFunction<Market, Direction, Num, Order> order);
 
     /**
      * Limit order with the best price by referrencing order books.
@@ -74,7 +85,7 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable makeBestPrice() {
-        return make((market, direction, price) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base.minimumSize));
+        return make((market, direction, size) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base.minimumSize));
     }
 
     /**
@@ -84,7 +95,7 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable makeBestPrice(Direction direction) {
-        return make((market, d, price) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base.minimumSize));
+        return make((market, dir, size) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base.minimumSize));
     }
 
     /**
@@ -110,7 +121,24 @@ public interface Makable {
      * 
      * @return Maker is cancellable.
      */
-    default Cancellable makeClaster(Num from, Num to) {
-        return makeBestPrice(Direction.BUY);
+    default Cancellable makeClaster(double from, double to, Division division) {
+        return makeClaster(Num.of(from), Num.of(to), division);
+    }
+
+    /**
+     * Limit order with the best price by referrencing order books.
+     * 
+     * @return Maker is cancellable.
+     */
+    default Cancellable makeClaster(Num from, Num to, Division division) {
+        Cancellable[] cancels = new Cancellable[division.size];
+        Num diff = from.minus(to).divide(division.size - 1);
+        for (int i = 0; i < division.size; i++) {
+            int index = i;
+            cancels[i] = makeOrder((market, direction, size) -> {
+                return Order.with.direction(direction, size.multiply(division.weights[index])).price(from.minus(diff.multiply(index)));
+            });
+        }
+        return I.bundle(cancels);
     }
 }
