@@ -164,6 +164,24 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     /**
+     * Observe entry state.
+     * 
+     * @return
+     */
+    public final Signal<Boolean> observeEntryTerminated() {
+        return I.signal(entries).flatMap(Order::observeStateNow).map(x -> entries.stream().allMatch(Order::isTerminated));
+    }
+
+    /**
+     * Observe exit state.
+     * 
+     * @return
+     */
+    public final Signal<Boolean> observeExitTerminated() {
+        return I.signal(exits).flatMap(Order::observeStateNow).map(x -> exits.stream().allMatch(Order::isTerminated));
+    }
+
+    /**
      * Compute position holding time.
      */
     public final Duration holdTime() {

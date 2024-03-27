@@ -136,10 +136,15 @@ public interface Makable {
      */
     default Cancellable makeCluster(Num from, Num to, Division division) {
         return makeOrder((market, direction, size) -> {
+            Num start = Num.max(direction, from, to);
+            Num end = Num.min(direction, from, to);
+
+            int scale = market.service.setting.base().scale;
             List<Order> orders = new ArrayList();
-            Num diff = from.minus(to).divide(division.size - 1);
+            Num diff = start.minus(end).divide(division.size - 1).scale(scale);
             for (int i = 0; i < division.size; i++) {
-                orders.add(Order.with.direction(direction, size.multiply(division.weights[i])).price(from.minus(diff.multiply(i))));
+                orders.add(Order.with.direction(direction, size.multiply(division.weights[i]))
+                        .price(start.minus(diff.multiply(i)).scale(scale)));
             }
             return orders;
         });

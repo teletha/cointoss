@@ -24,7 +24,7 @@ public final class BinanceFuture extends MarketServiceProvider {
 
     public static final MarketService FUTURE_BTC_USDT = new BinanceService("BTCUSDT", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.001))
-            .base(Currency.USDT.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.1))
             .priceRangeModifier(500)
             .acquirableExecutionSize(AcquirableSize));
 

@@ -42,6 +42,7 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
+import cointoss.util.arithmetic.Num;
 import cointoss.util.arithmetic.Primitives;
 import kiss.Disposable;
 import kiss.I;
@@ -60,6 +61,7 @@ import trademate.chart.part.ChartPart;
 import trademate.chart.part.MarketInfoPart;
 import trademate.chart.part.OrderBookPart;
 import trademate.chart.part.PriceRangedVolumePart;
+import trademate.order.OrderView;
 import trademate.setting.PerformanceSetting;
 import viewtify.Viewtify;
 import viewtify.preference.Preferences;
@@ -548,6 +550,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         gc.strokeText(I.translate("Duration") + "\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), textX, endY + lineY);
         gc.strokeText(I.translate("Spread") + "\t" + Primitives
                 .roundString(Math.abs(upperPrice - lowerPrice), scale), textX, endY + lineY * 2);
+
+        if (OrderView.ActiveMarket.equals(chart.market)) {
+            I.make(OrderView.class).setPriceRange(Num.of(upperPrice).scale(scale), Num.of(lowerPrice).scale(scale));
+        }
     }
 
     /**

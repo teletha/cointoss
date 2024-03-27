@@ -13,15 +13,20 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
+import javafx.scene.control.SelectionMode;
+
 import cointoss.Direction;
 import cointoss.Market;
+import cointoss.order.Division;
 import cointoss.trade.Scenario;
 import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
-import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
+import kiss.Managed;
+import kiss.Singleton;
 import kiss.Variable;
+import kiss.Ⅱ;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.ChartTheme;
@@ -31,6 +36,7 @@ import viewtify.keys.Key;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
+import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
@@ -40,6 +46,7 @@ import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 
+@Managed(Singleton.class)
 public class OrderView extends View {
 
     /** The active market. */
@@ -105,6 +112,12 @@ public class OrderView extends View {
     /** UI */
     private UIText<Num> orderThresholdSize;
 
+    private UIText<Num> clusterStart;
+
+    private UIText<Num> clusterEnd;
+
+    private UIComboBox<Division> clusterSize;
+
     /** UI */
     private UICheckBox history;
 
@@ -118,7 +131,7 @@ public class OrderView extends View {
     private UITableColumn<Scenario, Num> entryPrice;
 
     /** UI */
-    private UITableColumn<Scenario, Num> entrySize;
+    private UITableColumn<Scenario, Ⅱ<Num, Boolean>> entrySize;
 
     /** UI */
     private UITableColumn<Scenario, Num> exitPrice;
@@ -136,6 +149,7 @@ public class OrderView extends View {
                 form(style.buttons, makerSell, cancel, makerBuy);
                 form(en("Market"), FormStyles.Column5, market, trainingMode);
                 form(Amount, FormStyles.Column3, orderSize, orderThresholdSize, history);
+                form("Cluster", FormStyles.Column3, clusterStart, clusterEnd, clusterSize);
 
                 $(table, style.table, () -> {
                     $(entryPrice, style.Wide);
@@ -215,8 +229,10 @@ public class OrderView extends View {
         Commands.TakeSell.shortcut(Key.Q).contribute(this::takeSelling);
         Commands.TakeBuy.shortcut(Key.E).contribute(this::takeBuying);
         Commands.MakeSell.shortcut(Key.A).contribute(this::makeSelling);
+        Commands.ClusterSell.shortcut(Key.A.shift()).contribute(this::clusterSelling);
         Commands.Cancel.shortcut(Key.S).contribute(this::cancel);
         Commands.MakeBuy.shortcut(Key.D).contribute(this::makeBuying);
+        Commands.ClusterBuy.shortcut(Key.D.shift()).contribute(this::clusterBuying);
         Commands.SelectAll.shortcut(Key.A.ctrl()).contribute(this::selectAll);
 
         clear.text(en("Clear")).when(User.Action, Commands.Clear);
@@ -237,6 +253,10 @@ public class OrderView extends View {
         history.text(en("Full History"))
                 .initialize(false)
                 .observing(all -> table.take(all ? Scenario::isNotCancelled : Scenario::isActive));
+
+        clusterStart.acceptPositiveDecimalInput();
+        clusterEnd.acceptPositiveDecimalInput();
+        clusterSize.items(Division.values()).initialize(Division.Linear1);
 
         initializeTable();
     }
@@ -262,8 +282,8 @@ public class OrderView extends View {
                 .modelBySignal(param -> param.observeEntryPriceNow())
                 .render((ui, scenario, price) -> ui.text(price).unstyleAll().color(ChartTheme.colorBy(scenario)));
         entrySize.text(Amount)
-                .modelBySignal(Scenario::observeEntryExecutedSizeNow)
-                .render((ui, scenario, size) -> ui.text(size + " / " + scenario.entrySize));
+                .modelBySignal(m -> m.observeEntryExecutedSizeNow().combineLatest(m.observeEntryTerminated()))
+                .render((ui, scenario, x) -> ui.text(x.ⅰ + " / " + (x.ⅱ ? scenario.entryExecutedSize : scenario.entrySize)));
 
         // ===============================================
         // Exit Part
@@ -279,6 +299,11 @@ public class OrderView extends View {
         profitAndLoss.text(Profit)
                 .modelBySignal(scenario -> current.orderBook.by(scenario).best.observing().map(page -> scenario.predictProfit()))
                 .render((ui, scenario, profit) -> ui.text(profit).color(ChartTheme.colorBy(profit)));
+    }
+
+    public void setPriceRange(Num start, Num end) {
+        clusterStart.value(start);
+        clusterEnd.value(end);
     }
 
     private Num estimateSize() {
@@ -315,11 +340,19 @@ public class OrderView extends View {
         }
     }
 
-    private void makeClusterBuying() {
+    private void clusterSelling() {
+        if (current != null) {
+            current.trader()
+                    .entry(Direction.SELL, estimateSize(), s -> s
+                            .makeCluster(clusterStart.value(), clusterEnd.value(), clusterSize.value()));
+        }
+    }
+
+    private void clusterBuying() {
         if (current != null) {
             current.trader()
                     .entry(Direction.BUY, estimateSize(), s -> s
-                            .make(current.orderBook.longs.predictMakingPrice(orderThresholdSize.value())));
+                            .makeCluster(clusterStart.value(), clusterEnd.value(), clusterSize.value()));
         }
     }
 
@@ -347,6 +380,6 @@ public class OrderView extends View {
      * 
      */
     private enum Commands implements Command<Commands> {
-        TakeBuy, Clear, TakeSell, MakeBuy, Cancel, MakeSell, SelectAll;
+        TakeBuy, Clear, TakeSell, MakeBuy, ClusterBuy, Cancel, MakeSell, ClusterSell, SelectAll;
     }
 }
