@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.github.bucket4j.Bucket;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -42,6 +43,29 @@ public class Network {
             if (limiter != null) limiter.acquire(weight);
 
             return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client).to(observer, disposer);
+        }).subscribeOn(THREADS::submit);
+    }
+
+    /**
+     * Call REST API.
+     */
+    public static Signal<JSON> rest(HttpRequest.Builder request, Bucket limiter, long weight, HttpClient... client) {
+        return new Signal<JSON>((observer, disposer) -> {
+            try {
+                if (limiter != null) {
+                    if (limiter.tryConsume(weight)) {
+                        return I.http(request.timeout(Duration.ofSeconds(15)), JSON.class, client).to(observer, disposer);
+                    } else {
+                        System.out.println("LIMIT " + limiter.getAvailableTokens());
+                        observer.complete();
+                        return disposer;
+                    }
+                }
+                observer.complete();
+                return disposer;
+            } catch (Exception e) {
+                throw I.quiet(e);
+            }
         }).subscribeOn(THREADS::submit);
     }
 

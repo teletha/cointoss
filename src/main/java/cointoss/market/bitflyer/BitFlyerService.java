@@ -19,6 +19,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -51,6 +52,8 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.arithmetic.Num;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.local.SynchronizationStrategy;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -70,6 +73,11 @@ public class BitFlyerService extends MarketService {
 
     /** The API limit. */
     private static final APILimiter LIMITER = APILimiter.with.limit(80 /* 100 */).refresh(1, MINUTES);
+
+    private static final Bucket LIMIT = Bucket.builder()
+            .addLimit(limit -> limit.capacity(100).refillGreedy(100, Duration.ofMinutes(1)))
+            .withSynchronizationStrategy(SynchronizationStrategy.LOCK_FREE)
+            .build();
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
@@ -543,7 +551,7 @@ public class BitFlyerService extends MarketService {
             builder = builder.POST(BodyPublishers.ofString(bodyText));
         }
 
-        return Network.rest(builder, LIMITER, weight, client());
+        return Network.rest(builder, LIMIT, weight, client());
     }
 
     /**
