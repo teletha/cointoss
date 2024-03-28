@@ -1,5 +1,62 @@
 # Changelog
 
+## [1.5.0](https://github.com/teletha/cointoss/compare/v1.4.0...v1.5.0) (2024-03-28)
+
+
+### Features
+
+* add Makable#makeClaster ([9dcfe04](https://github.com/teletha/cointoss/commit/9dcfe048461a42fa0e5aab0776db9372fe24ef6d))
+* add RetryPolicy#delayOnLimitOverflow ([803d301](https://github.com/teletha/cointoss/commit/803d3017dd6aef12762e1ba9189ac5bf0f532397))
+* add RetryPolicy#delayOnMaintenance ([8dec7d8](https://github.com/teletha/cointoss/commit/8dec7d8732f70a3a2dfb25e533d0266a6717356f))
+* add various markets on binance ([fb78baa](https://github.com/teletha/cointoss/commit/fb78baa8d9a2c7493dcfadff24b9fc0c363aea80))
+* add various markets on bybit ([718b7f3](https://github.com/teletha/cointoss/commit/718b7f3c93b03978e9bd69786b6d2cdea089f027))
+* all rest access is running in worker threads now ([e90ad9c](https://github.com/teletha/cointoss/commit/e90ad9c10330b4cbd13a71951122ad9ededbf873))
+* change log layout ([db4065b](https://github.com/teletha/cointoss/commit/db4065b7ecb044dbb3e57055c499338d8a1f09ab))
+* configure drawing frame rate ([ca64a1f](https://github.com/teletha/cointoss/commit/ca64a1fdba7c74afcc539c2ba384ccc407ee3df5))
+* drop historical tarde flag ([7bbfdc0](https://github.com/teletha/cointoss/commit/7bbfdc08aa59c7689b05f87629d855d3a7237dd8))
+* fast local log scan ([889088a](https://github.com/teletha/cointoss/commit/889088a7de618a22af70f461105307647dacc65f))
+* integrate chart info and name ([7eb1b5d](https://github.com/teletha/cointoss/commit/7eb1b5dd2b4cc14b083280592d52b3f6bb6ae81b))
+* isolate scanning of log repository ([fb4beb9](https://github.com/teletha/cointoss/commit/fb4beb961162958515dd79e7829a031542e7a119))
+* make entry cancelable ([f07c19e](https://github.com/teletha/cointoss/commit/f07c19e10ae290f2660a8c55cbda5105648f9298))
+* order like cluster ([27ee8e3](https://github.com/teletha/cointoss/commit/27ee8e348b5f643ef3e43412856ce5c0ffc42a24))
+* provide chart part system ([69c3d7b](https://github.com/teletha/cointoss/commit/69c3d7b62d8bc539a69102c93a731d3960f90262))
+* provide market name and info parts ([2ca16d9](https://github.com/teletha/cointoss/commit/2ca16d9274d6da919cf17c8088dcae5b1f2cef12))
+* provide price-ranged volume part ([1c3b41e](https://github.com/teletha/cointoss/commit/1c3b41eb9a6cfee767ddaac019a24ad9774c092a))
+* remove FTX completely ([c821d34](https://github.com/teletha/cointoss/commit/c821d344356f0e99becf8a36052922181ecb3cee))
+* remove FTX from volume view ([d6085a0](https://github.com/teletha/cointoss/commit/d6085a00c6f9b8fb526eceb60601f48cb13cdd9c))
+* remove Huobi completely ([f754bbd](https://github.com/teletha/cointoss/commit/f754bbd892548ff99adfc73cd9c78aa6a583d777))
+* remove Liquid completely ([cf05b7e](https://github.com/teletha/cointoss/commit/cf05b7ec00102467443e2c1392ab0d1c1df8e2fd))
+* remove Market#cancel ([f14f2f6](https://github.com/teletha/cointoss/commit/f14f2f692acfcdd45745576aaec7a4f87edfc2e3))
+* remove Market#open, #close and #ticker. ([ad6d603](https://github.com/teletha/cointoss/commit/ad6d603f336b7e30c4dcec88f8d3e9f661376ceb))
+* remove TemporalData ([0612887](https://github.com/teletha/cointoss/commit/0612887962ea4f98d84b01e96a95705e94be6daf))
+* separate BinanceF from Binance ([36b03df](https://github.com/teletha/cointoss/commit/36b03dfde23052c1b826af610b5f3a40b529a5b5))
+* share realtime stream ([671ca4a](https://github.com/teletha/cointoss/commit/671ca4a92c7895f3c6853dd9ccdbd9844081c560))
+* update bybit and gmo api ([e4c65c6](https://github.com/teletha/cointoss/commit/e4c65c6cfc5bf1e535594511fba3b16f8dc85724))
+* update commons-net ([60df66b](https://github.com/teletha/cointoss/commit/60df66b2140566cc863719590f5e47d597d54e7b))
+
+
+### Bug Fixes
+
+* avoid NPE ([6ddd02b](https://github.com/teletha/cointoss/commit/6ddd02b3272d1a107bfc853ca25291156c2d2420))
+* avoid NPE ([39052e5](https://github.com/teletha/cointoss/commit/39052e56bc82d8702c9b8f4db9f8d1bc9302ea5e))
+* Bitflyer logger is broken in some markets. ([d8ec406](https://github.com/teletha/cointoss/commit/d8ec406122a74cc122bfef772cfee0c58ac2f7b5))
+* bybit api v5 ([7f6422f](https://github.com/teletha/cointoss/commit/7f6422f7a75ed606c37618e3ad4f27f6e63d1be3))
+* Bybit orderbook is broken ([63084b4](https://github.com/teletha/cointoss/commit/63084b4d71d431cc699e1a45af6df2db4d56ac16))
+* change color by order direction ([53a9746](https://github.com/teletha/cointoss/commit/53a9746c27db48ac6eec96f83084a245698f7c45))
+* cleanup ExecutionLog API ([7ab42e3](https://github.com/teletha/cointoss/commit/7ab42e37b2fa94a8f65045eb5f1e34189a43509b))
+* divided by zero ([5f6cdb2](https://github.com/teletha/cointoss/commit/5f6cdb2b396cd9f78af204f2be4a237937124053))
+* drop event related api from ChartPart ([acab136](https://github.com/teletha/cointoss/commit/acab1368e2a26126c04e17b5d98d11d6d7d5f846))
+* make market initialisation more smoothly ([26a67f0](https://github.com/teletha/cointoss/commit/26a67f0a1707f862e91eb9a118e26a56aebc48a0))
+* manage chart parts ([9ba7c04](https://github.com/teletha/cointoss/commit/9ba7c04ce0a3465a0619929f754010561d6ed116))
+* remove bucket4j ([68fed5f](https://github.com/teletha/cointoss/commit/68fed5f72df9aea64d796c5ef0927d22db4aa82a))
+* show setting view with window mode ([d7a5e38](https://github.com/teletha/cointoss/commit/d7a5e382cf920257a3c19c372e2c6e8d217c1225))
+* update ci process ([0e8454a](https://github.com/teletha/cointoss/commit/0e8454ae3f173976adf4a71b7a7fb991a2e9d9d0))
+* update license ([4c162bf](https://github.com/teletha/cointoss/commit/4c162bf8a20cedb9310c241a67826131cf2fb8ff))
+* update translation ([0490e22](https://github.com/teletha/cointoss/commit/0490e226302089b3ac699e701981c2b09d6d1c0c))
+* update viewtify ([4097ab8](https://github.com/teletha/cointoss/commit/4097ab8efab868ab2f791107adb904f13ab8e29a))
+* update viewtify ([2c9c609](https://github.com/teletha/cointoss/commit/2c9c6093d2561adf95fc914dff36db03478bdd1a))
+* use .env ([ac43b2e](https://github.com/teletha/cointoss/commit/ac43b2e3859486dcca821fce2a21686cb55d484d))
+
 ## [1.4.0](https://github.com/teletha/cointoss/compare/v1.3.0...v1.4.0) (2023-12-02)
 
 
