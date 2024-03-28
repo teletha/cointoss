@@ -30,6 +30,8 @@ const root = {
 		"trademate",
 		"trademate.chart",
 		"trademate.chart.builtin",
+		"trademate.chart.line",
+		"trademate.chart.part",
 		"trademate.order",
 		"trademate.setting",
 		"trademate.verify",
@@ -396,6 +398,20 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Cancellable",
+			"packageName": "cointoss.order",
+			"type": "Functional"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "CandlePart",
+			"packageName": "trademate.chart.part",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "CandleType",
 			"packageName": "trademate.chart",
 			"type": "Enum"
@@ -413,6 +429,13 @@ const root = {
 			"name": "ChartCanvas",
 			"packageName": "trademate.chart",
 			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "ChartPart",
+			"packageName": "trademate.chart.part",
+			"type": "AbstractClass"
 		},
 		{
 			"modifiers": {
@@ -553,6 +576,13 @@ const root = {
 			"name": "Directional",
 			"packageName": "cointoss",
 			"type": "Functional"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Division",
+			"packageName": "cointoss.order",
+			"type": "Enum"
 		},
 		{
 			"modifiers": {
@@ -788,6 +818,20 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "LimitOverflowError",
+			"packageName": "cointoss.market",
+			"type": "Exception"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "LineMark",
+			"packageName": "trademate.chart.line",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Liquidation",
 			"packageName": "cointoss.ticker.data",
 			"type": "Class"
@@ -858,6 +902,20 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "MaintenanceError",
+			"packageName": "cointoss.market",
+			"type": "Exception"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Makable",
+			"packageName": "cointoss.order",
+			"type": "Functional"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Market",
 			"packageName": "cointoss",
 			"type": "Class"
@@ -868,6 +926,13 @@ const root = {
 			"name": "MarketAccount",
 			"packageName": "cointoss.market",
 			"type": "AbstractClass"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "MarketInfoPart",
+			"packageName": "trademate.chart.part",
+			"type": "Class"
 		},
 		{
 			"modifiers": {
@@ -1152,22 +1217,8 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderBookView",
-			"packageName": "trademate.order",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderBuilder",
-			"packageName": "trademate.order",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderCatalog",
-			"packageName": "trademate.order",
+			"name": "OrderBookPart",
+			"packageName": "trademate.chart.part",
 			"type": "Class"
 		},
 		{
@@ -1194,41 +1245,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderStrategy",
-			"packageName": "cointoss.order",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderStrategy.Cancellable",
-			"packageName": "cointoss.order",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderStrategy.Makable",
-			"packageName": "cointoss.order",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderStrategy.Orderable",
-			"packageName": "cointoss.order",
-			"type": "Interface"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "OrderStrategy.Takable",
-			"packageName": "cointoss.order",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderType",
 			"packageName": "cointoss.order",
 			"type": "Enum"
@@ -1238,6 +1254,27 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "OrderView",
 			"packageName": "trademate.order",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Orderable",
+			"packageName": "cointoss.order",
+			"type": "Interface"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "PerformanceSetting",
+			"packageName": "trademate.setting",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "PerformanceSettingView",
+			"packageName": "trademate.setting",
 			"type": "Class"
 		},
 		{
@@ -1320,6 +1357,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "PriceNotify",
+			"packageName": "trademate.chart.line",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "PriceRangedVolumeManager",
 			"packageName": "cointoss.volume",
 			"type": "Class"
@@ -1336,6 +1380,13 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "PriceRangedVolumeManager.PriceRangedVolumePeriod",
 			"packageName": "cointoss.volume",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "PriceRangedVolumePart",
+			"packageName": "trademate.chart.part",
 			"type": "Class"
 		},
 		{
@@ -1502,16 +1553,16 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "StaticConfig",
-			"packageName": "trademate.setting",
+			"name": "SummaryView",
+			"packageName": "trademate",
 			"type": "Class"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "SummaryView",
-			"packageName": "trademate",
-			"type": "Class"
+			"name": "Takable",
+			"packageName": "cointoss.order",
+			"type": "Functional"
 		},
 		{
 			"modifiers": {

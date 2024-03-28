@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="l">
+		<header class="Y">
+			<h1 class="N" date="2023-12-02" ver="1.4.0"><code>Cointoss</code></h1>
+			<nav class="h"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="c" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="k">
+			<nav class="K">
+				<div></div>
+			</nav>
+			<article class="O" id="Article">
+				<section class="Z"><code class="a">trademate.chart.part</code>
+					<h2 class="AbstractClass m"><code class="f">ChartPart</code></h2>
+					<div class="H">
+						<ul class="C G">
+							<li><code><a href="api/trademate.chart.part.CandlePart.html">CandlePart</a></code></li>
+							<li><code><a href="api/trademate.chart.part.MarketInfoPart.html">MarketInfoPart</a></code></li>
+							<li><code><a href="api/trademate.chart.part.OrderBookPart.html">OrderBookPart</a></code></li>
+							<li><code><a href="api/trademate.chart.part.PriceRangedVolumePart.html">PriceRangedVolumePart</a></code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="Z" id="parent">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">parent</code><i class="M"><code class="return"><a href="api/trademate.chart.ChartCanvas.html">ChartCanvas</a></code></i></h2><span class="B"><p>The parent chart.</p>
+</span></section>
+				<section class="Z" id="layout">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">layout</code><i class="M"><code class="return">viewtify.ui.helper.LayoutAssistant</code></i></h2><span class="B"><p>The layout manage.</p>
+</span></section>
+				<section class="Z" id="canvas">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">canvas</code><i class="M"><code class="return">viewtify.ui.canvas.EnhancedCanvas</code></i></h2><span class="B"><p>The actual canvas.</p>
+</span></section>
+				<section class="Z" id="managed">
+					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="f">managed</code><i class="M"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>viewtify.ui.canvas.EnhancedCanvas</code></code></code></i></h2><span class="B"><p>The all managed canvases.</p>
+</span></section>
+				<section class="Z" id="ChartPart(trademate.chart.ChartCanvas)">
+					<h2 class="U"><i class="PROTECTED"></i><code class="f">ChartPart</code><code class="P">(<code><a href="api/trademate.chart.ChartCanvas.html">ChartCanvas</a></code> <code class="parameterName">parent</code>)</code></h2>
+					<table class="j">
+						<tr class="X">
+							<td><code><a href="api/trademate.chart.ChartCanvas.html">ChartCanvas</a></code> <code>parent</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Set up part of the chart.</p>
+</span></section>
+				<section class="Z" id="createCanvas()">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">createCanvas</code><code class="P">()</code><i class="M"><code>viewtify.ui.canvas.EnhancedCanvas</code></i></h2>
+					<table class="j">
+						<tr class="R">
+							<td><code>viewtify.ui.canvas.EnhancedCanvas</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Create new canvas.</p>
+</span></section>
+				<section class="Z" id="configurePreferedCanvasSize(viewtify.ui.canvas.EnhancedCanvas)">
+					<h2 class="U"><i class="PROTECTED"></i><code class="f">configurePreferedCanvasSize</code><code class="P">(<code>viewtify.ui.canvas.EnhancedCanvas</code> <code class="parameterName">canvas</code>)</code><i class="M"><code>void</code></i></h2>
+					<table class="j">
+						<tr class="X">
+							<td><code>viewtify.ui.canvas.EnhancedCanvas</code> <code>canvas</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Configure your prefered canvas size.</p>
+</span></section>
+				<section class="Z" id="draw()">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">draw</code><code class="P">()</code><i class="M"><code>void</code></i></h2>
+				</section>
+				<section class="Z" id="chartAxisModification()">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">chartAxisModification</code><code class="P">()</code><i class="M"><code array="fix">javafx.beans.Observable</code></i></h2>
+					<table class="j">
+						<tr class="R">
+							<td><code array="fix">javafx.beans.Observable</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section class="Z" id="userInterfaceModification()">
+					<h2 class="U"><i class="FINAL"><i class="PROTECTED"></i></i><code class="f">userInterfaceModification</code><code class="P">()</code><i class="M"><code>kiss.Signal</code></i></h2>
+					<table class="j">
+						<tr class="R">
+							<td><code>kiss.Signal</code></td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</article>
+			<aside class="Q" id="SubNavi">
+				<div class="b">
+					<h5 class="g">Constructors</h5>
+					<ul>
+						<li><i class="PROTECTED"></i><code><a href="api/trademate.chart.part.ChartPart.html#ChartPart(trademate.chart.ChartCanvas)">ChartPart</a></code><code class="P">(<code><a href="api/trademate.chart.ChartCanvas.html">ChartCanvas</a></code> <code class="parameterName">parent</code>)</code></li>
+					</ul>
+					<h5 class="g">Fields</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.part.ChartPart.html#parent">parent</a></code><i class="V"><code class="return"><a href="api/trademate.chart.ChartCanvas.html">ChartCanvas</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.part.ChartPart.html#layout">layout</a></code><i class="V"><code class="return">viewtify.ui.helper.LayoutAssistant</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.part.ChartPart.html#canvas">canvas</a></code><i class="V"><code class="return">viewtify.ui.canvas.EnhancedCanvas</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.part.ChartPart.html#managed">managed</a></code><i class="V"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>viewtify.ui.canvas.EnhancedCanvas</code></code></code></i></li>
+					</ul>
+					<h5 class="g">Methods</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/trademate.chart.part.ChartPart.html#createCanvas()">createCanvas</a></code><code class="P">()</code><i class="V"><code>viewtify.ui.canvas.EnhancedCanvas</code></i></li>
+						<li><i class="PROTECTED"></i><code><a href="api/trademate.chart.part.ChartPart.html#configurePreferedCanvasSize(viewtify.ui.canvas.EnhancedCanvas)">configurePreferedCanvasSize</a></code><code class="P">(<code>viewtify.ui.canvas.EnhancedCanvas</code> <code class="parameterName">canvas</code>)</code><i class="V"><code>void</code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.part.ChartPart.html#draw()">draw</a></code><code class="P">()</code><i class="V"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/trademate.chart.part.ChartPart.html#chartAxisModification()">chartAxisModification</a></code><code class="P">()</code><i class="V"><code array="fix">javafx.beans.Observable</code></i></li>
+						<li><i class="FINAL"><i class="PROTECTED"></i></i><code><a href="api/trademate.chart.part.ChartPart.html#userInterfaceModification()">userInterfaceModification</a></code><code class="P">()</code><i class="V"><code>kiss.Signal</code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

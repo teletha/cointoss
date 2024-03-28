@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="O">
-		<header class="k">
-			<h1 class="I" date="2023-12-02" ver="1.4.0"><code>Cointoss</code></h1>
-			<nav class="e"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="l">
+		<header class="Y">
+			<h1 class="N" date="2023-12-02" ver="1.4.0"><code>Cointoss</code></h1>
+			<nav class="h"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="U" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="c" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,14 +31,14 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="L">
-			<nav class="V">
+		<main class="k">
+			<nav class="K">
 				<div></div>
 			</nav>
-			<article class="l" id="Article">
-				<section class="m"><code class="i">cointoss.util.feather</code>
-					<h2 class="AbstractClass h"><code class="W">DataCodec</code><code class="R">&#60;<code>T</code>&#62;</code></h2>
-					<div class="Y">
+			<article class="O" id="Article">
+				<section class="Z"><code class="a">cointoss.util.feather</code>
+					<h2 class="AbstractClass m"><code class="f">DataCodec</code><code class="P">&#60;<code>T</code>&#62;</code></h2>
+					<div class="H">
 						<ul class="C D">
 							<li><code>T</code></li>
 						</ul>
@@ -47,87 +47,87 @@
 						</ul>
 					</div><span class="B"><p>Data serializer and deserializer which can convert data from/to bytes.</p>
 </span></section>
-				<section class="m" id="DataCodec()">
-					<h2 class="j"><i class="PUBLIC"></i><code class="W">DataCodec</code><code class="R">()</code></h2>
+				<section class="Z" id="DataCodec()">
+					<h2 class="U"><i class="PUBLIC"></i><code class="f">DataCodec</code><code class="P">()</code></h2>
 				</section>
-				<section class="m" id="size()">
-					<h2 class="j"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="W">size</code><code class="R">()</code><i class="Q"><code>int</code></i></h2>
-					<table class="c">
-						<tr class="a">
+				<section class="Z" id="size()">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">size</code><code class="P">()</code><i class="M"><code>int</code></i></h2>
+					<table class="j">
+						<tr class="R">
 							<td><code>int</code></td>
 							<td><span><p>The total size.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Total bytes size of this data type.</p>
 </span></section>
-				<section class="m" id="read(long,java.nio.ByteBuffer)">
-					<h2 class="j"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="W">read</code><code class="R">(<code>long</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code class="parameterName">reader</code>)</code><i class="Q"><code>T</code></i></h2>
-					<table class="c">
-						<tr class="d">
+				<section class="Z" id="read(long,java.nio.ByteBuffer)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">read</code><code class="P">(<code>long</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code class="parameterName">reader</code>)</code><i class="M"><code>T</code></i></h2>
+					<table class="j">
+						<tr class="X">
 							<td><code>long</code> <code>time</code></td>
 							<td></td>
 						</tr>
-						<tr class="d">
+						<tr class="X">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code>reader</code></td>
 							<td><span><p>A byte reader.</p>
 </span></td>
 						</tr>
-						<tr class="a">
+						<tr class="R">
 							<td><code>T</code></td>
 							<td><span><p>A restored data.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Convert from bytes to data.</p>
 </span></section>
-				<section class="m" id="write(java.lang.Object,java.nio.ByteBuffer)">
-					<h2 class="j"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="W">write</code><code class="R">(<code>T</code> <code class="parameterName">item</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code class="parameterName">writer</code>)</code><i class="Q"><code>void</code></i></h2>
-					<table class="c">
-						<tr class="d">
+				<section class="Z" id="write(java.lang.Object,java.nio.ByteBuffer)">
+					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="f">write</code><code class="P">(<code>T</code> <code class="parameterName">item</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code class="parameterName">writer</code>)</code><i class="M"><code>void</code></i></h2>
+					<table class="j">
+						<tr class="X">
 							<td><code>T</code> <code>item</code></td>
 							<td><span><p>A data to store.</p>
 </span></td>
 						</tr>
-						<tr class="d">
+						<tr class="X">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code>writer</code></td>
 							<td><span><p>A byte writer.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Convert from data to bytes.</p>
 </span></section>
-				<section class="m" id="of(java.lang.Class)">
-					<h2 class="j"><i class="PUBLIC STATIC"></i><code class="W">of</code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>T</code></code></code> <code class="parameterName">type</code>)</code><i class="Q"><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></i></h2>
-					<table class="c">
-						<tr class="J">
+				<section class="Z" id="of(java.lang.Class)">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">of</code><code class="P">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>T</code></code></code> <code class="parameterName">type</code>)</code><i class="M"><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></i></h2>
+					<table class="j">
+						<tr class="i">
 							<td><code>T</code></td>
 							<td><span><p>A data class.</p>
 </span></td>
 						</tr>
-						<tr class="d">
+						<tr class="X">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>T</code></code></code> <code>type</code></td>
 							<td><span><p>A data class.</p>
 </span></td>
 						</tr>
-						<tr class="a">
+						<tr class="R">
 							<td><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></td>
 							<td><span><p>The automatically derived <code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a></code>.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Get the Model based data type for the specified type.</p>
 </span></section>
-				<section class="m" id="of(kiss.Model)">
-					<h2 class="j"><i class="PUBLIC STATIC"></i><code class="W">of</code><code class="R">(<code>kiss.Model<code class="parameters"><code>T</code></code></code> <code class="parameterName">model</code>)</code><i class="Q"><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></i></h2>
-					<table class="c">
-						<tr class="J">
+				<section class="Z" id="of(kiss.Model)">
+					<h2 class="U"><i class="PUBLIC STATIC"></i><code class="f">of</code><code class="P">(<code>kiss.Model<code class="parameters"><code>T</code></code></code> <code class="parameterName">model</code>)</code><i class="M"><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></i></h2>
+					<table class="j">
+						<tr class="i">
 							<td><code>T</code></td>
 							<td><span><p>A data class.</p>
 </span></td>
 						</tr>
-						<tr class="d">
+						<tr class="X">
 							<td><code>kiss.Model<code class="parameters"><code>T</code></code></code> <code>model</code></td>
 							<td><span><p>A data model.</p>
 </span></td>
 						</tr>
-						<tr class="a">
+						<tr class="R">
 							<td><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></td>
 							<td><span><p>The automatically derived <code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a></code>.</p>
 </span></td>
@@ -135,22 +135,22 @@
 					</table><span class="B"><p>Get the Model based data type for the specified type.</p>
 </span></section>
 			</article>
-			<aside class="b" id="SubNavi">
-				<div class="P">
-					<h5 class="S">Constructors</h5>
+			<aside class="Q" id="SubNavi">
+				<div class="b">
+					<h5 class="g">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.DataCodec.html#DataCodec()">DataCodec</a></code><code class="R">()</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.DataCodec.html#DataCodec()">DataCodec</a></code><code class="P">()</code></li>
 					</ul>
-					<h5 class="S">Static Methods</h5>
+					<h5 class="g">Static Methods</h5>
 					<ul>
-						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.util.feather.DataCodec.html#of(java.lang.Class)">of</a></code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>T</code></code></code> <code class="parameterName">type</code>)</code><i class="K"><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></i></li>
-						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.util.feather.DataCodec.html#of(kiss.Model)">of</a></code><code class="R">(<code>kiss.Model<code class="parameters"><code>T</code></code></code> <code class="parameterName">model</code>)</code><i class="K"><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.util.feather.DataCodec.html#of(java.lang.Class)">of</a></code><code class="P">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>T</code></code></code> <code class="parameterName">type</code>)</code><i class="V"><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.util.feather.DataCodec.html#of(kiss.Model)">of</a></code><code class="P">(<code>kiss.Model<code class="parameters"><code>T</code></code></code> <code class="parameterName">model</code>)</code><i class="V"><code><a href="api/cointoss.util.feather.DataCodec.html">DataCodec</a><code class="parameters"><code>T</code></code></code></i></li>
 					</ul>
-					<h5 class="S">Methods</h5>
+					<h5 class="g">Methods</h5>
 					<ul>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.DataCodec.html#size()">size</a></code><code class="R">()</code><i class="K"><code>int</code></i></li>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.DataCodec.html#read(long,java.nio.ByteBuffer)">read</a></code><code class="R">(<code>long</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code class="parameterName">reader</code>)</code><i class="K"><code>T</code></i></li>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.DataCodec.html#write(java.lang.Object,java.nio.ByteBuffer)">write</a></code><code class="R">(<code>T</code> <code class="parameterName">item</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code class="parameterName">writer</code>)</code><i class="K"><code>void</code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.DataCodec.html#size()">size</a></code><code class="P">()</code><i class="V"><code>int</code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.DataCodec.html#read(long,java.nio.ByteBuffer)">read</a></code><code class="P">(<code>long</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code class="parameterName">reader</code>)</code><i class="V"><code>T</code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.DataCodec.html#write(java.lang.Object,java.nio.ByteBuffer)">write</a></code><code class="P">(<code>T</code> <code class="parameterName">item</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/nio/ByteBuffer.html">ByteBuffer</a></code> <code class="parameterName">writer</code>)</code><i class="V"><code>void</code></i></li>
 					</ul>
 				</div>
 			</aside>
