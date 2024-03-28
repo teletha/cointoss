@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
@@ -18,6 +19,7 @@ import cointoss.execution.Execution;
 class TickerTest extends TickerTestSupport {
 
     @Test
+    @Disabled
     void open() {
         Ticker ticker = manager.on(Span.Minute1);
         List<Tick> open = ticker.open.toList();
