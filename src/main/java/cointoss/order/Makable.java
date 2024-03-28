@@ -141,7 +141,7 @@ public interface Makable {
 
             int scale = market.service.setting.base().scale;
             List<Order> orders = new ArrayList();
-            Num diff = start.minus(end).divide(division.size - 1).scale(scale);
+            Num diff = start.minus(end).divide(Math.max(1, division.size - 1)).scale(scale);
             for (int i = 0; i < division.size; i++) {
                 orders.add(Order.with.direction(direction, size.multiply(division.weights[i]))
                         .price(start.minus(diff.multiply(i)).scale(scale)));
