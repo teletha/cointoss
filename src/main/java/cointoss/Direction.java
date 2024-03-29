@@ -34,34 +34,6 @@ public enum Direction implements Directional {
     }
 
     /**
-     * @return
-     */
-    @Override
-    public Direction inverse() {
-        return this == BUY ? SELL : BUY;
-    }
-
-    /**
-     * Helper to detect.
-     * 
-     * @return
-     */
-    @Override
-    public boolean isBuy() {
-        return this == BUY;
-    }
-
-    /**
-     * Helper to detect.
-     * 
-     * @return
-     */
-    @Override
-    public boolean isSell() {
-        return this == SELL;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

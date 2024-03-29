@@ -191,7 +191,7 @@ public final class OrderManager {
         // compute compound size and price
         if (compoundSize.v.isZero()) {
             // no position
-            if (side.isBuy()) {
+            if (side.isPositive()) {
                 compoundSize.set(diffSize);
             } else {
                 compoundSize.set(diffSize.negate());
@@ -200,7 +200,7 @@ public final class OrderManager {
         } else {
             if (compoundSize.v.isPositive()) {
                 // long position
-                if (side.isBuy()) {
+                if (side.isPositive()) {
                     Num oldTotalPrice = oldPrice.multiply(oldSize);
                     Num newTotalPrice = newPrice.multiply(newSize);
 
@@ -216,7 +216,7 @@ public final class OrderManager {
                 }
             } else {
                 // short position
-                if (side.isBuy()) {
+                if (side.isPositive()) {
                     compoundSize.set(v -> v.plus(diffSize));
                     if (compoundSize.v.isPositive()) {
                         compoundTotalPrice = newPrice.multiply(compoundSize);

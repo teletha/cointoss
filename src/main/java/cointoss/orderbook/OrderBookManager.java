@@ -72,7 +72,7 @@ public class OrderBookManager implements Disposable {
      * @return The associated {@link OrderBook}.
      */
     public OrderBook by(Directional side) {
-        return side.isBuy() ? longs : shorts;
+        return side.isPositive() ? longs : shorts;
     }
 
     /**
@@ -119,7 +119,7 @@ public class OrderBookManager implements Disposable {
         if (threshold.isZero()) {
             return price;
         }
-        return side.isBuy() ? longs.computeBestPrice(price, threshold, diff) : shorts.computeBestPrice(price, threshold, diff);
+        return side.isPositive() ? longs.computeBestPrice(price, threshold, diff) : shorts.computeBestPrice(price, threshold, diff);
     }
 
     /**

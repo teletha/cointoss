@@ -87,7 +87,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 0.25).price(8));
 
         Scenario s = last();
-        if (side.isBuy()) {
+        if (side.isPositive()) {
             assert s.entryPrice.scale(0).is(12);
         } else {
             assert s.entryPrice.scale(0).is(7);
@@ -115,7 +115,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 0.25).price(16));
 
         Scenario s = last();
-        if (side.isBuy()) {
+        if (side.isPositive()) {
             assert s.entryPrice.is(13);
         } else {
             assert s.entryPrice.is(10);
@@ -143,7 +143,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 0.25).price(4));
 
         Scenario s = last();
-        if (side.isBuy()) {
+        if (side.isPositive()) {
             assert s.entryPrice.is(10);
         } else {
             assert s.entryPrice.is(7);
@@ -170,7 +170,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 1).price(10));
 
         Scenario s = last();
-        if (side.isBuy()) {
+        if (side.isPositive()) {
             assert s.entryPrice.is(10);
         } else {
             assert s.entryPrice.is(5);
@@ -197,7 +197,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 1).price(5));
 
         Scenario s = last();
-        if (side.isBuy()) {
+        if (side.isPositive()) {
             assert s.entryPrice.is(10);
         } else {
             assert s.entryPrice.is(5);

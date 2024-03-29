@@ -25,24 +25,6 @@ public interface Directional extends Orientational {
     }
 
     /**
-     * Utility to detect.
-     * 
-     * @return
-     */
-    default boolean isBuy() {
-        return direction() == Direction.BUY;
-    }
-
-    /**
-     * Utility to detect.
-     * 
-     * @return
-     */
-    default boolean isSell() {
-        return direction() == Direction.SELL;
-    }
-
-    /**
      * Utility to inverse {@link Direction}.
      * 
      * @return

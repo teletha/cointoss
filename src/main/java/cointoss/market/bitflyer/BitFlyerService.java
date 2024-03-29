@@ -49,8 +49,8 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import hypatia.Num;
 import cointoss.util.Network;
+import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -314,7 +314,7 @@ public class BitFlyerService extends MarketService {
         ZonedDateTime date = parse(json.text("exec_date")).atZone(Chrono.UTC);
         String buyer = json.text("buy_child_order_acceptance_id");
         String seller = json.text("sell_child_order_acceptance_id");
-        String taker = direction.isBuy() ? buyer : seller;
+        String taker = direction.isPositive() ? buyer : seller;
         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller, direction);
         int delay = estimateDelay(taker, date);
 

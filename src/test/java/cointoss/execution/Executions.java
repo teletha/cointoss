@@ -68,7 +68,7 @@ public class Executions {
             list.add(Execution.with.direction(side, size)
                     .price(price)
                     .consecutive(i == 0 ? ExecutionModel.ConsecutiveDifference
-                            : side.isBuy() ? ExecutionModel.ConsecutiveSameBuyer : ExecutionModel.ConsecutiveSameSeller));
+                            : side.isPositive() ? ExecutionModel.ConsecutiveSameBuyer : ExecutionModel.ConsecutiveSameSeller));
         }
         return list;
     }

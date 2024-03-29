@@ -490,7 +490,7 @@ public class VerifiableMarketService extends MarketService {
             if (validateTradableByPrice(order, e)) {
                 Num executedSize = Num.min(e.size, order.remainingSize);
                 if (order.type.isTaker() && executedSize.isNot(0)) {
-                    order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price, latestPrice)
+                    order.marketMinPrice = order.isPositive() ? Num.max(order.marketMinPrice, e.price, latestPrice)
                             : Num.min(order.marketMinPrice, e.price, latestPrice);
                     order.price = order.price.multiply(order.executedSize)
                             .plus(order.marketMinPrice.multiply(executedSize))
@@ -558,7 +558,7 @@ public class VerifiableMarketService extends MarketService {
         if (order.type == OrderType.Taker) {
             return true;
         }
-        if (order.isBuy()) {
+        if (order.isPositive()) {
             Num price = order.price;
             return price.isGreaterThan(e.price) || price.is(setting.base.minimumSize);
         } else {
@@ -658,7 +658,7 @@ public class VerifiableMarketService extends MarketService {
             this.type = o.type;
             this.condition = o.quantityCondition;
             this.createTimeMills = o.creationTime.toInstant().toEpochMilli();
-            this.marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
+            this.marketMinPrice = isPositive() ? Num.ZERO : Num.MAX;
         }
 
         /**

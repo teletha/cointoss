@@ -91,7 +91,7 @@ public class VerifiableMarket extends Market {
                         .id(e.id ^ (97 + i))
                         .date(service.now())
                         .delay(e.delay)
-                        .consecutive(e.direction.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller);
+                        .consecutive(e.direction.isPositive() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller);
 
                 perform(copy);
             }

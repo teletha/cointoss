@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static java.time.temporal.ChronoUnit.MILLIS;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -55,9 +55,9 @@ class CompactLogTest {
 
         List<Execution> compact = I.signal(e1, e2, e3).plug(new CompactLog()).toList();
         assert compact.size() == 3;
-        assert compact.get(0).direction.isBuy();
-        assert compact.get(1).direction.isSell();
-        assert compact.get(2).direction.isBuy();
+        assert compact.get(0).direction.isPositive();
+        assert compact.get(1).direction.isNegative();
+        assert compact.get(2).direction.isPositive();
     }
 
     @Test

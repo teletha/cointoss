@@ -67,7 +67,7 @@ public class GlobalVolume {
     public final void add(MarketService service, Directional side, float volume) {
         float[] volumes = services.computeIfAbsent(service, key -> new float[4]);
 
-        if (side.isBuy()) {
+        if (side.isPositive()) {
             volumes[0] += volume;
             longs += volume;
         } else {
@@ -85,7 +85,7 @@ public class GlobalVolume {
     public final void add(MarketService service, Liquidation e) {
         float[] volumes = services.computeIfAbsent(service, key -> new float[4]);
 
-        if (e.isBuy()) {
+        if (e.isPositive()) {
             volumes[2] += e.size;
             liquidatedLongs += e.size;
         } else {

@@ -34,7 +34,7 @@ class VerifiableMarketTest {
     @Test
     void requestBuyLimitOrder() {
         market.request(Order.with.buy(1).price(1)).to(order -> {
-            assert order.isBuy();
+            assert order.isPositive();
             assert order.executedSize.is(0);
             assert order.remainingSize().is(1);
         });

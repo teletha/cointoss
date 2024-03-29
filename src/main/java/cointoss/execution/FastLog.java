@@ -67,7 +67,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
         end = start + 5000;
         open = highest = lowest = close = e.price.doubleValue();
         latestId = e.id;
-        if (e.isBuy()) {
+        if (e.isPositive()) {
             buys = e.size.doubleValue();
             sells = 0;
         } else {
@@ -88,7 +88,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
         close = price;
         latestId = e.id;
 
-        if (e.isBuy()) {
+        if (e.isPositive()) {
             buys += e.size.doubleValue();
         } else {
             sells += e.size.doubleValue();

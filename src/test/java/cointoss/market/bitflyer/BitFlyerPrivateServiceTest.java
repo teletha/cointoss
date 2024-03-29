@@ -62,7 +62,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
 
         Order order = list.get(0);
         assert order.id.equals("JRF20200714-015806-840451");
-        assert order.direction.isSell();
+        assert order.direction.isNegative();
         assert order.type.isMaker();
         assert order.size.is(0.01);
         assert order.remainingSize().is(0.01);
@@ -124,7 +124,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
 
         Order order = list.get(0);
         assert order.id.equals("JRF20200710-956385-394856");
-        assert order.direction.isBuy();
+        assert order.direction.isPositive();
         assert order.type.isMaker();
         assert order.size.is(0.5);
         assert order.remainingSize().is(0.2);
@@ -186,7 +186,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
 
         Order order = list.get(0);
         assert order.id.equals("JRF20200710-956385-394856");
-        assert order.direction.isBuy();
+        assert order.direction.isPositive();
         assert order.type.isMaker();
         assert order.size.is(0.5);
         assert order.remainingSize().is(0);
@@ -266,7 +266,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
 
         Order order = list.get(0);
         assert order.id.equals("JRF20200714-015806-840451");
-        assert order.direction.isSell();
+        assert order.direction.isNegative();
         assert order.type.isMaker();
         assert order.size.is(0.01);
         assert order.remainingSize().is(0.01);
@@ -281,7 +281,7 @@ public class BitFlyerPrivateServiceTest extends PrivateServiceTestTemplate<BitFl
 
         order = list.get(1);
         assert order.id.equals("JRF20200710-956385-394856");
-        assert order.direction.isBuy();
+        assert order.direction.isPositive();
         assert order.type.isMaker();
         assert order.size.is(0.5);
         assert order.remainingSize().is(0);

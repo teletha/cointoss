@@ -70,7 +70,7 @@ public class OrderBook implements Listener {
      */
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
-        this.base = side.isBuy() ? DoubleMap.createReversedMap() : DoubleMap.createSortedMap();
+        this.base = side.isPositive() ? DoubleMap.createReversedMap() : DoubleMap.createSortedMap();
         this.scaleBase = setting.base.scale;
         this.scaleTarget = setting.target.scale;
         this.takerFee = setting.takerFee;
@@ -108,7 +108,7 @@ public class OrderBook implements Listener {
      */
     private void grouping(float range) {
         this.range = range;
-        this.grouped = side.isBuy() ? DoubleMap.createReversedMap() : DoubleMap.createSortedMap();
+        this.grouped = side.isPositive() ? DoubleMap.createReversedMap() : DoubleMap.createSortedMap();
 
         // grouping the current boards
         for (OrderBookPage board : base.values()) {
@@ -143,7 +143,7 @@ public class OrderBook implements Listener {
             double h = floor(hint, range, scaleBase);
 
             DoubleEntry<OrderBookPage> entry = grouped.firstEntry();
-            if (side.isBuy()) {
+            if (side.isPositive()) {
                 while (entry != null && entry.getDoubleKey() > h) {
                     grouped.pollFirstEntry();
                     entry = grouped.firstEntry();
@@ -174,7 +174,7 @@ public class OrderBook implements Listener {
 
         ConcurrentNavigableDoubleMap<OrderBookPage> grouped = grouped();
 
-        if (side.isBuy()) {
+        if (side.isPositive()) {
             if (lowerPrice.isGreaterThan(base.firstKey()) || upperPrice.isLessThan(base.lastKey())) {
                 return max;
             }
@@ -371,7 +371,7 @@ public class OrderBook implements Listener {
         if (diff == null) diff = Num.ZERO;
 
         Num total = Num.ZERO;
-        boolean buy = side.isBuy();
+        boolean buy = side.isPositive();
         for (OrderBookPage board : base.values()) {
             if (buy ? board.price <= start : board.price >= start) {
                 total = total.plus(board.size);
@@ -393,7 +393,7 @@ public class OrderBook implements Listener {
         if (!base.isEmpty()) {
             double price = base.firstDoubleKey();
 
-            while (side.isBuy() ? price > hint : price < hint) {
+            while (side.isPositive() ? price > hint : price < hint) {
                 OrderBookPage removed = base.remove(price);
 
                 if (grouped != null) {

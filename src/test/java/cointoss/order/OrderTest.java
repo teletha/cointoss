@@ -135,10 +135,10 @@ public class OrderTest {
 
     @Test
     void direction() {
-        assert Order.with.buy(1).direction.isBuy();
-        assert Order.with.sell(1).direction.isSell();
-        assert Order.with.direction(Direction.BUY, 1).direction.isBuy();
-        assert Order.with.direction(Direction.SELL, 1).direction.isSell();
+        assert Order.with.buy(1).direction.isPositive();
+        assert Order.with.sell(1).direction.isNegative();
+        assert Order.with.direction(Direction.BUY, 1).direction.isPositive();
+        assert Order.with.direction(Direction.SELL, 1).direction.isNegative();
 
         assertThrows(IllegalArgumentException.class, () -> Order.with.direction((Direction) null, 1));
     }

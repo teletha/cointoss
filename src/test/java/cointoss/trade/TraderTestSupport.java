@@ -433,7 +433,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
         if (make) {
             Num p = price.divide(2);
-            if (side.isBuy()) {
+            if (side.isPositive()) {
                 p = price.minus(p);
             } else {
                 p = price.plus(p);

@@ -25,7 +25,7 @@ public class SidePart implements Directional, TradePart {
      */
     public SidePart(Direction side) {
         this.side = side;
-        this.sign = side.isBuy() ? 1 : -1;
+        this.sign = side.isPositive() ? 1 : -1;
     }
 
     /**
