@@ -39,14 +39,6 @@ abstract class ScenarioBaseModel implements Orientational<Direction>, Profitable
      * {@inheritDoc}
      */
     @Override
-    public boolean isPositive() {
-        return orientation().isPositive();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Direction orientation() {
         throw new Error("This method never will be called! Fix bug!");
     }

@@ -38,7 +38,7 @@ public enum Direction implements Orientational<Direction> {
      * @return
      */
     public Direction inverse() {
-        return this == Direction.BUY ? Direction.SELL : Direction.BUY;
+        return this == BUY ? SELL : BUY;
     }
 
     /**
@@ -46,7 +46,15 @@ public enum Direction implements Orientational<Direction> {
      */
     @Override
     public boolean isPositive() {
-        return this == Direction.BUY;
+        return this == BUY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isNegative() {
+        return this == SELL;
     }
 
     /**

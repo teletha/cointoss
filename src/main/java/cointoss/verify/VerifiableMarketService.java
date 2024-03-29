@@ -670,14 +670,6 @@ public class VerifiableMarketService extends MarketService {
         }
 
         /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isPositive() {
-            return direction.isPositive();
-        }
-
-        /**
          * Cancel this order actually.
          */
         private void cancel() {

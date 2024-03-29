@@ -19,14 +19,6 @@ import icy.manipulator.Icy;
 @Icy
 abstract class PositionModel implements Orientational<Direction> {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isPositive() {
-        return orientation().isPositive();
-    }
-
     @Icy.Property
     @Override
     public abstract Direction orientation();

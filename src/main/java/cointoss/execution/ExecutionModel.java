@@ -46,14 +46,6 @@ abstract class ExecutionModel implements Orientational<Direction>, Timelinable {
     public static final int DelayHuge = -1;
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isPositive() {
-        return orientation().isPositive();
-    }
-
-    /**
      * Execution {@link Direction}.
      * 
      * @return

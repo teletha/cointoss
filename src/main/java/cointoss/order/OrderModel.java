@@ -35,14 +35,6 @@ abstract class OrderModel implements Orientational<Direction>, Comparable<OrderM
     /**
      * {@inheritDoc}
      */
-    @Override
-    public boolean isPositive() {
-        return orientation().isPositive();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Icy.Property
     @Override
     public abstract Direction orientation();

@@ -115,14 +115,6 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isPositive() {
-        return directional.isPositive();
-    }
-
-    /**
      * Check status of this {@link Scenario}.
      * 
      * @return A result.
