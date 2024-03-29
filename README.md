@@ -115,7 +115,7 @@ Cointoss depends on the following products on runtime.
 * [controlsfx-11.2.1](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.1)
 * [failureaccess-1.0.2](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.2)
 * [guava-33.1.0-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.1.0-jre)
-* [hypatia-1.0.0](https://mvnrepository.com/artifact/com.github.teletha/hypatia/1.0.0)
+* [hypatia-1.0.1](https://mvnrepository.com/artifact/com.github.teletha/hypatia/1.0.1)
 * [javafx-base-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-base/23-ea+3)
 * [javafx-base-23-ea+3-linux](https://mvnrepository.com/artifact/org.openjfx/javafx-base/23-ea+3)
 * [javafx-controls-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/23-ea+3)
