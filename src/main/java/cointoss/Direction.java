@@ -24,24 +24,6 @@ public enum Direction implements Orientational<Direction> {
     private static final Random RAN = new Random();
 
     /**
-     * Return ID.
-     * 
-     * @return
-     */
-    public String mark() {
-        return this == BUY ? "B" : "S";
-    }
-
-    /**
-     * Utility to inverse {@link Direction}.
-     * 
-     * @return
-     */
-    public Direction inverse() {
-        return this == BUY ? SELL : BUY;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -55,6 +37,38 @@ public enum Direction implements Orientational<Direction> {
     @Override
     public boolean isNegative() {
         return this == SELL;
+    }
+
+    /**
+     * Alias
+     */
+    public boolean isBuy() {
+        return this == BUY;
+    }
+
+    /**
+     * Alias
+     */
+    public boolean isSell() {
+        return this == SELL;
+    }
+
+    /**
+     * Utility to inverse {@link Direction}.
+     * 
+     * @return
+     */
+    public Direction inverse() {
+        return this == BUY ? SELL : BUY;
+    }
+
+    /**
+     * Return ID.
+     * 
+     * @return
+     */
+    public String mark() {
+        return this == BUY ? "B" : "S";
     }
 
     /**
