@@ -10,8 +10,7 @@
 package cointoss;
 
 import java.util.Objects;
-
-import org.apache.commons.lang3.RandomUtils;
+import java.util.Random;
 
 import hypatia.Orientational;
 import kiss.Decoder;
@@ -21,6 +20,8 @@ import kiss.Singleton;
 
 public enum Direction implements Orientational<Direction> {
     BUY, SELL;
+
+    private static final Random RAN = new Random();
 
     /**
      * Return ID.
@@ -86,7 +87,7 @@ public enum Direction implements Orientational<Direction> {
      * @return A random value.
      */
     public static Direction random() {
-        return RandomUtils.nextBoolean() ? BUY : SELL;
+        return RAN.nextBoolean() ? BUY : SELL;
     }
 
     /**
