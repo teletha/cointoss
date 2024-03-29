@@ -4,7 +4,6 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
 import hypatia.Num;
-
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Throwable;
@@ -73,7 +72,7 @@ public class Execution extends ExecutionModel {
     private static final MethodHandle size$912239839= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle assignWithAccumulative$1150132994= invoker("assignWithAccumulative", Num.class, DoubleConsumer.class);
+    private static final MethodHandle assignWithAccumulative$301451316= invoker("assignWithAccumulative", Num.class, DoubleConsumer.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$101354429= invoker("price", int.class);
@@ -252,7 +251,7 @@ public class Execution extends ExecutionModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, assignWithAccumulative$1150132994.invoke(this, value, (DoubleConsumer) this::setAccumulative));
+            sizeUpdater.invoke(this, assignWithAccumulative$301451316.invoke(this, value, (DoubleConsumer) this::setAccumulative));
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

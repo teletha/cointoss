@@ -3,7 +3,6 @@ package cointoss.trade;
 import cointoss.trade.AbstractTrader;
 import cointoss.util.ObservableNumProperty;
 import hypatia.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;

@@ -3,7 +3,6 @@ package cointoss.ticker.data;
 import cointoss.Direction;
 import cointoss.ticker.data.Liquidation;
 import hypatia.Num;
-
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
