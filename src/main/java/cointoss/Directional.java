@@ -14,14 +14,14 @@ import hypatia.Orientational;
 /**
  * @version 2017/08/20 18:46:21
  */
-public interface Directional extends Orientational {
+public interface Directional extends Orientational<Direction> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     default boolean isPositive() {
-        return direction() == Direction.BUY;
+        return orientation() == Direction.BUY;
     }
 
     /**
@@ -30,13 +30,6 @@ public interface Directional extends Orientational {
      * @return
      */
     default Direction inverse() {
-        return direction() == Direction.BUY ? Direction.SELL : Direction.BUY;
+        return orientation() == Direction.BUY ? Direction.SELL : Direction.BUY;
     }
-
-    /**
-     * Get {@link Direction}.
-     * 
-     * @return
-     */
-    Direction direction();
 }

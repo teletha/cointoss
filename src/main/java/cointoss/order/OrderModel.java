@@ -37,7 +37,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      */
     @Icy.Property
     @Override
-    public abstract Direction direction();
+    public abstract Direction orientation();
 
     /**
      * Specify direction by {@link Directional}.
@@ -45,9 +45,9 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      * @param direction A directional data.
      * @return
      */
-    @Icy.Overload("direction")
-    private Direction direction(Directional direction) {
-        return direction.direction();
+    @Icy.Overload("orientation")
+    private Direction orientation(Directional direction) {
+        return direction.orientation();
     }
 
     /**
@@ -56,7 +56,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      * @param direction A direction literal.
      * @return A parsed direction.
      */
-    @Icy.Overload("direction")
+    @Icy.Overload("orientation")
     private Direction direction(String direction) {
         return Direction.parse(direction);
     }
@@ -469,7 +469,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(type().isMaker() ? direction().mark() : direction().mark().toLowerCase());
+        builder.append(type().isMaker() ? orientation().mark() : orientation().mark().toLowerCase());
         builder.append(executedSize()).append("/").append(size()).append("@").append(price());
         builder.append("\t").append(state());
         if (terminationTime() == null) {

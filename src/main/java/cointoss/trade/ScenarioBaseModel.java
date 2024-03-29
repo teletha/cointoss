@@ -39,7 +39,7 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
      * {@inheritDoc}
      */
     @Override
-    public Direction direction() {
+    public Direction orientation() {
         throw new Error("This method never will be called! Fix bug!");
     }
 
@@ -146,7 +146,7 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
      */
     @Override
     public final Num unrealizedProfit(Num currentPrice) {
-        return currentPrice.diff(direction(), entryPrice()).multiply(entryExecutedSize().minus(exitExecutedSize())).minus(commission());
+        return currentPrice.diff(orientation(), entryPrice()).multiply(entryExecutedSize().minus(exitExecutedSize())).minus(commission());
     }
 
     /**

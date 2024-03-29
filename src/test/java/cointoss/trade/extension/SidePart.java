@@ -32,7 +32,7 @@ public class SidePart implements Directional, TradePart {
      * {@inheritDoc}
      */
     @Override
-    public Direction direction() {
+    public Direction orientation() {
         return side;
     }
 

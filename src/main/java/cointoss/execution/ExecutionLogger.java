@@ -49,7 +49,7 @@ public class ExecutionLogger {
         String price = encodePrice(execution, previous);
         String size = encodeSize(execution, previous);
         String delay = encodeInt(execution.delay + 3);
-        String side = execution.direction.mark();
+        String side = execution.orientation.mark();
 
         return new String[] {id, time, price, side + delay + size};
     }

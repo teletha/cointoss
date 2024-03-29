@@ -61,7 +61,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
         assert e.id == 1828074164;
-        assert e.direction == Direction.BUY;
+        assert e.orientation == Direction.BUY;
         assert e.price.is(999224);
         assert e.size.is(0.1);
         assert e.date.isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
@@ -69,7 +69,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
 
         e = list.get(1);
         assert e.id == 1828074165;
-        assert e.direction == Direction.BUY;
+        assert e.orientation == Direction.BUY;
         assert e.price.is(999231);
         assert e.size.is(0.01);
         assert e.date.isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
@@ -97,7 +97,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
 
         Execution e = service.executionLatest().waitForTerminate().to().exact();
         assert e.id == 1828011727;
-        assert e.direction == Direction.BUY;
+        assert e.orientation == Direction.BUY;
         assert e.price.is(999262);
         assert e.size.is(0.03954578);
         assert e.date.isEqual(Chrono.utc(2020, 7, 13, 6, 24, 54, 157));
@@ -122,7 +122,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
 
         Execution exe = list.get(0);
         assert exe.id == 1826991347L;
-        assert exe.direction == Direction.BUY;
+        assert exe.orientation == Direction.BUY;
         assert exe.price.is(999469.0);
         assert exe.size.is(0.01);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 307));
@@ -130,7 +130,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
 
         exe = list.get(1);
         assert exe.id == 1826991348L;
-        assert exe.direction == Direction.SELL;
+        assert exe.orientation == Direction.SELL;
         assert exe.price.is(999467.0);
         assert exe.size.is(0.1);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 324));

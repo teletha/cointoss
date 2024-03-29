@@ -204,7 +204,7 @@ public class BitfinexService extends MarketService {
                     Num basePrice = e.get(Num.class, "6");
                     Num liquidatedPrice = e.get(Num.class, "11");
                     return Liquidation.with.date(Chrono.utcByMills(e.get(long.class, "2")))
-                            .direction(basePrice.isLessThan(liquidatedPrice) ? Direction.BUY : Direction.SELL)
+                            .orientation(basePrice.isLessThan(liquidatedPrice) ? Direction.BUY : Direction.SELL)
                             .size(Math.abs(e.get(double.class, "5")))
                             .price(liquidatedPrice);
                 });

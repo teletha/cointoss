@@ -55,9 +55,9 @@ class CompactLogTest {
 
         List<Execution> compact = I.signal(e1, e2, e3).plug(new CompactLog()).toList();
         assert compact.size() == 3;
-        assert compact.get(0).direction.isPositive();
-        assert compact.get(1).direction.isNegative();
-        assert compact.get(2).direction.isPositive();
+        assert compact.get(0).orientation.isPositive();
+        assert compact.get(1).orientation.isNegative();
+        assert compact.get(2).orientation.isPositive();
     }
 
     @Test

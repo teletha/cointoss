@@ -53,7 +53,7 @@ class OrderStrategy implements Orderable, Takable, Makable, Cancellable {
     @Override
     public Orderable take() {
         actions.add((market, direction, size, previous, orders) -> {
-            List<Order> order = I.list(Order.with.direction(direction, size));
+            List<Order> order = I.list(Order.with.orientation(direction, size));
             order.forEach(orders::accept);
 
             market.orders.request(order).to(() -> {

@@ -121,7 +121,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             protected void exit() {
             }
         }));
-        market.perform(Execution.with.direction(e.direction, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
+        market.perform(Execution.with.direction(e.orientation, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();
     }
 
@@ -175,7 +175,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             }
         }));
 
-        market.perform(Execution.with.direction(e.direction, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
+        market.perform(Execution.with.direction(e.orientation, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();
         market.perform(Execution.with.direction(e.inverse(), partialExitSize).price(exit.price.minus(e.inverse(), 1)).date(exit.date));
         awaitOrderBufferingTime();
@@ -248,7 +248,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     private void executeExit(Num size, Num price) {
         Scenario s = last();
 
-        market.perform(Execution.with.direction(s.direction(), size).price(price.minus(s.inverse(), 1)).date(market.service.now()));
+        market.perform(Execution.with.direction(s.orientation(), size).price(price.minus(s.inverse(), 1)).date(market.service.now()));
     }
 
     /**

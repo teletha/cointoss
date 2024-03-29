@@ -112,7 +112,7 @@ public final class OrderManager {
      */
     private void add(Order order) {
         // calculate position
-        calculateCompoundPosition(order.direction, Num.ZERO, Num.ZERO, order.price, order.executedSize);
+        calculateCompoundPosition(order.orientation, Num.ZERO, Num.ZERO, order.price, order.executedSize);
 
         // store order and fire add event
         add.accept(order);
@@ -137,7 +137,7 @@ public final class OrderManager {
      */
     private void updateFully(Order order, Order updater) {
         // calculate position
-        calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.size);
+        calculateCompoundPosition(order.orientation, order.price, order.executedSize, updater.price, updater.size);
 
         order.setPrice(updater.price);
         order.setExecutedSize(updater.size);
@@ -157,7 +157,7 @@ public final class OrderManager {
      */
     private void updatePartially(Order order, Order updater) {
         // calculate position
-        calculateCompoundPosition(order.direction, order.price, order.executedSize, updater.price, updater.executedSize);
+        calculateCompoundPosition(order.orientation, order.price, order.executedSize, updater.price, updater.executedSize);
 
         Num newExecutedSize = order.executedSize.plus(updater.size);
         Num newAveragePrice = order.price.multiply(order.executedSize)
@@ -492,7 +492,7 @@ public final class OrderManager {
          * @return The updater.
          */
         public static Order create(String id, Direction side, Num size, Num price) {
-            return Order.with.direction(side, size).price(price).id(id);
+            return Order.with.orientation(side, size).price(price).id(id);
         }
 
         /**

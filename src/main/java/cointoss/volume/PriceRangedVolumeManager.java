@@ -49,7 +49,7 @@ public class PriceRangedVolumeManager {
             seller = new PriceRangedVolumePeriod(e.price.floatValue());
         }
 
-        if (e.direction == Direction.BUY) {
+        if (e.orientation == Direction.BUY) {
             buyer.update(e.price, e.size.floatValue());
         } else {
             seller.update(e.price, e.size.floatValue());

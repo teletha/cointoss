@@ -115,7 +115,7 @@ class FastLogTest {
     }
 
     private boolean equals(Execution one, Execution other) {
-        assert one.direction == other.direction;
+        assert one.orientation == other.orientation;
         assert one.size.equals(other.size);
         assert one.price.equals((other.price));
         assert one.date.equals(other.date);

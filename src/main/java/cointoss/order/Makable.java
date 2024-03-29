@@ -72,7 +72,7 @@ public interface Makable {
      */
     default Cancellable make(WiseTriFunction<Market, Direction, Num, Num> price) {
         return makeOrder((makert, direction, size) -> I
-                .list(Order.with.direction(direction, size).price(price.apply(makert, direction, size))));
+                .list(Order.with.orientation(direction, size).price(price.apply(makert, direction, size))));
     }
 
     /**
@@ -143,7 +143,7 @@ public interface Makable {
             List<Order> orders = new ArrayList();
             Num diff = start.minus(end).divide(Math.max(1, division.size - 1)).scale(scale);
             for (int i = 0; i < division.size; i++) {
-                orders.add(Order.with.direction(direction, size.multiply(division.weights[i]))
+                orders.add(Order.with.orientation(direction, size.multiply(division.weights[i]))
                         .price(start.minus(diff.multiply(i)).scale(scale)));
             }
             return orders;

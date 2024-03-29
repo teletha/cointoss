@@ -49,7 +49,7 @@ public class LiquidationEater extends Trader {
     protected void declareStrategy(Market market, Funds fund) {
         market.timeline.to(exe -> {
             if (exe.delay == Execution.DelayHuge) {
-                if (exe.direction == Direction.BUY) {
+                if (exe.orientation == Direction.BUY) {
                     startBuy = exe.mills;
                     volumeBuy = volumeBuy.plus(exe.size);
                 } else {

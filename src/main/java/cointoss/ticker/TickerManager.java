@@ -120,7 +120,7 @@ public final class TickerManager implements Disposable {
         }
 
         // update total related values
-        if (e.direction == Direction.BUY) {
+        if (e.orientation == Direction.BUY) {
             longVolume += e.size.doubleValue();
             if (e.delay == Execution.DelayHuge) {
                 shortLosscutVolume += e.size.doubleValue();

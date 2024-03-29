@@ -345,7 +345,7 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public Signal<Order> orders() {
         return I.signal(orderActive).map(o -> {
-            Order order = Order.with.direction(o.direction, o.size)
+            Order order = Order.with.orientation(o.direction, o.size)
                     .price(o.price)
                     .quantityCondition(o.condition)
                     .executedSize(o.executedSize)
@@ -362,7 +362,7 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public Signal<Order> orders(OrderState state) {
         return I.signal(orderActive).take(o -> o.state == state).map(o -> {
-            Order order = Order.with.direction(o.direction, o.size)
+            Order order = Order.with.orientation(o.direction, o.size)
                     .price(o.price)
                     .quantityCondition(o.condition)
                     .executedSize(o.executedSize)
@@ -510,7 +510,7 @@ public class VerifiableMarketService extends MarketService {
                     tasks.poll().run();
                 }
 
-                executor.accept(Execution.with.direction(e.direction, executedSize)
+                executor.accept(Execution.with.direction(e.orientation, executedSize)
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date)
                         .id(e.id)
@@ -518,7 +518,7 @@ public class VerifiableMarketService extends MarketService {
                         .delay(e.delay));
 
                 if (executedSize.isNot(e.size)) {
-                    emulate(Execution.with.direction(e.direction, e.size.minus(executedSize))
+                    emulate(Execution.with.direction(e.orientation, e.size.minus(executedSize))
                             .price(e.price)
                             .date(e.date)
                             .id(e.id)
@@ -651,7 +651,7 @@ public class VerifiableMarketService extends MarketService {
          */
         private BackendOrder(Order o) {
             this.front = o;
-            this.direction = o.direction;
+            this.direction = o.orientation;
             this.size = o.size;
             this.executedSize = o.executedSize;
             this.price = o.price;
@@ -665,7 +665,7 @@ public class VerifiableMarketService extends MarketService {
          * {@inheritDoc}
          */
         @Override
-        public Direction direction() {
+        public Direction orientation() {
             return direction;
         }
 

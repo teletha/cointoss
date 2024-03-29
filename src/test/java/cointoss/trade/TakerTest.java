@@ -36,7 +36,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 1).price(10));
 
         Scenario s = last();
-        assert s.direction() == side.direction();
+        assert s.orientation() == side.orientation();
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(1);
         assert s.entryPrice.is(10);
@@ -60,7 +60,7 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side.inverse(), 1).price(10));
 
         Scenario s = last();
-        assert s.direction() == side.direction();
+        assert s.orientation() == side.orientation();
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(1);
         assert s.entryPrice.is(10);

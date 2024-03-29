@@ -34,14 +34,6 @@ public enum Direction implements Directional {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Direction direction() {
-        return this;
-    }
-
-    /**
      * @param position
      * @return
      */

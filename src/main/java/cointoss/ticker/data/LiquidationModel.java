@@ -29,7 +29,7 @@ interface LiquidationModel extends Timelinable, Directional {
 
     @Override
     @Icy.Property
-    Direction direction();
+    Direction orientation();
 
     @Icy.Property
     double size();

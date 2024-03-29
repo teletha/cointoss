@@ -109,7 +109,7 @@ public class Execution extends ExecutionModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle directionUpdater = updater("direction");
+    private static final MethodHandle orientationUpdater = updater("orientation");
 
     /** The final property updater. */
     private static final MethodHandle sizeUpdater = updater("size");
@@ -139,7 +139,7 @@ public class Execution extends ExecutionModel {
     private static final MethodHandle infoUpdater = updater("info");
 
     /** The exposed property. */
-    public final Direction direction;
+    public final Direction orientation;
 
     /** The exposed property. */
     public final Num size;
@@ -172,7 +172,7 @@ public class Execution extends ExecutionModel {
      * HIDE CONSTRUCTOR
      */
     protected Execution() {
-        this.direction = null;
+        this.orientation = null;
         this.size = null;
         this.id = super.id();
         this.price = super.price();
@@ -190,31 +190,31 @@ public class Execution extends ExecutionModel {
      *  @return
      */
     @Override
-    public final Direction direction() {
-        return this.direction;
+    public final Direction orientation() {
+        return this.orientation;
     }
 
     /**
      * Provide classic getter API.
      *
-     * @return A value of direction property.
+     * @return A value of orientation property.
      */
     @SuppressWarnings("unused")
-    private final Direction getDirection() {
-        return this.direction;
+    private final Direction getOrientation() {
+        return this.orientation;
     }
 
     /**
      * Provide classic setter API.
      *
-     * @paran value A new value of direction property to assign.
+     * @paran value A new value of orientation property to assign.
      */
-    private final void setDirection(Direction value) {
+    private final void setOrientation(Direction value) {
         if (value == null) {
-            throw new IllegalArgumentException("The direction property requires non-null value.");
+            throw new IllegalArgumentException("The orientation property requires non-null value.");
         }
         try {
-            directionUpdater.invoke(this, value);
+            orientationUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -608,7 +608,7 @@ public class Execution extends ExecutionModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(direction, size, id, price, accumulative, date, mills, consecutive, delay, info);
+        return Objects.hash(orientation, size, id, price, accumulative, date, mills, consecutive, delay, info);
     }
 
     /**
@@ -623,7 +623,7 @@ public class Execution extends ExecutionModel {
         }
 
         Execution other = (Execution) o;
-        if (!Objects.equals(direction, other.direction)) return false;
+        if (!Objects.equals(orientation, other.orientation)) return false;
         if (!Objects.equals(size, other.size)) return false;
         if (id != other.id) return false;
         if (!Objects.equals(price, other.price)) return false;
@@ -646,7 +646,7 @@ public class Execution extends ExecutionModel {
         if (this.size == value) {
             return this;
         }
-        return with.direction(this.direction, value).id(this.id).price(this.price).accumulative(this.accumulative).date(this.date).mills(this.mills).consecutive(this.consecutive).delay(this.delay).info(this.info);
+        return with.orientation(this.orientation, value).id(this.id).price(this.price).accumulative(this.accumulative).date(this.date).mills(this.mills).consecutive(this.consecutive).delay(this.delay).info(this.info);
     }
 
     /** The singleton builder. */
@@ -658,67 +658,67 @@ public class Execution extends ExecutionModel {
     public static class Ìnstantiator<Self extends Execution & ÅssignableÅrbitrary<Self>> {
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public Self direction(Direction direction, Num size) {
+        public Self orientation(Direction orientation, Num size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             o.size(size);
             return (Self)o;
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public Self direction(Direction direction, int size) {
+        public Self orientation(Direction orientation, int size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             o.size(size);
             return (Self)o;
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public Self direction(Direction direction, float size) {
+        public Self orientation(Direction orientation, float size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             o.size(size);
             return (Self)o;
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public Self direction(Direction direction, long size) {
+        public Self orientation(Direction orientation, long size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             o.size(size);
             return (Self)o;
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public Self direction(Direction direction, double size) {
+        public Self orientation(Direction orientation, double size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             o.size(size);
             return (Self)o;
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -730,7 +730,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -742,7 +742,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -754,7 +754,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -766,7 +766,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -778,7 +778,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -790,7 +790,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -802,7 +802,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -814,7 +814,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -826,7 +826,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -838,7 +838,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -850,7 +850,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -862,7 +862,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -874,7 +874,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -886,7 +886,7 @@ public class Execution extends ExecutionModel {
         }
 
         /**
-         * Create new {@link Execution} with the specified direction property.
+         * Create new {@link Execution} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -901,45 +901,45 @@ public class Execution extends ExecutionModel {
     /**
      * Property assignment API.
      */
-    public static interface ÅssignableDirection<Next> {
+    public static interface ÅssignableOrientation<Next> {
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next direction(Direction value) {
-            ((Execution) this).setDirection(value);
+        default Next orientation(Direction value) {
+            ((Execution) this).setOrientation(value);
             return (Next) this;
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next buy() {
-            return direction(Direction.BUY);
+            return orientation(Direction.BUY);
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next sell() {
-            return direction(Direction.SELL);
+            return orientation(Direction.SELL);
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next direction(Directional direction) {
             try {
-                return direction((Direction) direction$268375447.invoke(this, direction));
+                return orientation((Direction) direction$268375447.invoke(this, direction));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1192,7 +1192,7 @@ public class Execution extends ExecutionModel {
     /**
      * Internal aggregated API.
      */
-    protected static interface ÅssignableAll extends ÅssignableDirection, ÅssignableSize {
+    protected static interface ÅssignableAll extends ÅssignableOrientation, ÅssignableSize {
     }
 
     /**
@@ -1205,7 +1205,7 @@ public class Execution extends ExecutionModel {
      * The identifier for properties.
      */
     static final class My {
-        static final String Direction = "direction";
+        static final String Orientation = "orientation";
         static final String Size = "size";
         static final String Id = "id";
         static final String Price = "price";

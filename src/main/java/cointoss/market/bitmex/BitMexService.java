@@ -227,7 +227,7 @@ public class BitMexService extends MarketService {
                     Num price = e.get(Num.class, "price");
 
                     return Liquidation.with.date(Chrono.utcNow())
-                            .direction(e.get(Direction.class, "side").inverse())
+                            .orientation(e.get(Direction.class, "side").inverse())
                             .size(price.divide(size).scale(setting.target.scale).doubleValue())
                             .price(price);
                 });

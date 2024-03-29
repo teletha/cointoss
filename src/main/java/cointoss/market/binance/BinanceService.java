@@ -228,7 +228,7 @@ public class BinanceService extends MarketService {
                 .flatIterable(e -> e.find("*"))
                 .map(e -> {
                     return Liquidation.with.date(Chrono.utcByMills(e.get(long.class, "time")))
-                            .direction(e.get(Direction.class, "side").inverse())
+                            .orientation(e.get(Direction.class, "side").inverse())
                             .size(e.get(double.class, "executedQty"))
                             .price(e.get(Num.class, "averagePrice"));
                 });
@@ -246,7 +246,7 @@ public class BinanceService extends MarketService {
         return clientRealtimely().subscribe(new Topic("forceOrder", marketName)).map(e -> {
             JSON json = e.get("data").get("o");
             return Liquidation.with.date(Chrono.utcByMills(json.get(long.class, "T")))
-                    .direction(json.get(Direction.class, "S").inverse())
+                    .orientation(json.get(Direction.class, "S").inverse())
                     .size(json.get(double.class, "q"))
                     .price(json.get(Num.class, "ap"));
         });

@@ -50,7 +50,7 @@ public class Position extends PositionModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle directionUpdater = updater("direction");
+    private static final MethodHandle orientationUpdater = updater("orientation");
 
     /** The final property updater. */
     private static final MethodHandle priceUpdater = updater("price");
@@ -62,7 +62,7 @@ public class Position extends PositionModel {
     private static final MethodHandle dateUpdater = updater("date");
 
     /** The exposed property. */
-    public final Direction direction;
+    public final Direction orientation;
 
     /** The exposed property. */
     public final Num price;
@@ -77,43 +77,43 @@ public class Position extends PositionModel {
      * HIDE CONSTRUCTOR
      */
     protected Position() {
-        this.direction = null;
+        this.orientation = null;
         this.price = null;
         this.size = null;
         this.date = null;
     }
 
     /**
-     * Return the direction property.
+     * Return the orientation property.
      *
-     * @return A value of direction property.
+     * @return A value of orientation property.
      */
     @Override
-    public final Direction direction() {
-        return this.direction;
+    public final Direction orientation() {
+        return this.orientation;
     }
 
     /**
      * Provide classic getter API.
      *
-     * @return A value of direction property.
+     * @return A value of orientation property.
      */
     @SuppressWarnings("unused")
-    private final Direction getDirection() {
-        return this.direction;
+    private final Direction getOrientation() {
+        return this.orientation;
     }
 
     /**
      * Provide classic setter API.
      *
-     * @paran value A new value of direction property to assign.
+     * @paran value A new value of orientation property to assign.
      */
-    private final void setDirection(Direction value) {
+    private final void setOrientation(Direction value) {
         if (value == null) {
-            throw new IllegalArgumentException("The direction property requires non-null value.");
+            throw new IllegalArgumentException("The orientation property requires non-null value.");
         }
         try {
-            directionUpdater.invoke(this, value);
+            orientationUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -283,7 +283,7 @@ public class Position extends PositionModel {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("Position [");
-        builder.append("direction=").append(direction).append(", ");
+        builder.append("orientation=").append(orientation).append(", ");
         builder.append("price=").append(price).append(", ");
         builder.append("size=").append(size).append(", ");
         builder.append("date=").append(date).append("]");
@@ -297,7 +297,7 @@ public class Position extends PositionModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(direction, price, size, date);
+        return Objects.hash(orientation, price, size, date);
     }
 
     /**
@@ -312,7 +312,7 @@ public class Position extends PositionModel {
         }
 
         Position other = (Position) o;
-        if (!Objects.equals(direction, other.direction)) return false;
+        if (!Objects.equals(orientation, other.orientation)) return false;
         if (!Objects.equals(price, other.price)) return false;
         if (!Objects.equals(size, other.size)) return false;
         if (!Objects.equals(date, other.date)) return false;
@@ -328,18 +328,18 @@ public class Position extends PositionModel {
     public static class Ìnstantiator<Self extends Position & ÅssignableÅrbitrary<Self>> {
 
         /**
-         * Create new {@link Position} with the specified direction property.
+         * Create new {@link Position} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public ÅssignablePrice<ÅssignableSize<ÅssignableDate<Self>>> direction(Direction direction) {
+        public ÅssignablePrice<ÅssignableSize<ÅssignableDate<Self>>> orientation(Direction orientation) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             return o;
         }
 
         /**
-         * Create new {@link Position} with the specified direction property.
+         * Create new {@link Position} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -350,7 +350,7 @@ public class Position extends PositionModel {
         }
 
         /**
-         * Create new {@link Position} with the specified direction property.
+         * Create new {@link Position} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -364,35 +364,35 @@ public class Position extends PositionModel {
     /**
      * Property assignment API.
      */
-    public static interface ÅssignableDirection<Next> {
+    public static interface ÅssignableOrientation<Next> {
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next direction(Direction value) {
-            ((Position) this).setDirection(value);
+        default Next orientation(Direction value) {
+            ((Position) this).setOrientation(value);
             return (Next) this;
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next buy() {
-            return direction(Direction.BUY);
+            return orientation(Direction.BUY);
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next sell() {
-            return direction(Direction.SELL);
+            return orientation(Direction.SELL);
         }
     }
 
@@ -456,7 +456,7 @@ public class Position extends PositionModel {
     /**
      * Internal aggregated API.
      */
-    protected static interface ÅssignableAll extends ÅssignableDirection, ÅssignablePrice, ÅssignableSize, ÅssignableDate {
+    protected static interface ÅssignableAll extends ÅssignableOrientation, ÅssignablePrice, ÅssignableSize, ÅssignableDate {
     }
 
     /**
@@ -469,7 +469,7 @@ public class Position extends PositionModel {
      * The identifier for properties.
      */
     static final class My {
-        static final String Direction = "direction";
+        static final String Orientation = "orientation";
         static final String Price = "price";
         static final String Size = "size";
         static final String Date = "date";

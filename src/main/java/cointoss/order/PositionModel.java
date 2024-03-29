@@ -21,7 +21,7 @@ abstract class PositionModel implements Directional {
 
     @Icy.Property
     @Override
-    public abstract Direction direction();
+    public abstract Direction orientation();
 
     @Icy.Property(mutable = true)
     public abstract Num price();

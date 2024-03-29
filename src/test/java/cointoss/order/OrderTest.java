@@ -71,23 +71,23 @@ public class OrderTest {
 
     @Test
     void limit() {
-        Order order = Order.with.direction(Direction.BUY, 1).price(20);
-        assert order.direction == Direction.BUY;
+        Order order = Order.with.orientation(Direction.BUY, 1).price(20);
+        assert order.orientation == Direction.BUY;
         assert order.size.is(1);
         assert order.price.is(20);
     }
 
     @Test
     void market() {
-        Order order = Order.with.direction(Direction.BUY, 1);
-        assert order.direction == Direction.BUY;
+        Order order = Order.with.orientation(Direction.BUY, 1);
+        assert order.orientation == Direction.BUY;
         assert order.size.is(1);
         assert order.price.is(0);
     }
 
     @Test
     void observeTerminatingByCompleted() {
-        Order order = Order.with.direction(Direction.BUY, 1);
+        Order order = Order.with.orientation(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
         order.setState(OrderState.ACTIVE);
@@ -111,7 +111,7 @@ public class OrderTest {
 
     @Test
     void observeTerminatingByCanceld() {
-        Order order = Order.with.direction(Direction.BUY, 1);
+        Order order = Order.with.orientation(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
         order.setState(OrderState.ACTIVE);
@@ -135,12 +135,12 @@ public class OrderTest {
 
     @Test
     void direction() {
-        assert Order.with.buy(1).direction.isPositive();
-        assert Order.with.sell(1).direction.isNegative();
-        assert Order.with.direction(Direction.BUY, 1).direction.isPositive();
-        assert Order.with.direction(Direction.SELL, 1).direction.isNegative();
+        assert Order.with.buy(1).orientation.isPositive();
+        assert Order.with.sell(1).orientation.isNegative();
+        assert Order.with.orientation(Direction.BUY, 1).orientation.isPositive();
+        assert Order.with.orientation(Direction.SELL, 1).orientation.isNegative();
 
-        assertThrows(IllegalArgumentException.class, () -> Order.with.direction((Direction) null, 1));
+        assertThrows(IllegalArgumentException.class, () -> Order.with.orientation((Direction) null, 1));
     }
 
     @Test

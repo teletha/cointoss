@@ -52,7 +52,7 @@ public class Liquidation implements LiquidationModel {
     private static final MethodHandle dateUpdater = updater("date");
 
     /** The final property updater. */
-    private static final MethodHandle directionUpdater = updater("direction");
+    private static final MethodHandle orientationUpdater = updater("orientation");
 
     /** The final property updater. */
     private static final MethodHandle sizeUpdater = updater("size");
@@ -64,7 +64,7 @@ public class Liquidation implements LiquidationModel {
     public final ZonedDateTime date;
 
     /** The exposed property. */
-    public final Direction direction;
+    public final Direction orientation;
 
     /** The exposed property. */
     public final double size;
@@ -77,7 +77,7 @@ public class Liquidation implements LiquidationModel {
      */
     protected Liquidation() {
         this.date = null;
-        this.direction = null;
+        this.orientation = null;
         this.size = 0D;
         this.price = null;
     }
@@ -116,36 +116,36 @@ public class Liquidation implements LiquidationModel {
     }
 
     /**
-     * Return the direction property.
+     * Return the orientation property.
      *
-     * @return A value of direction property.
+     * @return A value of orientation property.
      */
     @Override
-    public final Direction direction() {
-        return this.direction;
+    public final Direction orientation() {
+        return this.orientation;
     }
 
     /**
      * Provide classic getter API.
      *
-     * @return A value of direction property.
+     * @return A value of orientation property.
      */
     @SuppressWarnings("unused")
-    private final Direction getDirection() {
-        return this.direction;
+    private final Direction getOrientation() {
+        return this.orientation;
     }
 
     /**
      * Provide classic setter API.
      *
-     * @paran value A new value of direction property to assign.
+     * @paran value A new value of orientation property to assign.
      */
-    private final void setDirection(Direction value) {
+    private final void setOrientation(Direction value) {
         if (value == null) {
-            throw new IllegalArgumentException("The direction property requires non-null value.");
+            throw new IllegalArgumentException("The orientation property requires non-null value.");
         }
         try {
-            directionUpdater.invoke(this, value);
+            orientationUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -232,7 +232,7 @@ public class Liquidation implements LiquidationModel {
     public String toString() {
         StringBuilder builder = new StringBuilder("Liquidation [");
         builder.append("date=").append(date).append(", ");
-        builder.append("direction=").append(direction).append(", ");
+        builder.append("orientation=").append(orientation).append(", ");
         builder.append("size=").append(size).append(", ");
         builder.append("price=").append(price).append("]");
         return builder.toString();
@@ -245,7 +245,7 @@ public class Liquidation implements LiquidationModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(date, direction, size, price);
+        return Objects.hash(date, orientation, size, price);
     }
 
     /**
@@ -261,7 +261,7 @@ public class Liquidation implements LiquidationModel {
 
         Liquidation other = (Liquidation) o;
         if (!Objects.equals(date, other.date)) return false;
-        if (!Objects.equals(direction, other.direction)) return false;
+        if (!Objects.equals(orientation, other.orientation)) return false;
         if (size != other.size) return false;
         if (!Objects.equals(price, other.price)) return false;
         return true;
@@ -280,7 +280,7 @@ public class Liquidation implements LiquidationModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableDirection<ÅssignableSize<ÅssignablePrice<Self>>> date(ZonedDateTime date) {
+        public ÅssignableOrientation<ÅssignableSize<ÅssignablePrice<Self>>> date(ZonedDateTime date) {
             Åssignable o = new Åssignable();
             o.date(date);
             return o;
@@ -307,35 +307,35 @@ public class Liquidation implements LiquidationModel {
     /**
      * Property assignment API.
      */
-    public static interface ÅssignableDirection<Next> {
+    public static interface ÅssignableOrientation<Next> {
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next direction(Direction value) {
-            ((Liquidation) this).setDirection(value);
+        default Next orientation(Direction value) {
+            ((Liquidation) this).setOrientation(value);
             return (Next) this;
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next buy() {
-            return direction(Direction.BUY);
+            return orientation(Direction.BUY);
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next sell() {
-            return direction(Direction.SELL);
+            return orientation(Direction.SELL);
         }
     }
 
@@ -382,7 +382,7 @@ public class Liquidation implements LiquidationModel {
     /**
      * Internal aggregated API.
      */
-    protected static interface ÅssignableAll extends ÅssignableDate, ÅssignableDirection, ÅssignableSize, ÅssignablePrice {
+    protected static interface ÅssignableAll extends ÅssignableDate, ÅssignableOrientation, ÅssignableSize, ÅssignablePrice {
     }
 
     /**
@@ -396,7 +396,7 @@ public class Liquidation implements LiquidationModel {
      */
     static final class My {
         static final String Date = "date";
-        static final String Direction = "direction";
+        static final String Orientation = "orientation";
         static final String Size = "size";
         static final String Price = "price";
     }

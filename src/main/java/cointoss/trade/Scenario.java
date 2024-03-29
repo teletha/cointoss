@@ -253,7 +253,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             Num deltaSize = v.minus(entryExecutedSize);
 
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize, Order::executedSize, this::setEntryCommission);
-            trader.updateSnapshot(direction(), Num.ZERO, deltaSize, order.price);
+            trader.updateSnapshot(orientation(), Num.ZERO, deltaSize, order.price);
 
             logEntry("Update entry ");
         });
@@ -343,7 +343,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             Num deltaSize = v.minus(exitExecutedSize);
 
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize, Order::executedSize, this::setExitCommission);
-            trader.updateSnapshot(direction(), realizedProfit.minus(previous), deltaSize.negate(), null);
+            trader.updateSnapshot(orientation(), realizedProfit.minus(previous), deltaSize.negate(), null);
 
             logExit("Update " + type);
         });
@@ -362,8 +362,8 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * {@inheritDoc}
      */
     @Override
-    public final Direction direction() {
-        return directional.direction();
+    public final Direction orientation() {
+        return directional.orientation();
     }
 
     /**

@@ -54,7 +54,7 @@ public class Order extends OrderModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle direction$268375447= invoker("direction", Directional.class);
+    private static final MethodHandle orientation$268375447= invoker("orientation", Directional.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle direction$927011984= invoker("direction", String.class);
@@ -106,7 +106,7 @@ public class Order extends OrderModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle directionUpdater = updater("direction");
+    private static final MethodHandle orientationUpdater = updater("orientation");
 
     /** The final property updater. */
     private static final MethodHandle sizeUpdater = updater("size");
@@ -139,7 +139,7 @@ public class Order extends OrderModel {
     private static final MethodHandle stateUpdater = updater("state");
 
     /** The exposed property. */
-    public final Direction direction;
+    public final Direction orientation;
 
     /** The exposed property. */
     public final Num size;
@@ -211,7 +211,7 @@ public class Order extends OrderModel {
      * HIDE CONSTRUCTOR
      */
     protected Order() {
-        this.direction = null;
+        this.orientation = null;
         this.size = null;
         this.price = super.price();
         this.type = super.type();
@@ -226,31 +226,31 @@ public class Order extends OrderModel {
 
     /** {@inheritDoc} */
     @Override
-    public final Direction direction() {
-        return this.direction;
+    public final Direction orientation() {
+        return this.orientation;
     }
 
     /**
      * Provide classic getter API.
      *
-     * @return A value of direction property.
+     * @return A value of orientation property.
      */
     @SuppressWarnings("unused")
-    private final Direction getDirection() {
-        return this.direction;
+    private final Direction getOrientation() {
+        return this.orientation;
     }
 
     /**
      * Provide classic setter API.
      *
-     * @paran value A new value of direction property to assign.
+     * @paran value A new value of orientation property to assign.
      */
-    private final void setDirection(Direction value) {
+    private final void setOrientation(Direction value) {
         if (value == null) {
-            throw new IllegalArgumentException("The direction property requires non-null value.");
+            throw new IllegalArgumentException("The orientation property requires non-null value.");
         }
         try {
-            directionUpdater.invoke(this, value);
+            orientationUpdater.invoke(this, value);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -676,43 +676,43 @@ public class Order extends OrderModel {
     public static class Ìnstantiator<Self extends Order & ÅssignableÅrbitrary<Self>> {
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public Self direction(Direction direction, Num size) {
+        public Self orientation(Direction orientation, Num size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             o.size(size);
             return (Self)o;
         }
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public Self direction(Direction direction, long size) {
+        public Self orientation(Direction orientation, long size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             o.size(size);
             return (Self)o;
         }
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
-        public Self direction(Direction direction, double size) {
+        public Self orientation(Direction orientation, double size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(orientation);
             o.size(size);
             return (Self)o;
         }
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -724,7 +724,7 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -736,7 +736,7 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -748,7 +748,7 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -760,7 +760,7 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -772,7 +772,7 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Create new {@link Order} with the specified direction property.
+         * Create new {@link Order} with the specified orientation property.
          * 
          * @return The next assignable model.
          */
@@ -789,9 +789,9 @@ public class Order extends OrderModel {
          *  @param direction A directional data.
          *  @return
          */
-        public Self direction(Directional direction, Num size) {
+        public Self orientation(Directional direction, Num size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(direction);
             o.size(size);
             return (Self)o;
         }
@@ -802,9 +802,9 @@ public class Order extends OrderModel {
          *  @param direction A directional data.
          *  @return
          */
-        public Self direction(Directional direction, long size) {
+        public Self orientation(Directional direction, long size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(direction);
             o.size(size);
             return (Self)o;
         }
@@ -815,9 +815,9 @@ public class Order extends OrderModel {
          *  @param direction A directional data.
          *  @return
          */
-        public Self direction(Directional direction, double size) {
+        public Self orientation(Directional direction, double size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(direction);
             o.size(size);
             return (Self)o;
         }
@@ -865,35 +865,35 @@ public class Order extends OrderModel {
     /**
      * Property assignment API.
      */
-    public static interface ÅssignableDirection<Next> {
+    public static interface ÅssignableOrientation<Next> {
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next direction(Direction value) {
-            ((Order) this).setDirection(value);
+        default Next orientation(Direction value) {
+            ((Order) this).setOrientation(value);
             return (Next) this;
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next buy() {
-            return direction(Direction.BUY);
+            return orientation(Direction.BUY);
         }
 
         /**
-         * Assign direction property.
+         * Assign orientation property.
          * 
          * @return The next assignable model.
          */
         default Next sell() {
-            return direction(Direction.SELL);
+            return orientation(Direction.SELL);
         }
 
         /**
@@ -902,9 +902,9 @@ public class Order extends OrderModel {
          *  @param direction A directional data.
          *  @return
          */
-        default Next direction(Directional direction) {
+        default Next orientation(Directional direction) {
             try {
-                return direction((Direction) direction$268375447.invoke(this, direction));
+                return orientation((Direction) orientation$268375447.invoke(this, direction));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -918,7 +918,7 @@ public class Order extends OrderModel {
          */
         default Next direction(String direction) {
             try {
-                return direction((Direction) direction$927011984.invoke(this, direction));
+                return orientation((Direction) direction$927011984.invoke(this, direction));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1251,7 +1251,7 @@ public class Order extends OrderModel {
     /**
      * Internal aggregated API.
      */
-    protected static interface ÅssignableAll extends ÅssignableDirection, ÅssignableSize {
+    protected static interface ÅssignableAll extends ÅssignableOrientation, ÅssignableSize {
     }
 
     /**
@@ -1264,7 +1264,7 @@ public class Order extends OrderModel {
      * The identifier for properties.
      */
     static final class My {
-        static final String Direction = "direction";
+        static final String Orientation = "orientation";
         static final String Size = "size";
         static final String Price = "price";
         static final String Type = "type";

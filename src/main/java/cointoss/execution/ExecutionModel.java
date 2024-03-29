@@ -52,11 +52,11 @@ abstract class ExecutionModel implements Directional, Timelinable {
      */
     @Override
     @Icy.Property
-    public abstract Direction direction();
+    public abstract Direction orientation();;
 
-    @Icy.Overload("direction")
+    @Icy.Overload("orientation")
     private Direction direction(Directional direction) {
-        return direction.direction();
+        return direction.orientation();
     }
 
     /**
@@ -196,6 +196,7 @@ abstract class ExecutionModel implements Directional, Timelinable {
      * 
      * @return
      */
+    @Override
     @Icy.Property
     public ZonedDateTime date() {
         return Chrono.MIN;
@@ -317,7 +318,7 @@ abstract class ExecutionModel implements Directional, Timelinable {
      */
     @Override
     public String toString() {
-        return id() + " " + date().toLocalDateTime() + " " + direction()
+        return id() + " " + date().toLocalDateTime() + " " + orientation()
                 .mark() + " " + price() + " " + size() + " " + consecutive() + " " + delay();
     }
 }

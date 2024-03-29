@@ -86,12 +86,12 @@ public class VerifiableMarket extends Market {
             perform(e);
 
             for (int i = 1; i < count; i++) {
-                Execution copy = Execution.with.direction(e.direction, e.size)
+                Execution copy = Execution.with.direction(e.orientation, e.size)
                         .price(e.price)
                         .id(e.id ^ (97 + i))
                         .date(service.now())
                         .delay(e.delay)
-                        .consecutive(e.direction.isPositive() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller);
+                        .consecutive(e.orientation.isPositive() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller);
 
                 perform(copy);
             }
@@ -103,9 +103,9 @@ public class VerifiableMarket extends Market {
      */
     public void requestAndExecution(Order order) {
         request(order).to(id -> {
-            Execution e = Execution.with.direction(order.direction, order.size)
+            Execution e = Execution.with.direction(order.orientation, order.size)
                     .date(service.now())
-                    .price(order.price.minus(order.direction, service.setting.base.minimumSize));
+                    .price(order.price.minus(order.orientation, service.setting.base.minimumSize));
 
             perform(e);
         });

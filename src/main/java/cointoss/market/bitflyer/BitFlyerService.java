@@ -147,7 +147,7 @@ public class BitFlyerService extends MarketService {
             request.minute_to_expire = 60 * 24;
             request.price = order.price;
             request.product_code = marketName;
-            request.side = order.direction().name();
+            request.side = order.orientation().name();
             request.size = order.size;
             request.time_in_force = order.quantityCondition.abbreviation;
 
@@ -161,7 +161,7 @@ public class BitFlyerService extends MarketService {
             request.order_ref_id = id;
             request.price = order.price;
             request.product_code = marketName;
-            request.side = order.direction().name();
+            request.side = order.orientation().name();
             request.size = order.size;
             request.time_in_force = order.quantityCondition.abbreviation;
 
@@ -197,7 +197,7 @@ public class BitFlyerService extends MarketService {
                 }
             }
 
-            return Order.with.direction(order.direction, order.size)
+            return Order.with.orientation(order.orientation, order.size)
                     .id(order.id)
                     .state(OrderState.CANCELED)
                     .executedSize(order.executedSize);
@@ -491,7 +491,7 @@ public class BitFlyerService extends MarketService {
     protected Signal<Liquidation> connectLiquidation() {
         return this.executionsRealtimely()
                 .take(e -> e.delay == Execution.DelayHuge)
-                .map(e -> Liquidation.with.date(e.date).direction(e.direction.inverse()).size(e.size.doubleValue()).price(e.price));
+                .map(e -> Liquidation.with.date(e.date).orientation(e.orientation.inverse()).size(e.size.doubleValue()).price(e.price));
     }
 
     /**
@@ -649,7 +649,7 @@ public class BitFlyerService extends MarketService {
         public OrderState child_order_state;
 
         public Order toOrder() {
-            Order o = Order.with.direction(side, size)
+            Order o = Order.with.orientation(side, size)
                     .price(price)
                     .executedSize(executed_size)
                     .state(child_order_state)
