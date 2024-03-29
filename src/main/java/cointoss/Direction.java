@@ -34,6 +34,15 @@ public enum Direction implements Directional {
     }
 
     /**
+     * Utility to inverse {@link Direction}.
+     * 
+     * @return
+     */
+    public Direction inverse() {
+        return this == Direction.BUY ? Direction.SELL : Direction.BUY;
+    }
+
+    /**
      * @param position
      * @return
      */

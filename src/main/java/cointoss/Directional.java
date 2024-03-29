@@ -23,13 +23,4 @@ public interface Directional extends Orientational<Direction> {
     default boolean isPositive() {
         return orientation() == Direction.BUY;
     }
-
-    /**
-     * Utility to inverse {@link Direction}.
-     * 
-     * @return
-     */
-    default Direction inverse() {
-        return orientation() == Direction.BUY ? Direction.SELL : Direction.BUY;
-    }
 }
