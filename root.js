@@ -23,7 +23,6 @@ const root = {
 		"cointoss.trade",
 		"cointoss.trade.bot",
 		"cointoss.util",
-		"cointoss.util.arithmetic",
 		"cointoss.util.feather",
 		"cointoss.verify",
 		"cointoss.volume",
@@ -156,13 +155,6 @@ const root = {
 			"name": "Arbitrager",
 			"packageName": "cointoss.trade.bot",
 			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Arithmetic",
-			"packageName": "cointoss.util.arithmetic",
-			"type": "AbstractClass"
 		},
 		{
 			"modifiers": {
@@ -1042,13 +1034,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Num",
-			"packageName": "cointoss.util.arithmetic",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "NumIndicator",
 			"packageName": "cointoss.ticker",
 			"type": "AbstractClass"
@@ -1401,13 +1386,6 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "PrimitiveStats",
 			"packageName": "cointoss.analyze",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Primitives",
-			"packageName": "cointoss.util.arithmetic",
 			"type": "Class"
 		},
 		{
