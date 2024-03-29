@@ -134,7 +134,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
                 double[] prices = bull ? new double[] {open, lowest, highest, close} : new double[] {open, highest, lowest, close};
 
                 for (int i = 0; i < prices.length; i++) {
-                    observer.accept(Execution.with.direction(sides[i], sizes[i])
+                    observer.accept(Execution.with.orientation(sides[i], sizes[i])
                             .price(prices[i])
                             .id(latestId - 3 + i)
                             .date(Chrono.utcByMills(start + 1000 * i)));

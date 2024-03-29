@@ -15,15 +15,15 @@ import java.util.Deque;
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.order.Order;
 import cointoss.util.ObservableNumProperty;
 import hypatia.Num;
+import hypatia.Orientational;
 import icy.manipulator.Icy;
 import kiss.Managed;
 
 @Icy(setterModifier = "final")
-abstract class ScenarioBaseModel implements Directional, Profitable {
+abstract class ScenarioBaseModel implements Orientational<Direction>, Profitable {
 
     /** The list entry orders. */
     @VisibleForTesting
@@ -34,6 +34,14 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
     @VisibleForTesting
     @Managed
     Deque<Order> exits = new ArrayDeque();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPositive() {
+        return orientation().isPositive();
+    }
 
     /**
      * {@inheritDoc}

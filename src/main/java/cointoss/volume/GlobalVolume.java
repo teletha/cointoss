@@ -13,11 +13,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.ticker.data.Liquidation;
 import hypatia.Num;
+import hypatia.Orientational;
 
 public class GlobalVolume {
 
@@ -53,7 +53,7 @@ public class GlobalVolume {
      * @param side A side of the additional volume.
      * @param volume The volume to add.
      */
-    public final void add(MarketService service, Directional side, Num volume) {
+    public final void add(MarketService service, Orientational side, Num volume) {
         add(service, side, volume.floatValue());
     }
 
@@ -64,7 +64,7 @@ public class GlobalVolume {
      * @param side A side of the additional volume.
      * @param volume The volume to add.
      */
-    public final void add(MarketService service, Directional side, float volume) {
+    public final void add(MarketService service, Orientational side, float volume) {
         float[] volumes = services.computeIfAbsent(service, key -> new float[4]);
 
         if (side.isPositive()) {

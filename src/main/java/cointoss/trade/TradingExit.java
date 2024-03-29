@@ -12,16 +12,17 @@ package cointoss.trade;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import cointoss.Directional;
+import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.Orderable;
 import cointoss.ticker.Span;
 import hypatia.Num;
+import hypatia.Orientational;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
-public interface TradingExit extends Directional {
+public interface TradingExit extends Orientational<Direction> {
 
     /**
      * The current market.

@@ -30,12 +30,12 @@ import java.util.function.Predicate;
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.Market;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
 import cointoss.order.Orderable;
 import hypatia.Num;
+import hypatia.Orientational;
 import kiss.Disposable;
 import kiss.Extensible;
 import kiss.I;
@@ -209,7 +209,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
      * {@inheritDoc}
      */
     @Override
-    public Scenario entry(Directional directional, Num size, Consumer<Orderable> declaration) {
+    public Scenario entry(Orientational directional, Num size, Consumer<Orderable> declaration) {
         Scenario s = new Scenario() {
             @Override
             protected void entry() {

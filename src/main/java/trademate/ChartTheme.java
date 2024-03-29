@@ -14,9 +14,10 @@ import static javafx.scene.paint.Color.*;
 import java.util.List;
 import java.util.function.Consumer;
 
-import cointoss.Directional;
-import hypatia.Num;
 import javafx.scene.paint.Color;
+
+import hypatia.Num;
+import hypatia.Orientational;
 import kiss.Variable;
 import viewtify.preference.Preferences;
 
@@ -107,7 +108,7 @@ public class ChartTheme extends Preferences {
      * @param direction
      * @return
      */
-    public static Variable<Color> colorBy(Directional direction) {
+    public static Variable<Color> colorBy(Orientational direction) {
         ChartTheme theme = Preferences.of(ChartTheme.class);
         return direction.isPositive() ? theme.buy : theme.sell;
     }

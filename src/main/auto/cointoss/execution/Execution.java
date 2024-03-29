@@ -1,9 +1,9 @@
 package cointoss.execution;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.execution.Execution;
 import hypatia.Num;
+import hypatia.Orientational;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Throwable;
@@ -57,7 +57,7 @@ public class Execution extends ExecutionModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle direction$268375447= invoker("direction", Directional.class);
+    private static final MethodHandle direction$1158975041= invoker("direction", Orientational.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle size$101354429= invoker("size", int.class);
@@ -842,7 +842,7 @@ public class Execution extends ExecutionModel {
          * 
          * @return The next assignable model.
          */
-        public Self direction(Directional direction, Num size) {
+        public Self direction(Orientational<Direction> direction, Num size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
@@ -854,7 +854,7 @@ public class Execution extends ExecutionModel {
          * 
          * @return The next assignable model.
          */
-        public Self direction(Directional direction, int size) {
+        public Self direction(Orientational<Direction> direction, int size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
@@ -866,7 +866,7 @@ public class Execution extends ExecutionModel {
          * 
          * @return The next assignable model.
          */
-        public Self direction(Directional direction, float size) {
+        public Self direction(Orientational<Direction> direction, float size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
@@ -878,7 +878,7 @@ public class Execution extends ExecutionModel {
          * 
          * @return The next assignable model.
          */
-        public Self direction(Directional direction, long size) {
+        public Self direction(Orientational<Direction> direction, long size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
@@ -890,7 +890,7 @@ public class Execution extends ExecutionModel {
          * 
          * @return The next assignable model.
          */
-        public Self direction(Directional direction, double size) {
+        public Self direction(Orientational<Direction> direction, double size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
@@ -937,9 +937,9 @@ public class Execution extends ExecutionModel {
          * 
          * @return The next assignable model.
          */
-        default Next direction(Directional direction) {
+        default Next direction(Orientational<Direction> direction) {
             try {
-                return orientation((Direction) direction$268375447.invoke(this, direction));
+                return orientation((Direction) direction$1158975041.invoke(this, direction));
             } catch (Throwable e) {
                 throw quiet(e);
             }

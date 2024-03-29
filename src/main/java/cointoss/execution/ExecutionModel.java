@@ -15,14 +15,14 @@ import java.util.function.DoubleConsumer;
 import java.util.function.LongConsumer;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.util.Chrono;
 import cointoss.util.feather.Timelinable;
 import hypatia.Num;
+import hypatia.Orientational;
 import icy.manipulator.Icy;
 
 @Icy(grouping = 2)
-abstract class ExecutionModel implements Directional, Timelinable {
+abstract class ExecutionModel implements Orientational<Direction>, Timelinable {
 
     /** The internal id counter. */
     private static final AtomicLong counter = new AtomicLong(1);
@@ -46,16 +46,24 @@ abstract class ExecutionModel implements Directional, Timelinable {
     public static final int DelayHuge = -1;
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPositive() {
+        return orientation().isPositive();
+    }
+
+    /**
      * Execution {@link Direction}.
      * 
      * @return
      */
     @Override
     @Icy.Property
-    public abstract Direction orientation();;
+    public abstract Direction orientation();
 
     @Icy.Overload("orientation")
-    private Direction direction(Directional direction) {
+    private Direction direction(Orientational<Direction> direction) {
         return direction.orientation();
     }
 

@@ -12,13 +12,21 @@ package cointoss.ticker.data;
 import java.time.ZonedDateTime;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.util.feather.Timelinable;
 import hypatia.Num;
+import hypatia.Orientational;
 import icy.manipulator.Icy;
 
 @Icy
-interface LiquidationModel extends Timelinable, Directional {
+interface LiquidationModel extends Timelinable, Orientational<Direction> {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default boolean isPositive() {
+        return orientation().isPositive();
+    }
 
     /**
      * {@inheritDoc}

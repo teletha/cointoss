@@ -13,15 +13,13 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.RandomUtils;
 
+import hypatia.Orientational;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.Managed;
 import kiss.Singleton;
 
-/**
- * @version 2017/07/21 19:47:35
- */
-public enum Direction implements Directional {
+public enum Direction implements Orientational<Direction> {
     BUY, SELL;
 
     /**
@@ -40,6 +38,14 @@ public enum Direction implements Directional {
      */
     public Direction inverse() {
         return this == Direction.BUY ? Direction.SELL : Direction.BUY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPositive() {
+        return this == Direction.BUY;
     }
 
     /**

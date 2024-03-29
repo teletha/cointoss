@@ -12,12 +12,20 @@ package cointoss.order;
 import java.time.ZonedDateTime;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import hypatia.Num;
+import hypatia.Orientational;
 import icy.manipulator.Icy;
 
 @Icy
-abstract class PositionModel implements Directional {
+abstract class PositionModel implements Orientational<Direction> {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPositive() {
+        return orientation().isPositive();
+    }
 
     @Icy.Property
     @Override

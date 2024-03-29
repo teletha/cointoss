@@ -1,11 +1,11 @@
 package cointoss.order;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.order.Order;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
 import hypatia.Num;
+import hypatia.Orientational;
 import java.lang.String;
 import java.lang.Throwable;
 import java.lang.UnsupportedOperationException;
@@ -54,10 +54,10 @@ public class Order extends OrderModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle orientation$268375447= invoker("orientation", Directional.class);
+    private static final MethodHandle orientation$1158975041= invoker("orientation", Orientational.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle direction$927011984= invoker("direction", String.class);
+    private static final MethodHandle orientation$927011984= invoker("orientation", String.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle size$1093866057= invoker("size", long.class);
@@ -784,12 +784,12 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Specify direction by {@link Directional}.
+         * Specify direction by {@link Orientational}.
          *  
          *  @param direction A directional data.
          *  @return
          */
-        public Self orientation(Directional direction, Num size) {
+        public Self orientation(Orientational<Direction> direction, Num size) {
             Åssignable o = new Åssignable();
             o.orientation(direction);
             o.size(size);
@@ -797,12 +797,12 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Specify direction by {@link Directional}.
+         * Specify direction by {@link Orientational}.
          *  
          *  @param direction A directional data.
          *  @return
          */
-        public Self orientation(Directional direction, long size) {
+        public Self orientation(Orientational<Direction> direction, long size) {
             Åssignable o = new Åssignable();
             o.orientation(direction);
             o.size(size);
@@ -810,12 +810,12 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Specify direction by {@link Directional}.
+         * Specify direction by {@link Orientational}.
          *  
          *  @param direction A directional data.
          *  @return
          */
-        public Self orientation(Directional direction, double size) {
+        public Self orientation(Orientational<Direction> direction, double size) {
             Åssignable o = new Åssignable();
             o.orientation(direction);
             o.size(size);
@@ -828,9 +828,9 @@ public class Order extends OrderModel {
          *  @param direction A direction literal.
          *  @return A parsed direction.
          */
-        public Self direction(String direction, Num size) {
+        public Self orientation(String direction, Num size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(direction);
             o.size(size);
             return (Self)o;
         }
@@ -841,9 +841,9 @@ public class Order extends OrderModel {
          *  @param direction A direction literal.
          *  @return A parsed direction.
          */
-        public Self direction(String direction, long size) {
+        public Self orientation(String direction, long size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(direction);
             o.size(size);
             return (Self)o;
         }
@@ -854,9 +854,9 @@ public class Order extends OrderModel {
          *  @param direction A direction literal.
          *  @return A parsed direction.
          */
-        public Self direction(String direction, double size) {
+        public Self orientation(String direction, double size) {
             Åssignable o = new Åssignable();
-            o.direction(direction);
+            o.orientation(direction);
             o.size(size);
             return (Self)o;
         }
@@ -897,14 +897,14 @@ public class Order extends OrderModel {
         }
 
         /**
-         * Specify direction by {@link Directional}.
+         * Specify direction by {@link Orientational}.
          *  
          *  @param direction A directional data.
          *  @return
          */
-        default Next orientation(Directional direction) {
+        default Next orientation(Orientational<Direction> direction) {
             try {
-                return orientation((Direction) orientation$268375447.invoke(this, direction));
+                return orientation((Direction) orientation$1158975041.invoke(this, direction));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -916,9 +916,9 @@ public class Order extends OrderModel {
          *  @param direction A direction literal.
          *  @return A parsed direction.
          */
-        default Next direction(String direction) {
+        default Next orientation(String direction) {
             try {
-                return orientation((Direction) direction$927011984.invoke(this, direction));
+                return orientation((Direction) orientation$927011984.invoke(this, direction));
             } catch (Throwable e) {
                 throw quiet(e);
             }

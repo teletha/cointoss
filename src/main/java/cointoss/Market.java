@@ -34,6 +34,7 @@ import cointoss.util.Chrono;
 import cointoss.verify.TrainingMarket;
 import cointoss.volume.PriceRangedVolumeManager;
 import hypatia.Num;
+import hypatia.Orientational;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
@@ -235,7 +236,7 @@ public class Market implements Disposable {
      *         strategies are performed. (Note: not when all orders are completed but when the
      *         strategy is completed)
      */
-    public final Signal<Order> request(Directional directional, double size, Consumer<Orderable> declaration) {
+    public final Signal<Order> request(Orientational directional, double size, Consumer<Orderable> declaration) {
         return request(directional, Num.of(size), declaration);
     }
 
@@ -251,7 +252,7 @@ public class Market implements Disposable {
      *         strategies are performed. (Note: not when all orders are completed but when the
      *         strategy is completed)
      */
-    public final Signal<Order> request(Directional directional, Num size, Consumer<Orderable> declaration) {
+    public final Signal<Order> request(Orientational<Direction> directional, Num size, Consumer<Orderable> declaration) {
         return new Signal<>((observer, disposer) -> {
             OrderStrategy strategy = new OrderStrategy();
             declaration.accept(strategy);

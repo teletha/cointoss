@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.Market;
 import cointoss.order.Makable;
 import cointoss.order.Order;
@@ -30,6 +29,7 @@ import cointoss.order.Takable;
 import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import hypatia.Num;
+import hypatia.Orientational;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -38,10 +38,10 @@ import kiss.Variable;
 /**
  * Declarative entry and exit definition.
  */
-public abstract class Scenario extends ScenarioBase implements Directional, Disposable, TradingEntry, TradingExit {
+public abstract class Scenario extends ScenarioBase implements Orientational<Direction>, Disposable, TradingEntry, TradingExit {
 
     /** The scenario direction. */
-    private Directional directional;
+    private Orientational<Direction> directional;
 
     /** The target market. */
     protected Market market;
@@ -112,6 +112,14 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     @Override
     public Market market() {
         return market;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPositive() {
+        return directional.isPositive();
     }
 
     /**
@@ -222,7 +230,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return A ordering method.
      */
     @Override
-    public final Scenario entry(Directional directional, Num size, Consumer<Orderable> declaration) {
+    public final Scenario entry(Orientational directional, Num size, Consumer<Orderable> declaration) {
         if (size == null || size.isLessThan(market.service.setting.target.minimumSize)) {
             throw new Error("Entry size is less than minimum bid size.");
         }
@@ -297,7 +305,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         if (entryPrice.isLessThan(directional, price)) {
             // profit
             disposer = observeEntryExecutedSizeDiff().debounceAll(1, SECONDS, market.service.scheduler()).map(Num::sum).to(size -> {
-                market.request(directional.inverse(), size, strategy).to(o -> {
+                market.request(directional.orientation().inverse(), size, strategy).to(o -> {
                     processExitOrder(o, "exitAt");
                 });
             });
@@ -306,7 +314,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             disposer = market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(directional, price)).first().to(e -> {
                 disposeEntry();
 
-                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {
+                market.request(directional.orientation().inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {
                     processExitOrder(o, "exitAtStopLoss");
                 });
             });
@@ -321,7 +329,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     public final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
         disposerForExit.add(timing.first().to(() -> {
             if (!isExitTerminated()) {
-                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(e -> {
+                market.request(directional.orientation().inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(e -> {
                     processExitOrder(e, "exitWhen");
                 });
             }

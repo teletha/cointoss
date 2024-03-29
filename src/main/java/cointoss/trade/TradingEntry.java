@@ -11,12 +11,12 @@ package cointoss.trade;
 
 import java.util.function.Consumer;
 
-import cointoss.Directional;
 import cointoss.Market;
 import cointoss.order.Makable;
 import cointoss.order.Orderable;
 import cointoss.order.Takable;
 import hypatia.Num;
+import hypatia.Orientational;
 
 public interface TradingEntry {
 
@@ -35,7 +35,7 @@ public interface TradingEntry {
      * @param size This entry's size.
      * @return Chainable API.
      */
-    default Scenario entry(Directional directional, long size) {
+    default Scenario entry(Orientational directional, long size) {
         return entry(directional, size, Orderable::take);
     }
 
@@ -48,7 +48,7 @@ public interface TradingEntry {
      * @param declaration This entry's order strategy.
      * @return Chainable API.
      */
-    default Scenario entry(Directional directional, long size, Consumer<Orderable> declaration) {
+    default Scenario entry(Orientational directional, long size, Consumer<Orderable> declaration) {
         return entry(directional, Num.of(size), declaration);
     }
 
@@ -60,7 +60,7 @@ public interface TradingEntry {
      * @param size This entry's size.
      * @return Chainable API.
      */
-    default Scenario entry(Directional directional, double size) {
+    default Scenario entry(Orientational directional, double size) {
         return entry(directional, size, Orderable::take);
     }
 
@@ -73,7 +73,7 @@ public interface TradingEntry {
      * @param declaration This entry's order strategy.
      * @return Chainable API.
      */
-    default Scenario entry(Directional directional, double size, Consumer<Orderable> declaration) {
+    default Scenario entry(Orientational directional, double size, Consumer<Orderable> declaration) {
         return entry(directional, Num.of(size), declaration);
     }
 
@@ -85,7 +85,7 @@ public interface TradingEntry {
      * @param size This entry's size.
      * @return Chainable API.
      */
-    default Scenario entry(Directional directional, Num size) {
+    default Scenario entry(Orientational directional, Num size) {
         return entry(directional, size, Orderable::take);
     }
 
@@ -98,5 +98,5 @@ public interface TradingEntry {
      * @param declaration This entry's order strategy.
      * @return Chainable API.
      */
-    Scenario entry(Directional directional, Num size, Consumer<Orderable> declaration);
+    Scenario entry(Orientational directional, Num size, Consumer<Orderable> declaration);
 }

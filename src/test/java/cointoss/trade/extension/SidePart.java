@@ -10,9 +10,9 @@
 package cointoss.trade.extension;
 
 import cointoss.Direction;
-import cointoss.Directional;
+import hypatia.Orientational;
 
-public class SidePart implements Directional, TradePart {
+public class SidePart implements Orientational<Direction>, TradePart {
 
     /** The actual side. */
     public final Direction side;
@@ -26,6 +26,14 @@ public class SidePart implements Directional, TradePart {
     public SidePart(Direction side) {
         this.side = side;
         this.sign = side.isPositive() ? 1 : -1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPositive() {
+        return side.isPositive();
     }
 
     /**

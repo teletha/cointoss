@@ -138,7 +138,7 @@ class CompoundSizeAndPriceTest {
         OrderManager orders = new OrderManager(new VerifiableMarketService());
 
         orders.update(Order.with.orientation(side, size).price(price.entry).id("A").executedSize(size));
-        orders.update(Order.with.orientation(side.inverse(), size.half).price(price.entry).id("B").executedSize(size.half));
+        orders.update(Order.with.orientation(side.orientation().inverse(), size.half).price(price.entry).id("B").executedSize(size.half));
         assert orders.compoundSize.v.is(side.sign * size.half);
         assert orders.compoundPrice.v.is(price.entry);
     }
@@ -148,7 +148,10 @@ class CompoundSizeAndPriceTest {
         OrderManager orders = new OrderManager(new VerifiableMarketService());
 
         orders.update(Order.with.orientation(side, size).price(price.entry).id("A").executedSize(size));
-        orders.update(Order.with.orientation(side.inverse(), size.half).price(price.entry * 2).id("B").executedSize(size.half));
+        orders.update(Order.with.orientation(side.orientation().inverse(), size.half)
+                .price(price.entry * 2)
+                .id("B")
+                .executedSize(size.half));
         assert orders.compoundSize.v.is(side.sign * size.half);
         assert orders.compoundPrice.v.is(price.entry);
     }
@@ -158,7 +161,7 @@ class CompoundSizeAndPriceTest {
         OrderManager orders = new OrderManager(new VerifiableMarketService());
 
         orders.update(Order.with.orientation(side, size).price(price.entry).id("A").executedSize(size));
-        orders.update(Order.with.orientation(side.inverse(), size).price(price.entry).id("B").executedSize(size));
+        orders.update(Order.with.orientation(side.orientation().inverse(), size).price(price.entry).id("B").executedSize(size));
         assert orders.compoundSize.v.is(0);
         assert orders.compoundPrice.v.is(0);
     }
@@ -200,7 +203,7 @@ class CompoundSizeAndPriceTest {
         assert orders.compoundSize.v.is(side.sign * 1);
         assert orders.compoundPrice.v.is(10);
 
-        orders.update(Order.with.orientation(side.inverse(), 1).price(20).id("B").executedSize(1));
+        orders.update(Order.with.orientation(side.orientation().inverse(), 1).price(20).id("B").executedSize(1));
         assert orders.compoundSize.v.is(0);
         assert orders.compoundPrice.v.is(0);
 
@@ -208,11 +211,11 @@ class CompoundSizeAndPriceTest {
         assert orders.compoundSize.v.is(side.sign * 1);
         assert orders.compoundPrice.v.is(10);
 
-        orders.update(Order.with.orientation(side.inverse(), 4).price(20).id("C").executedSize(3));
+        orders.update(Order.with.orientation(side.orientation().inverse(), 4).price(20).id("C").executedSize(3));
         assert orders.compoundSize.v.is(-side.sign * 2);
         assert orders.compoundPrice.v.is(20);
 
-        orders.update(Order.with.orientation(side.inverse(), 4).price(20).id("C").executedSize(4));
+        orders.update(Order.with.orientation(side.orientation().inverse(), 4).price(20).id("C").executedSize(4));
         assert orders.compoundSize.v.is(-side.sign * 3);
         assert orders.compoundPrice.v.is(20);
     }

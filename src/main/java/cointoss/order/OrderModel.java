@@ -17,20 +17,28 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.util.Chrono;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
 import hypatia.Num;
+import hypatia.Orientational;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
 
 @Icy(grouping = 2)
-abstract class OrderModel implements Directional, Comparable<OrderModel> {
+abstract class OrderModel implements Orientational<Direction>, Comparable<OrderModel> {
 
     /** The relation holder. */
     private Map<Class, Object> relations;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPositive() {
+        return orientation().isPositive();
+    }
 
     /**
      * {@inheritDoc}
@@ -40,13 +48,13 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     public abstract Direction orientation();
 
     /**
-     * Specify direction by {@link Directional}.
+     * Specify direction by {@link Orientational}.
      * 
      * @param direction A directional data.
      * @return
      */
     @Icy.Overload("orientation")
-    private Direction orientation(Directional direction) {
+    private Direction orientation(Orientational<Direction> direction) {
         return direction.orientation();
     }
 
@@ -57,7 +65,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      * @return A parsed direction.
      */
     @Icy.Overload("orientation")
-    private Direction direction(String direction) {
+    private Direction orientation(String direction) {
         return Direction.parse(direction);
     }
 

@@ -12,9 +12,9 @@ package cointoss.orderbook;
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.MarketService;
 import hypatia.Num;
+import hypatia.Orientational;
 import kiss.Disposable;
 import kiss.Signal;
 
@@ -71,7 +71,7 @@ public class OrderBookManager implements Disposable {
      * @param side A target direction.
      * @return The associated {@link OrderBook}.
      */
-    public OrderBook by(Directional side) {
+    public OrderBook by(Orientational side) {
         return side.isPositive() ? longs : shorts;
     }
 
@@ -115,7 +115,7 @@ public class OrderBookManager implements Disposable {
      * @param diff
      * @return
      */
-    public Num computeBestPrice(Directional side, Num price, Num threshold, Num diff) {
+    public Num computeBestPrice(Orientational side, Num price, Num threshold, Num diff) {
         if (threshold.isZero()) {
             return price;
         }

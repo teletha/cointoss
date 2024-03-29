@@ -57,7 +57,7 @@ class TakerTest extends TraderTestSupport {
         }));
 
         // trigger taker
-        market.perform(Execution.with.direction(side.inverse(), 1).price(10));
+        market.perform(Execution.with.direction(side.orientation().inverse(), 1).price(10));
 
         Scenario s = last();
         assert s.orientation() == side.orientation();

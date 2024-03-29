@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -35,6 +34,7 @@ import cointoss.util.Chrono;
 import cointoss.util.TimebaseSupport;
 import cointoss.verify.VerifiableMarket;
 import hypatia.Num;
+import hypatia.Orientational;
 import kiss.I;
 import kiss.Signal;
 
@@ -177,7 +177,9 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
         market.perform(Execution.with.direction(e.orientation, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();
-        market.perform(Execution.with.direction(e.inverse(), partialExitSize).price(exit.price.minus(e.inverse(), 1)).date(exit.date));
+        market.perform(Execution.with.direction(e.orientation.inverse(), partialExitSize)
+                .price(exit.price.minus(e.orientation.inverse(), 1))
+                .date(exit.date));
         awaitOrderBufferingTime();
     }
 
@@ -216,7 +218,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     private void executeEntry(Num size, Num price) {
         Scenario s = last();
 
-        market.perform(Execution.with.direction(s.inverse(), size).price(price.minus(s, 1)).date(market.service.now()));
+        market.perform(Execution.with.direction(s.orientation().inverse(), size).price(price.minus(s, 1)).date(market.service.now()));
     }
 
     /**
@@ -248,7 +250,9 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     private void executeExit(Num size, Num price) {
         Scenario s = last();
 
-        market.perform(Execution.with.direction(s.orientation(), size).price(price.minus(s.inverse(), 1)).date(market.service.now()));
+        market.perform(Execution.with.direction(s.orientation(), size)
+                .price(price.minus(s.orientation().inverse(), 1))
+                .date(market.service.now()));
     }
 
     /**
@@ -346,7 +350,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             execute(true, side, size, price.entryN, 0);
             market.elapse(hold.sec);
             exit(o -> o.make(price.exit));
-            execute(true, side.inverse(), size.halfN, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size.halfN, price.exitN, 0);
             break;
 
         case ExitCompletely:
@@ -354,7 +358,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             execute(true, side, size, price.entryN, 0);
             market.elapse(hold.sec);
             exit(o -> o.make(price.exit));
-            execute(true, side.inverse(), size, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size, price.exitN, 0);
             break;
 
         case ExitMultiple:
@@ -362,8 +366,8 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             execute(true, side, size, price.entryN, 0);
             market.elapse(hold.sec);
             exit(o -> o.make(price.exit));
-            execute(true, side.inverse(), size.halfN, price.exitN, 0);
-            execute(true, side.inverse(), size.halfN, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size.halfN, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size.halfN, price.exitN, 0);
             break;
 
         case ExitSeparately:
@@ -371,9 +375,9 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             execute(true, side, size, price.entryN, 0);
             market.elapse(hold.sec);
             exit(o -> o.make(price.exit));
-            execute(true, side.inverse(), size.halfN, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size.halfN, price.exitN, 0);
             market.elapse(30, SECONDS);
-            execute(true, side.inverse(), size.halfN, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size.halfN, price.exitN, 0);
             break;
 
         case ExitCanceled:
@@ -396,7 +400,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             execute(true, side, size, price.entryN, 0);
             market.elapse(hold.sec);
             exit(o -> o.make(price.exit).cancelAfter(0, MINUTES).make(price.exit));
-            execute(true, side.inverse(), size, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size, price.exitN, 0);
             break;
 
         case ExitPartiallyCancelled:
@@ -404,7 +408,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             execute(true, side, size, price.entryN, 0);
             market.elapse(hold.sec);
             exit(o -> o.make(price.exit));
-            execute(true, side.inverse(), size.halfN, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size.halfN, price.exitN, 0);
             break;
 
         case EntryPartiallyCanceledAndExitCompletely:
@@ -413,7 +417,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             cancelEntry();
             market.elapse(hold.sec);
             exit(o -> o.make(price.exit));
-            execute(true, side.inverse(), size, price.exitN, 0);
+            execute(true, side.orientation().inverse(), size, price.exitN, 0);
             break;
         }
         return s;
@@ -428,7 +432,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param price
      * @param sec
      */
-    private void execute(boolean make, Directional side, Num size, Num price, long sec) {
+    private void execute(boolean make, Orientational<Direction> side, Num size, Num price, long sec) {
         ZonedDateTime time = Chrono.MIN.plusSeconds(sec);
 
         if (make) {

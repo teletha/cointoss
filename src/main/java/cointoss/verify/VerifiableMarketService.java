@@ -28,7 +28,6 @@ import java.util.function.Consumer;
 
 import cointoss.Currency;
 import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -44,6 +43,7 @@ import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.RetryPolicy;
 import hypatia.Num;
+import hypatia.Orientational;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
@@ -510,7 +510,7 @@ public class VerifiableMarketService extends MarketService {
                     tasks.poll().run();
                 }
 
-                executor.accept(Execution.with.direction(e.orientation, executedSize)
+                executor.accept(Execution.with.orientation(e.orientation, executedSize)
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date)
                         .id(e.id)
@@ -518,7 +518,7 @@ public class VerifiableMarketService extends MarketService {
                         .delay(e.delay));
 
                 if (executedSize.isNot(e.size)) {
-                    emulate(Execution.with.direction(e.orientation, e.size.minus(executedSize))
+                    emulate(Execution.with.orientation(e.orientation, e.size.minus(executedSize))
                             .price(e.price)
                             .date(e.date)
                             .id(e.id)
@@ -594,7 +594,7 @@ public class VerifiableMarketService extends MarketService {
     /**
      * For test.
      */
-    private class BackendOrder implements Directional {
+    private class BackendOrder implements Orientational<Direction> {
 
         /** The frontend order. */
         private final Order front;
@@ -667,6 +667,14 @@ public class VerifiableMarketService extends MarketService {
         @Override
         public Direction orientation() {
             return direction;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isPositive() {
+            return direction.isPositive();
         }
 
         /**
