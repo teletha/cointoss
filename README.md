@@ -43,7 +43,7 @@ Add it into in the dependencies element like so:
 <dependency>
     <groupId>com.github.teletha</groupId>
     <artifactId>cointoss</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 #### [Gradle](https://gradle.org/)
@@ -56,7 +56,7 @@ repositories {
 Add it into the dependencies section like so:
 ```gradle
 dependencies {
-    implementation 'com.github.teletha:cointoss:1.4.0'
+    implementation 'com.github.teletha:cointoss:1.5.0'
 }
 ```
 #### [SBT](https://www.scala-sbt.org/)
@@ -66,7 +66,7 @@ resolvers += "jitpack" at "https://jitpack.io"
 ```
 Add it into the libraryDependencies section like so:
 ```scala
-libraryDependencies += "com.github.teletha" % "cointoss" % "1.4.0"
+libraryDependencies += "com.github.teletha" % "cointoss" % "1.5.0"
 ```
 #### [Leiningen](https://leiningen.org/)
 Add JitPack repository at the end of repositories in your project.clj:
@@ -75,12 +75,12 @@ Add JitPack repository at the end of repositories in your project.clj:
 ```
 Add it into the dependencies section like so:
 ```clj
-:dependencies [[com.github.teletha/cointoss "1.4.0"]]
+:dependencies [[com.github.teletha/cointoss "1.5.0"]]
 ```
 #### [Bee](https://teletha.github.io/bee)
 Add it into your project definition class like so:
 ```java
-require("com.github.teletha", "cointoss", "1.4.0");
+require("com.github.teletha", "cointoss", "1.5.0");
 ```
 <p align="right"><a href="#top">back to top</a></p>
 
@@ -108,25 +108,13 @@ If you think something might be a bug, but you're not sure, ask on StackOverflow
 
 ## Dependency
 Cointoss depends on the following products on runtime.
-* [HdrHistogram-2.1.12](https://mvnrepository.com/artifact/org.hdrhistogram/HdrHistogram/2.1.12)
-* [JLargeArrays-1.5](https://mvnrepository.com/artifact/pl.edu.icm/JLargeArrays/1.5)
-* [JTransforms-3.1](https://mvnrepository.com/artifact/com.github.wendykierp/JTransforms/3.1)
 * [altfx-1.3.0](https://mvnrepository.com/artifact/com.github.teletha/altfx/1.3.0)
-* [annotations-24.0.1](https://mvnrepository.com/artifact/org.jetbrains/annotations/24.0.1)
-* [bench-11.3.0](https://mvnrepository.com/artifact/io.fair-acc/bench/11.3.0)
-* [chartfx-11.3.0](https://mvnrepository.com/artifact/io.fair-acc/chartfx/11.3.0)
 * [commons-lang3-3.14.0](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.14.0)
-* [commons-math3-3.6.1](https://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.6.1)
 * [commons-net-3.10.0](https://mvnrepository.com/artifact/commons-net/commons-net/3.10.0)
 * [conjure-1.1.1](https://mvnrepository.com/artifact/com.github.teletha/conjure/1.1.1)
-* [controlsfx-11.1.2](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.1.2)
-* [dataset-11.3.0](https://mvnrepository.com/artifact/io.fair-acc/dataset/11.3.0)
+* [controlsfx-11.2.1](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.1)
 * [failureaccess-1.0.2](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.2)
-* [guava-33.0.0-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.0.0-jre)
-* [ikonli-core-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-core/12.3.1)
-* [ikonli-fontawesome-pack-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome-pack/12.3.1)
-* [ikonli-fontawesome5-pack-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome5-pack/12.3.1)
-* [ikonli-javafx-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-javafx/12.3.1)
+* [guava-33.1.0-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.1.0-jre)
 * [javafx-base-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-base/23-ea+3)
 * [javafx-base-23-ea+3-linux](https://mvnrepository.com/artifact/org.openjfx/javafx-base/23-ea+3)
 * [javafx-controls-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/23-ea+3)
@@ -138,17 +126,14 @@ Cointoss depends on the following products on runtime.
 * [javafx-web-23-ea+3](https://mvnrepository.com/artifact/org.openjfx/javafx-web/23-ea+3)
 * [javafx-web-23-ea+3-linux](https://mvnrepository.com/artifact/org.openjfx/javafx-web/23-ea+3)
 * [lycoris-1.0.0](https://mvnrepository.com/artifact/com.github.teletha/lycoris/1.0.0)
-* [math-11.3.0](https://mvnrepository.com/artifact/io.fair-acc/math/11.3.0)
 * [openjfx-monocle-jdk-12.0.1+2](https://mvnrepository.com/artifact/org.testfx/openjfx-monocle/jdk-12.0.1+2)
-* [pngj-2.1.0](https://mvnrepository.com/artifact/ar.com.hjg/pngj/2.1.0)
 * [primavera-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/primavera/1.1.0)
 * [psychopath-1.12.1](https://mvnrepository.com/artifact/com.github.teletha/psychopath/1.12.1)
-* [sinobu-3.9.1](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.9.1)
-* [slf4j-api-2.0.9](https://mvnrepository.com/artifact/org.slf4j/slf4j-api/2.0.9)
+* [sinobu-3.10.1](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.10.1)
 * [stylist-1.10.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.10.0)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
-* [viewtify-2.22.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.22.0)
-* [zstd-jni-1.5.5-11](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.5-11)
+* [viewtify-2.23.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.23.0)
+* [zstd-jni-1.5.6-1](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.6-1)
 <p align="right"><a href="#top">back to top</a></p>
 
 
