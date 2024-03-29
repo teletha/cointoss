@@ -565,13 +565,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Directional",
-			"packageName": "cointoss",
-			"type": "Functional"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Division",
 			"packageName": "cointoss.order",
 			"type": "Enum"
@@ -670,7 +663,7 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Execution.ÅssignableDirection",
+			"name": "Execution.ÅssignableOrientation",
 			"packageName": "cointoss.execution",
 			"type": "Interface"
 		},
@@ -845,7 +838,7 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Liquidation.ÅssignableDirection",
+			"name": "Liquidation.ÅssignableOrientation",
 			"packageName": "cointoss.ticker.data",
 			"type": "Interface"
 		},
@@ -1139,7 +1132,7 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Order.ÅssignableDirection",
+			"name": "Order.ÅssignableOrientation",
 			"packageName": "cointoss.order",
 			"type": "Interface"
 		},
@@ -1307,7 +1300,7 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Position.ÅssignableDirection",
+			"name": "Position.ÅssignableOrientation",
 			"packageName": "cointoss.order",
 			"type": "Interface"
 		},
