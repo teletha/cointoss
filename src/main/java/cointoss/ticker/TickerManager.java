@@ -13,7 +13,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;

@@ -12,14 +12,13 @@ package trademate.chart.line;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import hypatia.Num;
+import hypatia.Primitives;
 import javafx.collections.ObservableList;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-
-import cointoss.util.arithmetic.Num;
-import cointoss.util.arithmetic.Primitives;
 import kiss.Variable;
 import stylist.Style;
 import trademate.chart.Axis;

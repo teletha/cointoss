@@ -29,8 +29,8 @@ import cointoss.orderbook.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
+import hypatia.Num;
 import cointoss.util.Network;
-import cointoss.util.arithmetic.Num;
 import kiss.JSON;
 import kiss.Signal;
 

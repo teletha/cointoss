@@ -3,7 +3,8 @@ package cointoss.execution;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
+
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Throwable;

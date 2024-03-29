@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import cointoss.ticker.Tick;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Signal;
 
 /**

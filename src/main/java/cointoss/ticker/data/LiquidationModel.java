@@ -13,8 +13,8 @@ import java.time.ZonedDateTime;
 
 import cointoss.Direction;
 import cointoss.Directional;
-import cointoss.util.arithmetic.Num;
 import cointoss.util.feather.Timelinable;
+import hypatia.Num;
 import icy.manipulator.Icy;
 
 @Icy

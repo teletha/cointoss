@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import cointoss.Currency;
 import cointoss.Market;
 import cointoss.market.MarketServiceProvider;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;

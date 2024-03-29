@@ -14,10 +14,9 @@ import static javafx.scene.paint.Color.*;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javafx.scene.paint.Color;
-
 import cointoss.Directional;
-import cointoss.util.arithmetic.Num;
+import javafx.scene.paint.Color;
+import hypatia.Num;
 import kiss.Variable;
 import viewtify.preference.Preferences;
 

@@ -53,7 +53,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;

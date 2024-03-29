@@ -11,7 +11,7 @@ package cointoss.market.bitflyer;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 /**
  * @version 2018/07/30 7:02:55

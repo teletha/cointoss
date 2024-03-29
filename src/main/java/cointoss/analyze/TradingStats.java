@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.arithmetic.Num.*;
+import static hypatia.Num.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -31,7 +31,7 @@ import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Variable;
 import kiss.WiseConsumer;

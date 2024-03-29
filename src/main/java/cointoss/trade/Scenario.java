@@ -29,7 +29,7 @@ import cointoss.order.Orderable;
 import cointoss.order.Takable;
 import cointoss.ticker.Span;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;

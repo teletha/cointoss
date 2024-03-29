@@ -11,7 +11,7 @@ package cointoss.analyze;
 
 import java.util.function.Function;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 /**
  * This class provides a means of updating summary statistics as each new data point is added. The

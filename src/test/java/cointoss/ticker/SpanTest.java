@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 class SpanTest {
 

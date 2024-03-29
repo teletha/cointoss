@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Extensible;
 import kiss.I;
 import kiss.Model;

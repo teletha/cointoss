@@ -10,7 +10,7 @@
 package cointoss.orderbook;
 
 import static cointoss.orderbook.OrderBookChanges.*;
-import static cointoss.util.arithmetic.Num.ONE;
+import static hypatia.Num.*;
 
 import java.util.Collection;
 
@@ -21,7 +21,7 @@ import com.google.common.collect.Iterables;
 import cointoss.Currency;
 import cointoss.Direction;
 import cointoss.MarketSetting;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 class OrderBookTest {
 

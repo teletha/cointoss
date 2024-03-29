@@ -26,7 +26,7 @@ import cointoss.execution.LogType;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;

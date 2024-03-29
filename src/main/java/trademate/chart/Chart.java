@@ -22,7 +22,7 @@ import javafx.scene.layout.Region;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Primitives;
+import hypatia.Primitives;
 import trademate.setting.PerformanceSetting;
 import viewtify.preference.Preferences;
 import viewtify.ui.helper.LayoutAssistant;

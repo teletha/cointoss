@@ -15,7 +15,7 @@ import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
-import cointoss.util.arithmetic.Primitives;
+import hypatia.Primitives;
 import kiss.I;
 import trademate.order.OrderView;
 import trademate.setting.PerformanceSetting;

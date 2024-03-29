@@ -2,7 +2,7 @@ package cointoss.trade;
 
 import cointoss.trade.ScenarioBase;
 import cointoss.util.ObservableNumProperty;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
@@ -226,20 +226,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         return entrySizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySize() {
         return entrySizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntrySizeNow() {
         return entrySizeCustomizer.observe$Now();
     }
@@ -291,20 +281,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         return entryExecutedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSize() {
         return entryExecutedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryExecutedSizeNow() {
         return entryExecutedSizeCustomizer.observe$Now();
     }
@@ -356,20 +336,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         return entryPriceCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPrice() {
         return entryPriceCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeEntryPriceNow() {
         return entryPriceCustomizer.observe$Now();
     }
@@ -458,20 +428,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         return exitSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSize() {
         return exitSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitSizeNow() {
         return exitSizeCustomizer.observe$Now();
     }
@@ -523,20 +483,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         return exitExecutedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSize() {
         return exitExecutedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitExecutedSizeNow() {
         return exitExecutedSizeCustomizer.observe$Now();
     }
@@ -588,20 +538,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         return exitPriceCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPrice() {
         return exitPriceCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExitPriceNow() {
         return exitPriceCustomizer.observe$Now();
     }
@@ -686,20 +626,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         return realizedProfitCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfit() {
         return realizedProfitCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeRealizedProfitNow() {
         return realizedProfitCustomizer.observe$Now();
     }

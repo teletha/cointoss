@@ -5,7 +5,7 @@ import cointoss.Directional;
 import cointoss.order.Order;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import java.lang.String;
 import java.lang.Throwable;
 import java.lang.UnsupportedOperationException;
@@ -66,7 +66,7 @@ public class Order extends OrderModel {
     private static final MethodHandle size$912239839= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateSize$2101382901= invoker("validateSize", Num.class);
+    private static final MethodHandle validateSize$253442283= invoker("validateSize", Num.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$1093866057= invoker("price", long.class);
@@ -75,7 +75,7 @@ public class Order extends OrderModel {
     private static final MethodHandle price$912239839= invoker("price", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$701841881= invoker("price", Num.class, Consumer.class);
+    private static final MethodHandle price$2141541105= invoker("price", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle executedSize$1093866057= invoker("executedSize", long.class);
@@ -84,7 +84,7 @@ public class Order extends OrderModel {
     private static final MethodHandle executedSize$912239839= invoker("executedSize", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle checkExecutedSize$2101382901= invoker("checkExecutedSize", Num.class);
+    private static final MethodHandle checkExecutedSize$253442283= invoker("checkExecutedSize", Num.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle validateState$41283920= invoker("validateState", OrderState.class);
@@ -287,7 +287,7 @@ public class Order extends OrderModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, validateSize$2101382901.invoke(this, value));
+            sizeUpdater.invoke(this, validateSize$253442283.invoke(this, value));
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -324,7 +324,7 @@ public class Order extends OrderModel {
             value = super.price();
         }
         try {
-            priceUpdater.invoke(this, price$701841881.invoke(this, value, (Consumer<cointoss.order.OrderType>) this::setType));
+            priceUpdater.invoke(this, price$2141541105.invoke(this, value, (Consumer<cointoss.order.OrderType>) this::setType));
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -435,7 +435,7 @@ public class Order extends OrderModel {
             value = super.executedSize();
         }
         try {
-            executedSizeUpdater.invoke(this, checkExecutedSize$2101382901.invoke(this, value));
+            executedSizeUpdater.invoke(this, checkExecutedSize$253442283.invoke(this, value));
             executedSizeCustomizer.accept(this.executedSize);
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
@@ -443,29 +443,14 @@ public class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeDiff() {
         return executedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSize() {
         return executedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeNow() {
         return executedSizeCustomizer.observe$Now();
     }
@@ -582,20 +567,10 @@ public class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTime() {
         return creationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return creationTimeCustomizer.observe$Now();
     }
@@ -638,20 +613,10 @@ public class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTime() {
         return terminationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTimeNow() {
         return terminationTimeCustomizer.observe$Now();
     }
@@ -694,20 +659,10 @@ public class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<cointoss.order.OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<cointoss.order.OrderState> observeStateNow() {
         return stateCustomizer.observe$Now();
     }
@@ -1104,6 +1059,15 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next fillOrKill() {
+            return quantityCondition(cointoss.order.QuantityCondition.FillOrKill);
+        }
+
+        /**
+         * Assign quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
         default Next goodTillCanceled() {
             return quantityCondition(cointoss.order.QuantityCondition.GoodTillCanceled);
         }
@@ -1115,15 +1079,6 @@ public class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(cointoss.order.QuantityCondition.ImmediateOrCancel);
-        }
-
-        /**
-         * Assign quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(cointoss.order.QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1225,24 +1180,6 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next init() {
-            return state(cointoss.order.OrderState.INIT);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(cointoss.order.OrderState.REQUESTING);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
         default Next active() {
             return state(cointoss.order.OrderState.ACTIVE);
         }
@@ -1261,8 +1198,8 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next completed() {
-            return state(cointoss.order.OrderState.COMPLETED);
+        default Next canceled() {
+            return state(cointoss.order.OrderState.CANCELED);
         }
 
         /**
@@ -1270,8 +1207,8 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next canceled() {
-            return state(cointoss.order.OrderState.CANCELED);
+        default Next completed() {
+            return state(cointoss.order.OrderState.COMPLETED);
         }
 
         /**
@@ -1288,8 +1225,26 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next init() {
+            return state(cointoss.order.OrderState.INIT);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next rejected() {
             return state(cointoss.order.OrderState.REJECTED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(cointoss.order.OrderState.REQUESTING);
         }
     }
 

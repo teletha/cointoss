@@ -12,7 +12,7 @@ package cointoss.execution;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 /**
  * {@link ExecutionDeltaLogger} writes compact size log by using the delta.

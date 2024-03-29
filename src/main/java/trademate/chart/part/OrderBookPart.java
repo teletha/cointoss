@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.orderbook.OrderBookPage;

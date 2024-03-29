@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public class CurrencySetting {
 

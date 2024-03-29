@@ -10,7 +10,7 @@
 package cointoss.trade;
 
 import cointoss.MarketService;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Variable;
 
 public class Funds {

@@ -14,7 +14,7 @@ import java.util.function.UnaryOperator;
 
 import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLogger;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import icy.manipulator.Icy;
 import kiss.I;
 

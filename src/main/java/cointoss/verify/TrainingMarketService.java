@@ -20,8 +20,8 @@ import cointoss.order.OrderState;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.orderbook.OrderBookManager;
 import cointoss.util.EfficientWebSocket;
-import cointoss.util.arithmetic.Num;
 import cointoss.volume.PriceRangedVolumeManager;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
 

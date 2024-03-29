@@ -3,8 +3,9 @@ package cointoss.verify;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
 import cointoss.trade.Trader;
-import cointoss.util.arithmetic.Num;
 import cointoss.verify.BackTest;
+import hypatia.Num;
+
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;

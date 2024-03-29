@@ -20,7 +20,7 @@ import cointoss.order.Makable;
 import cointoss.order.Order;
 import cointoss.order.Orderable;
 import cointoss.order.Takable;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;

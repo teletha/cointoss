@@ -33,8 +33,8 @@ import cointoss.trade.extension.StrategyPart;
 import cointoss.trade.extension.TradePart;
 import cointoss.util.Chrono;
 import cointoss.util.TimebaseSupport;
-import cointoss.util.arithmetic.Num;
 import cointoss.verify.VerifiableMarket;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
 

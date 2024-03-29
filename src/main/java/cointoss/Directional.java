@@ -9,10 +9,20 @@
  */
 package cointoss;
 
+import hypatia.Orientational;
+
 /**
  * @version 2017/08/20 18:46:21
  */
-public interface Directional {
+public interface Directional extends Orientational {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default boolean isPositive() {
+        return direction() == Direction.BUY;
+    }
 
     /**
      * Utility to detect.

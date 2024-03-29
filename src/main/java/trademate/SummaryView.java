@@ -14,7 +14,7 @@ import static java.util.concurrent.TimeUnit.*;
 import cointoss.MarketService;
 import cointoss.MarketType;
 import cointoss.market.MarketServiceProvider;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;

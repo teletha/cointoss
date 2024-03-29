@@ -43,7 +43,7 @@ import cointoss.orderbook.OrderBookChanges;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.RetryPolicy;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;

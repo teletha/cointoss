@@ -12,7 +12,7 @@ package cointoss.trade.extension;
 import java.util.function.Consumer;
 
 import cointoss.order.Orderable;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.WiseBiConsumer;
 
 public enum StrategyPart implements TradePart {

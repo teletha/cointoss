@@ -12,7 +12,7 @@ package cointoss.orderbook;
 import java.util.List;
 
 import cointoss.Direction;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.JSON;
 
 public abstract class OrderBookChanges {

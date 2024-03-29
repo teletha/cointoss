@@ -27,7 +27,7 @@ import antibug.WebSocketServer;
 import antibug.WebSocketServer.WebSocketClient;
 import cointoss.MarketService;
 import cointoss.util.EfficientWebSocket;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Model;
 import kiss.WiseBiFunction;

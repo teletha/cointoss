@@ -11,8 +11,8 @@ package cointoss.volume;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.arithmetic.Num;
 import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod;
+import hypatia.Num;
 
 class PriceVolumeTest {
 

@@ -21,7 +21,7 @@ import cointoss.Directional;
 import cointoss.util.Chrono;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;

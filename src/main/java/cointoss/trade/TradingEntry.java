@@ -16,7 +16,7 @@ import cointoss.Market;
 import cointoss.order.Makable;
 import cointoss.order.Orderable;
 import cointoss.order.Takable;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public interface TradingEntry {
 

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public class DivisionTest {
 

@@ -16,7 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 /**
  * @version 2018/07/08 11:44:58

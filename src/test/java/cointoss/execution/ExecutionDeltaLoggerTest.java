@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 class ExecutionDeltaLoggerTest {
 

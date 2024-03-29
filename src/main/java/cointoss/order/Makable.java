@@ -14,7 +14,7 @@ import java.util.List;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Variable;
 import kiss.WiseTriFunction;

@@ -16,7 +16,7 @@ import java.util.List;
 
 import cointoss.Direction;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public class Executions {
 

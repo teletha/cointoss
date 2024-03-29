@@ -11,9 +11,9 @@ package trademate.chart.part;
 
 import java.util.concurrent.TimeUnit;
 
-import cointoss.util.arithmetic.Num;
 import cointoss.volume.PriceRangedVolumeManager.GroupedVolumes;
 import cointoss.volume.PriceRangedVolumeManager.PriceRangedVolumePeriod;
+import hypatia.Num;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;

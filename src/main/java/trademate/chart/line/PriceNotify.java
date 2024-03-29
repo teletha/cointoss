@@ -12,7 +12,7 @@ package trademate.chart.line;
 import javafx.scene.input.MouseEvent;
 
 import cointoss.MarketService;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Variable;
 import trademate.chart.Axis.TickLable;

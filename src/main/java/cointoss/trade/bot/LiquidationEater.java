@@ -16,7 +16,7 @@ import cointoss.ticker.Span;
 import cointoss.trade.Funds;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signaling;
 

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.math.DoubleMath;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 class NumStatsTest {
 

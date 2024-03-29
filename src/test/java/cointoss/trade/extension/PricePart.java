@@ -9,7 +9,7 @@
  */
 package cointoss.trade.extension;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public class PricePart implements TradePart {
 

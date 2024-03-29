@@ -9,7 +9,7 @@
  */
 package cointoss.ticker;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 /**
  * Built-in {@link Indicator} collection.

@@ -35,7 +35,7 @@ import cointoss.Market;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
 import cointoss.order.Orderable;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Disposable;
 import kiss.Extensible;
 import kiss.I;

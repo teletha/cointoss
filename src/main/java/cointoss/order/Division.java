@@ -11,7 +11,7 @@ package cointoss.order;
 
 import java.util.Arrays;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public enum Division {
     Linear1, Linear2, Linear4, Linear5, Linear8, Linear10, Linear16, Linear20, Linear25, Curve2(0.4, 0.6), Curve4(0.1, 0.2, 0.3,

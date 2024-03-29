@@ -17,7 +17,7 @@ import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.ticker.data.Liquidation;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public class GlobalVolume {
 

@@ -15,7 +15,7 @@ import java.util.List;
 import com.google.common.collect.Iterables;
 
 import cointoss.util.ObservableNumProperty;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import icy.manipulator.Icy;
 
 @Icy

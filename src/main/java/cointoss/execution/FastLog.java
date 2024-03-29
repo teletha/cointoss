@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import cointoss.Direction;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
 

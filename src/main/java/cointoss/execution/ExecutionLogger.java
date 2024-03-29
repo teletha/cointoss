@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import cointoss.Direction;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Managed;
 import kiss.Singleton;
 

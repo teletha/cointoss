@@ -12,8 +12,8 @@ package cointoss.ticker;
 import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
 import cointoss.util.feather.Timelinable;
+import hypatia.Num;
 
 public final class Tick implements Timelinable {
 

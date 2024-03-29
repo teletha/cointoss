@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.Direction;
 import cointoss.MarketService;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;

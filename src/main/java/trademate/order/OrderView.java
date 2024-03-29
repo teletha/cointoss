@@ -14,13 +14,12 @@ import static trademate.CommonText.*;
 import java.text.Normalizer.Form;
 
 import javafx.scene.control.SelectionMode;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.Division;
 import cointoss.trade.Scenario;
-import cointoss.util.arithmetic.Num;
 import cointoss.verify.TrainingMarket;
+import hypatia.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Managed;

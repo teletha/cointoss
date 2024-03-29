@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public interface Profitable {
 

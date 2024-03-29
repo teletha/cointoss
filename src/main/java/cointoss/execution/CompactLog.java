@@ -12,7 +12,7 @@ package cointoss.execution;
 import java.util.function.Function;
 
 import cointoss.Market;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.Signal;
 
 class CompactLog implements Function<Signal<Execution>, Signal<Execution>> {

@@ -2,7 +2,7 @@ package cointoss.order;
 
 import cointoss.Direction;
 import cointoss.order.Position;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;

@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 
 public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndicator> {
 

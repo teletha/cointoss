@@ -19,7 +19,7 @@ import java.util.List;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.JSON;
 
 /**

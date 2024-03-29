@@ -19,7 +19,7 @@ import java.util.function.ToDoubleFunction;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;

@@ -11,7 +11,7 @@ package cointoss;
 
 import java.util.Set;
 
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 
 public enum Currency {

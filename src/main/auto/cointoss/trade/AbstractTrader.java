@@ -2,7 +2,8 @@ package cointoss.trade;
 
 import cointoss.trade.AbstractTrader;
 import cointoss.util.ObservableNumProperty;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
+
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;

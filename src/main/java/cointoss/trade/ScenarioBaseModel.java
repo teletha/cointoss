@@ -18,7 +18,7 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.order.Order;
 import cointoss.util.ObservableNumProperty;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import icy.manipulator.Icy;
 import kiss.Managed;
 

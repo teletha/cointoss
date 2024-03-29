@@ -21,7 +21,7 @@ import cointoss.arbitrage.Arbitrage;
 import cointoss.market.MarketServiceProvider;
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Managed;
 import kiss.Signal;

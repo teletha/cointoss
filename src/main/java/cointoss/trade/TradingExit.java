@@ -16,7 +16,7 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.order.Orderable;
 import cointoss.ticker.Span;
-import cointoss.util.arithmetic.Num;
+import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
