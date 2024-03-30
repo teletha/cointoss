@@ -500,6 +500,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Request canceling all orders actually.
+     * 
+     * @return A cancelled order result (state, remainingSize, executedSize).
+     */
+    public Signal<Boolean> cancelAll() {
+        return I.signal();
+    }
+
+    /**
      * Request all orders.
      * 
      * @return

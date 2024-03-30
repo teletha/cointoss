@@ -14,6 +14,7 @@ import static trademate.CommonText.*;
 import java.text.Normalizer.Form;
 
 import javafx.scene.control.SelectionMode;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.Division;
@@ -365,7 +366,7 @@ public class OrderView extends View {
 
     private void cancel() {
         if (current != null) {
-            current.orders.cancelNowAll();
+            current.orders.cancelAllNow();
         }
     }
 

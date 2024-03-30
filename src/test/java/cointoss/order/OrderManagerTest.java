@@ -14,10 +14,12 @@ import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
 
+@PowerAssertOff
 class OrderManagerTest {
 
     private VerifiableMarket market = new VerifiableMarket();
@@ -50,6 +52,18 @@ class OrderManagerTest {
         assert added.size() == 1;
         orders.requestNow(Order.with.buy(1).price(10));
         assert added.size() == 2;
+    }
+
+    @Test
+    void addedSameOrder() {
+        List<Order> added = orders.added.toList();
+        assert added.size() == 0;
+
+        Order o = Order.with.buy(1).price(10).id("same");
+        orders.requestNow(o);
+        assert added.size() == 1;
+        orders.requestNow(o);
+        assert added.size() == 1;
     }
 
     @Test

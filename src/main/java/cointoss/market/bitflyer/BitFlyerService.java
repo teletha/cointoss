@@ -139,7 +139,6 @@ public class BitFlyerService extends MarketService {
     public Signal<String> request(Order order) {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
-        System.out.println(order.price);
 
         if (forTest || Session.id == null) {
             ChildOrderRequest request = new ChildOrderRequest();
@@ -204,6 +203,22 @@ public class BitFlyerService extends MarketService {
         }).skipNull();
 
         return call.combine(isCancelled).take(1).map(v -> v.ⅱ);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Boolean> cancelAll() {
+        CancelRequest cancel = new CancelRequest();
+        cancel.product_code = marketName;
+        cancel.account_id = Session.accountId;
+
+        Signal<JSON> call = forTest || Session.id == null || cancel.order_id == null
+                ? rest("POST", API.Private, "/v1/me/cancelallchildorders", I.write(cancel))
+                : rest("POST", API.Internal, "/trade/cancelorder", I.write(cancel));
+
+        return call.mapTo(true);
     }
 
     /**
@@ -420,8 +435,6 @@ public class BitFlyerService extends MarketService {
                 .flatIterable(json -> json.find("params", "message", "*"))
                 .take(json -> json.has("product_code", marketName))
                 .map(json -> {
-                    System.out.println(json);
-
                     String type = json.text("event_type");
                     Direction side = json.get(Direction.class, "side");
                     Num price = json.get(Num.class, "price");

@@ -43,7 +43,15 @@ public final class OrderManager {
     private final Signaling<Order> add = new Signaling();
 
     /** The order adding event. */
-    public final Signal<Order> added = add.expose;
+    public final Signal<Order> added = add.expose.take(o -> {
+        // check duplicated order
+        for (Order manage : managed) {
+            if (manage.id.equals(o.id)) {
+                return false;
+            }
+        }
+        return true;
+    }).share();
 
     /** The order removed event. */
     private final Signaling<Order> remove = new Signaling();
@@ -359,6 +367,10 @@ public final class OrderManager {
         return I.signal(orders).flatMap(this::cancel);
     }
 
+    public Signal<Boolean> cancelAll() {
+        return service.cancelAll();
+    }
+
     /**
      * Cancel the specified {@link Order} from the market actually.
      * 
@@ -387,10 +399,8 @@ public final class OrderManager {
     /**
      * Cancel all orders.
      */
-    public void cancelNowAll() {
-        for (Order order : items) {
-            cancelNow(order);
-        }
+    public void cancelAllNow() {
+        service.cancelAll().to(I.NoOP);
     }
 
     /**
@@ -467,9 +477,18 @@ public final class OrderManager {
             add.accept(order);
 
             // check order executions while request and response
-            orders.forEach(e -> {
-                if (e.id.equals(orderId)) {
-                    updatePartially(order, e);
+            orders.forEach(o -> {
+                if (o.id.equals(order.id)) {
+                    switch (o.state) {
+                    case ACTIVE:
+                    case ACTIVE_PARTIAL:
+                    case COMPLETED:
+                        updatePartially(order, o);
+                        break;
+
+                    default:
+                        break;
+                    }
                 }
             });
 

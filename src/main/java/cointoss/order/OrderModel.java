@@ -478,6 +478,7 @@ abstract class OrderModel implements Orientational<Direction>, Comparable<OrderM
             builder.append("\t").append(Chrono.format(creationTime())).append("～").append(Chrono.format(terminationTime()));
             builder.append("(").append(Chrono.formatAsDuration(creationTime(), terminationTime())).append(")");
         }
+        builder.append("\t#").append(id());
         return builder.toString();
     }
 
