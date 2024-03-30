@@ -43,15 +43,7 @@ public final class OrderManager {
     private final Signaling<Order> add = new Signaling();
 
     /** The order adding event. */
-    public final Signal<Order> added = add.expose.take(o -> {
-        // check duplicated order
-        for (Order manage : managed) {
-            if (manage.id.equals(o.id)) {
-                return false;
-            }
-        }
-        return true;
-    }).share();
+    public final Signal<Order> added = add.expose;
 
     /** The order removed event. */
     private final Signaling<Order> remove = new Signaling();
@@ -73,8 +65,6 @@ public final class OrderManager {
      */
     public OrderManager(MarketService service) {
         this.service = service;
-        added.to(managed::add);
-        removed.to(managed::remove);
 
         // retrieve orders on server
         // don't use orders().to(addition); it completes addition signaling itself
@@ -122,7 +112,10 @@ public final class OrderManager {
         // calculate position
         calculateCompoundPosition(order.orientation, Num.ZERO, Num.ZERO, order.price, order.executedSize);
 
-        // store order and fire add event
+        // store order
+        managed.add(order);
+
+        // fire event
         add.accept(order);
     }
 
@@ -474,7 +467,8 @@ public final class OrderManager {
         private void complement(String orderId) {
             // stop recording realtime executions and register order id atomically
             disposer.dispose();
-            add.accept(order);
+            add(order);
+            // add.accept(order);
 
             // check order executions while request and response
             orders.forEach(o -> {
@@ -493,7 +487,13 @@ public final class OrderManager {
             });
 
             // order termination will unregister
-            order.observeTerminating().to(remove::accept);
+            order.observeTerminating().first().to(() -> {
+                // remove order
+                managed.remove(order);
+
+                // fire event
+                remove.accept(order);
+            });
         }
     }
 
