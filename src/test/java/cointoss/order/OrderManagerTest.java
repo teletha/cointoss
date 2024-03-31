@@ -9,22 +9,25 @@
  */
 package cointoss.order;
 
-import java.util.List;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
 
-@PowerAssertOff
 class OrderManagerTest {
 
-    private VerifiableMarket market = new VerifiableMarket();
+    private VerifiableMarket market;
 
-    private OrderManager orders = market.orders;
+    private OrderManager orders;
+
+    @BeforeEach
+    void setup() {
+        market = new VerifiableMarket();
+        orders = market.orders;
+    }
 
     @Test
     void request() {
@@ -44,61 +47,15 @@ class OrderManagerTest {
     }
 
     @Test
-    void added() {
-        List<Order> added = orders.added.toList();
-        assert added.size() == 0;
-
-        orders.requestNow(Order.with.buy(1).price(10));
-        assert added.size() == 1;
-        orders.requestNow(Order.with.buy(1).price(10));
-        assert added.size() == 2;
-    }
-
-    @Test
-    void addedSameOrder() {
-        List<Order> added = orders.added.toList();
-        assert added.size() == 0;
-
-        Order o = Order.with.buy(1).price(10).id("same");
-        orders.requestNow(o);
-        assert added.size() == 1;
-        orders.requestNow(o);
-        assert added.size() == 1;
-    }
-
-    @Test
-    void removedByCancel() {
+    void updateRemovedByCancel() {
         Order order1 = orders.requestNow(Order.with.buy(1).price(10));
         Order order2 = orders.requestNow(Order.with.buy(1).price(10));
+        assert orders.items.size() == 2;
 
-        List<Order> removed = orders.removed.toList();
-        assert removed.size() == 0;
-        orders.cancelNow(order1);
-        assert removed.size() == 1;
-        orders.cancelNow(order2);
-        assert removed.size() == 2;
-    }
-
-    @Test
-    void removedByExecute() {
-        orders.requestNow(Order.with.buy(1).price(10));
-
-        List<Order> removed = orders.removed.toList();
-        assert removed.size() == 0;
-        market.perform(Execution.with.sell(1).price(9));
-        assert removed.size() == 1;
-    }
-
-    @Test
-    void removedByExecuteDividedly() {
-        orders.requestNow(Order.with.buy(2).price(10));
-
-        List<Order> removed = orders.removed.toList();
-        assert removed.size() == 0;
-        market.perform(Execution.with.sell(1).price(9));
-        assert removed.size() == 0;
-        market.perform(Execution.with.sell(1).price(9));
-        assert removed.size() == 1;
+        orders.update(OrderManager.Update.cancel(order1.id));
+        assert orders.items.size() == 1;
+        orders.update(OrderManager.Update.cancel(order2.id));
+        assert orders.items.size() == 0;
     }
 
     @Test
@@ -109,22 +66,6 @@ class OrderManagerTest {
         orders.request(order).to(o -> {
             assert o.creationTime.isEqual(market.service.now());
         });
-    }
-
-    @Test
-    void manages() {
-        List<Order> list = orders.manages().toList();
-        assert list.size() == 0;
-
-        orders.requestNow(Order.with.buy(1).price(1));
-        assert list.size() == 1;
-
-        List<Order> other = orders.manages().toList();
-        assert other.size() == 1;
-
-        orders.requestNow(Order.with.sell(1).price(1));
-        assert other.size() == 2;
-        assert list.size() == 2;
     }
 
     @Disabled
@@ -158,20 +99,51 @@ class OrderManagerTest {
     }
 
     @Test
-    void updateNew() {
-        orders.update(Order.with.buy(1).price(10).id("A"));
-
+    void updateAddDiffOrder() {
+        orders.update(Order.with.buy(1).price(10).id("one"));
         assert orders.items.size() == 1;
-        assert orders.items.get(0).id.equals("A");
+        orders.update(Order.with.buy(1).price(10).id("other"));
+        assert orders.items.size() == 2;
     }
 
     @Test
-    void updateChange() {
-        orders.update(Order.with.buy(1).price(10).id("A"));
-        orders.update(Order.with.buy(1).price(10).id("A").executedSize(1).state(OrderState.ACTIVE));
-
+    void updateAddSameOrder() {
+        orders.update(Order.with.buy(1).price(10).id("same"));
         assert orders.items.size() == 1;
-        assert orders.items.get(0).id.equals("A");
-        assert orders.items.get(0).executedSize.is(1);
+        orders.update(Order.with.buy(1).price(10).id("same"));
+        assert orders.items.size() == 1;
+    }
+
+    @Test
+    void updateExecutedOrder() {
+        orders.update(Order.with.buy(1).price(10).id("A"));
+        assert orders.items.size() == 1;
+        Order order = orders.items.get(0);
+        assert order.size.is(1);
+        assert order.executedSize.is(0);
+
+        orders.update(Order.with.buy(1).price(10).id("A").executedSize(1).state(OrderState.ACTIVE));
+        assert orders.items.size() == 0;
+        assert order.size.is(1);
+        assert order.executedSize.is(1);
+    }
+
+    @Test
+    void updatePartialExecutedOrder() {
+        orders.update(Order.with.buy(1).price(10).id("A"));
+        Order order = orders.items.get(0);
+        assert orders.items.size() == 1;
+        assert order.size.is(1);
+        assert order.executedSize.is(0);
+
+        orders.update(Order.with.buy(0.5).price(10).id("A").state(OrderState.ACTIVE_PARTIAL));
+        assert orders.items.size() == 1;
+        assert order.size.is(1);
+        assert order.executedSize.is(0.5);
+
+        orders.update(Order.with.buy(0.5).price(10).id("A").state(OrderState.ACTIVE_PARTIAL));
+        assert orders.items.size() == 0;
+        assert order.size.is(1);
+        assert order.executedSize.is(1);
     }
 }

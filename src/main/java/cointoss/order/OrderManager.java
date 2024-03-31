@@ -22,7 +22,6 @@ import hypatia.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
-import kiss.Signaling;
 import kiss.Variable;
 
 /**
@@ -38,18 +37,6 @@ public final class OrderManager {
 
     /** The unmodifiable exposed active orders. */
     public final List<Order> items = Collections.unmodifiableList(managed);
-
-    /** The order adding event. */
-    private final Signaling<Order> add = new Signaling();
-
-    /** The order adding event. */
-    public final Signal<Order> added = add.expose;
-
-    /** The order removed event. */
-    private final Signaling<Order> remove = new Signaling();
-
-    /** The order removed event. */
-    public final Signal<Order> removed = remove.expose;
 
     /** The compound size and direction (minus means short position). */
     public final Variable<Num> compoundSize = Variable.of(Num.ZERO);
@@ -112,11 +99,14 @@ public final class OrderManager {
         // calculate position
         calculateCompoundPosition(order.orientation, Num.ZERO, Num.ZERO, order.price, order.executedSize);
 
-        // store order
+        // add order
         managed.add(order);
 
-        // fire event
-        add.accept(order);
+        // unregister when terminating
+        order.observeTerminating().first().to(() -> {
+            // remove order
+            managed.remove(order);
+        });
     }
 
     /**
@@ -240,15 +230,6 @@ public final class OrderManager {
         } else {
             compoundPrice.set(compoundTotalPrice.divide(compoundSize.v.abs()).scale(service.setting.base.scale));
         }
-    }
-
-    /**
-     * Stream for the current managed {@link Order}s and the incoming {@link Order}s.
-     * 
-     * @return
-     */
-    public Signal<Order> manages() {
-        return I.signal(managed).merge(added);
     }
 
     /**
@@ -484,15 +465,6 @@ public final class OrderManager {
                         break;
                     }
                 }
-            });
-
-            // order termination will unregister
-            order.observeTerminating().first().to(() -> {
-                // remove order
-                managed.remove(order);
-
-                // fire event
-                remove.accept(order);
             });
         }
     }
