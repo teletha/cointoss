@@ -148,6 +148,8 @@ public final class OrderManager {
      */
     private void updatePartially(Order order, Order updater) {
         // calculate position
+        System.out.println("Partial " + updater + "    $$$$$$$  " + order);
+        new Error().printStackTrace();
         calculateCompoundPosition(order.orientation, order.price, order.executedSize, updater.price, updater.executedSize);
 
         Num newExecutedSize = order.executedSize.plus(updater.size);
@@ -453,7 +455,8 @@ public final class OrderManager {
 
             // check order executions while request and response
             orders.forEach(o -> {
-                if (o.id.equals(order.id)) {
+                System.out.println("COMP " + o + "%%%" + order.id + "&&&" + orderId);
+                if (o.id.equals(orderId)) {
                     switch (o.state) {
                     case ACTIVE:
                     case ACTIVE_PARTIAL:

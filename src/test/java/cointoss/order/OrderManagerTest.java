@@ -72,8 +72,7 @@ class OrderManagerTest {
         market.service.emulateExecutionBeforeOrderResponse(Execution.with.buy(0.2).price(9));
         market.service.emulateExecutionBeforeOrderResponse(Execution.with.buy(0.3).price(9));
 
-        Order o = Order.with.buy(1).price(10);
-        orders.requestNow(o);
+        Order o = orders.requestNow(Order.with.buy(1).price(10));
         assert o.remainingSize().is(0.5);
         assert o.executedSize.is(0.5);
 
