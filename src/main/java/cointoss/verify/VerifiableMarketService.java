@@ -505,7 +505,6 @@ public class VerifiableMarketService extends MarketService {
                 }
 
                 Num price = order.type.isTaker() ? order.marketMinPrice : order.price;
-                System.out.println(executedSize + "   " + price + "  " + order.id);
                 orderUpdateRealtimely.accept(OrderManager.Update.executePartially(order.id, executedSize, price, Num.ZERO));
 
                 while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {

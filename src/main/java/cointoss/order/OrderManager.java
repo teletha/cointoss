@@ -87,7 +87,10 @@ public final class OrderManager {
                 }
             }
         }
-        add(updater);
+
+        if (updater.state == OrderState.INIT) {
+            add(updater);
+        }
     }
 
     /**
@@ -148,8 +151,6 @@ public final class OrderManager {
      */
     private void updatePartially(Order order, Order updater) {
         // calculate position
-        System.out.println("Partial " + updater + "    $$$$$$$  " + order);
-        new Error().printStackTrace();
         calculateCompoundPosition(order.orientation, order.price, order.executedSize, updater.price, updater.executedSize);
 
         Num newExecutedSize = order.executedSize.plus(updater.size);
@@ -247,12 +248,12 @@ public final class OrderManager {
         if (order.state == OrderState.INIT || order.state == OrderState.REQUESTING) {
             order.setState(REQUESTING);
 
-            Complementer complementer = new Complementer(order);
+            Builder complementer = new Builder(order);
 
             return service.request(order)
                     .retry(service.retryPolicy(5))
                     .effectOnObserve(complementer::start)
-                    .effect(complementer::complement)
+                    .effect(complementer::check)
                     .effectOnTerminate(complementer::stop)
                     .map(id -> {
                         order.setState(ACTIVE);
@@ -398,19 +399,14 @@ public final class OrderManager {
     }
 
     /**
-     * <p>
-     * Comlement executions while order request and response.
-     * </p>
-     * <p>
-     * If the execution data comes to the real-time API before the oreder's response, the order
-     * cannot be identified from the real-time API.
-     * </p>
-     * <p>
+     * Support executions while order request and response. If the execution data comes to the
+     * real-time API before the oreder's response, the order cannot be identified from the real-time
+     * API.
+     * 
      * Record all execution data from request to response, and check if there is already an
      * execution data at response.
-     * </p>
      */
-    private class Complementer {
+    private class Builder {
 
         /** The associated order. */
         private final Order order;
@@ -424,7 +420,7 @@ public final class OrderManager {
         /**
          * 
          */
-        private Complementer(Order order) {
+        private Builder(Order order) {
             this.order = order;
         }
 
@@ -447,15 +443,13 @@ public final class OrderManager {
          * real-time API. Check if there is an order in the execution data recorded after placing
          * the order.
          */
-        private void complement(String orderId) {
+        private void check(String orderId) {
             // stop recording realtime executions and register order id atomically
             disposer.dispose();
             add(order);
-            // add.accept(order);
 
             // check order executions while request and response
-            orders.forEach(o -> {
-                System.out.println("COMP " + o + "%%%" + order.id + "&&&" + orderId);
+            for (Order o : orders) {
                 if (o.id.equals(orderId)) {
                     switch (o.state) {
                     case ACTIVE:
@@ -468,7 +462,7 @@ public final class OrderManager {
                         break;
                     }
                 }
-            });
+            }
         }
     }
 
