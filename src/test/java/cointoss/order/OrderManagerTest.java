@@ -10,7 +10,6 @@
 package cointoss.order;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
@@ -68,7 +67,6 @@ class OrderManagerTest {
         });
     }
 
-    @Disabled
     @Test
     void recieveExecutionsBeforeOrderResponse() {
         market.service.emulateExecutionBeforeOrderResponse(Execution.with.buy(0.2).price(9));
