@@ -170,9 +170,11 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<String> request(Order order) {
+        String identifier = "LOCAL-ACCEPTANCE-" + id++;
+
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
-            child.id = "LOCAL-ACCEPTANCE-" + id++;
+            child.id = identifier;
             child.state = OrderState.ACTIVE;
             child.createTimeMills = nowMills + latency.lag();
             child.remainingSize = order.size;
@@ -197,6 +199,10 @@ public class VerifiableMarketService extends MarketService {
             }
 
             return child.id;
+        }).effectOnComplete(() -> {
+            if (order.type.isMaker()) {
+                orderUpdateRealtimely.accept(OrderManager.Update.create(identifier, order.orientation, order.size, order.price));
+            }
         });
     }
 
