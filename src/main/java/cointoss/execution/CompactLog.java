@@ -15,6 +15,10 @@ import cointoss.Market;
 import hypatia.Num;
 import kiss.Signal;
 
+/**
+ * {@link CompactLog} combines all trades of the same direction and price within one second in a row
+ * into a single contract.
+ */
 class CompactLog implements Function<Signal<Execution>, Signal<Execution>> {
 
     private Execution previous = Market.BASE;

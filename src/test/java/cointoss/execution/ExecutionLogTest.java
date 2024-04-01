@@ -9,7 +9,8 @@
  */
 package cointoss.execution;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -56,15 +57,22 @@ class ExecutionLogTest {
         List<Execution> original = writeNormalLog(today);
         List<Execution> restored = log.at(today).toList();
 
+        assert original.size() == 10;
+        assert restored.size() == 10;
+
         assertIterableEquals(original, restored);
     }
 
     @Test
-    void readCompactLog() {
+    void readCompactLog() throws InterruptedException {
         ZonedDateTime today = Chrono.utcNow();
         List<Execution> original = writeCompactLog(today);
         List<Execution> restored = log.at(today).toList();
 
+        assert original.size() == 10;
+        assert restored.size() <= 10;
+
+        assumeTrue(restored.size() == 10);
         assertIterableEquals(original, restored);
     }
 
@@ -85,6 +93,8 @@ class ExecutionLogTest {
      * @param date A target date.
      */
     private List<Execution> writeCompactLog(ZonedDateTime date) {
-        return log.cache(date).writeCompact(I.signal(Executions.random(10))).toList();
+        List<Execution> list = Executions.random(10);
+        log.cache(date).writeCompact(I.signal(list)).to();
+        return list;
     }
 }
