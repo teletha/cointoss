@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
+import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -134,6 +135,16 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     }
 
     /**
+     * Set the delay time between trials.
+     * 
+     * @return
+     */
+    @Icy.Property
+    Predicate<Throwable> skipRetry() {
+        return x -> false;
+    }
+
+    /**
      * Show debuggable name with the specified name.
      * 
      * @return
@@ -166,31 +177,35 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
      */
     @Override
     public Signal<?> APPLY(Signal<Throwable> error) throws Throwable {
-        return error.flatMap(e -> limit() <= 0 || e instanceof AssertionError ? I.signalError(e) : I.signal(e)).take(limit()).delay(e -> {
-            // try to reset counting
-            long now = System.currentTimeMillis();
-            if (now - latestRetryTime > 10 * 60 * 1000) {
-                count = 0;
-            }
-            latestRetryTime = now;
+        return error.flatMap(e -> limit() <= 0 || e instanceof AssertionError || skipRetry().test(e) ? I.signalError(e) : I.signal(e))
+                .take(limit())
+                .delay(e -> {
+                    // try to reset counting
+                    long now = System.currentTimeMillis();
+                    if (now - latestRetryTime > 10 * 60 * 1000) {
+                        count = 0;
+                    }
+                    latestRetryTime = now;
 
-            Duration duration = Duration.ZERO;
-            LongFunction<Duration> delay = isMaintenance(e) ? delayOnMaintenace() : isLimitError(e) ? delayOnLimitOverflow() : delay();
-            if (delay != null) {
-                duration = delay.apply(count++);
-                if (10 < duration.toMinutes()) {
-                    duration = Duration.ofMinutes(10);
-                }
-            }
+                    Duration duration = Duration.ZERO;
+                    LongFunction<Duration> delay = isMaintenance(e) ? delayOnMaintenace()
+                            : isLimitError(e) ? delayOnLimitOverflow() : delay();
+                    if (delay != null) {
+                        duration = delay.apply(count++);
+                        if (10 < duration.toMinutes()) {
+                            duration = Duration.ofMinutes(10);
+                        }
+                    }
 
-            String name = name();
-            if (name != null && name.length() != 0) {
-                I.error(this + " will retry after " + Chrono.formatAsDuration(duration) + ".");
-                I.error(e);
-            }
+                    String name = name();
+                    if (name != null && name.length() != 0) {
+                        I.error(this + " will retry after " + Chrono.formatAsDuration(duration) + ".");
+                        I.error(e);
+                    }
 
-            return duration;
-        }, scheduler()).effect(onRetry);
+                    return duration;
+                }, scheduler())
+                .effect(onRetry);
     }
 
     private boolean isMaintenance(Throwable e) {

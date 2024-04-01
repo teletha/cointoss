@@ -9,12 +9,16 @@
  */
 package cointoss.order;
 
+import static cointoss.Direction.*;
+import static hypatia.Num.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
+import kiss.I;
 
 class OrderManagerTest {
 
@@ -142,5 +146,12 @@ class OrderManagerTest {
         assert orders.items.size() == 0;
         assert order.size.is(1);
         assert order.executedSize.is(1);
+    }
+
+    @Test
+    void acceptOrderOnSever() {
+        market.service.request(OrderManager.Update.create("A", BUY, ONE, ONE)).to(I.NoOP);
+
+        assert orders.items.size() == 1;
     }
 }

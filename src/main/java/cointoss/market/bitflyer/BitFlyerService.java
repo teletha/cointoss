@@ -560,6 +560,14 @@ public class BitFlyerService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isAuthenticationError(String message) {
+        return message.contains("Authentication error");
+    }
+
+    /**
      * Singleton session holder. The JVM specification guarantees automatic lazy initialization on
      * first access.
      */
