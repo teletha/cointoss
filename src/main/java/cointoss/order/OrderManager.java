@@ -22,7 +22,6 @@ import hypatia.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
-import kiss.Variable;
 
 /**
  * 
@@ -37,15 +36,6 @@ public final class OrderManager {
 
     /** The unmodifiable exposed active orders. */
     public final List<Order> items = Collections.unmodifiableList(managed);
-
-    /** The compound size and direction (minus means short position). */
-    public final Variable<Num> compoundSize = Variable.of(Num.ZERO);
-
-    /** The compound average position price. */
-    public final Variable<Num> compoundPrice = Variable.of(Num.ZERO);
-
-    /** The compound total position price. */
-    private Num compoundTotalPrice = Num.ZERO;
 
     /**
      * @param service
@@ -99,9 +89,6 @@ public final class OrderManager {
      * @param order
      */
     private void add(Order order) {
-        // calculate position
-        calculateCompoundPosition(order.orientation, Num.ZERO, Num.ZERO, order.price, order.executedSize);
-
         // add order
         managed.add(order);
 
@@ -130,9 +117,6 @@ public final class OrderManager {
      * @param updater A new order info.
      */
     private void updateFully(Order order, Order updater) {
-        // calculate position
-        calculateCompoundPosition(order.orientation, order.price, order.executedSize, updater.price, updater.size);
-
         order.setPrice(updater.price);
         order.setExecutedSize(updater.size);
         order.setCommission(updater.commission);
@@ -150,9 +134,6 @@ public final class OrderManager {
      * @param updater A new order info.
      */
     private void updatePartially(Order order, Order updater) {
-        // calculate position
-        calculateCompoundPosition(order.orientation, order.price, order.executedSize, updater.price, updater.executedSize);
-
         Num newExecutedSize = order.executedSize.plus(updater.size);
         Num newAveragePrice = order.price.multiply(order.executedSize)
                 .plus(updater.price.multiply(updater.size))
@@ -167,71 +148,6 @@ public final class OrderManager {
         if (order.size.is(order.executedSize)) {
             order.setState(OrderState.COMPLETED);
             order.setTerminationTime(service.now());
-        }
-    }
-
-    /**
-     * Update the compound position.
-     * 
-     * @param side A changed position's direction.
-     * @param oldPrice An base position's price.
-     * @param oldSize A base position's size.
-     * @param newPrice An changed position's price.
-     * @param newSize A changed position's size.
-     */
-    private void calculateCompoundPosition(Direction side, Num oldPrice, Num oldSize, Num newPrice, Num newSize) {
-        Num diffSize = newSize.minus(oldSize);
-
-        // compute compound size and price
-        if (compoundSize.v.isZero()) {
-            // no position
-            if (side.isPositive()) {
-                compoundSize.set(diffSize);
-            } else {
-                compoundSize.set(diffSize.negate());
-            }
-            compoundTotalPrice = newPrice.multiply(diffSize);
-        } else {
-            if (compoundSize.v.isPositive()) {
-                // long position
-                if (side.isPositive()) {
-                    Num oldTotalPrice = oldPrice.multiply(oldSize);
-                    Num newTotalPrice = newPrice.multiply(newSize);
-
-                    compoundSize.set(v -> v.plus(diffSize));
-                    compoundTotalPrice = compoundTotalPrice.minus(oldTotalPrice).plus(newTotalPrice);
-                } else {
-                    compoundSize.set(v -> v.minus(diffSize));
-                    if (compoundSize.v.isNegative()) {
-                        compoundTotalPrice = newPrice.multiply(compoundSize).abs();
-                    } else {
-                        compoundTotalPrice = compoundPrice.v.multiply(compoundSize);
-                    }
-                }
-            } else {
-                // short position
-                if (side.isPositive()) {
-                    compoundSize.set(v -> v.plus(diffSize));
-                    if (compoundSize.v.isPositive()) {
-                        compoundTotalPrice = newPrice.multiply(compoundSize);
-                    } else {
-                        compoundTotalPrice = compoundPrice.v.multiply(compoundSize).abs();
-                    }
-                } else {
-                    Num oldTotalPrice = oldPrice.multiply(oldSize);
-                    Num newTotalPrice = newPrice.multiply(newSize);
-
-                    compoundSize.set(v -> v.minus(diffSize));
-                    compoundTotalPrice = compoundTotalPrice.minus(oldTotalPrice).plus(newTotalPrice);
-                }
-            }
-        }
-
-        if (compoundSize.v.isZero()) {
-            compoundPrice.set(Num.ZERO);
-            compoundTotalPrice = Num.ZERO;
-        } else {
-            compoundPrice.set(compoundTotalPrice.divide(compoundSize.v.abs()).scale(service.setting.base.scale));
         }
     }
 
