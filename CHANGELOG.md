@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.6.0](https://github.com/teletha/cointoss/compare/v1.5.0...v1.6.0) (2024-04-01)
+
+
+### Features
+
+* add alias method Direction#isBuy and #isSell ([caca812](https://github.com/teletha/cointoss/commit/caca812d80ed2c8a469cd1c044304bb294487477))
+* export arithmetic classes as hypatia ([aca7c61](https://github.com/teletha/cointoss/commit/aca7c61c447b407ce22c181e22a8982c42718427))
+* remove Directional, use Orientational instead ([0d3e3d7](https://github.com/teletha/cointoss/commit/0d3e3d7d1a33981d98f3c6a1bbce88605775bee7))
+* remove order related events on OrderManager ([58dd36d](https://github.com/teletha/cointoss/commit/58dd36db31f355c5416f38476c43cfec7ef3abbe))
+
+
+### Bug Fixes
+
+* OrderManager should ignore the duplicated order ([e38701a](https://github.com/teletha/cointoss/commit/e38701aaaa743f3d73a2dc72aad2968f37017ce3))
+* pass all tests in order management ([89c80e5](https://github.com/teletha/cointoss/commit/89c80e50654d72d670a7b9b64c8b2e38e55fcbfd))
+* refactoring order manager ([c71f2ef](https://github.com/teletha/cointoss/commit/c71f2effd098f21c36d3b2548493ba23d523bcba))
+* remove deprecated method ([8732a77](https://github.com/teletha/cointoss/commit/8732a7784efba6ed1c8b735f453571fe763bda20))
+* update hypatia ([d2c2679](https://github.com/teletha/cointoss/commit/d2c267999a9fe644a76b6a92eb39b17d66a4af34))
+* VerifiableMarketService should use the partial order execution ([aa0a968](https://github.com/teletha/cointoss/commit/aa0a968ad244e4bcaed164858c72cf97f19a1738))
+
 ## [1.5.0](https://github.com/teletha/cointoss/compare/v1.4.0...v1.5.0) (2024-03-28)
 
 
