@@ -11,51 +11,95 @@ package cointoss.util;
 
 import java.net.HttpRetryException;
 
+import cointoss.market.Exchange;
+import kiss.I;
+import kiss.Variable;
+
 @SuppressWarnings("serial")
-public class NetworkError extends Error {
+public abstract class NetworkError extends Error {
+
+    /** The error message. */
+    private static final Variable<String> messageAuthentication = I
+            .translate("Authetication is required. Please check your access token or password.");
+
+    /** The error message. */
+    private static final Variable<String> messageLimitOverflow = I
+            .translate("API limit has been exceeded. Please try again in a few minutes.");
+
+    /** The error message. */
+    private static final Variable<String> messageMaintenance = I
+            .translate("The market is under maintenance. Please refer to the official maintenance information.");
+
+    /** The error message. */
+    private static final Variable<String> messageMinimumOrder = I
+            .translate("The order quantity is too small. Please increase the order quantity.");
+
+    private static final Variable<String> URL = I.translate("Open the target URL");
+
+    /** The target exchange. */
+    private final Exchange exchange;
 
     /**
      * Hide constructor.
      * 
      * @param cause
+     * @param exchange
      */
-    protected NetworkError(String message, Throwable cause) {
-        super(message, cause, false, true);
+    protected NetworkError(Variable<String> message, Throwable cause, Exchange exchange) {
+        super(message.exact(), cause, false, true);
+
+        this.exchange = exchange;
     }
 
     /**
-     * Build user-friendly error message.
-     * 
-     * @param service
-     * @param cause
-     * @return
+     * {@inheritDoc}
      */
-    private static String buildErrorMessage(String message, Throwable cause) {
-        if (cause instanceof HttpRetryException exception) {
-            return message + " " + exception.getLocation() + " --> " + exception.getReason();
+    @Override
+    public String getMessage() {
+        if (getCause() instanceof HttpRetryException x) {
+            return super.getMessage() + "\t" + x.getLocation() + " --> " + x.getReason();
         } else {
-            return message + " " + cause.getLocalizedMessage();
+            return super.getMessage();
         }
     }
 
-    public static class AuthenticationError extends NetworkError {
-
-        AuthenticationError(Throwable cause) {
-            super(buildErrorMessage("Authetication is required.", cause), cause);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        if (getCause() instanceof HttpRetryException x) {
+            return exchange.name() + "\r\n" + super.getMessage() + "\n[" + URL + "](" + x.getLocation() + ")";
+        } else {
+            return super.getMessage();
         }
     }
 
-    public static class RateLimitError extends NetworkError {
+    public static class UnauthenticatedAccess extends NetworkError {
 
-        RateLimitError(Throwable cause) {
-            super(buildErrorMessage("RateLimit is overflow.", cause), cause);
+        UnauthenticatedAccess(Throwable cause, Exchange exchange) {
+            super(messageAuthentication, cause, exchange);
         }
     }
 
-    public static class MaintenanceError extends NetworkError {
+    public static class APILimitOverflow extends NetworkError {
 
-        MaintenanceError(Throwable cause) {
-            super(buildErrorMessage("Market is maintenance now.", cause), cause);
+        APILimitOverflow(Throwable cause, Exchange exchange) {
+            super(messageLimitOverflow, cause, exchange);
+        }
+    }
+
+    public static class MarketMaintenance extends NetworkError {
+
+        MarketMaintenance(Throwable cause, Exchange exchange) {
+            super(messageMaintenance, cause, exchange);
+        }
+    }
+
+    public static class MinimumOrder extends NetworkError {
+
+        MinimumOrder(Throwable cause, Exchange exchange) {
+            super(messageMinimumOrder, cause, exchange);
         }
     }
 }

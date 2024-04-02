@@ -14,7 +14,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
-import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -135,16 +134,6 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     }
 
     /**
-     * Set the delay time between trials.
-     * 
-     * @return
-     */
-    @Icy.Property
-    Predicate<Throwable> skipRetry() {
-        return x -> false;
-    }
-
-    /**
      * Show debuggable name with the specified name.
      * 
      * @return
@@ -177,7 +166,8 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
      */
     @Override
     public Signal<?> APPLY(Signal<Throwable> error) throws Throwable {
-        return error.flatMap(e -> limit() <= 0 || e instanceof AssertionError || skipRetry().test(e) ? I.signalError(e) : I.signal(e))
+        return error
+                .flatMap(e -> limit() <= 0 || e instanceof AssertionError || e instanceof NetworkError ? I.signalError(e) : I.signal(e))
                 .take(limit())
                 .delay(e -> {
                     // try to reset counting

@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
-import java.util.function.Predicate;
 
 /**
  * Generated model for {@link RetryPolicyModel}.
@@ -97,9 +96,6 @@ public class RetryPolicy extends RetryPolicyModel {
     private static final MethodHandle delayOnMaintenaceUpdater = updater("delayOnMaintenace");
 
     /** The final property updater. */
-    private static final MethodHandle skipRetryUpdater = updater("skipRetry");
-
-    /** The final property updater. */
     private static final MethodHandle nameUpdater = updater("name");
 
     /** The final property updater. */
@@ -118,9 +114,6 @@ public class RetryPolicy extends RetryPolicyModel {
     final LongFunction<Duration> delayOnMaintenace;
 
     /** The exposed property. */
-    final Predicate<Throwable> skipRetry;
-
-    /** The exposed property. */
     final String name;
 
     /** The exposed property. */
@@ -134,7 +127,6 @@ public class RetryPolicy extends RetryPolicyModel {
         this.delay = super.delay();
         this.delayOnLimitOverflow = super.delayOnLimitOverflow();
         this.delayOnMaintenace = super.delayOnMaintenace();
-        this.skipRetry = super.skipRetry();
         this.name = super.name();
         this.scheduler = super.scheduler();
     }
@@ -285,43 +277,6 @@ public class RetryPolicy extends RetryPolicyModel {
     }
 
     /**
-     * Set the delay time between trials.
-     *  
-     *  @return
-     */
-    @Override
-    final Predicate<Throwable> skipRetry() {
-        return this.skipRetry;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of skipRetry property.
-     */
-    @SuppressWarnings("unused")
-    private final Predicate<Throwable> getSkipRetry() {
-        return this.skipRetry;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of skipRetry property to assign.
-     */
-    private final void setSkipRetry(Predicate<Throwable> value) {
-        if (value == null) {
-            value = super.skipRetry();
-        }
-        try {
-            skipRetryUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
      * Show debuggable name with the specified name.
      *  
      *  @return
@@ -402,7 +357,7 @@ public class RetryPolicy extends RetryPolicyModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(limit, delay, delayOnLimitOverflow, delayOnMaintenace, skipRetry, name, scheduler);
+        return Objects.hash(limit, delay, delayOnLimitOverflow, delayOnMaintenace, name, scheduler);
     }
 
     /**
@@ -421,7 +376,6 @@ public class RetryPolicy extends RetryPolicyModel {
         if (!Objects.equals(delay, other.delay)) return false;
         if (!Objects.equals(delayOnLimitOverflow, other.delayOnLimitOverflow)) return false;
         if (!Objects.equals(delayOnMaintenace, other.delayOnMaintenace)) return false;
-        if (!Objects.equals(skipRetry, other.skipRetry)) return false;
         if (!Objects.equals(name, other.name)) return false;
         if (!Objects.equals(scheduler, other.scheduler)) return false;
         return true;
@@ -585,17 +539,6 @@ public class RetryPolicy extends RetryPolicyModel {
         }
 
         /**
-         * Assign skipRetry property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next skipRetry(Predicate<? extends Throwable> value) {
-            ((RetryPolicy) this).setSkipRetry((java.util.function.Predicate)value);
-            return (Next) this;
-        }
-
-        /**
          * Assign name property.
          * 
          * @param value A new value to assign.
@@ -638,7 +581,6 @@ public class RetryPolicy extends RetryPolicyModel {
         static final String Delay = "delay";
         static final String DelayOnLimitOverflow = "delayOnLimitOverflow";
         static final String DelayOnMaintenace = "delayOnMaintenace";
-        static final String SkipRetry = "skipRetry";
         static final String Name = "name";
         static final String Scheduler = "scheduler";
     }
