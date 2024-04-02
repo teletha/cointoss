@@ -58,8 +58,6 @@ public final class OrderManager {
      * @param updater
      */
     final void update(Order updater) {
-        System.out.println("Managed " + managed);
-        System.out.println("Updater " + updater);
         Order manage = managed.get(updater.id);
         if (manage == null) {
             if (updater.state == OrderState.INIT) {
