@@ -46,7 +46,7 @@ public final class OrderManager {
 
         // retrieve orders on server
         // don't use orders().to(addition); it completes addition signaling itself
-        service.orders(OrderState.ACTIVE).retry(service.retryPolicy(5)).to(this::update);
+        service.orders(OrderState.ACTIVE).to(this::update);
 
         // retrieve orders on realtime
         service.add(service.ordersRealtimely().to(this::update));
@@ -60,27 +60,30 @@ public final class OrderManager {
     final void update(Order updater) {
         Order manage = managed.get(updater.id);
         if (manage == null) {
-            if (updater.state == OrderState.INIT) {
+            switch (updater.state) {
+            case INIT:
                 add(updater);
+                return;
+
+            default:
+                return;
             }
         } else {
-            if (manage.id.equals(updater.id)) {
-                switch (updater.state) {
-                case CANCELED:
-                    cancel(manage, updater);
-                    return;
+            switch (updater.state) {
+            case CANCELED:
+                cancel(manage, updater);
+                return;
 
-                case ACTIVE:
-                    updateFully(manage, updater);
-                    return;
+            case ACTIVE:
+                updateFully(manage, updater);
+                return;
 
-                case ACTIVE_PARTIAL:
-                    updatePartially(manage, updater);
-                    return;
+            case ACTIVE_PARTIAL:
+                updatePartially(manage, updater);
+                return;
 
-                default:
-                    return;
-                }
+            default:
+                return;
             }
         }
     }

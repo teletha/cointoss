@@ -728,7 +728,37 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 .delay(x -> Duration.ofSeconds(x < 30 ? (x + 1) * (x + 1) : 900))
                 .scheduler(scheduler())
                 .name(name == null || name.length() == 0 ? null : id + " : " + name)
-                .skipRetry(e -> isAuthenticationError(e.getMessage()));
+                .skipRetry(e -> isAuthenticationError(e) || isMaintenaceError(e));
+    }
+
+    /**
+     * Test whether the given message means authentication error or not.
+     * 
+     * @param message
+     * @return
+     */
+    protected boolean isAuthenticationError(Throwable message) {
+        return false;
+    }
+
+    /**
+     * Test whether the given message means maintenance error or not.
+     * 
+     * @param message
+     * @return
+     */
+    protected boolean isMaintenaceError(Throwable message) {
+        return false;
+    }
+
+    /**
+     * Test whether the given message means rate-limit error or not.
+     * 
+     * @param message
+     * @return
+     */
+    protected boolean isRateLimitError(Throwable message) {
+        return false;
     }
 
     /**
@@ -748,16 +778,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     public boolean supportOrderBookFix() {
-        return false;
-    }
-
-    /**
-     * Test whether the given message means authentication error or not.
-     * 
-     * @param message
-     * @return
-     */
-    protected boolean isAuthenticationError(String message) {
         return false;
     }
 
