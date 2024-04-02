@@ -119,7 +119,7 @@ class OrderManagerTest {
     void updateExecutedOrder() {
         orders.update(Order.with.buy(1).price(10).id("A"));
         assert orders.items.size() == 1;
-        Order order = orders.items.get(0);
+        Order order = orders.items.get("A");
         assert order.size.is(1);
         assert order.executedSize.is(0);
 
@@ -132,7 +132,7 @@ class OrderManagerTest {
     @Test
     void updatePartialExecutedOrder() {
         orders.update(Order.with.buy(1).price(10).id("A"));
-        Order order = orders.items.get(0);
+        Order order = orders.items.get("A");
         assert orders.items.size() == 1;
         assert order.size.is(1);
         assert order.executedSize.is(0);
@@ -150,22 +150,22 @@ class OrderManagerTest {
 
     @Test
     void acceptOrderOnSever() {
-        market.service.request(OrderManager.Update.create("A", BUY, ONE, ONE)).to(I.NoOP);
+        String id = market.service.request(OrderManager.Update.create("A", BUY, ONE, ONE)).to().exact();
         assert orders.items.size() == 1;
 
-        Order order = orders.items.get(0);
+        Order order = orders.items.get(id);
         assert order.state == OrderState.ACTIVE;
     }
 
     @Test
     void acceptCancelOnSever() {
-        market.service.request(OrderManager.Update.create("A", BUY, ONE, ONE)).to(I.NoOP);
+        String id = market.service.request(OrderManager.Update.create("A", BUY, ONE, ONE)).to().exact();
         assert orders.items.size() == 1;
 
-        Order order = orders.items.get(0);
+        Order order = orders.items.get(id);
         assert order.state == OrderState.ACTIVE;
 
-        market.service.cancel(OrderManager.Update.create("A", BUY, ONE, ONE)).to(I.NoOP);
+        market.service.cancel(OrderManager.Update.create(id, BUY, ONE, ONE)).to(I.NoOP);
         assert orders.items.size() == 0;
         assert order.state == OrderState.CANCELED;
     }

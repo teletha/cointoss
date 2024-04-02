@@ -14,7 +14,8 @@ import static cointoss.order.OrderState.*;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -32,10 +33,10 @@ public final class OrderManager {
     private final MarketService service;
 
     /** The actual order manager. */
-    private final List<Order> managed = new CopyOnWriteArrayList();
+    private final Map<String, Order> managed = new ConcurrentHashMap();
 
     /** The unmodifiable exposed active orders. */
-    public final List<Order> items = Collections.unmodifiableList(managed);
+    public final Map<String, Order> items = Collections.unmodifiableMap(managed);
 
     /**
      * @param service
@@ -57,29 +58,32 @@ public final class OrderManager {
      * @param updater
      */
     final void update(Order updater) {
-        for (Order order : managed) {
-            if (order.id.equals(updater.id)) {
+        System.out.println("Managed " + managed);
+        System.out.println("Updater " + updater);
+        Order manage = managed.get(updater.id);
+        if (manage == null) {
+            if (updater.state == OrderState.INIT) {
+                add(updater);
+            }
+        } else {
+            if (manage.id.equals(updater.id)) {
                 switch (updater.state) {
                 case CANCELED:
-                    cancel(order, updater);
+                    cancel(manage, updater);
                     return;
 
                 case ACTIVE:
-                    updateFully(order, updater);
+                    updateFully(manage, updater);
                     return;
 
                 case ACTIVE_PARTIAL:
-                    updatePartially(order, updater);
+                    updatePartially(manage, updater);
                     return;
 
                 default:
                     return;
                 }
             }
-        }
-
-        if (updater.state == OrderState.INIT) {
-            add(updater);
         }
     }
 
@@ -92,12 +96,12 @@ public final class OrderManager {
         order.setState(ACTIVE);
 
         // add order
-        managed.add(order);
+        managed.put(order.id, order);
 
         // unregister when terminating
         order.observeTerminating().first().to(() -> {
             // remove order
-            managed.remove(order);
+            managed.remove(order.id);
         });
     }
 
@@ -364,6 +368,7 @@ public final class OrderManager {
         private void check(String orderId) {
             // stop recording realtime executions and register order id atomically
             disposer.dispose();
+            order.setId(orderId);
             add(order);
 
             // check order executions while request and response
