@@ -151,7 +151,22 @@ class OrderManagerTest {
     @Test
     void acceptOrderOnSever() {
         market.service.request(OrderManager.Update.create("A", BUY, ONE, ONE)).to(I.NoOP);
-
         assert orders.items.size() == 1;
+
+        Order order = orders.items.get(0);
+        assert order.state == OrderState.ACTIVE;
+    }
+
+    @Test
+    void acceptCancelOnSever() {
+        market.service.request(OrderManager.Update.create("A", BUY, ONE, ONE)).to(I.NoOP);
+        assert orders.items.size() == 1;
+
+        Order order = orders.items.get(0);
+        assert order.state == OrderState.ACTIVE;
+
+        market.service.cancel(OrderManager.Update.create("A", BUY, ONE, ONE)).to(I.NoOP);
+        assert orders.items.size() == 0;
+        assert order.state == OrderState.CANCELED;
     }
 }

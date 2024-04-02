@@ -89,6 +89,8 @@ public final class OrderManager {
      * @param order
      */
     private void add(Order order) {
+        order.setState(ACTIVE);
+
         // add order
         managed.add(order);
 

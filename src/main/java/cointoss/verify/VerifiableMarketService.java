@@ -591,7 +591,7 @@ public class VerifiableMarketService extends MarketService {
      */
     private BackendOrder findBy(Order order) {
         for (BackendOrder back : orderActive) {
-            if (back.front == order) {
+            if (back.front.id.equals(order.id)) {
                 return back;
             }
         }
