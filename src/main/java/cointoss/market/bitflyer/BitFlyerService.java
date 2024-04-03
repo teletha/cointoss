@@ -563,7 +563,7 @@ public class BitFlyerService extends MarketService {
             builder = builder.POST(BodyPublishers.ofString(bodyText));
         }
 
-        return Network.rest(builder, LIMITER, weight, client()).mapError(e -> ERRORS.convert(e, this));
+        return Network.rest(builder, LIMITER, weight, client()).mapError(e -> ERRORS.convert(e, this)).retry(withPolicy());
     }
 
     /**

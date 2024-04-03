@@ -27,8 +27,8 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import hypatia.Num;
 import cointoss.util.Network;
+import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -199,7 +199,7 @@ public class CoincheckService extends MarketService {
             builder = HttpRequest.newBuilder(URI.create("https://coincheck.com/api/" + path));
         }
 
-        return Network.rest(builder, Limit, client()).retry(retryPolicy(retryMax, "Coincheck RESTCall"));
+        return Network.rest(builder, Limit, client()).retry(withPolicy());
     }
 
     /**

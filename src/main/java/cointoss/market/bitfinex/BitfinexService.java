@@ -34,6 +34,8 @@ import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.NetworkError.Kind;
+import cointoss.util.NetworkErrorDetector;
 import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.I;
@@ -43,6 +45,9 @@ import kiss.Signal;
 public class BitfinexService extends MarketService {
 
     private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
+
+    /** The error converter. */
+    private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector().register(Kind.LimitOverflow, "ratelimit: error");
 
     /** The API limit. */
     private static final APILimiter LimitForREST = APILimiter.with.limit(10).refresh(Duration.ofMinutes(1));
@@ -267,7 +272,7 @@ public class BitfinexService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api-pub.bitfinex.com/v2/" + path));
 
-        return Network.rest(builder, LimitForREST, client()).retry(retryPolicy(retryMax, "Bitfinex RESTCall"));
+        return Network.rest(builder, LimitForREST, client()).mapError(e -> ERRORS.convert(e, this)).retry(withPolicy());
     }
 
     /**

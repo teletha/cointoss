@@ -54,6 +54,8 @@ public class NetworkErrorDetector {
      * @return
      */
     public Throwable convert(String message, MarketService market) {
+        message = message.toLowerCase();
+
         for (Kind kind : Kind.values()) {
             for (String word : keywords.get(kind)) {
                 if (message.contains(word)) {

@@ -9,7 +9,7 @@
  */
 package cointoss.market.coinbase;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -29,8 +29,8 @@ import cointoss.orderbook.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import hypatia.Num;
 import cointoss.util.Network;
+import hypatia.Num;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -173,7 +173,7 @@ public class CoinbaseService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.pro.coinbase.com/" + path));
 
-        return Network.rest(builder, LIMITER, client()).retry(retryPolicy(retryMax, exchange + " RESTCall"));
+        return Network.rest(builder, LIMITER, client()).retry(withPolicy());
     }
 
     /**

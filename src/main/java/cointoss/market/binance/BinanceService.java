@@ -275,7 +275,7 @@ public class BinanceService extends MarketService {
                 : isDelivery ? "https://dapi.binance.com/dapi/v1/" : "https://fapi.binance.com/fapi/v1/";
         Builder builder = HttpRequest.newBuilder(URI.create(path.startsWith("http") ? path : uri + path));
 
-        return Network.rest(builder, Limit, weight, client()).retry(retryPolicy(retryMax, "Binance RESTCall"));
+        return Network.rest(builder, Limit, weight, client()).retry(withPolicy());
     }
 
     /**

@@ -48,7 +48,8 @@ import psychopath.Locator;
 
 public abstract class MarketService implements Comparable<MarketService>, Disposable {
 
-    public static final int retryMax = 10;
+    /** The default max number of retry. */
+    private static final int retryMax = 10;
 
     /** The exchange. */
     public final Exchange exchange;
@@ -220,7 +221,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 return disposer;
             }) //
                     .effectOnError(e -> e.printStackTrace())
-                    .retry(retryPolicy(MarketService.retryMax, "ExecutionLog"))
+                    .retry(withPolicy(retryMax, "ExecutionLog"))
                     .effect(log::store)
                     .share();
         }
@@ -359,7 +360,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         if (executionRealtimely == null) {
             executionRealtimely = connectExecutionRealtimely().effectOnObserve(disposer::add).share();
         }
-        return executionRealtimely.retry(autoReconnect ? retryPolicy(retryMax, "ExecutionRealtimely") : null);
+        return executionRealtimely.retry(autoReconnect ? withPolicy(retryMax, "ExecutionRealtimely") : null);
     }
 
     /**
@@ -532,7 +533,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A event stream of order state.
      */
     public final synchronized Signal<Order> ordersRealtimely() {
-        return connectOrdersRealtimely().effectOnObserve(disposer::add).retry(retryPolicy(retryMax, "OrderRealtimely"));
+        return connectOrdersRealtimely().effectOnObserve(disposer::add).retry(withPolicy(retryMax, "OrderRealtimely"));
     }
 
     /**
@@ -570,7 +571,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         if (orderbookRealtimely == null) {
             orderbookRealtimely = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add).share();
         }
-        return orderbookRealtimely.retry(autoReconnect ? retryPolicy(retryMax, "OrderBookRealtimely") : null);
+        return orderbookRealtimely.retry(autoReconnect ? withPolicy(retryMax, "OrderBookRealtimely") : null);
     }
 
     /**
@@ -591,7 +592,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public final synchronized Signal<Liquidation> liquidationRealtimely() {
         if (liquidationRealtimely == null) {
-            liquidationRealtimely = connectLiquidation().effectOnObserve(disposer::add).retry(retryPolicy(retryMax, "Liquidation")).share();
+            liquidationRealtimely = connectLiquidation().effectOnObserve(disposer::add).retry(withPolicy(retryMax, "Liquidation")).share();
         }
         return liquidationRealtimely;
     }
@@ -710,11 +711,10 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     /**
      * Create new {@link RetryPolicy}.
      * 
-     * @param max The maximum number to retry.
      * @return
      */
-    public final RetryPolicy retryPolicy(int max) {
-        return retryPolicy(max, null);
+    protected final RetryPolicy withPolicy() {
+        return withPolicy(retryMax, formattedId);
     }
 
     /**
@@ -723,7 +723,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @param max The maximum number to retry.
      * @return
      */
-    public RetryPolicy retryPolicy(int max, String name) {
+    protected RetryPolicy withPolicy(int max, String name) {
         return RetryPolicy.with.limit(max)
                 .delay(x -> Duration.ofSeconds(x < 30 ? (x + 1) * (x + 1) : 900))
                 .scheduler(scheduler())

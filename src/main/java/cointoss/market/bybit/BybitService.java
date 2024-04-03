@@ -253,7 +253,7 @@ public class BybitService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.bybit.com/v5/" + path));
 
-        return Network.rest(builder, Limit, client()).retry(retryPolicy(retryMax, "Bybit RESTCall"));
+        return Network.rest(builder, Limit, client()).retry(withPolicy());
     }
 
     /**

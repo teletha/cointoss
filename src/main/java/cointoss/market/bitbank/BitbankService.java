@@ -27,8 +27,8 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import hypatia.Num;
 import cointoss.util.Network;
+import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -189,7 +189,7 @@ public class BitbankService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://public.bitbank.cc/" + path));
 
-        return Network.rest(builder, Limit, client()).retry(retryPolicy(retryMax, "Bitbank RESTCall [" + path + "]"));
+        return Network.rest(builder, Limit, client()).retry(withPolicy());
     }
 
     /**
