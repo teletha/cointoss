@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="K">
+		<header class="Z">
+			<h1 class="i" date="2024-04-01" ver="1.6.0"><code>Cointoss</code></h1>
+			<nav class="X"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="j" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="I">
+			<nav class="Y">
+				<div></div>
+			</nav>
+			<article class="f" id="Article">
+				<section class="m"><code class="S">cointoss.util</code>
+					<h2 class="Class H"><code class="V">NetworkErrorDetector</code></h2>
+					<div class="R"></div>
+				</section>
+				<section class="m" id="NetworkErrorDetector()">
+					<h2 class="h"><i class="PUBLIC"></i><code class="V">NetworkErrorDetector</code><code class="k">()</code></h2>
+				</section>
+				<section class="m" id="convert(java.lang.Throwable,cointoss.MarketService)">
+					<h2 class="h"><i class="PUBLIC"></i><code class="V">convert</code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code> <code class="parameterName">e</code>, <code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">market</code>)</code><i class="W"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code></i></h2>
+					<table class="O">
+						<tr class="d">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code> <code>e</code></td>
+							<td></td>
+						</tr>
+						<tr class="d">
+							<td><code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code>market</code></td>
+							<td></td>
+						</tr>
+						<tr class="a">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Convert to <code><a href="api/cointoss.util.NetworkError.html">NetworkError</a></code> if available.</p>
+</span></section>
+				<section class="m" id="convert(java.lang.String,cointoss.MarketService)">
+					<h2 class="h"><i class="PUBLIC"></i><code class="V">convert</code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">message</code>, <code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">market</code>)</code><i class="W"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code></i></h2>
+					<table class="O">
+						<tr class="d">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>message</code></td>
+							<td></td>
+						</tr>
+						<tr class="d">
+							<td><code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code>market</code></td>
+							<td></td>
+						</tr>
+						<tr class="a">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Convert to <code><a href="api/cointoss.util.NetworkError.html">NetworkError</a></code> if available.</p>
+</span></section>
+				<section class="m" id="register(cointoss.util.NetworkError.Kind,java.lang.String...)">
+					<h2 class="h"><i class="PUBLIC"></i><code class="V">register</code><code class="k">(<code><a href="api/cointoss.util.NetworkError.Kind.html">Kind</a></code> <code class="parameterName">kind</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">words</code>)</code><i class="W"><code><a href="api/cointoss.util.NetworkErrorDetector.html">NetworkErrorDetector</a></code></i></h2>
+					<table class="O">
+						<tr class="d">
+							<td><code><a href="api/cointoss.util.NetworkError.Kind.html">Kind</a></code> <code>kind</code></td>
+							<td></td>
+						</tr>
+						<tr class="d">
+							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>words</code></td>
+							<td></td>
+						</tr>
+						<tr class="a">
+							<td><code><a href="api/cointoss.util.NetworkErrorDetector.html">NetworkErrorDetector</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Register the error words.</p>
+</span></section>
+			</article>
+			<aside class="c" id="SubNavi">
+				<div class="l">
+					<h5 class="P">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.NetworkErrorDetector.html#NetworkErrorDetector()">NetworkErrorDetector</a></code><code class="k">()</code></li>
+					</ul>
+					<h5 class="P">Methods</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.NetworkErrorDetector.html#convert(java.lang.Throwable,cointoss.MarketService)">convert</a></code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code> <code class="parameterName">e</code>, <code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">market</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.NetworkErrorDetector.html#convert(java.lang.String,cointoss.MarketService)">convert</a></code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">message</code>, <code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">market</code>)</code><i class="e"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Throwable.html">Throwable</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.NetworkErrorDetector.html#register(cointoss.util.NetworkError.Kind,java.lang.String...)">register</a></code><code class="k">(<code><a href="api/cointoss.util.NetworkError.Kind.html">Kind</a></code> <code class="parameterName">kind</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">words</code>)</code><i class="e"><code><a href="api/cointoss.util.NetworkErrorDetector.html">NetworkErrorDetector</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

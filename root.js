@@ -31,6 +31,7 @@ const root = {
 		"trademate.chart.builtin",
 		"trademate.chart.line",
 		"trademate.chart.part",
+		"trademate.notify",
 		"trademate.order",
 		"trademate.setting",
 		"trademate.verify",
@@ -803,13 +804,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "LimitOverflowError",
-			"packageName": "cointoss.market",
-			"type": "Exception"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "LineMark",
 			"packageName": "trademate.chart.line",
 			"type": "Class"
@@ -883,13 +877,6 @@ const root = {
 			"name": "LogType",
 			"packageName": "cointoss.execution",
 			"type": "Enum"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "MaintenanceError",
-			"packageName": "cointoss.market",
-			"type": "Exception"
 		},
 		{
 			"modifiers": {
@@ -1006,6 +993,27 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "NetworkError",
+			"packageName": "cointoss.util",
+			"type": "Exception"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "NetworkError.Kind",
+			"packageName": "cointoss.util",
+			"type": "Enum"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "NetworkErrorDetector",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Notificator",
 			"packageName": "trademate.setting",
 			"type": "Class"
@@ -1022,6 +1030,13 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "NotificatorSetting",
 			"packageName": "trademate.setting",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "NotifyNetworkError",
+			"packageName": "trademate.notify",
 			"type": "Class"
 		},
 		{
