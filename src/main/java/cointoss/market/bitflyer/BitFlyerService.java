@@ -49,8 +49,9 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import cointoss.util.NetworkErrorDetector;
 import cointoss.util.Network;
+import cointoss.util.NetworkError.Kind;
+import cointoss.util.NetworkErrorDetector;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -72,10 +73,10 @@ public class BitFlyerService extends MarketService {
     /** The API limit. */
     private static final APILimiter LIMITER = APILimiter.with.limit(80 /* 100 */).refresh(1, MINUTES);
 
-    /** The error detection. */
-    private static final NetworkErrorDetector DETECTOR = new NetworkErrorDetector(Exchange.BitFlyer)
-            .authentication("key not found", "authentication error")
-            .minimumOrder("minimum order");
+    /** The error converter. */
+    private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector()
+            .register(Kind.Unauthenticated, "key not found", "authentication error")
+            .register(Kind.MinimumOrder, "minimum order");
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")
@@ -562,7 +563,7 @@ public class BitFlyerService extends MarketService {
             builder = builder.POST(BodyPublishers.ofString(bodyText));
         }
 
-        return Network.rest(builder, LIMITER, weight, client()).mapError(DETECTOR);
+        return Network.rest(builder, LIMITER, weight, client()).mapError(e -> ERRORS.convert(e, this));
     }
 
     /**

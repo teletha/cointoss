@@ -9,63 +9,34 @@
  */
 package cointoss.util;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
-import cointoss.market.Exchange;
-import kiss.WiseFunction;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
-public class NetworkErrorDetector implements WiseFunction<Throwable, Throwable> {
+import cointoss.MarketService;
+import cointoss.util.NetworkError.Kind;
 
-    /** The keyword for authentication error. */
-    private final Set<String> auth = new HashSet();
+public class NetworkErrorDetector {
 
-    /** The keyword for maintenance error. */
-    private final Set<String> maintenance = new HashSet();
-
-    /** The keyword for rate-limit error. */
-    private final Set<String> limit = new HashSet();
-
-    /** The keyword for minimum order size error. */
-    private final Set<String> min = new HashSet();
-
-    /** The associated exchange. */
-    private final Exchange exchange;
-
-    public NetworkErrorDetector(Exchange exchange) {
-        this.exchange = Objects.requireNonNull(exchange);
-    }
+    /** The keyword for various errors. */
+    private final Multimap<Kind, String> keywords = MultimapBuilder.enumKeys(Kind.class).arrayListValues().build();
 
     /**
-     * {@inheritDoc}
+     * Convert to {@link NetworkError} if available.
+     * 
+     * @param e
+     * @param market
+     * @return
      */
-    @Override
-    public Throwable APPLY(Throwable e) throws Throwable {
+    public Throwable convert(Throwable e, MarketService market) {
         String message = e.getMessage().toLowerCase();
 
-        for (String word : auth) {
-            if (message.contains(word)) {
-                return new NetworkError.UnauthenticatedAccess(e, exchange);
-            }
-        }
-
-        for (String word : limit) {
-            if (message.contains(word)) {
-                return new NetworkError.APILimitOverflow(e, exchange);
-            }
-        }
-
-        for (String word : maintenance) {
-            if (message.contains(word)) {
-                return new NetworkError.MarketMaintenance(e, exchange);
-            }
-        }
-
-        for (String word : min) {
-            if (message.contains(word)) {
-                return new NetworkError.MinimumOrder(e, exchange);
+        for (Kind kind : Kind.values()) {
+            for (String word : keywords.get(kind)) {
+                if (message.contains(word)) {
+                    return new NetworkError(kind, e, market);
+                }
             }
         }
         return e;
@@ -77,41 +48,8 @@ public class NetworkErrorDetector implements WiseFunction<Throwable, Throwable> 
      * @param words
      * @return
      */
-    public NetworkErrorDetector authentication(String... words) {
-        auth.addAll(List.of(words));
-        return this;
-    }
-
-    /**
-     * Register the error words.
-     * 
-     * @param words
-     * @return
-     */
-    public NetworkErrorDetector maintenance(String... words) {
-        maintenance.addAll(List.of(words));
-        return this;
-    }
-
-    /**
-     * Register the error words.
-     * 
-     * @param words
-     * @return
-     */
-    public NetworkErrorDetector limitOverflow(String... words) {
-        limit.addAll(List.of(words));
-        return this;
-    }
-
-    /**
-     * Register the error words.
-     * 
-     * @param words
-     * @return
-     */
-    public NetworkErrorDetector minimumOrder(String... words) {
-        min.addAll(List.of(words));
+    public NetworkErrorDetector register(Kind kind, String... words) {
+        keywords.putAll(kind, List.of(words));
         return this;
     }
 }

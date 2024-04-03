@@ -11,44 +11,41 @@ package cointoss.util;
 
 import java.net.HttpRetryException;
 
-import cointoss.market.Exchange;
-import kiss.I;
-import kiss.Variable;
+import cointoss.MarketService;
 
 @SuppressWarnings("serial")
-public abstract class NetworkError extends Error {
+public final class NetworkError extends Error {
 
-    /** The error message. */
-    private static final Variable<String> messageAuthentication = I
-            .translate("Authetication is required. Please check your access token or password.");
+    /** The target market. */
+    public final MarketService service;
 
-    /** The error message. */
-    private static final Variable<String> messageLimitOverflow = I
-            .translate("API limit has been exceeded. Please try again in a few minutes.");
-
-    /** The error message. */
-    private static final Variable<String> messageMaintenance = I
-            .translate("The market is under maintenance. Please refer to the official maintenance information.");
-
-    /** The error message. */
-    private static final Variable<String> messageMinimumOrder = I
-            .translate("The order quantity is too small. Please increase the order quantity.");
-
-    private static final Variable<String> URL = I.translate("Open the target URL");
-
-    /** The target exchange. */
-    private final Exchange exchange;
+    /** The kind of error. */
+    public final Kind kind;
 
     /**
      * Hide constructor.
      * 
      * @param cause
-     * @param exchange
+     * @param service
      */
-    protected NetworkError(Variable<String> message, Throwable cause, Exchange exchange) {
-        super(message.exact(), cause, false, true);
+    NetworkError(Kind kind, Throwable cause, MarketService service) {
+        super(kind.message, cause, false, true);
 
-        this.exchange = exchange;
+        this.kind = kind;
+        this.service = service;
+    }
+
+    /**
+     * Locate error request.
+     * 
+     * @return
+     */
+    public String getLocation() {
+        if (getCause() instanceof HttpRetryException x) {
+            return x.getLocation();
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -64,42 +61,22 @@ public abstract class NetworkError extends Error {
     }
 
     /**
-     * {@inheritDoc}
+     * Error type.
      */
-    @Override
-    public String toString() {
-        if (getCause() instanceof HttpRetryException x) {
-            return exchange.name() + "\r\n" + super.getMessage() + "\n[" + URL + "](" + x.getLocation() + ")";
-        } else {
-            return super.getMessage();
-        }
-    }
+    public enum Kind {
+        Unauthenticated("Authetication is required. Please check your access token or password."),
 
-    public static class UnauthenticatedAccess extends NetworkError {
+        LimitOverflow("API limit has been exceeded. Please try again in a few minutes."),
 
-        UnauthenticatedAccess(Throwable cause, Exchange exchange) {
-            super(messageAuthentication, cause, exchange);
-        }
-    }
+        Maintenance("The market is under maintenance. Please refer to the official maintenance information."),
 
-    public static class APILimitOverflow extends NetworkError {
+        MinimumOrder("The order quantity is too small. Please increase the order quantity.");
 
-        APILimitOverflow(Throwable cause, Exchange exchange) {
-            super(messageLimitOverflow, cause, exchange);
-        }
-    }
+        /** The associated message. */
+        public final String message;
 
-    public static class MarketMaintenance extends NetworkError {
-
-        MarketMaintenance(Throwable cause, Exchange exchange) {
-            super(messageMaintenance, cause, exchange);
-        }
-    }
-
-    public static class MinimumOrder extends NetworkError {
-
-        MinimumOrder(Throwable cause, Exchange exchange) {
-            super(messageMinimumOrder, cause, exchange);
+        private Kind(String message) {
+            this.message = message;
         }
     }
 }
