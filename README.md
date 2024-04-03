@@ -130,10 +130,10 @@ Cointoss depends on the following products on runtime.
 * [openjfx-monocle-jdk-12.0.1+2](https://mvnrepository.com/artifact/org.testfx/openjfx-monocle/jdk-12.0.1+2)
 * [primavera-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/primavera/1.1.0)
 * [psychopath-1.12.1](https://mvnrepository.com/artifact/com.github.teletha/psychopath/1.12.1)
-* [sinobu-3.10.1](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.10.1)
+* [sinobu-3.11.0](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.11.0)
 * [stylist-1.10.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.10.0)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
-* [viewtify-2.23.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.23.0)
+* [viewtify-2.24.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.24.0)
 * [zstd-jni-1.5.6-1](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.6-1)
 <p align="right"><a href="#top">back to top</a></p>
 
