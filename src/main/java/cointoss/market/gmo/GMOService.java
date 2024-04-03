@@ -34,15 +34,16 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLogRepository;
 import cointoss.market.Exchange;
-import cointoss.market.LimitOverflowError;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
-import hypatia.Num;
 import cointoss.util.Network;
+import cointoss.util.NetworkError.Kind;
+import cointoss.util.NetworkErrorDetector;
+import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -55,6 +56,9 @@ public class GMOService extends MarketService {
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+
+    /** The error converter. */
+    private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector().register(Kind.LimitOverflow, "requests are too many");
 
     /** The API limit. */
     private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(200, MILLISECONDS);
@@ -189,12 +193,7 @@ public class GMOService extends MarketService {
         return Network.rest(builder, LIMITER, client()).flatMap(json -> {
             if (json.get(int.class, "status") != 0) {
                 String message = json.get("messages").get("0").text("message_string") + " [" + path + "]";
-
-                if (message.contains("Requests are too many")) {
-                    return I.signalError(new LimitOverflowError(message));
-                } else {
-                    return I.signalError(new IllegalAccessError(message));
-                }
+                return I.signalError(ERRORS.convert(message, this));
             } else {
                 return I.signal(json);
             }

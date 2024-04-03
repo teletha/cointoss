@@ -17,8 +17,7 @@ import java.util.function.LongFunction;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import cointoss.market.LimitOverflowError;
-import cointoss.market.MaintenanceError;
+import cointoss.util.NetworkError.Kind;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
@@ -166,54 +165,43 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
      */
     @Override
     public Signal<?> APPLY(Signal<Throwable> error) throws Throwable {
-        return error
-                .flatMap(e -> limit() <= 0 || e instanceof AssertionError || e instanceof NetworkError ? I.signalError(e) : I.signal(e))
-                .take(limit())
-                .delay(e -> {
-                    // try to reset counting
-                    long now = System.currentTimeMillis();
-                    if (now - latestRetryTime > 10 * 60 * 1000) {
-                        count = 0;
-                    }
-                    latestRetryTime = now;
+        return error.flatMap(e -> limit() <= 0 || !isRecoverableError(e) ? I.signalError(e) : I.signal(e)).take(limit()).delay(e -> {
+            // try to reset counting
+            long now = System.currentTimeMillis();
+            if (now - latestRetryTime > 10 * 60 * 1000) {
+                count = 0;
+            }
+            latestRetryTime = now;
 
-                    Duration duration = Duration.ZERO;
-                    LongFunction<Duration> delay = isMaintenance(e) ? delayOnMaintenace()
-                            : isLimitError(e) ? delayOnLimitOverflow() : delay();
-                    if (delay != null) {
-                        duration = delay.apply(count++);
-                        if (10 < duration.toMinutes()) {
-                            duration = Duration.ofMinutes(10);
-                        }
-                    }
+            Duration duration = Duration.ZERO;
+            LongFunction<Duration> delay = NetworkError.check(e, Kind.Maintenance) ? delayOnMaintenace()
+                    : NetworkError.check(e, Kind.LimitOverflow) ? delayOnLimitOverflow() : delay();
+            if (delay != null) {
+                duration = delay.apply(count++);
+                if (10 < duration.toMinutes()) {
+                    duration = Duration.ofMinutes(10);
+                }
+            }
 
-                    String name = name();
-                    if (name != null && name.length() != 0) {
-                        I.error(this + " will retry after " + Chrono.formatAsDuration(duration) + ".");
-                        I.error(e);
-                    }
+            String name = name();
+            if (name != null && name.length() != 0) {
+                I.error(this + " will retry after " + Chrono.formatAsDuration(duration) + ".");
+                I.error(e);
+            }
 
-                    return duration;
-                }, scheduler())
-                .effect(onRetry);
+            return duration;
+        }, scheduler()).effect(onRetry);
     }
 
-    private boolean isMaintenance(Throwable e) {
-        String mes = e.getMessage();
-        if (mes == null) {
+    private boolean isRecoverableError(Throwable e) {
+        if (e instanceof AssertionError) {
             return false;
         }
-        mes = mes.toLowerCase();
-        return e instanceof MaintenanceError || mes.contains("maintenance");
-    }
 
-    private boolean isLimitError(Throwable e) {
-        String mes = e.getMessage();
-        if (mes == null) {
-            return false;
+        if (e instanceof NetworkError x) {
+            return x.kind.recoverable;
         }
-        mes = mes.toLowerCase();
-        return e instanceof LimitOverflowError || mes.contains("ratelimit");
+        return true;
     }
 
     public static WiseFunction<Signal<Throwable>, Signal<?>> comply(long limit) {

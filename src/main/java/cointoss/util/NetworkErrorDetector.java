@@ -30,6 +30,10 @@ public class NetworkErrorDetector {
      * @return
      */
     public Throwable convert(Throwable e, MarketService market) {
+        if (e instanceof NetworkError) {
+            return e;
+        }
+
         String message = e.getMessage().toLowerCase();
 
         for (Kind kind : Kind.values()) {
@@ -40,6 +44,24 @@ public class NetworkErrorDetector {
             }
         }
         return e;
+    }
+
+    /**
+     * Convert to {@link NetworkError} if available.
+     * 
+     * @param message
+     * @param market
+     * @return
+     */
+    public Throwable convert(String message, MarketService market) {
+        for (Kind kind : Kind.values()) {
+            for (String word : keywords.get(kind)) {
+                if (message.contains(word)) {
+                    return new NetworkError(kind, message, market);
+                }
+            }
+        }
+        return new NetworkError(Kind.Unkwnow, message, market);
     }
 
     /**

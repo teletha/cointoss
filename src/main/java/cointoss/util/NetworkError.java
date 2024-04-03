@@ -25,6 +25,19 @@ public final class NetworkError extends Error {
     /**
      * Hide constructor.
      * 
+     * @param message
+     * @param service
+     */
+    NetworkError(Kind kind, String message, MarketService service) {
+        super(kind.message + " " + message, null, false, true);
+
+        this.kind = kind;
+        this.service = service;
+    }
+
+    /**
+     * Hide constructor.
+     * 
      * @param cause
      * @param service
      */
@@ -61,22 +74,39 @@ public final class NetworkError extends Error {
     }
 
     /**
+     * Test whether the given error is specified {@link NetworkError} or not.
+     * 
+     * @param error
+     * @param kind
+     * @return
+     */
+    public static boolean check(Throwable error, Kind kind) {
+        return error instanceof NetworkError x && x.kind == kind;
+    }
+
+    /**
      * Error type.
      */
     public enum Kind {
-        Unauthenticated("Authetication is required. Please check your access token or password."),
+        Unauthenticated("Authetication is required. Please check your access token or password.", false),
 
-        LimitOverflow("API limit has been exceeded. Please try again in a few minutes."),
+        LimitOverflow("API limit has been exceeded. Please try again in a few minutes.", true),
 
-        Maintenance("The market is under maintenance. Please refer to the official maintenance information."),
+        Maintenance("The market is under maintenance. Please refer to the official maintenance information.", true),
 
-        MinimumOrder("The order quantity is too small. Please increase the order quantity.");
+        MinimumOrder("The order quantity is too small. Please increase the order quantity.", false),
+
+        Unkwnow("Unknown network error.", true);
 
         /** The associated message. */
         public final String message;
 
-        private Kind(String message) {
+        /** The recoverable error or not. */
+        public final boolean recoverable;
+
+        private Kind(String message, boolean recoverable) {
             this.message = message;
+            this.recoverable = recoverable;
         }
     }
 }
