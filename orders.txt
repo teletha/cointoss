@@ -1,21 +1,78 @@
-Click
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-006458=B0/0.1@10143936	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006458, JRF20240402-002505-006457=B0/0.1@10158804	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006457, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451, JRF20240402-002505-012120=B0/0.1@10173672	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012120}
-Updater B0/0.1@10114200	INIT	1970-01-01T09:00:00Å`  	#JRF20240402-002505-013451
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-006458=B0/0.1@10143936	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006458, JRF20240402-002505-006457=B0/0.1@10158804	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006457, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451, JRF20240402-002505-012120=B0/0.1@10173672	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012120}
-Updater B0/0.1@10129068	INIT	1970-01-01T09:00:00Å`  	#JRF20240402-002505-012119
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-006458=B0/0.1@10143936	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006458, JRF20240402-002505-006457=B0/0.1@10158804	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006457, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451, JRF20240402-002505-012120=B0/0.1@10173672	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012120}
-Updater B0/0.1@10158804	INIT	1970-01-01T09:00:00Å`  	#JRF20240402-002505-006457
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-006458=B0/0.1@10143936	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006458, JRF20240402-002505-006457=B0/0.1@10158804	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006457, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451, JRF20240402-002505-012120=B0/0.1@10173672	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012120}
-Updater B0/0.1@10143936	INIT	1970-01-01T09:00:00Å`  	#JRF20240402-002505-006458
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-006458=B0/0.1@10143936	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006458, JRF20240402-002505-006457=B0/0.1@10158804	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006457, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451, JRF20240402-002505-012120=B0/0.1@10173672	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012120}
-Updater B0/0.1@10173672	INIT	1970-01-01T09:00:00Å`  	#JRF20240402-002505-012120
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-006458=B0/0.1@10143936	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006458, JRF20240402-002505-006457=B0/0.1@10158804	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006457, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451, JRF20240402-002505-012120=B0/0.1@10173672	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012120}
-Updater b0/1@0	CANCELED	1970-01-01T09:00:00Å`  	#JRF20240402-002505-012120
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-006458=B0/0.1@10143936	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006458, JRF20240402-002505-006457=B0/0.1@10158804	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006457, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451}
-Updater b0/1@0	CANCELED	1970-01-01T09:00:00Å`  	#JRF20240402-002505-006457
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-006458=B0/0.1@10143936	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-006458, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451}
-Updater b0/1@0	CANCELED	1970-01-01T09:00:00Å`  	#JRF20240402-002505-006458
-Managed {JRF20240402-002505-012119=B0/0.1@10129068	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-012119, JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451}
-Updater b0/1@0	CANCELED	1970-01-01T09:00:00Å`  	#JRF20240402-002505-012119
-Managed {JRF20240402-002505-013451=B0/0.1@10114200	ACTIVE	2024-04-02T09:25:13Å`  	#JRF20240402-002505-013451}
-Updater b0/1@0	CANCELED	1970-01-01T09:00:00Å`  	#JRF20240402-002505-013451
+java.lang.Error 
+	at kiss.Observer.error(Observer.java:57)
+	at kiss.Subscriber.error(Subscriber.java:94)
+	at kiss.Subscriber.error(Subscriber.java:92) 5
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Signal.lambda$261(Signal.java:3649) #countableì‡ÇÃerror delegator
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.I.lambda$83(I.java:2114) #signalErrorÇÃÉGÉâÅ[ìäÇ∞
+	at kiss.Signal.to(Signal.java:269)Å@#subscriberÇÃí èÌèàóù
+	at kiss.Signal.to(Signal.java:258)
+	at kiss.Signal.lambda$88(Signal.java:1754) #flatMapÇÃerror delegation
+	at kiss.Subscriber.accept(Subscriber.java:117)
+	at kiss.Signaling.accept(Signaling.java:31)
+	at kiss.Signal.lambda$167(Signal.java:2520)Å@#retryÇÃÉGÉâÅ[ÉXÉgÉäÅ[ÉÄì‡Ç≈acceptÇ≈ÉGÉâÅ[Çó¨ÇµÇƒÇ¢ÇÈ
+	at kiss.Subscriber.accept(Subscriber.java:117)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Signal.lambda$123(Signal.java:2065)Å@#mapErrorÇ≈ïœä∑íÜ
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.I.lambda$45(I.java:998)
+java.lang.Error
+	at kiss.Observer.error(Observer.java:57)
+	at kiss.Subscriber.error(Subscriber.java:94)
+	at kiss.Subscriber.error(Subscriber.java:92) 5
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Signal.lambda$261(Signal.java:3649)  #countableì‡ÇÃerror delegator
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Signal.to(Signal.java:271) # subscriberì‡Ç≈ÉGÉâÅ[Ç™î≠ê∂ÇµÇΩÇÃÇ≈rethrowÇµÇƒÇ¢ÇÈ
+	at kiss.Signal.to(Signal.java:258)
+	at kiss.Signal.lambda$88(Signal.java:1754)Å@#flatMapÇÃerror delegation
+	at kiss.Subscriber.accept(Subscriber.java:117)
+	at kiss.Signaling.accept(Signaling.java:31)
+	at kiss.Signal.lambda$167(Signal.java:2520)Å@#retryÇÃÉGÉâÅ[ÉXÉgÉäÅ[ÉÄì‡Ç≈acceptÇ≈ÉGÉâÅ[Çó¨ÇµÇƒÇ¢ÇÈ
+	at kiss.Subscriber.accept(Subscriber.java:117)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Signal.lambda$123(Signal.java:2065)Å@#mapErrorÇ≈ïœä∑íÜ
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.I.lambda$45(I.java:998)
+java.lang.Error
+	at kiss.Observer.error(Observer.java:57)
+	at kiss.Subscriber.error(Subscriber.java:94)
+	at kiss.Subscriber.error(Subscriber.java:92) 6
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.accept(Subscriber.java:122)Å@#acceptíÜÇ…ÉGÉâÅ[Ç™èoÇΩÇÃÇ≈rethrow
+	at kiss.Signaling.accept(Signaling.java:31)
+	at kiss.Signal.lambda$167(Signal.java:2520) #retryÇÃÉGÉâÅ[ÉXÉgÉäÅ[ÉÄì‡Ç≈acceptÇ≈ÉGÉâÅ[Çó¨ÇµÇƒÇ¢ÇÈ
+	at kiss.Subscriber.accept(Subscriber.java:117)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Signal.lambda$123(Signal.java:2065)Å@#mapErrorÇ≈ïœä∑íÜ
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.I.lambda$45(I.java:998)
+java.lang.Error
+	at kiss.Observer.error(Observer.java:57)
+	at kiss.Subscriber.error(Subscriber.java:94)
+	at kiss.Subscriber.error(Subscriber.java:92) 6
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Signaling.error(Signaling.java:51)
+	at kiss.Subscriber.error(Subscriber.java:94)
+	at kiss.Subscriber.accept(Subscriber.java:122) #acceptíÜÇ…ÉGÉâÅ[Ç™èoÇΩÇÃÇ≈rethrow
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.Signal.lambda$123(Signal.java:2065) #mapErrorÇ≈ïœä∑íÜ
+	at kiss.Subscriber.error(Subscriber.java:92)
+	at kiss.I.lambda$45(I.java:998)

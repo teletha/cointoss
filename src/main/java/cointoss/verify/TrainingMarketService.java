@@ -105,6 +105,15 @@ public class TrainingMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Boolean> cancelAll() {
+        System.out.println("cancel all");
+        return frontend.cancelAll();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Execution> executions(long startId, long endId) {
         return backend.executions(startId, endId);
     }

@@ -248,7 +248,7 @@ public class OrderView extends View {
         makerBuyText.text(en("Make Buying")).color(ChartTheme.$.buy);
 
         trainingMode.text(en("Demo Trade")).initialize(true).disable(false);
-        orderSize.value(Num.of("0.5")).normalizeInput(Form.NFKC).acceptPositiveDecimalInput();
+        orderSize.value(Num.of("0.08")).normalizeInput(Form.NFKC).acceptPositiveDecimalInput();
         orderThresholdSize.value(Num.of("3")).normalizeInput(Form.NFKC).acceptPositiveDecimalInput();
         history.text(en("Full History"))
                 .initialize(false)

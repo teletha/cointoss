@@ -242,6 +242,10 @@ public class VerifiableMarketService extends MarketService {
             return I.signal();
         }
 
+        return cancel(backend, order);
+    }
+
+    private Signal<Order> cancel(BackendOrder backend, Order order) {
         // when latency is zero, cancel order immediately
         ZonedDateTime delay = latency.emulate(now);
 
@@ -265,6 +269,19 @@ public class VerifiableMarketService extends MarketService {
         backend.cancelTimeMills = Chrono.epochMills(delay);
 
         return backend.canceling.expose;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Boolean> cancelAll() {
+        Signal<Order> composed = I.signal();
+
+        for (BackendOrder back : orderActive) {
+            composed = composed.merge(cancel(back, null));
+        }
+        return composed.isSignaled();
     }
 
     /**

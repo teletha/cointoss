@@ -29,7 +29,7 @@ public final class NetworkError extends Error {
      * @param service
      */
     NetworkError(Kind kind, String message, MarketService service) {
-        super(kind.message + " " + message, null, false, true);
+        super(kind.message + " " + message, null, true, true);
 
         this.kind = kind;
         this.service = service;
@@ -42,7 +42,7 @@ public final class NetworkError extends Error {
      * @param service
      */
     NetworkError(Kind kind, Throwable cause, MarketService service) {
-        super(kind.message, cause, false, true);
+        super(kind.message, cause, true, true);
 
         this.kind = kind;
         this.service = service;
