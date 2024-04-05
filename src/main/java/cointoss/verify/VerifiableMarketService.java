@@ -281,7 +281,7 @@ public class VerifiableMarketService extends MarketService {
         for (BackendOrder back : orderActive) {
             composed = composed.merge(cancel(back, null));
         }
-        return composed.isSignaled();
+        return composed.mapTo(true);
     }
 
     /**
