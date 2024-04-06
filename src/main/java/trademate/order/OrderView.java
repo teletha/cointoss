@@ -13,14 +13,13 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
-import javafx.scene.control.SelectionMode;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.Division;
 import cointoss.trade.Scenario;
 import cointoss.verify.TrainingMarket;
 import hypatia.Num;
+import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Managed;
@@ -140,6 +139,15 @@ public class OrderView extends View {
     private UITableColumn<Scenario, Num> exitSize;
 
     /** UI */
+    private UITableColumn<Scenario, Num> losscutPrice;
+
+    /** UI */
+    private UITableColumn<Scenario, Num> losscutSize;
+
+    /** UI */
+    private UITableColumn<Scenario, Num> riskRewardRatio;
+
+    /** UI */
     private UITableColumn<Scenario, Num> profitAndLoss;
 
     class view extends ViewDSL {
@@ -156,6 +164,9 @@ public class OrderView extends View {
                     $(entrySize, style.Narrow);
                     $(exitPrice, style.Wide);
                     $(exitSize, style.Narrow);
+                    $(losscutPrice, style.Wide);
+                    $(losscutSize, style.Narrow);
+                    $(riskRewardRatio, style.Narrow);
                     $(profitAndLoss, style.Wide);
                 });
             });
@@ -294,8 +305,17 @@ public class OrderView extends View {
                 .render((ui, scenario, size) -> ui.text(size + " / " + scenario.exitSize));
 
         // ===============================================
+        // Losscut Part
+        // ===============================================
+        losscutPrice.text(LosscutPrice).modelBySignal(Scenario::observeExitPriceNow).render((ui, scenario, price) -> ui.text(price));
+        losscutSize.text(Amount)
+                .modelBySignal(Scenario::observeExitExecutedSizeNow)
+                .render((ui, scenario, size) -> ui.text(size + " / " + scenario.exitSize));
+
+        // ===============================================
         // Analyze Part
         // ===============================================
+        riskRewardRatio.text(RiskReward);
         profitAndLoss.text(Profit)
                 .modelBySignal(scenario -> current.orderBook.by(scenario).best.observing().map(page -> scenario.predictProfit()))
                 .render((ui, scenario, profit) -> ui.text(profit).color(ChartTheme.colorBy(profit)));
