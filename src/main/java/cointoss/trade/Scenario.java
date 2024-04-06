@@ -303,7 +303,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
             });
         } else {
             // losscut
-            market.priceMatcher.register(price, this, () -> {
+            market.priceMatcher.register(price, directional, () -> {
                 disposeEntry();
 
                 market.request(orientation().inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {

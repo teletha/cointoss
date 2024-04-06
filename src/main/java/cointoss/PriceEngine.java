@@ -57,28 +57,41 @@ public class PriceEngine {
         }
     }
 
-    public void register(Variable<Num> price, Orientational direction, WiseRunnable action) {
-        if (price.isFixed()) {
-            if (direction.isPositive()) {
-                buyer.put(price.v, action);
-            } else {
-                seller.put(price.v, action);
-            }
-        } else {
-            if (direction.isPositive()) {
-                buyer.put(price.v, action);
+    /**
+     * Register the priced action.
+     * 
+     * @param price
+     * @param orientational
+     * @param action
+     */
+    public void register(Num price, Orientational orientational, WiseRunnable action) {
+        register(Variable.of(price).fix(), orientational, action);
+    }
+
+    /**
+     * Register the priced action.
+     * 
+     * @param price
+     * @param orientational
+     * @param action
+     */
+    public void register(Variable<Num> price, Orientational orientational, WiseRunnable action) {
+        if (orientational.isPositive()) {
+            buyer.put(price.v, action);
+            if (!price.isFixed()) {
                 price.observing().diff().buffer(2).to(list -> {
                     buyer.remove(list.get(0));
                     buyer.put(list.get(1), action);
                 });
-            } else {
-                seller.put(price.v, action);
+            }
+        } else {
+            seller.put(price.v, action);
+            if (!price.isFixed()) {
                 price.observing().diff().buffer(2).to(list -> {
                     seller.remove(list.get(0));
                     seller.put(list.get(1), action);
                 });
             }
         }
-
     }
 }
