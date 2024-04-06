@@ -16,8 +16,10 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .startRandom()
-                .endDuration(365)
+                // .start(2024, 1, 1)
+                // .end(2024, 3, 31)
+                .start(2022, 4, 1)
+                .end(2022, 7, 31)
                 .traders(new RandomWalker())
                 .fast()
                 .detail(false)
@@ -28,12 +30,14 @@ public class BackTestInvoker {
         // ZonedDateTime end = Chrono.utc(2022, 1, 11);
         // SignalSynchronizer synchronizer = new SignalSynchronizer();
         //
-        // Binance.FUTURE_EHT_USDT.openInterest().query(start.toEpochSecond(),
+        // BinanceFuture.FUTURE_EHT_USDT.openInterest().query(start.toEpochSecond(),
         // end.toEpochSecond()).plug(synchronizer.sync()).to(oi -> {
         // System.out.println(oi);
         // });
         //
-        // new ExecutionLog(Binance.FUTURE_EHT_USDT).at(start).plug(synchronizer.sync()).to(exe -> {
+        // new
+        // ExecutionLog(BinanceFuture.FUTURE_EHT_USDT).at(start).plug(synchronizer.sync()).to(exe ->
+        // {
         // System.out.println(exe);
         // });
     }

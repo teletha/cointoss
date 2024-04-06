@@ -10,13 +10,13 @@
 package cointoss.verify;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -58,7 +58,7 @@ public class VerifiableMarketService extends MarketService {
     private int id = 0;
 
     /** The order manager. */
-    private final List<BackendOrder> orderActive = new ArrayList<>();
+    private final List<BackendOrder> orderActive = new CopyOnWriteArrayList();
 
     /** The order manager. */
     final Signaling<Order> orderUpdateRealtimely = new Signaling();
@@ -497,7 +497,7 @@ public class VerifiableMarketService extends MarketService {
 
             // check quantity condition
             if (order.condition == QuantityCondition.FillOrKill && !validateTradable(order, e)) {
-                iterator.remove();
+                orderActive.remove(order);
                 continue;
             }
 
@@ -505,7 +505,7 @@ public class VerifiableMarketService extends MarketService {
                 if (validateTradableByPrice(order, e)) {
                     order.remainingSize = Num.min(e.size, order.remainingSize);
                 } else {
-                    iterator.remove();
+                    orderActive.remove(order);
                     continue;
                 }
             }
@@ -524,7 +524,7 @@ public class VerifiableMarketService extends MarketService {
 
                 if (order.remainingSize.isZero()) {
                     order.state = OrderState.COMPLETED;
-                    iterator.remove();
+                    orderActive.remove(order);
                 }
 
                 Num price = order.type.isTaker() ? order.marketMinPrice : order.price;

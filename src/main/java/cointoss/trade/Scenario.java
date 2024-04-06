@@ -293,7 +293,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      */
     @Override
     public final void exitAt(Variable<Num> price, Consumer<Orderable> strategy) {
-        Disposable disposer;
+        Disposable disposer = Disposable.empty();
         if (entryPrice.isLessThan(directional, price)) {
             // profit
             disposer = observeEntryExecutedSizeDiff().debounceAll(1, SECONDS, market.service.scheduler()).map(Num::sum).to(size -> {
@@ -303,10 +303,10 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
             });
         } else {
             // losscut
-            disposer = market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(directional, price)).first().to(e -> {
+            market.priceMatcher.register(price, this, () -> {
                 disposeEntry();
 
-                market.request(directional.orientation().inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {
+                market.request(orientation().inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {
                     processExitOrder(o, "exitAtStopLoss");
                 });
             });

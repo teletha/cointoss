@@ -68,6 +68,9 @@ public class Market implements Disposable {
     /** The price volume manager. */
     public final PriceRangedVolumeManager priceVolume;
 
+    /** The fast price matching engine. */
+    public final PriceEngine priceMatcher;
+
     /** The ticker manager. */
     public final TickerManager tickers;
 
@@ -120,6 +123,7 @@ public class Market implements Disposable {
         this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();
         this.tickers = createTickerManager();
+        this.priceMatcher = new PriceEngine(this);
 
         // build tickers for each span
         timeline.to(e -> {

@@ -143,7 +143,7 @@ public interface TradingExit extends Orientational<Direction> {
      * @param price An exit price.
      */
     default void exitAt(Num price, Consumer<Orderable> strategy) {
-        exitAt(Variable.of(price), strategy);
+        exitAt(Variable.of(price).fix(), strategy);
     }
 
     /**

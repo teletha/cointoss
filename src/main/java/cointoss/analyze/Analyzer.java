@@ -12,6 +12,7 @@ package cointoss.analyze;
 import java.util.List;
 
 import cointoss.Market;
+import cointoss.execution.Execution;
 import cointoss.trade.Trader;
 
 public interface Analyzer {
@@ -23,6 +24,15 @@ public interface Analyzer {
      * @param traders
      */
     default void initialize(Market market, List<Trader> traders) {
+        // do nothing
+    }
+
+    /**
+     * Show progress.
+     * 
+     * @param e
+     */
+    default void progress(Execution e) {
         // do nothing
     }
 

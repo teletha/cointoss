@@ -180,10 +180,10 @@ interface BackTestModel {
      * @param analyzer
      */
     default void run(Analyzer analyzer) {
-        if (analyzer == null) {
-            analyzer = new ConsoleAnalyzer();
-        }
+        execute(analyzer == null ? new ConsoleAnalyzer() : analyzer);
+    }
 
+    private void execute(Analyzer analyzer) {
         VerifiableMarket market = new VerifiableMarket(service());
         market.tickers.tickers().to(e -> e.ticks.disableMemorySaving());
         market.service.baseCurrency = initialBaseCurrency();
@@ -195,7 +195,10 @@ interface BackTestModel {
         analyzer.initialize(market, traders());
 
         LocalDateTime start = LocalDateTime.now();
-        market.readLog(log -> log.range(start(), end(), type()).effect(market::perform).effectOnError(Throwable::printStackTrace));
+        market.readLog(log -> log.range(start(), end(), type())
+                .effect(market::perform)
+                .effectOnError(Throwable::printStackTrace)
+                .effect(analyzer::progress));
         LocalDateTime end = LocalDateTime.now();
 
         for (Trader trader : traders()) {

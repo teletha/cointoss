@@ -12,8 +12,23 @@ package cointoss.analyze;
 import java.util.List;
 
 import cointoss.Market;
+import cointoss.execution.Execution;
 
 public class ConsoleAnalyzer implements Analyzer {
+
+    private int day;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void progress(Execution e) {
+        int day = e.date.getDayOfMonth();
+        if (day != this.day) {
+            this.day = day;
+            System.out.println("Processing " + e.date.toLocalDate());
+        }
+    }
 
     /**
      * {@inheritDoc}

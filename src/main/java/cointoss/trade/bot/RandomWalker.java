@@ -20,29 +20,23 @@ import cointoss.trade.Trader;
 public class RandomWalker extends Trader {
 
     /**
-     * 
-     */
-    public RandomWalker() {
-        enable();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     protected void declareStrategy(Market market, Funds fund) {
-        when(market.tickers.on(Hour4).open, x -> trade(new Scenario() {
+        when(market.tickers.on(Hour1).open, x -> trade(new Scenario() {
 
             @Override
             protected void entry() {
-                Direction dir = Direction.random();
+                Direction dir = Direction.BUY;
 
-                entry(dir, 0.2, o -> o.make(market.tickers.latest.v.price.minus(dir, 300)));
+                entry(dir, 0.01);
             }
 
             @Override
             protected void exit() {
-                exitAt(entryPrice.minus(this, 10000));
+                // exitAt(entryPrice.plus(this, 1000000));
+                exitAt(entryPrice.minus(this, 100000));
             }
         }));
     }
