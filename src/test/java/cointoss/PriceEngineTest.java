@@ -22,14 +22,114 @@ public class PriceEngineTest {
     private VerifiableMarket market = new VerifiableMarket();
 
     @Test
-    void action() {
+    void buy() {
         AtomicInteger counter = new AtomicInteger();
 
-        market.priceMatcher.register(Num.ONE, Direction.BUY, counter::incrementAndGet);
+        market.priceMatcher.register(Num.of(5), Direction.BUY, counter::incrementAndGet);
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(10));
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(1));
+        assert counter.get() == 1;
+    }
+
+    @Test
+    void buyMultiPrices() {
+        AtomicInteger counter = new AtomicInteger();
+
+        market.priceMatcher.register(Num.of(5), Direction.BUY, counter::incrementAndGet);
+        market.priceMatcher.register(Num.of(10), Direction.BUY, counter::incrementAndGet);
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(15));
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(10));
+        assert counter.get() == 1;
+
+        market.perform(Execution.with.buy(1).price(5));
+        assert counter.get() == 2;
+    }
+
+    @Test
+    void buyMultiPricesAtSameTiming() {
+        AtomicInteger counter = new AtomicInteger();
+
+        market.priceMatcher.register(Num.of(5), Direction.BUY, counter::incrementAndGet);
+        market.priceMatcher.register(Num.of(10), Direction.BUY, counter::incrementAndGet);
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(5));
+        assert counter.get() == 2;
+    }
+
+    @Test
+    void buySamePrice() {
+        AtomicInteger counter = new AtomicInteger();
+
+        market.priceMatcher.register(Num.of(5), Direction.BUY, counter::incrementAndGet);
+        market.priceMatcher.register(Num.of(5), Direction.BUY, counter::incrementAndGet);
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(5));
+        assert counter.get() == 2;
+    }
+
+    @Test
+    void sell() {
+        AtomicInteger counter = new AtomicInteger();
+
+        market.priceMatcher.register(Num.of(5), Direction.SELL, counter::incrementAndGet);
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(1));
         assert counter.get() == 0;
 
         market.perform(Execution.with.buy(1).price(10));
         assert counter.get() == 1;
     }
 
+    @Test
+    void sellMultiPrices() {
+        AtomicInteger counter = new AtomicInteger();
+
+        market.priceMatcher.register(Num.of(5), Direction.SELL, counter::incrementAndGet);
+        market.priceMatcher.register(Num.of(10), Direction.SELL, counter::incrementAndGet);
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(1));
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(5));
+        assert counter.get() == 1;
+
+        market.perform(Execution.with.buy(1).price(10));
+        assert counter.get() == 2;
+    }
+
+    @Test
+    void sellMultiPricesAtSameTiming() {
+        AtomicInteger counter = new AtomicInteger();
+
+        market.priceMatcher.register(Num.of(5), Direction.SELL, counter::incrementAndGet);
+        market.priceMatcher.register(Num.of(10), Direction.SELL, counter::incrementAndGet);
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(15));
+        assert counter.get() == 2;
+    }
+
+    @Test
+    void sellSamePrice() {
+        AtomicInteger counter = new AtomicInteger();
+
+        market.priceMatcher.register(Num.of(5), Direction.SELL, counter::incrementAndGet);
+        market.priceMatcher.register(Num.of(5), Direction.SELL, counter::incrementAndGet);
+        assert counter.get() == 0;
+
+        market.perform(Execution.with.buy(1).price(5));
+        assert counter.get() == 2;
+    }
 }

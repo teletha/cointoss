@@ -10,8 +10,10 @@
 package cointoss;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.execution.Execution;
 import hypatia.Num;
@@ -24,9 +26,9 @@ import kiss.WiseRunnable;
  */
 public class PriceEngine {
 
-    private final ConcurrentSkipListMap<Num, WiseRunnable> seller = new ConcurrentSkipListMap();
+    private final ConcurrentSkipListMap<Num, List<WiseRunnable>> seller = new ConcurrentSkipListMap();
 
-    private final ConcurrentSkipListMap<Num, WiseRunnable> buyer = new ConcurrentSkipListMap();
+    private final ConcurrentSkipListMap<Num, List<WiseRunnable>> buyer = new ConcurrentSkipListMap();
 
     public PriceEngine(Market market) {
         market.timeline.to(this::match);
@@ -38,20 +40,20 @@ public class PriceEngine {
      * @param price
      */
     private void match(Execution e) {
-        ConcurrentNavigableMap<Num, WiseRunnable> matched = buyer.tailMap(e.price, true);
+        ConcurrentNavigableMap<Num, List<WiseRunnable>> matched = buyer.tailMap(e.price, true);
         if (!matched.isEmpty()) {
-            Iterator<WiseRunnable> iterator = matched.values().iterator();
+            Iterator<List<WiseRunnable>> iterator = matched.values().iterator();
             while (iterator.hasNext()) {
-                iterator.next().run();
+                iterator.next().forEach(Runnable::run);
                 iterator.remove();
             }
         }
 
         matched = seller.headMap(e.price, true);
         if (!matched.isEmpty()) {
-            Iterator<WiseRunnable> iterator = matched.values().iterator();
+            Iterator<List<WiseRunnable>> iterator = matched.values().iterator();
             while (iterator.hasNext()) {
-                iterator.next().run();
+                iterator.next().forEach(Runnable::run);
                 iterator.remove();
             }
         }
@@ -77,20 +79,34 @@ public class PriceEngine {
      */
     public void register(Variable<Num> price, Orientational orientational, WiseRunnable action) {
         if (orientational.isPositive()) {
-            buyer.put(price.v, action);
+            register(buyer, price.v, action);
             if (!price.isFixed()) {
                 price.observing().diff().buffer(2).to(list -> {
-                    buyer.remove(list.get(0));
-                    buyer.put(list.get(1), action);
+                    unregister(buyer, list.get(0), action);
+                    register(buyer, list.get(1), action);
                 });
             }
         } else {
-            seller.put(price.v, action);
+            register(seller, price.v, action);
             if (!price.isFixed()) {
                 price.observing().diff().buffer(2).to(list -> {
-                    seller.remove(list.get(0));
-                    seller.put(list.get(1), action);
+                    unregister(seller, list.get(0), action);
+                    register(seller, list.get(1), action);
                 });
+            }
+        }
+    }
+
+    private void register(ConcurrentSkipListMap<Num, List<WiseRunnable>> waitings, Num price, WiseRunnable action) {
+        waitings.computeIfAbsent(price, p -> new CopyOnWriteArrayList()).add(action);
+    }
+
+    private void unregister(ConcurrentSkipListMap<Num, List<WiseRunnable>> waitings, Num price, WiseRunnable action) {
+        List<WiseRunnable> actions = waitings.remove(price);
+        if (actions != null) {
+            actions.remove(action);
+            if (actions.isEmpty()) {
+                waitings.remove(price);
             }
         }
     }
