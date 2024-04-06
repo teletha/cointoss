@@ -68,7 +68,7 @@ public class Market implements Disposable {
     /** The price volume manager. */
     public final PriceRangedVolumeManager priceVolume;
 
-    /** The fast price matching engine. */
+    /** The price matching engine. */
     public final PriceEngine priceMatcher;
 
     /** The ticker manager. */
