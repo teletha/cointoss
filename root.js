@@ -1350,6 +1350,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "PriceEngine",
+			"packageName": "cointoss",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "PriceNotify",
 			"packageName": "trademate.chart.line",
 			"type": "Class"
