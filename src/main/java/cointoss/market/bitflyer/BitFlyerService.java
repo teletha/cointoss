@@ -76,7 +76,7 @@ public class BitFlyerService extends MarketService {
     /** The error converter. */
     private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector()
             .register(Kind.Unauthenticated, "key not found", "authentication error")
-            .register(Kind.MinimumOrder, "minimum order");
+            .register(Kind.InvalidOrder, "minimum order", "margin amount is insufficient");
 
     /** The shared realtime communicator. It will be shared across all markets on this exchange. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws.lightstream.bitflyer.com/json-rpc")

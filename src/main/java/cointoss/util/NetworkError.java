@@ -94,7 +94,7 @@ public final class NetworkError extends Error {
 
         Maintenance("The market is under maintenance. Please refer to the official maintenance information.", true),
 
-        MinimumOrder("The order quantity is too small. Please increase the order quantity.", false),
+        InvalidOrder("The order quantity is too small. Please increase the order quantity.", false),
 
         Unkwnow("Unknown network error.", true);
 
