@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.7.0](https://github.com/teletha/cointoss/compare/v1.6.0...v1.7.0) (2024-04-07)
+
+
+### Features
+
+* accept canceling order from server ([9053111](https://github.com/teletha/cointoss/commit/9053111c0787e9ba1afa6e173ce9dc656ba40d5f))
+* detects network related error types ([8d35879](https://github.com/teletha/cointoss/commit/8d35879145939c7b82eff1b90ee72c9dd2726726))
+* Provide fast price matching engine. ([51c1d62](https://github.com/teletha/cointoss/commit/51c1d625f0e25bf09b61ff83095a4b5022b70562))
+* remove compounded info on OrderManager ([6693ad6](https://github.com/teletha/cointoss/commit/6693ad6ac24857c17f2b09fe6894c49186a4df72))
+* support cancelAll on verification ([c3f3a89](https://github.com/teletha/cointoss/commit/c3f3a896e6991557210638db679237be024bb7bb))
+* support various network related errors ([e158ee0](https://github.com/teletha/cointoss/commit/e158ee0b272afb3053ecb33f238e6ac3bf222e8e))
+
+
+### Bug Fixes
+
+* CompactLog tests randomly fail. ([ec67cff](https://github.com/teletha/cointoss/commit/ec67cff390b463b32a6f2df4159fbdcea3496352))
+* GMOService uses NetworkError ([3c0250a](https://github.com/teletha/cointoss/commit/3c0250a0ccf857fc2700cec9b1d911786ed5e8f5))
+* prevent order duplication ([a01d988](https://github.com/teletha/cointoss/commit/a01d988467d730cef935a29f3570acbcdbd22398))
+* PriceEnegine supports multiple actions on same price ([c2196a3](https://github.com/teletha/cointoss/commit/c2196a30748c119562eac9e891db0ab255a24868))
+* refactoring ([de6eaee](https://github.com/teletha/cointoss/commit/de6eaee9bfc35b6f0708fcee9fd4d947bd24647c))
+* suppress errors ([343f171](https://github.com/teletha/cointoss/commit/343f171ff59106afa7c0c6ce171c8cd9472f7408))
+
 ## [1.6.0](https://github.com/teletha/cointoss/compare/v1.5.0...v1.6.0) (2024-04-01)
 
 
