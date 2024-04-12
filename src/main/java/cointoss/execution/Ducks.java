@@ -28,19 +28,16 @@ public class Ducks {
         RDB<FastTick> db = RDB.of(FastTick.class);
 
         // Market market = Market.of(BitFlyer.FX_BTC_JPY);
-        // market.tickers.on(Span.Minute1).close.to(tick -> {
-        // FastTick fast = new FastTick(tick);
-        // System.out.println(fast);
-        // db.update(fast);
+        // market.tickers.on(Span.Minute1).close.map(FastTick::new).buffer(60 * 24 * 3).to(list -> {
+        // db.updateAll(list);
+        // System.out.println(list.get(0));
         // });
         // market.readLog(log -> log.from(Chrono.utc(2023, 1, 1)));
 
-        // long start = System.currentTimeMillis();
-        // Double max = db.max(FastTick::getHight);
-        // Double min = db.min(FastTick::getLow);
-        // System.out.println(System.currentTimeMillis() - start + " " + String.format("%.10f", max)
-        // + " " + min);
-        db.findBy("time, close, avg(close) over order by date rows between 4 precending and current row from ");
+        long start = System.currentTimeMillis();
+        Double max = db.max(FastTick::getHight);
+        Double min = db.min(FastTick::getLow);
+        System.out.println(System.currentTimeMillis() - start + " " + String.format("%.10f", max) + " " + min);
     }
 
     private static class FastTick extends DuckModel<FastTick> {
