@@ -16,6 +16,7 @@ public class Project extends bee.api.Project {
 
         require("com.github.teletha", "sinobu");
         require("com.github.teletha", "viewtify");
+        require("com.github.teletha", "typewriter");
         require("com.github.teletha", "hypatia");
         require("com.github.teletha", "icymanipulator").atAnnotation();
         require("com.github.teletha", "antibug").atTest();
@@ -30,6 +31,7 @@ public class Project extends bee.api.Project {
         unrequire("org.checkerframework", "checker-qual");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
+        require("org.duckdb", "duckdb_jdbc");
         // require("io.fair-acc", "chartfx");
         // require("org.apache.iotdb", "iotdb-session");
 
