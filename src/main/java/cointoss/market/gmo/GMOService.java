@@ -58,7 +58,8 @@ public class GMOService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The error converter. */
-    private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector().register(Kind.LimitOverflow, "requests are too many");
+    private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector().register(Kind.LimitOverflow, "requests are too many")
+            .register(Kind.Maintenance, "maintenance");
 
     /** The API limit. */
     private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(200, MILLISECONDS);
