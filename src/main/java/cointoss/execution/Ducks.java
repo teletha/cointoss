@@ -9,6 +9,8 @@
  */
 package cointoss.execution;
 
+import java.sql.SQLException;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 
 import cointoss.ticker.Tick;
@@ -32,12 +34,25 @@ public class Ducks {
         // db.updateAll(list);
         // System.out.println(list.get(0));
         // });
-        // market.readLog(log -> log.from(Chrono.utc(2023, 1, 1)));
+        // market.readLog(log -> log.from(Chrono.utc(2024, 1, 1)));
 
         long start = System.currentTimeMillis();
         Double max = db.max(FastTick::getHight);
         Double min = db.min(FastTick::getLow);
         System.out.println(System.currentTimeMillis() - start + " " + String.format("%.10f", max) + " " + min);
+        db.query()
+                .select(FastTick::getClose, FastTick::getId)
+                .avg(FastTick::getClose, 60 * 5 * 23)
+                .fromCurrentTable()
+                .orderBy(FastTick::getId)
+                .qurey()
+                .to(x -> {
+                    try {
+                        System.out.println(x.getDouble(1) + " " + Instant.ofEpochSecond(x.getLong(2)) + "  " + x.getDouble(3));
+                    } catch (SQLException e) {
+                        throw I.quiet(e);
+                    }
+                });
     }
 
     private static class FastTick extends DuckModel<FastTick> {
@@ -101,6 +116,96 @@ public class Ducks {
          */
         public void setLow(double low) {
             this.low = low;
+        }
+
+        /**
+         * Get the time property of this {@link Ducks.FastTick}.
+         * 
+         * @return The time property.
+         */
+        public ZonedDateTime getTime() {
+            return time;
+        }
+
+        /**
+         * Set the time property of this {@link Ducks.FastTick}.
+         * 
+         * @param time The time value to set.
+         */
+        public void setTime(ZonedDateTime time) {
+            this.time = time;
+        }
+
+        /**
+         * Get the open property of this {@link Ducks.FastTick}.
+         * 
+         * @return The open property.
+         */
+        public double getOpen() {
+            return open;
+        }
+
+        /**
+         * Set the open property of this {@link Ducks.FastTick}.
+         * 
+         * @param open The open value to set.
+         */
+        public void setOpen(double open) {
+            this.open = open;
+        }
+
+        /**
+         * Get the close property of this {@link Ducks.FastTick}.
+         * 
+         * @return The close property.
+         */
+        public double getClose() {
+            return close;
+        }
+
+        /**
+         * Set the close property of this {@link Ducks.FastTick}.
+         * 
+         * @param close The close value to set.
+         */
+        public void setClose(double close) {
+            this.close = close;
+        }
+
+        /**
+         * Get the buy property of this {@link Ducks.FastTick}.
+         * 
+         * @return The buy property.
+         */
+        public double getBuy() {
+            return buy;
+        }
+
+        /**
+         * Set the buy property of this {@link Ducks.FastTick}.
+         * 
+         * @param buy The buy value to set.
+         */
+        public void setBuy(double buy) {
+            this.buy = buy;
+        }
+
+        /**
+         * Get the sell property of this {@link Ducks.FastTick}.
+         * 
+         * @return The sell property.
+         */
+        public double getSell() {
+            return sell;
+        }
+
+        /**
+         * Set the sell property of this {@link Ducks.FastTick}.
+         * 
+         * @param sell The sell value to set.
+         */
+        public void setSell(double sell) {
+            this.sell = sell;
         }
 
         /**
