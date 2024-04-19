@@ -9,8 +9,6 @@
  */
 package cointoss.execution;
 
-import java.sql.SQLException;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 
 import cointoss.ticker.Tick;
@@ -30,29 +28,44 @@ public class Ducks {
         RDB<FastTick> db = RDB.of(FastTick.class);
 
         // Market market = Market.of(BitFlyer.FX_BTC_JPY);
-        // market.tickers.on(Span.Minute1).close.map(FastTick::new).buffer(60 * 24 * 3).to(list -> {
-        // db.updateAll(list);
-        // System.out.println(list.get(0));
+        // market.tickers.on(Span.Minute1).close.map(FastTick::new).buffer(60 * 24).to(list -> {
+        // System.out.println(list.stream().map(x -> x.time).toList());
         // });
         // market.readLog(log -> log.from(Chrono.utc(2024, 1, 1)));
 
         long start = System.currentTimeMillis();
-        Double max = db.max(FastTick::getHight);
-        Double min = db.min(FastTick::getLow);
-        System.out.println(System.currentTimeMillis() - start + " " + String.format("%.10f", max) + " " + min);
-        db.query()
-                .select(FastTick::getClose, FastTick::getId)
-                .avg(FastTick::getClose, 60 * 5 * 23)
-                .fromCurrentTable()
-                .orderBy(FastTick::getId)
-                .qurey()
-                .to(x -> {
-                    try {
-                        System.out.println(x.getDouble(1) + " " + Instant.ofEpochSecond(x.getLong(2)) + "  " + x.getDouble(3));
-                    } catch (SQLException e) {
-                        throw I.quiet(e);
-                    }
-                });
+        // db.findAll().buffer(60 * 5 * 23, 1).to(ticks -> {
+        // double total = 0;
+        // for (FastTick tick : ticks) {
+        // total += tick.close;
+        // }
+        // });
+        // db.avg(FastTick::getClose, o -> o.frame(-60 * 5 * 23, 0)).to(avg -> {
+        // System.out.println(avg);
+        // });
+
+        db.findBy($ -> {
+            Selected key = $.select(FastTick::getId).divided(1440).floor();
+            $.select(FastTick::getHeight).max();
+            $.select(FastTick::getLow).min();
+            $.select(FastTick::getOpen).first();
+            $.select(FastTick::getClose).last();
+            $.select(FastTick::getBuy).sum();
+            $.select(FastTick::getSell).sum();
+
+            $.groupBy(key);
+            $.orderBy(key);
+        });
+
+        db.query().select("id/14400").fromCurrentTable().groupBy("id / 14400").qurey().to(x -> {
+            try {
+                System.out.println(x.getLong(1));
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+        });
+
+        System.out.println(System.currentTimeMillis() - start);
     }
 
     private static class FastTick extends DuckModel<FastTick> {
@@ -80,6 +93,24 @@ public class Ducks {
             this.low = tick.lowPrice();
             this.buy = tick.longVolume();
             this.sell = tick.shortVolume();
+        }
+
+        /**
+         * Get the time property of this {@link Ducks.FastTick}.
+         * 
+         * @return The time property.
+         */
+        public ZonedDateTime getTime() {
+            return time;
+        }
+
+        /**
+         * Set the time property of this {@link Ducks.FastTick}.
+         * 
+         * @param time The time value to set.
+         */
+        public void setTime(ZonedDateTime time) {
+            this.time = time;
         }
 
         /**
@@ -116,24 +147,6 @@ public class Ducks {
          */
         public void setLow(double low) {
             this.low = low;
-        }
-
-        /**
-         * Get the time property of this {@link Ducks.FastTick}.
-         * 
-         * @return The time property.
-         */
-        public ZonedDateTime getTime() {
-            return time;
-        }
-
-        /**
-         * Set the time property of this {@link Ducks.FastTick}.
-         * 
-         * @param time The time value to set.
-         */
-        public void setTime(ZonedDateTime time) {
-            this.time = time;
         }
 
         /**

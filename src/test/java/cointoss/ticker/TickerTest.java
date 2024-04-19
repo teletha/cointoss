@@ -62,16 +62,4 @@ class TickerTest extends TickerTestSupport {
         manager.update(Execution.with.buy(1).price(10).date(afterMinute(3)));
         assert close.size() == 3;
     }
-
-    @Test
-    void closeSkipEmptyTick() {
-        Ticker ticker = manager.on(Span.Minute1);
-        List<Tick> close = ticker.close.toList();
-        assert close.size() == 0;
-
-        manager.update(Execution.with.buy(1).price(10).date(afterMinute(1)));
-        assert close.size() == 0;
-        manager.update(Execution.with.buy(1).price(10).date(afterMinute(20)));
-        assert close.size() == 1;
-    }
 }

@@ -34,7 +34,7 @@ public final class Ticker implements Disposable {
     final Signaling<Tick> closing = new Signaling();
 
     /** The event about opening new tick. */
-    public final Signal<Tick> close = closing.expose.skip(tick -> tick.volume() == 0);
+    public final Signal<Tick> close = closing.expose;
 
     /** The tick store. */
     public final FeatherStore<Tick> ticks;
