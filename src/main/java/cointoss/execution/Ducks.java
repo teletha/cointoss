@@ -12,6 +12,8 @@ package cointoss.execution;
 import java.time.ZonedDateTime;
 
 import cointoss.ticker.Tick;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import kiss.I;
 import psychopath.Locator;
 import typewriter.duck.DuckModel;
@@ -44,25 +46,15 @@ public class Ducks {
         // System.out.println(avg);
         // });
 
-        db.findBy($ -> {
-            Selected key = $.select(FastTick::getId).divided(1440).floor();
-            $.select(FastTick::getHeight).max();
-            $.select(FastTick::getLow).min();
-            $.select(FastTick::getOpen).first();
-            $.select(FastTick::getClose).last();
-            $.select(FastTick::getBuy).sum();
-            $.select(FastTick::getSell).sum();
-
-            $.groupBy(key);
-            $.orderBy(key);
-        });
-
-        db.query().select("id/14400").fromCurrentTable().groupBy("id / 14400").qurey().to(x -> {
-            try {
-                System.out.println(x.getLong(1));
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
+        // db.query().select("id/14400").fromCurrentTable().groupBy("id / 14400").qurey().to(x -> {
+        // try {
+        // System.out.println(x.getLong(1));
+        // } catch (Exception e) {
+        // // TODO: handle exception
+        // }
+        // });
+        db.writer(w -> {
+            w.select(m -> m.getId());
         });
 
         System.out.println(System.currentTimeMillis() - start);
@@ -228,5 +220,24 @@ public class Ducks {
         public String toString() {
             return "FastTick [time=" + time + ", open=" + open + ", close=" + close + ", hight=" + hight + ", low=" + low + ", buy=" + buy + ", sell=" + sell + "]";
         }
+    }
+
+    @Entity
+    private static class SpringTick {
+
+        @Id
+        public long epochSeconds;
+
+        public double open;
+
+        public double close;
+
+        public double hight;
+
+        public double low;
+
+        public double buy;
+
+        public double sell;
     }
 }

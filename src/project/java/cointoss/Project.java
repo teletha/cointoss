@@ -35,6 +35,7 @@ public class Project extends bee.api.Project {
         require("org.jooq", "jooq");
         // require("io.fair-acc", "chartfx");
         // require("org.apache.iotdb", "iotdb-session");
+        require("org.hibernate.orm", "hibernate-core");
 
         // chartfx requires old jafafx, so override it
         require("org.openjfx", "javafx-base");
