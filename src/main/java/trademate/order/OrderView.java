@@ -120,7 +120,7 @@ public class OrderView extends View {
 
     private UIText<Num> acceptableLoss;
 
-    private UIText<Num> retreatRange;
+    private UIText<Num> acceptableRetreat;
 
     /** UI */
     private UICheckBox history;
@@ -165,7 +165,7 @@ public class OrderView extends View {
                     });
                     $(vbox, () -> {
                         form(en("Acceptable Loss"), FormStyles.Column3, acceptableLoss);
-                        form(en("Retreat Range"), FormStyles.Column3, retreatRange);
+                        form(en("Acceptable Retreat"), FormStyles.Column3, acceptableRetreat);
                     });
                     $(vbox, () -> {
                         form(en("Market"), FormStyles.Column5, market, trainingMode);
@@ -282,6 +282,9 @@ public class OrderView extends View {
         clusterStart.acceptPositiveDecimalInput();
         clusterEnd.acceptPositiveDecimalInput();
         clusterSize.items(Division.values()).initialize(Division.Linear1);
+
+        acceptableLoss.acceptPositiveIntegralInput().initialize(Num.of(5000)).suffix("円");
+        acceptableRetreat.acceptPositiveIntegralInput().initialize(Num.of(100)).suffix("円");
 
         initializeTable();
     }
