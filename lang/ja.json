@@ -2,6 +2,7 @@
 	"messages": {
 		"": "",
 		"API limit has been exceeded. Please try again in a few minutes.": "API の制限を超えました。数分後にもう一度試してください。",
+		"Acceptable Loss": "許容損失",
 		"Access Token": "アクセストークン",
 		"Access Token Test": "アクセス トークン テスト",
 		"Account ID": "アカウントID",
@@ -156,6 +157,7 @@
 		"Related to chart": "チャート関連",
 		"Remaining": "残存",
 		"Retreat": "撤退",
+		"Retreat Range": "退却範囲",
 		"Reverse": "ドテン",
 		"Risk Reward": "リスクリワード",
 		"Run": "実行",

@@ -118,6 +118,10 @@ public class OrderView extends View {
 
     private UIComboBox<Division> clusterSize;
 
+    private UIText<Num> acceptableLoss;
+
+    private UIText<Num> retreatRange;
+
     /** UI */
     private UICheckBox history;
 
@@ -154,11 +158,21 @@ public class OrderView extends View {
     class view extends ViewDSL {
         {
             $(container, FormStyles.Label70, FormStyles.LabelCenter, () -> {
-                form(style.buttons, takerSell, clear, takerBuy);
-                form(style.buttons, makerSell, cancel, makerBuy);
-                form(en("Market"), FormStyles.Column5, market, trainingMode);
-                form(Amount, FormStyles.Column3, orderSize, orderThresholdSize, history);
-                form("Cluster", FormStyles.Column3, clusterStart, clusterEnd, clusterSize);
+                $(hbox, () -> {
+                    $(vbox, () -> {
+                        form(style.buttons, takerSell, clear, takerBuy);
+                        form(style.buttons, makerSell, cancel, makerBuy);
+                    });
+                    $(vbox, () -> {
+                        form(en("Acceptable Loss"), FormStyles.Column3, acceptableLoss);
+                        form(en("Retreat Range"), FormStyles.Column3, retreatRange);
+                    });
+                    $(vbox, () -> {
+                        form(en("Market"), FormStyles.Column5, market, trainingMode);
+                        form(Amount, FormStyles.Column3, orderSize, orderThresholdSize, history);
+                        form("Cluster", FormStyles.Column3, clusterStart, clusterEnd, clusterSize);
+                    });
+                });
 
                 $(table, style.table, () -> {
                     $(entryPrice, style.Wide);
