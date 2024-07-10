@@ -13,14 +13,13 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
-import javafx.scene.control.SelectionMode;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.Division;
 import cointoss.trade.Scenario;
 import cointoss.verify.TrainingMarket;
 import hypatia.Num;
+import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Managed;
@@ -74,6 +73,9 @@ public class OrderView extends View {
     private UILabel takerBuyPrice;
 
     /** UI */
+    private UILabel takerBuyLoss;
+
+    /** UI */
     private UIButton takerSell;
 
     /** UI */
@@ -81,6 +83,9 @@ public class OrderView extends View {
 
     /** UI */
     private UILabel takerSellPrice;
+
+    /** UI */
+    private UILabel takerSellLoss;
 
     /** UI */
     private UIButton clear;
@@ -238,7 +243,12 @@ public class OrderView extends View {
                             .on(Viewtify.UIThread)
                             .skip(v -> v.ⅱ == null)
                             .to(v -> {
-                                takerSellPrice.text(m.orderBook.longs.predictTakingPrice(v.ⅱ));
+                                Num taker = m.orderBook.longs.predictTakingPrice(v.ⅱ);
+                                Num loss = m.orderBook.shorts.predictTakingPrice(v.ⅱ);
+
+                                takerSellPrice.text(taker);
+                                takerSellLoss
+                                        .text(taker.minus(loss).multiply(orderSize.valueOr(Num.ONE)).scale(m.service.setting.base.scale));
                                 makerBuyPrice.text(m.orderBook.longs.predictMakingPrice(v.ⅲ));
                             }));
                     disposer.add(m.orderBook.shorts.best.observing()//
@@ -246,7 +256,12 @@ public class OrderView extends View {
                             .on(Viewtify.UIThread)
                             .skip(v -> v.ⅱ == null)
                             .to(v -> {
-                                takerBuyPrice.text(m.orderBook.shorts.predictTakingPrice(v.ⅱ));
+                                Num taker = m.orderBook.shorts.predictTakingPrice(v.ⅱ);
+                                Num loss = m.orderBook.longs.predictTakingPrice(v.ⅱ);
+
+                                takerBuyPrice.text(taker);
+                                takerBuyLoss
+                                        .text(loss.minus(taker).multiply(orderSize.valueOr(Num.ONE)).scale(m.service.setting.base.scale));
                                 makerSellPrice.text(m.orderBook.shorts.predictMakingPrice(v.ⅲ));
                             }));
                 });
@@ -261,9 +276,9 @@ public class OrderView extends View {
         Commands.SelectAll.shortcut(Key.A.ctrl()).contribute(this::selectAll);
 
         clear.text(en("Clear")).when(User.Action, Commands.Clear);
-        takerSell.textV(takerSellText, takerSellPrice).color(ChartTheme.$.sell).when(User.Action, Commands.TakeSell);
+        takerSell.textV(takerSellText, takerSellPrice, takerSellLoss).color(ChartTheme.$.sell).when(User.Action, Commands.TakeSell);
         takerSellText.text(en("Take Selling")).color(ChartTheme.$.sell);
-        takerBuy.textV(takerBuyText, takerBuyPrice).color(ChartTheme.$.buy).when(User.Action, Commands.TakeBuy);
+        takerBuy.textV(takerBuyText, takerBuyPrice, takerBuyLoss).color(ChartTheme.$.buy).when(User.Action, Commands.TakeBuy);
         takerBuyText.text(en("Take Buying")).color(ChartTheme.$.buy);
 
         cancel.text(en("Cancel")).when(User.Action, Commands.Cancel);
