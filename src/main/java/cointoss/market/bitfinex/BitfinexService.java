@@ -13,11 +13,8 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -26,9 +23,7 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
-import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
-import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -36,7 +31,6 @@ import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.NetworkError.Kind;
 import cointoss.util.NetworkErrorDetector;
-import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -215,52 +209,56 @@ public class BitfinexService extends MarketService {
                 });
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected FeatherStore<OpenInterest> initializeOpenInterest() {
-        return FeatherStore.create(OpenInterest.class, Span.Minute5)
-                .enableInterpolation(5)
-                .enableDiskStore(file("oi.db"))
-                .enableDataSupplier(seconds -> {
-                    ZonedDateTime lowerLimit = Chrono.utcNow().minusYears(1);
-                    ZonedDateTime time = Chrono.max(lowerLimit, Chrono.utcBySeconds(seconds));
-
-                    return retrieveOpenInterest(time, 1000);
-                }, I.schedule(LocalTime.of(0, 1), 5, TimeUnit.MINUTES).flatMap(x -> {
-                    return retrieveOpenInterest(Chrono.utcNow().minusMinutes(20), 10);
-                }));
-    }
-
-    private Signal<OpenInterest> retrieveOpenInterest(ZonedDateTime start, int limit) {
-        long startMilli = Math.max(start.truncatedTo(ChronoUnit.MINUTES).minusMinutes(1).toInstant().toEpochMilli(), 0);
-        limit = Math.min(5 * limit, 5000);
-
-        return call("GET", "status/deriv/t" + marketName + "/hist?limit=" + limit + "&sort=1&start=" + startMilli)
-                .flatIterable(json -> json.find("*"))
-                .map(x -> {
-                    // All times are near 57 seconds, so move them up.
-                    ZonedDateTime time = Chrono
-                            .utcByMills(x.get(long.class, "0") + 10000 /* 10 seconds */)
-                            .truncatedTo(ChronoUnit.MINUTES);
-
-                    if (time.getMinute() % 5 == 0) {
-                        float size = x.get(float.class, "17");
-                        return OpenInterest.with.date(time).size(size);
-                    } else {
-                        return (OpenInterest) null;
-                    }
-                })
-                .skipNull();
-    }
-
-    private Signal<OpenInterest> connectOpenInterest() {
-        return clientRealtimely().subscribe(new Topic("status", "deriv:t" + marketName)).map(root -> {
-            JSON e = root.get("1");
-            return OpenInterest.with.date(Chrono.utcNow()).size(e.get(float.class, "17"));
-        });
-    }
+    // /**
+    // * {@inheritDoc}
+    // */
+    // @Override
+    // protected FeatherStore<OpenInterest> initializeOpenInterest() {
+    // return FeatherStore.create(OpenInterest.class, Span.Minute5)
+    // .enableInterpolation(5)
+    // .enableDiskStore(file("oi.db"))
+    // .enableDataSupplier(seconds -> {
+    // ZonedDateTime lowerLimit = Chrono.utcNow().minusYears(1);
+    // ZonedDateTime time = Chrono.max(lowerLimit, Chrono.utcBySeconds(seconds));
+    //
+    // return retrieveOpenInterest(time, 1000);
+    // }, I.schedule(LocalTime.of(0, 1), 5, TimeUnit.MINUTES).flatMap(x -> {
+    // return retrieveOpenInterest(Chrono.utcNow().minusMinutes(20), 10);
+    // }));
+    // }
+    //
+    // private Signal<OpenInterest> retrieveOpenInterest(ZonedDateTime start, int limit) {
+    // long startMilli =
+    // Math.max(start.truncatedTo(ChronoUnit.MINUTES).minusMinutes(1).toInstant().toEpochMilli(),
+    // 0);
+    // limit = Math.min(5 * limit, 5000);
+    //
+    // return call("GET", "status/deriv/t" + marketName + "/hist?limit=" + limit + "&sort=1&start="
+    // + startMilli)
+    // .flatIterable(json -> json.find("*"))
+    // .map(x -> {
+    // // All times are near 57 seconds, so move them up.
+    // ZonedDateTime time = Chrono
+    // .utcByMills(x.get(long.class, "0") + 10000 /* 10 seconds */)
+    // .truncatedTo(ChronoUnit.MINUTES);
+    //
+    // if (time.getMinute() % 5 == 0) {
+    // float size = x.get(float.class, "17");
+    // return OpenInterest.with.date(time).size(size);
+    // } else {
+    // return (OpenInterest) null;
+    // }
+    // })
+    // .skipNull();
+    // }
+    //
+    // private Signal<OpenInterest> connectOpenInterest() {
+    // return clientRealtimely().subscribe(new Topic("status", "deriv:t" + marketName)).map(root ->
+    // {
+    // JSON e = root.get("1");
+    // return OpenInterest.with.date(Chrono.utcNow()).size(e.get(float.class, "17"));
+    // });
+    // }
 
     /**
      * Call rest API.

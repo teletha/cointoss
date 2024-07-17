@@ -15,7 +15,6 @@ import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,15 +25,12 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
-import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
-import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
-import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.JSON;
 import kiss.Signal;
@@ -61,8 +57,6 @@ public class BitMexService extends MarketService {
 
     /** The instrument tick size. */
     private final Num instrumentTickSize;
-
-    private final FeatherStore<OpenInterest> openInterests = FeatherStore.create(OpenInterest.class, 10, 6 * 60 * 4, 3);
 
     /**
      * @param marketName
@@ -233,31 +227,32 @@ public class BitMexService extends MarketService {
                 });
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected FeatherStore<OpenInterest> initializeOpenInterest() {
-        return FeatherStore.create(OpenInterest.class, Span.Minute5)
-                .enableDiskStore(file("oi.db"))
-                .enablePassiveDataSupplier(connectOpenInterest());
-    }
-
-    /**
-     * @return
-     */
-    private Signal<OpenInterest> connectOpenInterest() {
-        return clientRealtimely().subscribe(new Topic("instrument", marketName))
-                .take(e -> e.has("action", "update"))
-                .flatIterable(e -> e.find("data", "*"))
-                .take(e -> e.has("openInterest"))
-                .map(e -> {
-                    ZonedDateTime time = ZonedDateTime.parse(e.text("timestamp"), RealTimeFormat).truncatedTo(ChronoUnit.SECONDS);
-                    float size = e.get(float.class, "openInterest");
-                    float value = e.get(float.class, "openValue");
-                    return OpenInterest.with.date(time).size(value / size);
-                });
-    }
+    // /**
+    // * {@inheritDoc}
+    // */
+    // @Override
+    // protected FeatherStore<OpenInterest> initializeOpenInterest() {
+    // return FeatherStore.create(OpenInterest.class, Span.Minute5)
+    // .enableDiskStore(file("oi.db"))
+    // .enablePassiveDataSupplier(connectOpenInterest());
+    // }
+    //
+    // /**
+    // * @return
+    // */
+    // private Signal<OpenInterest> connectOpenInterest() {
+    // return clientRealtimely().subscribe(new Topic("instrument", marketName))
+    // .take(e -> e.has("action", "update"))
+    // .flatIterable(e -> e.find("data", "*"))
+    // .take(e -> e.has("openInterest"))
+    // .map(e -> {
+    // ZonedDateTime time = ZonedDateTime.parse(e.text("timestamp"),
+    // RealTimeFormat).truncatedTo(ChronoUnit.SECONDS);
+    // float size = e.get(float.class, "openInterest");
+    // float value = e.get(float.class, "openValue");
+    // return OpenInterest.with.date(time).size(value / size);
+    // });
+    // }
 
     // public static void main(String[] args) throws InterruptedException {
     // double[] volume = new double[3];

@@ -32,14 +32,11 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.orderbook.OrderBookPage;
-import cointoss.ticker.Span;
-import cointoss.ticker.data.OpenInterest;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
-import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -204,44 +201,47 @@ public class BybitService extends MarketService {
         return OrderBookChanges.byJSON(bids, asks, "0", "1");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected FeatherStore<OpenInterest> initializeOpenInterest() {
-        return FeatherStore.create(OpenInterest.class, Span.Minute5)
-                .enableDiskStore(file("oi.db"))
-                .enableDataSupplier(time -> provideOpenInterest(Chrono.utcBySeconds(time)), connectOpenInterest());
-    }
-
-    /**
-     * @param startExcluded
-     * @return
-     */
-    private Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
-        return call("GET", "market/open-interest?symbol=" + marketName + "&category=linear&intervalTime=5min&limit=200")
-                .flatIterable(e -> e.find("result", "list", "$"))
-                .map(e -> {
-                    float size = e.get(float.class, "openInterest");
-                    ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "timestamp"));
-                    OpenInterest oi = OpenInterest.with.date(date).size(size);
-                    return oi;
-                })
-                .take(e -> e.date.isAfter(startExcluded));
-    }
-
-    /**
-     * @return
-     */
-    private Signal<OpenInterest> connectOpenInterest() {
-        return clientRealtimely().subscribe(new Topic("tickers", marketName)).map(e -> e.get("data")).map(e -> {
-            if (e.has("openInterest")) {
-                return OpenInterest.with.date(Chrono.utcNow()).size(e.get(float.class, "openInterest"));
-            } else {
-                return (OpenInterest) null;
-            }
-        }).skipNull();
-    }
+    // /**
+    // * {@inheritDoc}
+    // */
+    // @Override
+    // protected FeatherStore<OpenInterest> initializeOpenInterest() {
+    // return FeatherStore.create(OpenInterest.class, Span.Minute5)
+    // .enableDiskStore(file("oi.db"))
+    // .enableDataSupplier(time -> provideOpenInterest(Chrono.utcBySeconds(time)),
+    // connectOpenInterest());
+    // }
+    //
+    // /**
+    // * @param startExcluded
+    // * @return
+    // */
+    // private Signal<OpenInterest> provideOpenInterest(ZonedDateTime startExcluded) {
+    // return call("GET", "market/open-interest?symbol=" + marketName +
+    // "&category=linear&intervalTime=5min&limit=200")
+    // .flatIterable(e -> e.find("result", "list", "$"))
+    // .map(e -> {
+    // float size = e.get(float.class, "openInterest");
+    // ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "timestamp"));
+    // OpenInterest oi = OpenInterest.with.date(date).size(size);
+    // return oi;
+    // })
+    // .take(e -> e.date.isAfter(startExcluded));
+    // }
+    //
+    // /**
+    // * @return
+    // */
+    // private Signal<OpenInterest> connectOpenInterest() {
+    // return clientRealtimely().subscribe(new Topic("tickers", marketName)).map(e ->
+    // e.get("data")).map(e -> {
+    // if (e.has("openInterest")) {
+    // return OpenInterest.with.date(Chrono.utcNow()).size(e.get(float.class, "openInterest"));
+    // } else {
+    // return (OpenInterest) null;
+    // }
+    // }).skipNull();
+    // }
 
     /**
      * Call rest API.

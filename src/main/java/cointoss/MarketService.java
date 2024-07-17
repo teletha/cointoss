@@ -30,11 +30,9 @@ import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.ticker.data.Liquidation;
-import cointoss.ticker.data.OpenInterest;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.RetryPolicy;
-import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.Decoder;
 import kiss.Disposable;
@@ -74,8 +72,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
 
     /** The market specific scheduler. */
     private final ScheduledThreadPoolExecutor scheduler;
-
-    private FeatherStore<OpenInterest> openInterest;
 
     /** The shared stream. */
     private Signal<Execution> executionCollector;
@@ -604,24 +600,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     protected Signal<Liquidation> connectLiquidation() {
         return I.signal();
-    }
-
-    /**
-     * Provide the market specific tick related data if needed.
-     */
-    public final synchronized FeatherStore<OpenInterest> openInterest() {
-        if (openInterest == null && !setting.type.isSpot()) {
-            openInterest = initializeOpenInterest();
-            add(openInterest);
-        }
-        return openInterest;
-    }
-
-    /**
-     * Provide the market specific tick related data if needed.
-     */
-    protected FeatherStore<OpenInterest> initializeOpenInterest() {
-        return null;
     }
 
     /**

@@ -32,10 +32,10 @@ public class Project extends bee.api.Project {
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
         require("org.duckdb", "duckdb_jdbc");
-        require("org.jooq", "jooq");
+        // require("org.jooq", "jooq");
         // require("io.fair-acc", "chartfx");
         // require("org.apache.iotdb", "iotdb-session");
-        require("org.hibernate.orm", "hibernate-core");
+        // require("org.hibernate.orm", "hibernate-core");
 
         // chartfx requires old jafafx, so override it
         require("org.openjfx", "javafx-base");
