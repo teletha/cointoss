@@ -373,7 +373,7 @@ public class GlobalVolumeView extends View {
                         canDisplayVolume[0] = true;
                     }
 
-                    if (0 <= volume.liquidatedLongVolume()) {
+                    if (0 < volume.liquidatedLongVolume()) {
                         String text = Primitives.roundString(volume.liquidatedLongVolume(), 0);
                         context.setStroke(liquidatedColor);
                         context.strokeText(text, x[0] + coordinate(text), 10);
@@ -388,7 +388,7 @@ public class GlobalVolumeView extends View {
                         canDisplayVolume[1] = true;
                     }
 
-                    if (0 <= volume.liquidatedShortVolume()) {
+                    if (0 < volume.liquidatedShortVolume()) {
                         String text = Primitives.roundString(volume.liquidatedShortVolume(), 0);
                         context.setStroke(liquidatedColor);
                         context.strokeText(text, x[0] + coordinate(text), padding + maxHeight * 2);
