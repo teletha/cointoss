@@ -158,6 +158,8 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
     public final boolean isExitTerminated() {
         if (entryExecutedSize.isZero() && isEntryTerminated()) {
             return exits.isEmpty() || exits.stream().allMatch(Order::isTerminated);
+        } else if (entryExecutedSize.isNot(exitExecutedSize)) {
+            return false;
         } else {
             return exits.isEmpty() == false && exits.stream().allMatch(Order::isTerminated);
         }
@@ -318,10 +320,12 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      * {@inheritDoc}
      */
     @Override
-    public final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
+    public final void exitWhen(Signal<?> timing, double ratio, Consumer<Orderable> strategy) {
         disposerForExit.add(timing.first().to(() -> {
             if (!isExitTerminated()) {
-                market.request(directional.orientation().inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(e -> {
+                Num exitRatio = Num.between(Num.ZERO, Num.of(ratio), Num.ONE);
+                Num actualRequestSize = Num.min(remainingSize(), entryExecutedSize.multiply(exitRatio));
+                market.request(directional.orientation().inverse(), actualRequestSize, strategy).to(e -> {
                     processExitOrder(e, "exitWhen");
                 });
             }
@@ -512,8 +516,15 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      * Operate to stop this {@link Scenario} right now.
      */
     public final void stop() {
+        stop(1);
+    }
+
+    /**
+     * Operate to stop this {@link Scenario} right now.
+     */
+    public final void stop(double ratio) {
         cancelEntries();
-        exitWhen(now());
+        exitWhen(now(), ratio);
     }
 
     /**

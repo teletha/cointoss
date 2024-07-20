@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
+import cointoss.order.Orderable;
 import cointoss.trade.extension.TradeTest;
 
 class ScenarioTest extends TraderTestSupport {
@@ -226,6 +227,73 @@ class ScenarioTest extends TraderTestSupport {
         market.perform(Execution.with.buy(1.4).price(1146));
         assert s.exits.size() == 1;
         assert s.entryExecutedSize.is(1);
+        assert s.exitExecutedSize.is(1);
+    }
+
+    @Test
+    void exit() {
+        when(now(), v -> trade(new Scenario() {
+
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, Orderable::take);
+            }
+
+            @Override
+            protected void exit() {
+                exitWhen(now());
+            }
+        }));
+
+        Scenario s = last();
+        market.perform(Execution.with.buy(1).price(15));
+        assert s.entries.size() == 1;
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(1);
+        assert s.exits.size() == 1;
+        assert s.exitSize.is(1);
+        assert s.exitExecutedSize.is(0);
+
+        market.perform(Execution.with.buy(1).price(20));
+        assert s.entries.size() == 1;
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(1);
+        assert s.exits.size() == 1;
+        assert s.exitSize.is(1);
+        assert s.exitExecutedSize.is(1);
+    }
+
+    @Test
+    void exitHalf() {
+        when(now(), v -> trade(new Scenario() {
+
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, Orderable::take);
+            }
+
+            @Override
+            protected void exit() {
+                exitWhen(now(), 0.5);
+            }
+        }));
+
+        Scenario s = last();
+        market.perform(Execution.with.buy(1).price(15));
+        assert s.exits.size() == 1;
+        assert s.exitSize.is(0.5);
+        assert s.exitExecutedSize.is(0);
+
+        market.perform(Execution.with.buy(1).price(20));
+        assert s.exits.size() == 1;
+        assert s.exitSize.is(0.5);
+        assert s.exitExecutedSize.is(0.5);
+
+        s.exitWhen(now(), 0.5);
+
+        market.perform(Execution.with.buy(1).price(20));
+        assert s.exits.size() == 2;
+        assert s.exitSize.is(1);
         assert s.exitExecutedSize.is(1);
     }
 

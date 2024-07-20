@@ -182,10 +182,29 @@ public interface TradingExit extends Orientational<Direction> {
     }
 
     /**
+     * Exit on your timing by full taker.
+     * 
+     * @param timing The exit timing.
+     */
+    default void exitWhen(Signal<?> timing, double ratio) {
+        exitWhen(timing, ratio, Orderable::take);
+    }
+
+    /**
      * Declare exit order.
      * 
      * @param timing The exit timing.
      * @param strategy The exit strategy.
      */
-    public void exitWhen(Signal<?> timing, Consumer<Orderable> strategy);
+    default void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
+        exitWhen(timing, 1, strategy);
+    }
+
+    /**
+     * Declare exit order.
+     * 
+     * @param timing The exit timing.
+     * @param strategy The exit strategy.
+     */
+    public void exitWhen(Signal<?> timing, double ratio, Consumer<Orderable> strategy);
 }
