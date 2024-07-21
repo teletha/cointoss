@@ -147,7 +147,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      * @return A result.
      */
     public final boolean isEntryTerminated() {
-        return entries.stream().allMatch(Order::isTerminated);
+        return !entries.isEmpty() && entries.stream().allMatch(Order::isTerminated);
     }
 
     /**
@@ -156,13 +156,15 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      * @return A result.
      */
     public final boolean isExitTerminated() {
-        if (entryExecutedSize.isZero() && isEntryTerminated()) {
-            return exits.isEmpty() || exits.stream().allMatch(Order::isTerminated);
-        } else if (entryExecutedSize.isNot(exitExecutedSize)) {
+        if (!isEntryTerminated()) {
             return false;
-        } else {
-            return exits.isEmpty() == false && exits.stream().allMatch(Order::isTerminated);
         }
+
+        if (entryExecutedSize.isZero()) {
+            return true;
+        }
+
+        return !exits.isEmpty() && exits.stream().allMatch(Order::isTerminated);
     }
 
     /**
