@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.7.0](https://github.com/teletha/cointoss/compare/v1.6.0...v1.7.0) (2024-07-22)
+
+
+### Features
+
+* accept canceling order from server ([9053111](https://github.com/teletha/cointoss/commit/9053111c0787e9ba1afa6e173ce9dc656ba40d5f))
+* detect maintenance on GMO ([325f1f6](https://github.com/teletha/cointoss/commit/325f1f65b817a35b557cbe9e2dbed89b283b43fc))
+* detects network related error types ([8d35879](https://github.com/teletha/cointoss/commit/8d35879145939c7b82eff1b90ee72c9dd2726726))
+* dispose oi ralated system ([219a693](https://github.com/teletha/cointoss/commit/219a6939ac85d680d804206b3a916e35f8f74455))
+* Provide fast price matching engine. ([51c1d62](https://github.com/teletha/cointoss/commit/51c1d625f0e25bf09b61ff83095a4b5022b70562))
+* remove compounded info on OrderManager ([6693ad6](https://github.com/teletha/cointoss/commit/6693ad6ac24857c17f2b09fe6894c49186a4df72))
+* support cancelAll on verification ([c3f3a89](https://github.com/teletha/cointoss/commit/c3f3a896e6991557210638db679237be024bb7bb))
+* support various network related errors ([e158ee0](https://github.com/teletha/cointoss/commit/e158ee0b272afb3053ecb33f238e6ac3bf222e8e))
+
+
+### Bug Fixes
+
+* CompactLog tests randomly fail. ([ec67cff](https://github.com/teletha/cointoss/commit/ec67cff390b463b32a6f2df4159fbdcea3496352))
+* GMOService uses NetworkError ([3c0250a](https://github.com/teletha/cointoss/commit/3c0250a0ccf857fc2700cec9b1d911786ed5e8f5))
+* hide empty liquidation on global volume view ([dad8f25](https://github.com/teletha/cointoss/commit/dad8f252c190ec035cc2a8756738022595d26013))
+* notify tick with empty volume ([bb44be1](https://github.com/teletha/cointoss/commit/bb44be11d341259de81fb75b5fa80ec733bc4414))
+* prevent order duplication ([a01d988](https://github.com/teletha/cointoss/commit/a01d988467d730cef935a29f3570acbcdbd22398))
+* PriceEnegine supports multiple actions on same price ([c2196a3](https://github.com/teletha/cointoss/commit/c2196a30748c119562eac9e891db0ab255a24868))
+* refactoring ([de6eaee](https://github.com/teletha/cointoss/commit/de6eaee9bfc35b6f0708fcee9fd4d947bd24647c))
+* suppress errors ([343f171](https://github.com/teletha/cointoss/commit/343f171ff59106afa7c0c6ce171c8cd9472f7408))
+* test half exit ([07b359a](https://github.com/teletha/cointoss/commit/07b359a2afa31e77384972a5b371d4de658815e1))
+* update error on bitflyer ([89d3c15](https://github.com/teletha/cointoss/commit/89d3c1549327af8c6fcf24fd1db7ef897983dbb4))
+
 ## [1.6.0](https://github.com/teletha/cointoss/compare/v1.5.0...v1.6.0) (2024-04-01)
 
 
