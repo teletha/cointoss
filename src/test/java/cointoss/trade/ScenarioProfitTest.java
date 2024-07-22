@@ -38,7 +38,7 @@ class ScenarioProfitTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void realizedProfitExitTwice(SidePart side, SizePart size, PricePart price) {
+    void realizedProfitExitDividedly(SidePart side, SizePart size, PricePart price) {
         Scenario s = entry(side, size, o -> o.make(price.entry));
         assert s.realizedProfit.is(0);
 
@@ -95,7 +95,7 @@ class ScenarioProfitTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void unrealizedProfitExitTwice(SidePart side, SizePart size, PricePart price) {
+    void unrealizedProfitExitDividedly(SidePart side, SizePart size, PricePart price) {
         Scenario s = entry(side, size, o -> o.make(price.entry));
         assert s.unrealizedProfit(price.middleN).is(0);
         assert s.unrealizedProfit(price.entryN).is(0);
@@ -167,7 +167,7 @@ class ScenarioProfitTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void profitExitTwice(SidePart side, SizePart size, PricePart price) {
+    void profitExitDividedly(SidePart side, SizePart size, PricePart price) {
         Scenario s = entry(side, size, o -> o.make(price.entry));
         assert s.profit(price.middleN).is(0);
         assert s.profit(price.entryN).is(0);
