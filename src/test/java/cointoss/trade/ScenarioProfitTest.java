@@ -71,6 +71,45 @@ class ScenarioProfitTest extends TraderTestSupport {
     }
 
     @TradeTest
+    void unrealizedProfitExitTwice(SidePart side, SizePart size, PricePart price) {
+        Scenario s = entry(side, size, o -> o.make(price.entry));
+        assert s.unrealizedProfit(price.middleN).is(0);
+        assert s.unrealizedProfit(price.entryN).is(0);
+        assert s.unrealizedProfit(price.lossN).is(0);
+
+        executeEntryHalf();
+        assert s.unrealizedProfit(price.middleN).is(size.half * price.diffHalf * side.sign);
+        assert s.unrealizedProfit(price.entryN).is(size.half * 0 * side.sign);
+        assert s.unrealizedProfit(price.lossN).is(size.half * -price.diffHalf * side.sign);
+
+        executeEntryAll();
+        assert s.unrealizedProfit(price.middleN).is(size.num * price.diffHalf * side.sign);
+        assert s.unrealizedProfit(price.entryN).is(size.num * 0 * side.sign);
+        assert s.unrealizedProfit(price.lossN).is(size.num * -price.diffHalf * side.sign);
+
+        exit(0.5, o -> o.make(price.exit));
+        assert s.unrealizedProfit(price.middleN).is(size.num * price.diffHalf * side.sign);
+        assert s.unrealizedProfit(price.entryN).is(size.num * 0 * side.sign);
+        assert s.unrealizedProfit(price.lossN).is(size.num * -price.diffHalf * side.sign);
+
+        executeExitAll();
+        assert s.unrealizedProfit(price.middleN).is(size.half * price.diffHalf * side.sign);
+        assert s.unrealizedProfit(price.entryN).is(size.half * 0 * side.sign);
+        assert s.unrealizedProfit(price.lossN).is(size.half * -price.diffHalf * side.sign);
+
+        exit(0.5, o -> o.make(price.exit));
+        assert s.unrealizedProfit(price.middleN).is(size.half * price.diffHalf * side.sign);
+        assert s.unrealizedProfit(price.entryN).is(size.half * 0 * side.sign);
+        assert s.unrealizedProfit(price.lossN).is(size.half * -price.diffHalf * side.sign);
+
+        executeExitAll();
+        assert s.unrealizedProfit(price.middleN).is(0);
+        assert s.unrealizedProfit(price.entryN).is(0);
+        assert s.unrealizedProfit(price.lossN).is(0);
+
+    }
+
+    @TradeTest
     void profit(SidePart side, SizePart size, PricePart price) {
         Scenario s = entry(side, size, o -> o.make(price.entry));
         assert s.profit(price.middleN).is(0);
