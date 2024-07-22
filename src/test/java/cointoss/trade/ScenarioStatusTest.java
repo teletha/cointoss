@@ -124,6 +124,7 @@ class ScenarioStatusTest extends TraderTestSupport {
         case ExitCanceledThenOtherExit:
         case ExitPartially:
         case ExitPartiallyCancelled:
+        case ExitOneCompletedOtherRemained:
             assert s.state.is(OrderState.ACTIVE);
             break;
 
