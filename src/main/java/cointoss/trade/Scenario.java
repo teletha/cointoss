@@ -164,6 +164,10 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
             return true;
         }
 
+        if (exitExecutedSize.isLessThan(entryExecutedSize)) {
+            return false;
+        }
+
         return !exits.isEmpty() && exits.stream().allMatch(Order::isTerminated);
     }
 

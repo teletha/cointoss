@@ -189,6 +189,12 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         return last();
     }
 
+    protected final Scenario exit(double ratio, Consumer<Orderable> strategy) {
+        Scenario s = last();
+        s.exitWhen(now(), ratio, strategy);
+        return last();
+    }
+
     /**
      * Execute entry order completelly.
      */
@@ -418,6 +424,15 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             market.elapse(hold.sec);
             exit(o -> o.make(price.exit));
             execute(true, side.orientation().inverse(), size, price.exitN, 0);
+            break;
+
+        case ExitOneCompletedOtherRemained:
+            s = entry(side, size, o -> o.make(price.entry));
+            execute(true, side, size, price.entryN, 0);
+            market.elapse(hold.sec);
+            exit(0.5, o -> o.make(price.exit));
+            exit(0.5, o -> o.make(price.exit));
+            execute(true, side.orientation().inverse(), size.halfN, price.exitN, 0);
             break;
         }
         return s;

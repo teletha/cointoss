@@ -75,6 +75,7 @@ class ScenarioStatusTest extends TraderTestSupport {
         case ExitCompletely:
         case ExitMultiple:
         case ExitSeparately:
+        case ExitOneCompletedOtherRemained:
             assert s.isEntryTerminated() == true;
             break;
 
@@ -94,7 +95,6 @@ class ScenarioStatusTest extends TraderTestSupport {
         case ExitCompletely:
         case ExitMultiple:
         case ExitSeparately:
-        case ExitCanceled:
         case ExitCanceledThenOtherExitCompletely:
             assert s.isExitTerminated() == true;
             break;

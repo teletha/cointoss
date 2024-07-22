@@ -44,6 +44,7 @@ class TraderSnapshotTest extends TraderTestSupport {
             case ExitPartially:
             case ExitPartiallyCancelled:
             case EntryPartiallyCanceledAndExitCompletely:
+            case ExitOneCompletedOtherRemained:
                 assert alreadyExited.realizedProfit().is(price.diff * size.half * side.sign);
                 break;
 
@@ -100,6 +101,7 @@ class TraderSnapshotTest extends TraderTestSupport {
             case EntryPartiallyCanceled:
             case ExitPartially:
             case ExitPartiallyCancelled:
+            case ExitOneCompletedOtherRemained:
                 assert alreadyExited.unrealizedProfit(price.exitN).is(price.diff * size.half * side.sign);
                 assert alreadyExited.unrealizedProfit(price.entryN.plus(price.diffHalfN)).is(price.diffHalf * size.half * side.sign);
                 assert alreadyExited.unrealizedProfit(price.entryN.minus(price.diffHalfN)).is(-price.diffHalf * size.half * side.sign);
