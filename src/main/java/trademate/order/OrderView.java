@@ -312,13 +312,13 @@ public class OrderView extends View {
         // Table Part
         // ===============================================
         table.mode(SelectionMode.MULTIPLE).observeItemState(s -> s.state).context(root -> {
-            root.menu(en("Cancel")).when(User.Action, () -> table.snapshotSelectedtems().forEach(Scenario::cancelEntries));
+            root.menu(en("Cancel")).when(User.Action, () -> table.snapshotSelectedItems().forEach(Scenario::cancelEntries));
             root.menu(en("Clear"), sub -> {
-                sub.menu(en("All")).action(() -> table.snapshotSelectedtems().forEach(Scenario::stop));
-                sub.menu(en("Half")).action(() -> table.snapshotSelectedtems().forEach(s -> s.stop(0.5)));
+                sub.menu(en("All")).action(() -> table.snapshotSelectedItems().forEach(Scenario::stop));
+                sub.menu(en("Half")).action(() -> table.snapshotSelectedItems().forEach(s -> s.stop(0.5)));
             });
             root.menu(en("Retreat"))
-                    .when(User.Action, () -> table.snapshotSelectedtems().forEach(s -> s.retreat(Num.of(100), Num.of(-100))));
+                    .when(User.Action, () -> table.snapshotSelectedItems().forEach(s -> s.retreat(Num.of(100), Num.of(-100))));
         });
 
         // ===============================================
