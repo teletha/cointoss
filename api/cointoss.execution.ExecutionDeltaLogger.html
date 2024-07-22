@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="P">
-		<header class="W">
-			<h1 class="j" date="2024-04-01" ver="1.6.0"><code>Cointoss</code></h1>
-			<nav class="h"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="l">
+		<header class="i">
+			<h1 class="m" date="2024-04-01" ver="1.6.0"><code>Cointoss</code></h1>
+			<nav class="b"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="c" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="H" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,531 +31,531 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="U">
-			<nav class="b">
+		<main class="d">
+			<nav class="f">
 				<div></div>
 			</nav>
-			<article class="M" id="Article">
-				<section class="R"><code class="i">cointoss.execution</code>
-					<h2 class="Class g"><code class="d">ExecutionDeltaLogger</code></h2>
-					<div class="Q">
+			<article class="k" id="Article">
+				<section class="g"><code class="P">cointoss.execution</code>
+					<h2 class="Class e"><code class="M">ExecutionDeltaLogger</code></h2>
+					<div class="S">
 						<ul class="C E">
 							<li><code><a href="api/cointoss.execution.ExecutionLogger.html">ExecutionLogger</a></code></li>
 						</ul>
 					</div><span class="B"><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html">ExecutionDeltaLogger</a></code> writes compact size log by using the delta.</span></section>
-				<section class="R" id="ExecutionDeltaLogger()">
-					<h2 class="T"><i class="PUBLIC"></i><code class="d">ExecutionDeltaLogger</code><code class="V">()</code></h2>
+				<section class="g" id="ExecutionDeltaLogger()">
+					<h2 class="h"><i class="PUBLIC"></i><code class="M">ExecutionDeltaLogger</code><code class="U">()</code></h2>
 				</section>
-				<section class="R" id="decodeId(java.lang.String,cointoss.execution.Execution)">
-					<h2 class="T"><i class="OVERRIDE PROTECTED"></i><code class="d">decodeId</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code>long</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeId(java.lang.String,cointoss.execution.Execution)">
+					<h2 class="h"><i class="OVERRIDE PROTECTED"></i><code class="M">decodeId</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code>long</code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>value</code></td>
 							<td><span><p>A encoded value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>previous</code></td>
 							<td><span><p>A previous execution.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code>long</code></td>
 							<td><span><p>A decoded execution.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Decode id.</p>
 </span></section>
-				<section class="R" id="encodeId(cointoss.execution.Execution,cointoss.execution.Execution)">
-					<h2 class="T"><i class="OVERRIDE PROTECTED"></i><code class="d">encodeId</code><code class="V">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeId(cointoss.execution.Execution,cointoss.execution.Execution)">
+					<h2 class="h"><i class="OVERRIDE PROTECTED"></i><code class="M">encodeId</code><code class="U">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>execution</code></td>
 							<td><span><p>A current execution.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>previous</code></td>
 							<td><span><p>A previous execution.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td><span><p>An encoded value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Encode id.</p>
 </span></section>
-				<section class="R" id="decodeDate(java.lang.String,cointoss.execution.Execution)">
-					<h2 class="T"><i class="OVERRIDE PROTECTED"></i><code class="d">decodeDate</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeDate(java.lang.String,cointoss.execution.Execution)">
+					<h2 class="h"><i class="OVERRIDE PROTECTED"></i><code class="M">decodeDate</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>value</code></td>
 							<td><span><p>A encoded value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>previous</code></td>
 							<td><span><p>A previous execution.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></td>
 							<td><span><p>A decoded execution.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Decode date.</p>
 </span></section>
-				<section class="R" id="encodeDate(cointoss.execution.Execution,cointoss.execution.Execution)">
-					<h2 class="T"><i class="OVERRIDE PROTECTED"></i><code class="d">encodeDate</code><code class="V">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeDate(cointoss.execution.Execution,cointoss.execution.Execution)">
+					<h2 class="h"><i class="OVERRIDE PROTECTED"></i><code class="M">encodeDate</code><code class="U">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>execution</code></td>
 							<td><span><p>A current execution.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>previous</code></td>
 							<td><span><p>A previous execution.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td><span><p>An encoded value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Encode date.</p>
 </span></section>
-				<section class="R" id="decodeSize(java.lang.String,cointoss.execution.Execution)">
-					<h2 class="T"><i class="OVERRIDE PROTECTED"></i><code class="d">decodeSize</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeSize(java.lang.String,cointoss.execution.Execution)">
+					<h2 class="h"><i class="OVERRIDE PROTECTED"></i><code class="M">decodeSize</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code>hypatia.Num</code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>value</code></td>
 							<td><span><p>A encoded value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>previous</code></td>
 							<td><span><p>A previous execution.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A decoded execution.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Decode size.</p>
 </span></section>
-				<section class="R" id="encodeSize(cointoss.execution.Execution,cointoss.execution.Execution)">
-					<h2 class="T"><i class="OVERRIDE PROTECTED"></i><code class="d">encodeSize</code><code class="V">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeSize(cointoss.execution.Execution,cointoss.execution.Execution)">
+					<h2 class="h"><i class="OVERRIDE PROTECTED"></i><code class="M">encodeSize</code><code class="U">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>execution</code></td>
 							<td><span><p>A current execution.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>previous</code></td>
 							<td><span><p>A previous execution.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td><span><p>An encoded value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Encode size.</p>
 </span></section>
-				<section class="R" id="decodePrice(java.lang.String,cointoss.execution.Execution)">
-					<h2 class="T"><i class="OVERRIDE PROTECTED"></i><code class="d">decodePrice</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodePrice(java.lang.String,cointoss.execution.Execution)">
+					<h2 class="h"><i class="OVERRIDE PROTECTED"></i><code class="M">decodePrice</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code>hypatia.Num</code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>value</code></td>
 							<td><span><p>A encoded value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>previous</code></td>
 							<td><span><p>A previous execution.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A decoded execution.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Decode price.</p>
 </span></section>
-				<section class="R" id="encodePrice(cointoss.execution.Execution,cointoss.execution.Execution)">
-					<h2 class="T"><i class="OVERRIDE PROTECTED"></i><code class="d">encodePrice</code><code class="V">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodePrice(cointoss.execution.Execution,cointoss.execution.Execution)">
+					<h2 class="h"><i class="OVERRIDE PROTECTED"></i><code class="M">encodePrice</code><code class="U">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>execution</code></td>
 							<td><span><p>A current execution.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code>previous</code></td>
 							<td><span><p>A previous execution.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td><span><p>An encoded value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Encode price.</p>
 </span></section>
-				<section class="R" id="encodeDelta(int,int,int)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">encodeDelta</code><code class="V">(<code>int</code> <code class="parameterName">current</code>, <code>int</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeDelta(int,int,int)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">encodeDelta</code><code class="U">(<code>int</code> <code class="parameterName">current</code>, <code>int</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code>int</code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>int</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>int</code> <code>defaultValue</code></td>
 							<td><span><p>A default value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute delta value. If it is default value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="decodeDelta(java.lang.String,int,int)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">decodeDelta</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>int</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="m"><code>int</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeDelta(java.lang.String,int,int)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">decodeDelta</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>int</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="Q"><code>int</code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>int</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>int</code> <code>defaultValue</code></td>
 							<td><span><p>A default value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code>int</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute delta value. If it is default value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="encodeDelta(long,long,long)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">encodeDelta</code><code class="V">(<code>long</code> <code class="parameterName">current</code>, <code>long</code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeDelta(long,long,long)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">encodeDelta</code><code class="U">(<code>long</code> <code class="parameterName">current</code>, <code>long</code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code>long</code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>long</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>long</code> <code>defaultValue</code></td>
 							<td><span><p>A default value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute delta value. If it is default value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="decodeDelta(java.lang.String,long,long)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">decodeDelta</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>long</code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="m"><code>long</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeDelta(java.lang.String,long,long)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">decodeDelta</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>long</code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="Q"><code>long</code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>long</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>long</code> <code>defaultValue</code></td>
 							<td><span><p>A default value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code>long</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute delta value. If it is default value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="encodeDelta(java.time.ZonedDateTime,java.time.ZonedDateTime,long)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">encodeDelta</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeDelta(java.time.ZonedDateTime,java.time.ZonedDateTime,long)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">encodeDelta</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>long</code> <code>defaultValue</code></td>
 							<td><span><p>A default value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute delta value. If it is default value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="decodeDelta(java.lang.String,java.time.ZonedDateTime,long)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">decodeDelta</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeDelta(java.lang.String,java.time.ZonedDateTime,long)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">decodeDelta</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>long</code> <code>defaultValue</code></td>
 							<td><span><p>A default value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute delta value. If it is default value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="encodeIntegralDelta(hypatia.Num,hypatia.Num,int)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">encodeIntegralDelta</code><code class="V">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeIntegralDelta(hypatia.Num,hypatia.Num,int)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">encodeIntegralDelta</code><code class="U">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>int</code> <code>defaultValue</code></td>
 							<td><span><p>A default value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute delta value. If it is default value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="decodeIntegralDelta(java.lang.String,hypatia.Num,int)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">decodeIntegralDelta</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="m"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeIntegralDelta(java.lang.String,hypatia.Num,int)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">decodeIntegralDelta</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="Q"><code>hypatia.Num</code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>int</code> <code>defaultValue</code></td>
 							<td><span><p>A default value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code>hypatia.Num</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute delta value. If it is default value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="encodeDiff(hypatia.Num,hypatia.Num)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">encodeDiff</code><code class="V">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeDiff(hypatia.Num,hypatia.Num)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">encodeDiff</code><code class="U">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute diff value. If these are same value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="decodeDiff(java.lang.String,hypatia.Num)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">decodeDiff</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>)</code><i class="m"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeDiff(java.lang.String,hypatia.Num)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">decodeDiff</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>)</code><i class="Q"><code>hypatia.Num</code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code>hypatia.Num</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute diff value. If these are same value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="encodeDiff(hypatia.Num,hypatia.Num,hypatia.Num)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">encodeDiff</code><code class="V">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>hypatia.Num</code> <code class="parameterName">coefficient</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeDiff(hypatia.Num,hypatia.Num,hypatia.Num)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">encodeDiff</code><code class="U">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>hypatia.Num</code> <code class="parameterName">coefficient</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>coefficient</code></td>
 							<td><span><p>A coefficient to reduce decimal value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute diff value. If these are same value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="decodeDiff(java.lang.String,hypatia.Num,hypatia.Num)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">decodeDiff</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>hypatia.Num</code> <code class="parameterName">coefficient</code>)</code><i class="m"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeDiff(java.lang.String,hypatia.Num,hypatia.Num)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">decodeDiff</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>hypatia.Num</code> <code class="parameterName">coefficient</code>)</code><i class="Q"><code>hypatia.Num</code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code>hypatia.Num</code> <code>coefficient</code></td>
 							<td><span><p>A coefficient to reduce decimal value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code>hypatia.Num</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute diff value. If these are same value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="encodeDiff(java.lang.String,java.lang.String)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">encodeDiff</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="encodeDiff(java.lang.String,java.lang.String)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">encodeDiff</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute diff value. If these are same value, empty string will be returned.</p>
 </span></section>
-				<section class="R" id="decodeDiff(java.lang.String,java.lang.String)">
-					<h2 class="T"><i class="STATIC PROTECTED"></i><code class="d">decodeDiff</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">previous</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="g" id="decodeDiff(java.lang.String,java.lang.String)">
+					<h2 class="h"><i class="PROTECTED STATIC"></i><code class="M">decodeDiff</code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">previous</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="L">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>current</code></td>
 							<td><span><p>A current value.</p>
 </span></td>
 						</tr>
-						<tr class="H">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>previous</code></td>
 							<td><span><p>A previous value.</p>
 </span></td>
 						</tr>
-						<tr class="X">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute diff value. If these are same value, empty string will be returned.</p>
 </span></section>
 			</article>
-			<aside class="L" id="SubNavi">
-				<div class="Y">
-					<h5 class="I">Constructors</h5>
+			<aside class="N" id="SubNavi">
+				<div class="O">
+					<h5 class="V">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#ExecutionDeltaLogger()">ExecutionDeltaLogger</a></code><code class="V">()</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#ExecutionDeltaLogger()">ExecutionDeltaLogger</a></code><code class="U">()</code></li>
 					</ul>
-					<h5 class="I">Static Methods</h5>
+					<h5 class="V">Static Methods</h5>
 					<ul>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDelta(int,int,int)">encodeDelta</a></code><code class="V">(<code>int</code> <code class="parameterName">current</code>, <code>int</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDelta(java.lang.String,int,int)">decodeDelta</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>int</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="O"><code>int</code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDelta(long,long,long)">encodeDelta</a></code><code class="V">(<code>long</code> <code class="parameterName">current</code>, <code>long</code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDelta(java.lang.String,long,long)">decodeDelta</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>long</code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="O"><code>long</code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDelta(java.time.ZonedDateTime,java.time.ZonedDateTime,long)">encodeDelta</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDelta(java.lang.String,java.time.ZonedDateTime,long)">decodeDelta</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeIntegralDelta(hypatia.Num,hypatia.Num,int)">encodeIntegralDelta</a></code><code class="V">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeIntegralDelta(java.lang.String,hypatia.Num,int)">decodeIntegralDelta</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="O"><code>hypatia.Num</code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDiff(hypatia.Num,hypatia.Num)">encodeDiff</a></code><code class="V">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDiff(java.lang.String,hypatia.Num)">decodeDiff</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>)</code><i class="O"><code>hypatia.Num</code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDiff(hypatia.Num,hypatia.Num,hypatia.Num)">encodeDiff</a></code><code class="V">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>hypatia.Num</code> <code class="parameterName">coefficient</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDiff(java.lang.String,hypatia.Num,hypatia.Num)">decodeDiff</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>hypatia.Num</code> <code class="parameterName">coefficient</code>)</code><i class="O"><code>hypatia.Num</code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDiff(java.lang.String,java.lang.String)">encodeDiff</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="STATIC PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDiff(java.lang.String,java.lang.String)">decodeDiff</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDelta(int,int,int)">encodeDelta</a></code><code class="U">(<code>int</code> <code class="parameterName">current</code>, <code>int</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDelta(java.lang.String,int,int)">decodeDelta</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>int</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="Z"><code>int</code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDelta(long,long,long)">encodeDelta</a></code><code class="U">(<code>long</code> <code class="parameterName">current</code>, <code>long</code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDelta(java.lang.String,long,long)">decodeDelta</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>long</code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="Z"><code>long</code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDelta(java.time.ZonedDateTime,java.time.ZonedDateTime,long)">encodeDelta</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDelta(java.lang.String,java.time.ZonedDateTime,long)">decodeDelta</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">previous</code>, <code>long</code> <code class="parameterName">defaultValue</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeIntegralDelta(hypatia.Num,hypatia.Num,int)">encodeIntegralDelta</a></code><code class="U">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeIntegralDelta(java.lang.String,hypatia.Num,int)">decodeIntegralDelta</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>int</code> <code class="parameterName">defaultValue</code>)</code><i class="Z"><code>hypatia.Num</code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDiff(hypatia.Num,hypatia.Num)">encodeDiff</a></code><code class="U">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDiff(java.lang.String,hypatia.Num)">decodeDiff</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>)</code><i class="Z"><code>hypatia.Num</code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDiff(hypatia.Num,hypatia.Num,hypatia.Num)">encodeDiff</a></code><code class="U">(<code>hypatia.Num</code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>hypatia.Num</code> <code class="parameterName">coefficient</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDiff(java.lang.String,hypatia.Num,hypatia.Num)">decodeDiff</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code>hypatia.Num</code> <code class="parameterName">previous</code>, <code>hypatia.Num</code> <code class="parameterName">coefficient</code>)</code><i class="Z"><code>hypatia.Num</code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDiff(java.lang.String,java.lang.String)">encodeDiff</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PROTECTED STATIC"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDiff(java.lang.String,java.lang.String)">decodeDiff</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">current</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
 					</ul>
-					<h5 class="I">Methods</h5>
+					<h5 class="V">Methods</h5>
 					<ul>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeId(java.lang.String,cointoss.execution.Execution)">decodeId</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code>long</code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeId(cointoss.execution.Execution,cointoss.execution.Execution)">encodeId</a></code><code class="V">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDate(java.lang.String,cointoss.execution.Execution)">decodeDate</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDate(cointoss.execution.Execution,cointoss.execution.Execution)">encodeDate</a></code><code class="V">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeSize(java.lang.String,cointoss.execution.Execution)">decodeSize</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code>hypatia.Num</code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeSize(cointoss.execution.Execution,cointoss.execution.Execution)">encodeSize</a></code><code class="V">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodePrice(java.lang.String,cointoss.execution.Execution)">decodePrice</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code>hypatia.Num</code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodePrice(cointoss.execution.Execution,cointoss.execution.Execution)">encodePrice</a></code><code class="V">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="O"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeId(java.lang.String,cointoss.execution.Execution)">decodeId</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code>long</code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeId(cointoss.execution.Execution,cointoss.execution.Execution)">encodeId</a></code><code class="U">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeDate(java.lang.String,cointoss.execution.Execution)">decodeDate</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeDate(cointoss.execution.Execution,cointoss.execution.Execution)">encodeDate</a></code><code class="U">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodeSize(java.lang.String,cointoss.execution.Execution)">decodeSize</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code>hypatia.Num</code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodeSize(cointoss.execution.Execution,cointoss.execution.Execution)">encodeSize</a></code><code class="U">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#decodePrice(java.lang.String,cointoss.execution.Execution)">decodePrice</a></code><code class="U">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">value</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code>hypatia.Num</code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.execution.ExecutionDeltaLogger.html#encodePrice(cointoss.execution.Execution,cointoss.execution.Execution)">encodePrice</a></code><code class="U">(<code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">execution</code>, <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> <code class="parameterName">previous</code>)</code><i class="Z"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
 					</ul>
 				</div>
 			</aside>
