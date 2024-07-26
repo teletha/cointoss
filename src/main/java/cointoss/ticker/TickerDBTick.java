@@ -13,9 +13,9 @@ import typewriter.duck.DuckModel;
 
 public class TickerDBTick extends DuckModel {
 
-    public long time;
+    public long id;
 
-    public double end;
+    public double close;
 
     public double start;
 

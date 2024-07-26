@@ -17,60 +17,101 @@ import cointoss.execution.LogType;
 import cointoss.market.binance.BinanceFuture;
 import cointoss.util.Chrono;
 import kiss.I;
-import kiss.Signal;
+import psychopath.Locator;
 import typewriter.rdb.RDB;
 
 public class TickerCompare {
 
     public static void main(String[] args) {
         I.load(TickerDB.class);
-        I.env("typewriter.sqlite", "jdbc:duckdb::test");
+        I.env("typewriter.sqlite", "jdbc:duckdb:/duck.db");
 
-        ZonedDateTime s = Chrono.utc(2024, 6, 1);
-        ZonedDateTime ee = Chrono.utc(2024, 6, 30);
+        ZonedDateTime starting = Chrono.utc(2024, 6, 1);
+        ZonedDateTime ending = Chrono.utc(2024, 7, 30);
 
+        store(starting, ending);
+        //
+        // Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
+        //
+        // AtomicInteger count = new AtomicInteger();
+        //
+        // Ticker ticker = market.tickers.on(Span.Hour1);
+        //
+        // market.tickers.add(market.log.range(starting, ending, LogType.Fast));
+        //
+        // System.out.println(ticker.ticks.size());
+        //
+        // long start = System.currentTimeMillis();
+        // ticker.ticks.query(starting.toEpochSecond(), ending.toEpochSecond()).to(x -> {
+        // count.incrementAndGet();
+        // });
+        // long end = System.currentTimeMillis();
+        //
+        // System.out.println("Feather " + (end - start) + " " + count.get());
+        // count.set(0);
+        //
+        // RDB<TickerDBTick> db = RDB.of(TickerDBTick.class);
+        // ticker.ticks.query(starting.toEpochSecond(), ending.toEpochSecond()).map(e -> {
+        // TickerDBTick tick = new TickerDBTick();
+        // tick.id = e.openTime;
+        // tick.start = e.openPrice;
+        // tick.close = e.closePrice;
+        // tick.high = e.highPrice;
+        // tick.low = e.lowPrice;
+        // return tick;
+        // }).buffer(24 * 2).to(e -> {
+        // db.updateAll(e);
+        // });
+        //
+        // Signal<TickerDBTick> query = db.findBy(TickerDBTick::getId, x ->
+        // x.isLessThan(ending.toEpochSecond() - 60 * 60 * 24 * 30));
+        // start = System.currentTimeMillis();
+        // query.to(e -> {
+        // count.incrementAndGet();
+        // });
+        // end = System.currentTimeMillis();
+        //
+        // System.out.println("QUERY " + (end - start) + " " + count.get());
+    }
+
+    private static void store(ZonedDateTime starting, ZonedDateTime ending) {
         Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
 
-        AtomicInteger count = new AtomicInteger();
+        Ticker ticker = market.tickers.on(Span.Hour1);
+        ticker.ticks.enableDiskStore(Locator.file("feather.db"));
+        market.tickers.add(market.log.range(starting, ending, LogType.Fast));
+        ticker.ticks.commit();
+
+        RDB<TickerDBTick> db = RDB.of(TickerDBTick.class);
+        ticker.ticks.query(starting.toEpochSecond(), ending.toEpochSecond()).map(e -> {
+            TickerDBTick tick = new TickerDBTick();
+            tick.id = e.openTime;
+            tick.start = e.openPrice;
+            tick.close = e.closePrice;
+            tick.high = e.highPrice;
+            tick.low = e.lowPrice;
+            return tick;
+        }).buffer(24).to(e -> {
+            db.updateAll(e);
+        });
+
+    }
+
+    private static void read(ZonedDateTime starting, ZonedDateTime ending) {
+        Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
 
         Ticker ticker = market.tickers.on(Span.Hour1);
+        ticker.ticks.enableDiskStore(Locator.file("feather.db"));
 
-        market.tickers.add(market.log.range(s, ee, LogType.Fast));
-
-        System.out.println(ticker.ticks.size());
-
+        AtomicInteger count = new AtomicInteger();
         long start = System.currentTimeMillis();
-        ticker.ticks.query(s.toEpochSecond(), ee.toEpochSecond()).to(x -> {
+
+        ticker.ticks.query(starting.toEpochSecond(), ending.toEpochSecond()).to(e -> {
             count.incrementAndGet();
         });
         long end = System.currentTimeMillis();
 
-        System.out.println("Feather " + (end - start) + "   " + count.get());
+        System.out.println("Feather " + (end - start) + "  " + count.get());
         count.set(0);
-
-        RDB<TickerDBTick> db = RDB.of(TickerDBTick.class);
-        ticker.ticks.query(s.toEpochSecond(), ee.toEpochSecond()).map(e -> {
-            TickerDBTick tick = new TickerDBTick();
-            tick.time = e.openTime;
-            tick.start = e.openPrice;
-            tick.end = e.closePrice;
-            tick.high = e.highPrice;
-            tick.low = e.lowPrice;
-
-            return tick;
-        }).buffer(10000).to(e -> {
-            db.updateAll(e);
-        });
-
-        ZonedDateTime utc = Chrono.utc(2024, 6, 1);
-
-        Signal<TickerDBExecution> query = db.findAll();
-        start = System.currentTimeMillis();
-        query.to(e -> {
-            count.incrementAndGet();
-        });
-        end = System.currentTimeMillis();
-
-        System.out.println("QUERY " + (end - start) + "  " + count.get());
     }
 }
