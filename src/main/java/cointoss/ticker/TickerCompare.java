@@ -17,6 +17,7 @@ import cointoss.execution.LogType;
 import cointoss.market.binance.BinanceFuture;
 import cointoss.util.Chrono;
 import kiss.I;
+import kiss.Signal;
 import psychopath.Locator;
 import typewriter.rdb.RDB;
 
@@ -24,12 +25,12 @@ public class TickerCompare {
 
     public static void main(String[] args) {
         I.load(TickerDB.class);
-        I.env("typewriter.sqlite", "jdbc:duckdb:/duck.db");
+        I.env("typewriter.duckdb", "jdbc:duckdb:duck.db");
 
-        ZonedDateTime starting = Chrono.utc(2024, 6, 1);
+        ZonedDateTime starting = Chrono.utc(2023, 1, 1);
         ZonedDateTime ending = Chrono.utc(2024, 7, 30);
 
-        store(starting, ending);
+        save(starting, ending);
         //
         // Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
         //
@@ -74,7 +75,7 @@ public class TickerCompare {
         // System.out.println("QUERY " + (end - start) + " " + count.get());
     }
 
-    private static void store(ZonedDateTime starting, ZonedDateTime ending) {
+    private static void save(ZonedDateTime starting, ZonedDateTime ending) {
         Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
 
         Ticker ticker = market.tickers.on(Span.Hour1);
@@ -94,7 +95,6 @@ public class TickerCompare {
         }).buffer(24).to(e -> {
             db.updateAll(e);
         });
-
     }
 
     private static void read(ZonedDateTime starting, ZonedDateTime ending) {
@@ -113,5 +113,15 @@ public class TickerCompare {
 
         System.out.println("Feather " + (end - start) + "  " + count.get());
         count.set(0);
+
+        RDB<TickerDBTick> db = RDB.of(TickerDBTick.class);
+        Signal<TickerDBTick> query = db.findAll();
+        start = System.currentTimeMillis();
+        query.to(e -> {
+            count.incrementAndGet();
+        });
+        end = System.currentTimeMillis();
+
+        System.out.println("QUERY " + (end - start) + " " + count.get());
     }
 }
