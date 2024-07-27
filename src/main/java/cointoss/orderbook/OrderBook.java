@@ -182,9 +182,11 @@ public class OrderBook implements Listener {
             Num lowerRounded = Num.max(Num.of(base.lastDoubleKey()), lowerPrice).floor(range);
             Num upperRounded = Num.min(Num.of(base.firstDoubleKey()), upperPrice).floor(range);
 
-            for (OrderBookPage page : grouped.subMap(upperRounded.doubleValue(), true, lowerRounded.doubleValue(), true).values()) {
-                if (max.size < page.size) {
-                    max = page;
+            if (lowerRounded.isLessThan(upperRounded)) {
+                for (OrderBookPage page : grouped.subMap(upperRounded.doubleValue(), true, lowerRounded.doubleValue(), true).values()) {
+                    if (max.size < page.size) {
+                        max = page;
+                    }
                 }
             }
         } else {
@@ -195,9 +197,11 @@ public class OrderBook implements Listener {
             Num lowerRounded = Num.max(Num.of(base.firstDoubleKey()), lowerPrice).floor(range);
             Num upperRounded = Num.min(Num.of(base.lastDoubleKey()), upperPrice).floor(range);
 
-            for (OrderBookPage page : grouped.subMap(lowerRounded.doubleValue(), true, upperRounded.doubleValue(), true).values()) {
-                if (max.size < page.size) {
-                    max = page;
+            if (lowerRounded.isLessThan(upperRounded)) {
+                for (OrderBookPage page : grouped.subMap(lowerRounded.doubleValue(), true, upperRounded.doubleValue(), true).values()) {
+                    if (max.size < page.size) {
+                        max = page;
+                    }
                 }
             }
         }

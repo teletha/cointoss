@@ -27,7 +27,7 @@ public class TickerCompare {
         I.load(TickerDB.class);
         I.env("typewriter.duckdb", "jdbc:duckdb:duck.db");
 
-        ZonedDateTime starting = Chrono.utc(2023, 1, 1);
+        ZonedDateTime starting = Chrono.utc(2024, 6, 1);
         ZonedDateTime ending = Chrono.utc(2024, 7, 30);
 
         save(starting, ending);
@@ -80,6 +80,7 @@ public class TickerCompare {
 
         Ticker ticker = market.tickers.on(Span.Hour1);
         ticker.ticks.enableDiskStore(Locator.file("feather.db"));
+
         market.tickers.add(market.log.range(starting, ending, LogType.Fast));
         ticker.ticks.commit();
 

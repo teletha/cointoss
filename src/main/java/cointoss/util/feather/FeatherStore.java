@@ -10,6 +10,7 @@
 package cointoss.util.feather;
 
 import java.lang.reflect.Array;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -214,6 +215,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     public synchronized FeatherStore<E> enableDiskStore(File databaseFile, DataCodec<E> dataType) {
         if (databaseFile != null && this.disk == null) {
             this.disk = new DiskStorage(databaseFile, dataType != null ? dataType : DataCodec.of(model), itemDuration);
+            System.out.println("Enabe disk " + disk);
             if (disk.startTime() < first) {
                 first = disk.startTime();
             }
@@ -328,6 +330,9 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
             segment.set((int) index[1], previous == null ? item : accumulator.apply(previous, item));
         }
 
+        if (itemDuration == Span.Hour1.seconds) {
+            System.out.println(Instant.ofEpochSecond(item.seconds()));
+        }
         // update managed time
         if (time < first) {
             first = time;
@@ -731,6 +736,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      */
     public void commit() {
         if (disk != null) {
+            System.out.println("Commit " + Instant.ofEpochSecond(disk.startTime()) + "   " + Instant.ofEpochSecond(disk.endTime()));
             for (Entry<Long, OnHeap<E>> entry : indexed.entrySet()) {
                 disk.write(entry.getKey(), entry.getValue().items);
             }
@@ -746,8 +752,12 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
         long evictableTime = eviction.access(time);
         if (evictableTime != -1) {
             OnHeap<E> segment = indexed.remove(evictableTime);
+            if (itemDuration == Span.Hour1.seconds) {
+                System.out.println("try evict " + disk);
+            }
             if (disk != null) {
                 disk.write(evictableTime, segment.items);
+                System.out.println("Write to disk");
             }
             segment.clear();
 
