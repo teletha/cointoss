@@ -16,17 +16,15 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
-import cointoss.execution.LogType;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Num;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -202,9 +200,10 @@ public class ChartView extends View {
         ZonedDateTime max = Chrono.utcBySeconds(chart.axisX.logicalMaxValue.longValue());
 
         if (ticker.isPresent()) {
-            market.v.tickers.add(market.v.service.log.range(min.minusDays(6), min.minusDays(1), LogType.Fast)
-                    .effect(e -> market.v.priceVolume.update(e)));
-            chart.layoutForcely();
+            // market.v.tickers.add(market.v.service.log.range(min.minusDays(6), min.minusDays(1),
+            // LogType.Fast)
+            // .effect(e -> market.v.priceVolume.update(e)));
+            // chart.layoutForcely();
         }
     }
 

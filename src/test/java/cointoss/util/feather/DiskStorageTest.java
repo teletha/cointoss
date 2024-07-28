@@ -97,6 +97,32 @@ public class DiskStorageTest {
     }
 
     @Test
+    void readLessThanStart() {
+        DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
+        int base = 60 * 60 * 24 * 35;
+        storage.write(base, new IntValue(base), null, new IntValue(base + 2));
+        assert storage.offsetTime() == 60 * 60 * 24 * 31;
+
+        IntValue[] items = new IntValue[3];
+        assert storage.read(0, items)[0] == 0;
+        assert items[0] == null;
+        assert items[1] == null;
+        assert items[2] == null;
+    }
+
+    @Test
+    void readGreaterThanEnd() {
+        DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
+        storage.write(0, new IntValue(0), null, new IntValue(2));
+
+        IntValue[] items = new IntValue[3];
+        assert storage.read(60 * 60 * 24 * 5000, items)[0] == 0;
+        assert items[0] == null;
+        assert items[1] == null;
+        assert items[2] == null;
+    }
+
+    @Test
     void readNoItem() {
         DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
 
@@ -181,7 +207,7 @@ public class DiskStorageTest {
     }
 
     @Test
-    void rebuildAutomatically() {
+    void rebuildAutomaticallyOnWrite() {
         DiskStorage<IntValue> storage = createStorage(IntValue.class, 1);
         int base = 60 * 60 * 24 * 35;
         storage.write(base, new IntValue(base), null, new IntValue(base + 2));

@@ -294,10 +294,14 @@ class DiskStorage<T> {
         }
 
         long stamp = lock.readLock();
+        long offset = (truncatedTime - offsetTime) / duration * itemWidth;
+        if (offset < 0) {
+            return new int[] {0, -1, -1};
+        }
 
         try {
             ByteBuffer buffer = ByteBuffer.allocate(itemWidth * items.length);
-            int size = channel.read(buffer, HEADER_SIZE + (truncatedTime - offsetTime) / duration * itemWidth);
+            int size = channel.read(buffer, HEADER_SIZE + offset);
             if (size == -1) {
                 return new int[] {0, -1, -1};
             }

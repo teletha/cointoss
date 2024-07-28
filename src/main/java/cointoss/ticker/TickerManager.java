@@ -90,15 +90,6 @@ public final class TickerManager implements Disposable {
         return I.signal(tickers);
     }
 
-    public void add(Signal<Execution> additions) {
-        TickerManager manager = new TickerManager(service);
-        additions.to(manager::update);
-
-        for (int i = 0; i < manager.tickers.length; i++) {
-            tickers[i].ticks.merge(manager.tickers[i].ticks);
-        }
-    }
-
     /**
      * Update all {@link Ticker}s by {@link Execution}.
      * 

@@ -215,7 +215,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     public synchronized FeatherStore<E> enableDiskStore(File databaseFile, DataCodec<E> dataType) {
         if (databaseFile != null && this.disk == null) {
             this.disk = new DiskStorage(databaseFile, dataType != null ? dataType : DataCodec.of(model), itemDuration);
-            System.out.println("Enabe disk " + disk);
+            System.out.println("Enabe disk " + disk + "  " + this);
             if (disk.startTime() < first) {
                 first = disk.startTime();
             }
@@ -752,12 +752,9 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
         long evictableTime = eviction.access(time);
         if (evictableTime != -1) {
             OnHeap<E> segment = indexed.remove(evictableTime);
-            if (itemDuration == Span.Hour1.seconds) {
-                System.out.println("try evict " + disk);
-            }
+
             if (disk != null) {
                 disk.write(evictableTime, segment.items);
-                System.out.println("Write to disk");
             }
             segment.clear();
 
