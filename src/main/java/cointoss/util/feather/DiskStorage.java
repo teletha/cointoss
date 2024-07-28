@@ -293,9 +293,14 @@ class DiskStorage<T> {
             return new int[] {0, -1, -1};
         }
 
-        long stamp = lock.readLock();
         long offset = (truncatedTime - offsetTime) / duration * itemWidth;
         if (offset < 0) {
+            return new int[] {0, -1, -1};
+        }
+
+        long stamp = lock.tryOptimisticRead();
+
+        if (!lock.validate(stamp)) {
             return new int[] {0, -1, -1};
         }
 
@@ -326,8 +331,6 @@ class DiskStorage<T> {
             return new int[] {readableItemSize - skip, firstIndex, lastIndex};
         } catch (IOException e) {
             throw I.quiet(e);
-        } finally {
-            lock.unlockRead(stamp);
         }
     }
 

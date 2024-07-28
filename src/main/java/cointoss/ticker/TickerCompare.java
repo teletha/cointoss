@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,7 +29,7 @@ public class TickerCompare {
         I.env("typewriter.duckdb", "jdbc:duckdb:duck.db");
 
         ZonedDateTime starting = Chrono.utc(2023, 6, 1);
-        ZonedDateTime ending = Chrono.utc(2024, 7, 30);
+        ZonedDateTime ending = Chrono.utc(2024, 7, 27);
 
         save(starting, ending);
         //
@@ -96,6 +97,7 @@ public class TickerCompare {
             tick.low = e.lowPrice;
             return tick;
         }).buffer(24).to(e -> {
+            System.out.println("DB " + Instant.ofEpochSecond(e.getFirst().id));
             db.updateAll(e);
         });
     }

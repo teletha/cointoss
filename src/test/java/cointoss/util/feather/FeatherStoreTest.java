@@ -341,6 +341,18 @@ class FeatherStoreTest {
     }
 
     @Test
+    void queryDataFromDiskCache() {
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
+
+        store.store(value(0));
+        store.commit();
+        store.clear();
+        assert store.existOnHeap(value(0)) == false;
+        assert store.existOnDisk(value(0)) == true;
+        assert store.query(0).toList().getFirst().value == 0;
+    }
+
+    @Test
     void supportPrimitiveTypes() {
         Primitive primitive = new Primitive();
         primitive.intValue = 1;
