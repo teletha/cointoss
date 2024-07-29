@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cointoss.Market;
-import cointoss.execution.LogType;
 import cointoss.market.binance.BinanceFuture;
 import cointoss.util.Chrono;
 import kiss.I;
@@ -31,7 +30,7 @@ public class TickerCompare {
         ZonedDateTime starting = Chrono.utc(2023, 6, 1);
         ZonedDateTime ending = Chrono.utc(2024, 7, 27);
 
-        save(starting, ending);
+        read(starting, ending);
         //
         // Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
         //
@@ -82,13 +81,14 @@ public class TickerCompare {
         Ticker ticker = market.tickers.on(Span.Hour1);
         ticker.ticks.enableDiskStore(Locator.file("feather.db"));
 
-        market.log.range(starting, ending, LogType.Fast).to(e -> {
-            market.tickers.update(e);
-        });
-        ticker.ticks.commit();
+        // market.log.range(starting, ending, LogType.Fast).to(e -> {
+        // market.tickers.update(e);
+        // });
+        // ticker.ticks.commit();
 
         RDB<TickerDBTick> db = RDB.of(TickerDBTick.class);
         ticker.ticks.query(starting.toEpochSecond(), ending.toEpochSecond()).map(e -> {
+            System.out.println(e);
             TickerDBTick tick = new TickerDBTick();
             tick.id = e.openTime;
             tick.start = e.openPrice;
@@ -98,7 +98,7 @@ public class TickerCompare {
             return tick;
         }).buffer(24).to(e -> {
             System.out.println("DB " + Instant.ofEpochSecond(e.getFirst().id));
-            db.updateAll(e);
+            // db.updateAll(e);
         });
     }
 

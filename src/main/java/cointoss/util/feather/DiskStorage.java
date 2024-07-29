@@ -328,6 +328,7 @@ class DiskStorage<T> {
                 }
                 time += duration;
             }
+            System.out.println(readableItemSize + "  " + skip + "  " + firstIndex + "  " + lastIndex);
             return new int[] {readableItemSize - skip, firstIndex, lastIndex};
         } catch (IOException e) {
             throw I.quiet(e);

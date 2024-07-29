@@ -17,9 +17,6 @@ import hypatia.Num;
 
 public final class Tick implements Timelinable {
 
-    /** The empty dummy. */
-    static final Tick EMPTY = new Tick();
-
     /** Begin time of this tick (epoch second). */
     public final long openTime;
 
@@ -53,9 +50,9 @@ public final class Tick implements Timelinable {
     /**
      * Empty Dummt Tick.
      */
-    private Tick() {
-        this.openTime = 0;
-        this.openPrice = closePrice = highPrice = lowPrice = 0;
+    Tick(long startEpochSeconds, double open) {
+        this.openTime = startEpochSeconds;
+        this.openPrice = open;
     }
 
     /**

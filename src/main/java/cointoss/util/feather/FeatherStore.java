@@ -690,7 +690,6 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
                 segment.max = result[2];
                 tryEvict(startTime);
                 indexed.put(startTime, segment);
-
                 return segment;
             }
         }
