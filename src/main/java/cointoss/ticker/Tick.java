@@ -14,14 +14,17 @@ import java.time.ZonedDateTime;
 import cointoss.util.Chrono;
 import cointoss.util.feather.Timelinable;
 import hypatia.Num;
+import typewriter.duck.DuckModel;
+import typewriter.rdb.RDB;
 
-public final class Tick implements Timelinable {
+@SuppressWarnings("unused")
+public final class Tick extends DuckModel<Tick> implements Timelinable {
 
     /** Begin time of this tick (epoch second). */
-    public final long openTime;
+    long openTime;
 
     /** Open price of the period */
-    public final double openPrice;
+    double openPrice;
 
     /** Close price of the period. */
     double closePrice;
@@ -48,11 +51,9 @@ public final class Tick implements Timelinable {
     Ticker ticker;
 
     /**
-     * Empty Dummt Tick.
+     * Empty Tick.
      */
-    Tick(long startEpochSeconds, double open) {
-        this.openTime = startEpochSeconds;
-        this.openPrice = open;
+    Tick() {
     }
 
     /**
@@ -88,6 +89,30 @@ public final class Tick implements Timelinable {
      * {@inheritDoc}
      */
     @Override
+    protected RDB<Tick> backend() {
+        return super.backend();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getId() {
+        return openTime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setId(long id) {
+        openTime = id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ZonedDateTime date() {
         return Chrono.utcByMills(openTime * 1000);
     }
@@ -97,6 +122,15 @@ public final class Tick implements Timelinable {
      */
     @Override
     public long seconds() {
+        return openTime;
+    }
+
+    /**
+     * Retrieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
+    public long openTime() {
         return openTime;
     }
 
@@ -315,5 +349,149 @@ public final class Tick implements Timelinable {
 
         Tick other = (Tick) obj;
         return openTime == other.openTime;
+    }
+
+    /**
+     * Get the openPrice property of this {@link Tick}.
+     * 
+     * @return The openPrice property.
+     */
+    private double getOpenPrice() {
+        return openPrice;
+    }
+
+    /**
+     * Set the openPrice property of this {@link Tick}.
+     * 
+     * @param openPrice The openPrice value to set.
+     */
+    private void setOpenPrice(double openPrice) {
+        this.openPrice = openPrice;
+    }
+
+    /**
+     * Get the closePrice property of this {@link Tick}.
+     * 
+     * @return The closePrice property.
+     */
+    private double getClosePrice() {
+        return closePrice;
+    }
+
+    /**
+     * Set the closePrice property of this {@link Tick}.
+     * 
+     * @param closePrice The closePrice value to set.
+     */
+    private void setClosePrice(double closePrice) {
+        this.closePrice = closePrice;
+    }
+
+    /**
+     * Get the highPrice property of this {@link Tick}.
+     * 
+     * @return The highPrice property.
+     */
+    private double getHighPrice() {
+        return highPrice;
+    }
+
+    /**
+     * Set the highPrice property of this {@link Tick}.
+     * 
+     * @param highPrice The highPrice value to set.
+     */
+    private void setHighPrice(double highPrice) {
+        this.highPrice = highPrice;
+    }
+
+    /**
+     * Get the lowPrice property of this {@link Tick}.
+     * 
+     * @return The lowPrice property.
+     */
+    private double getLowPrice() {
+        return lowPrice;
+    }
+
+    /**
+     * Set the lowPrice property of this {@link Tick}.
+     * 
+     * @param lowPrice The lowPrice value to set.
+     */
+    private void setLowPrice(double lowPrice) {
+        this.lowPrice = lowPrice;
+    }
+
+    /**
+     * Get the longVolume property of this {@link Tick}.
+     * 
+     * @return The longVolume property.
+     */
+    private double getLongVolume() {
+        return longVolume;
+    }
+
+    /**
+     * Set the longVolume property of this {@link Tick}.
+     * 
+     * @param longVolume The longVolume value to set.
+     */
+    private void setLongVolume(double longVolume) {
+        this.longVolume = longVolume;
+    }
+
+    /**
+     * Get the longLosscutVolume property of this {@link Tick}.
+     * 
+     * @return The longLosscutVolume property.
+     */
+    private double getLongLosscutVolume() {
+        return longLosscutVolume;
+    }
+
+    /**
+     * Set the longLosscutVolume property of this {@link Tick}.
+     * 
+     * @param longLosscutVolume The longLosscutVolume value to set.
+     */
+    private void setLongLosscutVolume(double longLosscutVolume) {
+        this.longLosscutVolume = longLosscutVolume;
+    }
+
+    /**
+     * Get the shortVolume property of this {@link Tick}.
+     * 
+     * @return The shortVolume property.
+     */
+    private double getShortVolume() {
+        return shortVolume;
+    }
+
+    /**
+     * Set the shortVolume property of this {@link Tick}.
+     * 
+     * @param shortVolume The shortVolume value to set.
+     */
+    private void setShortVolume(double shortVolume) {
+        this.shortVolume = shortVolume;
+    }
+
+    /**
+     * Get the shortLosscutVolume property of this {@link Tick}.
+     * 
+     * @return The shortLosscutVolume property.
+     */
+    private double getShortLosscutVolume() {
+        return shortLosscutVolume;
+    }
+
+    /**
+     * Set the shortLosscutVolume property of this {@link Tick}.
+     * 
+     * @param shortLosscutVolume The shortLosscutVolume value to set.
+     */
+    private void setShortLosscutVolume(double shortLosscutVolume) {
+        this.shortLosscutVolume = shortLosscutVolume;
     }
 }

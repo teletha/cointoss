@@ -61,7 +61,7 @@ public enum CandleType {
     }
 
     private static Color price(Tick tick) {
-        double open = tick.openPrice;
+        double open = tick.openPrice();
         double close = tick.closePrice();
 
         if (open < close) {
@@ -87,7 +87,7 @@ public enum CandleType {
     }
 
     private static Color priceVolume(Tick tick) {
-        double open = tick.openPrice;
+        double open = tick.openPrice();
         double close = tick.closePrice();
         double buy = tick.longVolume();
         double sell = tick.shortVolume();
@@ -114,7 +114,7 @@ public enum CandleType {
     }
 
     private static Color priceVolumeWeight(Tick tick) {
-        double open = tick.openPrice;
+        double open = tick.openPrice();
         double close = tick.closePrice();
         double buy = tick.longVolume();
         double sell = tick.shortVolume();

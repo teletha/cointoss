@@ -18,17 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -44,6 +33,16 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import hypatia.Primitives;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -637,7 +636,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layout(() -> {
             chart.ticker.to(ticker -> {
                 // estimate visible range
-                chart.ticker.map(v -> v.ticks.last()).map(t -> t.openTime - ticker.span.seconds).to(end -> {
+                chart.ticker.map(v -> v.ticks.last()).map(t -> t.openTime() - ticker.span.seconds).to(end -> {
                     long start = (long) axisX.computeVisibleMinValue();
 
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
@@ -669,7 +668,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                     ticker.ticks.query(start, end).to(tick -> {
                         double[] values = candle.valueAt(tick);
-                        double x = axisX.getPositionForValue(tick.openTime);
+                        double x = axisX.getPositionForValue(tick.openTime());
                         double high = axisY.getPositionForValue(values[1]);
                         double low = axisY.getPositionForValue(values[2]);
 
@@ -772,8 +771,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 Tick tick = ticker.ticks.last();
 
-                double x = axisX.getPositionForValue(tick.openTime);
-                double open = axisY.getPositionForValue(tick.openPrice);
+                double x = axisX.getPositionForValue(tick.openTime());
+                double open = axisY.getPositionForValue(tick.openPrice());
                 double close = axisY.getPositionForValue(tick.closePrice());
                 double high = axisY.getPositionForValue(tick.highPrice());
                 double low = axisY.getPositionForValue(tick.lowPrice());
@@ -788,7 +787,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 Tick previous = ticker.ticks.before(tick);
                 if (previous != null && chart.showIndicator.is(TRUE)) {
-                    double lastX = axisX.getPositionForValue(previous.openTime);
+                    double lastX = axisX.getPositionForValue(previous.openTime());
 
                     for (Plotter plotter : plotters) {
                         if (registry.globalSetting(plotter.origin).visible.is(false)) {
@@ -822,8 +821,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         gc.setFont(InfoFont);
 
         int base = chart.market.v.service.setting.base.scale;
-        String date = Chrono.systemByMills(tick.openTime * 1000).format(Chrono.DateTime);
-        String open = CommonText.OpenPrice + " " + Primitives.roundString(tick.openPrice, base);
+        String date = Chrono.systemByMills(tick.openTime() * 1000).format(Chrono.DateTime);
+        String open = CommonText.OpenPrice + " " + Primitives.roundString(tick.openPrice(), base);
         String high = CommonText.HighPrice + " " + Primitives.roundString(tick.highPrice(), base);
         String low = CommonText.LowPrice + " " + Primitives.roundString(tick.lowPrice(), base);
         String close = CommonText.ClosePrice + " " + Primitives.roundString(tick.closePrice(), base);
