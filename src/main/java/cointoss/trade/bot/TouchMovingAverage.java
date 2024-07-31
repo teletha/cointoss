@@ -9,9 +9,7 @@
  */
 package cointoss.trade.bot;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -26,8 +24,6 @@ import kiss.Signal;
 
 public class TouchMovingAverage extends Trader {
 
-    private Map<Tick, Scenario> entries = new HashMap();
-
     public int tickSize = 4;
 
     public double riskRewardRatio = 2.5;
@@ -41,7 +37,7 @@ public class TouchMovingAverage extends Trader {
         Ticker ticker = market.tickers.on(span);
         DoubleIndicator sma = DoubleIndicator.build(ticker, tick -> tick.highPrice()).sma(21);
 
-        Signal<Tick> up = market.tickers.on(Span.Second20).close.map(e -> e.closePrice())
+        Signal<Tick> up = market.tickers.on(Span.Minute1).close.map(e -> e.closePrice())
                 .plug(breakupDouble(sma::valueAtLast))
                 .map(v -> ticker.ticks.last())
                 .diff()
@@ -53,7 +49,7 @@ public class TouchMovingAverage extends Trader {
                     return true;
                 });
 
-        Signal<Tick> down = market.tickers.on(Span.Second20).close.map(e -> e.closePrice())
+        Signal<Tick> down = market.tickers.on(Span.Minute1).close.map(e -> e.closePrice())
                 .plug(breakdownDouble(sma::valueAtLast))
                 .map(v -> ticker.ticks.last())
                 .diff()
