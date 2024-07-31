@@ -10,7 +10,6 @@
 package cointoss.util.feather;
 
 import java.lang.reflect.Array;
-import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -329,9 +328,6 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
             segment.set((int) index[1], previous == null ? item : accumulator.apply(previous, item));
         }
 
-        if (itemDuration == Span.Hour1.seconds) {
-            System.out.println(Instant.ofEpochSecond(item.seconds()));
-        }
         // update managed time
         if (time < first) {
             first = time;

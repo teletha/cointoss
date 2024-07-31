@@ -27,17 +27,17 @@ public enum Span {
 
     Second20(20, SECOND_OF_MINUTE, 30, MINUTES, 12, 1), // 3 * 30 * 12 = 1080
 
-    Minute1(1, MINUTE_OF_HOUR, 4, HOURS, 6, 1), // 60 * 4 * 6 = 1440
+    Minute1(1, MINUTE_OF_HOUR, 2, HOURS, 6, 1), // 60 * 2 * 8 = 960
 
-    Minute5(5, MINUTE_OF_HOUR, 12, HOURS, 10, 1), // 12 * 12 * 10 = 1440
+    Minute5(5, MINUTE_OF_HOUR, 8, HOURS, 10, 1), // 12 * 8 * 10 = 960
 
-    Minute15(15, MINUTE_OF_HOUR, 1, DAYS, 12, 1), // 4 * 24 * 12 = 1152
+    Minute15(15, MINUTE_OF_HOUR, 1, DAYS, 10, 1), // 4 * 24 * 10 = 960
 
-    Hour1(1, HOUR_OF_DAY, 3, DAYS, 12, 1, 1), // 24 * 3 * 10 = 720
+    Hour1(1, HOUR_OF_DAY, 4, DAYS, 12, 1, 1), // 24 * 4 * 10 = 960
 
-    Hour4(4, HOUR_OF_DAY, 10, DAYS, 10, 1), // 6 * 10 * 10 = 600
+    Hour4(4, HOUR_OF_DAY, 10, DAYS, 12, 1), // 6 * 10 * 12 = 720
 
-    Hour12(12, HOUR_OF_DAY, 30, DAYS, 10, 1), // 2 * 30 * 10 = 600
+    Hour12(12, HOUR_OF_DAY, 30, DAYS, 12, 1), // 2 * 30 * 12 = 720
 
     Day1(1, EPOCH_DAY, 60, DAYS, 10, 1, 2), // 60 * 10 = 600
 

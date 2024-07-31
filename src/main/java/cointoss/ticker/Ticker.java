@@ -108,7 +108,7 @@ public final class Ticker implements Disposable {
 
             while (current.openTime + span.seconds < start.toEpochSecond()) {
                 current.freeze();
-                set.updateLazy(current);
+                if (span != Span.Second20) set.updateLazy(current);
                 closing.accept(current);
                 current = new Tick(current.openTime + span.seconds, current.closePrice(), this);
                 ticks.store(current);
@@ -116,7 +116,7 @@ public final class Ticker implements Disposable {
 
             // create the latest tick for execution
             current.freeze();
-            set.updateLazy(current);
+            if (span != Span.Second20) set.updateLazy(current);
             closing.accept(current);
             current = new Tick(current.openTime + span.seconds, execution.price, this);
             currentTickEndTime = computeEndTime();
@@ -139,7 +139,6 @@ public final class Ticker implements Disposable {
     public void vandalize() {
         ticks.clear();
         set.commit();
-        System.out.println("Dispose ticker");
     }
 
     /**

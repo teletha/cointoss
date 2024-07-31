@@ -26,27 +26,16 @@ public class TickerCompare {
         I.load(TickerDB.class);
         I.env("typewriter.sqlite", "jdbc:sqlite:market.sqlite");
 
-        RDB<Tick> db = RDB.of(Tick.class, Span.Hour1);
-
         ZonedDateTime starting = Chrono.utc(2020, 6, 1);
         ZonedDateTime ending = Chrono.utc(2024, 7, 27);
 
-        read(starting, ending, db);
+        save(starting, ending, null);
     }
 
     private static void save(ZonedDateTime starting, ZonedDateTime ending, RDB<Tick> db) {
         Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
 
-        Ticker ticker = market.tickers.on(Span.Hour1);
-
-        ticker.closing.expose.buffer(24 * 10).to(e -> {
-            System.out.println(e);
-            db.updateAll(e);
-        });
-
-        market.log.range(starting, ending, LogType.Fast).to(e -> {
-            market.tickers.update(e);
-        });
+        market.readLog(x -> x.range(starting, ending, LogType.Fast));
     }
 
     private static void read(ZonedDateTime starting, ZonedDateTime ending, RDB<Tick> db) {
