@@ -14,11 +14,10 @@ import java.time.ZonedDateTime;
 import cointoss.util.Chrono;
 import cointoss.util.feather.Timelinable;
 import hypatia.Num;
-import typewriter.duck.DuckModel;
-import typewriter.rdb.RDB;
+import typewriter.api.model.IdentifiableModel;
 
 @SuppressWarnings("unused")
-public final class Tick extends DuckModel<Tick> implements Timelinable {
+public final class Tick extends IdentifiableModel implements Timelinable {
 
     /** Begin time of this tick (epoch second). */
     long openTime;
@@ -83,14 +82,6 @@ public final class Tick extends DuckModel<Tick> implements Timelinable {
         this.longLosscutVolume = ticker.manager.longLosscutVolume;
         this.shortVolume = ticker.manager.shortVolume;
         this.shortLosscutVolume = ticker.manager.shortLosscutVolume;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected RDB<Tick> backend() {
-        return super.backend();
     }
 
     /**

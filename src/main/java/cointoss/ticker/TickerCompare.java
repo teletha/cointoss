@@ -26,7 +26,7 @@ public class TickerCompare {
         I.load(TickerDB.class);
         I.env("typewriter.duckdb", "jdbc:duckdb:duck.db");
 
-        RDB<Tick> db = RDB.of(Tick.class, o -> o.name(name -> name + "_" + Span.Hour1.name()));
+        RDB<Tick> db = RDB.of(Tick.class, Span.Hour1);
 
         ZonedDateTime starting = Chrono.utc(2020, 6, 1);
         ZonedDateTime ending = Chrono.utc(2024, 7, 27);
