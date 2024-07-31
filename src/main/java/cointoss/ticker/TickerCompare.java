@@ -24,7 +24,7 @@ public class TickerCompare {
 
     public static void main(String[] args) {
         I.load(TickerDB.class);
-        I.env("typewriter.duckdb", "jdbc:duckdb:duck.db");
+        I.env("typewriter.sqlite", "jdbc:sqlite:market.sqlite");
 
         RDB<Tick> db = RDB.of(Tick.class, Span.Hour1);
 

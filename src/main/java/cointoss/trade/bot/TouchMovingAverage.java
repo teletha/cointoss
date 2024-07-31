@@ -41,7 +41,7 @@ public class TouchMovingAverage extends Trader {
         Ticker ticker = market.tickers.on(span);
         DoubleIndicator sma = DoubleIndicator.build(ticker, tick -> tick.highPrice()).sma(21);
 
-        Signal<Tick> up = market.tickers.on(Span.Second10).close.map(e -> e.closePrice())
+        Signal<Tick> up = market.tickers.on(Span.Second20).close.map(e -> e.closePrice())
                 .plug(breakupDouble(sma::valueAtLast))
                 .map(v -> ticker.ticks.last())
                 .diff()
@@ -53,7 +53,7 @@ public class TouchMovingAverage extends Trader {
                     return true;
                 });
 
-        Signal<Tick> down = market.tickers.on(Span.Second10).close.map(e -> e.closePrice())
+        Signal<Tick> down = market.tickers.on(Span.Second20).close.map(e -> e.closePrice())
                 .plug(breakdownDouble(sma::valueAtLast))
                 .map(v -> ticker.ticks.last())
                 .diff()

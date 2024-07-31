@@ -32,6 +32,7 @@ public class Project extends bee.api.Project {
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
         require("org.duckdb", "duckdb_jdbc");
+        require("org.xerial", "sqlite-jdbc");
         // require("org.jooq", "jooq");
         // require("io.fair-acc", "chartfx");
         // require("org.apache.iotdb", "iotdb-session");

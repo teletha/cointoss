@@ -276,6 +276,7 @@ public final class Tick extends IdentifiableModel implements Timelinable {
             longLosscutVolume = longLosscutVolume();
             shortVolume = shortVolume();
             shortLosscutVolume = shortLosscutVolume();
+
             ticker = null;
         }
     }
