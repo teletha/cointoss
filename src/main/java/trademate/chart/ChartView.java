@@ -37,7 +37,6 @@ import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.helper.User;
 
 public class ChartView extends View {
 
@@ -46,9 +45,6 @@ public class ChartView extends View {
 
     /** The list of plottable candle date. */
     public final Variable<Ticker> ticker = Variable.empty();
-
-    /** Configuration UI */
-    private UIButton load;
 
     /** Configuration UI */
     private UIButton config;
@@ -106,8 +102,6 @@ public class ChartView extends View {
                     $(span, style.span);
                     $(config, style.config);
                 });
-
-                $(load, style.load);
             });
         }
     }
@@ -127,10 +121,6 @@ public class ChartView extends View {
 
         Style config = () -> {
             padding.horizontal(8, px).top(6, px).bottom(5, px);
-        };
-
-        Style load = () -> {
-            position.bottom(0, px).left(0, px);
         };
 
         Style span = () -> {
@@ -191,8 +181,6 @@ public class ChartView extends View {
                 });
 
         pricedVolumeType.initialize(PriceRangedVolumeType.values()).enableWhen(showPricedVolume.isSelected());
-
-        load.text(FontAwesome.Glyph.DOWNLOAD).when(User.Action, this::loadPastData);
     }
 
     public void loadPastData() {
