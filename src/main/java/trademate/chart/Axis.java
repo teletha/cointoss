@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
-import hypatia.Primitives;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -30,6 +29,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
+
+import hypatia.Primitives;
 import kiss.Disposable;
 import kiss.Variable;
 import stylist.Style;
@@ -40,7 +41,7 @@ import viewtify.ui.helper.StyleHelper;
 public class Axis extends Region {
 
     /** The zoom division. */
-    private static final int ZoomDivision = 100;
+    private static final int ZoomDivision = 10;
 
     /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the

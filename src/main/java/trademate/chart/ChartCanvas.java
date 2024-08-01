@@ -18,6 +18,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -33,16 +44,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import hypatia.Primitives;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -188,6 +189,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** The managed parts. */
     private final List<ChartPart> parts;
+
+    /** The flag. */
+    boolean autoExpand;
 
     /**
      * Chart canvas.
@@ -642,6 +646,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
                     // the array of capacity increase.
                     double tickSize = ((end - start) / ticker.span.seconds) + 2;
+                    boolean needDrawingOpenAndClose = tickSize * 0.3 < candles.getWidth();
 
                     // redraw all candles.
                     GraphicsContext gc = candles.getGraphicsContext2D();
@@ -662,7 +667,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     CandleType candleType = chart.candleType.value();
                     double width = candles.getWidth();
                     double height = candles.getHeight();
-                    DoubleList valueX = new DoubleList((int) Math.round(width / BarWidth));
+                    DoubleList valueX = new DoubleList((int) tickSize);
                     Indicator<double[]> candle = candleType.candles.apply(ticker);
 
                     ticker.ticks.query(start, end).to(tick -> {
@@ -675,11 +680,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             gc.setLineWidth(1);
                             gc.setStroke(candleType.coordinator.apply(tick));
                             gc.strokeLine(x, high, x, low);
-
-                            double open = axisY.getPositionForValue(values[0]);
-                            double close = axisY.getPositionForValue(values[3]);
-                            gc.setLineWidth(BarWidth);
-                            gc.strokeLine(x, open, x, close);
+                            if (needDrawingOpenAndClose) {
+                                double open = axisY.getPositionForValue(values[0]);
+                                double close = axisY.getPositionForValue(values[3]);
+                                gc.setLineWidth(BarWidth);
+                                gc.strokeLine(x, open, x, close);
+                            }
                         }
 
                         // reduce drawing cost at initialization phase

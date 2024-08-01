@@ -34,7 +34,7 @@ public class Project extends bee.api.Project {
         require("org.duckdb", "duckdb_jdbc");
         require("org.xerial", "sqlite-jdbc");
         // require("org.jooq", "jooq");
-        // require("io.fair-acc", "chartfx");
+        require("io.fair-acc", "chartfx");
         // require("org.apache.iotdb", "iotdb-session");
         // require("org.hibernate.orm", "hibernate-core");
 
