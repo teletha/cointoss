@@ -642,7 +642,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
                     // the array of capacity increase.
                     double tickSize = ((end - start) / ticker.span.seconds) + 2;
-                    boolean needDrawingOpenAndClose = tickSize * 0.3 < candles.getWidth();
 
                     // redraw all candles.
                     GraphicsContext gc = candles.getGraphicsContext2D();
@@ -663,7 +662,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     CandleType candleType = chart.candleType.value();
                     double width = candles.getWidth();
                     double height = candles.getHeight();
-                    DoubleList valueX = new DoubleList((int) tickSize);
+                    DoubleList valueX = new DoubleList((int) Math.round(width / BarWidth));
                     Indicator<double[]> candle = candleType.candles.apply(ticker);
 
                     ticker.ticks.query(start, end).to(tick -> {
@@ -676,12 +675,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             gc.setLineWidth(1);
                             gc.setStroke(candleType.coordinator.apply(tick));
                             gc.strokeLine(x, high, x, low);
-                            if (needDrawingOpenAndClose) {
-                                double open = axisY.getPositionForValue(values[0]);
-                                double close = axisY.getPositionForValue(values[3]);
-                                gc.setLineWidth(BarWidth);
-                                gc.strokeLine(x, open, x, close);
-                            }
+
+                            double open = axisY.getPositionForValue(values[0]);
+                            double close = axisY.getPositionForValue(values[3]);
+                            gc.setLineWidth(BarWidth);
+                            gc.strokeLine(x, open, x, close);
                         }
 
                         // reduce drawing cost at initialization phase
