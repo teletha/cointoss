@@ -14,11 +14,11 @@ import java.util.Objects;
 
 import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
+import cointoss.util.Chrono;
 import cointoss.util.feather.FeatherStore;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
-import typewriter.rdb.RDB;
 
 public final class Ticker implements Disposable {
 
@@ -40,8 +40,8 @@ public final class Ticker implements Disposable {
     /** The tick store. */
     public final FeatherStore<Tick> ticks;
 
-    /** The tick store. */
-    public final RDB<Tick> set;
+    // /** The tick store. */
+    // public final RDB<Tick> set;
 
     /** The cache of upper tickers. */
     final Ticker[] uppers;
@@ -75,7 +75,7 @@ public final class Ticker implements Disposable {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
         this.ticks = FeatherStore.create(Tick.class, span);
-        this.set = RDB.of(Tick.class, manager.service.formattedId, span);
+        // this.set = RDB.of(Tick.class, manager.service.formattedId, span);
         this.manager = manager;
     }
 
@@ -108,7 +108,7 @@ public final class Ticker implements Disposable {
 
             while (current.openTime + span.seconds < start.toEpochSecond()) {
                 current.freeze();
-                set.updateLazy(current);
+                // set.updateLazy(current);
                 closing.accept(current);
                 current = new Tick(current.openTime + span.seconds, current.closePrice(), this);
                 ticks.store(current);
@@ -116,7 +116,7 @@ public final class Ticker implements Disposable {
 
             // create the latest tick for execution
             current.freeze();
-            set.updateLazy(current);
+            // set.updateLazy(current);
             closing.accept(current);
             current = new Tick(current.openTime + span.seconds, execution.price, this);
             currentTickEndTime = computeEndTime();
@@ -130,6 +130,30 @@ public final class Ticker implements Disposable {
 
     private long computeEndTime() {
         return (current.openTime + span.seconds) * 1000;
+    }
+
+    /**
+     * Test whether the ticks are filled or not.
+     * 
+     * @return
+     */
+    public boolean isFilled() {
+        return ticks.isFilled();
+    }
+
+    /**
+     * Try to fill ticks.
+     */
+    public void requestFill() {
+        if (!isFilled()) {
+            long start = ticks.last().openTime - ticks.totalTime();
+            ZonedDateTime startDay = Chrono.utcBySeconds(start);
+            ZonedDateTime stopDay = Chrono.utcBySeconds(ticks.firstTime());
+
+            System.out.println("Request fill on " + span + " from " + startDay + " to " + stopDay);
+
+            manager.append(startDay, stopDay, span.uppers(true));
+        }
     }
 
     /**

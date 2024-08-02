@@ -196,6 +196,10 @@ public class ChartView extends View {
         }
     }
 
+    public void autoTickerExpand(boolean enable) {
+        chart.autoTickerExpand(enable);
+    }
+
     /**
      * 
      */

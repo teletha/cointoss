@@ -648,6 +648,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     double tickSize = ((end - start) / ticker.span.seconds) + 2;
                     boolean needDrawingOpenAndClose = tickSize * 0.3 < candles.getWidth();
 
+                    if (autoExpand && !ticker.ticks.isFilled()) {
+                        ticker.requestFill();
+                    }
+
                     // redraw all candles.
                     GraphicsContext gc = candles.getGraphicsContext2D();
                     gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());

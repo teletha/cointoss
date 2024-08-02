@@ -88,6 +88,24 @@ class SpanTest {
         assert Span.Minute1.distance(null, tick(0)) == 0;
     }
 
+    @Test
+    void uppers() {
+        assert Span.Day7.uppers(true).size() == 1;
+        assert Span.Day7.uppers(false).size() == 0;
+
+        assert Span.Day3.uppers(true).size() == 2;
+        assert Span.Day3.uppers(false).size() == 1;
+
+        assert Span.Day1.uppers(true).size() == 3;
+        assert Span.Day1.uppers(false).size() == 2;
+
+        assert Span.Hour12.uppers(true).size() == 4;
+        assert Span.Hour12.uppers(false).size() == 3;
+
+        assert Span.Hour4.uppers(true).size() == 5;
+        assert Span.Hour4.uppers(false).size() == 4;
+    }
+
     /**
      * Create {@link Tick} simply.
      * 

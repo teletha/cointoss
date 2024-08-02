@@ -9,6 +9,9 @@
  */
 package cointoss.ticker;
 
+import java.time.ZonedDateTime;
+import java.util.Set;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
@@ -185,6 +188,39 @@ public final class TickerManager implements Disposable {
 
             for (Ticker upper : ticker.uppers) {
                 updateLowPrice(upper, price);
+            }
+        }
+    }
+
+    /**
+     * Append
+     * 
+     * @param start
+     * @param end
+     */
+    public void append(ZonedDateTime start, ZonedDateTime end, Span... accepters) {
+        append(start, end, Set.of(accepters));
+    }
+
+    /**
+     * Append
+     * 
+     * @param start
+     * @param end
+     */
+    public void append(ZonedDateTime start, ZonedDateTime end, Set<Span> accepters) {
+        TickerManager temporary = new TickerManager(service);
+
+        // build tickers on temporary manager
+        Market.of(service).log.range(start, end).to(temporary::update);
+
+        for (int i = 0; i < temporary.tickers.length; i++) {
+            Ticker ticker = temporary.tickers[i];
+
+            if (accepters.contains(ticker.span)) {
+                ticker.ticks.merge(temporary.tickers[i].ticks);
+
+                System.out.println("Merge log to " + ticker.span + " from " + start + " to " + end);
             }
         }
     }

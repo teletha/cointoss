@@ -13,15 +13,16 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleFunction;
 
-import cointoss.ticker.Span;
-import cointoss.ticker.Ticker;
-import cointoss.util.Chrono;
-import hypatia.Primitives;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
+
+import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import hypatia.Primitives;
 import trademate.setting.PerformanceSetting;
 import viewtify.preference.Preferences;
 import viewtify.ui.helper.LayoutAssistant;
@@ -92,6 +93,13 @@ public class Chart extends Region {
         });
 
         getChildren().addAll(canvas, axisX, axisY);
+    }
+
+    /**
+     * @param enable
+     */
+    public final void autoTickerExpand(boolean enable) {
+        canvas.autoExpand = enable;
     }
 
     /**

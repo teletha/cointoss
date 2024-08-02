@@ -42,6 +42,9 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     /** The size of item. */
     private final int itemSize;
 
+    /** The size of segment. */
+    private final int segmentSize;
+
     /** The duration of segmenet. */
     private final long segmentDuration;
 
@@ -99,6 +102,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
         this.model = Model.of(type);
         this.itemDuration = itemDuration;
         this.itemSize = itemSize;
+        this.segmentSize = segmentSize;
         this.segmentDuration = itemDuration * itemSize;
         this.eviction = EvictionPolicy.byLRU(segmentSize);
     }
@@ -287,6 +291,15 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     }
 
     /**
+     * Return the total time of this store.
+     * 
+     * @return
+     */
+    public long totalTime() {
+        return segmentDuration * segmentSize;
+    }
+
+    /**
      * Check whether this {@link FeatherStore} is empty or not.
      * 
      * @return Result.
@@ -302,6 +315,15 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      */
     public boolean isNotEmpty() {
         return !indexed.isEmpty();
+    }
+
+    /**
+     * Test whether the ticks are filled or not.
+     * 
+     * @return
+     */
+    public boolean isFilled() {
+        return segmentSize <= indexed.size();
     }
 
     /**
@@ -746,10 +768,12 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
         if (evictableTime != -1) {
             OnHeap<E> segment = indexed.remove(evictableTime);
 
-            if (disk != null) {
-                disk.write(evictableTime, segment.items);
+            if (segment != null) {
+                if (disk != null) {
+                    disk.write(evictableTime, segment.items);
+                }
+                segment.clear();
             }
-            segment.clear();
 
             if (evictableTime <= first) {
                 OnHeap<E> heap = indexed.firstValue();

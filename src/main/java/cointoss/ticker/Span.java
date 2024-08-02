@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.Set;
 
 import kiss.I;
 import kiss.Variable;
@@ -35,13 +37,13 @@ public enum Span {
 
     Hour4(4, HOUR_OF_DAY, 10, DAYS, 12, 1), // 6 * 10 * 12 = 720
 
-    Hour12(12, HOUR_OF_DAY, 30, DAYS, 12, 1), // 2 * 30 * 12 = 720
+    Hour12(12, HOUR_OF_DAY, 30, DAYS, 10, 1), // 2 * 30 * 10 = 600
 
-    Day1(1, EPOCH_DAY, 60, DAYS, 10, 1, 2), // 60 * 10 = 600
+    Day1(1, EPOCH_DAY, 60, DAYS, 6, 1, 2), // 60 * 6 = 360
 
-    Day3(3, EPOCH_DAY, 180, DAYS, 10), // 60 * 10 = 600
+    Day3(3, EPOCH_DAY, 180, DAYS, 5), // 60 * 5 = 300
 
-    Day7(7, EPOCH_DAY, 364 /* 7x52 */, DAYS, 10); // 52 * 10 = 520
+    Day7(7, EPOCH_DAY, 364 /* 7x52 */, DAYS, 4); // 52 * 4 = 208
 
     /** The actual duration. */
     public final Duration duration;
@@ -163,5 +165,22 @@ public enum Span {
         } else {
             return 1;
         }
+    }
+
+    /**
+     * Collect the upper spans.
+     * 
+     * @return
+     */
+    Set<Span> uppers(boolean containSelf) {
+        Set<Span> set = new HashSet();
+        Span[] values = Span.values();
+        int key = containSelf ? ordinal() - 1 : ordinal();
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].ordinal() > key) {
+                set.add(values[i]);
+            }
+        }
+        return set;
     }
 }
