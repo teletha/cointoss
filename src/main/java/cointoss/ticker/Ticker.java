@@ -14,7 +14,6 @@ import java.util.Objects;
 
 import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
-import cointoss.util.Chrono;
 import cointoss.util.feather.FeatherStore;
 import kiss.Disposable;
 import kiss.Signal;
@@ -145,15 +144,7 @@ public final class Ticker implements Disposable {
      * Try to fill ticks.
      */
     public void requestFill() {
-        if (!isFilled()) {
-            long start = ticks.last().openTime - ticks.totalTime();
-            ZonedDateTime startDay = Chrono.utcBySeconds(start);
-            ZonedDateTime stopDay = Chrono.utcBySeconds(ticks.firstTime());
-
-            System.out.println("Request fill on " + span + " from " + startDay + " to " + stopDay);
-
-            manager.append(startDay, stopDay, span.uppers(true));
-        }
+        ticks.requestFill();
     }
 
     /**

@@ -10,6 +10,7 @@
 package cointoss.util.feather;
 
 import java.lang.reflect.Array;
+import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.function.Predicate;
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.ticker.Span;
+import cointoss.util.Chrono;
 import kiss.Disposable;
 import kiss.Model;
 import kiss.Signal;
@@ -288,15 +290,6 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      */
     public int size() {
         return indexed.values().stream().mapToInt(OnHeap::size).sum();
-    }
-
-    /**
-     * Return the total time of this store.
-     * 
-     * @return
-     */
-    public long totalTime() {
-        return segmentDuration * segmentSize;
     }
 
     /**
@@ -819,6 +812,15 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
         long[] index = index(item.seconds());
         disk.read(index[0], container);
         return Objects.equals(item, container[(int) index[1]]);
+    }
+
+    /**
+     * 
+     */
+    public void requestFill() {
+        long start = lastTime() - segmentDuration * (segmentSize - 1);
+        ZonedDateTime startDay = Chrono.utcBySeconds(start);
+        ZonedDateTime stopDay = Chrono.utcBySeconds(firstTime()).plusDays(1);
     }
 
     /**

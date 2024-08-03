@@ -26,8 +26,8 @@ public class TickerCompare {
         I.load(TickerDB.class);
         I.env("typewriter.sqlite", "jdbc:sqlite:market.sqlite");
 
-        ZonedDateTime starting = Chrono.utc(2020, 6, 1);
-        ZonedDateTime ending = Chrono.utc(2024, 7, 27);
+        ZonedDateTime starting = Chrono.utc(2024, 6, 1);
+        ZonedDateTime ending = Chrono.utc(2024, 7, 31);
 
         save(starting, ending, null);
     }
