@@ -10,7 +10,7 @@
 package cointoss.ticker;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -50,6 +50,8 @@ public final class TickerManager implements Disposable {
 
     /** The initialization state. */
     private boolean initialized;
+
+    private boolean whileReadingLog;
 
     /**
      * 
@@ -198,28 +200,29 @@ public final class TickerManager implements Disposable {
      * @param start
      * @param end
      */
-    public void append(ZonedDateTime start, ZonedDateTime end, Span... accepters) {
-        append(start, end, Set.of(accepters));
-    }
+    public synchronized void append(ZonedDateTime start, ZonedDateTime end) {
+        if (!whileReadingLog) {
+            whileReadingLog = true;
 
-    /**
-     * Append
-     * 
-     * @param start
-     * @param end
-     */
-    public void append(ZonedDateTime start, ZonedDateTime end, Set<Span> accepters) {
-        TickerManager temporary = new TickerManager(service);
+            I.schedule(10, TimeUnit.MILLISECONDS, service.scheduler()).to(() -> {
+                TickerManager temporary = new TickerManager(service);
+                temporary.on(Span.Day1).open.to(e -> {
+                    System.out.println("Read log " + e.date());
+                });
 
-        // build tickers on temporary manager
-        Market.of(service).log.range(start, end).to(temporary::update);
+                // build tickers on temporary manager
+                Market.of(service).log.range(start, end).to(temporary::update);
 
-        for (int i = 0; i < tickers.length; i++) {
-            Ticker ticker = tickers[i];
+                for (int i = 0; i < tickers.length; i++) {
+                    Ticker ticker = tickers[i];
+                    ticker.ticks.merge(temporary.tickers[i].ticks);
+                }
+            }, e -> {
 
-            if (accepters.contains(ticker.span)) {
-                ticker.ticks.merge(temporary.tickers[i].ticks);
-            }
+            }, () -> {
+                whileReadingLog = false;
+                System.out.println("Complete read log");
+            });
         }
     }
 

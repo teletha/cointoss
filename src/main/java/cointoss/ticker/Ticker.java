@@ -137,25 +137,24 @@ public final class Ticker implements Disposable {
     }
 
     /**
-     * Test whether the ticks are filled or not.
-     * 
-     * @return
-     */
-    public boolean isFilled() {
-        return ticks.isFilled();
-    }
-
-    /**
      * Try to fill ticks.
      */
     public void requestFill() {
-        ZonedDateTime startDay = Chrono.utcBySeconds(ticks.firstSegmentTime());
-        ZonedDateTime stopDay = Chrono.utcBySeconds(ticks.firstTime()).plusDays(1);
+        if (!ticks.isFilled()) {
+            ZonedDateTime startDay = Chrono.utcBySeconds(ticks.firstSegmentTime());
+            ZonedDateTime stopDay = Chrono.utcBySeconds(ticks.firstTime()).plusDays(1);
 
-        if (set != null) {
-            set.findBy(Tick::getId, x -> x.isOrMoreThan(startDay.toEpochSecond()).isOrLessThan(stopDay.toEpochSecond())).to(tick -> {
-                ticks.store(tick);
-            });
+            if (set != null) {
+                set.findBy(Tick::getId, x -> x.isOrMoreThan(startDay.toEpochSecond()).isOrLessThan(stopDay.toEpochSecond())).to(tick -> {
+                    ticks.store(tick);
+                });
+
+                if (!ticks.isFilled()) {
+                    System.out.println("Load " + ticks + " from " + startDay + " to " + stopDay);
+                    new Error().printStackTrace();
+                    manager.append(startDay, stopDay);
+                }
+            }
         }
     }
 

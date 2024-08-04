@@ -39,7 +39,7 @@ public enum Span {
 
     Day1(1, EPOCH_DAY, 60, DAYS, 14, 1), // 60 * 14 = 840
 
-    Day7(7, EPOCH_DAY, 364 /* 7x52 */, DAYS, 8); // 52 * 8 =416
+    Day7(7, EPOCH_DAY, 91 /* 7x52/4 */, DAYS, 24); // 13 * 24 =312
 
     /** The actual duration. */
     public final Duration duration;

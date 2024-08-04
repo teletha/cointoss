@@ -33,7 +33,7 @@ public class TickerBuildTool {
     }
 
     private static void save(ZonedDateTime starting, ZonedDateTime ending, RDB<Tick> db) {
-        Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
+        Market market = Market.of(BinanceFuture.FUTURE_EHT_USDT);
 
         market.readLog(x -> x.range(starting, ending, LogType.Fast));
 

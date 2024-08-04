@@ -123,7 +123,7 @@ public class Chart extends Region {
     @Override
     protected final void layoutChildren() {
         layoutChart.layout(() -> {
-            if (autoExpand && !chart.ticker.v.ticks.isFilled()) {
+            if (autoExpand && chart.ticker.isPresent()) {
                 chart.ticker.v.requestFill();
             }
 
