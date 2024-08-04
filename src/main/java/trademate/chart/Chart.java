@@ -57,6 +57,9 @@ public class Chart extends Region {
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this);
 
+    /** The ticker management type. */
+    private boolean autoExpand;
+
     /**
      * 
      */
@@ -99,7 +102,7 @@ public class Chart extends Region {
      * @param enable
      */
     public final void autoTickerExpand(boolean enable) {
-        canvas.autoExpand = enable;
+        autoExpand = enable;
     }
 
     /**
@@ -116,6 +119,10 @@ public class Chart extends Region {
     @Override
     protected final void layoutChildren() {
         layoutChart.layout(() -> {
+            if (autoExpand && !chart.ticker.v.ticks.isFilled()) {
+                chart.ticker.v.requestFill();
+            }
+
             setAxisXRange();
             setAxisYRange();
 
@@ -170,7 +177,10 @@ public class Chart extends Region {
         long duration = end - start;
 
         Span span;
-        if (1 < duration / 86400 /* 60x60x24 */) {
+
+        if (chart.ticker.isPresent()) {
+            span = chart.ticker.v.span;
+        } else if (1 < duration / 86400 /* 60x60x24 */) {
             span = Span.Day1;
         } else if (1 < duration / 3600 /* 60x60 */) {
             span = Span.Hour1;

@@ -70,7 +70,6 @@ class SpanTest {
     @Test
     void ticksPerDay() {
         assert Span.Day1.ticksPerDay() == 1;
-        assert Span.Day3.ticksPerDay() == 1;
         assert Span.Day7.ticksPerDay() == 1;
         assert Span.Hour4.ticksPerDay() == 6;
         assert Span.Hour1.ticksPerDay() == 24;
@@ -93,14 +92,8 @@ class SpanTest {
         assert Span.Day7.uppers(true).size() == 1;
         assert Span.Day7.uppers(false).size() == 0;
 
-        assert Span.Day3.uppers(true).size() == 2;
-        assert Span.Day3.uppers(false).size() == 1;
-
         assert Span.Day1.uppers(true).size() == 3;
         assert Span.Day1.uppers(false).size() == 2;
-
-        assert Span.Hour12.uppers(true).size() == 4;
-        assert Span.Hour12.uppers(false).size() == 3;
 
         assert Span.Hour4.uppers(true).size() == 5;
         assert Span.Hour4.uppers(false).size() == 4;

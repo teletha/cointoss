@@ -14,10 +14,12 @@ import java.util.Objects;
 
 import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
+import cointoss.util.Chrono;
 import cointoss.util.feather.FeatherStore;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
+import typewriter.rdb.RDB;
 
 public final class Ticker implements Disposable {
 
@@ -39,8 +41,8 @@ public final class Ticker implements Disposable {
     /** The tick store. */
     public final FeatherStore<Tick> ticks;
 
-    // /** The tick store. */
-    // public final RDB<Tick> set;
+    /** The tick store. */
+    private RDB<Tick> set;
 
     /** The cache of upper tickers. */
     final Ticker[] uppers;
@@ -74,8 +76,11 @@ public final class Ticker implements Disposable {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
         this.ticks = FeatherStore.create(Tick.class, span);
-        // this.set = RDB.of(Tick.class, manager.service.formattedId, span);
         this.manager = manager;
+
+        if (manager != null && manager.service != null) {
+            this.set = RDB.of(Tick.class, manager.service.formattedId, span);
+        }
     }
 
     /**
@@ -107,7 +112,7 @@ public final class Ticker implements Disposable {
 
             while (current.openTime + span.seconds < start.toEpochSecond()) {
                 current.freeze();
-                // set.updateLazy(current);
+                if (set != null) set.updateLazy(current);
                 closing.accept(current);
                 current = new Tick(current.openTime + span.seconds, current.closePrice(), this);
                 ticks.store(current);
@@ -115,7 +120,7 @@ public final class Ticker implements Disposable {
 
             // create the latest tick for execution
             current.freeze();
-            // set.updateLazy(current);
+            if (set != null) set.updateLazy(current);
             closing.accept(current);
             current = new Tick(current.openTime + span.seconds, execution.price, this);
             currentTickEndTime = computeEndTime();
@@ -144,7 +149,14 @@ public final class Ticker implements Disposable {
      * Try to fill ticks.
      */
     public void requestFill() {
-        ticks.requestFill();
+        ZonedDateTime startDay = Chrono.utcBySeconds(ticks.firstSegmentTime());
+        ZonedDateTime stopDay = Chrono.utcBySeconds(ticks.firstTime()).plusDays(1);
+
+        if (set != null) {
+            set.findBy(Tick::getId, x -> x.isOrMoreThan(startDay.toEpochSecond()).isOrLessThan(stopDay.toEpochSecond())).to(tick -> {
+                ticks.store(tick);
+            });
+        }
     }
 
     /**

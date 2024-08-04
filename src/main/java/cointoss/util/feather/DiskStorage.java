@@ -15,7 +15,6 @@ import static java.nio.file.StandardOpenOption.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.time.LocalDate;
 import java.util.concurrent.locks.StampedLock;
 
@@ -42,9 +41,6 @@ class DiskStorage<T> {
 
     /** The actual channel. */
     private FileChannel channel;
-
-    /** The process lock. */
-    private final FileLock lockForProcess;
 
     /** The read-write lock. */
     private final StampedLock lock = new StampedLock();
@@ -82,7 +78,6 @@ class DiskStorage<T> {
             this.file = databaseFile;
             this.channel = databaseFile.isPresent() ? databaseFile.newFileChannel(READ, WRITE)
                     : databaseFile.newFileChannel(CREATE_NEW, SPARSE, READ, WRITE);
-            this.lockForProcess = databaseFile.extension("lock").newFileChannel(CREATE, READ, WRITE).tryLock();
             this.codec = codec;
             this.itemWidth = codec.size() + 1;
             this.duration = duration;
@@ -105,10 +100,6 @@ class DiskStorage<T> {
     void close() {
         try {
             channel.close();
-            if (lockForProcess != null) {
-                lockForProcess.close();
-                file.extension("lock").delete();
-            }
         } catch (IOException e) {
             throw I.quiet(e);
         }
@@ -139,12 +130,6 @@ class DiskStorage<T> {
      * @throws IOException
      */
     private void writeHeader() {
-        if (lockForProcess == null) {
-            // The current process does not have write permission because it is being used by
-            // another process.
-            return;
-        }
-
         if (headerModified) {
             try {
                 channel.force(true);
@@ -222,12 +207,6 @@ class DiskStorage<T> {
      * @param newOffsetTime
      */
     private void rebuild(long newOffsetTime) {
-        if (lockForProcess == null) {
-            // The current process does not have write permission because it is being used by
-            // another process.
-            return;
-        }
-
         try {
             DiskStorage rebuild = new DiskStorage(file.base(file.base() + "-rebuild"), codec, duration);
 
@@ -342,12 +321,6 @@ class DiskStorage<T> {
      * @param items
      */
     void write(long truncatedTime, T... items) {
-        if (lockForProcess == null) {
-            // The current process does not have write permission because it is being used by
-            // another process.
-            return;
-        }
-
         long stamp = lock.writeLock();
         int firstIndex = -1;
         int lastIndex = -1;

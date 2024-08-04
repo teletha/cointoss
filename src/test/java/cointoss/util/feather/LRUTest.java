@@ -59,11 +59,10 @@ class LRUTest {
     @Test
     void overSameValue3() {
         LRU cache = new LRU(3);
-        cache.access(1);
-        cache.access(2);
-        cache.access(3);
-        cache.access(3);
-
+        assert cache.access(1) == -1;
+        assert cache.access(2) == -1;
+        assert cache.access(3) == -1;
+        assert cache.access(3) == -1;
         assert cache.eldest() == 1;
         assert cache.latest() == 3;
     }

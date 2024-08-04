@@ -84,7 +84,7 @@ public class TradingView extends View {
         chart.showRealtimeUpdate.set(false);
         chart.autoTickerExpand(true);
         Coordinator.request(service, next -> {
-            market.readLog(x -> x.fromLast(7, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
+            market.readLog(x -> x.fromLast(3, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
 
             chart.market.set(market);
             chart.showRealtimeUpdate.set(tab.isSelected());

@@ -190,9 +190,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The managed parts. */
     private final List<ChartPart> parts;
 
-    /** The flag. */
-    boolean autoExpand;
-
     /**
      * Chart canvas.
      * 
@@ -647,10 +644,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     // the array of capacity increase.
                     double tickSize = ((end - start) / ticker.span.seconds) + 2;
                     boolean needDrawingOpenAndClose = tickSize * 0.3 < candles.getWidth();
-
-                    if (autoExpand && !ticker.ticks.isFilled()) {
-                        ticker.requestFill();
-                    }
 
                     // redraw all candles.
                     GraphicsContext gc = candles.getGraphicsContext2D();

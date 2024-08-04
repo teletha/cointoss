@@ -211,8 +211,6 @@ public final class TickerManager implements Disposable {
     public void append(ZonedDateTime start, ZonedDateTime end, Set<Span> accepters) {
         TickerManager temporary = new TickerManager(service);
 
-        System.out.println("Request fill log to " + " from " + start + " to " + end);
-
         // build tickers on temporary manager
         Market.of(service).log.range(start, end).to(temporary::update);
 

@@ -10,7 +10,8 @@
 package cointoss.util.feather;
 
 import java.lang.reflect.Array;
-import java.time.ZonedDateTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -24,7 +25,6 @@ import java.util.function.Predicate;
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.ticker.Span;
-import cointoss.util.Chrono;
 import kiss.Disposable;
 import kiss.Model;
 import kiss.Signal;
@@ -293,6 +293,15 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     }
 
     /**
+     * Return the size of the segments.
+     * 
+     * @return
+     */
+    public int segmentSize() {
+        return indexed.size();
+    }
+
+    /**
      * Check whether this {@link FeatherStore} is empty or not.
      * 
      * @return Result.
@@ -458,6 +467,15 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
 
     public long lastTime() {
         return last;
+    }
+
+    /**
+     * Compute the first segment time logically in the current state.
+     * 
+     * @return
+     */
+    public long firstSegmentTime() {
+        return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
     }
 
     /**
@@ -758,7 +776,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      */
     private void tryEvict(long time) {
         long evictableTime = eviction.access(time);
-        if (evictableTime != -1) {
+        if (evictableTime != -1 && isFilled()) {
             OnHeap<E> segment = indexed.remove(evictableTime);
 
             if (segment != null) {
@@ -815,12 +833,13 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     }
 
     /**
-     * 
+     * {@inheritDoc}
      */
-    public void requestFill() {
-        long start = lastTime() - segmentDuration * (segmentSize - 1);
-        ZonedDateTime startDay = Chrono.utcBySeconds(start);
-        ZonedDateTime stopDay = Chrono.utcBySeconds(firstTime()).plusDays(1);
+    @Override
+    public String toString() {
+        return "FeatherStore [" + Duration
+                .ofSeconds(itemDuration) + "  segment:" + segmentSize() + "/" + segmentSize + "  item: " + size() + "/" + (itemSize * segmentSize) + "  first: " + Instant
+                        .ofEpochSecond(firstTime()) + "  last: " + Instant.ofEpochSecond(lastTime()) + "]";
     }
 
     /**

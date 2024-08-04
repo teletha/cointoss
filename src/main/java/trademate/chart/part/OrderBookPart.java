@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.orderbook.OrderBookPage;
@@ -79,18 +80,23 @@ public class OrderBookPart extends ChartPart {
             // search the nearest and largest order size
             chart.market.to(m -> {
                 double y = e.getY();
+                double upper = parent.axisY.getValueForPosition(y + 2);
+                double lower = parent.axisY.getValueForPosition(y - 2);
 
-                OrderBookPage largest = m.orderBook
-                        .findLargestOrder(parent.axisY.getValueForPosition(y + 2), parent.axisY.getValueForPosition(y - 2));
+                // exclude NaN and INFINIT
+                if (0 <= upper && 0 <= lower) {
+                    OrderBookPage largest = m.orderBook.findLargestOrder(upper, lower);
 
-                if (largest != null) {
-                    double price = largest.price + m.orderBook.ranged();
-                    double position = parent.axisY.getPositionForValue(price);
-                    int size = (int) largest.size;
+                    if (largest != null) {
+                        double price = largest.price + m.orderBook.ranged();
+                        double position = parent.axisY.getPositionForValue(price);
+                        int size = (int) largest.size;
 
-                    canvasDigit.clear()
-                            .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL).v)
-                            .strokeText(size, canvasDigit.getWidth() - largest.size * scale - String.valueOf(size).length() * 7, position);
+                        canvasDigit.clear()
+                                .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL).v)
+                                .strokeText(size, canvasDigit.getWidth() - largest.size * scale - String.valueOf(size)
+                                        .length() * 7, position);
+                    }
                 }
             });
         });

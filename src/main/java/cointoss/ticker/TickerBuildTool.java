@@ -20,14 +20,14 @@ import kiss.I;
 import kiss.Signal;
 import typewriter.rdb.RDB;
 
-public class TickerCompare {
+public class TickerBuildTool {
 
     public static void main(String[] args) {
         I.load(TickerDB.class);
         I.env("typewriter.sqlite", "jdbc:sqlite:market.sqlite");
 
-        ZonedDateTime starting = Chrono.utc(2024, 6, 1);
-        ZonedDateTime ending = Chrono.utc(2024, 7, 31);
+        ZonedDateTime starting = Chrono.utc(2024, 5, 22);
+        ZonedDateTime ending = Chrono.utc(2024, 8, 1);
 
         save(starting, ending, null);
     }
@@ -36,6 +36,8 @@ public class TickerCompare {
         Market market = Market.of(BinanceFuture.FUTURE_BTC_USDT);
 
         market.readLog(x -> x.range(starting, ending, LogType.Fast));
+
+        market.tickers.dispose();
     }
 
     private static void read(ZonedDateTime starting, ZonedDateTime ending, RDB<Tick> db) {

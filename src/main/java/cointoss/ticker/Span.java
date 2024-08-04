@@ -33,17 +33,13 @@ public enum Span {
 
     Minute15(15, MINUTE_OF_HOUR, 1, DAYS, 10, 1), // 4 * 24 * 10 = 960
 
-    Hour1(1, HOUR_OF_DAY, 4, DAYS, 12, 1, 1), // 24 * 4 * 10 = 960
+    Hour1(1, HOUR_OF_DAY, 4, DAYS, 10, 1, 1), // 24 * 4 * 10 = 960
 
-    Hour4(4, HOUR_OF_DAY, 10, DAYS, 12, 1), // 6 * 10 * 12 = 720
+    Hour4(4, HOUR_OF_DAY, 10, DAYS, 14, 1), // 6 * 10 * 14 = 840
 
-    Hour12(12, HOUR_OF_DAY, 30, DAYS, 10, 1), // 2 * 30 * 10 = 600
+    Day1(1, EPOCH_DAY, 60, DAYS, 14, 1), // 60 * 14 = 840
 
-    Day1(1, EPOCH_DAY, 60, DAYS, 6, 1, 2), // 60 * 6 = 360
-
-    Day3(3, EPOCH_DAY, 180, DAYS, 5), // 60 * 5 = 300
-
-    Day7(7, EPOCH_DAY, 364 /* 7x52 */, DAYS, 4); // 52 * 4 = 208
+    Day7(7, EPOCH_DAY, 364 /* 7x52 */, DAYS, 8); // 52 * 8 =416
 
     /** The actual duration. */
     public final Duration duration;
