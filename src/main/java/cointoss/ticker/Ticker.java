@@ -149,11 +149,9 @@ public final class Ticker implements Disposable {
                     ticks.store(tick);
                 });
 
-                if (!ticks.isFilled()) {
-                    System.out.println("Load " + ticks + " from " + startDay + " to " + stopDay);
-                    new Error().printStackTrace();
-                    manager.append(startDay, stopDay);
-                }
+                // if (!ticks.isFilled()) {
+                // manager.append(startDay, stopDay);
+                // }
             }
         }
     }
