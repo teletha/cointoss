@@ -839,7 +839,10 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     public String toString() {
         return "FeatherStore [" + Duration
                 .ofSeconds(itemDuration) + "  segment:" + segmentSize() + "/" + segmentSize + "  item: " + size() + "/" + (itemSize * segmentSize) + "  first: " + Instant
-                        .ofEpochSecond(firstTime()) + "  last: " + Instant.ofEpochSecond(lastTime()) + "]";
+                        .ofEpochSecond(firstTime()) + "  last: " + Instant.ofEpochSecond(lastTime()) + "  keys: " + indexed.keySet()
+                                .stream()
+                                .map(x -> Instant.ofEpochSecond(x))
+                                .toList() + "]";
     }
 
     /**

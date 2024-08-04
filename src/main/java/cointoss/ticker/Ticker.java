@@ -42,7 +42,7 @@ public final class Ticker implements Disposable {
     public final FeatherStore<Tick> ticks;
 
     /** The tick store. */
-    private RDB<Tick> set;
+    RDB<Tick> set;
 
     /** The cache of upper tickers. */
     final Ticker[] uppers;
@@ -140,18 +140,17 @@ public final class Ticker implements Disposable {
      * Try to fill ticks.
      */
     public void requestFill() {
-        if (!ticks.isFilled()) {
+        if (!ticks.isFilled() && set != null) {
+            ZonedDateTime firstDay = manager.service.log.firstCacheDate();
             ZonedDateTime startDay = Chrono.utcBySeconds(ticks.firstSegmentTime());
             ZonedDateTime stopDay = Chrono.utcBySeconds(ticks.firstTime()).plusDays(1);
 
-            if (set != null) {
-                set.findBy(Tick::getId, x -> x.isOrMoreThan(startDay.toEpochSecond()).isOrLessThan(stopDay.toEpochSecond())).to(tick -> {
-                    ticks.store(tick);
-                });
+            set.findBy(Tick::getId, x -> x.isOrMoreThan(startDay.toEpochSecond()).isOrLessThan(stopDay.toEpochSecond())).to(tick -> {
+                ticks.store(tick);
+            });
 
-                // if (!ticks.isFilled()) {
-                // manager.append(startDay, stopDay);
-                // }
+            if (!ticks.isFilled() && firstDay.isBefore(startDay)) {
+                manager.append(startDay, stopDay, span);
             }
         }
     }

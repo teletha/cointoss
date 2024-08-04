@@ -199,29 +199,32 @@ public final class TickerManager implements Disposable {
      * 
      * @param start
      * @param end
+     * @param span
      */
-    public synchronized void append(ZonedDateTime start, ZonedDateTime end) {
+    public synchronized void append(ZonedDateTime start, ZonedDateTime end, Span span) {
         if (!whileReadingLog) {
             whileReadingLog = true;
 
+            I.info(service.formattedId + " has incompleted ticker. " + on(span).ticks);
+
+            TickerManager temporary = new TickerManager(service);
+            for (int i = 0; i < temporary.tickers.length; i++) {
+                temporary.tickers[i].set.setMax(1024 * 16);
+            }
+
             I.schedule(10, TimeUnit.MILLISECONDS, service.scheduler()).to(() -> {
-                TickerManager temporary = new TickerManager(service);
-                temporary.on(Span.Day1).open.to(e -> {
-                    System.out.println("Read log " + e.date());
-                });
+                temporary.on(Span.Day1).open.to(e -> I.info(service.formattedId + " builds past ticker. [" + e.date() + "]"));
 
                 // build tickers on temporary manager
                 Market.of(service).log.range(start, end).to(temporary::update);
-
-                for (int i = 0; i < tickers.length; i++) {
-                    Ticker ticker = tickers[i];
-                    ticker.ticks.merge(temporary.tickers[i].ticks);
-                }
             }, e -> {
 
             }, () -> {
                 whileReadingLog = false;
-                System.out.println("Complete read log");
+                for (int i = 0; i < temporary.tickers.length; i++) {
+                    temporary.tickers[i].set.commit();
+                }
+                I.info(service.formattedId + " completes past ticker.");
             });
         }
     }
