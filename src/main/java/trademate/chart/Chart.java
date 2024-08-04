@@ -42,7 +42,7 @@ public class Chart extends Region {
 
     /** The x-axis UI. */
     public final Axis axisX = new Axis(1, Side.BOTTOM)
-            .units(M, 5 * M, 10 * M, 30 * M, 60 * M, 2 * 60 * M, 4 * 60 * M, 6 * 60 * M, 12 * 60 * M, D, 2 * D, 3 * D, 7 * D, 15 * D, 30 * D)
+            .units(M, 5 * M, 10 * M, 30 * M, 60 * M, 2 * 60 * M, 4 * 60 * M, 6 * 60 * M, 12 * 60 * M, D, 2 * D, 3 * D, 7 * D, 15 * D, 30 * D, 90 * D, 180 * D, 360 * D)
             .padding(60);
 
     /** The y-axis UI. */
@@ -85,7 +85,11 @@ public class Chart extends Region {
                 int hour = time.getHour() * 60 * 60 - time.getOffset().getTotalSeconds();
 
                 if (time.getMinute() == 0 && hour == 0) {
-                    return time.format(Chrono.DateTimeWithoutSec);
+                    if (chart.ticker.isPresent() && chart.ticker.v.span.ordinal() >= Span.Hour4.ordinal()) {
+                        return time.format(Chrono.Date);
+                    } else {
+                        return time.format(Chrono.DateTimeWithoutSec);
+                    }
                 } else {
                     return time.format(Chrono.TimeWithoutSec);
                 }
