@@ -12,8 +12,6 @@ package cointoss.util.feather;
 import java.lang.reflect.Array;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -71,9 +69,6 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     /** The date-time of last item. */
     private long last = 0;
 
-    /** The bulk data source. */
-    private LongFunction<Signal<E>> bulk;
-
     /**
      * Create the store for timeseries data.
      * 
@@ -114,17 +109,6 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      */
     @Override
     public void vandalize() {
-    }
-
-    /**
-     * Enable the data source.
-     * 
-     * @param bulk
-     * @return Chainable API.
-     */
-    public FeatherStore<E> enableOnDemandDataSupplier(LongFunction<Signal<E>> bulk) {
-        this.bulk = bulk;
-        return this;
     }
 
     /**
@@ -720,36 +704,6 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
                 tryEvict(startTime);
                 indexed.put(startTime, segment);
                 return segment;
-            }
-        }
-
-        // Bulk Data Source
-        if (bulk != null) {
-            Signal<E> supply = bulk.apply(startTime);
-            if (supply != null) {
-                long[] times = {startTime, startTime + segmentDuration};
-                Deque<OnHeap<E>> heaps = new ArrayDeque();
-                heaps.add(new OnHeap(model, times[0], itemSize));
-                tryEvict(times[0]);
-                indexed.put(times[0], heaps.peekLast());
-
-                supply.to(item -> {
-                    long timestamp = item.seconds();
-                    if (times[0] <= timestamp) {
-                        if (timestamp < times[1]) {
-                            heaps.peekLast().set((int) index(timestamp)[1], item);
-                        } else {
-                            times[0] = times[1];
-                            times[1] = times[0] + segmentDuration;
-                            heaps.add(new OnHeap(model, times[0], itemSize));
-                            tryEvict(times[0]);
-                            indexed.put(times[0], heaps.peekLast());
-
-                            heaps.peekLast().set((int) index(timestamp)[1], item);
-                        }
-                    }
-                });
-                return heaps.peekFirst();
             }
         }
 

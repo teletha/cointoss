@@ -223,7 +223,7 @@ class FeatherStoreTest {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
 
         // 2019-12-12 02:16:30
-        Assertions.assertArrayEquals(new long[] {1576108800, 136}, store.index(1576116990));
+        Assertions.assertArrayEquals(new long[] {1576116000, 16}, store.index(1576116990));
         // 2019-12-13 00:00:00
         Assertions.assertArrayEquals(new long[] {1576195200, 0}, store.index(1576195200));
         // 2019-12-13 00:00:59

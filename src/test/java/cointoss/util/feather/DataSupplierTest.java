@@ -50,17 +50,4 @@ class DataSupplierTest {
         assert store.size() == 3;
         assert store.at(120).value == 130;
     }
-
-    @Test
-    void onDemand() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableOnDemandDataSupplier(onDemand);
-        assert store.size() == 0;
-
-        assert store.at(0).value == 0;
-        assert store.at(86400 - 60).value == 86400 - 60;
-        assert store.size() == 1440;
-
-        assert store.at(86400).value == 86400;
-        assert store.size() == 1440; // max size of in-memory
-    }
 }
