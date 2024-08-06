@@ -75,7 +75,7 @@ public final class Ticker implements Disposable {
     Ticker(Span span, TickerManager manager) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
-        this.ticks = FeatherStore.create(Tick.class, span);
+        this.ticks = FeatherStore.create(Tick.class, span).enablePersistence(manager.service.formattedId, span);
         this.manager = manager;
 
         if (manager != null && manager.service != null) {
@@ -151,7 +151,7 @@ public final class Ticker implements Disposable {
             // ticks.store(tick);
             // });
 
-            ticks.restore(startDay.toEpochSecond(), stopDay.toEpochSecond());
+            // ticks.restore(startDay.toEpochSecond(), stopDay.toEpochSecond());
 
             if (!ticks.isFilled() && firstDay.isBefore(startDay)) {
                 // manager.append(startDay, stopDay, span);
