@@ -11,15 +11,18 @@ package cointoss.util.feather;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
 import cointoss.ticker.Span;
 import psychopath.File;
 import psychopath.Locator;
+import typewriter.api.model.IdentifiableModel;
 
 class FeatherStoreTestBase {
 
@@ -49,10 +52,10 @@ class FeatherStoreTestBase {
     protected final FeatherStore<Value> createStore(Span span, List<Value> initialMemoryValues, List<Value> initialDiskValues) {
         FeatherStore<Value> store = FeatherStore.create(Value.class, span);
         if (initialDiskValues != null) {
-            store.enableDiskStore(databaseFile());
+            store.enablePersistence(databaseFile());
             store.store(initialDiskValues);
             store.commit();
-            store.clear();
+            store.clearHeap();
         }
 
         if (initialMemoryValues != null) {
@@ -79,10 +82,10 @@ class FeatherStoreTestBase {
     protected final FeatherStore<Value> createStore(int itemSize, int segmentSize, List<Value> initialMemoryValues, List<Value> initialDiskValues) {
         FeatherStore<Value> store = FeatherStore.create(Value.class, 1, itemSize, segmentSize);
         if (initialDiskValues != null) {
-            store.enableDiskStore(databaseFile());
+            store.enablePersistence(RandomStringUtils.randomAlphanumeric(30));
             store.store(initialDiskValues);
             store.commit();
-            store.clear();
+            store.clearHeap();
         }
 
         if (initialMemoryValues != null) {
@@ -127,12 +130,73 @@ class FeatherStoreTestBase {
         return list;
     }
 
-    @SuppressWarnings("preview")
-    public record Value(int value) implements Timelinable {
+    public class Value extends IdentifiableModel implements Timelinable {
+
+        public int value;
+
+        public Value() {
+        }
+
+        public Value(int value) {
+            this.value = value;
+        }
 
         @Override
         public long seconds() {
             return value;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long getId() {
+            return value;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setId(long id) {
+            value = (int) id;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getEnclosingInstance().hashCode();
+            result = prime * result + Objects.hash(value);
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null) return false;
+            if (getClass() != obj.getClass()) return false;
+            Value other = (Value) obj;
+            if (!getEnclosingInstance().equals(other.getEnclosingInstance())) return false;
+            return value == other.value;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "Value [value=" + value + "]";
+        }
+
+        private FeatherStoreTestBase getEnclosingInstance() {
+            return FeatherStoreTestBase.this;
         }
     }
 }

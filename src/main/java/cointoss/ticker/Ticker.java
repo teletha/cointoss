@@ -160,7 +160,7 @@ public final class Ticker implements Disposable {
      */
     @Override
     public void vandalize() {
-        ticks.clear();
+        ticks.clearHeap();
     }
 
     /**

@@ -273,8 +273,7 @@ public class Execution extends ExecutionModel {
      *
      * @return A value of id property.
      */
-    @SuppressWarnings("unused")
-    private final long getId() {
+    public long getId() {
         return this.id;
     }
 

@@ -13,7 +13,9 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public interface Timelinable {
+import typewriter.api.Identifiable;
+
+public interface Timelinable extends Identifiable {
 
     /**
      * The date and time. (UTC)
@@ -40,5 +42,13 @@ public interface Timelinable {
      */
     default long mills() {
         return date().toInstant().toEpochMilli();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default long getId() {
+        return seconds();
     }
 }

@@ -9,7 +9,7 @@
  */
 package cointoss.util.feather;
 
-import static cointoss.util.feather.Option.Latest;
+import static cointoss.util.feather.Option.*;
 
 import java.util.List;
 
@@ -206,7 +206,7 @@ class QueryTest extends FeatherStoreTestBase {
         List<Value> list = query.toList();
         assert list.size() == ints.size();
         for (int i = 0; i < list.size(); i++) {
-            assert list.get(i).value() == ints.get(i);
+            assert list.get(i).value == ints.get(i);
         }
         return true;
     }
@@ -215,7 +215,7 @@ class QueryTest extends FeatherStoreTestBase {
         List<Value> list = query.toList();
         assert list.size() == values.length;
         for (int i = 0; i < list.size(); i++) {
-            assert list.get(i).value() == values[i];
+            assert list.get(i).value == values[i];
         }
         return true;
     }

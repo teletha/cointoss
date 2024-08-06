@@ -185,7 +185,7 @@ interface BackTestModel {
 
     private void execute(Analyzer analyzer) {
         VerifiableMarket market = new VerifiableMarket(service());
-        market.tickers.tickers().to(e -> e.ticks.disableMemorySaving());
+        market.tickers.tickers().to(e -> e.ticks.disableMemoryCompaction());
         market.service.baseCurrency = initialBaseCurrency();
         market.service.targetCurrency = initialTargetCurrency();
 

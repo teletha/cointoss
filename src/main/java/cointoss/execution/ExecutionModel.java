@@ -122,7 +122,7 @@ abstract class ExecutionModel implements Orientational<Direction>, Timelinable {
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(getterModifier = "public")
     public long id() {
         return counter.getAndIncrement();
     }

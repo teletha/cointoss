@@ -14,7 +14,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.LongFunction;
@@ -29,9 +28,10 @@ import kiss.Signal;
 import primavera.map.ConcurrentNavigableLongMap;
 import primavera.map.LongMap;
 import primavera.map.LongMap.LongEntry;
-import psychopath.File;
+import typewriter.api.model.IdentifiableModel;
+import typewriter.rdb.RDB;
 
-public final class FeatherStore<E extends Timelinable> implements Disposable {
+public final class FeatherStore<E extends IdentifiableModel & Timelinable> implements Disposable {
 
     /** The item type. */
     private final Model<E> model;
@@ -51,9 +51,6 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     /** The completed data manager. */
     private final ConcurrentNavigableLongMap<OnHeap<E>> indexed = LongMap.createSortedMap();
 
-    /** The disk store. */
-    private DiskStorage<E> disk;
-
     /** The eviction policy. */
     private EvictionPolicy eviction;
 
@@ -69,6 +66,9 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     /** The date-time of last item. */
     private long last = 0;
 
+    /** The disk store. */
+    private RDB<E> db;
+
     /**
      * Create the store for timeseries data.
      * 
@@ -77,7 +77,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * @param span
      * @return
      */
-    public static <E extends Timelinable> FeatherStore<E> create(Class<E> type, Span span) {
+    public static <E extends IdentifiableModel & Timelinable> FeatherStore<E> create(Class<E> type, Span span) {
         return new FeatherStore<E>(type, span.seconds, (int) (span.segmentSeconds / span.seconds), span.segmentSize);
     }
 
@@ -88,7 +88,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * @param type
      * @return
      */
-    public static <E extends Timelinable> FeatherStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
+    public static <E extends IdentifiableModel & Timelinable> FeatherStore<E> create(Class<E> type, long itemDuration, int itemSize, int segmentSize) {
         return new FeatherStore<E>(type, itemDuration, itemSize, segmentSize);
     }
 
@@ -188,29 +188,10 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     /**
      * Enable the transparent disk persistence.
      * 
-     * @param databaseFile An actual file to store data.
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> enableDiskStore(File databaseFile) {
-        return enableDiskStore(databaseFile, null);
-    }
-
-    /**
-     * Enable the transparent disk persistence.
-     * 
-     * @param databaseFile An actual file to store data.
-     * @return Chainable API.
-     */
-    public synchronized FeatherStore<E> enableDiskStore(File databaseFile, DataCodec<E> dataType) {
-        if (databaseFile != null && this.disk == null) {
-            this.disk = new DiskStorage(databaseFile, dataType != null ? dataType : DataCodec.of(model), itemDuration);
-            if (disk.startTime() < first) {
-                first = disk.startTime();
-            }
-            if (last < disk.endTime()) {
-                last = disk.endTime();
-            }
-        }
+    public synchronized FeatherStore<E> enablePersistence(Object... qualifers) {
+        db = RDB.of(model.type, qualifers);
         return this;
     }
 
@@ -219,7 +200,7 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * 
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> disableMemorySaving() {
+    public synchronized FeatherStore<E> disableMemoryCompaction() {
         eviction = EvictionPolicy.never();
         return this;
     }
@@ -318,6 +299,10 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * @param item Time series items to store.
      */
     public void store(E item) {
+        if (item == null) {
+            return;
+        }
+
         long time = item.seconds();
         long[] index = index(time);
 
@@ -483,18 +468,18 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
     /**
      * Clear all items from heap.
      */
-    public void clear() {
+    public void clearHeap() {
         for (OnHeap segment : indexed.values()) {
             segment.clear();
         }
         indexed.clear();
 
-        if (disk == null) {
+        if (db == null) {
             first = Long.MAX_VALUE;
             last = 0;
         } else {
-            first = disk.startTime();
-            last = disk.endTime();
+            first = db.min(E::getId);
+            last = db.max(E::getId);
         }
     }
 
@@ -693,18 +678,16 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
         }
 
         // Disk Cache
-        if (disk != null) {
-            segment = new OnHeap(model, startTime, itemSize);
-            int[] result = disk.read(startTime, segment.items);
-            segment.sync = true;
+        if (db != null) {
+            OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
+            db.findBy(E::getId, x -> x.isOrMoreThan(startTime).isLessThan(startTime + itemSize * itemDuration)).to(item -> {
+                long[] index = index(item.seconds());
+                heap.set((int) index[1], item);
+            });
 
-            if (1 <= result[0]) {
-                segment.min = result[1];
-                segment.max = result[2];
-                tryEvict(startTime);
-                indexed.put(startTime, segment);
-                return segment;
-            }
+            tryEvict(startTime);
+            indexed.put(startTime, heap);
+            return heap;
         }
 
         // Not Found
@@ -716,9 +699,10 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      * disk will be overwritten. If the disk store is not enabled, nothing will happen.
      */
     public void commit() {
-        if (disk != null) {
+        if (db != null) {
             for (Entry<Long, OnHeap<E>> entry : indexed.entrySet()) {
-                disk.write(entry.getKey(), entry.getValue().items);
+                OnHeap<E> value = entry.getValue();
+                db.updateAll(value.items);
             }
         }
     }
@@ -734,8 +718,8 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
             OnHeap<E> segment = indexed.remove(evictableTime);
 
             if (segment != null) {
-                if (disk != null) {
-                    disk.write(evictableTime, segment.items);
+                if (db != null) {
+                    db.updateAll(segment.items);
                 }
                 segment.clear();
             }
@@ -776,14 +760,10 @@ public final class FeatherStore<E extends Timelinable> implements Disposable {
      */
     @VisibleForTesting
     boolean existOnDisk(E item) {
-        if (disk == null) {
+        if (db == null) {
             return false;
         }
-
-        E[] container = (E[]) Array.newInstance(model.type, 1);
-        long[] index = index(item.seconds());
-        disk.read(index[0], container);
-        return Objects.equals(item, container[(int) index[1]]);
+        return db.findBy(item.getId()).to().is(item);
     }
 
     /**

@@ -16,16 +16,13 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
-import antibug.CleanRoom;
 import cointoss.Currency;
 import cointoss.MarketType;
 import cointoss.ticker.Span;
 import cointoss.ticker.data.OpenInterest;
 import cointoss.util.Chrono;
-import psychopath.File;
-import psychopath.Locator;
+import typewriter.api.model.IdentifiableModel;
 
 class FeatherStoreTest {
     private static final int days = 60 * 60 * 24;
@@ -46,7 +43,7 @@ class FeatherStoreTest {
         return IntStream.of(values).mapToObj(this::value).collect(Collectors.toList());
     }
 
-    static class Value implements Timelinable {
+    static class Value extends IdentifiableModel implements Timelinable {
 
         public long value;
 
@@ -56,6 +53,22 @@ class FeatherStoreTest {
 
         Value(long value) {
             this.value = value;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long getId() {
+            return value;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setId(long id) {
+            value = id;
         }
 
         @Override
@@ -260,16 +273,9 @@ class FeatherStoreTest {
         assert store.before(2 * days + 1).value == days;
     }
 
-    @RegisterExtension
-    CleanRoom room = new CleanRoom();
-
-    private File databaseFile() {
-        return Locator.file(room.locateRadom());
-    }
-
     @Test
     void diskCache() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("diskCache");
 
         int base = (int) Span.Minute1.segmentSeconds;
 
@@ -320,7 +326,7 @@ class FeatherStoreTest {
 
     @Test
     void persist() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("persist");
 
         store.store(value(0));
         assert store.existOnDisk(value(0)) == false;
@@ -330,11 +336,11 @@ class FeatherStoreTest {
 
     @Test
     void readDataFromDiskCache() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("readDataFromDiskCache");
 
         store.store(value(0));
         store.commit();
-        store.clear();
+        store.clearHeap();
         assert store.existOnHeap(value(0)) == false;
         assert store.at(0).value == 0;
         assert store.at(60) == null;
@@ -342,66 +348,14 @@ class FeatherStoreTest {
 
     @Test
     void queryDataFromDiskCache() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("queryDataFromDiskCache");
 
         store.store(value(0));
         store.commit();
-        store.clear();
+        store.clearHeap();
         assert store.existOnHeap(value(0)) == false;
         assert store.existOnDisk(value(0)) == true;
         assert store.query(0).toList().getFirst().value == 0;
-    }
-
-    @Test
-    void supportPrimitiveTypes() {
-        Primitive primitive = new Primitive();
-        primitive.intValue = 1;
-        primitive.longValue = -2;
-        primitive.floatValue = 3.3f;
-        primitive.doubleValue = -0.4;
-        primitive.booleanValue = true;
-        primitive.charValue = 'c';
-        primitive.byteValue = 2;
-        primitive.shortValue = 3;
-
-        FeatherStore<Primitive> store = FeatherStore.create(Primitive.class, Span.Minute1).enableDiskStore(databaseFile());
-        store.store(primitive);
-        store.commit();
-        store.clear();
-
-        Primitive restored = store.at(primitive.intValue);
-        assert restored != null;
-        assert restored.intValue == primitive.intValue;
-        assert restored.longValue == primitive.longValue;
-        assert restored.floatValue == primitive.floatValue;
-        assert restored.doubleValue == primitive.doubleValue;
-        assert restored.booleanValue == primitive.booleanValue;
-        assert restored.charValue == primitive.charValue;
-        assert restored.byteValue == primitive.byteValue;
-        assert restored.shortValue == primitive.shortValue;
-    }
-
-    private static class Primitive implements Timelinable {
-        public int intValue;
-
-        public long longValue;
-
-        public float floatValue;
-
-        public double doubleValue;
-
-        public boolean booleanValue;
-
-        public char charValue;
-
-        public short shortValue;
-
-        public byte byteValue;
-
-        @Override
-        public ZonedDateTime date() {
-            return Chrono.utcBySeconds(intValue);
-        }
     }
 
     @Test
@@ -410,10 +364,10 @@ class FeatherStoreTest {
         e.type = MarketType.DERIVATIVE;
         e.currency = Currency.BTC;
 
-        FeatherStore<Enums> store = FeatherStore.create(Enums.class, Span.Minute1).enableDiskStore(databaseFile());
+        FeatherStore<Enums> store = FeatherStore.create(Enums.class, Span.Minute1).enablePersistence("supportEnum");
         store.store(e);
         store.commit();
-        store.clear();
+        store.clearHeap();
 
         Enums restored = store.at(e.seconds());
         assert restored != null;
@@ -421,10 +375,19 @@ class FeatherStoreTest {
         assert restored.currency == e.currency;
     }
 
-    private static class Enums implements Timelinable {
+    private static class Enums extends IdentifiableModel implements Timelinable {
         public MarketType type;
 
         public Currency currency;
+
+        @Override
+        public long getId() {
+            return seconds();
+        }
+
+        @Override
+        protected void setId(long id) {
+        }
 
         @Override
         public ZonedDateTime date() {
@@ -434,23 +397,23 @@ class FeatherStoreTest {
 
     @Test
     void supportZonedDateTime() {
-        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute1).enableDiskStore(databaseFile());
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute1).enablePersistence("supportZonedDateTime");
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
         store.commit();
-        store.clear();
+        store.clearHeap();
         assert store.at(oi.seconds()).equals(oi);
     }
 
     @Test
     void storeSparsedDisk() {
-        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day1).enableDiskStore(databaseFile());
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day1).enablePersistence("storeSparsedDisk");
         OpenInterest oi1 = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);
         store.store(oi1, oi2, oi3);
         store.commit();
-        store.clear();
+        store.clearHeap();
 
         assert store.at(oi1.seconds()).equals(oi1);
         assert store.at(oi2.seconds()).equals(oi2);
@@ -487,7 +450,7 @@ class FeatherStoreTest {
 
     @Test
     void endTimeWithDisk() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enableDiskStore(databaseFile());
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("endTimeWithDisk");
         assert store.lastTime() == 0;
 
         store.store(new Value(60));
@@ -497,7 +460,7 @@ class FeatherStoreTest {
         assert store.lastTime() == 600;
 
         store.commit();
-        store.clear();
+        store.clearHeap();
         assert store.lastTime() == 600;
     }
 }
