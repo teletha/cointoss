@@ -192,6 +192,16 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public synchronized FeatherStore<E> enablePersistence(Object... qualifers) {
         db = RDB.of(model.type, qualifers);
+
+        long start = db.min(E::getId);
+        long end = db.max(E::getId);
+        System.out.println(start + "  " + end);
+        if (start < first) {
+            first = start;
+        }
+        if (last < end) {
+            last = end;
+        }
         return this;
     }
 
@@ -285,12 +295,21 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Test whether the ticks are filled or not.
+     * Test whether the heap are filled or not.
      * 
      * @return
      */
     public boolean isFilled() {
         return segmentSize <= indexed.size();
+    }
+
+    /**
+     * Test wheterh the persistence is active or not.
+     * 
+     * @return
+     */
+    public boolean isPersistable() {
+        return db != null;
     }
 
     /**
@@ -704,6 +723,18 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 OnHeap<E> value = entry.getValue();
                 db.updateAll(value.items);
             }
+        }
+    }
+
+    /**
+     * Restore data from disk.
+     */
+    public void restore(long start, long end) {
+        if (db != null) {
+            db.findBy(E::getId, x -> x.isOrMoreThan(start).isOrLessThan(end)).to(x -> {
+                store(x);
+                System.out.println(x);
+            });
         }
     }
 
