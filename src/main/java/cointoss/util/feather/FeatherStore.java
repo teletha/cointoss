@@ -192,16 +192,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public synchronized FeatherStore<E> enablePersistence(Object... qualifers) {
         db = RDB.of(model.type, qualifers);
-
-        long start = db.min(E::getId);
-        long end = db.max(E::getId);
-        System.out.println(start + "  " + end);
-        if (start < first) {
-            first = start;
-        }
-        if (last < end) {
-            last = end;
-        }
         return this;
     }
 
@@ -428,7 +418,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public E at(long timestamp) {
-        if (timestamp < 0) {
+        if (timestamp < 0 || System.currentTimeMillis() < timestamp * 1000) {
             return null;
         }
 
@@ -493,13 +483,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
         indexed.clear();
 
-        if (db == null) {
-            first = Long.MAX_VALUE;
-            last = 0;
-        } else {
-            first = db.min(E::getId);
-            last = db.max(E::getId);
-        }
+        first = Long.MAX_VALUE;
+        last = 0;
     }
 
     /**
@@ -698,15 +683,23 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
         // Disk Cache
         if (db != null) {
-            OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
-            db.findBy(E::getId, x -> x.isOrMoreThan(startTime).isLessThan(startTime + itemSize * itemDuration)).to(item -> {
-                long[] index = index(item.seconds());
-                heap.set((int) index[1], item);
-            });
-
-            tryEvict(startTime);
-            indexed.put(startTime, heap);
-            return heap;
+            // OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
+            // db.findBy(E::getId, x -> x.isOrMoreThan(startTime).isLessThan(startTime + itemSize *
+            // itemDuration)).to(item -> {
+            // long[] index = index(item.seconds());
+            // heap.set((int) index[1], item);
+            // });
+            //
+            // tryEvict(startTime);
+            // indexed.put(startTime, heap);
+            // try {
+            // System.out.println(this);
+            // System.out.println(Instant.ofEpochSecond(firstSegmentTime()) + " " +
+            // Instant.ofEpochSecond(firstTime()) + " " + Instant
+            // .ofEpochSecond(startTime));
+            // } catch (Exception e) {
+            // }
+            // return heap;
         }
 
         // Not Found
@@ -733,8 +726,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (db != null) {
             db.findBy(E::getId, x -> x.isOrMoreThan(start).isOrLessThan(end)).to(x -> {
                 store(x);
-                System.out.println(x);
             });
+            System.out.println("restore " + this);
         }
     }
 
@@ -749,9 +742,10 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             OnHeap<E> segment = indexed.remove(evictableTime);
 
             if (segment != null) {
-                if (db != null) {
-                    db.updateAll(segment.items);
-                }
+                // if (db != null) {
+                // db.updateAll(segment.items);
+                // }
+                System.out.println("Evict " + Instant.ofEpochSecond(evictableTime));
                 segment.clear();
             }
 

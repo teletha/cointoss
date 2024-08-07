@@ -9,6 +9,8 @@
  */
 package cointoss.util.feather;
 
+import java.util.concurrent.ConcurrentSkipListSet;
+
 public interface EvictionPolicy {
 
     /**
@@ -54,6 +56,33 @@ public interface EvictionPolicy {
 
                 long result = policy.access(time);
                 return result == time ? -1 : result;
+            }
+        };
+    }
+
+    static EvictionPolicy eldest(int size) {
+        return new EvictionPolicy() {
+
+            /** The latest time. */
+            private long latest;
+
+            /** The actual policy. */
+            private ConcurrentSkipListSet<Long> policy = new ConcurrentSkipListSet();
+
+            @Override
+            public long access(long time) {
+                if (latest < time) {
+                    latest = time;
+                }
+
+                policy.add(time);
+
+                if (size < policy.size()) {
+                    System.out.println("evic");
+                    return policy.pollFirst();
+                } else {
+                    return -1;
+                }
             }
         };
     }

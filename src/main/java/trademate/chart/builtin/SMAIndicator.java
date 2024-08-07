@@ -25,6 +25,8 @@ public class SMAIndicator extends PlotScript {
 
     public final Variable<Integer> shortDays = Variable.of(21);
 
+    public final Variable<Integer> longDays = Variable.of(200);
+
     /**
      * {@inheritDoc}
      */
@@ -36,6 +38,7 @@ public class SMAIndicator extends PlotScript {
         line(market.tickers.on(Minute15), shortDays, base, style.SMA15M);
         line(market.tickers.on(Hour1), shortDays, base, style.SMA1H);
         line(market.tickers.on(Hour4), shortDays, base, style.SMA4H);
+        line(market.tickers.on(Day1), longDays, base, style.SMA1D);
     }
 
     private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {
@@ -74,6 +77,10 @@ public class SMAIndicator extends PlotScript {
 
         Style SMA4H = () -> {
             stroke.color(Color.rgb(57, 80, 195, alpha));
+        };
+
+        Style SMA1D = () -> {
+            stroke.color(Color.rgb(234, 80, 195, alpha));
         };
     }
 }
