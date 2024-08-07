@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.LongFunction;
 import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -109,80 +108,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     @Override
     public void vandalize() {
-    }
-
-    /**
-     * Enable the active data suppliance.
-     * 
-     * @param active
-     * @return Chainable API.
-     */
-    public FeatherStore<E> enableActiveDataSupplier(LongFunction<Signal<E>> active) {
-        return enableDataSupplier(active, null);
-    }
-
-    /**
-     * Enable the passive data suppliance.
-     * 
-     * @param passive
-     * @return Chainable API.
-     */
-    public FeatherStore<E> enablePassiveDataSupplier(Signal<E> passive) {
-        return enableDataSupplier(null, passive);
-    }
-
-    /**
-     * Enable the data suppliance.
-     * 
-     * @param passive
-     * @return Chainable API.
-     */
-    public FeatherStore<E> enableDataSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
-        if (active != null) {
-            startActiveSupplier(active, passive);
-        } else {
-            startPassiveSupplier(passive);
-        }
-        return this;
-    }
-
-    /**
-     * Invoke the active data supplier at start up.
-     * 
-     * @param active
-     * @param passive
-     */
-    private void startActiveSupplier(LongFunction<Signal<E>> active, Signal<E> passive) {
-        long startingLatestTime = lastTime();
-
-        active.apply(last).to(e -> {
-            store(e);
-        }, error -> {
-            startPassiveSupplier(passive);
-        }, () -> {
-            // If the new data is being retrieved, then the last time before and after the method
-            // call is probably different.
-            long currentLatestTime = lastTime();
-
-            if (startingLatestTime != currentLatestTime) {
-                startActiveSupplier(active, passive);
-            } else {
-                startPassiveSupplier(passive);
-            }
-        });
-    }
-
-    /**
-     * Invoke the passive data supplier at start up.
-     * 
-     * @param passive
-     */
-    private void startPassiveSupplier(Signal<E> passive) {
-        if (passive != null) {
-            add(passive.effectOnDispose(this::commit).to(e -> {
-                store(e);
-            }));
-        }
     }
 
     /**
@@ -678,6 +603,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         // Memory Cache
         OnHeap<E> segment = indexed.get(startTime);
         if (segment != null) {
+            eviction.access(startTime);
             return segment;
         }
 
