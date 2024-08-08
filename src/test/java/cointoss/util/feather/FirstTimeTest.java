@@ -38,6 +38,21 @@ class FirstTimeTest extends FeatherStoreTestBase {
     }
 
     @Test
+    void memoryOnlyUpdate() {
+        FeatherStore<Value> store = createStore(1, 10, null, value(10, 20, 30, 40));
+        assert store.firstTime() == 10;
+
+        store.store(value(5));
+        assert store.firstTime() == 5;
+
+        store.store(value(1));
+        assert store.firstTime() == 1;
+
+        store.store(value(15));
+        assert store.firstTime() == 1;
+    }
+
+    @Test
     void diskOnly() {
         FeatherStore<Value> store = createStore(1, 10, null, value(1, 2, 3, 4));
         assert store.firstTime() == 1;

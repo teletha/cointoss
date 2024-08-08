@@ -38,6 +38,21 @@ class LastTimeTest extends FeatherStoreTestBase {
     }
 
     @Test
+    void memoryOnlyUpdate() {
+        FeatherStore<Value> store = createStore(1, 10, null, value(10, 20, 30, 40));
+        assert store.lastTime() == 40;
+
+        store.store(value(50));
+        assert store.lastTime() == 50;
+
+        store.store(value(100));
+        assert store.lastTime() == 100;
+
+        store.store(value(15));
+        assert store.lastTime() == 100;
+    }
+
+    @Test
     void diskOnly() {
         FeatherStore<Value> store = createStore(1, 10, null, value(1, 2, 3, 4));
         assert store.lastTime() == 4;

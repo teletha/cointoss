@@ -373,10 +373,22 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         return item;
     }
 
+    /**
+     * Get the date and time of the first element from all stored data, including secondary cache.
+     * 
+     * @return
+     * @see #first()
+     */
     public long firstTime() {
         return first;
     }
 
+    /**
+     * Get the date and time of the last element from all stored data, including secondary cache.
+     * 
+     * @return
+     * @see #last()
+     */
     public long lastTime() {
         return last;
     }
@@ -391,18 +403,20 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Get the first stored time series item.
+     * Retrieve the first element from all stored data, including secondary cache.
      * 
      * @return The first stored time series item.
+     * @see #firstTime()
      */
     public E first() {
         return at(first);
     }
 
     /**
-     * Get the last stored time series item which is .
+     * Retrieve the last element from all stored data, including secondary cache.
      * 
      * @return The last stored time series item.
+     * @see #lastTime()
      */
     public E last() {
         return at(last);
