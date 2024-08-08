@@ -16,6 +16,7 @@ import javafx.scene.text.FontWeight;
 
 import cointoss.CurrencySetting;
 import cointoss.analyze.OnlineStats;
+import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import hypatia.Primitives;
@@ -79,11 +80,14 @@ public class MarketInfoPart extends ChartPart {
                             .roundString(spread, base.scale), ChartCanvas.chartInfoLeftPadding + offset, verticalOffset);
 
                     OnlineStats volatilityStats = parent.chart.ticker.v.spreadStats;
-                    double volatility = parent.chart.ticker.v.ticks.last().spread();
-                    c.setFill(volatilityStats.calculateSigma(volatility) <= 2 ? textColor : WarningColor);
-                    c.fillText(VolatilityLabel.v + " " + Primitives.roundString(volatility, base.scale) + " (" + Primitives
-                            .roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives.roundString(volatilityStats
-                                    .sigma(2), base.scale) + ")", ChartCanvas.chartInfoLeftPadding + offset * 2, verticalOffset);
+                    Tick last = parent.chart.ticker.v.ticks.lastCache();
+                    if (last != null) {
+                        double volatility = last.spread();
+                        c.setFill(volatilityStats.calculateSigma(volatility) <= 2 ? textColor : WarningColor);
+                        c.fillText(VolatilityLabel.v + " " + Primitives.roundString(volatility, base.scale) + " (" + Primitives
+                                .roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives.roundString(volatilityStats
+                                        .sigma(2), base.scale) + ")", ChartCanvas.chartInfoLeftPadding + offset * 2, verticalOffset);
+                    }
                 });
     }
 

@@ -352,7 +352,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public E at(long timestamp) {
-        if (timestamp < 0) {
+        if (timestamp < 0 || timestamp < firstIdealCacheTime()) {
             return null;
         }
 
@@ -394,6 +394,34 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
+     * Retrieves the time of the first element from the memory cache only.
+     * 
+     * @return
+     */
+    public long firstCacheTime() {
+        if (indexed.isEmpty()) {
+            return -1;
+        }
+
+        E item = indexed.firstValue().first();
+        return item == null ? -1 : item.seconds();
+    }
+
+    /**
+     * Retrieves the time of the last element from the memory cache only.
+     * 
+     * @return
+     */
+    public long lastCacheTime() {
+        if (indexed.isEmpty()) {
+            return -1;
+        }
+
+        E item = indexed.lastValue().last();
+        return item == null ? -1 : item.seconds();
+    }
+
+    /**
      * Compute the first segment time logically in the current state.
      * 
      * @return
@@ -404,30 +432,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
 
         return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
-    }
-
-    /**
-     * Retrieves the time of the first element from the primary cache in memory.
-     * 
-     * @return
-     */
-    public long firstCacheTime() {
-        if (indexed.isEmpty()) {
-            return -1;
-        }
-        return indexed.firstValue().first().seconds();
-    }
-
-    /**
-     * Retrieves the time of the last element from the primary cache in memory.
-     * 
-     * @return
-     */
-    public long lastCacheTime() {
-        if (indexed.isEmpty()) {
-            return -1;
-        }
-        return indexed.lastValue().last().seconds();
     }
 
     /**
@@ -448,6 +452,33 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public E last() {
         return at(last);
+    }
+
+    /**
+     * Retrieve the item at {@link #firstCacheTime()}.
+     * 
+     * @return
+     */
+    public E firstCache() {
+        return indexed.firstValue().first();
+    }
+
+    /**
+     * Retrieve the item at {@link #lastCacheTime()}.
+     * 
+     * @return
+     */
+    public E lastCache() {
+        return indexed.lastValue().last();
+    }
+
+    /**
+     * Retrieve the item at {@link #firstIdealCacheTime()}.
+     * 
+     * @return
+     */
+    public E firstIdealCache() {
+        return at(firstIdealCacheTime());
     }
 
     /**
@@ -589,6 +620,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             // to within the range of the actual data.
             long segmentStart = Math.max(startIndex[0], index(first)[0]);
             long segmentEnd = Math.min(endIndex[0], index(last)[0]);
+            long ideal = firstIdealCacheTime();
             int remaining = o.max;
 
             if (forward) {
@@ -601,7 +633,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                     }
                 }
             } else {
-                for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
+                for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer
+                        .isDisposed() && (!o.safe || ideal < time); time -= segmentDuration) {
                     OnHeap<E> heap = supply(time);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
@@ -659,7 +692,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         // Memory Cache
         OnHeap<E> segment = indexed.get(startTime);
         if (segment != null) {
-            eviction.access(startTime);
             return segment;
         }
 
@@ -673,6 +705,10 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             tryEvict(startTime);
             indexed.put(startTime, heap);
+
+            if (segmentDuration == Span.Minute5.segmentSeconds) {
+                System.out.println("Restore " + this);
+            }
             return heap;
         }
 
@@ -718,6 +754,14 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 if (db != null) {
                     db.updateAll(segment.items);
                 }
+
+                if (segmentDuration == Span.Minute5.segmentSeconds) {
+                    System.out.println("Evicted by " + Instant.ofEpochSecond(time) + "  " + Instant
+                            .ofEpochSecond(segment.startTime) + "  " + this);
+
+                    new Error().printStackTrace();
+                }
+
                 segment.clear();
             }
 

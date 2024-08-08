@@ -22,8 +22,10 @@ class LRU implements EvictionPolicy {
 
     private int[] prevs;
 
+    /** The index of eldest value in values. */
     private int eldest;
 
+    /** The index of latest value in values. */
     private int latest;
 
     LRU(int size) {
@@ -69,12 +71,14 @@ class LRU implements EvictionPolicy {
             return -1;
         }
 
+        // ignore existing
+
         // completed assign
         for (int i = 0; i < values.length; i++) {
             if (values[i] == item) {
                 delete(i);
                 updateLatest(i);
-                return values[eldest];
+                return -1;
             }
         }
 
@@ -90,6 +94,9 @@ class LRU implements EvictionPolicy {
         return v;
     }
 
+    /**
+     * @param newLatest The index of new latest value in values.
+     */
     private void updateLatest(int newLatest) {
         nexts[latest] = newLatest;
 

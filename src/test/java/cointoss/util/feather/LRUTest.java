@@ -32,11 +32,10 @@ class LRUTest {
     @Test
     void overSameValue1() {
         LRU cache = new LRU(3);
-        cache.access(1);
-        cache.access(2);
-        cache.access(3);
-        cache.access(1);
-
+        assert cache.access(1) == -1;
+        assert cache.access(2) == -1;
+        assert cache.access(3) == -1;
+        assert cache.access(1) == -1;
         assert cache.eldest() == 2;
         assert cache.latest() == 1;
     }
@@ -44,10 +43,10 @@ class LRUTest {
     @Test
     void overSameValue2() {
         LRU cache = new LRU(3);
-        cache.access(1);
-        cache.access(2);
-        cache.access(3);
-        cache.access(2);
+        assert cache.access(1) == -1;
+        assert cache.access(2) == -1;
+        assert cache.access(3) == -1;
+        assert cache.access(2) == -1;
         assert cache.eldest() == 1;
         assert cache.latest() == 2;
 

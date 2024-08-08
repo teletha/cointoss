@@ -637,7 +637,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layout(() -> {
             chart.ticker.to(ticker -> {
                 // estimate visible range
-                chart.ticker.map(v -> v.ticks.last()).map(t -> t.openTime() - ticker.span.seconds).to(end -> {
+                chart.ticker.map(v -> v.ticks.lastCache()).map(t -> t.openTime() - ticker.span.seconds).to(end -> {
                     long start = (long) axisX.computeVisibleMinValue();
 
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
@@ -770,7 +770,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 GraphicsContext gc = candleLatest.getGraphicsContext2D();
                 gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
 
-                Tick tick = ticker.ticks.last();
+                Tick tick = ticker.ticks.lastCache();
+                if (tick == null) {
+                    return;
+                }
 
                 double x = axisX.getPositionForValue(tick.openTime());
                 double open = axisY.getPositionForValue(tick.openPrice());
