@@ -398,12 +398,36 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * 
      * @return
      */
-    public long firstIdealTime() {
+    public long firstIdealCacheTime() {
         if (indexed.isEmpty()) {
             return -1;
         }
 
         return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
+    }
+
+    /**
+     * Retrieves the time of the first element from the primary cache in memory.
+     * 
+     * @return
+     */
+    public long firstCacheTime() {
+        if (indexed.isEmpty()) {
+            return -1;
+        }
+        return indexed.firstValue().first().seconds();
+    }
+
+    /**
+     * Retrieves the time of the last element from the primary cache in memory.
+     * 
+     * @return
+     */
+    public long lastCacheTime() {
+        if (indexed.isEmpty()) {
+            return -1;
+        }
+        return indexed.lastValue().last().seconds();
     }
 
     /**
