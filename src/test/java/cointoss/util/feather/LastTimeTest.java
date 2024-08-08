@@ -14,6 +14,12 @@ import org.junit.jupiter.api.Test;
 class LastTimeTest extends FeatherStoreTestBase {
 
     @Test
+    void noData() {
+        FeatherStore<Value> store = createStore(1, 10, null, null);
+        assert store.lastTime() == -1;
+    }
+
+    @Test
     void memoryOnly() {
         FeatherStore<Value> store = createStore(1, 10, value(1, 2, 3, 4), null);
         assert store.lastTime() == 4;

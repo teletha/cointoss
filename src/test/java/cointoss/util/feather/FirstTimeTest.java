@@ -14,6 +14,12 @@ import org.junit.jupiter.api.Test;
 class FirstTimeTest extends FeatherStoreTestBase {
 
     @Test
+    void noData() {
+        FeatherStore<Value> store = createStore(1, 10, null, null);
+        assert store.firstTime() == -1;
+    }
+
+    @Test
     void memoryOnly() {
         FeatherStore<Value> store = createStore(1, 10, value(1, 2, 3, 4), null);
         assert store.firstTime() == 1;
