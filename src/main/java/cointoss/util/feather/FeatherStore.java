@@ -398,7 +398,11 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * 
      * @return
      */
-    public long firstSegmentTime() {
+    public long firstIdealTime() {
+        if (indexed.isEmpty()) {
+            return -1;
+        }
+
         return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
     }
 

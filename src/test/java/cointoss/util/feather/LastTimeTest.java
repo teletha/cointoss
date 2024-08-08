@@ -32,7 +32,7 @@ class LastTimeTest extends FeatherStoreTestBase {
     }
 
     @Test
-    void memoryOnlyfirstEviction() {
+    void memoryOnlyFirstEviction() {
         FeatherStore<Value> store = createStore(1, 3, value(1, 2, 3, 4, 5, 6), null);
         assert store.lastTime() == 6;
     }
@@ -45,7 +45,7 @@ class LastTimeTest extends FeatherStoreTestBase {
 
     @Test
     void memoryOnlyUpdate() {
-        FeatherStore<Value> store = createStore(1, 10, null, value(10, 20, 30, 40));
+        FeatherStore<Value> store = createStore(1, 10, value(10, 20, 30, 40), null);
         assert store.lastTime() == 40;
 
         store.store(value(50));

@@ -138,7 +138,7 @@ public final class Ticker implements Disposable {
     public void requestFill() {
         if (!ticks.isFilled()) {
             ZonedDateTime firstDay = manager.service.log.firstCacheDate();
-            ZonedDateTime startDay = Chrono.utcBySeconds(ticks.firstSegmentTime());
+            ZonedDateTime startDay = Chrono.utcBySeconds(ticks.firstIdealTime());
             ZonedDateTime stopDay = Chrono.utcBySeconds(ticks.firstTime()).plusDays(1);
 
             // set.findBy(Tick::getId, x ->

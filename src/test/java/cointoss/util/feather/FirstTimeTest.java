@@ -32,7 +32,7 @@ class FirstTimeTest extends FeatherStoreTestBase {
     }
 
     @Test
-    void memoryOnlyfirstEviction() {
+    void memoryOnlyFirstEviction() {
         FeatherStore<Value> store = createStore(1, 3, value(1, 2, 3, 4, 5, 6), null);
         assert store.firstTime() == 4;
     }
@@ -60,7 +60,7 @@ class FirstTimeTest extends FeatherStoreTestBase {
 
     @Test
     void diskOnly() {
-        FeatherStore<Value> store = createStore(1, 10, null, value(1, 2, 3, 4));
+        FeatherStore<Value> store = createStore(1, 10, value(1, 2, 3, 4), null);
         assert store.firstTime() == 1;
     }
 
