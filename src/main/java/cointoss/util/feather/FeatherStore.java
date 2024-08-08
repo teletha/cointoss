@@ -380,7 +380,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @see #first()
      */
     public long firstTime() {
-        return first;
+        return first == Long.MAX_VALUE ? -1 : first;
     }
 
     /**
@@ -390,7 +390,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @see #last()
      */
     public long lastTime() {
-        return last;
+        return last == 0 ? -1 : last;
     }
 
     /**
@@ -744,12 +744,14 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     @Override
     public String toString() {
-        return "FeatherStore [" + Duration
-                .ofSeconds(itemDuration) + "  segment:" + segmentSize() + "/" + segmentSize + "  item: " + size() + "/" + (itemSize * segmentSize) + "  first: " + Instant
-                        .ofEpochSecond(firstTime()) + "  last: " + Instant.ofEpochSecond(lastTime()) + "  keys: " + indexed.keySet()
-                                .stream()
-                                .map(x -> Instant.ofEpochSecond(x))
-                                .toList() + "]";
+        return new StringBuilder("FeatherStore [").append(Duration.ofSeconds(itemDuration))
+                .append("  segment: " + segmentSize() + "/" + segmentSize)
+                .append("  item: " + size() + "/" + (itemSize * segmentSize))
+                .append("  first: " + (0 <= firstTime() ? Instant.ofEpochSecond(Math.min(firstTime(), 31556889864403199L)) : "NoData"))
+                .append("  last: " + (0 <= lastTime() ? Instant.ofEpochSecond(lastTime()) : "NoData"))
+                .append("  keys: " + indexed.keySet().stream().map(Instant::ofEpochSecond).toList())
+                .append("]")
+                .toString();
     }
 
     /**
