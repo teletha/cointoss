@@ -32,6 +32,12 @@ import typewriter.rdb.RDB;
 
 public final class FeatherStore<E extends IdentifiableModel & Timelinable> implements Disposable {
 
+    /** The initial value. */
+    private static final long FIRST_INIT = Long.MAX_VALUE;
+
+    /** The initial value. */
+    private static final long LAST_INIT = 0;
+
     /** The item type. */
     private final Model<E> model;
 
@@ -59,11 +65,16 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /** The data interpolation. */
     private int interpolation;
 
-    /** The date-time of first item. */
-    private long first = Long.MAX_VALUE;
+    private long firstHeap = FIRST_INIT;
 
-    /** The date-time of last item. */
-    private long last = 0;
+    /** The date-time of last item on heap. */
+    private long lastHeap = LAST_INIT;
+
+    /** The date-time of first item on disk. */
+    private long firstDisk = FIRST_INIT;
+
+    /** The date-time of last item on disk. */
+    private long lastDisk = LAST_INIT;
 
     /** The disk store. */
     private RDB<E> db;
@@ -117,15 +128,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public synchronized FeatherStore<E> enablePersistence(Object... qualifers) {
         db = RDB.of(model.type, qualifers);
-
-        long start = db.min(E::getId);
-        long end = db.max(E::getId);
-        if (start < first) {
-            first = start;
-        }
-        if (last < end) {
-            last = end;
-        }
+        firstDisk = firstDiskTime();
+        lastDisk = lastDiskTime();
         return this;
     }
 
@@ -250,11 +254,12 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         long[] index = index(time);
 
         OnHeap<E> segment = supply(index[0]);
+        boolean add = false;
 
         if (segment == null) {
+            add = true;
             segment = new OnHeap(model, index[0], itemSize);
             tryEvict(index[0]);
-            indexed.put(index[0], segment);
         }
 
         if (accumulator == null) {
@@ -264,12 +269,16 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             segment.set((int) index[1], previous == null ? item : accumulator.apply(previous, item));
         }
 
-        // update managed time
-        if (time < first) {
-            first = time;
+        if (add) {
+            indexed.put(index[0], segment);
         }
-        if (last < time) {
-            last = time;
+
+        // update managed time
+        if (time < firstHeap) {
+            firstHeap = time;
+        }
+        if (lastHeap < time) {
+            lastHeap = time;
         }
     }
 
@@ -335,12 +344,11 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             }
         }
 
-        if (first == Long.MAX_VALUE || other.first < first) {
-            first = other.first;
+        if (firstHeap == Long.MAX_VALUE || other.firstHeap < firstHeap) {
+            firstHeap = other.firstHeap;
         }
-
-        if (last == 0 || last < other.last) {
-            last = other.last;
+        if (lastHeap == 0 || lastHeap < other.lastHeap) {
+            lastHeap = other.lastHeap;
         }
         other.indexed.clear();
     }
@@ -380,7 +388,19 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @see #first()
      */
     public long firstTime() {
-        return first == Long.MAX_VALUE ? -1 : first;
+        if (firstHeap == FIRST_INIT) {
+            if (firstDisk == FIRST_INIT) {
+                return -1;
+            } else {
+                return firstDisk;
+            }
+        } else {
+            if (firstDisk == FIRST_INIT) {
+                return firstHeap;
+            } else {
+                return firstHeap < firstDisk ? firstHeap : firstDisk;
+            }
+        }
     }
 
     /**
@@ -390,7 +410,19 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @see #last()
      */
     public long lastTime() {
-        return last == 0 ? -1 : last;
+        if (lastHeap == LAST_INIT) {
+            if (lastDisk == LAST_INIT) {
+                return -1;
+            } else {
+                return lastDisk;
+            }
+        } else {
+            if (lastDisk == LAST_INIT) {
+                return lastHeap;
+            } else {
+                return lastHeap < lastDisk ? lastDisk : lastHeap;
+            }
+        }
     }
 
     /**
@@ -399,12 +431,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public long firstCacheTime() {
-        if (indexed.isEmpty()) {
-            return -1;
-        }
-
-        E item = indexed.firstValue().first();
-        return item == null ? -1 : item.seconds();
+        return firstHeap == FIRST_INIT ? -1 : firstHeap;
     }
 
     /**
@@ -413,12 +440,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public long lastCacheTime() {
-        if (indexed.isEmpty()) {
-            return -1;
-        }
-
-        E item = indexed.lastValue().last();
-        return item == null ? -1 : item.seconds();
+        return lastHeap == LAST_INIT ? -1 : lastHeap;
     }
 
     /**
@@ -435,13 +457,31 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
+     * Compute the time of first item on disk.
+     * 
+     * @return
+     */
+    private long firstDiskTime() {
+        return db == null ? FIRST_INIT : db.min(E::getId);
+    }
+
+    /**
+     * Compute the time of last item on disk.
+     * 
+     * @return
+     */
+    private long lastDiskTime() {
+        return db == null ? LAST_INIT : db.max(E::getId);
+    }
+
+    /**
      * Retrieve the first element from all stored data, including secondary cache.
      * 
      * @return The first stored time series item.
      * @see #firstTime()
      */
     public E first() {
-        return at(first);
+        return at(firstTime());
     }
 
     /**
@@ -451,7 +491,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @see #lastTime()
      */
     public E last() {
-        return at(last);
+        return at(lastTime());
     }
 
     /**
@@ -460,7 +500,12 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public E firstCache() {
-        return indexed.firstValue().first();
+        E item = at(firstCacheTime());
+
+        if (item == null) {
+            System.out.println("first null " + Instant.ofEpochSecond(firstHeap) + "  " + this);
+        }
+        return item;
     }
 
     /**
@@ -469,7 +514,12 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public E lastCache() {
-        return indexed.lastValue().last();
+        E item = at(lastCacheTime());
+
+        if (item == null) {
+            System.out.println("last null " + Instant.ofEpochSecond(lastHeap) + "  " + this);
+        }
+        return item;
     }
 
     /**
@@ -490,13 +540,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
         indexed.clear();
 
-        if (db == null) {
-            first = Long.MAX_VALUE;
-            last = 0;
-        } else {
-            first = db.min(E::getId);
-            last = db.max(E::getId);
-        }
+        firstHeap = FIRST_INIT;
+        lastHeap = LAST_INIT;
     }
 
     /**
@@ -586,6 +631,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         return new Signal<>((observer, disposer) -> {
             long s = start;
             long e = end;
+            long first = firstTime();
+            long last = lastTime();
 
             if (s == Option.Latest) {
                 s = last;
@@ -726,6 +773,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 OnHeap<E> value = entry.getValue();
                 db.updateAll(value.items);
             }
+            firstDisk = firstDiskTime();
+            lastDisk = lastDiskTime();
         }
     }
 
@@ -765,14 +814,21 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 segment.clear();
             }
 
-            if (evictableTime <= first) {
+            // if (evictableTime <= first) {
+            // OnHeap<E> heap = indexed.firstValue();
+            // first = heap == null ? Long.MAX_VALUE : heap.first().seconds();
+            // }
+            // if (last < evictableTime + segmentDuration) {
+            // OnHeap<E> heap = indexed.lastValue();
+            // last = heap == null ? 0 : heap.last().seconds();
+            // }
+            if (evictableTime <= firstHeap) {
                 OnHeap<E> heap = indexed.firstValue();
-                first = heap == null ? Long.MAX_VALUE : heap.first().seconds();
+                firstHeap = heap == null ? Long.MAX_VALUE : heap.first().seconds();
             }
-
-            if (last < evictableTime + segmentDuration) {
+            if (lastHeap < evictableTime + segmentDuration) {
                 OnHeap<E> heap = indexed.lastValue();
-                last = heap == null ? 0 : heap.last().seconds();
+                lastHeap = heap == null ? 0 : heap.last().seconds();
             }
         }
     }
@@ -817,7 +873,10 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 .append("  item: " + size() + "/" + (itemSize * segmentSize))
                 .append("  first: " + (0 <= firstTime() ? Instant.ofEpochSecond(Math.min(firstTime(), 31556889864403199L)) : "NoData"))
                 .append("  last: " + (0 <= lastTime() ? Instant.ofEpochSecond(lastTime()) : "NoData"))
-                .append("  keys: " + indexed.keySet().stream().map(Instant::ofEpochSecond).toList())
+                .append("  keys: " + indexed.entrySet()
+                        .stream()
+                        .map(e -> Instant.ofEpochSecond(e.getKey()) + "(" + e.getValue().size() + ")")
+                        .toList())
                 .append("]")
                 .toString();
     }
@@ -847,6 +906,15 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         private OnHeap(Model<T> model, long startTime, int size) {
             this.startTime = startTime;
             this.items = (T[]) Array.newInstance(model.type, size);
+        }
+
+        /**
+         * Check empty segment.
+         * 
+         * @return A positive size or zero.
+         */
+        boolean isEmpty() {
+            return max < 0;
         }
 
         /**
@@ -942,6 +1010,14 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             }
             return size;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "OnHeap[size: " + size() + " min: " + min + " max: " + max + " time: " + Instant.ofEpochSecond(startTime) + "]";
         }
     }
 }
