@@ -280,6 +280,10 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (lastHeap < time) {
             lastHeap = time;
         }
+
+        if (add) {
+            System.out.println("Add " + Instant.ofEpochSecond(item.seconds()) + " " + this);
+        }
     }
 
     /**
@@ -743,7 +747,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
 
         // Disk Cache
-        if (db != null) {
+        if (db != null && firstDisk <= startTime && startTime <= lastDisk) {
             OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
             db.findBy(E::getId, x -> x.isOrMoreThan(startTime).isLessThan(startTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
@@ -803,32 +807,16 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 if (db != null) {
                     db.updateAll(segment.items);
                 }
-
-                if (segmentDuration == Span.Minute5.segmentSeconds) {
-                    System.out.println("Evicted by " + Instant.ofEpochSecond(time) + "  " + Instant
-                            .ofEpochSecond(segment.startTime) + "  " + this);
-
-                    new Error().printStackTrace();
-                }
-
                 segment.clear();
             }
 
-            // if (evictableTime <= first) {
-            // OnHeap<E> heap = indexed.firstValue();
-            // first = heap == null ? Long.MAX_VALUE : heap.first().seconds();
-            // }
-            // if (last < evictableTime + segmentDuration) {
-            // OnHeap<E> heap = indexed.lastValue();
-            // last = heap == null ? 0 : heap.last().seconds();
-            // }
             if (evictableTime <= firstHeap) {
                 OnHeap<E> heap = indexed.firstValue();
-                firstHeap = heap == null ? Long.MAX_VALUE : heap.first().seconds();
+                firstHeap = heap == null ? FIRST_INIT : heap.first().seconds();
             }
             if (lastHeap < evictableTime + segmentDuration) {
                 OnHeap<E> heap = indexed.lastValue();
-                lastHeap = heap == null ? 0 : heap.last().seconds();
+                lastHeap = heap == null ? LAST_INIT : heap.last().seconds();
             }
         }
     }
@@ -900,16 +888,20 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         /** Flag whether the data is in sync with disk. */
         private boolean sync;
 
+        private Error stack;
+
         /**
          * @param startTime The starting time (epoch seconds).
          */
         private OnHeap(Model<T> model, long startTime, int size) {
             this.startTime = startTime;
             this.items = (T[]) Array.newInstance(model.type, size);
+
+            stack = new Error();
         }
 
         /**
-         * Check empty segment.
+         * Check segment size.
          * 
          * @return A positive size or zero.
          */
