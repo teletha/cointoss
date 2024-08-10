@@ -74,7 +74,7 @@ public final class Ticker implements Disposable {
         this.ticks = FeatherStore.create(Tick.class, span);
         this.manager = manager;
 
-        if (manager != null && manager.service != null) {
+        if (manager != null && manager.service != null && span != Span.Minute1) {
             ticks.enablePersistence(manager.service.formattedId, span);
         }
     }
@@ -159,7 +159,7 @@ public final class Ticker implements Disposable {
      */
     @Override
     public void vandalize() {
-        ticks.clearHeap();
+        ticks.commit();
     }
 
     /**

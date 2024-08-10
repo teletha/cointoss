@@ -12,6 +12,7 @@ package cointoss.util.feather;
 import java.lang.reflect.Array;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
@@ -130,8 +131,11 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         db = RDB.of(model.type, qualifers);
         firstDisk = firstDiskTime();
         lastDisk = lastDiskTime();
+        q = Arrays.toString(qualifers);
         return this;
     }
+
+    private String q;
 
     /**
      * Disable the automatic memory saving.
