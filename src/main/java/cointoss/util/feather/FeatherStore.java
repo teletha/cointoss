@@ -253,13 +253,12 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         long time = item.seconds();
         long[] index = index(time);
 
-        OnHeap<E> segment = supply(index[0]);
-        boolean add = false;
+        OnHeap<E> segment = supply(index[0], time, false);
 
         if (segment == null) {
-            add = true;
             segment = new OnHeap(model, index[0], itemSize);
             tryEvict(index[0]);
+            indexed.put(index[0], segment);
         }
 
         if (accumulator == null) {
@@ -269,20 +268,12 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             segment.set((int) index[1], previous == null ? item : accumulator.apply(previous, item));
         }
 
-        if (add) {
-            indexed.put(index[0], segment);
-        }
-
         // update managed time
         if (time < firstHeap) {
             firstHeap = time;
         }
         if (lastHeap < time) {
             lastHeap = time;
-        }
-
-        if (add) {
-            System.out.println("Add " + Instant.ofEpochSecond(item.seconds()) + " " + this);
         }
     }
 
@@ -364,12 +355,13 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public E at(long timestamp) {
-        if (timestamp < 0 || timestamp < firstIdealCacheTime()) {
+        if (timestamp < 0) {
             return null;
         }
 
         long[] index = index(timestamp);
-        OnHeap<E> segment = supply(index[0]);
+
+        OnHeap<E> segment = supply(index[0], timestamp, true);
         if (segment == null) {
             return null;
         }
@@ -504,12 +496,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public E firstCache() {
-        E item = at(firstCacheTime());
-
-        if (item == null) {
-            System.out.println("first null " + Instant.ofEpochSecond(firstHeap) + "  " + this);
-        }
-        return item;
+        return at(firstCacheTime());
     }
 
     /**
@@ -518,12 +505,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public E lastCache() {
-        E item = at(lastCacheTime());
-
-        if (item == null) {
-            System.out.println("last null " + Instant.ofEpochSecond(lastHeap) + "  " + this);
-        }
-        return item;
+        return at(lastCacheTime());
     }
 
     /**
@@ -671,12 +653,11 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             // to within the range of the actual data.
             long segmentStart = Math.max(startIndex[0], index(first)[0]);
             long segmentEnd = Math.min(endIndex[0], index(last)[0]);
-            long ideal = firstIdealCacheTime();
             int remaining = o.max;
 
             if (forward) {
                 for (long time = segmentStart; time <= segmentEnd && 0 < remaining && !disposer.isDisposed(); time += segmentDuration) {
-                    OnHeap<E> heap = supply(time);
+                    OnHeap<E> heap = supply(time, time, true);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -684,9 +665,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                     }
                 }
             } else {
-                for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer
-                        .isDisposed() && (!o.safe || ideal < time); time -= segmentDuration) {
-                    OnHeap<E> heap = supply(time);
+                for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
+                    OnHeap<E> heap = supply(time, time, true);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -739,7 +719,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @param startTime
      * @return
      */
-    private OnHeap<E> supply(long startTime) {
+    private OnHeap<E> supply(long startTime, long rawTime, boolean idealSafety) {
         // Memory Cache
         OnHeap<E> segment = indexed.get(startTime);
         if (segment != null) {
@@ -747,7 +727,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
 
         // Disk Cache
-        if (db != null && firstDisk <= startTime && startTime <= lastDisk) {
+        if (db != null && firstDisk <= rawTime && rawTime <= lastDisk && (!idealSafety || firstIdealCacheTime() <= startTime)) {
             OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
             db.findBy(E::getId, x -> x.isOrMoreThan(startTime).isLessThan(startTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
@@ -756,10 +736,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             tryEvict(startTime);
             indexed.put(startTime, heap);
-
-            if (segmentDuration == Span.Minute5.segmentSeconds) {
-                System.out.println("Restore " + this);
-            }
             return heap;
         }
 

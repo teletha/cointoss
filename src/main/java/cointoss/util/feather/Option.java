@@ -30,9 +30,6 @@ public final class Option {
     /** Option */
     int max = Integer.MAX_VALUE;
 
-    /** Option */
-    boolean safe;
-
     /**
      * Hide constructor.
      */
@@ -91,16 +88,6 @@ public final class Option {
             size = -1;
         }
         max = size;
-        return this;
-    }
-
-    /**
-     * Specifies the maximum number of elements to retrieve.
-     * 
-     * @return
-     */
-    public Option safe() {
-        safe = true;
         return this;
     }
 }
