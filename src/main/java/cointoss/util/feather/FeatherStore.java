@@ -271,6 +271,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             E previous = segment.get((int) index[1]);
             segment.set((int) index[1], previous == null ? item : accumulator.apply(previous, item));
         }
+        segment.modified = true;
 
         // update managed time
         if (time < firstHeap) {
@@ -340,6 +341,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                         merged.set(i, e);
                     }
                 }
+                merged.modified = true;
             }
         }
 
@@ -753,10 +755,18 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public void commit() {
         if (db != null) {
-            for (Entry<Long, OnHeap<E>> entry : indexed.entrySet()) {
-                OnHeap<E> value = entry.getValue();
-                db.updateAll(value.items);
-            }
+            db.transact(x -> {
+                for (Entry<Long, OnHeap<E>> entry : indexed.entrySet()) {
+                    OnHeap<E> value = entry.getValue();
+                    if (value.modified) {
+                        x.updateAll(value.items);
+                        value.modified = false;
+                    } else {
+                        System.out.println("Skip " + value);
+                    }
+                }
+            });
+
             firstDisk = firstDiskTime();
             lastDisk = lastDiskTime();
         }
@@ -865,10 +875,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         /** The last item index. */
         private int max = Integer.MIN_VALUE;
 
-        /** Flag whether the data is in sync with disk. */
-        private boolean sync;
-
-        private Error stack;
+        /** Flag to check if any external changes were made after reading from disk. */
+        private boolean modified;
 
         /**
          * @param startTime The starting time (epoch seconds).
@@ -876,17 +884,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         private OnHeap(Model<T> model, long startTime, int size) {
             this.startTime = startTime;
             this.items = (T[]) Array.newInstance(model.type, size);
-
-            stack = new Error();
-        }
-
-        /**
-         * Check segment size.
-         * 
-         * @return A positive size or zero.
-         */
-        boolean isEmpty() {
-            return max < 0;
         }
 
         /**
@@ -920,8 +917,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             // FAILSAFE : update min and max index after inserting item
             if (index < min) min = index;
             if (max < index) max = index;
-
-            sync = false;
         }
 
         /**
@@ -929,7 +924,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
          */
         void clear() {
             items = null;
-            sync = false;
         }
 
         /**
