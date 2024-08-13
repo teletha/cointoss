@@ -60,13 +60,6 @@ public interface ChartStyles extends StyleDSL {
         font.color(color);
     };
 
-    Style PriceSFD = () -> {
-        Color color = $.rgb(40, 100, 40);
-
-        stroke.width(0.5, px).color(color);
-        font.color(color);
-    };
-
     Style OrderSupportBuy = () -> {
         stroke.width(0.5, px).color(buy).dashArray(2, 4);
         font.color(buy);

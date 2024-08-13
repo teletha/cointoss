@@ -35,8 +35,6 @@ import com.google.common.cache.LoadingCache;
 
 import cointoss.Market;
 import cointoss.execution.Execution;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
@@ -135,9 +133,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart UI */
     private final LineMark orderSellPrice;
 
-    /** Chart UI */
-    private final LineMark sfdPrice;
-
     /** Flag whether candle chart should layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
@@ -209,7 +204,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.latestPrice = new LineMark(this, axisY, ChartStyles.PriceLatest);
         this.orderBuyPrice = new LineMark(this, axisY, ChartStyles.OrderSupportBuy);
         this.orderSellPrice = new LineMark(this, axisY, ChartStyles.OrderSupportSell);
-        this.sfdPrice = new LineMark(this, axisY, ChartStyles.PriceSFD);
         parts = List.of(new MarketInfoPart(this), new OrderBookPart(this, chart), new PriceRangedVolumePart(this, chart));
 
         layoutCandle.layoutBy(chartAxisModification())
@@ -241,11 +235,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         makeChartScrollable();
         visualizeLatestPrice();
         visualizeMouseTrack();
-        visualizeSFDPrice();
         visualizePriceSupporter();
 
         ObservableList<Node> children = getChildren();
-        children.addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice);
+        children.addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice);
         I.signal(parts).flatIterable(x -> x.managed).to(children::add);
         children.addAll(candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
@@ -581,23 +574,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Visualize SFD price in chart.
-     */
-    private void visualizeSFDPrice() {
-        chart.market.observe().on(Viewtify.UIThread).to(market -> {
-            if (market.service == BitFlyer.FX_BTC_JPY) {
-                for (SFD sfd : SFD.values()) {
-                    TickLable label = sfdPrice.createLabel("乖離" + sfd.percentage + "%");
-                    market.service.add(sfd.boundary().switchOn(chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(price -> {
-                        label.value.set(price.doubleValue());
-                        sfdPrice.layoutLine.requestLayout();
-                    }));
-                }
-            }
-        });
-    }
-
-    /**
      * 
      */
     void layoutForcely() {
@@ -620,7 +596,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         mouseTrackHorizontal.draw();
         notifyPrice.draw();
         latestPrice.draw();
-        sfdPrice.draw();
         orderBuyPrice.draw();
         orderSellPrice.draw();
 
