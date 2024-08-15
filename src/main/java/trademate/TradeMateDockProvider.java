@@ -13,9 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import hypatia.Primitives;
 import kiss.I;
 import trademate.order.OrderView;
 import trademate.setting.PerformanceSetting;
@@ -65,20 +62,12 @@ public class TradeMateDockProvider extends DockProvider {
 
         PerformanceSetting performance = Preferences.of(PerformanceSetting.class);
 
-        if (service == BitFlyer.FX_BTC_JPY) {
-            SFD.now() //
-                    .throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
-                    .diff()
-                    .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.id + "\n" + e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) "), service);
-        } else {
-            service.executionsRealtimely()
-                    .startWith(service.executionLatest())
-                    .throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
-                    .diff()
-                    .on(Viewtify.UIThread)
-                    .to(e -> tab.text(service.id + "\n" + e.price), service);
-        }
+        service.executionsRealtimely()
+                .startWith(service.executionLatest())
+                .throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
+                .diff()
+                .on(Viewtify.UIThread)
+                .to(e -> tab.text(service.id + "\n" + e.price), service);
     }
 
     /**
