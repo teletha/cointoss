@@ -241,6 +241,7 @@
 		"You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/).": "[LINE Notify](https://notify-bot.line.me/)から取得したアクセストークンを指定することでLINEに通知することが出来ます。",
 		"Your order is less than the minimum order size. Please change the size of order.": "ご注文は最小注文サイズ未満です。ご注文サイズを変更してください。",
 		"contains": "を含む",
+		"day": "日",
 		"days": "日",
 		"don't contain": "を含まない",
 		"ends with": "で終わる",
@@ -257,6 +258,8 @@
 		"sec": "秒",
 		"seconds": "秒",
 		"secs": "秒",
-		"starts with": "で始まる"
+		"starts with": "で始まる",
+		"week": "週",
+		"weeks": "週"
 	}
 }

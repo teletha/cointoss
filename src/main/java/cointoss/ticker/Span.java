@@ -39,7 +39,7 @@ public enum Span {
 
     Day(1, EPOCH_DAY, 60, DAYS, 14, 1), // 60 * 14 = 840
 
-    Week(7, DAY_OF_WEEK, 91 /* 7x52/4 */, DAYS, 24); // 13 * 24 =312
+    Week(7, EPOCH_DAY, 91 /* 7x52/4 */, DAYS, 24); // 13 * 24 =312
 
     /** The actual duration. */
     public final Duration duration;
@@ -88,7 +88,7 @@ public enum Span {
      * Calculate the start time.
      */
     public ZonedDateTime calculateStartTime(ZonedDateTime time) {
-        if (unit == DAY_OF_WEEK) {
+        if (this == Week) {
             // week based
             int dow = time.getDayOfWeek().getValue() - 1;
             return time.truncatedTo(ChronoUnit.DAYS).minusDays(dow);
@@ -126,7 +126,10 @@ public enum Span {
      */
     @Override
     public String toString() {
-        return amount + unitName.v;
+        return switch (this) {
+        case Week, Day -> unitName.v;
+        default -> amount + unitName.v;
+        };
     }
 
     /**
@@ -138,7 +141,7 @@ public enum Span {
     private Variable<String> unit() {
         switch (unit) {
         case EPOCH_DAY:
-            return I.translate("days");
+            return amount == 1 ? I.translate("day") : I.translate("week");
 
         case HOUR_OF_DAY:
             return I.translate("hours");
@@ -148,9 +151,6 @@ public enum Span {
 
         case SECOND_OF_MINUTE:
             return I.translate("secs");
-
-        case DAY_OF_WEEK:
-            return I.translate("weeks");
 
         default:
             // If this exception will be thrown, it is bug of this program. So we must rethrow
