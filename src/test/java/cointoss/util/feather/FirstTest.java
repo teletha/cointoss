@@ -39,7 +39,7 @@ class FirstTest extends FeatherStoreTestBase {
 
     @Test
     void firstOverDays() {
-        FeatherStore<Value> store = createStore(Span.Day1);
+        FeatherStore<Value> store = createStore(Span.Day);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.first().value == 0;
     }

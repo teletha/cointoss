@@ -195,7 +195,7 @@ class FeatherStoreTest {
 
     @Test
     void getByTimeOverTime() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day);
         store.store(value(0), value(days), value(2 * days), value(3 * days), value(4 * days));
         assert store.at(0).value == 0;
         assert store.at(days - 1).value == 0;
@@ -226,7 +226,7 @@ class FeatherStoreTest {
 
     @Test
     void sizeOverDays() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.size() == 5;
     }
@@ -262,7 +262,7 @@ class FeatherStoreTest {
 
     @Test
     void beforeOverTime() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.before(0) == null;
         assert store.before(days - 1) == null;
@@ -408,7 +408,7 @@ class FeatherStoreTest {
 
     @Test
     void storeSparsedDisk() {
-        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day1).enablePersistence("storeSparsedDisk");
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day).enablePersistence("storeSparsedDisk");
         OpenInterest oi1 = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);

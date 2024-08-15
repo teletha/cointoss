@@ -12,7 +12,6 @@ package cointoss.util.feather;
 import java.lang.reflect.Array;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
@@ -21,7 +20,9 @@ import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import cointoss.MarketService;
 import cointoss.ticker.Span;
+import cointoss.util.JobType;
 import kiss.Disposable;
 import kiss.Model;
 import kiss.Signal;
@@ -80,6 +81,9 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /** The disk store. */
     private RDB<E> db;
 
+    /** The auto commit job. */
+    private JobType auto;
+
     /**
      * Create the store for timeseries data.
      * 
@@ -127,15 +131,26 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * 
      * @return Chainable API.
      */
-    public synchronized FeatherStore<E> enablePersistence(Object... qualifers) {
+    public FeatherStore<E> enablePersistence(Object... qualifers) {
+        return enablePersistence((JobType) null, (MarketService) null, qualifers);
+    }
+
+    /**
+     * Enable the transparent disk persistence.
+     * 
+     * @return Chainable API.
+     */
+    public synchronized FeatherStore<E> enablePersistence(JobType autoCommitJob, MarketService service, Object... qualifers) {
         db = RDB.of(model.type, qualifers);
         firstDisk = firstDiskTime();
         lastDisk = lastDiskTime();
-        q = Arrays.toString(qualifers);
+
+        if (autoCommitJob != null) {
+            auto = autoCommitJob;
+            auto.schedule(service, this::commit);
+        }
         return this;
     }
-
-    private String q;
 
     /**
      * Disable the automatic memory saving.

@@ -23,7 +23,7 @@ public class TrendFollow extends Trader {
 
     public double size = 0.2;
 
-    public Span big = Span.Day1;
+    public Span big = Span.Day;
 
     public Span small = Span.Hour4;
 

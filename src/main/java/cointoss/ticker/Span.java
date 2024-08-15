@@ -37,9 +37,9 @@ public enum Span {
 
     Hour4(4, HOUR_OF_DAY, 10, DAYS, 14, 1), // 6 * 10 * 14 = 840
 
-    Day1(1, EPOCH_DAY, 60, DAYS, 14, 1), // 60 * 14 = 840
+    Day(1, EPOCH_DAY, 60, DAYS, 14, 1), // 60 * 14 = 840
 
-    Day7(7, EPOCH_DAY, 91 /* 7x52/4 */, DAYS, 24); // 13 * 24 =312
+    Week(7, DAY_OF_WEEK, 91 /* 7x52/4 */, DAYS, 24); // 13 * 24 =312
 
     /** The actual duration. */
     public final Duration duration;
@@ -88,8 +88,15 @@ public enum Span {
      * Calculate the start time.
      */
     public ZonedDateTime calculateStartTime(ZonedDateTime time) {
-        long value = time.getLong(unit);
-        return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
+        if (unit == DAY_OF_WEEK) {
+            // week based
+            int dow = time.getDayOfWeek().getValue() - 1;
+            return time.truncatedTo(ChronoUnit.DAYS).minusDays(dow);
+        } else {
+            // time based
+            long value = time.getLong(unit);
+            return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
+        }
     }
 
     /**
@@ -142,10 +149,12 @@ public enum Span {
         case SECOND_OF_MINUTE:
             return I.translate("secs");
 
+        case DAY_OF_WEEK:
+            return I.translate("weeks");
+
         default:
             // If this exception will be thrown, it is bug of this program. So we must rethrow
-            // the
-            // wrapped error in here.
+            // the wrapped error in here.
             throw new Error();
         }
     }

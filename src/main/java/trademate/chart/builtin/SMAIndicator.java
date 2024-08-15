@@ -38,7 +38,7 @@ public class SMAIndicator extends PlotScript {
         line(market.tickers.on(Minute15), shortDays, base, style.SMA15M);
         line(market.tickers.on(Hour1), shortDays, base, style.SMA1H);
         line(market.tickers.on(Hour4), shortDays, base, style.SMA4H);
-        line(market.tickers.on(Day1), longDays, base, style.SMA1D);
+        line(market.tickers.on(Day), longDays, base, style.SMA1D);
     }
 
     private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {

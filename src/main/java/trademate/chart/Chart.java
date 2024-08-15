@@ -185,7 +185,7 @@ public class Chart extends Region {
         if (chart.ticker.isPresent()) {
             span = chart.ticker.v.span;
         } else if (1 < duration / 86400 /* 60x60x24 */) {
-            span = Span.Day1;
+            span = Span.Day;
         } else if (1 < duration / 3600 /* 60x60 */) {
             span = Span.Hour1;
         } else if (1 < duration / 300 /* 60x5 */) {

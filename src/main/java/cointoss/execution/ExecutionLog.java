@@ -44,7 +44,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.util.Chrono;
-import cointoss.util.Job;
+import cointoss.util.JobType;
 import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
@@ -285,7 +285,7 @@ public class ExecutionLog {
         final File normal;
 
         /** The log writing task. */
-        private ScheduledFuture task = Job.NOOP;
+        private ScheduledFuture task = JobType.NOOP;
 
         /** The writing execution queue. */
         private LinkedList<Execution> queue = new LinkedList();
@@ -385,8 +385,8 @@ public class ExecutionLog {
          * @return Chainable API
          */
         private Cache enableAutoSave() {
-            if (task == Job.NOOP) {
-                task = Job.ExecutionLogWriter.schedule(this::write);
+            if (task == JobType.NOOP) {
+                task = JobType.ExecutionLogWriter.schedule(service, this::write);
             }
             return this;
         }
@@ -397,9 +397,9 @@ public class ExecutionLog {
          * @return
          */
         private Cache disableAutoSave() {
-            if (task != Job.NOOP) {
+            if (task != JobType.NOOP) {
                 task.cancel(false);
-                task = Job.NOOP;
+                task = JobType.NOOP;
                 write();
             }
             return this;
@@ -613,8 +613,6 @@ public class ExecutionLog {
             // write normal log
             try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
-
-                Job.ExecutionLogWriter.log(service);
                 repository.updateLocal(date);
             } catch (Throwable e) {
                 throw I.quiet(e);

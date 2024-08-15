@@ -167,7 +167,7 @@ class QueryTest extends FeatherStoreTestBase {
 
     @Test
     void beforeOverTime() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day1);
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day);
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert equality(store.query(0, o -> o.before().max(1)), EMPTY);
         assert equality(store.query(days - 1, o -> o.before().max(2)), EMPTY);
