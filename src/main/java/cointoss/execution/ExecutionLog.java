@@ -25,24 +25,16 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.TreeMultimap;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
@@ -51,12 +43,11 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.Exchange;
 import cointoss.util.Chrono;
+import cointoss.util.Job;
 import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
-import kiss.Signaling;
 import psychopath.Directory;
 import psychopath.File;
 
@@ -64,91 +55,6 @@ import psychopath.File;
  * {@link Execution} Log Manager.
  */
 public class ExecutionLog {
-
-    /** The message aggregator. */
-    private static final Signaling<MarketService> aggregateWritingLog = new Signaling();
-
-    static {
-        aggregateWritingLog.expose.debounceAll(5, TimeUnit.SECONDS).to(services -> {
-            TreeMultimap<Exchange, String> map = TreeMultimap.create();
-
-            for (MarketService service : services) {
-                map.put(service.exchange, service.marketName);
-            }
-
-            for (Entry<Exchange, Collection<String>> entry : map.asMap().entrySet()) {
-                I.info("Saved execution log for " + entry.getValue().size() + " markets in " + entry.getKey() + ". " + entry.getValue());
-            }
-        });
-    }
-
-    /** NOOP TASK */
-    private static final ScheduledFuture<Object> NOOP = new ScheduledFuture<Object>() {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int compareTo(Delayed o) {
-            return 0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isDone() {
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object get() throws InterruptedException, ExecutionException {
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long getDelay(TimeUnit unit) {
-            return 0;
-        }
-    };
-
-    /** The log writer. */
-    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(run -> {
-        Thread thread = new Thread(run);
-        thread.setName("ExecutionLog Writer");
-        thread.setDaemon(true);
-        return thread;
-    });
 
     /** The market provider. */
     public final MarketService service;
@@ -379,7 +285,7 @@ public class ExecutionLog {
         final File normal;
 
         /** The log writing task. */
-        private ScheduledFuture task = NOOP;
+        private ScheduledFuture task = Job.NOOP;
 
         /** The writing execution queue. */
         private LinkedList<Execution> queue = new LinkedList();
@@ -479,8 +385,8 @@ public class ExecutionLog {
          * @return Chainable API
          */
         private Cache enableAutoSave() {
-            if (task == NOOP) {
-                task = scheduler.scheduleWithFixedDelay(this::write, 60, 180, TimeUnit.SECONDS);
+            if (task == Job.NOOP) {
+                task = Job.ExecutionLogWriter.schedule(this::write);
             }
             return this;
         }
@@ -491,9 +397,9 @@ public class ExecutionLog {
          * @return
          */
         private Cache disableAutoSave() {
-            if (task != NOOP) {
+            if (task != Job.NOOP) {
                 task.cancel(false);
-                task = NOOP;
+                task = Job.NOOP;
                 write();
             }
             return this;
@@ -708,7 +614,7 @@ public class ExecutionLog {
             try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
 
-                aggregateWritingLog.accept(service);
+                Job.ExecutionLogWriter.log(service);
                 repository.updateLocal(date);
             } catch (Throwable e) {
                 throw I.quiet(e);
@@ -839,7 +745,7 @@ public class ExecutionLog {
         void convertNormalToCompact(boolean async) {
             if (!existCompact() && (!queue.isEmpty() || existNormal())) {
                 if (async) {
-                    scheduler.schedule(() -> convertNormalToCompact(false), 5, TimeUnit.SECONDS);
+                    I.schedule(5, TimeUnit.SECONDS).to(() -> convertNormalToCompact(false));
                 } else {
                     writeFast(writeCompact(readNormal())).to(I.NoOP, e -> {
                         I.error(service + " fails to compact the normal log. [" + date + "]");
