@@ -76,7 +76,7 @@ public final class Ticker implements Disposable {
         this.manager = manager;
 
         if (manager != null && manager.service != null && span != Span.Minute1) {
-            ticks.enablePersistence(JobType.TickerWriter, manager.service, manager.service.formattedId, span);
+            ticks.enablePersistence(JobType.TickerWriter, manager.service, manager.service.formattedId, span.name());
         }
     }
 
