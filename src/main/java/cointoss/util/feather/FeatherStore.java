@@ -38,7 +38,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     private static final long FIRST_INIT = Long.MAX_VALUE;
 
     /** The initial value. */
-    private static final long LAST_INIT = 0;
+    private static final long LAST_INIT = Long.MIN_VALUE;
 
     /** The item type. */
     private final Model<E> model;

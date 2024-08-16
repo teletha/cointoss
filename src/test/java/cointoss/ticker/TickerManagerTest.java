@@ -50,7 +50,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(200).date(Base.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(Minute5, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute5, Day)).to(ticker -> {
             assert ticker.ticks.first().highPrice == 300;
             assert ticker.ticks.last().highPrice == 300;
         });
@@ -88,7 +88,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(200).date(Base.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(Minute5, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute5, Day)).to(ticker -> {
             assert ticker.ticks.first().lowPrice == 100;
             assert ticker.ticks.last().lowPrice == 100;
         });
@@ -126,7 +126,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(200).date(Base.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(Minute5, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute5, Day)).to(ticker -> {
             assert ticker.ticks.first().openPrice == 300;
             assert ticker.ticks.last().openPrice == 300;
         });
@@ -151,7 +151,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(200).date(Base.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(Minute5, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute5, Day)).to(ticker -> {
             assert ticker.ticks.first().closePrice() == 200;
             assert ticker.ticks.last().closePrice() == 200;
         });
@@ -177,7 +177,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(200).date(Base.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(Minute5, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute5, Day)).to(ticker -> {
             assert ticker.ticks.first().longVolume() == 3d;
             assert ticker.ticks.last().longVolume() == 3d;
         });
@@ -212,7 +212,7 @@ class TickerManagerTest {
         manager.update(Execution.with.sell(1).price(200).date(Base.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(Minute5, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute5, Day)).to(ticker -> {
             assert ticker.ticks.first().shortVolume() == 3d;
             assert ticker.ticks.last().shortVolume() == 3d;
         });
@@ -282,27 +282,27 @@ class TickerManagerTest {
         });
 
         manager.update(Execution.with.buy(1).price(20).date(Base.plusSeconds(5)));
-        manager.tickers().take(between(Minute1, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute1, Day)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
 
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(1)));
         assert manager.on(Minute1).ticks.size() == 2;
-        manager.tickers().take(between(Minute5, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute5, Day)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
 
         manager.update(Execution.with.buy(1).price(40).date(Base.plusMinutes(5)));
         assert manager.on(Minute1).ticks.size() == 6;
         assert manager.on(Minute5).ticks.size() == 2;
-        manager.tickers().take(between(Span.Minute15, Week)).to(ticker -> {
+        manager.tickers().take(between(Span.Minute15, Day)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
 
         manager.update(Execution.with.buy(1).price(50).date(Base.plusMinutes(7)));
         assert manager.on(Minute1).ticks.size() == 8;
         assert manager.on(Minute5).ticks.size() == 2;
-        manager.tickers().take(between(Minute15, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute15, Day)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
     }
@@ -315,7 +315,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(5)));
         assert manager.on(Minute1).ticks.size() == 6;
         assert manager.on(Minute5).ticks.size() == 2;
-        manager.tickers().take(between(Minute15, Week)).to(ticker -> {
+        manager.tickers().take(between(Minute15, Day)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
     }

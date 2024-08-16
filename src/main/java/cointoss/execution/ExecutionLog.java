@@ -43,6 +43,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.JobType;
 import hypatia.Num;
@@ -695,15 +696,19 @@ public class ExecutionLog {
             File fast = fastLog();
 
             try {
+                TickerManager tickers = new TickerManager(service);
+
                 Execution[] prev = {Market.BASE};
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.plug(new FastLog(service.setting.target.scale)).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
                     prev[0] = e;
+                    tickers.update(e);
                 }).effectOnComplete(() -> {
                     writer.close();
                     repository.updateLocal(date);
+                    tickers.dispose();
                 });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -768,6 +773,21 @@ public class ExecutionLog {
                     I.error(e);
                 }, () -> {
                     writer.close();
+                });
+            }
+        }
+
+        /**
+         * Convert fast log to ticker log.
+         */
+        void convertFastToTicker() {
+            if (existFast()) {
+                TickerManager tickers = new TickerManager(service);
+                read(LogType.Fast).to(tickers::update, e -> {
+                    I.error(service + " fails to build the ticker log. [" + date + "]");
+                    I.error(e);
+                }, () -> {
+                    tickers.dispose();
                 });
             }
         }

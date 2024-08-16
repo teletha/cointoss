@@ -37,9 +37,7 @@ public enum Span {
 
     Hour4(4, HOUR_OF_DAY, 10, DAYS, 14, 1), // 6 * 10 * 14 = 840
 
-    Day(1, EPOCH_DAY, 60, DAYS, 14, 1), // 60 * 14 = 840
-
-    Week(7, EPOCH_DAY, 91 /* 7x52/4 */, DAYS, 24); // 13 * 24 =312
+    Day(1, EPOCH_DAY, 60, DAYS, 14); // 60 * 14 = 840
 
     /** The actual duration. */
     public final Duration duration;
@@ -88,15 +86,8 @@ public enum Span {
      * Calculate the start time.
      */
     public ZonedDateTime calculateStartTime(ZonedDateTime time) {
-        if (this == Week) {
-            // week based
-            int dow = time.getDayOfWeek().getValue() - 1;
-            return time.truncatedTo(ChronoUnit.DAYS).minusDays(dow);
-        } else {
-            // time based
-            long value = time.getLong(unit);
-            return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
-        }
+        long value = time.getLong(unit);
+        return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
     }
 
     /**
@@ -126,10 +117,7 @@ public enum Span {
      */
     @Override
     public String toString() {
-        return switch (this) {
-        case Week, Day -> unitName.v;
-        default -> amount + unitName.v;
-        };
+        return amount + unitName.v;
     }
 
     /**
@@ -141,7 +129,7 @@ public enum Span {
     private Variable<String> unit() {
         switch (unit) {
         case EPOCH_DAY:
-            return amount == 1 ? I.translate("day") : I.translate("week");
+            return I.translate("day");
 
         case HOUR_OF_DAY:
             return I.translate("hours");
