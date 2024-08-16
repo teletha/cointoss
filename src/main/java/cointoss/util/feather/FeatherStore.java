@@ -770,21 +770,19 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public void commit() {
         if (db != null) {
-            db.transact(x -> {
-                int skipped = 0;
-                int committed = 0;
-                for (Entry<Long, OnHeap<E>> entry : indexed.entrySet()) {
-                    OnHeap<E> value = entry.getValue();
-                    if (value.modified) {
-                        x.updateAll(value.items);
-                        value.modified = false;
-                        committed++;
-                    } else {
-                        skipped++;
-                    }
+            int skipped = 0;
+            int committed = 0;
+            for (Entry<Long, OnHeap<E>> entry : indexed.entrySet()) {
+                OnHeap<E> value = entry.getValue();
+                if (value.modified) {
+                    db.updateAll(value.items);
+                    value.modified = false;
+                    committed++;
+                } else {
+                    skipped++;
                 }
-                System.out.println("Commit " + committed + "/" + (committed + skipped) + " " + this);
-            });
+            }
+            System.out.println("Commit " + committed + "/" + (committed + skipped) + " " + this);
 
             firstDisk = firstDiskTime();
             lastDisk = lastDiskTime();
