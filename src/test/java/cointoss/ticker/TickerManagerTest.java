@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Predicate;
 
-import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 
@@ -162,7 +161,6 @@ class TickerManagerTest {
     }
 
     @Test
-    @PowerAssertOff
     void updateLongVolume() {
         // update
         manager.update(Execution.with.buy(1).price(300).date(Base));
