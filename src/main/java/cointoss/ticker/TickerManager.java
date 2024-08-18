@@ -230,6 +230,19 @@ public final class TickerManager implements Disposable {
     }
 
     /**
+     * Freeze the latest tick and save all ticks to disk.
+     */
+    public void freeze() {
+        for (Ticker ticker : tickers) {
+            // update the close price by the latest price
+            ticker.current.freeze();
+
+            // save all ticks to disk
+            ticker.ticks.commit();
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -238,4 +251,5 @@ public final class TickerManager implements Disposable {
             ticker.dispose();
         }
     }
+
 }

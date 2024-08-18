@@ -15,7 +15,6 @@ import java.util.Objects;
 import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
-import cointoss.util.JobType;
 import cointoss.util.feather.FeatherStore;
 import kiss.Disposable;
 import kiss.Signal;
@@ -76,7 +75,7 @@ public final class Ticker implements Disposable {
         this.manager = manager;
 
         if (manager != null && manager.service != null && span != Span.Minute1) {
-            ticks.enablePersistence(JobType.TickerWriter, manager.service, manager.service.formattedId, span.name());
+            ticks.enablePersistence(manager.service.formattedId, span.name());
         }
     }
 
@@ -158,7 +157,7 @@ public final class Ticker implements Disposable {
      */
     @Override
     public void vandalize() {
-        ticks.commit();
+        ticks.dispose();
     }
 
     /**

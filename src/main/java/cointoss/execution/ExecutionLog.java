@@ -708,7 +708,7 @@ public class ExecutionLog {
                 }).effectOnComplete(() -> {
                     writer.close();
                     repository.updateLocal(date);
-                    tickers.dispose();
+                    tickers.freeze();
                 });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -787,7 +787,7 @@ public class ExecutionLog {
                     I.error(service + " fails to build the ticker log. [" + date + "]");
                     I.error(e);
                 }, () -> {
-                    tickers.dispose();
+                    tickers.freeze();
                 });
             }
         }
