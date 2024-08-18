@@ -19,26 +19,29 @@ import kiss.WiseConsumer;
 public class Job {
 
     /** The scheduler manager. */
-    private static final Map<Object, ScheduledExecutorService> schedulers = new ConcurrentHashMap();
+    private static final Map<Object, Job> schedulers = new ConcurrentHashMap();
 
     public static Job by(Object key) {
-        return schedulers.computeIfAbsent(key, k -> Executors.newSingleThreadScheduledExecutor(run -> {
-            Thread thread = new Thread(run);
-            thread.setName(k.toString());
-            thread.setDaemon(true);
-            return thread;
-        }));
+        return schedulers.computeIfAbsent(key, Job::new);
     }
 
-    public static void run(Object key, WiseConsumer<JobProcess> job) {
-        ScheduledExecutorService scheduler = schedulers.computeIfAbsent(key, k -> Executors.newSingleThreadScheduledExecutor(run -> {
+    public static final Job ExecutionWriter = by("ExecutionWriter");
+
+    public static final Job TickerGenerator = by("TickerGenerator");
+
+    private final ScheduledExecutorService service;
+
+    private Job(Object key) {
+        service = Executors.newSingleThreadScheduledExecutor(run -> {
             Thread thread = new Thread(run);
-            thread.setName(k.toString());
+            thread.setName(key.toString());
             thread.setDaemon(true);
             return thread;
-        }));
+        });
+    }
 
-        scheduler.submit(() -> {
+    public void run(Object key, WiseConsumer<JobProcess> job) {
+        service.submit(() -> {
             JobProcess process = new JobProcess();
 
             job.accept(process);
