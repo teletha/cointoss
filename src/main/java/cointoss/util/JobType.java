@@ -25,6 +25,7 @@ import cointoss.MarketService;
 import cointoss.market.Exchange;
 import kiss.I;
 import kiss.Signaling;
+import kiss.WiseConsumer;
 
 public enum JobType {
 
@@ -130,11 +131,13 @@ public enum JobType {
         });
     }
 
-    public ScheduledFuture<?> schedule(MarketService service, Runnable job) {
+    public ScheduledFuture<?> schedule(MarketService service, WiseConsumer<JobProcess> job) {
+        JobProcess process = new JobProcess();
+
         if (intervalDelayMinutes <= 0) {
             return scheduler.schedule(() -> {
                 try {
-                    job.run();
+                    job.accept(process);
                 } finally {
                     aggregator.accept(service);
                 }
@@ -142,7 +145,7 @@ public enum JobType {
         } else {
             return scheduler.scheduleWithFixedDelay(() -> {
                 try {
-                    job.run();
+                    job.accept(process);
                 } finally {
                     aggregator.accept(service);
                 }

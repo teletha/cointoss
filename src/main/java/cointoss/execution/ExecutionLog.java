@@ -387,7 +387,9 @@ public class ExecutionLog {
          */
         private Cache enableAutoSave() {
             if (task == JobType.NOOP) {
-                task = JobType.ExecutionLogWriter.schedule(service, this::write);
+                task = JobType.ExecutionLogWriter.schedule(service, process -> {
+                    write();
+                });
             }
             return this;
         }

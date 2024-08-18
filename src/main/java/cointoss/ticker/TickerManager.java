@@ -220,7 +220,7 @@ public final class TickerManager implements Disposable {
      * @param startDay
      */
     public void buildDiskCacheFrom(ZonedDateTime startDay) {
-        JobType.TickerGeneration.schedule(service, () -> {
+        JobType.TickerGeneration.schedule(service, process -> {
             ZonedDateTime start = Chrono.max(startDay, service.log.firstCacheDate());
             TickerManager temporary = new TickerManager(service);
             service.log.range(start, on(Span.Day).ticks.firstCache().date(), LogType.Fast).to(temporary::update, e -> {

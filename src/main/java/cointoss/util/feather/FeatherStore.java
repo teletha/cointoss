@@ -147,7 +147,9 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
         if (autoCommitJob != null) {
             auto = autoCommitJob;
-            auto.schedule(service, this::commit);
+            auto.schedule(service, process -> {
+                commit();
+            });
         }
         return this;
     }
