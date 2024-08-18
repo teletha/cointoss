@@ -139,16 +139,11 @@ public final class Ticker implements Disposable {
             ZonedDateTime startDay = Chrono.utcBySeconds(ticks.firstIdealCacheTime());
             ZonedDateTime stopDay = Chrono.utcBySeconds(ticks.firstCacheTime()).plusDays(1);
 
-            // set.findBy(Tick::getId, x ->
-            // x.isOrMoreThan(startDay.toEpochSecond()).isOrLessThan(stopDay.toEpochSecond())).to(tick
-            // -> {
-            // ticks.store(tick);
-            // });
             ticks.restore(startDay.toEpochSecond(), stopDay.toEpochSecond());
 
-            // if (!ticks.isFilled() && firstDay.isBefore(startDay)) {
-            // manager.append(startDay, stopDay, span);
-            // }
+            if (!ticks.isFilled() && firstDay.isBefore(startDay)) {
+                manager.buildDiskCacheFrom(startDay);
+            }
         }
     }
 

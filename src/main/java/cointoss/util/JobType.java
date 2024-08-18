@@ -30,7 +30,7 @@ public enum JobType {
 
     ExecutionLogWriter(1, 3, "Saved execution log"),
 
-    TickerWriter(5, 5, "Saved ticker");
+    TickerGeneration(0, 0, "Generate ticker");
 
     /** NOOP TASK */
     public static final ScheduledFuture<Object> NOOP = new ScheduledFuture<Object>() {
@@ -131,12 +131,22 @@ public enum JobType {
     }
 
     public ScheduledFuture<?> schedule(MarketService service, Runnable job) {
-        return scheduler.scheduleWithFixedDelay(() -> {
-            try {
-                job.run();
-            } finally {
-                aggregator.accept(service);
-            }
-        }, initialDelayMinutes, intervalDelayMinutes, TimeUnit.MINUTES);
+        if (intervalDelayMinutes <= 0) {
+            return scheduler.schedule(() -> {
+                try {
+                    job.run();
+                } finally {
+                    aggregator.accept(service);
+                }
+            }, initialDelayMinutes, TimeUnit.MINUTES);
+        } else {
+            return scheduler.scheduleWithFixedDelay(() -> {
+                try {
+                    job.run();
+                } finally {
+                    aggregator.accept(service);
+                }
+            }, initialDelayMinutes, intervalDelayMinutes, TimeUnit.MINUTES);
+        }
     }
 }

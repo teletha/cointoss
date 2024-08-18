@@ -89,7 +89,7 @@ public class TradeMate extends View {
      */
     public static void main(String[] args) {
         I.load(Market.class);
-        I.env("typewriter.sqlite", "jdbc:sqlite:market.sqlite");
+        I.env("typewriter.sqlite", "jdbc:sqlite:.log/market.sqlite");
 
         // activate application
         Viewtify.application().icon("icon/app.png").onTerminating(EfficientWebSocket::shutdownNow).activate(TradeMate.class);

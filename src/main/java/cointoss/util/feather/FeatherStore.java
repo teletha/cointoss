@@ -288,7 +288,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
         segment.modified = true;
 
-        // update managed time
+        // update managed cache time
         if (time < firstHeap) {
             firstHeap = time;
         }
@@ -757,6 +757,14 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             tryEvict(startTime);
             indexed.put(startTime, heap);
+
+            // update managed cache time
+            if (heap.first().seconds() < firstHeap) {
+                firstHeap = heap.first().seconds();
+            }
+            if (lastHeap < heap.last().seconds()) {
+                lastHeap = heap.last().seconds();
+            }
             return heap;
         }
 

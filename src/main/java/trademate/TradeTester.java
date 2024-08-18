@@ -57,7 +57,7 @@ public class TradeTester extends View {
      */
     public static void main(String[] args) throws InterruptedException {
         I.load(Market.class);
-        I.env("typewriter.sqlite", "jdbc:sqlite:market.sqlite");
+        I.env("typewriter.sqlite", "jdbc:sqlite:.log/market.sqlite");
 
         // activate application
         Viewtify.application().icon("icon/tester.png").onTerminating(EfficientWebSocket::shutdownNow).activate(TradeTester.class);
