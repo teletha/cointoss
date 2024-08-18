@@ -53,11 +53,6 @@ public final class TickerManager implements Disposable {
     /** The initialization state. */
     private boolean initialized;
 
-    private boolean whileReadingLog;
-
-    /**
-     * 
-     */
     public TickerManager() {
         this(null);
     }

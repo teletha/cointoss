@@ -10,14 +10,10 @@
 package trademate.chart;
 
 import java.text.Normalizer.Form;
-import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import org.controlsfx.glyphfont.FontAwesome;
 
@@ -26,6 +22,8 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Num;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -182,46 +180,5 @@ public class ChartView extends View {
                 });
 
         pricedVolumeType.initialize(PriceRangedVolumeType.values()).enableWhen(showPricedVolume.isSelected());
-    }
-
-    public void loadPastData() {
-        ZonedDateTime min = Chrono.utcBySeconds(chart.axisX.logicalMinValue.longValue());
-        ZonedDateTime max = Chrono.utcBySeconds(chart.axisX.logicalMaxValue.longValue());
-
-        if (ticker.isPresent()) {
-            // market.v.tickers.add(market.v.service.log.range(min.minusDays(6), min.minusDays(1),
-            // LogType.Fast)
-            // .effect(e -> market.v.priceVolume.update(e)));
-            // chart.layoutForcely();
-        }
-    }
-
-    public void autoTickerExpand(boolean enable) {
-        chart.autoTickerExpand(enable);
-    }
-
-    /**
-     * 
-     */
-    private static class ChartConfig extends View {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected ViewDSL declareUI() {
-            return new ViewDSL() {
-                {
-
-                }
-            };
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void initialize() {
-        }
     }
 }

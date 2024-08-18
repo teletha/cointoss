@@ -56,9 +56,6 @@ public class Chart extends Region {
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this);
 
-    /** The ticker management type. */
-    private boolean autoExpand;
-
     /**
      * 
      */
@@ -102,13 +99,6 @@ public class Chart extends Region {
     }
 
     /**
-     * @param enable
-     */
-    public final void autoTickerExpand(boolean enable) {
-        autoExpand = enable;
-    }
-
-    /**
      * Layout chart immediately.
      */
     public final void layoutForcely() {
@@ -122,10 +112,6 @@ public class Chart extends Region {
     @Override
     protected final void layoutChildren() {
         layoutChart.layout(() -> {
-            if (autoExpand && chart.ticker.isPresent()) {
-                chart.ticker.v.requestFill();
-            }
-
             setAxisXRange();
             setAxisYRange();
 

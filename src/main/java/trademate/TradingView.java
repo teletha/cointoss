@@ -82,12 +82,15 @@ public class TradingView extends View {
         Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
 
         chart.showRealtimeUpdate.set(false);
-        chart.autoTickerExpand(true);
         Coordinator.request(service, next -> {
             market.readLog(x -> x.fromLast(3, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
 
             chart.market.set(market);
             chart.showRealtimeUpdate.set(tab.isSelected());
+            chart.ticker.observing().to(ticker -> {
+                ticker.requestFill();
+                chart.chart.layoutForcely();
+            });
 
             next.run();
         });
