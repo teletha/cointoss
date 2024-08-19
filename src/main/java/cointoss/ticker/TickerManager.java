@@ -18,6 +18,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.LogType;
 import cointoss.util.Chrono;
 import cointoss.util.JobType;
+import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -221,9 +222,25 @@ public final class TickerManager implements Disposable {
      */
     public void buildDiskCacheFrom(ZonedDateTime startDay) {
         JobType.TickerGeneration.schedule(service, process -> {
-            ZonedDateTime start = Chrono.max(startDay, service.log.firstCacheDate());
+            Thread.sleep(10000);
             TickerManager temporary = new TickerManager(service);
-            service.log.range(start, on(Span.Day).ticks.firstCache().date(), LogType.Fast).to(temporary::update, e -> {
+            FeatherStore<Tick> ticks = on(Span.Day).ticks;
+
+            ZonedDateTime start = Chrono.max(startDay, service.log.firstCacheDate());
+            ZonedDateTime end = ticks.firstCache().date();
+
+            if (ticks.firstTime() <= start.toEpochSecond()) {
+                System.out.println("END " + ticks.first() + "  " + start + "  " + on(Span.Day).ticks);
+                return;
+            } else {
+                System.out.println("NOOOOOOO " + ticks.first() + "  " + start + "  " + on(Span.Day).ticks);
+            }
+
+            temporary.on(Span.Day).open.to(e -> {
+                System.out.println(service + " converts log to ticker. [" + e.date() + "]");
+            });
+
+            service.log.range(start, end, LogType.Fast).to(temporary::update, e -> {
             }, () -> {
                 temporary.freeze();
             });

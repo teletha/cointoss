@@ -510,7 +510,10 @@ public class ExecutionLog {
                             .scan(() -> Market.BASE, logger::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
-                            .effectOnError(e -> I.error("Fail to read fast log. [" + fast + "]"))
+                            .effectOnError(e -> {
+                                I.error("Fail to read fast log. [" + fast + "]");
+                                I.error(e);
+                            })
                             .effectOnComplete(() -> {
                                 I.trace("Read fast log " + service.id + " [" + date + "] " + stopwatch.stop().elapsed());
                             });

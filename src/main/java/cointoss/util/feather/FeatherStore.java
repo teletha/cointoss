@@ -481,7 +481,12 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     private long firstDiskTime() {
-        return db == null ? FIRST_INIT : db.min(E::getId);
+        if (db == null) {
+            return FIRST_INIT;
+        }
+
+        long first = db.min(E::getId);
+        return first == 0 ? FIRST_INIT : first;
     }
 
     /**
@@ -490,7 +495,12 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     private long lastDiskTime() {
-        return db == null ? LAST_INIT : db.max(E::getId);
+        if (db == null) {
+            return LAST_INIT;
+        }
+
+        long last = db.max(E::getId);
+        return last == 0 ? LAST_INIT : last;
     }
 
     /**
@@ -761,11 +771,13 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             indexed.put(startTime, heap);
 
             // update managed cache time
-            if (heap.first().seconds() < firstHeap) {
-                firstHeap = heap.first().seconds();
-            }
-            if (lastHeap < heap.last().seconds()) {
-                lastHeap = heap.last().seconds();
+            if (heap.size() != 0) {
+                if (heap.first().seconds() < firstHeap) {
+                    firstHeap = heap.first().seconds();
+                }
+                if (lastHeap < heap.last().seconds()) {
+                    lastHeap = heap.last().seconds();
+                }
             }
             return heap;
         }
@@ -876,7 +888,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         return new StringBuilder("FeatherStore [").append(Duration.ofSeconds(itemDuration))
                 .append("  segment: " + segmentSize() + "/" + segmentSize)
                 .append("  item: " + size() + "/" + (itemSize * segmentSize))
-                .append("  first: " + (0 <= firstTime() ? Instant.ofEpochSecond(Math.min(firstTime(), 31556889864403199L)) : "NoData"))
+                .append("  first: " + (0 <= firstTime() ? Instant.ofEpochSecond(firstTime()) : "NoData"))
                 .append("  last: " + (0 <= lastTime() ? Instant.ofEpochSecond(lastTime()) : "NoData"))
                 .append("  keys: " + indexed.entrySet()
                         .stream()
@@ -959,7 +971,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
          * @return A first item or null.
          */
         T first() {
-            return items == null || min < 0 ? null : items[min];
+            return items == null || min < 0 || min == Integer.MAX_VALUE ? null : items[min];
         }
 
         /**
@@ -968,7 +980,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
          * @return A last item or null.
          */
         T last() {
-            return items == null || max < 0 ? null : items[max];
+            return items == null || max < 0 || max == Integer.MIN_VALUE ? null : items[max];
         }
 
         /**
