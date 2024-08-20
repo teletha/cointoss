@@ -434,8 +434,30 @@ public class Chrono {
      * @return
      */
     public static List<ZonedDateTime> range(int year, int month) {
-        ZonedDateTime current = utc(year, month, 1);
-        ZonedDateTime end = current.plusMonths(1);
+        ZonedDateTime start = utc(year, month, 1);
+        return ranged(start, start.plusMonths(1));
+    }
+
+    /**
+     * List up all days at the specified month.
+     * 
+     * @param start The start date. (included)
+     * @param end The end date. (included)
+     * @return
+     */
+    public static List<ZonedDateTime> range(ZonedDateTime start, ZonedDateTime end) {
+        return ranged(start, end.plusDays(1));
+    }
+
+    /**
+     * List up all days at the specified month.
+     * 
+     * @param start The start date. (included)
+     * @param end The end date. (included)
+     * @return
+     */
+    private static List<ZonedDateTime> ranged(ZonedDateTime start, ZonedDateTime end) {
+        ZonedDateTime current = start;
 
         List<ZonedDateTime> dates = new ArrayList();
         while (current.isBefore(end)) {

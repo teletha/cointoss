@@ -123,6 +123,11 @@ class ChronoTest {
     }
 
     @Test
+    void rangeByDate() {
+        assert Chrono.range(Chrono.utc(2022, 1, 1), Chrono.utc(2022, 1, 3)).size() == 3;
+    }
+
+    @Test
     void max() {
         assert Chrono.max(Chrono.utc(2021, 1, 1)).equals(Chrono.utc(2021, 1, 1));
         assert Chrono.max(Chrono.utc(2021, 1, 1), Chrono.utc(2021, 1, 2)).equals(Chrono.utc(2021, 1, 2));
