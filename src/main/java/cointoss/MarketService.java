@@ -109,7 +109,16 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         this.scheduler.allowCoreThreadTimeOut(true);
         this.scheduler.setKeepAliveTime(30, TimeUnit.SECONDS);
         // this.writable = directory().file(".lock").lock().mapTo(true).recover(false).to().exact();
-        this.log = new ExecutionLog(this);
+        this.log = createExecutionLog();
+    }
+
+    /**
+     * Create {@link ExecutionLog} for this service.
+     * 
+     * @return
+     */
+    protected ExecutionLog createExecutionLog() {
+        return new ExecutionLog(this);
     }
 
     /**

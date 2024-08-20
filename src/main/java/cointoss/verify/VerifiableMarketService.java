@@ -94,7 +94,14 @@ public class VerifiableMarketService extends MarketService {
      * 
      */
     public VerifiableMarketService() {
-        super(Exchange.TestNet, "TestableMarket", MarketSetting.with.derivative()
+        this("TestableMarket");
+    }
+
+    /**
+     * 
+     */
+    public VerifiableMarketService(String marketName) {
+        super(Exchange.TestNet, marketName, MarketSetting.with.derivative()
                 .target(Currency.UNKNOWN.minimumSize(0.0001))
                 .base(Currency.UNKNOWN.minimumSize(0.01)));
     }

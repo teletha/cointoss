@@ -142,8 +142,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public synchronized FeatherStore<E> enablePersistence(JobType autoCommitJob, MarketService service, Object... qualifers) {
         db = RDB.of(model.type, qualifers);
-        firstDisk = firstDiskTime();
-        lastDisk = lastDiskTime();
+        updateMeta();
 
         if (autoCommitJob != null) {
             auto = autoCommitJob;
@@ -398,6 +397,16 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             }
         }
         return item;
+    }
+
+    /**
+     * Update metadata.
+     */
+    public void updateMeta() {
+        if (db != null) {
+            firstDisk = firstDiskTime();
+            lastDisk = lastDiskTime();
+        }
     }
 
     /**

@@ -216,13 +216,63 @@ public final class TickerManager implements Disposable {
     }
 
     /**
+     * Build ticker data by date range.
+     * 
+     * @param start
+     * @param end
+     * @param forceRebuild
+     */
+    public void build(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
+        if (forceRebuild) {
+            buildCache(start, end);
+        } else {
+            FeatherStore<Tick> current = on(Span.Day).ticks;
+            Tick first = current.first();
+            Tick last = current.last();
+
+            if (first == null && last == null) {
+                buildCache(start, end);
+            } else {
+                if (start == null && last != null) {
+                    start = last.date();
+                }
+
+                if (end == null && first != null) {
+                    end = first.date();
+                }
+
+                if (start.toEpochSecond() < current.firstTime()) {
+                    buildCache(start, current.first().date());
+                }
+
+                if (current.lastTime() < end.toEpochSecond()) {
+                    buildCache(current.last().date(), end);
+                }
+            }
+        }
+    }
+
+    private void buildCache(ZonedDateTime start, ZonedDateTime end) {
+        I.info("Building ticker data on " + service + " from " + start + " to " + end + ".");
+
+        TickerManager temporary = new TickerManager(service);
+        service.log.range(start, end, LogType.Fast).to(temporary::update, e -> {
+        }, () -> {
+            temporary.freeze();
+
+            for (Ticker ticker : tickers) {
+                ticker.ticks.updateMeta();
+            }
+        });
+    }
+
+    /**
      * Generates data for the Ticker cache.
      * 
      * @param startDay
      */
     public void buildDiskCacheFrom(ZonedDateTime startDay) {
         JobType.TickerGeneration.schedule(service, process -> {
-            Thread.sleep(10000);
             TickerManager temporary = new TickerManager(service);
             FeatherStore<Tick> ticks = on(Span.Day).ticks;
 
