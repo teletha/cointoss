@@ -47,6 +47,6 @@ public class TickerManagerBuildTest {
 
         Ticker ticker = manager.on(Span.Hour4);
         List<Tick> build = ticker.ticks.query(start, end).toList();
-        assert build.size() == 24;
+        assert build.size() == 12;
     }
 }

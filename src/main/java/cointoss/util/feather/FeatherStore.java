@@ -814,7 +814,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
 
         // Disk Cache
-        if (db != null && firstDisk <= rawTime && rawTime <= lastDisk && (!idealSafety || firstIdealCacheTime() <= startTime)) {
+        if (db != null && (!idealSafety || firstIdealCacheTime() <= startTime)) {
             OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
             db.findBy(E::getId, x -> x.isOrMoreThan(startTime).isLessThan(startTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
