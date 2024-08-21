@@ -9,6 +9,7 @@
  */
 package trademate.chart;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 
@@ -20,8 +21,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import antibug.CleanRoom;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.ticker.Ticker;
 import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
 import kiss.Disposable;
 import kiss.Variable;
 import trademate.chart.PlotScriptRegistry.GlobalSetting;
@@ -128,8 +129,8 @@ class PlotScriptRegistryTest {
          * {@inheritDoc}
          */
         @Override
-        public String locate() {
-            return room.locate("pref.json").toAbsolutePath().toString();
+        public Path locate() {
+            return room.locate("pref.json").toAbsolutePath();
         }
     }
 }

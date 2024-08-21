@@ -9,6 +9,7 @@
  */
 package cointoss.execution;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
@@ -213,7 +214,7 @@ class Repository implements Storable<Repository> {
      * {@inheritDoc}
      */
     @Override
-    public String locate() {
-        return root.file("repository.json").toString();
+    public Path locate() {
+        return root.file("repository.json").asJavaPath();
     }
 }
