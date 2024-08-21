@@ -651,8 +651,54 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @param option Your options.
      * @return A result.
      */
+    public Signal<E> query(Timelinable start, Consumer<Option>... option) {
+        return query(start.seconds(), option);
+    }
+
+    /**
+     * Query items by temporal options.
+     * 
+     * @param start A starting time.
+     * @param option Your options.
+     * @return A result.
+     */
+    public Signal<E> query(ZonedDateTime start, Consumer<Option>... option) {
+        return query(start.toEpochSecond(), option);
+    }
+
+    /**
+     * Query items by temporal options.
+     * 
+     * @param start A starting time.
+     * @param option Your options.
+     * @return A result.
+     */
     public Signal<E> query(long start, Consumer<Option>... option) {
         return query(start, -1, option);
+    }
+
+    /**
+     * Query items by temporal options.
+     * 
+     * @param start A starting time.
+     * @param end A ending time.
+     * @param option Your options.
+     * @return A result.
+     */
+    public Signal<E> query(Timelinable start, Timelinable end, Consumer<Option>... option) {
+        return query(start.seconds(), end.seconds(), option);
+    }
+
+    /**
+     * Query items by temporal options.
+     * 
+     * @param start A starting time.
+     * @param end A ending time.
+     * @param option Your options.
+     * @return A result.
+     */
+    public Signal<E> query(ZonedDateTime start, ZonedDateTime end, Consumer<Option>... option) {
+        return query(start.toEpochSecond(), end.toEpochSecond(), option);
     }
 
     /**
@@ -697,7 +743,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             }
 
-            boolean forward = s < e;
+            boolean forward = s <= e;
             long[] startIndex = index(forward ? s : e);
             long[] endIndex = index(forward ? e : s);
             forward = o.forward == forward;
@@ -742,29 +788,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             return disposer;
         });
-    }
-
-    /**
-     * Query items by temporal options.
-     * 
-     * @param start A starting time.
-     * @param option Your options.
-     * @return A result.
-     */
-    public Signal<E> query(Timelinable start, Consumer<Option>... option) {
-        return query(start.seconds(), option);
-    }
-
-    /**
-     * Query items by temporal options.
-     * 
-     * @param start A starting time.
-     * @param end A ending time.
-     * @param option Your options.
-     * @return A result.
-     */
-    public Signal<E> query(Timelinable start, Timelinable end, Consumer<Option>... option) {
-        return query(start.seconds(), end.seconds(), option);
     }
 
     /**
@@ -823,20 +846,13 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public void commit() {
         if (db != null) {
-            int skipped = 0;
-            int committed = 0;
             for (Entry<Long, OnHeap<E>> entry : indexed.entrySet()) {
                 OnHeap<E> value = entry.getValue();
                 if (value.modified) {
                     db.updateAll(value.items);
                     value.modified = false;
-                    committed++;
-                } else {
-                    skipped++;
                 }
             }
-            System.out.println("Commit " + committed + "/" + (committed + skipped) + " " + this);
-
             updateMeta();
         }
     }
@@ -882,9 +898,22 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
     /**
      * For test.
-     * 
-     * @param item
-     * @return
+     */
+    @VisibleForTesting
+    boolean exist(E item) {
+        return existOnHeap(item) || existOnDisk(item);
+    }
+
+    /**
+     * For test.
+     */
+    @VisibleForTesting
+    boolean exist(long timestamp) {
+        return existOnHeap(timestamp) || existOnDisk(timestamp);
+    }
+
+    /**
+     * For test.
      */
     @VisibleForTesting
     boolean existOnHeap(E item) {
@@ -898,9 +927,19 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
     /**
      * For test.
-     * 
-     * @param item
-     * @return
+     */
+    @VisibleForTesting
+    boolean existOnHeap(long timestamp) {
+        long[] index = index(timestamp);
+        OnHeap segment = indexed.get(index[0]);
+        if (segment == null) {
+            return false;
+        }
+        return segment.get((int) index[1]) != null;
+    }
+
+    /**
+     * For test.
      */
     @VisibleForTesting
     boolean existOnDisk(E item) {
@@ -908,6 +947,17 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             return false;
         }
         return db.findBy(item.getId()).to().is(item);
+    }
+
+    /**
+     * For test.
+     */
+    @VisibleForTesting
+    boolean existOnDisk(long timestamp) {
+        if (db == null) {
+            return false;
+        }
+        return db.findBy(timestamp).to().isPresent();
     }
 
     /**
@@ -920,6 +970,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 .append("  item: " + size() + "/" + (itemSize * segmentSize))
                 .append("  first: " + (0 <= firstTime() ? Instant.ofEpochSecond(firstTime()) : "NoData"))
                 .append("  last: " + (0 <= lastTime() ? Instant.ofEpochSecond(lastTime()) : "NoData"))
+                .append("  diskFirst: " + (firstDiskTime() != FIRST_INIT ? Instant.ofEpochSecond(firstDiskTime()) : "NoData"))
+                .append("  diskLast: " + (lastDiskTime() != LAST_INIT ? Instant.ofEpochSecond(lastDiskTime()) : "NoData"))
                 .append("  keys: " + indexed.entrySet()
                         .stream()
                         .map(e -> Instant.ofEpochSecond(e.getKey()) + "(" + e.getValue().size() + ")")

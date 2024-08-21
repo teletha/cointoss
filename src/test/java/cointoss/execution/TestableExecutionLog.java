@@ -23,9 +23,6 @@ public class TestableExecutionLog extends ExecutionLog {
 
     private static final FileSystem fs = Jimfs.newFileSystem();
 
-    /**
-     * @param service
-     */
     public TestableExecutionLog(MarketService service) {
         super(service, Locator.directory(fs.getPath(service.marketName)));
     }

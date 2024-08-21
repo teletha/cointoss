@@ -22,6 +22,7 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "antibug").atTest();
         require("com.pgs-soft", "HttpClientMock").atTest();
         require("com.google.jimfs", "jimfs").atTest();
+        require("org.decimal4j", "decimal4j").atTest();
         require("org.apache.commons", "commons-lang3");
         require("commons-net", "commons-net");
         require("com.google.guava", "guava");
@@ -43,7 +44,6 @@ public class Project extends bee.api.Project {
         // chartfx requires old jafafx, so override it
         require("org.openjfx", "javafx-base");
         require("org.openjfx", "javafx-controls");
-        require("org.decimal4j", "decimal4j").atTest();
         // require("org.nd4j", "nd4j-native-platform");
         // require("org.deeplearning4j", "rl4j-core");
 

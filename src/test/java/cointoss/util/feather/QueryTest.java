@@ -50,8 +50,8 @@ class QueryTest extends FeatherStoreTestBase {
         FeatherStore<Value> store = createStore(values(30, 40), values(10, 30));
         assert equality(store.query(0), "10~40");
 
-        store = createStore(values(30, 40), values(10, 30));
-        assert equality(store.query(40), 40);
+        FeatherStore<Value> store2 = createStore(values(30, 40), values(10, 30));
+        assert equality(store2.query(40), 40);
     }
 
     @Test

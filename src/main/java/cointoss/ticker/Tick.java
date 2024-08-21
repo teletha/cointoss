@@ -323,27 +323,6 @@ public final class Tick extends IdentifiableModel implements Timelinable {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Long.hashCode(openTime);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Tick == false) {
-            return false;
-        }
-
-        Tick other = (Tick) obj;
-        return openTime == other.openTime;
-    }
-
-    /**
      * Get the openPrice property of this {@link Tick}.
      * 
      * @return The openPrice property.
@@ -377,6 +356,42 @@ public final class Tick extends IdentifiableModel implements Timelinable {
      */
     private void setClosePrice(double closePrice) {
         this.closePrice = closePrice;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        long temp;
+        temp = Double.doubleToLongBits(closePrice);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(highPrice);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(lowPrice);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(openPrice);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (int) (openTime ^ (openTime >>> 32));
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Tick)) return false;
+        Tick other = (Tick) obj;
+        if (Double.doubleToLongBits(closePrice) != Double.doubleToLongBits(other.closePrice)) return false;
+        if (Double.doubleToLongBits(highPrice) != Double.doubleToLongBits(other.highPrice)) return false;
+        if (Double.doubleToLongBits(lowPrice) != Double.doubleToLongBits(other.lowPrice)) return false;
+        if (Double.doubleToLongBits(openPrice) != Double.doubleToLongBits(other.openPrice)) return false;
+        if (openTime != other.openTime) return false;
+        return true;
     }
 
     /**

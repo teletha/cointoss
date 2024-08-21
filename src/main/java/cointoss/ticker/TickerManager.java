@@ -202,6 +202,7 @@ public final class TickerManager implements Disposable {
 
             // save all ticks to disk
             ticker.ticks.commit();
+            ticker.ticks.updateMeta();
         }
     }
 
@@ -252,6 +253,13 @@ public final class TickerManager implements Disposable {
         }
     }
 
+    public void show(String type) {
+        for (Ticker ticker : tickers) {
+            ticker.ticks.updateMeta();
+            System.out.println(type + "  " + ticker.span + "  " + ticker.ticks);
+        }
+    }
+
     private void buildCache(ZonedDateTime start, ZonedDateTime end) {
         I.info("Building ticker data on " + service + " from " + start + " to " + end + ".");
 
@@ -259,10 +267,6 @@ public final class TickerManager implements Disposable {
         service.log.range(start, end, LogType.Fast).to(temporary::update, e -> {
         }, () -> {
             temporary.freeze();
-
-            for (Ticker ticker : tickers) {
-                ticker.ticks.updateMeta();
-            }
         });
     }
 
