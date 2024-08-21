@@ -27,6 +27,7 @@ import cointoss.util.JobType;
 import kiss.Disposable;
 import kiss.Model;
 import kiss.Signal;
+import kiss.Variable;
 import primavera.map.ConcurrentNavigableLongMap;
 import primavera.map.LongMap;
 import primavera.map.LongMap.LongEntry;
@@ -515,8 +516,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             return FIRST_INIT;
         }
 
-        long first = db.min(E::getId);
-        return first == 0 ? FIRST_INIT : first;
+        Variable<Long> first = db.min(E::getId);
+        return first.isAbsent() ? FIRST_INIT : first.v;
     }
 
     /**
@@ -529,8 +530,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             return LAST_INIT;
         }
 
-        long last = db.max(E::getId);
-        return last == 0 ? LAST_INIT : last;
+        Variable<Long> last = db.max(E::getId);
+        return last.isAbsent() ? LAST_INIT : last.v;
     }
 
     /**
@@ -836,8 +837,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             }
             System.out.println("Commit " + committed + "/" + (committed + skipped) + " " + this);
 
-            firstDisk = firstDiskTime();
-            lastDisk = lastDiskTime();
+            updateMeta();
         }
     }
 

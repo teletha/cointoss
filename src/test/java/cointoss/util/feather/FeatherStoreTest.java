@@ -440,7 +440,7 @@ class FeatherStoreTest {
     @Test
     void endTimeWithDisk() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("endTimeWithDisk");
-        assert store.lastTime() == 0;
+        assert store.lastTime() == -1;
 
         store.store(new Value(60));
         assert store.lastTime() == 60;

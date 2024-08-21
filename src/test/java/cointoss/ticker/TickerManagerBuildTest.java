@@ -31,6 +31,6 @@ public class TickerManagerBuildTest {
 
         service.log.createFastLog(start, end, Span.Minute1);
         manager.build(start, end, false);
-        assert ticker.ticks.at(start) == null;
+        assert ticker.ticks.at(start) != null;
     }
 }
