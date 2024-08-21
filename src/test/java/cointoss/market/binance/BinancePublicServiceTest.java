@@ -9,23 +9,53 @@
  */
 package cointoss.market.binance;
 
+import java.net.http.HttpClient;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
+import kiss.I;
 
 public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceService> {
+
+    private class TestableService extends BinanceService {
+
+        TestableService(String marketName, MarketSetting setting) {
+            super(marketName, setting);
+        }
+
+        @Override
+        protected HttpClient client() {
+            return httpClient;
+        }
+
+        @Override
+        protected EfficientWebSocket clientRealtimely() {
+            try {
+                if (websocketServer.hasReplyRule()) {
+                    return super.clientRealtimely().withClient(websocketServer.httpClient()).withScheduler(chronus);
+                } else {
+                    usedRealWebSocket = true;
+                    return super.clientRealtimely().enableDebug();
+                }
+            } catch (Exception e) {
+                throw I.quiet(e);
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected BinanceService constructMarketService() {
-        return construct(BinanceService::new, Binance.BTC_USDT.marketName, Binance.BTC_USDT.setting);
+        return new TestableService(Binance.BTC_USDT.marketName, Binance.BTC_USDT.setting);
     }
 
     /**

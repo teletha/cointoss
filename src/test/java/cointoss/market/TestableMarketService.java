@@ -10,16 +10,13 @@
 package cointoss.market;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.TestableExecutionLog;
-import cointoss.util.NestableExtension;
 import cointoss.verify.VerifiableMarketService;
 
-public class TestableMarketService extends VerifiableMarketService implements NestableExtension {
+public class TestableMarketService extends VerifiableMarketService {
 
-    @RegisterExtension
     /** Expose the testable object. */
     public TestableExecutionLog log;
 

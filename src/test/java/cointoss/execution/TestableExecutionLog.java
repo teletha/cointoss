@@ -9,32 +9,36 @@
  */
 package cointoss.execution;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import java.nio.file.FileSystem;
+import java.time.ZonedDateTime;
 
-import antibug.CleanRoom;
+import com.google.common.jimfs.Jimfs;
+
 import cointoss.MarketService;
-import cointoss.util.NestableExtension;
+import cointoss.ticker.Span;
+import cointoss.util.Chrono;
 import psychopath.Locator;
 
-public class TestableExecutionLog extends ExecutionLog implements NestableExtension {
+public class TestableExecutionLog extends ExecutionLog {
 
-    @RegisterExtension
-    private static CleanRoom room = new CleanRoom();
+    private static final FileSystem fs = Jimfs.newFileSystem();
 
     /**
      * @param service
      */
     public TestableExecutionLog(MarketService service) {
-        super(service, Locator.directory(room.root));
+        super(service, Locator.directory(fs.getPath(service.marketName)));
     }
 
     /**
-     * {@inheritDoc}
+     * Create fast log with random execution data.
+     * 
+     * @param start
+     * @param end
      */
-    @Override
-    public void afterEach(ExtensionContext context) throws Exception {
-        System.out.println("OK Log");
+    public void createFastLog(ZonedDateTime start, ZonedDateTime end, Span span) {
+        for (ZonedDateTime date : Chrono.range(start, end)) {
+            cache(date).writeFast(Executions.random(start, end, span));
+        }
     }
-
 }

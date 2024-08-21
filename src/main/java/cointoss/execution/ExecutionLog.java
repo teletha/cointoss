@@ -417,7 +417,7 @@ public class ExecutionLog {
         Signal<Execution> read(LogType... types) {
             LogType type = types == null || types.length == 0 ? LogType.Normal : types[0];
 
-            if (existCompact()) {
+            if (existCompact() || existFast()) {
                 if (type == LogType.Fast) {
                     return readFast();
                 } else {
@@ -637,6 +637,15 @@ public class ExecutionLog {
         /**
          * Write the execution log to the normal log.
          * 
+         * @param executions A list of executions to write.
+         */
+        void writeNormal(Iterable<Execution> executions) {
+            writeNormal(I.signal(executions)).to(I.NoOP);
+        }
+
+        /**
+         * Write the execution log to the normal log.
+         * 
          * @param executions A stream of executions to write.
          * @return Wrapped {@link Signal}.
          */
@@ -667,6 +676,15 @@ public class ExecutionLog {
         }
 
         /**
+         * Write the execution log to the compact log.
+         * 
+         * @param executions A list of executions to write.
+         */
+        void writeCompact(Iterable<Execution> executions) {
+            writeCompact(I.signal(executions)).to(I.NoOP);
+        }
+
+        /**
          * Write the execution log to the fast log.
          * 
          * @param executions A stream of executions to write.
@@ -689,6 +707,24 @@ public class ExecutionLog {
             } catch (IOException e) {
                 throw I.quiet(e);
             }
+        }
+
+        /**
+         * Write the execution log to the fast log.
+         * 
+         * @param executions A list of executions to write.
+         */
+        void writeFast(Execution... executions) {
+            writeFast(I.signal(executions)).to(I.NoOP);
+        }
+
+        /**
+         * Write the execution log to the fast log.
+         * 
+         * @param executions A list of executions to write.
+         */
+        void writeFast(Iterable<Execution> executions) {
+            writeFast(I.signal(executions)).to(I.NoOP);
         }
 
         /**

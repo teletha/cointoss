@@ -292,7 +292,7 @@ public class Market implements Disposable {
     public final Market readLog(Function<ExecutionLog, Signal<Execution>> log) {
         if (!initialized) {
             initialized = true;
-            service.add(log.apply(service.log).to(timelineObservers));
+            service.add(log.apply(this.log).to(timelineObservers));
         }
         return this;
     }

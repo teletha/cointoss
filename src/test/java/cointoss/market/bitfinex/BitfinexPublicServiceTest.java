@@ -9,23 +9,53 @@
  */
 package cointoss.market.bitfinex;
 
+import java.net.http.HttpClient;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
+import kiss.I;
 
 class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexService> {
+
+    private class TestableService extends BitfinexService {
+
+        TestableService(String marketName, MarketSetting setting) {
+            super(marketName, setting);
+        }
+
+        @Override
+        protected HttpClient client() {
+            return httpClient;
+        }
+
+        @Override
+        protected EfficientWebSocket clientRealtimely() {
+            try {
+                if (websocketServer.hasReplyRule()) {
+                    return super.clientRealtimely().withClient(websocketServer.httpClient()).withScheduler(chronus);
+                } else {
+                    usedRealWebSocket = true;
+                    return super.clientRealtimely().enableDebug();
+                }
+            } catch (Exception e) {
+                throw I.quiet(e);
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected BitfinexService constructMarketService() {
-        return construct(BitfinexService::new, Bitfinex.BTC_USD.marketName, Bitfinex.BTC_USD.setting);
+        return new TestableService(Bitfinex.BTC_USD.marketName, Bitfinex.BTC_USD.setting);
     }
 
     /**

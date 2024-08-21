@@ -12,6 +12,7 @@ package cointoss.util.feather;
 import java.lang.reflect.Array;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
@@ -368,6 +369,26 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             lastHeap = other.lastHeap;
         }
         other.indexed.clear();
+    }
+
+    /**
+     * Get the item for the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp A time stamp.
+     * @return
+     */
+    public E at(Timelinable timestamp) {
+        return at(timestamp.seconds());
+    }
+
+    /**
+     * Get the item for the specified date.
+     * 
+     * @param date
+     * @return
+     */
+    public E at(ZonedDateTime date) {
+        return at(date.toEpochSecond());
     }
 
     /**

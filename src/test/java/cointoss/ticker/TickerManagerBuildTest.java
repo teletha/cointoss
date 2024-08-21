@@ -9,20 +9,28 @@
  */
 package cointoss.ticker;
 
+import java.time.ZonedDateTime;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 import cointoss.market.TestableMarketService;
 import cointoss.util.Chrono;
 
 public class TickerManagerBuildTest {
 
-    @RegisterExtension
-    TestableMarketService service = new TestableMarketService();
-
     @Test
     void build() {
+        TestableMarketService service = new TestableMarketService();
+
+        ZonedDateTime start = Chrono.utc(2020, 1, 1);
+        ZonedDateTime end = Chrono.utc(2020, 1, 2);
+
         TickerManager manager = new TickerManager(service);
-        manager.build(Chrono.utc(2020, 1, 1), Chrono.utc(2020, 1, 2), false);
+        Ticker ticker = manager.on(Span.Day);
+        assert ticker.ticks.at(start) == null;
+
+        service.log.createFastLog(start, end, Span.Minute1);
+        manager.build(start, end, false);
+        assert ticker.ticks.at(start) == null;
     }
 }

@@ -9,23 +9,53 @@
  */
 package cointoss.market.bitmex;
 
+import java.net.http.HttpClient;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
+import kiss.I;
 
 class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
+
+    private class TestableService extends BitMexService {
+
+        TestableService(MarketService service) {
+            super(88, service.marketName, service.setting);
+        }
+
+        @Override
+        protected HttpClient client() {
+            return httpClient;
+        }
+
+        @Override
+        protected EfficientWebSocket clientRealtimely() {
+            try {
+                if (websocketServer.hasReplyRule()) {
+                    return super.clientRealtimely().withClient(websocketServer.httpClient()).withScheduler(chronus);
+                } else {
+                    usedRealWebSocket = true;
+                    return super.clientRealtimely().enableDebug();
+                }
+            } catch (Exception e) {
+                throw I.quiet(e);
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected BitMexService constructMarketService() {
-        return construct(BitMexService::new, 88, BitMex.XBT_USD.marketName, BitMex.XBT_USD.setting);
+        return new TestableService(BitMex.XBT_USD);
     }
 
     /**

@@ -9,24 +9,54 @@
  */
 package cointoss.market.bitflyer;
 
+import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
+import kiss.I;
 
 class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerService> {
+
+    private class TestableService extends BitFlyerService {
+
+        TestableService(MarketService service) {
+            super(service.marketName, service.setting);
+        }
+
+        @Override
+        protected HttpClient client() {
+            return httpClient;
+        }
+
+        @Override
+        protected EfficientWebSocket clientRealtimely() {
+            try {
+                if (websocketServer.hasReplyRule()) {
+                    return super.clientRealtimely().withClient(websocketServer.httpClient()).withScheduler(chronus);
+                } else {
+                    usedRealWebSocket = true;
+                    return super.clientRealtimely().enableDebug();
+                }
+            } catch (Exception e) {
+                throw I.quiet(e);
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected BitFlyerService constructMarketService() {
-        return construct(BitFlyerService::new, BitFlyer.FX_BTC_JPY.marketName, BitFlyer.FX_BTC_JPY.setting, true);
+        return new TestableService(BitFlyer.FX_BTC_JPY);
     }
 
     /**
