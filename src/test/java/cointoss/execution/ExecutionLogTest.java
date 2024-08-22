@@ -27,7 +27,7 @@ import psychopath.Locator;
 class ExecutionLogTest {
 
     @RegisterExtension
-    CleanRoom room = new CleanRoom();
+    CleanRoom room = new CleanRoom(true);
 
     VerifiableMarket market = new VerifiableMarket();
 

@@ -45,7 +45,7 @@ public class Executions {
     public static List<Execution> random(ZonedDateTime start, ZonedDateTime end, Span span) {
         List<Execution> list = new ArrayList();
         ZonedDateTime current = start;
-        while (current.isBefore(end)) {
+        while (current.isBefore(end) || current.isEqual(end)) {
             list.add(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)).date(current));
             current = current.plus(span.duration);
         }
