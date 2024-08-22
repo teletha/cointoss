@@ -18,6 +18,7 @@ import cointoss.Direction;
 import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import hypatia.Num;
+import kiss.Signal;
 
 public class Executions {
 
@@ -42,14 +43,16 @@ public class Executions {
      * 
      * @return
      */
-    public static List<Execution> random(ZonedDateTime start, ZonedDateTime end, Span span) {
-        List<Execution> list = new ArrayList();
-        ZonedDateTime current = start;
-        while (current.isBefore(end) || current.isEqual(end)) {
-            list.add(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)).date(current));
-            current = current.plus(span.duration);
-        }
-        return list;
+    public static Signal<Execution> random(ZonedDateTime start, ZonedDateTime end, Span span) {
+        return new Signal<>((observer, disposer) -> {
+            ZonedDateTime current = start;
+            while (!disposer.isDisposed() && (current.isBefore(end) || current.isEqual(end))) {
+                observer.accept(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)).date(current));
+                current = current.plus(span.duration);
+            }
+            observer.complete();
+            return disposer;
+        });
     }
 
     /**

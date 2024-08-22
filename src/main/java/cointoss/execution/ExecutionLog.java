@@ -43,7 +43,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.ticker.TickerManager;
+import cointoss.ticker.TickerBuilder;
 import cointoss.util.Chrono;
 import cointoss.util.JobType;
 import hypatia.Num;
@@ -737,19 +737,15 @@ public class ExecutionLog {
             File fast = fastLog();
 
             try {
-                TickerManager tickers = new TickerManager(service);
-
                 Execution[] prev = {Market.BASE};
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
 
                 return executions.plug(new FastLog(service.setting.target.scale)).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
                     prev[0] = e;
-                    tickers.update(e);
                 }).effectOnComplete(() -> {
                     writer.close();
                     repository.updateLocal(date);
-                    tickers.freeze();
                 });
             } catch (IOException e) {
                 throw I.quiet(e);
@@ -791,7 +787,7 @@ public class ExecutionLog {
                 if (async) {
                     I.schedule(5, TimeUnit.SECONDS).to(() -> convertNormalToCompact(false));
                 } else {
-                    writeFast(writeCompact(readNormal())).to(I.NoOP, e -> {
+                    writeFast(writeCompact(readNormal())).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP, e -> {
                         I.error(service + " fails to compact the normal log. [" + date + "]");
                         I.error(e);
                     }, () -> {
@@ -823,13 +819,7 @@ public class ExecutionLog {
          */
         void convertFastToTicker() {
             if (existFast()) {
-                TickerManager tickers = new TickerManager(service);
-                read(LogType.Fast).to(tickers::update, e -> {
-                    I.error(service + " fails to build the ticker log. [" + date + "]");
-                    I.error(e);
-                }, () -> {
-                    tickers.freeze();
-                });
+                read(LogType.Fast).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP);
             }
         }
 

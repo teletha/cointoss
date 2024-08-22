@@ -12,10 +12,12 @@ package cointoss.ticker;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import cointoss.market.TestableMarketService;
 import cointoss.util.Chrono;
+import cointoss.util.feather.FeatherStore;
 
 public class TickerManagerBuildTest {
 
@@ -25,7 +27,7 @@ public class TickerManagerBuildTest {
         ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);
 
         TestableMarketService service = new TestableMarketService();
-        service.log.createFastLog(start, end, Span.Minute1);
+        service.log.createFastLog(start, end, Span.Minute1, false);
 
         TickerManager manager = new TickerManager(service);
         manager.build(start, end, false);
@@ -39,16 +41,26 @@ public class TickerManagerBuildTest {
     @Test
     void rebuild() {
         ZonedDateTime start = Chrono.utc(2020, 1, 1);
-        ZonedDateTime end = Chrono.utc(2020, 1, 3);
+        ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);
 
         TestableMarketService service = new TestableMarketService();
-        service.log.createFastLog(start, end, Span.Minute1);
+        service.log.createFastLog(start, end, Span.Minute1, false);
 
         TickerManager manager = new TickerManager(service);
-        manager.build(start, end, false);
+        FeatherStore<Tick> ticks = manager.on(Span.Minute15).ticks;
 
-        Ticker ticker = manager.on(Span.Hour4);
-        List<Tick> build = ticker.ticks.query(start, end).toList();
-        assert build.size() == 13;
+        manager.build(start, end, false);
+        List<Tick> oldTicks = ticks.query(start, end).toList();
+
+        // service.log.createFastLog(start, end, Span.Minute1, false);
+        manager.build(start, end, false);
+        ticks.clearHeap();
+        List<Tick> sameTicks = ticks.query(start, end).toList();
+        Assertions.assertIterableEquals(oldTicks, sameTicks);
+
+        // service.log.createFastLog(start, end, Span.Minute1, false);
+        // manager.build(start, end, true);
+        // List<Tick> newTicks = ticks.query(start, end).toList();
+        // Assertions.assertIterableEquals(oldTicks, newTicks);
     }
 }

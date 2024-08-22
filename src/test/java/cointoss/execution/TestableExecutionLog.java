@@ -16,7 +16,9 @@ import com.google.common.jimfs.Jimfs;
 
 import cointoss.MarketService;
 import cointoss.ticker.Span;
+import cointoss.ticker.TickerBuilder;
 import cointoss.util.Chrono;
+import kiss.I;
 import psychopath.Locator;
 
 public class TestableExecutionLog extends ExecutionLog {
@@ -33,9 +35,11 @@ public class TestableExecutionLog extends ExecutionLog {
      * @param start
      * @param end
      */
-    public void createFastLog(ZonedDateTime start, ZonedDateTime end, Span span) {
+    public void createFastLog(ZonedDateTime start, ZonedDateTime end, Span span, boolean buildTickerData) {
         for (ZonedDateTime date : Chrono.range(start, end)) {
-            cache(date).writeFast(Executions.random(start, end, span));
+            cache(date).writeFast(Executions.random(start, end, span))
+                    .effectOnLifecycle(buildTickerData ? new TickerBuilder(service) : null)
+                    .to(I.NoOP);
         }
     }
 }

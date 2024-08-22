@@ -16,8 +16,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.execution.LogType;
-import cointoss.util.Chrono;
-import cointoss.util.JobType;
 import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.Disposable;
@@ -193,20 +191,6 @@ public final class TickerManager implements Disposable {
     }
 
     /**
-     * Freeze the latest tick and save all ticks to disk.
-     */
-    public void freeze() {
-        for (Ticker ticker : tickers) {
-            // update the close price by the latest price
-            ticker.current.freeze();
-
-            // save all ticks to disk
-            ticker.ticks.commit();
-            ticker.ticks.updateMeta();
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -253,52 +237,13 @@ public final class TickerManager implements Disposable {
         }
     }
 
-    public void show(String type) {
-        for (Ticker ticker : tickers) {
-            ticker.ticks.updateMeta();
-            System.out.println(type + "  " + ticker.span + "  " + ticker.ticks);
-        }
-    }
-
     private void buildCache(ZonedDateTime start, ZonedDateTime end) {
         I.info("Building ticker data on " + service + " from " + start + " to " + end + ".");
 
-        TickerManager temporary = new TickerManager(service);
-        service.log.range(start, end, LogType.Fast).to(temporary::update, e -> {
-        }, () -> {
-            temporary.freeze();
-        });
-    }
-
-    /**
-     * Generates data for the Ticker cache.
-     * 
-     * @param startDay
-     */
-    public void buildDiskCacheFrom(ZonedDateTime startDay) {
-        JobType.TickerGeneration.schedule(service, process -> {
-            TickerManager temporary = new TickerManager(service);
-            FeatherStore<Tick> ticks = on(Span.Day).ticks;
-
-            ZonedDateTime start = Chrono.max(startDay, service.log.firstCacheDate());
-            ZonedDateTime end = ticks.firstCache().date();
-
-            if (ticks.firstTime() <= start.toEpochSecond()) {
-                System.out.println("END " + ticks.first() + "  " + start + "  " + on(Span.Day).ticks);
-                return;
-            } else {
-                System.out.println("NOOOOOOO " + ticks.first() + "  " + start + "  " + on(Span.Day).ticks);
-            }
-
-            temporary.on(Span.Day).open.to(e -> {
-                System.out.println(service + " converts log to ticker. [" + e.date() + "]");
-            });
-
-            service.log.range(start, end, LogType.Fast).to(temporary::update, e -> {
-            }, () -> {
-                temporary.freeze();
-            });
-        });
+        service.log.range(start, end, LogType.Fast)
+                .effectOnDispose(() -> I.signal(tickers).to(t -> t.ticks.updateMeta()))
+                .effectOnLifecycle(new TickerBuilder(service))
+                .to(I.NoOP);
     }
 
 }

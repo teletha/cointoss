@@ -142,7 +142,6 @@ public final class Ticker implements Disposable {
             ticks.restore(startDay.toEpochSecond(), stopDay.toEpochSecond());
 
             if (!ticks.isFilled() && firstDay.isBefore(startDay)) {
-                manager.buildDiskCacheFrom(startDay);
             }
         }
     }
