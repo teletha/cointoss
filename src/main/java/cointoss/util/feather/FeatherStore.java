@@ -584,7 +584,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /**
      * Clear all items from heap.
      */
-    public void clearHeap() {
+    public void clear() {
         for (OnHeap segment : indexed.values()) {
             segment.clear();
         }

@@ -9,10 +9,11 @@
  */
 package cointoss.ticker;
 
+import static antibug.Tester.*;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import cointoss.market.TestableMarketService;
@@ -27,7 +28,7 @@ public class TickerManagerBuildTest {
         ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);
 
         TestableMarketService service = new TestableMarketService();
-        service.log.createFastLog(start, end, Span.Minute1, false);
+        service.log.generateFastLog(start, end, Span.Minute1, false);
 
         TickerManager manager = new TickerManager(service);
         manager.build(start, end, false);
@@ -43,24 +44,41 @@ public class TickerManagerBuildTest {
         ZonedDateTime start = Chrono.utc(2020, 1, 1);
         ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);
 
+        // generate fast log
         TestableMarketService service = new TestableMarketService();
-        service.log.createFastLog(start, end, Span.Minute1, false);
+        service.log.generateFastLog(start, end, Span.Minute1, false);
 
         TickerManager manager = new TickerManager(service);
         FeatherStore<Tick> ticks = manager.on(Span.Minute15).ticks;
 
+        // build ticker data from fast log
         manager.build(start, end, false);
         List<Tick> oldTicks = ticks.query(start, end).toList();
+        List<Tick> newTicks = ticks.query(start, end).toList();
+        assert same(oldTicks, newTicks);
 
-        // service.log.createFastLog(start, end, Span.Minute1, false);
+        // clear memory cache and re-query data from same ticker data
+        ticks.clear();
+        newTicks = ticks.query(start, end).toList();
+        assert same(oldTicks, newTicks);
+
+        // clear memory cache and rebuild ticker data from same fast log
+        ticks.clear();
         manager.build(start, end, false);
-        ticks.clearHeap();
-        List<Tick> sameTicks = ticks.query(start, end).toList();
-        Assertions.assertIterableEquals(oldTicks, sameTicks);
+        newTicks = ticks.query(start, end).toList();
+        assert same(oldTicks, newTicks);
 
-        // service.log.createFastLog(start, end, Span.Minute1, false);
-        // manager.build(start, end, true);
-        // List<Tick> newTicks = ticks.query(start, end).toList();
-        // Assertions.assertIterableEquals(oldTicks, newTicks);
+        // clear memory cache and rebuild ticker data from same fast log
+        ticks.clear();
+        manager.build(start, end, true);
+        newTicks = ticks.query(start, end).toList();
+        assert same(oldTicks, newTicks);
+
+        // clear memory cache and rebuild ticker data from new generated fast log
+        ticks.clear();
+        service.log.generateFastLog(start, end, Span.Minute1, false);
+        manager.build(start, end, true);
+        newTicks = ticks.query(start, end).toList();
+        assert different(oldTicks, newTicks);
     }
 }

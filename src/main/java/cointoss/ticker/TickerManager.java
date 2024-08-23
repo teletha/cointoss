@@ -218,6 +218,7 @@ public final class TickerManager implements Disposable {
             if (first == null && last == null) {
                 buildCache(start, end);
             } else {
+                System.out.println(first + "  " + last);
                 if (start == null && last != null) {
                     start = last.date();
                 }

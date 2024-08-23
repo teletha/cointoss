@@ -35,7 +35,7 @@ public class TestableExecutionLog extends ExecutionLog {
      * @param start
      * @param end
      */
-    public void createFastLog(ZonedDateTime start, ZonedDateTime end, Span span, boolean buildTickerData) {
+    public void generateFastLog(ZonedDateTime start, ZonedDateTime end, Span span, boolean buildTickerData) {
         for (ZonedDateTime date : Chrono.range(start, end)) {
             cache(date).writeFast(Executions.random(start, end, span))
                     .effectOnLifecycle(buildTickerData ? new TickerBuilder(service) : null)

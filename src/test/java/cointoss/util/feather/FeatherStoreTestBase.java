@@ -55,7 +55,7 @@ class FeatherStoreTestBase {
             store.enablePersistence(databaseFile());
             store.store(initialDiskValues);
             store.commit();
-            store.clearHeap();
+            store.clear();
         }
 
         if (initialMemoryValues != null) {
@@ -85,7 +85,7 @@ class FeatherStoreTestBase {
             store.enablePersistence(RandomStringUtils.randomAlphanumeric(30));
             store.store(initialDiskValues);
             store.commit();
-            store.clearHeap();
+            store.clear();
         }
 
         if (initialMemoryValues != null) {

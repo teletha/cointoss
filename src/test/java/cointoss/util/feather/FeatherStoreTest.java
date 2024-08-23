@@ -341,7 +341,7 @@ class FeatherStoreTest {
 
         store.store(value(0));
         store.commit();
-        store.clearHeap();
+        store.clear();
         assert store.existOnHeap(value(0)) == false;
         assert store.at(0).value == 0;
         assert store.at(60) == null;
@@ -353,7 +353,7 @@ class FeatherStoreTest {
 
         store.store(value(0));
         store.commit();
-        store.clearHeap();
+        store.clear();
         assert store.existOnHeap(value(0)) == false;
         assert store.existOnDisk(value(0)) == true;
         assert store.query(0).toList().getFirst().value == 0;
@@ -368,7 +368,7 @@ class FeatherStoreTest {
         FeatherStore<Enums> store = FeatherStore.create(Enums.class, Span.Minute1).enablePersistence("supportEnum");
         store.store(e);
         store.commit();
-        store.clearHeap();
+        store.clear();
 
         Enums restored = store.at(e.seconds());
         assert restored != null;
@@ -402,7 +402,7 @@ class FeatherStoreTest {
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
         store.commit();
-        store.clearHeap();
+        store.clear();
         assert store.at(oi.seconds()).equals(oi);
     }
 
@@ -414,7 +414,7 @@ class FeatherStoreTest {
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);
         store.store(oi1, oi2, oi3);
         store.commit();
-        store.clearHeap();
+        store.clear();
 
         assert store.at(oi1.seconds()).equals(oi1);
         assert store.at(oi2.seconds()).equals(oi2);
@@ -449,7 +449,7 @@ class FeatherStoreTest {
         assert store.lastTime() == 600;
 
         store.commit();
-        store.clearHeap();
+        store.clear();
         assert store.lastTime() == 600;
     }
 }
