@@ -46,7 +46,7 @@ public class Executions {
     public static Signal<Execution> random(ZonedDateTime start, ZonedDateTime end, Span span) {
         return new Signal<>((observer, disposer) -> {
             ZonedDateTime current = start;
-            while (!disposer.isDisposed() && (current.isBefore(end) || current.isEqual(end))) {
+            while (!disposer.isDisposed() && (current.isBefore(end))) {
                 observer.accept(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)).date(current));
                 current = current.plus(span.duration);
             }

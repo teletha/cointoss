@@ -10,6 +10,7 @@
 package cointoss.ticker;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -208,6 +209,9 @@ public final class TickerManager implements Disposable {
      * @param forceRebuild
      */
     public void build(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
+        start = start.truncatedTo(ChronoUnit.DAYS);
+        end = end.truncatedTo(ChronoUnit.DAYS);
+
         if (forceRebuild) {
             buildCache(start, end);
         } else {
@@ -218,7 +222,6 @@ public final class TickerManager implements Disposable {
             if (first == null && last == null) {
                 buildCache(start, end);
             } else {
-                System.out.println(first + "  " + last);
                 if (start == null && last != null) {
                     start = last.date();
                 }

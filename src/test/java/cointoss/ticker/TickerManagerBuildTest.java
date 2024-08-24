@@ -81,4 +81,21 @@ public class TickerManagerBuildTest {
         newTicks = ticks.query(start, end).toList();
         assert different(oldTicks, newTicks);
     }
+
+    @Test
+    void beforeRange() {
+        ZonedDateTime start = Chrono.utc(2020, 1, 1);
+        ZonedDateTime end = Chrono.utc(2020, 1, 7, 23, 59, 0, 0);
+
+        // generate fast log
+        TestableMarketService service = new TestableMarketService();
+        service.log.generateFastLog(start, end, Span.Hour1, false);
+
+        TickerManager manager = new TickerManager(service);
+        FeatherStore<Tick> ticks = manager.on(Span.Minute15).ticks;
+
+        // build ticker data from fast log
+        manager.build(start.plusDays(2), end.minusDays(2), false);
+        assert ticks.first().date().equals(start.plusDays(2));
+    }
 }
