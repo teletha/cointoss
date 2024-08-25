@@ -100,15 +100,18 @@ public class TickerManagerBuildTest {
         manager.build(insideStart, insideEnd, false);
         assert ticks.first().date().equals(insideStart);
         assert ticks.last().date().equals(insideEnd);
+        List<Tick> inside = ticks.query(insideStart, insideEnd).toList();
 
         // build with previous data
         manager.build(start, insideEnd, false);
         assert ticks.first().date().equals(start);
         assert ticks.last().date().equals(insideEnd);
+        assert same(inside, ticks.query(insideStart, insideEnd).toList());
 
         // build with next data
         manager.build(insideStart, end, false);
         assert ticks.first().date().equals(start);
         assert ticks.last().date().equals(end);
+        assert same(inside, ticks.query(insideStart, insideEnd).toList());
     }
 }
