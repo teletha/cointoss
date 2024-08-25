@@ -275,7 +275,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         long time = item.seconds();
         long[] index = index(time);
 
-        OnHeap<E> segment = loadSegment(false, index[0], index[1], time);
+        OnHeap<E> segment = loadSegment(false, index[0], index[1]);
 
         if (segment == null) {
             segment = new OnHeap(model, index[0], itemSize);
@@ -405,7 +405,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
         long[] index = index(timestamp);
 
-        OnHeap<E> segment = loadSegment(true, index[0], index[1], timestamp);
+        OnHeap<E> segment = loadSegment(true, index[0], index[1]);
         if (segment == null) {
             return null;
         }
@@ -767,7 +767,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             if (forward) {
                 for (long time = segmentStart; time <= segmentEnd && 0 < remaining && !disposer.isDisposed(); time += segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0, time);
+                    OnHeap<E> heap = loadSegment(true, time, 0);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -776,7 +776,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             } else {
                 for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0, time);
+                    OnHeap<E> heap = loadSegment(true, time, 0);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -803,7 +803,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /**
      * Load the data segment at the specified date and time.
      */
-    private OnHeap<E> loadSegment(boolean readMode, long segmentTime, long segmentIndex, long itemTime) {
+    private OnHeap<E> loadSegment(boolean readMode, long segmentTime, long segmentIndex) {
         OnHeap<E> heap = indexed.get(segmentTime);
         if (heap != null) {
             // memory cache
