@@ -26,7 +26,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
     protected NumIndicator(Ticker ticker) {
         this(ticker, tick -> {
             Tick rounded = ticker.ticks.at(tick.openTime);
-            return rounded == null ? ticker.ticks.firstCache() : rounded;
+            return rounded == null ? ticker.ticks.firstIdealCache() : rounded;
         });
     }
 

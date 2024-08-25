@@ -43,7 +43,7 @@ public class TrendFollow extends Trader {
 
         when(ticker.open, x -> {
             Ticker bigger = market.tickers.on(big);
-            Tick last = bigger.ticks.lastCache();
+            Tick last = bigger.latest();
 
             if (last != null) {
                 trade(new Scenario() {

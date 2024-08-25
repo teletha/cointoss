@@ -22,7 +22,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void valueAt() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(ticker.ticks.at(sec * 0)) == 1d;
@@ -34,7 +34,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void valueAtLowerTick() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         Ticker lower = manager.on(Span.Minute1);
         long sec = lower.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice);
@@ -50,7 +50,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void combine() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice);
         DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice);
@@ -64,7 +64,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void map() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         Indicator<Num> indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).map(v -> Num.of(v));
         assert indicator.valueAt(ticker.ticks.at(0 * sec)).is(1);
@@ -76,7 +76,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void mapWith() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice);
         DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice);
@@ -90,7 +90,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void mapWith2() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice);
         DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice);
@@ -105,7 +105,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void mapToDouble() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).dmap(v -> v + 1);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 2d;
@@ -117,7 +117,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void mapToDoubleWith() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice);
         DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice);
@@ -133,7 +133,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
     void memo() {
         AtomicInteger count = new AtomicInteger();
 
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> {
             count.incrementAndGet();
@@ -165,7 +165,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void scale() {
-        Ticker ticker = ticker(Span.Minute5, 1.23, 2.34, 3.45, 4.56, 5.67);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1.23, 2.34, 3.45, 4.56, 5.67);
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).scale(1);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1.2d;
@@ -177,7 +177,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void sma() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).sma(2);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
@@ -196,7 +196,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void ema() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).ema(2);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
@@ -215,7 +215,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void mma() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).mma(2);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
@@ -234,7 +234,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void wma() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3, 4, 5);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3, 4, 5);
         long sec = ticker.span.seconds;
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice).wma(2);
         assert indicator.valueAt(ticker.ticks.at(0 * sec)) == 1d;
@@ -253,7 +253,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void dontCacheLatest() {
-        Ticker ticker = ticker(Span.Minute5, 1, 2, 3);
+        Ticker ticker = manager.generateTicker(Span.Minute5, 1, 2, 3);
         long sec = ticker.span.seconds;
         Tick tick2 = ticker.ticks.at(2 * sec);
 

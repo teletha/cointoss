@@ -9,75 +9,20 @@
  */
 package cointoss.ticker;
 
-import java.time.ZonedDateTime;
+import org.junit.jupiter.api.BeforeEach;
 
-import cointoss.execution.Execution;
 import cointoss.market.TestableMarketService;
-import cointoss.util.Chrono;
 import cointoss.util.TimebaseSupport;
 
 public class TickerTestSupport implements TimebaseSupport {
 
-    protected final TestableMarketService service = new TestableMarketService();
+    protected TestableMarketService service;
 
-    protected final TestableTickerManager manager = new TestableTickerManager(service);
+    protected TestableTickerManager manager;
 
-    /**
-     * Build {@link Ticker} simply with your values.
-     * 
-     * @param span
-     * @param values
-     * @return
-     */
-    public Ticker ticker(Span span, int... values) {
-        ZonedDateTime time = Chrono.MIN;
-
-        for (int value : values) {
-            manager.update(Execution.with.buy(value).price(value).date(time));
-            time = time.plus(span.duration);
-        }
-        return manager.on(span);
-    }
-
-    /**
-     * Build {@link Ticker} simply with your values.
-     * 
-     * @param span
-     * @param values
-     * @return
-     */
-    public Ticker ticker(Span span, double... values) {
-        ZonedDateTime time = Chrono.MIN;
-
-        for (double value : values) {
-            manager.update(Execution.with.buy(value).price(value).date(time));
-            time = time.plus(span.duration);
-        }
-        return manager.on(span);
-    }
-
-    /**
-     * Build {@link Tick} simply with tou values.
-     * 
-     * @param span
-     * @param open
-     * @param high
-     * @param low
-     * @param close
-     * @return
-     */
-    public Tick tick(Span span, int open, int high, int low, int close) {
-        if (high < open || high < low || high < close) {
-            throw new IllegalArgumentException("High price is not highest. [open:" + open + " high:" + high + " low:" + low + " close:" + close + "]");
-        }
-
-        ZonedDateTime time = Chrono.MIN;
-
-        manager.update(Execution.with.buy(1).price(open).date(time));
-        manager.update(Execution.with.buy(1).price(high).date(time));
-        manager.update(Execution.with.buy(1).price(low).date(time));
-        manager.update(Execution.with.buy(1).price(close).date(time));
-
-        return manager.on(span).current;
+    @BeforeEach
+    void setup() {
+        service = new TestableMarketService();
+        manager = new TestableTickerManager(service);
     }
 }

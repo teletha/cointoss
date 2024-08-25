@@ -22,7 +22,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
     protected Indicator(Ticker ticker) {
         this(ticker, tick -> {
             Tick rounded = ticker.ticks.at(tick.openTime);
-            return rounded == null ? ticker.ticks.firstCache() : rounded;
+            return rounded == null ? ticker.ticks.firstIdealCache() : rounded;
         });
     }
 
@@ -82,7 +82,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
 
         Function<Tick, Tick> normalizer = tick -> {
             Tick rounded = ticker.ticks.at(tick.openTime);
-            return rounded == null ? ticker.ticks.firstCache() : rounded;
+            return rounded == null ? ticker.ticks.firstIdealCache() : rounded;
         };
 
         return new Indicator<>(ticker, normalizer) {

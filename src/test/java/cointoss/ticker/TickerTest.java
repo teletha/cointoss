@@ -26,13 +26,13 @@ class TickerTest extends TickerTestSupport {
         assert open.size() == 0;
 
         manager.update(Execution.with.buy(1).price(10));
-        assert open.size() == 0;
-        manager.update(Execution.with.buy(1).price(20).date(afterMinute(1)));
         assert open.size() == 1;
-        manager.update(Execution.with.buy(1).price(10).date(afterMinute(2)));
+        manager.update(Execution.with.buy(1).price(20).date(afterMinute(1)));
         assert open.size() == 2;
-        manager.update(Execution.with.buy(1).price(10).date(afterMinute(3)));
+        manager.update(Execution.with.buy(1).price(10).date(afterMinute(2)));
         assert open.size() == 3;
+        manager.update(Execution.with.buy(1).price(10).date(afterMinute(3)));
+        assert open.size() == 4;
     }
 
     @Test
@@ -68,6 +68,9 @@ class TickerTest extends TickerTestSupport {
         ZonedDateTime start = Chrono.utc(2020, 1, 1);
         ZonedDateTime end = Chrono.utc(2020, 1, 7);
 
-        manager.generateTicker(start, end, Span.Minute1);
+        manager.generateTicker(Span.Minute1, start, end);
+
+        Ticker ticker = manager.on(Span.Minute1);
+        assert ticker.latest() == ticker.ticks.lastCache();
     }
 }

@@ -572,6 +572,15 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
+     * Retrieve the item at {@link #firstIdealCacheTime()}.
+     * 
+     * @return
+     */
+    public E firstIdealCache() {
+        return at(firstIdealCacheTime());
+    }
+
+    /**
      * Clear all items from heap.
      */
     public void clear() {
