@@ -46,7 +46,7 @@ public class TickerManagerBuildTest {
 
         // generate fast log
         TestableMarketService service = new TestableMarketService();
-        service.log.generateFastLog(start, end, Span.Minute1, false);
+        service.log.generateFastLog(start, end, Span.Hour1, false);
 
         TickerManager manager = new TickerManager(service);
         FeatherStore<Tick> ticks = manager.on(Span.Minute15).ticks;
@@ -76,14 +76,14 @@ public class TickerManagerBuildTest {
 
         // clear memory cache and rebuild ticker data from new generated fast log
         ticks.clear();
-        service.log.generateFastLog(start, end, Span.Minute1, false);
+        service.log.generateFastLog(start, end, Span.Hour1, false);
         manager.build(start, end, true);
         newTicks = ticks.query(start, end).toList();
         assert different(oldTicks, newTicks);
     }
 
     @Test
-    void beforeRange() {
+    void outOfRange() {
         ZonedDateTime start = Chrono.utc(2020, 1, 1);
         ZonedDateTime end = Chrono.utc(2020, 1, 7);
         ZonedDateTime insideStart = start.plusDays(2);
@@ -101,11 +101,14 @@ public class TickerManagerBuildTest {
         assert ticks.first().date().equals(insideStart);
         assert ticks.last().date().equals(insideEnd);
 
-        // build with before
-        System.out.println(ticks);
+        // build with previous data
         manager.build(start, insideEnd, false);
-        System.out.println("After " + ticks);
         assert ticks.first().date().equals(start);
         assert ticks.last().date().equals(insideEnd);
+
+        // build with next data
+        manager.build(insideStart, end, false);
+        assert ticks.first().date().equals(start);
+        assert ticks.last().date().equals(end);
     }
 }

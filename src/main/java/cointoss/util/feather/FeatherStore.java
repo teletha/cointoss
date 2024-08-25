@@ -275,7 +275,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         long time = item.seconds();
         long[] index = index(time);
 
-        OnHeap<E> segment = supply(index[0], time, false);
+        OnHeap<E> segment = supply(false, index[0], index[1], time, false);
 
         if (segment == null) {
             segment = new OnHeap(model, index[0], itemSize);
@@ -405,7 +405,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
         long[] index = index(timestamp);
 
-        OnHeap<E> segment = supply(index[0], timestamp, true);
+        OnHeap<E> segment = supply(true, index[0], index[1], timestamp, true);
         if (segment == null) {
             return null;
         }
@@ -767,7 +767,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             if (forward) {
                 for (long time = segmentStart; time <= segmentEnd && 0 < remaining && !disposer.isDisposed(); time += segmentDuration) {
-                    OnHeap<E> heap = supply(time, time, true);
+                    OnHeap<E> heap = supply(true, time, 0, time, true);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -776,7 +776,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             } else {
                 for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
-                    OnHeap<E> heap = supply(time, time, true);
+                    OnHeap<E> heap = supply(true, time, 0, time, true);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -803,26 +803,31 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /**
      * Get the data segment at the specified date and time.
      * 
-     * @param startTime
+     * @param segmentTime
      * @return
      */
-    private OnHeap<E> supply(long startTime, long rawTime, boolean idealSafety) {
+    private OnHeap<E> supply(boolean readMode, long segmentTime, long segmentIndex, long itemTime, boolean idealSafety) {
         // Memory Cache
-        OnHeap<E> segment = indexed.get(startTime);
+        OnHeap<E> segment = indexed.get(segmentTime);
         if (segment != null) {
-            return segment;
+            if (readMode && (segmentIndex < segment.min || segment.max < segmentIndex)) {
+                // Re-examine the disk cache because an index outside the range of the indexes held
+                // in this segment has been requested.
+            } else {
+                return segment;
+            }
         }
 
         // Disk Cache
-        if (db != null && (!idealSafety || firstIdealCacheTime() <= startTime)) {
-            OnHeap<E> heap = new OnHeap(model, startTime, itemSize);
-            db.findBy(E::getId, x -> x.isOrMoreThan(startTime).isLessThan(startTime + itemSize * itemDuration)).to(item -> {
+        if (db != null && (!idealSafety || firstIdealCacheTime() <= segmentTime)) {
+            OnHeap<E> heap = new OnHeap(model, segmentTime, itemSize);
+            db.findBy(E::getId, x -> x.isOrMoreThan(segmentTime).isLessThan(segmentTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
                 heap.set((int) index[1], item);
             });
 
-            tryEvict(startTime);
-            indexed.put(startTime, heap);
+            tryEvict(segmentTime);
+            indexed.put(segmentTime, heap);
 
             // update managed cache time
             if (heap.size() != 0) {
@@ -837,7 +842,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
 
         // Not Found
-        return null;
+        return segment;
     }
 
     /**
