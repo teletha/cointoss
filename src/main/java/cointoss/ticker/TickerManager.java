@@ -215,9 +215,9 @@ public final class TickerManager implements Disposable {
         if (forceRebuild) {
             buildCache(start, end);
         } else {
-            FeatherStore<Tick> current = on(Span.Day).ticks;
-            Tick first = current.first();
-            Tick last = current.last();
+            FeatherStore<Tick> ticks = on(Span.Day).ticks;
+            Tick first = ticks.first();
+            Tick last = ticks.last();
 
             if (first == null && last == null) {
                 buildCache(start, end);
@@ -230,12 +230,12 @@ public final class TickerManager implements Disposable {
                     end = first.date();
                 }
 
-                if (start.toEpochSecond() < current.firstTime()) {
-                    buildCache(start, current.first().date());
+                if (start.toEpochSecond() < ticks.firstTime()) {
+                    buildCache(start, ticks.first().date());
                 }
 
-                if (current.lastTime() < end.toEpochSecond()) {
-                    buildCache(current.last().date(), end);
+                if (ticks.lastTime() < end.toEpochSecond()) {
+                    buildCache(ticks.last().date(), end);
                 }
             }
         }

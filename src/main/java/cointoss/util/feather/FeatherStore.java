@@ -573,15 +573,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Retrieve the item at {@link #firstIdealCacheTime()}.
-     * 
-     * @return
-     */
-    public E firstIdealCache() {
-        return at(firstIdealCacheTime());
-    }
-
-    /**
      * Clear all items from heap.
      */
     public void clear() {
@@ -804,24 +795,29 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * Load the data segment at the specified date and time.
      */
     private OnHeap<E> loadSegment(boolean readMode, long segmentTime, long segmentIndex) {
-        OnHeap<E> heap = indexed.get(segmentTime);
-        if (heap != null) {
+        OnHeap<E> segment = indexed.get(segmentTime);
+        if (segment != null) {
             // memory cache
 
             // If data outside the cached range is requested, an attempt is made to read the data.
             // However, only in read mode. In write mode, it does not re-read the data as it is
             // common to write outside the range and is likely to overwrite the DB data anyway.
-            if (readMode && (segmentIndex < heap.min || heap.max < segmentIndex)) {
-                return loadData(heap, readMode, segmentTime);
+            if (readMode && (segmentIndex < segment.min || segment.max < segmentIndex)) {
+                return loadData(segment, readMode);
             } else {
-                return heap;
+                return segment;
             }
         } else {
             // create new memory cache and load data if DB is enabled
-            heap = loadData(new OnHeap(model, segmentTime, itemSize), readMode, segmentTime);
+            OnHeap<E> heap = new OnHeap(model, segmentTime, itemSize);
+            loadData(heap, readMode);
+
+            if (readMode && heap.size() == 0) {
+                return null;
+            }
+
             tryEvict(segmentTime);
             indexed.put(segmentTime, heap);
-
             return heap;
         }
     }
@@ -829,9 +825,9 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /**
      * Load data on the specified segment from DB.
      */
-    private OnHeap<E> loadData(OnHeap<E> heap, boolean idealSafe, long segmentTime) {
-        if (db != null && (!idealSafe || firstIdealCacheTime() <= segmentTime)) {
-            db.findBy(E::getId, x -> x.isOrMoreThan(segmentTime).isLessThan(segmentTime + itemSize * itemDuration)).to(item -> {
+    private OnHeap<E> loadData(OnHeap<E> heap, boolean idealSafe) {
+        if (db != null && (!idealSafe || firstIdealCacheTime() <= heap.startTime)) {
+            db.findBy(E::getId, x -> x.isOrMoreThan(heap.startTime).isLessThan(heap.startTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
                 heap.set((int) index[1], item);
             });

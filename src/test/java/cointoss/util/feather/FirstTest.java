@@ -69,4 +69,5 @@ class FirstTest extends FeatherStoreTestBase {
         assert store.existOnHeap(value(3)) == false;
         assert store.first().value == 3;
     }
+
 }
