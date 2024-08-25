@@ -275,7 +275,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         long time = item.seconds();
         long[] index = index(time);
 
-        OnHeap<E> segment = retrieveSegment(false, index[0], index[1], time, false);
+        OnHeap<E> segment = loadSegment(false, index[0], index[1], time);
 
         if (segment == null) {
             segment = new OnHeap(model, index[0], itemSize);
@@ -405,7 +405,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
         long[] index = index(timestamp);
 
-        OnHeap<E> segment = retrieveSegment(true, index[0], index[1], timestamp, true);
+        OnHeap<E> segment = loadSegment(true, index[0], index[1], timestamp);
         if (segment == null) {
             return null;
         }
@@ -767,7 +767,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             if (forward) {
                 for (long time = segmentStart; time <= segmentEnd && 0 < remaining && !disposer.isDisposed(); time += segmentDuration) {
-                    OnHeap<E> heap = retrieveSegment(true, time, 0, time, true);
+                    OnHeap<E> heap = loadSegment(true, time, 0, time);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -776,7 +776,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             } else {
                 for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
-                    OnHeap<E> heap = retrieveSegment(true, time, 0, time, true);
+                    OnHeap<E> heap = loadSegment(true, time, 0, time);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -801,24 +801,24 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Get the data segment at the specified date and time.
+     * Load the data segment at the specified date and time.
      */
-    private OnHeap<E> retrieveSegment(boolean readMode, long segmentTime, long segmentIndex, long itemTime, boolean idealSafe) {
+    private OnHeap<E> loadSegment(boolean readMode, long segmentTime, long segmentIndex, long itemTime) {
         OnHeap<E> heap = indexed.get(segmentTime);
         if (heap != null) {
-            // from memory cache
+            // memory cache
 
             // If data outside the cached range is requested, an attempt is made to read the data.
             // However, only in read mode. In write mode, it does not re-read the data as it is
             // common to write outside the range and is likely to overwrite the DB data anyway.
             if (readMode && (segmentIndex < heap.min || heap.max < segmentIndex)) {
-                return loadSegmentFromDB(heap, segmentTime, idealSafe);
+                return loadData(heap, readMode, segmentTime);
             } else {
                 return heap;
             }
         } else {
-            // from disk cache, create new segement and load data, then cache it
-            heap = loadSegmentFromDB(new OnHeap(model, segmentTime, itemSize), segmentTime, idealSafe);
+            // create new memory cache and load data if DB is enabled
+            heap = loadData(new OnHeap(model, segmentTime, itemSize), readMode, segmentTime);
             tryEvict(segmentTime);
             indexed.put(segmentTime, heap);
 
@@ -829,7 +829,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /**
      * Load data on the specified segment from DB.
      */
-    private OnHeap<E> loadSegmentFromDB(OnHeap<E> heap, long segmentTime, boolean idealSafe) {
+    private OnHeap<E> loadData(OnHeap<E> heap, boolean idealSafe, long segmentTime) {
         if (db != null && (!idealSafe || firstIdealCacheTime() <= segmentTime)) {
             db.findBy(E::getId, x -> x.isOrMoreThan(segmentTime).isLessThan(segmentTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
