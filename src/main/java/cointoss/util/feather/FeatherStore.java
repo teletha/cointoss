@@ -457,7 +457,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * Get the date and time of the last element from all stored data, including secondary cache.
      * 
      * @return
-     * @see #last()
      */
     public long lastTime() {
         if (lastHeap == LAST_INIT) {

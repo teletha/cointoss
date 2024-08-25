@@ -9,17 +9,17 @@
  */
 package cointoss.ticker;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
+import cointoss.util.Chrono;
 
 class TickerTest extends TickerTestSupport {
 
     @Test
-    @Disabled
     void open() {
         Ticker ticker = manager.on(Span.Minute1);
         List<Tick> open = ticker.open.toList();
@@ -61,5 +61,13 @@ class TickerTest extends TickerTestSupport {
         assert close.size() == 2;
         manager.update(Execution.with.buy(1).price(10).date(afterMinute(3)));
         assert close.size() == 3;
+    }
+
+    @Test
+    void latestIsLastCache() {
+        ZonedDateTime start = Chrono.utc(2020, 1, 1);
+        ZonedDateTime end = Chrono.utc(2020, 1, 7);
+
+        manager.generateTicker(start, end, Span.Minute1);
     }
 }

@@ -148,7 +148,7 @@ public class Chart extends Region {
 
             long seconds = ticker.span.seconds;
             axisX.logicalMinValue.set(ticker.ticks.firstCache().openTime());
-            axisX.logicalMaxValue.set(ticker.ticks.lastCache().openTime());
+            axisX.logicalMaxValue.set(ticker.latest().openTime());
             axisX.visibleMinRange.set(minimumTickNumber.doubleValue() * seconds);
             axisX.visibleMaxRange.set(maximumTickNumber.doubleValue() * seconds);
             axisX.zoom();

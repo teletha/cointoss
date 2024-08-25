@@ -17,6 +17,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.execution.LogType;
+import cointoss.util.Chrono;
 import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.Disposable;
@@ -24,7 +25,7 @@ import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
-public final class TickerManager implements Disposable {
+public class TickerManager implements Disposable {
 
     /** The latest execution. */
     public final Variable<Execution> latest = Variable.of(Market.BASE);
@@ -216,26 +217,18 @@ public final class TickerManager implements Disposable {
             buildCache(start, end);
         } else {
             FeatherStore<Tick> ticks = on(Span.Day).ticks;
-            Tick first = ticks.first();
-            Tick last = ticks.last();
+            long firstTime = ticks.firstTime();
+            long lastTime = ticks.lastTime();
 
-            if (first == null && last == null) {
+            if (firstTime == -1 && lastTime == -1) {
                 buildCache(start, end);
             } else {
-                if (start == null && last != null) {
-                    start = last.date();
+                if (start.toEpochSecond() < firstTime) {
+                    buildCache(start, Chrono.utcBySeconds(firstTime));
                 }
 
-                if (end == null && first != null) {
-                    end = first.date();
-                }
-
-                if (start.toEpochSecond() < ticks.firstTime()) {
-                    buildCache(start, ticks.first().date());
-                }
-
-                if (ticks.lastTime() < end.toEpochSecond()) {
-                    buildCache(ticks.last().date(), end);
+                if (lastTime < end.toEpochSecond()) {
+                    buildCache(Chrono.utcBySeconds(lastTime), end);
                 }
             }
         }

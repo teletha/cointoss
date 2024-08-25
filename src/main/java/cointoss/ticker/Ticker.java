@@ -131,6 +131,13 @@ public final class Ticker implements Disposable {
     }
 
     /**
+     * Get the latest tick.
+     */
+    public Tick latest() {
+        return current;
+    }
+
+    /**
      * Try to fill ticks.
      */
     public void requestFill() {

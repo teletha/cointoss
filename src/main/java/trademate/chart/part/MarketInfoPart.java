@@ -9,17 +9,16 @@
  */
 package trademate.chart.part;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-
 import cointoss.CurrencySetting;
 import cointoss.analyze.OnlineStats;
 import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import hypatia.Primitives;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import kiss.I;
 import kiss.Variable;
 import trademate.chart.ChartCanvas;
@@ -80,9 +79,9 @@ public class MarketInfoPart extends ChartPart {
                             .roundString(spread, base.scale), ChartCanvas.chartInfoLeftPadding + offset, verticalOffset);
 
                     OnlineStats volatilityStats = parent.chart.ticker.v.spreadStats;
-                    Tick last = parent.chart.ticker.v.ticks.lastCache();
-                    if (last != null) {
-                        double volatility = last.spread();
+                    Tick latest = parent.chart.ticker.v.latest();
+                    if (latest != null) {
+                        double volatility = latest.spread();
                         c.setFill(volatilityStats.calculateSigma(volatility) <= 2 ? textColor : WarningColor);
                         c.fillText(VolatilityLabel.v + " " + Primitives.roundString(volatility, base.scale) + " (" + Primitives
                                 .roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives.roundString(volatilityStats

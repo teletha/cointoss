@@ -12,12 +12,15 @@ package cointoss.ticker;
 import java.time.ZonedDateTime;
 
 import cointoss.execution.Execution;
+import cointoss.market.TestableMarketService;
 import cointoss.util.Chrono;
 import cointoss.util.TimebaseSupport;
 
 public class TickerTestSupport implements TimebaseSupport {
 
-    protected final TickerManager manager = new TickerManager();
+    protected final TestableMarketService service = new TestableMarketService();
+
+    protected final TestableTickerManager manager = new TestableTickerManager(service);
 
     /**
      * Build {@link Ticker} simply with your values.
