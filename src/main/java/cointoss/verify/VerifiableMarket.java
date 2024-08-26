@@ -20,13 +20,12 @@ import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.orderbook.OrderBookManager;
-import kiss.I;
 import kiss.Signal;
 
 public class VerifiableMarket extends Market {
 
     static {
-        I.env("typewriter.sqlite", "jdbc:sqlite:file:memdb?mode=memory&cache=shared");
+        // I.env("typewriter.sqlite", "jdbc:sqlite:file:memdb?mode=memory&cache=shared");
     }
 
     /** Hide super class field. */

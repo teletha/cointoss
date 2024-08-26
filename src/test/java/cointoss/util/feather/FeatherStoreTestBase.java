@@ -29,7 +29,7 @@ class FeatherStoreTestBase {
     protected static final int days = 60 * 60 * 24;
 
     @RegisterExtension
-    CleanRoom room = new CleanRoom(true);
+    CleanRoom room = new CleanRoom();
 
     protected final File databaseFile() {
         return Locator.file(room.locateRadom());

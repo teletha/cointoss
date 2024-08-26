@@ -75,12 +75,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /** The date-time of last item on heap. */
     private long lastHeap = LAST_INIT;
 
-    /** The date-time of first item on disk. */
-    private long firstDisk = FIRST_INIT;
-
-    /** The date-time of last item on disk. */
-    private long lastDisk = LAST_INIT;
-
     /** The disk store. */
     private RDB<E> db;
 
@@ -145,7 +139,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public synchronized FeatherStore<E> enablePersistence(JobType autoCommitJob, MarketService service, Object... qualifers) {
         db = RDB.of(model.type, qualifers);
-        updateMeta();
 
         if (autoCommitJob != null) {
             auto = autoCommitJob;
@@ -333,22 +326,14 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Update metadata.
-     */
-    public void updateMeta() {
-        if (db != null) {
-            firstDisk = computeFirstDiskTime();
-            lastDisk = computeLastDiskTime();
-        }
-    }
-
-    /**
      * Get the date and time of the first element from all stored data, including secondary
      * cache.This store without items will return -1.
      * 
      * @return
      */
     public long firstTime() {
+        long firstDisk = computeFirstDiskTime();
+
         if (firstHeap == FIRST_INIT) {
             return firstDisk == FIRST_INIT ? -1 : firstDisk;
         } else {
@@ -363,6 +348,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public long lastTime() {
+        long lastDisk = computeLastDiskTime();
+
         if (lastHeap == LAST_INIT) {
             return lastDisk == LAST_INIT ? -1 : lastDisk;
         } else {
@@ -399,7 +386,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (db == null) {
             return FIRST_INIT;
         }
-    
+
         Variable<Long> first = db.min(E::getId);
         return first.isAbsent() ? FIRST_INIT : first.v;
     }
@@ -413,7 +400,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (db == null) {
             return LAST_INIT;
         }
-    
+
         Variable<Long> last = db.max(E::getId);
         return last.isAbsent() ? LAST_INIT : last.v;
     }
@@ -427,7 +414,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (indexed.isEmpty()) {
             return -1;
         }
-    
+
         return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
     }
 
@@ -787,14 +774,14 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (model != other.model) {
             throw new IllegalArgumentException("Invalid models [" + model.type + "] and [" + other.model.type + "]");
         }
-    
+
         if (itemDuration != other.itemDuration) {
             throw new IllegalArgumentException("Different time span [" + itemDuration + "] and [" + other.itemDuration + "]");
         }
-    
+
         for (LongEntry<OnHeap<E>> entry : other.indexed.longEntrySet()) {
             tryEvict(entry.getLongKey());
-    
+
             OnHeap<E> merged = indexed.get(entry.getLongKey());
             if (merged == null) {
                 indexed.put(entry.getLongKey(), entry.getValue());
@@ -809,7 +796,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 merged.modified = true;
             }
         }
-    
+
         if (firstHeap == FIRST_INIT || other.firstHeap < firstHeap) {
             firstHeap = other.firstHeap;
         }
@@ -827,7 +814,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             segment.clear();
         }
         indexed.clear();
-    
+
         firstHeap = FIRST_INIT;
         lastHeap = LAST_INIT;
     }
@@ -845,7 +832,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                     value.modified = false;
                 }
             }
-            updateMeta();
         }
     }
 
