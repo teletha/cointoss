@@ -36,12 +36,6 @@ import typewriter.rdb.RDB;
 
 public final class FeatherStore<E extends IdentifiableModel & Timelinable> implements Disposable {
 
-    /** The initial value. */
-    private static final long FIRST_INIT = Long.MAX_VALUE;
-
-    /** The initial value. */
-    private static final long LAST_INIT = Long.MIN_VALUE;
-
     /** The item type. */
     private final Model<E> model;
 
@@ -69,6 +63,13 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /** The data interpolation. */
     private int interpolation;
 
+    /** The initial value. */
+    private static final long FIRST_INIT = Long.MAX_VALUE;
+
+    /** The initial value. */
+    private static final long LAST_INIT = Long.MIN_VALUE;
+
+    /** The date-time of last item on heap. */
     private long firstHeap = FIRST_INIT;
 
     /** The date-time of last item on heap. */
@@ -363,7 +364,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             }
         }
 
-        if (firstHeap == Long.MAX_VALUE || other.firstHeap < firstHeap) {
+        if (firstHeap == FIRST_INIT || other.firstHeap < firstHeap) {
             firstHeap = other.firstHeap;
         }
         if (lastHeap == 0 || lastHeap < other.lastHeap) {
@@ -426,56 +427,42 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public void updateMeta() {
         if (db != null) {
-            firstDisk = firstDiskTime();
-            lastDisk = lastDiskTime();
+            firstDisk = computeFirstDiskTime();
+            lastDisk = computeLastDiskTime();
         }
     }
 
     /**
-     * Get the date and time of the first element from all stored data, including secondary cache.
+     * Get the date and time of the first element from all stored data, including secondary
+     * cache.This store without items will return -1.
      * 
      * @return
-     * @see #first()
      */
     public long firstTime() {
         if (firstHeap == FIRST_INIT) {
-            if (firstDisk == FIRST_INIT) {
-                return -1;
-            } else {
-                return firstDisk;
-            }
+            return firstDisk == FIRST_INIT ? -1 : firstDisk;
         } else {
-            if (firstDisk == FIRST_INIT) {
-                return firstHeap;
-            } else {
-                return firstHeap < firstDisk ? firstHeap : firstDisk;
-            }
+            return firstDisk == FIRST_INIT || firstHeap < firstDisk ? firstHeap : firstDisk;
         }
     }
 
     /**
      * Get the date and time of the last element from all stored data, including secondary cache.
+     * This store without items will return -1.
      * 
      * @return
      */
     public long lastTime() {
         if (lastHeap == LAST_INIT) {
-            if (lastDisk == LAST_INIT) {
-                return -1;
-            } else {
-                return lastDisk;
-            }
+            return lastDisk == LAST_INIT ? -1 : lastDisk;
         } else {
-            if (lastDisk == LAST_INIT) {
-                return lastHeap;
-            } else {
-                return lastHeap < lastDisk ? lastDisk : lastHeap;
-            }
+            return lastDisk == LAST_INIT || lastDisk < lastHeap ? lastHeap : lastDisk;
         }
     }
 
     /**
-     * Retrieves the time of the first element from the memory cache only.
+     * Retrieves the time of the first element from the memory cache only. This store without items
+     * will return -1.
      * 
      * @return
      */
@@ -484,7 +471,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Retrieves the time of the last element from the memory cache only.
+     * Retrieves the time of the last element from the memory cache only. This store without items
+     * will return -1.
      * 
      * @return
      */
@@ -493,24 +481,11 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Compute the first segment time logically in the current state.
-     * 
-     * @return
-     */
-    public long firstIdealCacheTime() {
-        if (indexed.isEmpty()) {
-            return -1;
-        }
-
-        return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
-    }
-
-    /**
      * Compute the time of first item on disk.
      * 
      * @return
      */
-    private long firstDiskTime() {
+    private long computeFirstDiskTime() {
         if (db == null) {
             return FIRST_INIT;
         }
@@ -524,13 +499,26 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * 
      * @return
      */
-    private long lastDiskTime() {
+    private long computeLastDiskTime() {
         if (db == null) {
             return LAST_INIT;
         }
 
         Variable<Long> last = db.max(E::getId);
         return last.isAbsent() ? LAST_INIT : last.v;
+    }
+
+    /**
+     * Compute the first segment time logically in the current state.
+     * 
+     * @return
+     */
+    public long computeLogicalFirstCacheTime() {
+        if (indexed.isEmpty()) {
+            return -1;
+        }
+
+        return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
     }
 
     /**
@@ -569,15 +557,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public E lastCache() {
         return at(lastCacheTime());
-    }
-
-    /**
-     * Retrieve the item at {@link #firstIdealCacheTime()}.
-     * 
-     * @return
-     */
-    public E firstIdealCache() {
-        return at(firstIdealCacheTime());
     }
 
     /**
@@ -834,7 +813,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * Load data on the specified segment from DB.
      */
     private OnHeap<E> loadData(OnHeap<E> heap, boolean idealSafe) {
-        if (db != null && (!idealSafe || firstIdealCacheTime() <= heap.startTime)) {
+        if (db != null && (!idealSafe || computeLogicalFirstCacheTime() <= heap.startTime)) {
             db.findBy(E::getId, x -> x.isOrMoreThan(heap.startTime).isLessThan(heap.startTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
                 heap.set((int) index[1], item);
@@ -983,8 +962,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 .append("  item: " + size() + "/" + (itemSize * segmentSize))
                 .append("  first: " + (0 <= firstTime() ? Instant.ofEpochSecond(firstTime()) : "NoData"))
                 .append("  last: " + (0 <= lastTime() ? Instant.ofEpochSecond(lastTime()) : "NoData"))
-                .append("  diskFirst: " + (firstDiskTime() != FIRST_INIT ? Instant.ofEpochSecond(firstDiskTime()) : "NoData"))
-                .append("  diskLast: " + (lastDiskTime() != LAST_INIT ? Instant.ofEpochSecond(lastDiskTime()) : "NoData"))
+                .append("  diskFirst: " + (computeFirstDiskTime() != FIRST_INIT ? Instant.ofEpochSecond(computeFirstDiskTime()) : "NoData"))
+                .append("  diskLast: " + (computeLastDiskTime() != LAST_INIT ? Instant.ofEpochSecond(computeLastDiskTime()) : "NoData"))
                 .append("  keys: " + indexed.entrySet()
                         .stream()
                         .map(e -> Instant.ofEpochSecond(e.getKey()) + "(" + e.getValue().size() + ")")
