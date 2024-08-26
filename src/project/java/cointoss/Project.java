@@ -21,7 +21,6 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "icymanipulator").atAnnotation();
         require("com.github.teletha", "antibug").atTest();
         require("com.pgs-soft", "HttpClientMock").atTest();
-        require("com.google.jimfs", "jimfs").atTest();
         require("org.decimal4j", "decimal4j").atTest();
         require("org.apache.commons", "commons-lang3");
         require("commons-net", "commons-net");

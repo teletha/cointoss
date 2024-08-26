@@ -24,10 +24,6 @@ import kiss.Signal;
 
 public class VerifiableMarket extends Market {
 
-    static {
-        // I.env("typewriter.sqlite", "jdbc:sqlite:file:memdb?mode=memory&cache=shared");
-    }
-
     /** Hide super class field. */
     public final VerifiableMarketService service;
 
