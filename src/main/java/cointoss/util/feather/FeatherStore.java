@@ -333,96 +333,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Import time series items from other store.
-     * 
-     * @param other Time series store.
-     */
-    public void merge(FeatherStore<E> other) {
-        if (model != other.model) {
-            throw new IllegalArgumentException("Invalid models [" + model.type + "] and [" + other.model.type + "]");
-        }
-
-        if (itemDuration != other.itemDuration) {
-            throw new IllegalArgumentException("Different time span [" + itemDuration + "] and [" + other.itemDuration + "]");
-        }
-
-        for (LongEntry<OnHeap<E>> entry : other.indexed.longEntrySet()) {
-            tryEvict(entry.getLongKey());
-
-            OnHeap<E> merged = indexed.get(entry.getLongKey());
-            if (merged == null) {
-                indexed.put(entry.getLongKey(), entry.getValue());
-            } else {
-                OnHeap<E> merging = entry.getValue();
-                for (int i = 0; i < merging.items.length; i++) {
-                    E e = merging.items[i];
-                    if (e != null) {
-                        merged.set(i, e);
-                    }
-                }
-                merged.modified = true;
-            }
-        }
-
-        if (firstHeap == FIRST_INIT || other.firstHeap < firstHeap) {
-            firstHeap = other.firstHeap;
-        }
-        if (lastHeap == 0 || lastHeap < other.lastHeap) {
-            lastHeap = other.lastHeap;
-        }
-        other.indexed.clear();
-    }
-
-    /**
-     * Get the item for the specified timestamp (epoch seconds).
-     * 
-     * @param timestamp A time stamp.
-     * @return
-     */
-    public E at(Timelinable timestamp) {
-        return at(timestamp.seconds());
-    }
-
-    /**
-     * Get the item for the specified date.
-     * 
-     * @param date
-     * @return
-     */
-    public E at(ZonedDateTime date) {
-        return at(date.toEpochSecond());
-    }
-
-    /**
-     * Get the item for the specified timestamp (epoch seconds).
-     * 
-     * @param timestamp A time stamp.
-     * @return
-     */
-    public E at(long timestamp) {
-        if (timestamp < 0) {
-            return null;
-        }
-
-        long[] index = index(timestamp);
-
-        OnHeap<E> segment = loadSegment(true, index[0], index[1]);
-        if (segment == null) {
-            return null;
-        }
-
-        E item = segment.get((int) index[1]);
-        if (item == null) {
-            if (0 < interpolation) {
-                for (int i = (int) index[1] - 1, j = interpolation; 0 <= i && 0 < j && item == null; i--, j--) {
-                    item = segment.get(i);
-                }
-            }
-        }
-        return item;
-    }
-
-    /**
      * Update metadata.
      */
     public void updateMeta() {
@@ -489,7 +399,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (db == null) {
             return FIRST_INIT;
         }
-
+    
         Variable<Long> first = db.min(E::getId);
         return first.isAbsent() ? FIRST_INIT : first.v;
     }
@@ -503,7 +413,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (db == null) {
             return LAST_INIT;
         }
-
+    
         Variable<Long> last = db.max(E::getId);
         return last.isAbsent() ? LAST_INIT : last.v;
     }
@@ -517,7 +427,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (indexed.isEmpty()) {
             return -1;
         }
-
+    
         return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
     }
 
@@ -560,16 +470,52 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
-     * Clear all items from heap.
+     * Get the item for the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp A time stamp.
+     * @return
      */
-    public void clear() {
-        for (OnHeap segment : indexed.values()) {
-            segment.clear();
-        }
-        indexed.clear();
+    public E at(Timelinable timestamp) {
+        return at(timestamp.seconds());
+    }
 
-        firstHeap = FIRST_INIT;
-        lastHeap = LAST_INIT;
+    /**
+     * Get the item for the specified date.
+     * 
+     * @param date
+     * @return
+     */
+    public E at(ZonedDateTime date) {
+        return at(date.toEpochSecond());
+    }
+
+    /**
+     * Get the item for the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp A time stamp.
+     * @return
+     */
+    public E at(long timestamp) {
+        if (timestamp < 0) {
+            return null;
+        }
+
+        long[] index = index(timestamp);
+
+        OnHeap<E> segment = loadSegment(true, index[0], index[1]);
+        if (segment == null) {
+            return null;
+        }
+
+        E item = segment.get((int) index[1]);
+        if (item == null) {
+            if (0 < interpolation) {
+                for (int i = (int) index[1] - 1, j = interpolation; 0 <= i && 0 < j && item == null; i--, j--) {
+                    item = segment.get(i);
+                }
+            }
+        }
+        return item;
     }
 
     /**
@@ -830,6 +776,60 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             }
         }
         return heap;
+    }
+
+    /**
+     * Import time series items from other store.
+     * 
+     * @param other Time series store.
+     */
+    public void merge(FeatherStore<E> other) {
+        if (model != other.model) {
+            throw new IllegalArgumentException("Invalid models [" + model.type + "] and [" + other.model.type + "]");
+        }
+    
+        if (itemDuration != other.itemDuration) {
+            throw new IllegalArgumentException("Different time span [" + itemDuration + "] and [" + other.itemDuration + "]");
+        }
+    
+        for (LongEntry<OnHeap<E>> entry : other.indexed.longEntrySet()) {
+            tryEvict(entry.getLongKey());
+    
+            OnHeap<E> merged = indexed.get(entry.getLongKey());
+            if (merged == null) {
+                indexed.put(entry.getLongKey(), entry.getValue());
+            } else {
+                OnHeap<E> merging = entry.getValue();
+                for (int i = 0; i < merging.items.length; i++) {
+                    E e = merging.items[i];
+                    if (e != null) {
+                        merged.set(i, e);
+                    }
+                }
+                merged.modified = true;
+            }
+        }
+    
+        if (firstHeap == FIRST_INIT || other.firstHeap < firstHeap) {
+            firstHeap = other.firstHeap;
+        }
+        if (lastHeap == 0 || lastHeap < other.lastHeap) {
+            lastHeap = other.lastHeap;
+        }
+        other.indexed.clear();
+    }
+
+    /**
+     * Clear all items from heap.
+     */
+    public void clear() {
+        for (OnHeap segment : indexed.values()) {
+            segment.clear();
+        }
+        indexed.clear();
+    
+        firstHeap = FIRST_INIT;
+        lastHeap = LAST_INIT;
     }
 
     /**
