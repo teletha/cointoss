@@ -399,7 +399,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (db == null) {
             return FIRST_INIT;
         }
-    
+
         Variable<Long> first = db.min(E::getId);
         return first.isAbsent() ? FIRST_INIT : first.v;
     }
@@ -413,7 +413,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (db == null) {
             return LAST_INIT;
         }
-    
+
         Variable<Long> last = db.max(E::getId);
         return last.isAbsent() ? LAST_INIT : last.v;
     }
@@ -427,7 +427,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (indexed.isEmpty()) {
             return -1;
         }
-    
+
         return indexed.lastLongKey() - segmentDuration * (segmentSize - 1);
     }
 
@@ -787,14 +787,14 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (model != other.model) {
             throw new IllegalArgumentException("Invalid models [" + model.type + "] and [" + other.model.type + "]");
         }
-    
+
         if (itemDuration != other.itemDuration) {
             throw new IllegalArgumentException("Different time span [" + itemDuration + "] and [" + other.itemDuration + "]");
         }
-    
+
         for (LongEntry<OnHeap<E>> entry : other.indexed.longEntrySet()) {
             tryEvict(entry.getLongKey());
-    
+
             OnHeap<E> merged = indexed.get(entry.getLongKey());
             if (merged == null) {
                 indexed.put(entry.getLongKey(), entry.getValue());
@@ -809,7 +809,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 merged.modified = true;
             }
         }
-    
+
         if (firstHeap == FIRST_INIT || other.firstHeap < firstHeap) {
             firstHeap = other.firstHeap;
         }
@@ -827,7 +827,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             segment.clear();
         }
         indexed.clear();
-    
+
         firstHeap = FIRST_INIT;
         lastHeap = LAST_INIT;
     }

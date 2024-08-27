@@ -237,6 +237,9 @@ public class TickerManager implements Disposable {
     private void buildCache(ZonedDateTime start, ZonedDateTime end) {
         I.info("Building ticker data on " + service + " from " + start + " to " + end + ".");
 
-        service.log.range(start, end, LogType.Fast).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP);
+        service.log.range(start, end, LogType.Fast)
+                .effectOnDispose(() -> I.signal(tickers).to(t -> t.ticks.updateMeta()))
+                .effectOnLifecycle(new TickerBuilder(service))
+                .to(I.NoOP);
     }
 }
