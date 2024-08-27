@@ -1,5 +1,57 @@
 # Changelog
 
+## [1.7.0](https://github.com/teletha/cointoss/compare/v1.6.0...v1.7.0) (2024-08-27)
+
+
+### Features
+
+* accept canceling order from server ([9053111](https://github.com/teletha/cointoss/commit/9053111c0787e9ba1afa6e173ce9dc656ba40d5f))
+* add Chrono#range(startDate, endDate) ([a8330fc](https://github.com/teletha/cointoss/commit/a8330fc4cbd423e8324879a8600da488cbb60ee6))
+* Add FeatherStore#firstCacheTime and #lastCacheTime. ([84c0a27](https://github.com/teletha/cointoss/commit/84c0a277100c8229f222e0894de9aa09108cff5f))
+* change minimum span ([2a0df65](https://github.com/teletha/cointoss/commit/2a0df65c6f31963f2f28208a8bc46012a656db22))
+* detect maintenance on GMO ([325f1f6](https://github.com/teletha/cointoss/commit/325f1f65b817a35b557cbe9e2dbed89b283b43fc))
+* detects network related error types ([8d35879](https://github.com/teletha/cointoss/commit/8d35879145939c7b82eff1b90ee72c9dd2726726))
+* dispose oi ralated system ([219a693](https://github.com/teletha/cointoss/commit/219a6939ac85d680d804206b3a916e35f8f74455))
+* extract Job class ([a3d0123](https://github.com/teletha/cointoss/commit/a3d0123ba9fadfd251d9bc420270c4d3abafd81a))
+* FeatherStore removes bulk data supplier ([134fd02](https://github.com/teletha/cointoss/commit/134fd02d76dbbbb82a5fefdc66e93f3b0eb6d6d8))
+* FeatherStore removes data suppliers ([c03effa](https://github.com/teletha/cointoss/commit/c03effa0f83bb3990cb6e07d41c82953376e4684))
+* FeatherStore uses database instead of special disk cache. ([cfec3d7](https://github.com/teletha/cointoss/commit/cfec3d789e9a714210abc9b6fa2fb8f7160a27d4))
+* fill ticks automatically in trading view ([5cd0a1c](https://github.com/teletha/cointoss/commit/5cd0a1cdb17bf6a94c44fb1485670d23d1d62833))
+* fill ticks from db ([09679bd](https://github.com/teletha/cointoss/commit/09679bda11127f0ead5a9e556c55a126d42448c6))
+* load past ticker automatically ([ae810ad](https://github.com/teletha/cointoss/commit/ae810ade0d966fe178413ca8890f36ce3060fd3a))
+* Provide fast price matching engine. ([51c1d62](https://github.com/teletha/cointoss/commit/51c1d625f0e25bf09b61ff83095a4b5022b70562))
+* remove compounded info on OrderManager ([6693ad6](https://github.com/teletha/cointoss/commit/6693ad6ac24857c17f2b09fe6894c49186a4df72))
+* remove SFD on BitFlyer ([b80d041](https://github.com/teletha/cointoss/commit/b80d041f8feaf59cc632a2d9f1c49f83fb5a0552))
+* remove span for second ([d520ee8](https://github.com/teletha/cointoss/commit/d520ee8abbe7a18c736297628af4d2515b057c28))
+* remove Span.Week ([15ad3e0](https://github.com/teletha/cointoss/commit/15ad3e0ada7e46ef039c836d27a8de8db03d9b17))
+* replace Span.Day7 with Span.Week ([6d327be](https://github.com/teletha/cointoss/commit/6d327bee99bf1548a95b7b5cd8264c91f9393720))
+* Span#Minute1 doesn't save tickers. ([f9324a2](https://github.com/teletha/cointoss/commit/f9324a24d12a1eabe78c5d55ebea7780ee30e902))
+* support cancelAll on verification ([c3f3a89](https://github.com/teletha/cointoss/commit/c3f3a896e6991557210638db679237be024bb7bb))
+* support various network related errors ([e158ee0](https://github.com/teletha/cointoss/commit/e158ee0b272afb3053ecb33f238e6ac3bf222e8e))
+* update sinobu ([062bc50](https://github.com/teletha/cointoss/commit/062bc507b1c29668d674257cd3e9b07d600c412c))
+
+
+### Bug Fixes
+
+* change segment size ([938f093](https://github.com/teletha/cointoss/commit/938f09381dc52474dcd84ab9aaa010aa802d348d))
+* CompactLog tests randomly fail. ([ec67cff](https://github.com/teletha/cointoss/commit/ec67cff390b463b32a6f2df4159fbdcea3496352))
+* DiskStorage can read data from out of stored range. ([05d37a1](https://github.com/teletha/cointoss/commit/05d37a166f4a4c78a991dcebc5de1de0979a535e))
+* FeatherStore#supply requires read/write mode. ([62bd8ac](https://github.com/teletha/cointoss/commit/62bd8ac815267c759dd0b05c97dd669e148b2291))
+* GMOService uses NetworkError ([3c0250a](https://github.com/teletha/cointoss/commit/3c0250a0ccf857fc2700cec9b1d911786ed5e8f5))
+* hide empty liquidation on global volume view ([dad8f25](https://github.com/teletha/cointoss/commit/dad8f252c190ec035cc2a8756738022595d26013))
+* make x-axis label more readable ([16d151a](https://github.com/teletha/cointoss/commit/16d151a191c6c2058b4fec3883d21b62f8142667))
+* notify tick with empty volume ([bb44be1](https://github.com/teletha/cointoss/commit/bb44be11d341259de81fb75b5fa80ec733bc4414))
+* prevent order duplication ([a01d988](https://github.com/teletha/cointoss/commit/a01d988467d730cef935a29f3570acbcdbd22398))
+* PriceEnegine supports multiple actions on same price ([c2196a3](https://github.com/teletha/cointoss/commit/c2196a30748c119562eac9e891db0ab255a24868))
+* refactoring ([de6eaee](https://github.com/teletha/cointoss/commit/de6eaee9bfc35b6f0708fcee9fd4d947bd24647c))
+* refactoring FeatherStore#supply ([e51d46c](https://github.com/teletha/cointoss/commit/e51d46c3a7abd4a90bb56dcd5ce46f81c3ee0a44))
+* suppress errors ([343f171](https://github.com/teletha/cointoss/commit/343f171ff59106afa7c0c6ce171c8cd9472f7408))
+* test half exit ([07b359a](https://github.com/teletha/cointoss/commit/07b359a2afa31e77384972a5b371d4de658815e1))
+* ticker freeze close price when fast log conversion ([7b8695b](https://github.com/teletha/cointoss/commit/7b8695ba24fd2b3edb1a0a328ff15b8f059eb7ee))
+* update bytebuddy ([1f5724f](https://github.com/teletha/cointoss/commit/1f5724fe4eed2c081847708928a0b241e8e7157e))
+* update error on bitflyer ([89d3c15](https://github.com/teletha/cointoss/commit/89d3c1549327af8c6fcf24fd1db7ef897983dbb4))
+* update typewriter ([76f3629](https://github.com/teletha/cointoss/commit/76f3629fcc8c981096d8947d12576b890e95b458))
+
 ## [1.6.0](https://github.com/teletha/cointoss/compare/v1.5.0...v1.6.0) (2024-04-01)
 
 
