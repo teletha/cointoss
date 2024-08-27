@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="T">
-		<header class="Y">
-			<h1 class="g" date="2024-04-01" ver="1.6.0"><code>Cointoss</code></h1>
-			<nav class="H"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="H">
+		<header class="l">
+			<h1 class="h" date="2024-04-01" ver="1.7.0"><code>Cointoss</code></h1>
+			<nav class="Z"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="b" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="k" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,29 +31,168 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="X">
-			<nav class="a">
+		<main class="m">
+			<nav class="N">
 				<div></div>
 			</nav>
-			<article class="l" id="Article">
-				<section class="m B" id="1.6.0(2024-04-01)">
+			<article class="W" id="Article">
+				<section class="K B" id="1.7.0(2024-08-27)">
 					<header class="B P">
-						<h2>1.6.0 (2024-04-01)</h2>
-						<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+						<h2>1.7.0 (2024-08-27)</h2>
+						<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
 					<section class="B O" id="Features">
-						<header class="B M">
+						<header class="B i">
 							<h3>Features</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#twitter"/>
+									</svg>
+								</a></div>
+						</header>
+						<ul>
+
+							<li>accept canceling order from server (<a href="https://github.com/teletha/cointoss/commit/9053111c0787e9ba1afa6e173ce9dc656ba40d5f">9053111</a>)</li>
+
+							<li>add Chrono#range(startDate, endDate) (<a href="https://github.com/teletha/cointoss/commit/a8330fc4cbd423e8324879a8600da488cbb60ee6">a8330fc</a>)</li>
+
+							<li>Add FeatherStore#firstCacheTime and #lastCacheTime. (<a href="https://github.com/teletha/cointoss/commit/84c0a277100c8229f222e0894de9aa09108cff5f">84c0a27</a>)</li>
+
+							<li>change minimum span (<a href="https://github.com/teletha/cointoss/commit/2a0df65c6f31963f2f28208a8bc46012a656db22">2a0df65</a>)</li>
+
+							<li>detect maintenance on GMO (<a href="https://github.com/teletha/cointoss/commit/325f1f65b817a35b557cbe9e2dbed89b283b43fc">325f1f6</a>)</li>
+
+							<li>detects network related error types (<a href="https://github.com/teletha/cointoss/commit/8d35879145939c7b82eff1b90ee72c9dd2726726">8d35879</a>)</li>
+
+							<li>dispose oi ralated system (<a href="https://github.com/teletha/cointoss/commit/219a6939ac85d680d804206b3a916e35f8f74455">219a693</a>)</li>
+
+							<li>extract Job class (<a href="https://github.com/teletha/cointoss/commit/a3d0123ba9fadfd251d9bc420270c4d3abafd81a">a3d0123</a>)</li>
+
+							<li>FeatherStore removes bulk data supplier (<a href="https://github.com/teletha/cointoss/commit/134fd02d76dbbbb82a5fefdc66e93f3b0eb6d6d8">134fd02</a>)</li>
+
+							<li>FeatherStore removes data suppliers (<a href="https://github.com/teletha/cointoss/commit/c03effa0f83bb3990cb6e07d41c82953376e4684">c03effa</a>)</li>
+
+							<li>FeatherStore uses database instead of special disk cache. (<a href="https://github.com/teletha/cointoss/commit/cfec3d789e9a714210abc9b6fa2fb8f7160a27d4">cfec3d7</a>)</li>
+
+							<li>fill ticks automatically in trading view (<a href="https://github.com/teletha/cointoss/commit/5cd0a1cdb17bf6a94c44fb1485670d23d1d62833">5cd0a1c</a>)</li>
+
+							<li>fill ticks from db (<a href="https://github.com/teletha/cointoss/commit/09679bda11127f0ead5a9e556c55a126d42448c6">09679bd</a>)</li>
+
+							<li>load past ticker automatically (<a href="https://github.com/teletha/cointoss/commit/ae810ade0d966fe178413ca8890f36ce3060fd3a">ae810ad</a>)</li>
+
+							<li>Provide fast price matching engine. (<a href="https://github.com/teletha/cointoss/commit/51c1d625f0e25bf09b61ff83095a4b5022b70562">51c1d62</a>)</li>
+
+							<li>remove compounded info on OrderManager (<a href="https://github.com/teletha/cointoss/commit/6693ad6ac24857c17f2b09fe6894c49186a4df72">6693ad6</a>)</li>
+
+							<li>remove SFD on BitFlyer (<a href="https://github.com/teletha/cointoss/commit/b80d041f8feaf59cc632a2d9f1c49f83fb5a0552">b80d041</a>)</li>
+
+							<li>remove span for second (<a href="https://github.com/teletha/cointoss/commit/d520ee8abbe7a18c736297628af4d2515b057c28">d520ee8</a>)</li>
+
+							<li>remove Span.Week (<a href="https://github.com/teletha/cointoss/commit/15ad3e0ada7e46ef039c836d27a8de8db03d9b17">15ad3e0</a>)</li>
+
+							<li>replace Span.Day7 with Span.Week (<a href="https://github.com/teletha/cointoss/commit/6d327bee99bf1548a95b7b5cd8264c91f9393720">6d327be</a>)</li>
+
+							<li>Span#Minute1 doesn&#39;t save tickers. (<a href="https://github.com/teletha/cointoss/commit/f9324a24d12a1eabe78c5d55ebea7780ee30e902">f9324a2</a>)</li>
+
+							<li>support cancelAll on verification (<a href="https://github.com/teletha/cointoss/commit/c3f3a896e6991557210638db679237be024bb7bb">c3f3a89</a>)</li>
+
+							<li>support various network related errors (<a href="https://github.com/teletha/cointoss/commit/e158ee0b272afb3053ecb33f238e6ac3bf222e8e">e158ee0</a>)</li>
+
+							<li>update sinobu (<a href="https://github.com/teletha/cointoss/commit/062bc507b1c29668d674257cd3e9b07d600c412c">062bc50</a>)</li>
+</ul>
+					</section>
+					<section class="B O" id="BugFixes">
+						<header class="B i">
+							<h3>Bug Fixes</h3>
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#copy"/>
+									</svg>
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#twitter"/>
+									</svg>
+								</a></div>
+						</header>
+						<ul>
+
+							<li>change segment size (<a href="https://github.com/teletha/cointoss/commit/938f09381dc52474dcd84ab9aaa010aa802d348d">938f093</a>)</li>
+
+							<li>CompactLog tests randomly fail. (<a href="https://github.com/teletha/cointoss/commit/ec67cff390b463b32a6f2df4159fbdcea3496352">ec67cff</a>)</li>
+
+							<li>DiskStorage can read data from out of stored range. (<a href="https://github.com/teletha/cointoss/commit/05d37a166f4a4c78a991dcebc5de1de0979a535e">05d37a1</a>)</li>
+
+							<li>FeatherStore#supply requires read/write mode. (<a href="https://github.com/teletha/cointoss/commit/62bd8ac815267c759dd0b05c97dd669e148b2291">62bd8ac</a>)</li>
+
+							<li>GMOService uses NetworkError (<a href="https://github.com/teletha/cointoss/commit/3c0250a0ccf857fc2700cec9b1d911786ed5e8f5">3c0250a</a>)</li>
+
+							<li>hide empty liquidation on global volume view (<a href="https://github.com/teletha/cointoss/commit/dad8f252c190ec035cc2a8756738022595d26013">dad8f25</a>)</li>
+
+							<li>make x-axis label more readable (<a href="https://github.com/teletha/cointoss/commit/16d151a191c6c2058b4fec3883d21b62f8142667">16d151a</a>)</li>
+
+							<li>notify tick with empty volume (<a href="https://github.com/teletha/cointoss/commit/bb44be11d341259de81fb75b5fa80ec733bc4414">bb44be1</a>)</li>
+
+							<li>prevent order duplication (<a href="https://github.com/teletha/cointoss/commit/a01d988467d730cef935a29f3570acbcdbd22398">a01d988</a>)</li>
+
+							<li>PriceEnegine supports multiple actions on same price (<a href="https://github.com/teletha/cointoss/commit/c2196a30748c119562eac9e891db0ab255a24868">c2196a3</a>)</li>
+
+							<li>refactoring (<a href="https://github.com/teletha/cointoss/commit/de6eaee9bfc35b6f0708fcee9fd4d947bd24647c">de6eaee</a>)</li>
+
+							<li>refactoring FeatherStore#supply (<a href="https://github.com/teletha/cointoss/commit/e51d46c3a7abd4a90bb56dcd5ce46f81c3ee0a44">e51d46c</a>)</li>
+
+							<li>suppress errors (<a href="https://github.com/teletha/cointoss/commit/343f171ff59106afa7c0c6ce171c8cd9472f7408">343f171</a>)</li>
+
+							<li>test half exit (<a href="https://github.com/teletha/cointoss/commit/07b359a2afa31e77384972a5b371d4de658815e1">07b359a</a>)</li>
+
+							<li>ticker freeze close price when fast log conversion (<a href="https://github.com/teletha/cointoss/commit/7b8695ba24fd2b3edb1a0a328ff15b8f059eb7ee">7b8695b</a>)</li>
+
+							<li>update bytebuddy (<a href="https://github.com/teletha/cointoss/commit/1f5724fe4eed2c081847708928a0b241e8e7157e">1f5724f</a>)</li>
+
+							<li>update error on bitflyer (<a href="https://github.com/teletha/cointoss/commit/89d3c1549327af8c6fcf24fd1db7ef897983dbb4">89d3c15</a>)</li>
+
+							<li>update typewriter (<a href="https://github.com/teletha/cointoss/commit/76f3629fcc8c981096d8947d12576b890e95b458">76f3629</a>)</li>
+</ul>
+					</section>
+					<section class="B O" id="Asserts">
+						<header class="B i">
+							<h3>Assets</h3>
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#copy"/>
+									</svg>
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#twitter"/>
+									</svg>
+								</a></div>
+						</header>
+						<ul>
+							<li><a href="https://github.com/teletha/cointoss/archive/refs/tags/v1.7.0.zip">Source code</a> (zip)</li>
+						</ul>
+					</section>
+				</section>
+				<section class="K B" id="1.6.0(2024-04-01)">
+					<header class="B P">
+						<h2>1.6.0 (2024-04-01)</h2>
+						<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
+									<use href="main.svg#copy"/>
+								</svg>
+							</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
+									<use href="main.svg#twitter"/>
+								</svg>
+							</a></div>
+					</header>
+					<section class="B O" id="Features">
+						<header class="B i">
+							<h3>Features</h3>
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#copy"/>
+									</svg>
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -70,12 +209,12 @@
 </ul>
 					</section>
 					<section class="B O" id="BugFixes">
-						<header class="B M">
+						<header class="B i">
 							<h3>Bug Fixes</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -96,12 +235,12 @@
 </ul>
 					</section>
 					<section class="B O" id="Asserts">
-						<header class="B M">
+						<header class="B i">
 							<h3>Assets</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -111,24 +250,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="m B" id="1.5.0(2024-03-28)">
+				<section class="K B" id="1.5.0(2024-03-28)">
 					<header class="B P">
 						<h2>1.5.0 (2024-03-28)</h2>
-						<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
 					<section class="B O" id="Features">
-						<header class="B M">
+						<header class="B i">
 							<h3>Features</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -193,12 +332,12 @@
 </ul>
 					</section>
 					<section class="B O" id="BugFixes">
-						<header class="B M">
+						<header class="B i">
 							<h3>Bug Fixes</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -245,12 +384,12 @@
 </ul>
 					</section>
 					<section class="B O" id="Asserts">
-						<header class="B M">
+						<header class="B i">
 							<h3>Assets</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -260,24 +399,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="m B" id="1.4.0(2023-12-02)">
+				<section class="K B" id="1.4.0(2023-12-02)">
 					<header class="B P">
 						<h2>1.4.0 (2023-12-02)</h2>
-						<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
 					<section class="B O" id="Features">
-						<header class="B M">
+						<header class="B i">
 							<h3>Features</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -300,12 +439,12 @@
 </ul>
 					</section>
 					<section class="B O" id="BugFixes">
-						<header class="B M">
+						<header class="B i">
 							<h3>Bug Fixes</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -364,12 +503,12 @@
 </ul>
 					</section>
 					<section class="B O" id="Asserts">
-						<header class="B M">
+						<header class="B i">
 							<h3>Assets</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -379,24 +518,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="m B" id="1.3.0(2022-03-28)">
+				<section class="K B" id="1.3.0(2022-03-28)">
 					<header class="B P">
 						<h2>1.3.0 (2022-03-28)</h2>
-						<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
 					<section class="B O" id="Features">
-						<header class="B M">
+						<header class="B i">
 							<h3>Features</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -423,12 +562,12 @@
 </ul>
 					</section>
 					<section class="B O" id="BugFixes">
-						<header class="B M">
+						<header class="B i">
 							<h3>Bug Fixes</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -467,12 +606,12 @@
 </ul>
 					</section>
 					<section class="B O" id="Asserts">
-						<header class="B M">
+						<header class="B i">
 							<h3>Assets</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -482,24 +621,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="m B" id="1.2.0(2022-03-10)">
+				<section class="K B" id="1.2.0(2022-03-10)">
 					<header class="B P">
 						<h2>1.2.0 (2022-03-10)</h2>
-						<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
 					<section class="B O" id="Features">
-						<header class="B M">
+						<header class="B i">
 							<h3>Features</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -524,12 +663,12 @@
 </ul>
 					</section>
 					<section class="B O" id="BugFixes">
-						<header class="B M">
+						<header class="B i">
 							<h3>Bug Fixes</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -554,12 +693,12 @@
 </ul>
 					</section>
 					<section class="B O" id="Asserts">
-						<header class="B M">
+						<header class="B i">
 							<h3>Assets</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -569,24 +708,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="m B" id="1.1.0(2022-02-17)">
+				<section class="K B" id="1.1.0(2022-02-17)">
 					<header class="B P">
 						<h2>1.1.0 (2022-02-17)</h2>
-						<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
 					<section class="B O" id="Features">
-						<header class="B M">
+						<header class="B i">
 							<h3>Features</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -607,12 +746,12 @@
 </ul>
 					</section>
 					<section class="B O" id="BugFixes">
-						<header class="B M">
+						<header class="B i">
 							<h3>Bug Fixes</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -631,12 +770,12 @@
 </ul>
 					</section>
 					<section class="B O" id="Asserts">
-						<header class="B M">
+						<header class="B i">
 							<h3>Assets</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -646,24 +785,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="m B" id="1.0.0(2022-02-04)">
+				<section class="K B" id="1.0.0(2022-02-04)">
 					<header class="B P">
 						<h2>1.0.0 (2022-02-04)</h2>
-						<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
 					<section class="B O" id="Features">
-						<header class="B M">
+						<header class="B i">
 							<h3>Features</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -688,12 +827,12 @@
 </ul>
 					</section>
 					<section class="B O" id="BugFixes">
-						<header class="B M">
+						<header class="B i">
 							<h3>Bug Fixes</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -778,12 +917,12 @@
 </ul>
 					</section>
 					<section class="B O" id="Asserts">
-						<header class="B M">
+						<header class="B i">
 							<h3>Assets</h3>
-							<div class="i"><span class="perp N"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="j"><span class="perp V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet N"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet V"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -794,9 +933,10 @@
 					</section>
 				</section>
 			</article>
-			<aside class="L" id="SubNavi">
-				<div class="h">
+			<aside class="I" id="SubNavi">
+				<div class="e">
 					<ul>
+						<li><a href="doc/changelog.html#1.7.0(2024-08-27)">1.7.0 (2024-08-27)</a></li>
 						<li><a href="doc/changelog.html#1.6.0(2024-04-01)">1.6.0 (2024-04-01)</a></li>
 						<li><a href="doc/changelog.html#1.5.0(2024-03-28)">1.5.0 (2024-03-28)</a></li>
 						<li><a href="doc/changelog.html#1.4.0(2023-12-02)">1.4.0 (2023-12-02)</a></li>
