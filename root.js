@@ -552,13 +552,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "DataCodec",
-			"packageName": "cointoss.util.feather",
-			"type": "AbstractClass"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Direction",
 			"packageName": "cointoss",
 			"type": "Enum"
@@ -793,6 +786,27 @@ const root = {
 			"name": "Indicators",
 			"packageName": "cointoss.ticker",
 			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Job",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "JobProcess",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "JobType",
+			"packageName": "cointoss.util",
+			"type": "Enum"
 		},
 		{
 			"modifiers": {
@@ -1462,13 +1476,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "SFD",
-			"packageName": "cointoss.market.bitflyer",
-			"type": "Enum"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "SMAIndicator",
 			"packageName": "trademate.chart.builtin",
 			"type": "Class"
@@ -1568,6 +1575,13 @@ const root = {
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Ticker",
+			"packageName": "cointoss.ticker",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "TickerBuilder",
 			"packageName": "cointoss.ticker",
 			"type": "Class"
 		},
