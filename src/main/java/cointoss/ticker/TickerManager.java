@@ -202,6 +202,40 @@ public class TickerManager implements Disposable {
         }
     }
 
+    public Signal<ZonedDateTime> convert(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
+        start = start.truncatedTo(ChronoUnit.DAYS);
+        end = end.truncatedTo(ChronoUnit.DAYS);
+
+        if (forceRebuild) {
+            return convertCache(start, end);
+        } else {
+            FeatherStore<Tick> ticks = on(Span.Day).ticks;
+            long firstTime = ticks.firstTime();
+            long lastTime = ticks.lastTime();
+
+            if (firstTime == -1 && lastTime == -1) {
+                return convertCache(start, end);
+            } else {
+                Signal<ZonedDateTime> base = I.signal();
+
+                if (start.toEpochSecond() < firstTime) {
+                    base = base.merge(convertCache(start, Chrono.utcBySeconds(firstTime)));
+                }
+
+                if (lastTime < end.toEpochSecond()) {
+                    base = base.merge(convertCache(Chrono.utcBySeconds(lastTime), end));
+                }
+                return base;
+            }
+        }
+    }
+
+    private Signal<ZonedDateTime> convertCache(ZonedDateTime start, ZonedDateTime end) {
+        return I.signal(Chrono.range(start, end))
+                .effect(date -> service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP))
+                .effectOnDispose(() -> I.signal(tickers).to(t -> t.ticks.updateMeta()));
+    }
+
     /**
      * Build ticker data by date range.
      * 

@@ -96,7 +96,7 @@ public class TickerManagerBuildTest {
         TickerManager manager = new TickerManager(service);
         FeatherStore<Tick> ticks = manager.on(Span.Day).ticks;
 
-        // build insaide only
+        // build inaide only
         manager.build(insideStart, insideEnd, false);
         assert ticks.first().date().equals(insideStart);
         assert ticks.last().date().equals(insideEnd);

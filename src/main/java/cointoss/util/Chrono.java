@@ -21,7 +21,6 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -435,7 +434,7 @@ public class Chrono {
      */
     public static List<ZonedDateTime> range(int year, int month) {
         ZonedDateTime start = utc(year, month, 1);
-        return ranged(start, start.plusMonths(1));
+        return range(start, start.plusMonths(1));
     }
 
     /**
@@ -446,7 +445,7 @@ public class Chrono {
      * @return
      */
     public static List<ZonedDateTime> range(ZonedDateTime start, ZonedDateTime end) {
-        return ranged(start, end.plusDays(1));
+        return signal(start, end).toList();
     }
 
     /**
@@ -456,15 +455,21 @@ public class Chrono {
      * @param end The end date. (included)
      * @return
      */
-    private static List<ZonedDateTime> ranged(ZonedDateTime start, ZonedDateTime end) {
-        ZonedDateTime current = start;
+    public static Signal<ZonedDateTime> signal(ZonedDateTime start, ZonedDateTime end) {
+        return new Signal<>((observer, disposer) -> {
+            try {
+                ZonedDateTime current = start;
+                while (!disposer.isDisposed() && current.isBefore(end)) {
+                    observer.accept(current);
+                    current = current.plusDays(1);
+                }
+                observer.complete();
+            } catch (Exception e) {
+                observer.error(e);
+            }
+            return disposer;
 
-        List<ZonedDateTime> dates = new ArrayList();
-        while (current.isBefore(end)) {
-            dates.add(current);
-            current = current.plusDays(1);
-        }
-        return dates;
+        });
     }
 
     /**
