@@ -349,8 +349,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public long firstTime() {
-        firstDisk = computeFirstDiskTime();
-
         if (firstHeap == FIRST_INIT) {
             return firstDisk == FIRST_INIT ? -1 : firstDisk;
         } else {
@@ -365,8 +363,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * @return
      */
     public long lastTime() {
-        lastDisk = computeLastDiskTime();
-
         if (lastHeap == LAST_INIT) {
             return lastDisk == LAST_INIT ? -1 : lastDisk;
         } else {
