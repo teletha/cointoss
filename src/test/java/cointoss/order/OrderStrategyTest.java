@@ -14,10 +14,12 @@ import static java.time.temporal.ChronoUnit.*;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
+import cointoss.market.TestableMarketService;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signaling;
@@ -25,7 +27,12 @@ import kiss.WiseConsumer;
 
 class OrderStrategyTest {
 
-    private VerifiableMarket market = new VerifiableMarket();
+    private VerifiableMarket market;
+
+    @BeforeEach
+    void setup() {
+        market = new VerifiableMarket(new TestableMarketService());
+    }
 
     @Test
     void make() {

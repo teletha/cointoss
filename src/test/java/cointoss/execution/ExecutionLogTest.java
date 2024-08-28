@@ -15,12 +15,13 @@ import static org.junit.jupiter.api.Assumptions.*;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
+import cointoss.market.TestableMarketService;
 import cointoss.util.Chrono;
-import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import psychopath.Locator;
 
@@ -29,9 +30,12 @@ class ExecutionLogTest {
     @RegisterExtension
     CleanRoom room = new CleanRoom(true);
 
-    VerifiableMarket market = new VerifiableMarket();
+    private ExecutionLog log;
 
-    ExecutionLog log = new ExecutionLog(market.service, Locator.directory(room.root));
+    @BeforeEach
+    void setup() {
+        log = new ExecutionLog(new TestableMarketService(), Locator.directory(room.locateRadom()));
+    }
 
     @Test
     void logAtNoServicedDate() {

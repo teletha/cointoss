@@ -45,14 +45,14 @@ class FeatherStoreTest {
 
     static class Value extends IdentifiableModel implements Timelinable {
 
-        public long value;
+        public long item;
 
         Value(int value) {
-            this.value = value;
+            this.item = value;
         }
 
         Value(long value) {
-            this.value = value;
+            this.item = value;
         }
 
         /**
@@ -60,7 +60,7 @@ class FeatherStoreTest {
          */
         @Override
         public long getId() {
-            return value;
+            return item;
         }
 
         /**
@@ -68,12 +68,12 @@ class FeatherStoreTest {
          */
         @Override
         protected void setId(long id) {
-            value = id;
+            item = id;
         }
 
         @Override
         public ZonedDateTime date() {
-            return Chrono.utcBySeconds(value);
+            return Chrono.utcBySeconds(item);
         }
 
         /**
@@ -81,7 +81,7 @@ class FeatherStoreTest {
          */
         @Override
         public int hashCode() {
-            return (int) value;
+            return (int) item;
         }
 
         /**
@@ -90,7 +90,7 @@ class FeatherStoreTest {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Value) {
-                return ((Value) obj).value == value;
+                return ((Value) obj).item == item;
             } else {
                 return false;
             }
@@ -119,33 +119,33 @@ class FeatherStoreTest {
     void add() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(value(0));
-        assert store.at(0).value == 0;
+        assert store.at(0).item == 0;
         assert store.at(60) == null;
         assert store.at(120) == null;
 
         // update
         store.store(value(2));
-        assert store.at(0).value == 2;
+        assert store.at(0).item == 2;
         assert store.at(60) == null;
         assert store.at(120) == null;
 
         // add next stamp
         store.store(value(60));
-        assert store.at(0).value == 2;
-        assert store.at(60).value == 60;
+        assert store.at(0).item == 2;
+        assert store.at(60).item == 60;
         assert store.at(120) == null;
 
         // add next stamp
         store.store(value(120));
-        assert store.at(0).value == 2;
-        assert store.at(60).value == 60;
-        assert store.at(120).value == 120;
+        assert store.at(0).item == 2;
+        assert store.at(60).item == 60;
+        assert store.at(120).item == 120;
 
         // update
         store.store(value(156));
-        assert store.at(0).value == 2;
-        assert store.at(60).value == 60;
-        assert store.at(120).value == 156;
+        assert store.at(0).item == 2;
+        assert store.at(60).item == 60;
+        assert store.at(120).item == 156;
     }
 
     @Test
@@ -162,8 +162,8 @@ class FeatherStoreTest {
 
         store.merge(additions);
         assert store.size() == 4;
-        assert store.first().value == 0;
-        assert store.last().value == Span.Minute1.segmentSeconds * 3;
+        assert store.first().item == 0;
+        assert store.last().item == Span.Minute1.segmentSeconds * 3;
     }
 
     @Test
@@ -185,25 +185,25 @@ class FeatherStoreTest {
     void getByTime() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(value(0), value(60), value(120));
-        assert store.at(0).value == 0;
-        assert store.at(30).value == 0;
-        assert store.at(60).value == 60;
-        assert store.at(70).value == 60;
-        assert store.at(120).value == 120;
-        assert store.at(140).value == 120;
+        assert store.at(0).item == 0;
+        assert store.at(30).item == 0;
+        assert store.at(60).item == 60;
+        assert store.at(70).item == 60;
+        assert store.at(120).item == 120;
+        assert store.at(140).item == 120;
     }
 
     @Test
     void getByTimeOverTime() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Day);
         store.store(value(0), value(days), value(2 * days), value(3 * days), value(4 * days));
-        assert store.at(0).value == 0;
-        assert store.at(days - 1).value == 0;
-        assert store.at(days).value == days;
-        assert store.at(days + 1).value == days;
-        assert store.at(2 * days - 1).value == days;
-        assert store.at(2 * days).value == 2 * days;
-        assert store.at(2 * days + 1).value == 2 * days;
+        assert store.at(0).item == 0;
+        assert store.at(days - 1).item == 0;
+        assert store.at(days).item == days;
+        assert store.at(days + 1).item == days;
+        assert store.at(2 * days - 1).item == days;
+        assert store.at(2 * days).item == 2 * days;
+        assert store.at(2 * days + 1).item == 2 * days;
     }
 
     @Test
@@ -251,12 +251,12 @@ class FeatherStoreTest {
         store.store(values(0, 60, 120, 180));
         assert store.before(0) == null;
         assert store.before(36) == null;
-        assert store.before(60).value == 0;
-        assert store.before(72).value == 0;
-        assert store.before(120).value == 60;
-        assert store.before(144).value == 60;
-        assert store.before(180).value == 120;
-        assert store.before(240).value == 180;
+        assert store.before(60).item == 0;
+        assert store.before(72).item == 0;
+        assert store.before(120).item == 60;
+        assert store.before(144).item == 60;
+        assert store.before(180).item == 120;
+        assert store.before(240).item == 180;
         assert store.before(300) == null;
     }
 
@@ -266,11 +266,11 @@ class FeatherStoreTest {
         store.store(day(0), day(1), day(2), day(3), day(4));
         assert store.before(0) == null;
         assert store.before(days - 1) == null;
-        assert store.before(days).value == 0;
-        assert store.before(days + 1).value == 0;
-        assert store.before(2 * days - 1).value == 0;
-        assert store.before(2 * days).value == days;
-        assert store.before(2 * days + 1).value == days;
+        assert store.before(days).item == 0;
+        assert store.before(days + 1).item == 0;
+        assert store.before(2 * days - 1).item == 0;
+        assert store.before(2 * days).item == days;
+        assert store.before(2 * days + 1).item == days;
     }
 
     @Test
@@ -294,7 +294,7 @@ class FeatherStoreTest {
         assert store.existOnHeap(value(base * 20));
 
         store.store(value(base * 2));
-        assert store.at(base * 2).value == base * 2;
+        assert store.at(base * 2).item == base * 2;
         assert store.existOnHeap(value(base * 14)) == false;
         assert store.existOnHeap(value(base * 15)) == false;
         assert store.existOnHeap(value(base * 16));
@@ -323,7 +323,7 @@ class FeatherStoreTest {
         store.commit();
         store.clear();
         assert store.existOnHeap(value(0)) == false;
-        assert store.at(0).value == 0;
+        assert store.at(0).item == 0;
         assert store.at(60) == null;
     }
 
@@ -336,7 +336,7 @@ class FeatherStoreTest {
         store.clear();
         assert store.existOnHeap(value(0)) == false;
         assert store.existOnDisk(value(0)) == true;
-        assert store.query(0).toList().getFirst().value == 0;
+        assert store.query(0).toList().getFirst().item == 0;
     }
 
     @Test
@@ -405,16 +405,16 @@ class FeatherStoreTest {
     void accumulator() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.store(new Value(0));
-        assert store.at(0).value == 0;
+        assert store.at(0).item == 0;
 
         // replaceable
         store.store(new Value(1));
-        assert store.at(0).value == 1;
+        assert store.at(0).item == 1;
 
         store.enableAccumulator((prev, now) -> prev);
         // no replaceable
         store.store(new Value(2));
-        assert store.at(0).value == 1;
+        assert store.at(0).item == 1;
     }
 
     @Test

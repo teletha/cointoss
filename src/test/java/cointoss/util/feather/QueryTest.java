@@ -206,7 +206,7 @@ class QueryTest extends FeatherStoreTestBase {
         List<Value> list = query.toList();
         assert list.size() == ints.size();
         for (int i = 0; i < list.size(); i++) {
-            assert list.get(i).value == ints.get(i);
+            assert list.get(i).item == ints.get(i);
         }
         return true;
     }
@@ -215,7 +215,7 @@ class QueryTest extends FeatherStoreTestBase {
         List<Value> list = query.toList();
         assert list.size() == values.length;
         for (int i = 0; i < list.size(); i++) {
-            assert list.get(i).value == values[i];
+            assert list.get(i).item == values[i];
         }
         return true;
     }

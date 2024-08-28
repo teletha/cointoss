@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
+import cointoss.market.TestableMarketService;
 import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
@@ -28,7 +29,7 @@ class OrderManagerTest {
 
     @BeforeEach
     void setup() {
-        market = new VerifiableMarket();
+        market = new VerifiableMarket(new TestableMarketService());
         orders = market.orders;
     }
 

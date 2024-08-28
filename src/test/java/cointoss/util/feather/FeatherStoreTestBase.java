@@ -16,24 +16,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
-import antibug.CleanRoom;
 import cointoss.ticker.Span;
-import psychopath.File;
-import psychopath.Locator;
 import typewriter.api.model.IdentifiableModel;
 
 class FeatherStoreTestBase {
 
     protected static final int days = 60 * 60 * 24;
-
-    @RegisterExtension
-    CleanRoom room = new CleanRoom(true);
-
-    protected final File databaseFile() {
-        return Locator.file(room.locateRadom());
-    }
 
     /**
      * Create empty store.
@@ -52,7 +41,7 @@ class FeatherStoreTestBase {
     protected final FeatherStore<Value> createStore(Span span, List<Value> initialMemoryValues, List<Value> initialDiskValues) {
         FeatherStore<Value> store = FeatherStore.create(Value.class, span);
         if (initialDiskValues != null) {
-            store.enablePersistence(databaseFile());
+            store.enablePersistence(RandomStringUtils.randomAlphabetic(30));
             store.store(initialDiskValues);
             store.commit();
             store.clear();
@@ -132,18 +121,18 @@ class FeatherStoreTestBase {
 
     public class Value extends IdentifiableModel implements Timelinable {
 
-        public int value;
+        public int item;
 
         public Value() {
         }
 
         public Value(int value) {
-            this.value = value;
+            this.item = value;
         }
 
         @Override
         public long seconds() {
-            return value;
+            return item;
         }
 
         /**
@@ -151,7 +140,7 @@ class FeatherStoreTestBase {
          */
         @Override
         public long getId() {
-            return value;
+            return item;
         }
 
         /**
@@ -159,7 +148,7 @@ class FeatherStoreTestBase {
          */
         @Override
         public void setId(long id) {
-            value = (int) id;
+            item = (int) id;
         }
 
         /**
@@ -170,7 +159,7 @@ class FeatherStoreTestBase {
             final int prime = 31;
             int result = 1;
             result = prime * result + getEnclosingInstance().hashCode();
-            result = prime * result + Objects.hash(value);
+            result = prime * result + Objects.hash(item);
             return result;
         }
 
@@ -184,7 +173,7 @@ class FeatherStoreTestBase {
             if (getClass() != obj.getClass()) return false;
             Value other = (Value) obj;
             if (!getEnclosingInstance().equals(other.getEnclosingInstance())) return false;
-            return value == other.value;
+            return item == other.item;
         }
 
         /**
@@ -192,7 +181,7 @@ class FeatherStoreTestBase {
          */
         @Override
         public String toString() {
-            return "Value [value=" + value + "]";
+            return "Value [value=" + item + "]";
         }
 
         private FeatherStoreTestBase getEnclosingInstance() {

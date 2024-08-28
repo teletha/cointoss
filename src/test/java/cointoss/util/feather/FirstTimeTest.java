@@ -9,6 +9,7 @@
  */
 package cointoss.util.feather;
 
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 class FirstTimeTest extends FeatherStoreTestBase {
@@ -77,7 +78,7 @@ class FirstTimeTest extends FeatherStoreTestBase {
         assert store.firstTime() == 1;
     }
 
-    @Test
+    @RepeatedTest(2)
     void diskHasEarliestData() {
         FeatherStore<Value> store = createStore(1, 10, value(3, 4), value(1, 2, 3));
         assert store.existOnHeap(value(1)) == false;
