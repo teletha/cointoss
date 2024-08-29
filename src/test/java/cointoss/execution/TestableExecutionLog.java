@@ -13,7 +13,6 @@ import java.time.ZonedDateTime;
 
 import cointoss.MarketService;
 import cointoss.ticker.Span;
-import cointoss.ticker.TickerBuilder;
 import cointoss.util.Chrono;
 import kiss.I;
 
@@ -29,11 +28,9 @@ public class TestableExecutionLog extends ExecutionLog {
      * @param start
      * @param end
      */
-    public void generateFastLog(ZonedDateTime start, ZonedDateTime end, Span span, boolean buildTickerData) {
+    public void generateFastLog(ZonedDateTime start, ZonedDateTime end, Span span) {
         Chrono.range(start, end).to(date -> {
-            cache(date).writeFast(Executions.random(date, date.plusDays(1), span))
-                    .effectOnLifecycle(buildTickerData ? new TickerBuilder(service, null) : null)
-                    .to(I.NoOP);
+            cache(date).writeFast(Executions.random(date, date.plusDays(1), span)).to(I.NoOP);
         });
     }
 }

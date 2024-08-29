@@ -9,6 +9,8 @@
  */
 package cointoss.ticker;
 
+import java.util.Objects;
+
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import kiss.Disposable;
@@ -22,8 +24,8 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
     private final TickerManager manager;
 
     public TickerBuilder(MarketService service, TickerManager manager) {
-        this.service = service;
-        this.manager = manager;
+        this.service = Objects.requireNonNull(service);
+        this.manager = Objects.requireNonNull(manager);
     }
 
     /**
@@ -42,11 +44,9 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
                 ticker.ticks.commit();
             });
 
-            if (manager != null) {
-                manager.tickers().to(ticker -> {
-                    ticker.ticks.updateMeta();
-                });
-            }
+            manager.tickers().to(ticker -> {
+                ticker.ticks.updateMeta();
+            });
         });
         return temporary::update;
     }

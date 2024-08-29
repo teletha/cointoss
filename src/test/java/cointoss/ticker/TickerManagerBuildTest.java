@@ -28,7 +28,7 @@ public class TickerManagerBuildTest {
         ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);
 
         TestableMarketService service = new TestableMarketService();
-        service.log.generateFastLog(start, end, Span.Minute1, false);
+        service.log.generateFastLog(start, end, Span.Minute1);
 
         TickerManager manager = new TickerManager(service);
         manager.build(start, end, false).to();
@@ -46,7 +46,7 @@ public class TickerManagerBuildTest {
 
         // generate fast log
         TestableMarketService service = new TestableMarketService();
-        service.log.generateFastLog(start, end, Span.Hour1, false);
+        service.log.generateFastLog(start, end, Span.Hour1);
 
         TickerManager manager = new TickerManager(service);
         FeatherStore<Tick> ticks = manager.on(Span.Minute15).ticks;
@@ -76,7 +76,7 @@ public class TickerManagerBuildTest {
 
         // clear memory cache and rebuild ticker data from new generated fast log
         ticks.clear();
-        service.log.generateFastLog(start, end, Span.Hour1, false);
+        service.log.generateFastLog(start, end, Span.Hour1);
         manager.build(start, end, true).to();
         newTicks = ticks.query(start, end).toList();
         assert different(oldTicks, newTicks);
@@ -91,7 +91,7 @@ public class TickerManagerBuildTest {
 
         // generate fast log
         TestableMarketService service = new TestableMarketService();
-        service.log.generateFastLog(start, end, Span.Hour1, false);
+        service.log.generateFastLog(start, end, Span.Hour1);
 
         TickerManager manager = new TickerManager(service);
         FeatherStore<Tick> ticks = manager.on(Span.Day).ticks;
