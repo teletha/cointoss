@@ -11,9 +11,9 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="g">
-		<header class="W">
-			<h1 class="a" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
+	<body class="i">
+		<header class="P">
+			<h1 class="L" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
 			<nav class="R"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="T" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="m" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,280 +31,280 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="U">
-			<nav class="d">
+		<main class="k">
+			<nav class="V">
 				<div></div>
 			</nav>
-			<article class="b" id="Article">
-				<section class="V"><code class="Q">cointoss.analyze</code>
-					<h2 class="Class K"><code class="f">NumStats</code></h2>
-					<div class="l"></div><span class="B"><p>This class provides a means of updating summary statistics as each new data point is added. The
+			<article class="j" id="Article">
+				<section class="I"><code class="e">cointoss.analyze</code>
+					<h2 class="Class l"><code class="H">NumStats</code></h2>
+					<div class="c"></div><span class="B"><p>This class provides a means of updating summary statistics as each new data point is added. The
 data points are not stored, and values are updated with online algorithm.</p>
 </span></section>
-				<section class="V" id="NumStats()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">NumStats</code><code class="I">()</code></h2>
+				<section class="I" id="NumStats()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">NumStats</code><code class="Y">()</code></h2>
 				</section>
-				<section class="V" id="decay(hypatia.Num)">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">decay</code><code class="I">(<code>hypatia.Num</code> <code class="parameterName">factor</code>)</code><i class="Y"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
-					<table class="X">
-						<tr class="c">
+				<section class="I" id="decay(hypatia.Num)">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">decay</code><code class="Y">(<code>hypatia.Num</code> <code class="parameterName">factor</code>)</code><i class="a"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
+					<table class="h">
+						<tr class="f">
 							<td><code>hypatia.Num</code> <code>factor</code></td>
 							<td></td>
 						</tr>
-						<tr class="k">
+						<tr class="O">
 							<td><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Set the decay factor.</p>
 </span></section>
-				<section class="V" id="formatter(java.util.function.Function)">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">formatter</code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>hypatia.Num</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code> <code class="parameterName">formatter</code>)</code><i class="Y"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
-					<table class="X">
-						<tr class="c">
+				<section class="I" id="formatter(java.util.function.Function)">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">formatter</code><code class="Y">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>hypatia.Num</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code> <code class="parameterName">formatter</code>)</code><i class="a"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
+					<table class="h">
+						<tr class="f">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>hypatia.Num</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code> <code>formatter</code></td>
 							<td><span><p>A value formatter.</p>
 </span></td>
 						</tr>
-						<tr class="k">
+						<tr class="O">
 							<td><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Set value formatter.</p>
 </span></section>
-				<section class="V" id="negative()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">negative</code><code class="I">()</code><i class="Y"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="negative()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">negative</code><code class="Y">()</code><i class="a"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Set this <code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code> deal with negative values.</p>
 </span></section>
-				<section class="V" id="add(long)">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">add</code><code class="I">(<code>long</code> <code class="parameterName">value</code>)</code><i class="Y"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
-					<table class="X">
-						<tr class="c">
+				<section class="I" id="add(long)">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">add</code><code class="Y">(<code>long</code> <code class="parameterName">value</code>)</code><i class="a"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
+					<table class="h">
+						<tr class="f">
 							<td><code>long</code> <code>value</code></td>
 							<td><span><p>A value to add.</p>
 </span></td>
 						</tr>
-						<tr class="k">
+						<tr class="O">
 							<td><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Add new value to summarize.</p>
 </span></section>
-				<section class="V" id="add(double)">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">add</code><code class="I">(<code>double</code> <code class="parameterName">value</code>)</code><i class="Y"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
-					<table class="X">
-						<tr class="c">
+				<section class="I" id="add(double)">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">add</code><code class="Y">(<code>double</code> <code class="parameterName">value</code>)</code><i class="a"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
+					<table class="h">
+						<tr class="f">
 							<td><code>double</code> <code>value</code></td>
 							<td><span><p>A value to add.</p>
 </span></td>
 						</tr>
-						<tr class="k">
+						<tr class="O">
 							<td><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Add new value to summarize.</p>
 </span></section>
-				<section class="V" id="add(hypatia.Num)">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">add</code><code class="I">(<code>hypatia.Num</code> <code class="parameterName">value</code>)</code><i class="Y"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
-					<table class="X">
-						<tr class="c">
+				<section class="I" id="add(hypatia.Num)">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">add</code><code class="Y">(<code>hypatia.Num</code> <code class="parameterName">value</code>)</code><i class="a"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2>
+					<table class="h">
+						<tr class="f">
 							<td><code>hypatia.Num</code> <code>value</code></td>
 							<td><span><p>A value to add.</p>
 </span></td>
 						</tr>
-						<tr class="k">
+						<tr class="O">
 							<td><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Add new value to summarize.</p>
 </span></section>
-				<section class="V" id="kurtosis()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">kurtosis</code><code class="I">()</code><i class="Y"><code>hypatia.Num</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="kurtosis()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">kurtosis</code><code class="Y">()</code><i class="a"><code>hypatia.Num</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A kurtosis value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate kurtosis value.</p>
 </span></section>
-				<section class="V" id="max()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">max</code><code class="I">()</code><i class="Y"><code>hypatia.Num</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="max()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">max</code><code class="Y">()</code><i class="a"><code>hypatia.Num</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A maximum value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate maximum value.</p>
 </span></section>
-				<section class="V" id="formattedMax()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">formattedMax</code><code class="I">()</code><i class="Y"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="formattedMax()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">formattedMax</code><code class="Y">()</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td><span><p>A formatted maximum value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate maximum value.</p>
 </span></section>
-				<section class="V" id="min()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">min</code><code class="I">()</code><i class="Y"><code>hypatia.Num</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="min()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">min</code><code class="Y">()</code><i class="a"><code>hypatia.Num</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A minimum value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate minimum value.</p>
 </span></section>
-				<section class="V" id="formattedMin()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">formattedMin</code><code class="I">()</code><i class="Y"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="formattedMin()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">formattedMin</code><code class="Y">()</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td><span><p>A formatted minimum value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate minimum value.</p>
 </span></section>
-				<section class="V" id="mean()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">mean</code><code class="I">()</code><i class="Y"><code>hypatia.Num</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="mean()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">mean</code><code class="Y">()</code><i class="a"><code>hypatia.Num</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A mean value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate mean value.</p>
 </span></section>
-				<section class="V" id="formattedMean()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">formattedMean</code><code class="I">()</code><i class="Y"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="formattedMean()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">formattedMean</code><code class="Y">()</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td><span><p>A formatted mean value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate mean value.</p>
 </span></section>
-				<section class="V" id="skewness()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">skewness</code><code class="I">()</code><i class="Y"><code>hypatia.Num</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="skewness()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">skewness</code><code class="Y">()</code><i class="a"><code>hypatia.Num</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A sckewness value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate skweness value.</p>
 </span></section>
-				<section class="V" id="size()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">size</code><code class="I">()</code><i class="Y"><code>int</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="size()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">size</code><code class="Y">()</code><i class="a"><code>int</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>int</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The number of items.</p>
 </span></section>
-				<section class="V" id="decayedSize()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">decayedSize</code><code class="I">()</code><i class="Y"><code>int</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="decayedSize()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">decayedSize</code><code class="Y">()</code><i class="a"><code>int</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>int</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The approximate value of items.</p>
 </span></section>
-				<section class="V" id="standardDeviation()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">standardDeviation</code><code class="I">()</code><i class="Y"><code>hypatia.Num</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="standardDeviation()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">standardDeviation</code><code class="Y">()</code><i class="a"><code>hypatia.Num</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A standard deviation value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate standard deviation value.</p>
 </span></section>
-				<section class="V" id="total()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">total</code><code class="I">()</code><i class="Y"><code>hypatia.Num</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="total()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">total</code><code class="Y">()</code><i class="a"><code>hypatia.Num</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A total value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate total value.</p>
 </span></section>
-				<section class="V" id="formattedTotal()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">formattedTotal</code><code class="I">()</code><i class="Y"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="formattedTotal()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">formattedTotal</code><code class="Y">()</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td><span><p>A formatted total value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate total value.</p>
 </span></section>
-				<section class="V" id="variance()">
-					<h2 class="e"><i class="PUBLIC"></i><code class="f">variance</code><code class="I">()</code><i class="Y"><code>hypatia.Num</code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="variance()">
+					<h2 class="b"><i class="PUBLIC"></i><code class="H">variance</code><code class="Y">()</code><i class="a"><code>hypatia.Num</code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A variance value.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Calculate variance value.</p>
 </span></section>
-				<section class="V" id="toString()">
-					<h2 class="e"><i class="OVERRIDE PUBLIC"></i><code class="f">toString</code><code class="I">()</code><i class="Y"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="X">
-						<tr class="k">
+				<section class="I" id="toString()">
+					<h2 class="b"><i class="OVERRIDE PUBLIC"></i><code class="H">toString</code><code class="Y">()</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="h">
+						<tr class="O">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
 			</article>
-			<aside class="J" id="SubNavi">
-				<div class="M">
-					<h5 class="h">Constructors</h5>
+			<aside class="U" id="SubNavi">
+				<div class="Z">
+					<h5 class="T">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#NumStats()">NumStats</a></code><code class="I">()</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#NumStats()">NumStats</a></code><code class="Y">()</code></li>
 					</ul>
-					<h5 class="h">Methods</h5>
+					<h5 class="T">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#decay(hypatia.Num)">decay</a></code><code class="I">(<code>hypatia.Num</code> <code class="parameterName">factor</code>)</code><i class="N"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formatter(java.util.function.Function)">formatter</a></code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>hypatia.Num</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code> <code class="parameterName">formatter</code>)</code><i class="N"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#negative()">negative</a></code><code class="I">()</code><i class="N"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#add(long)">add</a></code><code class="I">(<code>long</code> <code class="parameterName">value</code>)</code><i class="N"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#add(double)">add</a></code><code class="I">(<code>double</code> <code class="parameterName">value</code>)</code><i class="N"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#add(hypatia.Num)">add</a></code><code class="I">(<code>hypatia.Num</code> <code class="parameterName">value</code>)</code><i class="N"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#kurtosis()">kurtosis</a></code><code class="I">()</code><i class="N"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#max()">max</a></code><code class="I">()</code><i class="N"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formattedMax()">formattedMax</a></code><code class="I">()</code><i class="N"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#min()">min</a></code><code class="I">()</code><i class="N"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formattedMin()">formattedMin</a></code><code class="I">()</code><i class="N"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#mean()">mean</a></code><code class="I">()</code><i class="N"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formattedMean()">formattedMean</a></code><code class="I">()</code><i class="N"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#skewness()">skewness</a></code><code class="I">()</code><i class="N"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#size()">size</a></code><code class="I">()</code><i class="N"><code>int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#decayedSize()">decayedSize</a></code><code class="I">()</code><i class="N"><code>int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#standardDeviation()">standardDeviation</a></code><code class="I">()</code><i class="N"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#total()">total</a></code><code class="I">()</code><i class="N"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formattedTotal()">formattedTotal</a></code><code class="I">()</code><i class="N"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#variance()">variance</a></code><code class="I">()</code><i class="N"><code>hypatia.Num</code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#toString()">toString</a></code><code class="I">()</code><i class="N"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#decay(hypatia.Num)">decay</a></code><code class="Y">(<code>hypatia.Num</code> <code class="parameterName">factor</code>)</code><i class="K"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formatter(java.util.function.Function)">formatter</a></code><code class="Y">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>hypatia.Num</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code> <code class="parameterName">formatter</code>)</code><i class="K"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#negative()">negative</a></code><code class="Y">()</code><i class="K"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#add(long)">add</a></code><code class="Y">(<code>long</code> <code class="parameterName">value</code>)</code><i class="K"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#add(double)">add</a></code><code class="Y">(<code>double</code> <code class="parameterName">value</code>)</code><i class="K"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#add(hypatia.Num)">add</a></code><code class="Y">(<code>hypatia.Num</code> <code class="parameterName">value</code>)</code><i class="K"><code><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#kurtosis()">kurtosis</a></code><code class="Y">()</code><i class="K"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#max()">max</a></code><code class="Y">()</code><i class="K"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formattedMax()">formattedMax</a></code><code class="Y">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#min()">min</a></code><code class="Y">()</code><i class="K"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formattedMin()">formattedMin</a></code><code class="Y">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#mean()">mean</a></code><code class="Y">()</code><i class="K"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formattedMean()">formattedMean</a></code><code class="Y">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#skewness()">skewness</a></code><code class="Y">()</code><i class="K"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#size()">size</a></code><code class="Y">()</code><i class="K"><code>int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#decayedSize()">decayedSize</a></code><code class="Y">()</code><i class="K"><code>int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#standardDeviation()">standardDeviation</a></code><code class="Y">()</code><i class="K"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#total()">total</a></code><code class="Y">()</code><i class="K"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#formattedTotal()">formattedTotal</a></code><code class="Y">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#variance()">variance</a></code><code class="Y">()</code><i class="K"><code>hypatia.Num</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.analyze.NumStats.html#toString()">toString</a></code><code class="Y">()</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
 					</ul>
 				</div>
 			</aside>
