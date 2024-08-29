@@ -88,7 +88,7 @@ public class TradingView extends View {
             chart.market.set(market);
             chart.showRealtimeUpdate.set(tab.isSelected());
             chart.ticker.observing().to(ticker -> {
-                ticker.requestFill();
+                market.tickers.build(false).to();
                 chart.chart.layoutForcely();
             });
 

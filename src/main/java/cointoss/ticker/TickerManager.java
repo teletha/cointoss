@@ -202,11 +202,35 @@ public class TickerManager implements Disposable {
         }
     }
 
+    /**
+     * Build ticker data from execution log.
+     * 
+     * @param forceRebuild
+     * @return
+     */
+    public Signal<ZonedDateTime> build(boolean forceRebuild) {
+        Ticker ticker = on(Span.Day);
+        ZonedDateTime startDay = Chrono.utcBySeconds(ticker.ticks.computeLogicalFirstCacheTime());
+        ZonedDateTime endDay = Chrono.utcBySeconds(ticker.ticks.lastCacheTime());
+
+        System.out.println(startDay + "  " + endDay);
+
+        return build(startDay, endDay, forceRebuild);
+    }
+
+    /**
+     * Build ticker data from execution log by your specified date-range.
+     * 
+     * @param start
+     * @param end
+     * @param forceRebuild
+     * @return
+     */
     public Signal<ZonedDateTime> build(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
         start = start.truncatedTo(ChronoUnit.DAYS);
         end = end.truncatedTo(ChronoUnit.DAYS);
 
-        Signal<ZonedDateTime> process = I.signal();;
+        Signal<ZonedDateTime> process = I.signal();
         if (forceRebuild) {
             process = buildCache(start, end);
         } else {
