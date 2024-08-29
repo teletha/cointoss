@@ -119,11 +119,11 @@ public class Market implements Disposable {
      */
     protected Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
-        this.log = service.log.registerConverter(new TickerBuilder(service));
         this.orders = createOrderManager();
         this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();
         this.tickers = createTickerManager();
+        this.log = service.log.registerConverter(new TickerBuilder(service, tickers));
         this.priceMatcher = new PriceEngine(this);
 
         // build tickers for each span

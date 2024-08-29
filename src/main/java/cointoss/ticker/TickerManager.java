@@ -202,27 +202,27 @@ public class TickerManager implements Disposable {
         }
     }
 
-    public Signal<ZonedDateTime> convert(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
+    public Signal<ZonedDateTime> build(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
         start = start.truncatedTo(ChronoUnit.DAYS);
         end = end.truncatedTo(ChronoUnit.DAYS);
 
         Signal<ZonedDateTime> process = I.signal();;
         if (forceRebuild) {
-            process = convertCache(start, end);
+            process = buildCache(start, end);
         } else {
             FeatherStore<Tick> ticks = on(Span.Day).ticks;
             long firstTime = ticks.firstTime();
             long lastTime = ticks.lastTime();
 
             if (firstTime == -1 && lastTime == -1) {
-                process = convertCache(start, end);
+                process = buildCache(start, end);
             } else {
                 if (start.toEpochSecond() < firstTime) {
-                    process = process.merge(convertCache(start, Chrono.utcBySeconds(firstTime)));
+                    process = process.merge(buildCache(start, Chrono.utcBySeconds(firstTime)));
                 }
 
                 if (lastTime < end.toEpochSecond()) {
-                    process = process.merge(convertCache(Chrono.utcBySeconds(lastTime), end));
+                    process = process.merge(buildCache(Chrono.utcBySeconds(lastTime), end));
                 }
             }
         }
@@ -230,49 +230,8 @@ public class TickerManager implements Disposable {
         return process;
     }
 
-    private Signal<ZonedDateTime> convertCache(ZonedDateTime start, ZonedDateTime end) {
+    private Signal<ZonedDateTime> buildCache(ZonedDateTime start, ZonedDateTime end) {
         return Chrono.range(start, end)
                 .effect(date -> service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service, this)).to(I.NoOP));
-    }
-
-    /**
-     * Build ticker data by date range.
-     * 
-     * @param start
-     * @param end
-     * @param forceRebuild
-     */
-    public void build(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
-        start = start.truncatedTo(ChronoUnit.DAYS);
-        end = end.truncatedTo(ChronoUnit.DAYS);
-
-        if (forceRebuild) {
-            buildCache(start, end);
-        } else {
-            FeatherStore<Tick> ticks = on(Span.Day).ticks;
-            long firstTime = ticks.firstTime();
-            long lastTime = ticks.lastTime();
-
-            if (firstTime == -1 && lastTime == -1) {
-                buildCache(start, end);
-            } else {
-                if (start.toEpochSecond() < firstTime) {
-                    buildCache(start, Chrono.utcBySeconds(firstTime));
-                }
-
-                if (lastTime < end.toEpochSecond()) {
-                    buildCache(Chrono.utcBySeconds(lastTime), end);
-                }
-            }
-        }
-    }
-
-    private void buildCache(ZonedDateTime start, ZonedDateTime end) {
-        I.info("Building ticker data on " + service + " from " + start + " to " + end + ".");
-
-        service.log.range(start, end, LogType.Fast)
-                .effectOnDispose(() -> I.signal(tickers).to(t -> t.ticks.updateMeta()))
-                .effectOnLifecycle(new TickerBuilder(service, this))
-                .to(I.NoOP);
     }
 }

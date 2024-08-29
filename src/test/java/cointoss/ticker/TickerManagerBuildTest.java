@@ -31,7 +31,7 @@ public class TickerManagerBuildTest {
         service.log.generateFastLog(start, end, Span.Minute1, false);
 
         TickerManager manager = new TickerManager(service);
-        manager.build(start, end, false);
+        manager.build(start, end, false).to();
         assert manager.on(Span.Day).ticks.query(start, end).toList().size() == 2;
         assert manager.on(Span.Hour4).ticks.query(start, end).toList().size() == 12;
         assert manager.on(Span.Hour1).ticks.query(start, end).toList().size() == 48;
@@ -52,7 +52,7 @@ public class TickerManagerBuildTest {
         FeatherStore<Tick> ticks = manager.on(Span.Minute15).ticks;
 
         // build ticker data from fast log
-        manager.build(start, end, false);
+        manager.build(start, end, false).to();
         List<Tick> oldTicks = ticks.query(start, end).toList();
         List<Tick> newTicks = ticks.query(start, end).toList();
         assert same(oldTicks, newTicks);
@@ -64,20 +64,20 @@ public class TickerManagerBuildTest {
 
         // clear memory cache and rebuild ticker data from same fast log
         ticks.clear();
-        manager.build(start, end, false);
+        manager.build(start, end, false).to();
         newTicks = ticks.query(start, end).toList();
         assert same(oldTicks, newTicks);
 
         // clear memory cache and rebuild ticker data from same fast log
         ticks.clear();
-        manager.build(start, end, true);
+        manager.build(start, end, true).to();
         newTicks = ticks.query(start, end).toList();
         assert same(oldTicks, newTicks);
 
         // clear memory cache and rebuild ticker data from new generated fast log
         ticks.clear();
         service.log.generateFastLog(start, end, Span.Hour1, false);
-        manager.build(start, end, true);
+        manager.build(start, end, true).to();
         newTicks = ticks.query(start, end).toList();
         assert different(oldTicks, newTicks);
     }
@@ -97,19 +97,19 @@ public class TickerManagerBuildTest {
         FeatherStore<Tick> ticks = manager.on(Span.Day).ticks;
 
         // build inaide only
-        manager.build(insideStart, insideEnd, false);
+        manager.build(insideStart, insideEnd, false).to();
         assert ticks.first().date().equals(insideStart);
         assert ticks.last().date().equals(insideEnd);
         List<Tick> inside = ticks.query(insideStart, insideEnd).toList();
 
         // build with previous data
-        manager.build(start, insideEnd, false);
+        manager.build(start, insideEnd, false).to();
         assert ticks.first().date().equals(start);
         assert ticks.last().date().equals(insideEnd);
         assert same(inside, ticks.query(insideStart, insideEnd).toList());
 
         // build with next data
-        manager.build(insideStart, end, false);
+        manager.build(insideStart, end, false).to();
         assert ticks.first().date().equals(start);
         assert ticks.last().date().equals(end);
         assert same(inside, ticks.query(insideStart, insideEnd).toList());
