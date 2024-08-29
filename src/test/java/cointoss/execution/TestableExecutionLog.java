@@ -36,10 +36,10 @@ public class TestableExecutionLog extends ExecutionLog {
      * @param end
      */
     public void generateFastLog(ZonedDateTime start, ZonedDateTime end, Span span, boolean buildTickerData) {
-        for (ZonedDateTime date : Chrono.range(start, end)) {
+        Chrono.range(start, end).to(date -> {
             cache(date).writeFast(Executions.random(date, date.plusDays(1), span))
                     .effectOnLifecycle(buildTickerData ? new TickerBuilder(service) : null)
                     .to(I.NoOP);
-        }
+        });
     }
 }

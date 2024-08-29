@@ -114,17 +114,17 @@ class ChronoTest {
 
     @Test
     void range() {
-        assert Chrono.range(2020, 11).size() == 30;
-        assert Chrono.range(2020, 12).size() == 31;
-        assert Chrono.range(2021, 1).size() == 31;
-        assert Chrono.range(2021, 2).size() == 28;
-        assert Chrono.range(2021, 3).size() == 31;
-        assert Chrono.range(2021, 4).size() == 30;
+        assert Chrono.range(2020, 11).toList().size() == 30;
+        assert Chrono.range(2020, 12).toList().size() == 31;
+        assert Chrono.range(2021, 1).toList().size() == 31;
+        assert Chrono.range(2021, 2).toList().size() == 28;
+        assert Chrono.range(2021, 3).toList().size() == 31;
+        assert Chrono.range(2021, 4).toList().size() == 30;
     }
 
     @Test
     void rangeByDate() {
-        assert Chrono.range(Chrono.utc(2022, 1, 1), Chrono.utc(2022, 1, 3)).size() == 3;
+        assert Chrono.range(Chrono.utc(2022, 1, 1), Chrono.utc(2022, 1, 3)).toList().size() == 3;
     }
 
     @Test

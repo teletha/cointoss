@@ -231,7 +231,7 @@ public class TickerManager implements Disposable {
     }
 
     private Signal<ZonedDateTime> convertCache(ZonedDateTime start, ZonedDateTime end) {
-        return I.signal(Chrono.range(start, end))
+        return Chrono.range(start, end)
                 .effect(date -> service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP))
                 .effectOnDispose(() -> I.signal(tickers).to(t -> t.ticks.updateMeta()));
     }

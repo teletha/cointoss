@@ -21,7 +21,6 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -432,9 +431,9 @@ public class Chrono {
      * @param month
      * @return
      */
-    public static List<ZonedDateTime> range(int year, int month) {
+    public static Signal<ZonedDateTime> range(int year, int month) {
         ZonedDateTime start = utc(year, month, 1);
-        return range(start, start.plusMonths(1));
+        return range(start, start.plusMonths(1).minusDays(1));
     }
 
     /**
@@ -444,22 +443,11 @@ public class Chrono {
      * @param end The end date. (included)
      * @return
      */
-    public static List<ZonedDateTime> range(ZonedDateTime start, ZonedDateTime end) {
-        return signal(start, end).toList();
-    }
-
-    /**
-     * List up all days at the specified month.
-     * 
-     * @param start The start date. (included)
-     * @param end The end date. (included)
-     * @return
-     */
-    public static Signal<ZonedDateTime> signal(ZonedDateTime start, ZonedDateTime end) {
+    public static Signal<ZonedDateTime> range(ZonedDateTime start, ZonedDateTime end) {
         return new Signal<>((observer, disposer) -> {
             try {
                 ZonedDateTime current = start;
-                while (!disposer.isDisposed() && current.isBefore(end)) {
+                while (!disposer.isDisposed() && (current.isBefore(end) || current.isEqual(end))) {
                     observer.accept(current);
                     current = current.plusDays(1);
                 }
