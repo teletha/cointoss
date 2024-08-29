@@ -276,7 +276,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         long time = item.seconds();
         long[] index = index(time);
 
-        OnHeap<E> segment = loadSegment(false, index[0], index[1]);
+        OnHeap<E> segment = loadSegment(false, index[0], index[1], time);
 
         if (segment == null) {
             segment = new OnHeap(model, index[0], itemSize);
@@ -502,7 +502,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
         long[] index = index(timestamp);
 
-        OnHeap<E> segment = loadSegment(true, index[0], index[1]);
+        OnHeap<E> segment = loadSegment(true, index[0], index[1], timestamp);
         if (segment == null) {
             return null;
         }
@@ -691,7 +691,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             if (forward) {
                 for (long time = segmentStart; time <= segmentEnd && 0 < remaining && !disposer.isDisposed(); time += segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0);
+                    OnHeap<E> heap = loadSegment(true, time, 0, start);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -700,7 +700,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             } else {
                 for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0);
+                    OnHeap<E> heap = loadSegment(true, time, 0, end);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -727,7 +727,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /**
      * Load the data segment at the specified date and time.
      */
-    private OnHeap<E> loadSegment(boolean readMode, long segmentTime, long segmentIndex) {
+    private OnHeap<E> loadSegment(boolean readMode, long segmentTime, long segmentIndex, long itemTime) {
         OnHeap<E> segment = indexed.get(segmentTime);
         if (segment != null) {
             // memory cache
@@ -736,14 +736,14 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             // However, only in read mode. In write mode, it does not re-read the data as it is
             // common to write outside the range and is likely to overwrite the DB data anyway.
             if (readMode && (segmentIndex < segment.min || segment.max < segmentIndex)) {
-                return loadData(segment, readMode);
+                return loadData(segment, readMode, itemTime);
             } else {
                 return segment;
             }
         } else {
             // create new memory cache and load data if DB is enabled
             OnHeap<E> heap = new OnHeap(model, segmentTime, itemSize);
-            loadData(heap, readMode);
+            loadData(heap, readMode, itemTime);
 
             if (readMode && heap.size() == 0) {
                 return null;
@@ -758,8 +758,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /**
      * Load data on the specified segment from DB.
      */
-    private OnHeap<E> loadData(OnHeap<E> heap, boolean idealSafe) {
-        if (db != null && (!idealSafe || computeLogicalFirstCacheTime() <= heap.startTime)) {
+    private OnHeap<E> loadData(OnHeap<E> heap, boolean idealSafe, long timestamp) {
+        if (db != null && firstDisk <= timestamp && timestamp <= lastDisk && (!idealSafe || computeLogicalFirstCacheTime() <= heap.startTime)) {
             db.findBy(E::getId, x -> x.isOrMoreThan(heap.startTime).isLessThan(heap.startTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
                 heap.set((int) index[1], item);
