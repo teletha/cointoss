@@ -15,8 +15,6 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import antibug.CleanRoom;
 import cointoss.Market;
@@ -27,7 +25,6 @@ import kiss.Disposable;
 import kiss.Variable;
 import trademate.chart.PlotScriptRegistry.GlobalSetting;
 
-@Execution(ExecutionMode.SAME_THREAD)
 class PlotScriptRegistryTest {
 
     @RegisterExtension
