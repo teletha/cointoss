@@ -23,22 +23,6 @@ import kiss.Signal;
 public class Executions {
 
     /**
-     * Create the specified numbers of {@link Execution}.
-     * 
-     * @param numbers
-     * @return
-     */
-    public static List<Execution> random(int numbers) {
-        List<Execution> list = new ArrayList();
-
-        for (int i = 0; i < numbers; i++) {
-            list.add(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)));
-        }
-
-        return list;
-    }
-
-    /**
      * Create the specified date-ranged {@link Execution}s.
      * 
      * @return

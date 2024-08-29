@@ -83,7 +83,7 @@ class ExecutionLogTest {
      * @param date A target date.
      */
     private List<Execution> writeNormalLog(ZonedDateTime date) {
-        List<Execution> list = Executions.random(10);
+        List<Execution> list = Executions.random(10, Span.Hour1);
         log.cache(date).normal.text(I.signal(list).map(Execution::toString).toList());
         return list;
     }
@@ -94,7 +94,7 @@ class ExecutionLogTest {
      * @param date A target date.
      */
     private List<Execution> writeCompactLog(ZonedDateTime date) {
-        List<Execution> list = Executions.random(10);
+        List<Execution> list = Executions.random(10, Span.Hour1);
         log.cache(date).writeCompact(I.signal(list)).to();
         return list;
     }
