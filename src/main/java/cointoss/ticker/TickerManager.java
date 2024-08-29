@@ -206,34 +206,33 @@ public class TickerManager implements Disposable {
         start = start.truncatedTo(ChronoUnit.DAYS);
         end = end.truncatedTo(ChronoUnit.DAYS);
 
+        Signal<ZonedDateTime> process = I.signal();;
         if (forceRebuild) {
-            return convertCache(start, end);
+            process = convertCache(start, end);
         } else {
             FeatherStore<Tick> ticks = on(Span.Day).ticks;
             long firstTime = ticks.firstTime();
             long lastTime = ticks.lastTime();
 
             if (firstTime == -1 && lastTime == -1) {
-                return convertCache(start, end);
+                process = convertCache(start, end);
             } else {
-                Signal<ZonedDateTime> base = I.signal();
-
                 if (start.toEpochSecond() < firstTime) {
-                    base = base.merge(convertCache(start, Chrono.utcBySeconds(firstTime)));
+                    process = process.merge(convertCache(start, Chrono.utcBySeconds(firstTime)));
                 }
 
                 if (lastTime < end.toEpochSecond()) {
-                    base = base.merge(convertCache(Chrono.utcBySeconds(lastTime), end));
+                    process = process.merge(convertCache(Chrono.utcBySeconds(lastTime), end));
                 }
-                return base;
             }
         }
+
+        return process;
     }
 
     private Signal<ZonedDateTime> convertCache(ZonedDateTime start, ZonedDateTime end) {
         return Chrono.range(start, end)
-                .effect(date -> service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP))
-                .effectOnDispose(() -> I.signal(tickers).to(t -> t.ticks.updateMeta()));
+                .effect(date -> service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service, this)).to(I.NoOP));
     }
 
     /**
@@ -273,7 +272,7 @@ public class TickerManager implements Disposable {
 
         service.log.range(start, end, LogType.Fast)
                 .effectOnDispose(() -> I.signal(tickers).to(t -> t.ticks.updateMeta()))
-                .effectOnLifecycle(new TickerBuilder(service))
+                .effectOnLifecycle(new TickerBuilder(service, this))
                 .to(I.NoOP);
     }
 }

@@ -9,24 +9,18 @@
  */
 package cointoss.execution;
 
-import java.nio.file.FileSystem;
 import java.time.ZonedDateTime;
-
-import com.google.common.jimfs.Jimfs;
 
 import cointoss.MarketService;
 import cointoss.ticker.Span;
 import cointoss.ticker.TickerBuilder;
 import cointoss.util.Chrono;
 import kiss.I;
-import psychopath.Locator;
 
 public class TestableExecutionLog extends ExecutionLog {
 
-    private static final FileSystem fs = Jimfs.newFileSystem();
-
     public TestableExecutionLog(MarketService service) {
-        super(service, Locator.directory(fs.getPath(service.marketName)));
+        super(service, service.directory("log"));
     }
 
     /**

@@ -14,27 +14,24 @@ import static org.junit.jupiter.api.Assumptions.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
-import antibug.CleanRoom;
-import cointoss.market.TestableMarketService;
+import cointoss.TestableMarketService;
+import cointoss.execution.ExecutionLog.Cache;
+import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import kiss.I;
-import psychopath.Locator;
 
 class ExecutionLogTest {
-
-    @RegisterExtension
-    CleanRoom room = new CleanRoom(true);
 
     private ExecutionLog log;
 
     @BeforeEach
     void setup() {
-        log = new ExecutionLog(new TestableMarketService(), Locator.directory(room.locateRadom()));
+        log = new ExecutionLog(new TestableMarketService());
     }
 
     @Test
@@ -100,5 +97,32 @@ class ExecutionLogTest {
         List<Execution> list = Executions.random(10);
         log.cache(date).writeCompact(I.signal(list)).to();
         return list;
+    }
+
+    @Test
+    void registerFastConverter() {
+        AtomicInteger counter = new AtomicInteger();
+
+        log.registerConverter(disposer -> {
+            return e -> counter.incrementAndGet();
+        });
+
+        Cache cache = log.cache(2025, 12, 15);
+        cache.writeNormal(Executions.random(10, Span.Hour1)).convertNormalToCompact(false);
+        assert counter.get() == 10;
+    }
+
+    @Test
+    void registerFastConverters() {
+        AtomicInteger counter1 = new AtomicInteger();
+        log.registerConverter(disposer -> e -> counter1.incrementAndGet());
+
+        AtomicInteger counter2 = new AtomicInteger();
+        log.registerConverter(disposer -> e -> counter2.incrementAndGet());
+
+        Cache cache = log.cache(2025, 12, 15);
+        cache.writeNormal(Executions.random(10, Span.Hour1)).convertNormalToCompact(false);
+        assert counter1.get() == 10;
+        assert counter2.get() == 10;
     }
 }

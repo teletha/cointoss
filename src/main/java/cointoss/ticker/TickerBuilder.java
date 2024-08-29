@@ -19,11 +19,15 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
 
     private final MarketService service;
 
-    /**
-     * @param service
-     */
+    private final TickerManager manager;
+
     public TickerBuilder(MarketService service) {
+        this(service, null);
+    }
+
+    public TickerBuilder(MarketService service, TickerManager manager) {
         this.service = service;
+        this.manager = manager;
     }
 
     /**
@@ -41,6 +45,12 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
                 // save all ticks to disk
                 ticker.ticks.commit();
             });
+
+            if (manager != null) {
+                manager.tickers().to(ticker -> {
+                    ticker.ticks.updateMeta();
+                });
+            }
         });
         return temporary::update;
     }

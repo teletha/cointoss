@@ -11,7 +11,7 @@ package cointoss.ticker;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import cointoss.market.TestableMarketService;
+import cointoss.TestableMarketService;
 import cointoss.util.TimebaseSupport;
 
 public class TickerTestSupport implements TimebaseSupport {

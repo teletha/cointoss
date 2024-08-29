@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -43,12 +44,14 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.ticker.TickerBuilder;
 import cointoss.util.Chrono;
 import cointoss.util.JobType;
 import hypatia.Num;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
+import kiss.WiseConsumer;
+import kiss.WiseFunction;
 import psychopath.Directory;
 import psychopath.File;
 
@@ -75,6 +78,9 @@ public class ExecutionLog {
     /** The log parser. */
     private final ExecutionLogger logger;
 
+    /** plugin system */
+    private final List<WiseFunction<Disposable, WiseConsumer<Execution>>> converters = new CopyOnWriteArrayList();
+
     /**
      * Create log manager.
      * 
@@ -97,6 +103,17 @@ public class ExecutionLog {
         this.logger = I.make(service.setting.executionLogger());
         this.repository = new Repository(root, service);
         this.cache = new Cache(repository.firstZDT());
+    }
+
+    /**
+     * Register the plugin for fast converter.
+     * 
+     * @param plugin
+     * @return
+     */
+    public final ExecutionLog registerConverter(WiseFunction<Disposable, WiseConsumer<Execution>> plugin) {
+        if (plugin != null) converters.add(plugin);
+        return this;
     }
 
     public final long estimateLastID() {
@@ -137,6 +154,13 @@ public class ExecutionLog {
      */
     final Cache lastCache() {
         return cache(lastCacheDate());
+    }
+
+    /**
+     * Create the specified date cache for TEST.
+     */
+    final Cache cache(int year, int month, int day) {
+        return new Cache(Chrono.utc(year, month, day));
     }
 
     /**
@@ -630,8 +654,10 @@ public class ExecutionLog {
          * 
          * @param executions A list of executions to write.
          */
-        void writeNormal(Execution... executions) {
+        Cache writeNormal(Execution... executions) {
             writeNormal(I.signal(executions)).to(I.NoOP);
+
+            return this;
         }
 
         /**
@@ -639,8 +665,10 @@ public class ExecutionLog {
          * 
          * @param executions A list of executions to write.
          */
-        void writeNormal(Iterable<Execution> executions) {
+        Cache writeNormal(Iterable<Execution> executions) {
             writeNormal(I.signal(executions)).to(I.NoOP);
+
+            return this;
         }
 
         /**
@@ -671,8 +699,10 @@ public class ExecutionLog {
          * 
          * @param executions A list of executions to write.
          */
-        void writeCompact(Execution... executions) {
+        Cache writeCompact(Execution... executions) {
             writeCompact(I.signal(executions)).to(I.NoOP);
+
+            return this;
         }
 
         /**
@@ -680,8 +710,10 @@ public class ExecutionLog {
          * 
          * @param executions A list of executions to write.
          */
-        void writeCompact(Iterable<Execution> executions) {
+        Cache writeCompact(Iterable<Execution> executions) {
             writeCompact(I.signal(executions)).to(I.NoOP);
+
+            return this;
         }
 
         /**
@@ -714,8 +746,10 @@ public class ExecutionLog {
          * 
          * @param executions A list of executions to write.
          */
-        void writeFast(Execution... executions) {
+        Cache writeFast(Execution... executions) {
             writeFast(I.signal(executions)).to(I.NoOP);
+
+            return this;
         }
 
         /**
@@ -723,8 +757,10 @@ public class ExecutionLog {
          * 
          * @param executions A list of executions to write.
          */
-        void writeFast(Iterable<Execution> executions) {
+        Cache writeFast(Iterable<Execution> executions) {
             writeFast(I.signal(executions)).to(I.NoOP);
+
+            return this;
         }
 
         /**
@@ -782,12 +818,17 @@ public class ExecutionLog {
         /**
          * Convert normal log to compact log.
          */
-        void convertNormalToCompact(boolean async) {
+        Cache convertNormalToCompact(boolean async) {
             if (!existCompact() && (!queue.isEmpty() || existNormal())) {
                 if (async) {
                     I.schedule(5, TimeUnit.SECONDS).to(() -> convertNormalToCompact(false));
                 } else {
-                    writeFast(writeCompact(readNormal())).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP, e -> {
+                    writeFast(writeCompact(readNormal())).plug(p -> {
+                        for (WiseFunction<Disposable, WiseConsumer<Execution>> plugin : converters) {
+                            p = p.effectOnLifecycle(plugin);
+                        }
+                        return p;
+                    }).to(I.NoOP, e -> {
                         I.error(service + " fails to compact the normal log. [" + date + "]");
                         I.error(e);
                     }, () -> {
@@ -795,12 +836,13 @@ public class ExecutionLog {
                     });
                 }
             }
+            return this;
         }
 
         /**
          * Convert compact log to normal log.
          */
-        void convertCompactToNormal() {
+        Cache convertCompactToNormal() {
             if (!existNormal() && existCompact()) {
                 CsvWriter writer = buildCsvWriter(normal.newOutputStream(ATOMIC_WRITE));
                 readCompact().to(e -> {
@@ -812,15 +854,7 @@ public class ExecutionLog {
                     writer.close();
                 });
             }
-        }
-
-        /**
-         * Convert fast log to ticker log.
-         */
-        void convertFastToTicker() {
-            if (existFast()) {
-                read(LogType.Fast).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP);
-            }
+            return this;
         }
 
         long estimateFirstID() {

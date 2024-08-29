@@ -27,6 +27,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderManager;
 import cointoss.order.Orderable;
 import cointoss.orderbook.OrderBookManager;
+import cointoss.ticker.TickerBuilder;
 import cointoss.ticker.TickerManager;
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
@@ -118,7 +119,7 @@ public class Market implements Disposable {
      */
     protected Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
-        this.log = service.log;
+        this.log = service.log.registerConverter(new TickerBuilder(service));
         this.orders = createOrderManager();
         this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();

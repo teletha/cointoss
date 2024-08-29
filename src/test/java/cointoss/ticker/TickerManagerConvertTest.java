@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.market.TestableMarketService;
+import cointoss.TestableMarketService;
 import cointoss.util.Chrono;
 import cointoss.util.feather.FeatherStore;
 

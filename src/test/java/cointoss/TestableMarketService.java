@@ -7,21 +7,30 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.market;
+package cointoss;
+
+import java.nio.file.FileSystem;
 
 import org.apache.commons.lang3.RandomStringUtils;
+
+import com.google.common.jimfs.Jimfs;
 
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.TestableExecutionLog;
 import cointoss.verify.VerifiableMarketService;
+import psychopath.Directory;
+import psychopath.Locator;
 
 public class TestableMarketService extends VerifiableMarketService {
+
+    /** The virtual file system. */
+    private static final FileSystem fs = Jimfs.newFileSystem();
 
     /** Expose the testable object. */
     public TestableExecutionLog log;
 
     public TestableMarketService() {
-        super(RandomStringUtils.randomAlphabetic(20));
+        super(RandomStringUtils.randomAlphanumeric(10));
     }
 
     /**
@@ -30,5 +39,13 @@ public class TestableMarketService extends VerifiableMarketService {
     @Override
     protected ExecutionLog createExecutionLog() {
         return log = new TestableExecutionLog(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Directory directory() {
+        return Locator.directory(fs.getPath(marketName));
     }
 }

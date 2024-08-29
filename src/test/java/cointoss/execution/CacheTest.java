@@ -15,45 +15,44 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 
-import antibug.CleanRoom;
+import cointoss.TestableMarket;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
-import psychopath.Locator;
 
 class CacheTest {
 
-    @RegisterExtension
-    CleanRoom room = new CleanRoom();
+    VerifiableMarket market;
 
-    VerifiableMarket market = new VerifiableMarket();
-
-    ExecutionLog log = new ExecutionLog(market.service, Locator.directory(room.root));
+    @BeforeEach
+    void setup() {
+        market = new TestableMarket();
+    }
 
     @Test
     void normalLog() {
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         assert cache.normal.name().equals("execution20201215.log");
     }
 
     @Test
     void compactLog() {
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         assert cache.compactLog().name().equals("execution20201215.clog");
     }
 
     @Test
     void fastLog() {
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         assert cache.fastLog().name().equals("execution20201215.flog");
     }
 
@@ -62,7 +61,7 @@ class CacheTest {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         assert cache.existNormal() == false;
 
         cache.writeNormal(e1, e2);
@@ -74,7 +73,7 @@ class CacheTest {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         assert cache.existCompact() == false;
 
         cache.writeCompact(e1, e2);
@@ -87,7 +86,7 @@ class CacheTest {
         Execution e2 = Execution.with.buy(1).price(12);
 
         // write
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeNormal(e1, e2);
 
         // read
@@ -103,7 +102,7 @@ class CacheTest {
         Execution e2 = Execution.with.buy(1).price(12);
 
         // write
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeCompact(e1, e2);
 
         // read
@@ -121,7 +120,7 @@ class CacheTest {
         Execution c2 = Execution.with.buy(2).price(12);
 
         // write
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeNormal(n1, n2);
         cache.writeCompact(c1, c2);
 
@@ -150,7 +149,7 @@ class CacheTest {
             }
         };
 
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         List<Execution> executions = cache.readExternalRepository(external).toList();
         assert executions.size() == 2;
         assert executions.get(0).equals(e1);
@@ -165,7 +164,7 @@ class CacheTest {
         Execution e2 = Execution.with.buy(1).price(12);
 
         // write
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeNormal(e1, e2);
         assert cache.existNormal();
         assert cache.existCompact() == false;
@@ -189,7 +188,7 @@ class CacheTest {
         Execution e2 = Execution.with.buy(1).price(12);
 
         // write
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeCompact(e1, e2);
         assert cache.existNormal() == false;
         assert cache.existCompact();
@@ -215,7 +214,7 @@ class CacheTest {
         Execution r1 = Execution.with.buy(1).price(12).date(date.plusDays(1));
         market.service.executionsWillResponse(r1);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.existCompletedNormal();
     }
@@ -229,7 +228,7 @@ class CacheTest {
         Execution r1 = Execution.with.buy(1).price(14).date(date);
         market.service.executionsWillResponse(r1);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.existCompletedNormal() == false;
     }
@@ -240,7 +239,7 @@ class CacheTest {
         Execution e1 = Execution.with.buy(1).price(10).date(date);
         Execution e2 = Execution.with.buy(1).price(12).date(date);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeCompact(e1, e2);
         assert cache.repair(false);
         assert cache.existCompact();
@@ -256,7 +255,7 @@ class CacheTest {
         Execution r1 = Execution.with.buy(1).price(14).date(date.plusDays(1));
         market.service.executionsWillResponse(r1);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.repair(false);
         assert cache.existCompact();
@@ -272,7 +271,7 @@ class CacheTest {
         Execution r1 = Execution.with.buy(1).price(14).date(date.plusDays(1));
         market.service.executionsWillResponse(r1);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.repair(false) == false;
         assert cache.existCompact() == false;
@@ -289,7 +288,7 @@ class CacheTest {
         market.service.executionsWillResponse(r1);
         market.service.external = useExternalRepository(date);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.repair(false);
         assert cache.existCompact();
@@ -304,7 +303,7 @@ class CacheTest {
         market.service.executionsWillResponse(r1);
         market.service.external = useExternalRepository(date);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         assert cache.repair(false);
         assert cache.existCompact();
         assert cache.existNormal() == false;
@@ -352,7 +351,7 @@ class CacheTest {
         Execution r3 = Execution.with.buy(1).price(15).date(date.plusDays(1));
         market.service.executionsWillResponse(r1, r2, r3);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.existNormal() == true;
 
@@ -372,7 +371,7 @@ class CacheTest {
         Execution r3 = Execution.with.buy(1).price(15).date(date.plusDays(1));
         market.service.executionsWillResponse(e1, e2, r1, r2, r3);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
 
         assert cache.repair(false);
@@ -391,7 +390,7 @@ class CacheTest {
         Execution r3 = Execution.with.buy(1).price(15).date(date);
         market.service.executionsWillResponse(r1, r2, r3);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.repair(false) == false;
         assert checkNormal(cache, e1, e2, r1, r2, r3);
@@ -408,7 +407,7 @@ class CacheTest {
         Execution r3 = Execution.with.buy(1).price(15).date(date);
         market.service.executionsWillResponse(e1, e2, r1, r2, r3);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.repair(false) == false;
         assert checkNormal(cache, e1, e2, r1, r2, r3);
@@ -423,7 +422,7 @@ class CacheTest {
         market.service.executionsWillResponse(e1, e2);
         market.service.searchNearestIdWillResponse(p0);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         assert cache.repair(false) == false;
         assert checkNormal(cache, e1, e2);
     }
@@ -438,14 +437,14 @@ class CacheTest {
         Execution r2 = Execution.with.sell(1).price(14).date(date.plusDays(1));
         market.service.executionsWillResponse(r1, r2);
 
-        Cache cache = log.cache(date);
+        Cache cache = market.log.cache(date);
         cache.writeNormal(e1, e2);
         assert cache.repair(false);
         assert checkCompact(cache, e1, e2);
     }
 
     /**
-     * Assert log.
+     * Assert market.log.
      * 
      * @param cache
      * @param executions
@@ -461,7 +460,7 @@ class CacheTest {
     }
 
     /**
-     * Assert log.
+     * Assert market.log.
      * 
      * @param cache
      * @param executions
@@ -481,7 +480,7 @@ class CacheTest {
         int size = 1000;
         Execution[] executions = Executions.random(size, Duration.ofMillis(2000)).toArray(new Execution[size]);
 
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeNormal(executions);
         HashCode hashOriginal = Files.asByteSource(cache.normal.asJavaFile()).hash(Hashing.sha256());
 
@@ -508,7 +507,7 @@ class CacheTest {
         Execution e2 = Execution.with.buy(1).price(10).id(2);
         Execution e3 = Execution.with.buy(1).price(10).id(3);
 
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeNormal(e1, e2, e3);
         assert cache.existNormal() == true;
         assert cache.normal.size() != 0;
@@ -521,7 +520,7 @@ class CacheTest {
         Execution e2 = Execution.with.buy(1).price(10).id(2);
         Execution e3 = Execution.with.buy(1).price(10).id(3);
 
-        Cache cache = log.cache(Chrono.utc(2020, 12, 15));
+        Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeCompact(e1, e2, e3);
         assert cache.estimateLastID() == 3;
     }

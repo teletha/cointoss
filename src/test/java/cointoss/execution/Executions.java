@@ -61,13 +61,23 @@ public class Executions {
      * @param numbers
      * @return
      */
-    public static List<Execution> random(int numbers, Duration interval) {
+    public static List<Execution> random(int numbers, Span span) {
+        return random(numbers, span.duration);
+    }
+
+    /**
+     * Create the specified numbers of {@link Execution}.
+     * 
+     * @param numbers
+     * @return
+     */
+    public static List<Execution> random(int numbers, Duration span) {
         List<Execution> list = new ArrayList();
         ZonedDateTime date = Chrono.MIN;
 
         for (int i = 0; i < numbers; i++) {
             list.add(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)).date(date));
-            date = date.plus(interval);
+            date = date.plus(span);
         }
 
         return list;

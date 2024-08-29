@@ -18,8 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import antibug.powerassert.PowerAssertOff;
+import cointoss.TestableMarketService;
 import cointoss.execution.Execution;
-import cointoss.market.TestableMarketService;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signaling;
