@@ -11,7 +11,6 @@ package cointoss.util.feather;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -156,11 +155,7 @@ class FeatherStoreTestBase {
          */
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + getEnclosingInstance().hashCode();
-            result = prime * result + Objects.hash(item);
-            return result;
+            return item;
         }
 
         /**
@@ -168,12 +163,11 @@ class FeatherStoreTestBase {
          */
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null) return false;
-            if (getClass() != obj.getClass()) return false;
-            Value other = (Value) obj;
-            if (!getEnclosingInstance().equals(other.getEnclosingInstance())) return false;
-            return item == other.item;
+            if (obj instanceof Value other) {
+                return item == other.item;
+            } else {
+                return false;
+            }
         }
 
         /**
@@ -182,10 +176,6 @@ class FeatherStoreTestBase {
         @Override
         public String toString() {
             return "Value [value=" + item + "]";
-        }
-
-        private FeatherStoreTestBase getEnclosingInstance() {
-            return FeatherStoreTestBase.this;
         }
     }
 }

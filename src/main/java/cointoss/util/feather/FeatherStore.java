@@ -660,6 +660,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             if (e == -1) {
                 if (o.forward) {
+                    s = Math.max(s, first);
                     e = Math.max(s, last);
                 } else {
                     e = s;
@@ -691,7 +692,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             if (forward) {
                 for (long time = segmentStart; time <= segmentEnd && 0 < remaining && !disposer.isDisposed(); time += segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0, start);
+                    System.out.println(segmentStart + "  " + time + "  " + this);
+                    OnHeap<E> heap = loadSegment(true, time, 0, time);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -700,7 +702,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             } else {
                 for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0, end);
+                    OnHeap<E> heap = loadSegment(true, time, 0, time);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;

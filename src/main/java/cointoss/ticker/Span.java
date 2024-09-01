@@ -48,6 +48,9 @@ public enum Span {
     /** The duration (seconds) of the segment. */
     public final long segmentSeconds;
 
+    /** The maximum size per a segment. */
+    public final int itemSize;
+
     /** The maximum size of the segment. */
     public final int segmentSize;
 
@@ -72,6 +75,7 @@ public enum Span {
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());
         this.seconds = duration.toSeconds();
+        this.itemSize = segment;
         this.segmentSeconds = Duration.of(segment, segmentUnit).toSeconds();
         this.segmentSize = maximumSegmentSize;
         this.uppers = new int[uppers.length];

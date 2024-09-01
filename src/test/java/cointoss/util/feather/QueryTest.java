@@ -11,9 +11,12 @@ package cointoss.util.feather;
 
 import static cointoss.util.feather.Option.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import cointoss.ticker.Span;
 import kiss.Signal;
@@ -179,6 +182,23 @@ class QueryTest extends FeatherStoreTestBase {
         assert equality(store.query(4 * days, o -> o.before().max(3)), 3 * days, 2 * days, 1 * days);
     }
 
+    @ParameterizedTest
+    @MethodSource("offsetForDay")
+    void loadFromDisk(int offset) {
+        FeatherStore<Value> store = createStore(Span.Day, null, List.of(day(offset), day(offset + 1), day(offset + 2)));
+        assert equality(store.query(offset), day(offset), day(offset + 1), day(offset + 2));
+    }
+
+    static Iterable<Integer> offsetForDay() {
+        List<Integer> list = new ArrayList();
+        long start = 0;
+        long end = Span.Day.itemSize * 2;
+        for (long i = start; i <= end; i += Span.Day.itemSize / 5) {
+            list.add((int) i);
+        }
+        return list;
+    }
+
     private static final int[] EMPTY = new int[0];
 
     private boolean equality(Signal<Value> query, String values) {
@@ -216,6 +236,15 @@ class QueryTest extends FeatherStoreTestBase {
         assert list.size() == values.length;
         for (int i = 0; i < list.size(); i++) {
             assert list.get(i).item == values[i];
+        }
+        return true;
+    }
+
+    private boolean equality(Signal<Value> query, Value... values) {
+        List<Value> list = query.toList();
+        assert list.size() == values.length;
+        for (int i = 0; i < list.size(); i++) {
+            assert list.get(i).equals(values[i]);
         }
         return true;
     }
