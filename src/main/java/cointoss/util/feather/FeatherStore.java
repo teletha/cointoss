@@ -649,35 +649,35 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
 
         return new Signal<>((observer, disposer) -> {
-            long s = start;
-            long e = end;
+            long actualStart = start;
+            long actualEnd = end;
             long first = firstTime();
             long last = lastTime();
 
-            if (s == Option.Latest) {
-                s = last;
+            if (actualStart == Option.Latest) {
+                actualStart = last;
             }
 
-            if (e == -1) {
+            if (actualEnd == -1) {
                 if (o.forward) {
-                    s = Math.max(s, first);
-                    e = Math.max(s, last);
+                    actualStart = Math.max(actualStart, first);
+                    actualEnd = Math.max(actualStart, last);
                 } else {
-                    e = s;
-                    s = 0;
+                    actualEnd = actualStart;
+                    actualStart = 0;
                 }
             }
 
-            boolean forward = s <= e;
-            long[] startIndex = index(forward ? s : e);
-            long[] endIndex = index(forward ? e : s);
+            boolean forward = actualStart <= actualEnd;
+            long[] startIndex = index(forward ? actualStart : actualEnd);
+            long[] endIndex = index(forward ? actualEnd : actualStart);
             forward = o.forward == forward;
 
             if (o.excludeStart) {
                 if (forward) {
                     startIndex[1] += 1;
                 } else {
-                    if (e <= last) {
+                    if (actualEnd <= last) {
                         endIndex[1] -= 1;
                     }
                 }
@@ -692,8 +692,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             if (forward) {
                 for (long time = segmentStart; time <= segmentEnd && 0 < remaining && !disposer.isDisposed(); time += segmentDuration) {
-                    System.out.println(segmentStart + "  " + time + "  " + this);
-                    OnHeap<E> heap = loadSegment(true, time, 0, time);
+                    OnHeap<E> heap = loadSegment(true, time, 0, actualStart);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -702,7 +701,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             } else {
                 for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0, time);
+                    OnHeap<E> heap = loadSegment(true, time, 0, actualEnd);
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
