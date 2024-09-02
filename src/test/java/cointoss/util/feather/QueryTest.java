@@ -182,7 +182,7 @@ class QueryTest extends FeatherStoreTestBase {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 20})
+    @ValueSource(ints = {0, 20, 60, 100, 150, 200})
     void loadFromDisk(int offset) {
         FeatherStore<Value> store = createStore(Span.Day, null, List.of(day(offset), day(offset + 1), day(offset + 2)));
         assert equality(store.query(offset), day(offset), day(offset + 1), day(offset + 2));
