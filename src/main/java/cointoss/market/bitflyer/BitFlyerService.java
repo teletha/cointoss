@@ -145,7 +145,7 @@ public class BitFlyerService extends MarketService {
     @Override
     public Signal<String> request(Order order) {
         Signal<String> call;
-        String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
+        String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.secure().nextNumeric(6);
 
         if (forTest || Session.id == null) {
             ChildOrderRequest request = new ChildOrderRequest();
@@ -844,7 +844,7 @@ public class BitFlyerService extends MarketService {
 
         private Auth() {
             long timestamp = Chrono.utcNow().toEpochSecond();
-            String nonce = RandomStringUtils.randomNumeric(16);
+            String nonce = RandomStringUtils.secure().nextNumeric(16);
             String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
                     .hashString(timestamp + nonce, StandardCharsets.UTF_8)
                     .toString();

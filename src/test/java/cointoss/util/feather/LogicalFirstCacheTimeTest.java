@@ -11,7 +11,7 @@ package cointoss.util.feather;
 
 import org.junit.jupiter.api.Test;
 
-class FirstIdealCacheTimeTest extends FeatherStoreTestBase {
+class LogicalFirstCacheTimeTest extends FeatherStoreTestBase {
 
     @Test
     void noData() {

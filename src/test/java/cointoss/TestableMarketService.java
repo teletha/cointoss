@@ -30,7 +30,7 @@ public class TestableMarketService extends VerifiableMarketService {
     public TestableExecutionLog log;
 
     public TestableMarketService() {
-        super(RandomStringUtils.randomAlphanumeric(10));
+        super(RandomStringUtils.secure().nextAlphanumeric(10));
     }
 
     /**

@@ -40,7 +40,7 @@ class FeatherStoreTestBase {
     protected final FeatherStore<Value> createStore(Span span, List<Value> initialMemoryValues, List<Value> initialDiskValues) {
         FeatherStore<Value> store = FeatherStore.create(Value.class, span);
         if (initialDiskValues != null) {
-            store.enablePersistence(RandomStringUtils.randomAlphabetic(30));
+            store.enablePersistence(RandomStringUtils.secure().nextAlphabetic(30));
             store.store(initialDiskValues);
             store.commit();
             store.clear();
@@ -70,7 +70,7 @@ class FeatherStoreTestBase {
     protected final FeatherStore<Value> createStore(int itemSize, int segmentSize, List<Value> initialMemoryValues, List<Value> initialDiskValues) {
         FeatherStore<Value> store = FeatherStore.create(Value.class, 1, itemSize, segmentSize);
         if (initialDiskValues != null) {
-            store.enablePersistence(RandomStringUtils.randomAlphanumeric(30));
+            store.enablePersistence(RandomStringUtils.secure().nextAlphabetic(30));
             store.store(initialDiskValues);
             store.commit();
             store.clear();

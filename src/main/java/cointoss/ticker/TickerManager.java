@@ -210,12 +210,21 @@ public class TickerManager implements Disposable {
      */
     public Signal<ZonedDateTime> build(boolean forceRebuild) {
         Ticker ticker = on(Span.Day);
-        ZonedDateTime startDay = Chrono.utcBySeconds(ticker.ticks.computeLogicalFirstCacheTime());
-        ZonedDateTime endDay = Chrono.utcBySeconds(ticker.ticks.lastCacheTime());
 
-        System.out.println(startDay + "  " + endDay);
+        // ideal cache's range
+        long[] times = ticker.ticks.computeIdealSegmentTime();
+        ZonedDateTime startCache = Chrono.utcBySeconds(times[0]);
+        ZonedDateTime endCache = Chrono.utcBySeconds(times[1]);
 
-        return build(startDay, endDay, forceRebuild);
+        // log's range
+        ZonedDateTime startLog = service.log.firstCacheDate();
+        ZonedDateTime endLog = service.log.lastCacheDate();
+
+        // compute the suitable log range
+        ZonedDateTime start = Chrono.min(startLog, Chrono.between(startLog, startCache, endLog));
+        ZonedDateTime end = Chrono.max(endLog, Chrono.between(startLog, endCache, endLog));
+
+        return build(start, end, forceRebuild);
     }
 
     /**

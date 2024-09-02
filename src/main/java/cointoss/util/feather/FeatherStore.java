@@ -432,6 +432,19 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
+     * Compute the first and last segment time logically in the current state.
+     * 
+     * @return
+     */
+    public long[] computeIdealSegmentTime() {
+        long last = lastTime();
+        if (last == -1) {
+            last = System.currentTimeMillis() / 1000L;
+        }
+        return new long[] {last - segmentDuration * (segmentSize - 1), last};
+    }
+
+    /**
      * Retrieve the first element from all stored data, including secondary cache.
      * 
      * @return The first stored time series item.
