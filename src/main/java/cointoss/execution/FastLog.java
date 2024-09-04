@@ -14,7 +14,6 @@ import java.util.function.Function;
 import cointoss.Direction;
 import cointoss.util.Chrono;
 import hypatia.Num;
-import kiss.I;
 import kiss.Signal;
 
 class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
@@ -51,18 +50,25 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
      */
     @Override
     public Signal<Execution> apply(Signal<Execution> signal) {
-        return signal.flatMap(e -> {
+        return signal.skip(x -> {
             if (start == -1) {
-                return createTick(e);
-            } else if (e.mills < end) {
-                return updateTick(e);
+                return createTick(x);
+            } else if (x.mills < end) {
+                return updateTick(x);
             } else {
-                return completeTick(e);
+                return false;
             }
-        }).concat(completeTick(null));
+        }).flatMap(e -> completeTick(e)).concat(completeTick(null));
     }
 
-    private Signal<Execution> createTick(Execution e) {
+    /**
+     * Normally, we would use an EMPTY Signal and process it with FlatMap, but that would require a
+     * lot of memory, so we use skip.
+     * 
+     * @param e
+     * @return
+     */
+    private boolean createTick(Execution e) {
         start = e.mills - e.mills % 5000;
         end = start + 5000;
         open = highest = lowest = close = e.price.doubleValue();
@@ -74,11 +80,17 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
             sells = e.size.doubleValue();
             buys = 0;
         }
-
-        return I.signal();
+        return true;
     }
 
-    private Signal<Execution> updateTick(Execution e) {
+    /**
+     * Normally, we would use an EMPTY Signal and process it with FlatMap, but that would require a
+     * lot of memory, so we use skip.
+     * 
+     * @param e
+     * @return
+     */
+    private boolean updateTick(Execution e) {
         double price = e.price.doubleValue();
         if (highest < price) {
             highest = price;
@@ -93,8 +105,7 @@ class FastLog implements Function<Signal<Execution>, Signal<Execution>> {
         } else {
             sells += e.size.doubleValue();
         }
-
-        return I.signal();
+        return true;
     }
 
     private Signal<Execution> completeTick(Execution next) {

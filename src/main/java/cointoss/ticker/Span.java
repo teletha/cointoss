@@ -35,9 +35,9 @@ public enum Span {
 
     Hour1(1, HOUR_OF_DAY, 4, DAYS, 10, 1, 1), // 24 * 4 * 10 = 960
 
-    Hour4(4, HOUR_OF_DAY, 10, DAYS, 14, 1), // 6 * 10 * 14 = 840
+    Hour4(4, HOUR_OF_DAY, 10, DAYS, 16, 1), // 6 * 10 * 16 = 960
 
-    Day(1, EPOCH_DAY, 60, DAYS, 14); // 60 * 14 = 840
+    Day(1, EPOCH_DAY, 60, DAYS, 16); // 60 * 16 = 960
 
     /** The actual duration. */
     public final Duration duration;

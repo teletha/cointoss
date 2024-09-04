@@ -13,6 +13,8 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
 import cointoss.util.Coordinator;
+import cointoss.util.Job;
+import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -85,11 +87,11 @@ public class TradingView extends View {
         Coordinator.request(service, next -> {
             market.readLog(x -> x.fromLast(3, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
 
-            // Job.TickerGenerator.run(service.exchange, job -> {
-            // market.tickers.buildFully(false).to(e -> {
-            // I.info(service + " builds ticker [" + e + "]");
-            // });
-            // });
+            Job.TickerGenerator.run(service.exchange, job -> {
+                market.tickers.buildFully(false).to(e -> {
+                    I.info(service + " builds ticker [" + e + "]");
+                });
+            });
 
             chart.market.set(market);
             chart.showRealtimeUpdate.set(tab.isSelected());
