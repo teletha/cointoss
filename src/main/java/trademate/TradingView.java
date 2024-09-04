@@ -85,12 +85,15 @@ public class TradingView extends View {
         Coordinator.request(service, next -> {
             market.readLog(x -> x.fromLast(3, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
 
+            // Job.TickerGenerator.run(service.exchange, job -> {
+            // market.tickers.buildFully(false).to(e -> {
+            // I.info(service + " builds ticker [" + e + "]");
+            // });
+            // });
+
             chart.market.set(market);
             chart.showRealtimeUpdate.set(tab.isSelected());
-            chart.ticker.observing().to(ticker -> {
-                market.tickers.build(false).to();
-                chart.chart.layoutForcely();
-            });
+            chart.ticker.observing().to(ticker -> chart.chart.layoutForcely());
 
             next.run();
         });

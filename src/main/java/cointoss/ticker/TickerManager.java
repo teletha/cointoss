@@ -208,7 +208,7 @@ public class TickerManager implements Disposable {
      * @param forceRebuild
      * @return
      */
-    public Signal<ZonedDateTime> build(boolean forceRebuild) {
+    public Signal<ZonedDateTime> buildFully(boolean forceRebuild) {
         Ticker ticker = on(Span.Day);
 
         // ideal cache's range
@@ -250,12 +250,12 @@ public class TickerManager implements Disposable {
             if (firstTime == -1 && lastTime == -1) {
                 process = buildCache(start, end);
             } else {
-                if (start.toEpochSecond() < firstTime) {
-                    process = process.merge(buildCache(start, Chrono.utcBySeconds(firstTime)));
-                }
-
                 if (lastTime < end.toEpochSecond()) {
                     process = process.merge(buildCache(Chrono.utcBySeconds(lastTime), end));
+                }
+
+                if (start.toEpochSecond() < firstTime) {
+                    process = process.merge(buildCache(start, Chrono.utcBySeconds(firstTime)));
                 }
             }
         }
@@ -264,7 +264,7 @@ public class TickerManager implements Disposable {
     }
 
     private Signal<ZonedDateTime> buildCache(ZonedDateTime start, ZonedDateTime end) {
-        return Chrono.range(start, end)
+        return Chrono.range(end, start)
                 .effect(date -> service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service, this)).to(I.NoOP));
     }
 }

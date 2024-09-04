@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.Direction;
 import cointoss.Market;
+import cointoss.TestableMarket;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.Orderable;
@@ -32,7 +33,6 @@ import cointoss.trade.extension.StrategyPart;
 import cointoss.trade.extension.TradePart;
 import cointoss.util.Chrono;
 import cointoss.util.TimebaseSupport;
-import cointoss.verify.VerifiableMarket;
 import hypatia.Num;
 import hypatia.Orientational;
 import kiss.I;
@@ -40,7 +40,7 @@ import kiss.Signal;
 
 public abstract class TraderTestSupport extends Trader implements TimebaseSupport {
 
-    protected VerifiableMarket market;
+    protected TestableMarket market;
 
     private ZonedDateTime base;
 
@@ -52,7 +52,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
     @BeforeEach
     void setup() {
-        market = new VerifiableMarket();
+        market = new TestableMarket();
         market.register(this);
 
         initialize(market);

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
+import cointoss.TestableMarket;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.QuantityCondition;
@@ -24,7 +25,7 @@ import hypatia.Num;
 
 class VerifiableMarketTest {
 
-    VerifiableMarket market = new VerifiableMarket();
+    TestableMarket market = new TestableMarket();
 
     @BeforeEach
     void initialize() {

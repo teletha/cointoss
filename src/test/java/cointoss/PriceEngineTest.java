@@ -14,12 +14,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
-import cointoss.verify.VerifiableMarket;
 import hypatia.Num;
 
 public class PriceEngineTest {
 
-    private VerifiableMarket market = new VerifiableMarket();
+    private TestableMarket market = new TestableMarket();
 
     @Test
     void buy() {

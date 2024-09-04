@@ -13,6 +13,7 @@ import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.TestableMarket;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import kiss.Variable;
@@ -21,7 +22,7 @@ class LatencyTest {
 
     @Test
     void request() {
-        VerifiableMarket market = new VerifiableMarket();
+        TestableMarket market = new TestableMarket();
         market.service.latency = Latency.fixed(3, SECONDS);
 
         market.request(Order.with.buy(1).price(10)).to(order -> {
@@ -45,7 +46,7 @@ class LatencyTest {
 
     @Test
     void cancel() {
-        VerifiableMarket market = new VerifiableMarket();
+        TestableMarket market = new TestableMarket();
         market.service.latency = Latency.fixed(3, SECONDS);
 
         market.request(Order.with.buy(1).price(10)).to(order -> {

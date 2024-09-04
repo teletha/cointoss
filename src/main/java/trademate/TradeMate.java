@@ -12,6 +12,9 @@ package trademate;
 import java.util.List;
 import java.util.Random;
 
+import org.sqlite.SQLiteConfig.JournalMode;
+import org.sqlite.SQLiteConfig.SynchronousMode;
+
 import cointoss.Market;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
@@ -23,6 +26,7 @@ import kiss.Singleton;
 import psychopath.Locator;
 import stylist.Style;
 import stylist.StyleDSL;
+import typewriter.sqlite.SQLite;
 import viewtify.Viewtify;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -90,6 +94,10 @@ public class TradeMate extends View {
     public static void main(String[] args) {
         I.load(Market.class);
         I.env("typewriter.sqlite", "jdbc:sqlite:.log/market.sqlite");
+        SQLite.configure(config -> {
+            config.setJournalMode(JournalMode.WAL);
+            config.setSynchronous(SynchronousMode.OFF);
+        });
 
         // activate application
         Viewtify.application().icon("icon/app.png").onTerminating(EfficientWebSocket::shutdownNow).activate(TradeMate.class);

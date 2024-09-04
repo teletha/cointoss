@@ -444,20 +444,35 @@ public class Chrono {
      * @return
      */
     public static Signal<ZonedDateTime> range(ZonedDateTime start, ZonedDateTime end) {
-        return new Signal<>((observer, disposer) -> {
-            try {
-                ZonedDateTime current = start;
-                while (!disposer.isDisposed() && (current.isBefore(end) || current.isEqual(end))) {
-                    observer.accept(current);
-                    current = current.plusDays(1);
+        if (start.isBefore(end)) {
+            return new Signal<>((observer, disposer) -> {
+                try {
+                    ZonedDateTime current = start;
+                    while (!disposer.isDisposed() && (current.isBefore(end) || current.isEqual(end))) {
+                        observer.accept(current);
+                        current = current.plusDays(1);
+                    }
+                    observer.complete();
+                } catch (Exception e) {
+                    observer.error(e);
                 }
-                observer.complete();
-            } catch (Exception e) {
-                observer.error(e);
-            }
-            return disposer;
-
-        });
+                return disposer;
+            });
+        } else {
+            return new Signal<>((observer, disposer) -> {
+                try {
+                    ZonedDateTime current = start;
+                    while (!disposer.isDisposed() && (current.isAfter(end) || current.isEqual(end))) {
+                        observer.accept(current);
+                        current = current.minusDays(1);
+                    }
+                    observer.complete();
+                } catch (Exception e) {
+                    observer.error(e);
+                }
+                return disposer;
+            });
+        }
     }
 
     /**

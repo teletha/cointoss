@@ -23,7 +23,7 @@ import cointoss.util.feather.FeatherStore;
 public class TickerManagerBuildTest {
 
     @Test
-    void buildFull() {
+    void buildFully() {
         ZonedDateTime start = Chrono.utc(2020, 1, 1);
         ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);
 
@@ -31,7 +31,7 @@ public class TickerManagerBuildTest {
         service.log.generateFastLog(start, end, Span.Minute1);
 
         TickerManager manager = new TickerManager(service);
-        manager.build(false).to();
+        manager.buildFully(false).to();
         assert manager.on(Span.Day).ticks.query(start, end).toList().size() == 2;
         assert manager.on(Span.Hour4).ticks.query(start, end).toList().size() == 12;
         assert manager.on(Span.Hour1).ticks.query(start, end).toList().size() == 48;

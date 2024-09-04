@@ -12,6 +12,7 @@ package cointoss.util;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -124,7 +125,20 @@ class ChronoTest {
 
     @Test
     void rangeByDate() {
-        assert Chrono.range(Chrono.utc(2022, 1, 1), Chrono.utc(2022, 1, 3)).toList().size() == 3;
+        List<ZonedDateTime> list = Chrono.range(Chrono.utc(2022, 1, 1), Chrono.utc(2022, 1, 3)).toList();
+        assert list.size() == 3;
+        assert list.get(0).getDayOfMonth() == 1;
+        assert list.get(1).getDayOfMonth() == 2;
+        assert list.get(2).getDayOfMonth() == 3;
+    }
+
+    @Test
+    void rangeByDateReverse() {
+        List<ZonedDateTime> list = Chrono.range(Chrono.utc(2022, 1, 3), Chrono.utc(2022, 1, 1)).toList();
+        assert list.size() == 3;
+        assert list.get(0).getDayOfMonth() == 3;
+        assert list.get(1).getDayOfMonth() == 2;
+        assert list.get(2).getDayOfMonth() == 1;
     }
 
     @Test

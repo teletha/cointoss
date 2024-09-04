@@ -25,13 +25,12 @@ import com.google.common.io.Files;
 import cointoss.TestableMarket;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.util.Chrono;
-import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
 
 class CacheTest {
 
-    VerifiableMarket market;
+    TestableMarket market;
 
     @BeforeEach
     void setup() {

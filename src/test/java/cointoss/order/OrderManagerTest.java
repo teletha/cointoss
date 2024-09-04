@@ -15,21 +15,20 @@ import static hypatia.Num.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cointoss.TestableMarketService;
+import cointoss.TestableMarket;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
-import cointoss.verify.VerifiableMarket;
 import kiss.I;
 
 class OrderManagerTest {
 
-    private VerifiableMarket market;
+    private TestableMarket market;
 
     private OrderManager orders;
 
     @BeforeEach
     void setup() {
-        market = new VerifiableMarket(new TestableMarketService());
+        market = new TestableMarket();
         orders = market.orders;
     }
 

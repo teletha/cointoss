@@ -9,12 +9,13 @@
  */
 package cointoss.verify;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.TestableMarket;
 import cointoss.execution.Execution;
 
 class VerifiableMarketServiceSchedulerTest {
@@ -23,7 +24,7 @@ class VerifiableMarketServiceSchedulerTest {
     void schedule() {
         Value v = new Value();
 
-        VerifiableMarket market = new VerifiableMarket();
+        TestableMarket market = new TestableMarket();
         ScheduledExecutorService scheduler = market.service.scheduler();
         market.perform(Execution.with.buy(1));
 

@@ -13,11 +13,10 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
-import cointoss.verify.VerifiableMarket;
 
 class MarketTest {
 
-    private VerifiableMarket market = new VerifiableMarket();
+    private TestableMarket market = new TestableMarket();
 
     @Test
     void registerCallDeclare() {

@@ -10,7 +10,7 @@
 package cointoss.order;
 
 import static cointoss.Direction.*;
-import static java.time.temporal.ChronoUnit.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.List;
 
@@ -18,20 +18,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import antibug.powerassert.PowerAssertOff;
-import cointoss.TestableMarketService;
+import cointoss.TestableMarket;
 import cointoss.execution.Execution;
-import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signaling;
 import kiss.WiseConsumer;
 
 class OrderStrategyTest {
 
-    private VerifiableMarket market;
+    private TestableMarket market;
 
     @BeforeEach
     void setup() {
-        market = new VerifiableMarket(new TestableMarketService());
+        market = new TestableMarket();
     }
 
     @Test
