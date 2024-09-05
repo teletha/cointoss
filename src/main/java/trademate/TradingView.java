@@ -9,12 +9,14 @@
  */
 package trademate;
 
+import java.time.Period;
+import java.time.ZonedDateTime;
+
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
 import cointoss.util.Coordinator;
 import cointoss.util.Job;
-import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -88,9 +90,18 @@ public class TradingView extends View {
             market.readLog(x -> x.fromLast(3, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
 
             Job.TickerGenerator.run(service.exchange, job -> {
-                market.tickers.buildFully(false).to(e -> {
-                    I.info(service + " builds ticker [" + e + "]");
-                });
+
+                ZonedDateTime[] dates = market.tickers.estimateFullBuild();
+                Period period = Period.between(dates[0].toLocalDate(), dates[1].toLocalDate());
+                int size = period.getDays();
+
+                // ToastMonitor.show(en("Build ticker data."), size, market.tickers.build(dates[0],
+                // dates[1], false)
+                // .map(e -> service + " build ticker [" + e + "]")
+                // .effect(e -> I.info(e)));
+                // market.tickers.buildFully(false).to(e -> {
+                // I.info(service + " builds ticker [" + e + "]");
+                // });
             });
 
             chart.market.set(market);

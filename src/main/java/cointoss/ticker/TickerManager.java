@@ -203,12 +203,11 @@ public class TickerManager implements Disposable {
     }
 
     /**
-     * Build ticker data from execution log.
+     * Estimate the date range of full build.
      * 
-     * @param forceRebuild
      * @return
      */
-    public Signal<ZonedDateTime> buildFully(boolean forceRebuild) {
+    public ZonedDateTime[] estimateFullBuild() {
         Ticker ticker = on(Span.Day);
 
         // ideal cache's range
@@ -224,7 +223,18 @@ public class TickerManager implements Disposable {
         ZonedDateTime start = Chrono.min(startLog, Chrono.between(startLog, startCache, endLog));
         ZonedDateTime end = Chrono.max(endLog, Chrono.between(startLog, endCache, endLog));
 
-        return build(start, end, forceRebuild);
+        return new ZonedDateTime[] {start, end};
+    }
+
+    /**
+     * Build ticker data from execution log.
+     * 
+     * @param forceRebuild
+     * @return
+     */
+    public Signal<ZonedDateTime> buildFully(boolean forceRebuild) {
+        ZonedDateTime[] dates = estimateFullBuild();
+        return build(dates[0], dates[1], forceRebuild);
     }
 
     /**
