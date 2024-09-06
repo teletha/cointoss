@@ -17,7 +17,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.binance.Binance;
 import cointoss.util.Chrono;
 import kiss.I;
 
@@ -29,7 +29,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        restoreNormal(BitFlyer.XRP_JPY, ZonedDateTime.now().minusDays(1));
+        createFastLog(Binance.BTC_USDT, Chrono.utc(2024, 3, 25));
     }
 
     /**
@@ -42,6 +42,23 @@ public class ExecutionLogTool {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.repair(false);
+    }
+
+    /**
+     * Create the fast log from normal log.
+     */
+    public static void createFastLog(MarketService service) {
+        ExecutionLog log = new ExecutionLog(service);
+        log.caches().effect(e -> System.out.println(e)).to(Cache::buildFast);
+    }
+
+    /**
+     * Create the fast log from normal log.
+     */
+    public static void createFastLog(MarketService service, ZonedDateTime date) {
+        ExecutionLog log = new ExecutionLog(service);
+        Cache cache = log.cache(date);
+        cache.buildFast();
     }
 
     /**

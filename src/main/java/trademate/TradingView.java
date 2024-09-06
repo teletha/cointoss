@@ -9,14 +9,15 @@
  */
 package trademate;
 
-import java.time.Period;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
 import cointoss.util.Coordinator;
 import cointoss.util.Job;
+import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -27,6 +28,8 @@ import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
+import viewtify.ui.toast.Toast;
+import viewtify.ui.toast.Toast.Monitor;
 
 public class TradingView extends View {
 
@@ -90,18 +93,15 @@ public class TradingView extends View {
             market.readLog(x -> x.fromLast(3, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
 
             Job.TickerGenerator.run(service.exchange, job -> {
-
                 ZonedDateTime[] dates = market.tickers.estimateFullBuild();
-                Period period = Period.between(dates[0].toLocalDate(), dates[1].toLocalDate());
-                int size = period.getDays();
+                int size = (int) dates[0].until(dates[1], ChronoUnit.DAYS);
 
-                // ToastMonitor.show(en("Build ticker data."), size, market.tickers.build(dates[0],
-                // dates[1], false)
-                // .map(e -> service + " build ticker [" + e + "]")
-                // .effect(e -> I.info(e)));
-                // market.tickers.buildFully(false).to(e -> {
-                // I.info(service + " builds ticker [" + e + "]");
-                // });
+                Monitor monitor = Monitor.title(en("Build ticker from historical log.")).totalProgress(size);
+                Toast.show(monitor, market.tickers.build(dates[0], dates[1], false)).to(date -> {
+                    String text = service + " [" + date.toLocalDate() + "]";
+                    I.debug("Build ticker on " + text);
+                    monitor.message(text).setProgress((int) date.until(dates[1], ChronoUnit.DAYS));
+                });
             });
 
             chart.market.set(market);

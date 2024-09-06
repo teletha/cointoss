@@ -50,6 +50,7 @@ import hypatia.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
+import kiss.Variable;
 import kiss.WiseConsumer;
 import kiss.WiseFunction;
 import psychopath.Directory;
@@ -378,7 +379,8 @@ public class ExecutionLog {
 
             try (NormalLog log = new NormalLog(normal)) {
                 long lastID = log.lastID();
-                return service.executions(lastID, lastID + 1).first().waitForTerminate().to().exact().date.toLocalDate().isAfter(date);
+                Variable<Execution> latest = service.executions(lastID, lastID + 1).first().waitForTerminate().to();
+                return latest.isPresent() ? latest.v.date.toLocalDate().isAfter(date) : false;
             } catch (Exception e) {
                 throw I.quiet(e);
             }
@@ -853,6 +855,20 @@ public class ExecutionLog {
                 }, () -> {
                     writer.close();
                 });
+            }
+            return this;
+        }
+
+        /**
+         * Build fast log.
+         */
+        Cache buildFast() {
+            if (!existFast()) {
+                if (existCompact()) {
+                    writeFast(readCompact()).to(I.NoOP);
+                } else if (existNormal()) {
+                    writeFast(writeCompact(readNormal())).to(I.NoOP);
+                }
             }
             return this;
         }
