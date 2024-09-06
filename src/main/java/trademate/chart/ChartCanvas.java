@@ -13,10 +13,22 @@ import static java.lang.Boolean.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -31,16 +43,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import hypatia.Primitives;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -50,6 +52,7 @@ import primavera.array.DoubleList;
 import stylist.Style;
 import trademate.ChartTheme;
 import trademate.CommonText;
+import trademate.TradingView;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.chart.line.LineMark;
@@ -509,6 +512,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             when(User.MouseRelease).take(RightButton).take(1).to(released -> {
                 if (pressed.getX() != released.getX() || pressed.getY() != released.getY()) {
                     supporter.clear();
+
+                    if (released.isControlDown() && released.isShiftDown()) {
+                        ZonedDateTime start = Chrono.utcBySeconds((long) axisX.getValueForPosition(pressed.getX()));
+                        ZonedDateTime end = Chrono.utcBySeconds((long) axisX.getValueForPosition(released.getX()));
+
+                        chart.findAncestorView(TradingView.class).to(view -> {
+                            view.buildTicker(start, end, true);
+                        });
+                    }
                 } else {
                     notifyPrice.notifyByPrice(released);
                 }

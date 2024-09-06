@@ -9,6 +9,8 @@
  */
 package cointoss.execution;
 
+import java.awt.Desktop;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
@@ -20,6 +22,7 @@ import cointoss.market.MarketServiceProvider;
 import cointoss.market.binance.Binance;
 import cointoss.util.Chrono;
 import kiss.I;
+import psychopath.File;
 
 /**
  * Migration Tool.
@@ -29,7 +32,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        createFastLog(Binance.BTC_USDT, Chrono.utc(2024, 3, 25));
+        createFastLog(Binance.BTC_USDT, Chrono.utc(2022, 2, 7));
     }
 
     /**
@@ -67,10 +70,12 @@ public class ExecutionLogTool {
      * @param service
      * @param date
      */
-    public static void restoreNormal(MarketService service, ZonedDateTime date) {
+    public static Operated restoreNormal(MarketService service, ZonedDateTime date) {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.convertCompactToNormal();
+
+        return new Operated(cache.normal);
     }
 
     /**
@@ -113,5 +118,21 @@ public class ExecutionLogTool {
     private static void processLog(Consumer<ExecutionLog> service) {
         I.load(Market.class);
         MarketServiceProvider.availableMarketServices().map(ExecutionLog::new).to(service);
+    }
+
+    private static class Operated {
+        private File file;
+
+        Operated(File file) {
+            this.file = file;
+        }
+
+        private void open() {
+            try {
+                Desktop.getDesktop().open(file.asJavaFile());
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
     }
 }

@@ -107,18 +107,25 @@ public class TradingView extends View {
      * Build ticker.
      */
     public void buildTicker(boolean forceRebuild) {
+        ZonedDateTime[] dates = market.tickers.estimateFullBuild();
+        buildTicker(dates[0], dates[1], forceRebuild);
+    }
+
+    /**
+     * Build ticker.
+     */
+    public void buildTicker(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
         Job.TickerGenerator.run(service.exchange, job -> {
-            ZonedDateTime[] dates = market.tickers.estimateFullBuild();
-            int size = (int) dates[0].until(dates[1], ChronoUnit.DAYS);
+            int size = (int) start.until(end, ChronoUnit.DAYS);
 
             Monitor monitor = Monitor.title(en("Build ticker from historical log."))
                     .totalProgress(size)
-                    .whenCompleted(market.tickers::clear);
+                    .whenCompleted(market.tickers::expire);
 
-            Toast.show(monitor, market.tickers.build(dates[0], dates[1], forceRebuild)).to(date -> {
+            Toast.show(monitor, market.tickers.build(start, end, forceRebuild)).to(date -> {
                 String text = service + " [" + date.toLocalDate() + "]";
                 I.debug("Build ticker on " + text);
-                monitor.message(text).setProgress((int) date.until(dates[1], ChronoUnit.DAYS));
+                monitor.message(text).setProgress((int) date.until(end, ChronoUnit.DAYS));
             });
         });
     }

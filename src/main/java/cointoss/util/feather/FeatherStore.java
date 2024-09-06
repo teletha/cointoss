@@ -749,7 +749,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             // If data outside the cached range is requested, an attempt is made to read the data.
             // However, only in read mode. In write mode, it does not re-read the data as it is
             // common to write outside the range and is likely to overwrite the DB data anyway.
-            if (readMode && (segmentIndex < segment.min || segment.max < segmentIndex)) {
+            if ((readMode || segment.expired) && (segmentIndex < segment.min || segment.max < segmentIndex)) {
                 return loadData(segment, readMode, itemTime);
             } else {
                 return segment;
@@ -781,6 +781,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             // update managed cache time
             if (heap.size() != 0) {
+                heap.expired = false;
+
                 if (heap.first().seconds() < firstHeap) {
                     firstHeap = heap.first().seconds();
                 }
@@ -831,6 +833,15 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             lastHeap = other.lastHeap;
         }
         other.indexed.clear();
+    }
+
+    /**
+     * Expire all items on heap.
+     */
+    public void expire() {
+        for (OnHeap segment : indexed.values()) {
+            segment.expired = true;
+        }
     }
 
     /**
@@ -1004,6 +1015,9 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
         /** Flag to check if any external changes were made after reading from disk. */
         private boolean modified;
+
+        /** Flag to check if disk storage is up-to-date. */
+        private boolean expired;
 
         /**
          * @param startTime The starting time (epoch seconds).
