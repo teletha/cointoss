@@ -111,7 +111,10 @@ public class TradingView extends View {
             ZonedDateTime[] dates = market.tickers.estimateFullBuild();
             int size = (int) dates[0].until(dates[1], ChronoUnit.DAYS);
 
-            Monitor monitor = Monitor.title(en("Build ticker from historical log.")).totalProgress(size);
+            Monitor monitor = Monitor.title(en("Build ticker from historical log."))
+                    .totalProgress(size)
+                    .whenCompleted(market.tickers::clear);
+
             Toast.show(monitor, market.tickers.build(dates[0], dates[1], forceRebuild)).to(date -> {
                 String text = service + " [" + date.toLocalDate() + "]";
                 I.debug("Build ticker on " + text);

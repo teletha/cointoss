@@ -277,4 +277,13 @@ public class TickerManager implements Disposable {
         return Chrono.range(end, start)
                 .effect(date -> service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service, this)).to(I.NoOP));
     }
+
+    /**
+     * Clear all cache on memory.
+     */
+    public void clear() {
+        for (Ticker ticker : tickers) {
+            ticker.ticks.clear();
+        }
+    }
 }
