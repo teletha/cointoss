@@ -27,6 +27,7 @@ import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
+import trademate.TradingView;
 import trademate.verify.BackTestView;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
@@ -74,6 +75,9 @@ public class ChartView extends View {
 
     /** Configuration UI */
     public UIComboBox<PriceRangedVolumeType> pricedVolumeType;
+
+    /** Configuration UI */
+    public UIButton rebuild;
 
     /** Chart UI */
     public Chart chart;
@@ -153,10 +157,10 @@ public class ChartView extends View {
         config.text(FontAwesome.Glyph.GEAR).popup(new ViewDSL() {
             {
                 $(vbox, FormStyles.Label90, FormStyles.LabelCenter, () -> {
-                    form("Candle Type", FormStyles.Column3, showCandle, candleType);
-                    form("Latest Price", FormStyles.Column3, showLatestPrice);
-                    form("Orderbook", FormStyles.Column3, showOrderbook, orderbookPriceRange, orderbookHideSize);
-                    form("Priced Volume", FormStyles.Column3, showPricedVolume, pricedVolumeType);
+                    form(en("Ticker"), FormStyles.Column3, showCandle, candleType, rebuild);
+                    form(en("Latest Price"), FormStyles.Column3, showLatestPrice);
+                    form(en("Orderbook"), FormStyles.Column3, showOrderbook, orderbookPriceRange, orderbookHideSize);
+                    form(en("Priced Volume"), FormStyles.Column3, showPricedVolume, pricedVolumeType);
                 });
             }
         });
@@ -180,5 +184,6 @@ public class ChartView extends View {
                 });
 
         pricedVolumeType.initialize(PriceRangedVolumeType.values()).enableWhen(showPricedVolume.isSelected());
+        rebuild.text(en("Rebuild")).action(() -> findAncestorView(TradingView.class).to(view -> view.buildTicker(true)));
     }
 }

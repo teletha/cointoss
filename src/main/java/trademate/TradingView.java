@@ -91,18 +91,7 @@ public class TradingView extends View {
         chart.showRealtimeUpdate.set(false);
         Coordinator.request(service, next -> {
             market.readLog(x -> x.fromLast(3, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
-
-            Job.TickerGenerator.run(service.exchange, job -> {
-                ZonedDateTime[] dates = market.tickers.estimateFullBuild();
-                int size = (int) dates[0].until(dates[1], ChronoUnit.DAYS);
-
-                Monitor monitor = Monitor.title(en("Build ticker from historical log.")).totalProgress(size);
-                Toast.show(monitor, market.tickers.build(dates[0], dates[1], false)).to(date -> {
-                    String text = service + " [" + date.toLocalDate() + "]";
-                    I.debug("Build ticker on " + text);
-                    monitor.message(text).setProgress((int) date.until(dates[1], ChronoUnit.DAYS));
-                });
-            });
+            buildTicker(false);
 
             chart.market.set(market);
             chart.showRealtimeUpdate.set(tab.isSelected());
@@ -112,6 +101,23 @@ public class TradingView extends View {
         });
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));
+    }
+
+    /**
+     * Build ticker.
+     */
+    public void buildTicker(boolean forceRebuild) {
+        Job.TickerGenerator.run(service.exchange, job -> {
+            ZonedDateTime[] dates = market.tickers.estimateFullBuild();
+            int size = (int) dates[0].until(dates[1], ChronoUnit.DAYS);
+
+            Monitor monitor = Monitor.title(en("Build ticker from historical log.")).totalProgress(size);
+            Toast.show(monitor, market.tickers.build(dates[0], dates[1], forceRebuild)).to(date -> {
+                String text = service + " [" + date.toLocalDate() + "]";
+                I.debug("Build ticker on " + text);
+                monitor.message(text).setProgress((int) date.until(dates[1], ChronoUnit.DAYS));
+            });
+        });
     }
 
     /**

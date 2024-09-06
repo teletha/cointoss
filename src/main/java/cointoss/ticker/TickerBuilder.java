@@ -38,7 +38,7 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
         param.add(() -> {
             temporary.tickers().to(ticker -> {
                 // update the close price by the latest price
-                ticker.current.freeze();
+                if (ticker.current != null) ticker.current.freeze();
 
                 // save all ticks to disk
                 ticker.ticks.commit();
