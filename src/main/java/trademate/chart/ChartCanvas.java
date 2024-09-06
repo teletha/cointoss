@@ -13,7 +13,6 @@ import static java.lang.Boolean.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -615,9 +614,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 chart.ticker.map(Ticker::latest).map(t -> t.openTime() - ticker.span.seconds).to(end -> {
                     // long start = (long) axisX.computeVisibleMinValue();
                     long start = ticker.ticks.computeLogicalFirstCacheTime();
-                    System.out.println(Instant.ofEpochSecond(start) + "  " + Instant.ofEpochSecond(end));
-                    System.out.println(Instant.ofEpochSecond(ticker.ticks.firstTime()) + "   " + Instant.ofEpochSecond(ticker.ticks
-                            .computeLogicalFirstCacheTime()) + "    " + Instant.ofEpochSecond(ticker.ticks.computeIdealSegmentTime()[0]));
 
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
                     // the array of capacity increase.
