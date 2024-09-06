@@ -13,21 +13,11 @@ import static java.lang.Boolean.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -42,6 +32,16 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import hypatia.Primitives;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -613,7 +613,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             chart.ticker.to(ticker -> {
                 // estimate visible range
                 chart.ticker.map(Ticker::latest).map(t -> t.openTime() - ticker.span.seconds).to(end -> {
-                    long start = (long) axisX.computeVisibleMinValue();
+                    // long start = (long) axisX.computeVisibleMinValue();
+                    long start = ticker.ticks.computeLogicalFirstCacheTime();
+                    System.out.println(Instant.ofEpochSecond(start) + "  " + Instant.ofEpochSecond(end));
+                    System.out.println(Instant.ofEpochSecond(ticker.ticks.firstTime()) + "   " + Instant.ofEpochSecond(ticker.ticks
+                            .computeLogicalFirstCacheTime()) + "    " + Instant.ofEpochSecond(ticker.ticks.computeIdealSegmentTime()[0]));
 
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
                     // the array of capacity increase.

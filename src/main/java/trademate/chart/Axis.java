@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
+import hypatia.Primitives;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -29,8 +30,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
-
-import hypatia.Primitives;
 import kiss.Disposable;
 import kiss.Variable;
 import stylist.Style;
@@ -266,7 +265,7 @@ public class Axis extends Region {
      */
     public double getPositionForValue(double value) {
         double position = uiRatio * (value - computeVisibleMinValue());
-        return (isHorizontal() ? position : getHeight() - position) - padding.get();
+        return (isHorizontal() ? position : getHeight() - position);
     }
 
     /**
@@ -276,8 +275,6 @@ public class Axis extends Region {
      * @return
      */
     public final double getValueForPosition(double position) {
-        position += padding.get();
-
         if (isVertical()) {
             position = getHeight() - position;
         }
@@ -322,11 +319,8 @@ public class Axis extends Region {
 
     /**
      * Compute axis properties to layout items.
-     * 
-     * @param width A current visual width, may be -1.
-     * @param height A curretn visual height, may be -1.
      */
-    private void computeAxisProperties(double width, double height) {
+    private void computeAxisProperties() {
         double low = computeVisibleMinValue();
         double up = computeVisibleMaxValue();
         double visualDiff = up - low;
@@ -382,9 +376,9 @@ public class Axis extends Region {
      */
     private double computeAxisLength() {
         if (isVertical()) {
-            return getHeight();
+            return getHeight() - padding.doubleValue();
         } else {
-            return getWidth();
+            return getWidth() - padding.doubleValue();
         }
     }
 
@@ -397,7 +391,7 @@ public class Axis extends Region {
             double width = getWidth();
             double height = getHeight();
 
-            computeAxisProperties(width, height);
+            computeAxisProperties();
             layoutLabels(width, height);
             layoutGroups(width, height);
         });

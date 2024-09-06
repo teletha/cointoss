@@ -13,16 +13,15 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleFunction;
 
+import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import hypatia.Primitives;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
-
-import cointoss.ticker.Span;
-import cointoss.ticker.Ticker;
-import cointoss.util.Chrono;
-import hypatia.Primitives;
 import trademate.setting.PerformanceSetting;
 import viewtify.preference.Preferences;
 import viewtify.ui.helper.LayoutAssistant;
@@ -148,7 +147,7 @@ public class Chart extends Region {
             }
 
             long seconds = ticker.span.seconds;
-            axisX.logicalMinValue.set(ticker.ticks.firstCache().openTime());
+            axisX.logicalMinValue.set(ticker.ticks.computeLogicalFirstCacheTime());
             axisX.logicalMaxValue.set(ticker.latest().openTime());
             axisX.visibleMinRange.set(minimumTickNumber.doubleValue() * seconds);
             axisX.visibleMaxRange.set(maximumTickNumber.doubleValue() * seconds);
