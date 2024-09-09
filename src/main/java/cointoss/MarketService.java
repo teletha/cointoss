@@ -625,6 +625,15 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
+     * Check the existence of external log repository.
+     * 
+     * @return
+     */
+    public boolean hasExternalRepository() {
+        return externalRepository() != ExecutionLogRepository.NOP;
+    }
+
+    /**
      * Get the external log repository.
      * 
      * @return

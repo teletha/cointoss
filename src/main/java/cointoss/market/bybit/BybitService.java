@@ -260,6 +260,14 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public boolean hasExternalRepository() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ExecutionLogRepository externalRepository() {
         return new OfficialRepository(this);
     }
