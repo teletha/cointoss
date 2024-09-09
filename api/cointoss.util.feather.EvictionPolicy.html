@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="L">
-		<header class="T">
-			<h1 class="O" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
-			<nav class="R"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="V">
+		<header class="U">
+			<h1 class="I" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
+			<nav class="N"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="m" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="k" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,24 +31,24 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="J">
-			<nav class="M">
+		<main class="b">
+			<nav class="O">
 				<div></div>
 			</nav>
-			<article class="g" id="Article">
-				<section class="a"><code class="N">cointoss.util.feather</code>
-					<h2 class="Functional i"><code class="b">EvictionPolicy</code></h2>
+			<article class="d" id="Article">
+				<section class="Q"><code class="f">cointoss.util.feather</code>
+					<h2 class="Functional P"><code class="S">EvictionPolicy</code></h2>
 					<div class="h"></div>
 				</section>
-				<section class="a" id="access(long)">
-					<h2 class="U"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="b">access</code><code class="X">(<code>long</code> <code class="parameterName">time</code>)</code><i class="j"><code>long</code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="access(long)">
+					<h2 class="W"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="S">access</code><code class="K">(<code>long</code> <code class="parameterName">time</code>)</code><i class="j"><code>long</code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code>long</code> <code>time</code></td>
 							<td><span><p>The current accessing time.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code>long</code></td>
 							<td><span><p>The most unnecessary time which should be evicted, or -1 if there is no evictable
 time.</p>
@@ -57,24 +57,24 @@ time.</p>
 					</table><span class="B"><p>Calculates the most unnecessary time that should be evicted based on the history of changes
 made by accessing the specified time.</p>
 </span></section>
-				<section class="a" id="never()">
-					<h2 class="U"><i class="STATIC PUBLIC"></i><code class="b">never</code><code class="X">()</code><i class="j"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></h2>
-					<table class="f">
-						<tr class="Y">
+				<section class="Q" id="never()">
+					<h2 class="W"><i class="PUBLIC STATIC"></i><code class="S">never</code><code class="K">()</code><i class="j"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></h2>
+					<table class="J">
+						<tr class="g">
 							<td><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Provide the <code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code> which never evict any value.</p>
 </span></section>
-				<section class="a" id="byLRU(int)">
-					<h2 class="U"><i class="STATIC PUBLIC"></i><code class="b">byLRU</code><code class="X">(<code>int</code> <code class="parameterName">size</code>)</code><i class="j"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="byLRU(int)">
+					<h2 class="W"><i class="PUBLIC STATIC"></i><code class="S">byLRU</code><code class="K">(<code>int</code> <code class="parameterName">size</code>)</code><i class="j"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code>int</code> <code>size</code></td>
 							<td><span><p>A cache size.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></td>
 							<td><span><p>A new <code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code>.</p>
 </span></td>
@@ -82,31 +82,31 @@ made by accessing the specified time.</p>
 					</table><span class="B"><p>Provides an <code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code> based on the LRU algorithm with a specified size. However,
 the most recent time will never be evicted as it is expected to be accessed frequently.</p>
 </span></section>
-				<section class="a" id="eldest(int)">
-					<h2 class="U"><i class="STATIC PUBLIC"></i><code class="b">eldest</code><code class="X">(<code>int</code> <code class="parameterName">size</code>)</code><i class="j"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="eldest(int)">
+					<h2 class="W"><i class="PUBLIC STATIC"></i><code class="S">eldest</code><code class="K">(<code>int</code> <code class="parameterName">size</code>)</code><i class="j"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code>int</code> <code>size</code></td>
 							<td></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
 			</article>
-			<aside class="K" id="SubNavi">
-				<div class="S">
-					<h5 class="W">Static Methods</h5>
+			<aside class="i" id="SubNavi">
+				<div class="H">
+					<h5 class="e">Static Methods</h5>
 					<ul>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.feather.EvictionPolicy.html#never()">never</a></code><code class="X">()</code><i class="d"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></li>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.feather.EvictionPolicy.html#byLRU(int)">byLRU</a></code><code class="X">(<code>int</code> <code class="parameterName">size</code>)</code><i class="d"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></li>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.feather.EvictionPolicy.html#eldest(int)">eldest</a></code><code class="X">(<code>int</code> <code class="parameterName">size</code>)</code><i class="d"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.util.feather.EvictionPolicy.html#never()">never</a></code><code class="K">()</code><i class="m"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.util.feather.EvictionPolicy.html#byLRU(int)">byLRU</a></code><code class="K">(<code>int</code> <code class="parameterName">size</code>)</code><i class="m"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.util.feather.EvictionPolicy.html#eldest(int)">eldest</a></code><code class="K">(<code>int</code> <code class="parameterName">size</code>)</code><i class="m"><code><a href="api/cointoss.util.feather.EvictionPolicy.html">EvictionPolicy</a></code></i></li>
 					</ul>
-					<h5 class="W">Methods</h5>
+					<h5 class="e">Methods</h5>
 					<ul>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.EvictionPolicy.html#access(long)">access</a></code><code class="X">(<code>long</code> <code class="parameterName">time</code>)</code><i class="d"><code>long</code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.EvictionPolicy.html#access(long)">access</a></code><code class="K">(<code>long</code> <code class="parameterName">time</code>)</code><i class="m"><code>long</code></i></li>
 					</ul>
 				</div>
 			</aside>

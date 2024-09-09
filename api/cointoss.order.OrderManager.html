@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="L">
-		<header class="T">
-			<h1 class="O" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
-			<nav class="R"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="V">
+		<header class="U">
+			<h1 class="I" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
+			<nav class="N"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="m" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="k" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,36 +31,36 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="J">
-			<nav class="M">
+		<main class="b">
+			<nav class="O">
 				<div></div>
 			</nav>
-			<article class="g" id="Article">
-				<section class="a"><code class="N">cointoss.order</code>
-					<h2 class="Class i"><code class="b">OrderManager</code></h2>
+			<article class="d" id="Article">
+				<section class="Q"><code class="f">cointoss.order</code>
+					<h2 class="Class P"><code class="S">OrderManager</code></h2>
 					<div class="h"></div>
 				</section>
-				<section class="a" id="items">
-					<h2 class="U"><i class="FINAL"><i class="PUBLIC"></i></i><code class="b">items</code><i class="j"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code>, <code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2><span class="B"><p>The unmodifiable exposed active orders.</p>
+				<section class="Q" id="items">
+					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="S">items</code><i class="j"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code>, <code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2><span class="B"><p>The unmodifiable exposed active orders.</p>
 </span></section>
-				<section class="a" id="OrderManager(cointoss.MarketService)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">OrderManager</code><code class="X">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="OrderManager(cointoss.MarketService)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">OrderManager</code><code class="K">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code>service</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="a" id="request(cointoss.order.Order)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">request</code><code class="X">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="request(cointoss.order.Order)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">request</code><code class="K">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code> <code>order</code></td>
 							<td><span><p>A order to request.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td><span><p>A order request process.</p>
 </span></td>
@@ -69,15 +69,15 @@
 method DON&#39;T request order, you MUST subscribe Signal. If you want to request
 actually, you can use <code><a href="api/cointoss.order.OrderManager.html#requestNow(Order)">#requestNow(Order)</a></code>.</p>
 </span></section>
-				<section class="a" id="request(java.util.List)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">request</code><code class="X">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="request(java.util.List)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">request</code><code class="K">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code>orders</code></td>
 							<td><span><p>A list of order to request.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td><span><p>A order request process.</p>
 </span></td>
@@ -86,45 +86,45 @@ actually, you can use <code><a href="api/cointoss.order.OrderManager.html#reques
 method DON&#39;T request order, you MUST subscribe Signal. If you want to request
 actually, you can use <code><a href="api/cointoss.order.OrderManager.html#requestNow(Order)">#requestNow(Order)</a></code>.</p>
 </span></section>
-				<section class="a" id="requestNow(cointoss.order.Order)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">requestNow</code><code class="X">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="requestNow(cointoss.order.Order)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">requestNow</code><code class="K">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code> <code>order</code></td>
 							<td><span><p>A order to request.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code></td>
 							<td><span><p>A requested <code><a href="api/cointoss.order.Order.html">Order</a></code>.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Request the specified <code><a href="api/cointoss.order.Order.html">Order</a></code> to the market actually.</p>
 </span></section>
-				<section class="a" id="requestNow(java.util.List)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">requestNow</code><code class="X">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="j"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="requestNow(java.util.List)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">requestNow</code><code class="K">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="j"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code>orders</code></td>
 							<td><span><p>A list of order to request.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td><span><p>A list of requested <code><a href="api/cointoss.order.Order.html">Order</a></code>.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Request all specified <code><a href="api/cointoss.order.Order.html">Order</a></code> to the market actually.</p>
 </span></section>
-				<section class="a" id="cancel(cointoss.order.Order)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">cancel</code><code class="X">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="cancel(cointoss.order.Order)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">cancel</code><code class="K">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code> <code>order</code></td>
 							<td><span><p>A order to cancel.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td><span><p>A order cancel process.</p>
 </span></td>
@@ -133,15 +133,15 @@ actually, you can use <code><a href="api/cointoss.order.OrderManager.html#reques
 method DON&#39;T cancel order, you MUST subscribe Signal. If you want to cancel actually,
 you can use <code><a href="api/cointoss.order.OrderManager.html#cancelNow(Order)">#cancelNow(Order)</a></code>.</p>
 </span></section>
-				<section class="a" id="cancel(java.util.List)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">cancel</code><code class="X">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="cancel(java.util.List)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">cancel</code><code class="K">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code>orders</code></td>
 							<td><span><p>A list of orders to cancel.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td><span><p>A order cancel process.</p>
 </span></td>
@@ -150,62 +150,62 @@ you can use <code><a href="api/cointoss.order.OrderManager.html#cancelNow(Order)
 method DON&#39;T cancel order, you MUST subscribe Signal. If you want to cancel actually,
 you can use <code><a href="api/cointoss.order.OrderManager.html#cancelNow(Order)">#cancelNow(Order)</a></code>.</p>
 </span></section>
-				<section class="a" id="cancelAll()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">cancelAll</code><code class="X">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2>
-					<table class="f">
-						<tr class="Y">
+				<section class="Q" id="cancelAll()">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">cancelAll</code><code class="K">()</code><i class="j"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2>
+					<table class="J">
+						<tr class="g">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="a" id="cancelNow(cointoss.order.Order)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">cancelNow</code><code class="X">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="cancelNow(cointoss.order.Order)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">cancelNow</code><code class="K">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="j"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code> <code>order</code></td>
 							<td><span><p>A order to request.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code></td>
 							<td><span><p>A canceled <code><a href="api/cointoss.order.Order.html">Order</a></code>.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Cancel the specified <code><a href="api/cointoss.order.Order.html">Order</a></code> from the market actually.</p>
 </span></section>
-				<section class="a" id="cancelNow(java.util.List)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">cancelNow</code><code class="X">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="j"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="f">
-						<tr class="l">
+				<section class="Q" id="cancelNow(java.util.List)">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">cancelNow</code><code class="K">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="j"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="J">
+						<tr class="T">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code>orders</code></td>
 							<td><span><p>A list of orders to cancel.</p>
 </span></td>
 						</tr>
-						<tr class="Y">
+						<tr class="g">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td><span><p>A list of canceled <code><a href="api/cointoss.order.Order.html">Order</a></code>.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Cancel all specified <code><a href="api/cointoss.order.Order.html">Order</a></code> from the market actually.</p>
 </span></section>
-				<section class="a" id="cancelAllNow()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">cancelAllNow</code><code class="X">()</code><i class="j"><code>void</code></i></h2><span class="B"><p>Cancel all orders.</p>
+				<section class="Q" id="cancelAllNow()">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">cancelAllNow</code><code class="K">()</code><i class="j"><code>void</code></i></h2><span class="B"><p>Cancel all orders.</p>
 </span></section>
-				<section class="a" id="hasActiveOrder()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">hasActiveOrder</code><code class="X">()</code><i class="j"><code>boolean</code></i></h2>
-					<table class="f">
-						<tr class="Y">
+				<section class="Q" id="hasActiveOrder()">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">hasActiveOrder</code><code class="K">()</code><i class="j"><code>boolean</code></i></h2>
+					<table class="J">
+						<tr class="g">
 							<td><code>boolean</code></td>
 							<td><span><p>A result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Check the order state.</p>
 </span></section>
-				<section class="a" id="hasNoActiveOrder()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="b">hasNoActiveOrder</code><code class="X">()</code><i class="j"><code>boolean</code></i></h2>
-					<table class="f">
-						<tr class="Y">
+				<section class="Q" id="hasNoActiveOrder()">
+					<h2 class="W"><i class="PUBLIC"></i><code class="S">hasNoActiveOrder</code><code class="K">()</code><i class="j"><code>boolean</code></i></h2>
+					<table class="J">
+						<tr class="g">
 							<td><code>boolean</code></td>
 							<td><span><p>A result.</p>
 </span></td>
@@ -213,30 +213,30 @@ you can use <code><a href="api/cointoss.order.OrderManager.html#cancelNow(Order)
 					</table><span class="B"><p>Check the order state.</p>
 </span></section>
 			</article>
-			<aside class="K" id="SubNavi">
-				<div class="S">
-					<h5 class="W">Constructors</h5>
+			<aside class="i" id="SubNavi">
+				<div class="H">
+					<h5 class="e">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#OrderManager(cointoss.MarketService)">OrderManager</a></code><code class="X">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#OrderManager(cointoss.MarketService)">OrderManager</a></code><code class="K">(<code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>)</code></li>
 					</ul>
-					<h5 class="W">Fields</h5>
+					<h5 class="e">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#items">items</a></code><i class="d"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code>, <code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.OrderManager.html#items">items</a></code><i class="m"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code>, <code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
 					</ul>
-					<h5 class="W">Methods</h5>
+					<h5 class="e">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#request(cointoss.order.Order)">request</a></code><code class="X">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#request(java.util.List)">request</a></code><code class="X">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#requestNow(cointoss.order.Order)">requestNow</a></code><code class="X">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="d"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#requestNow(java.util.List)">requestNow</a></code><code class="X">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="d"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancel(cointoss.order.Order)">cancel</a></code><code class="X">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancel(java.util.List)">cancel</a></code><code class="X">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelAll()">cancelAll</a></code><code class="X">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelNow(cointoss.order.Order)">cancelNow</a></code><code class="X">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="d"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelNow(java.util.List)">cancelNow</a></code><code class="X">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="d"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelAllNow()">cancelAllNow</a></code><code class="X">()</code><i class="d"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#hasActiveOrder()">hasActiveOrder</a></code><code class="X">()</code><i class="d"><code>boolean</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#hasNoActiveOrder()">hasNoActiveOrder</a></code><code class="X">()</code><i class="d"><code>boolean</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#request(cointoss.order.Order)">request</a></code><code class="K">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="m"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#request(java.util.List)">request</a></code><code class="K">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="m"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#requestNow(cointoss.order.Order)">requestNow</a></code><code class="K">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="m"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#requestNow(java.util.List)">requestNow</a></code><code class="K">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancel(cointoss.order.Order)">cancel</a></code><code class="K">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="m"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancel(java.util.List)">cancel</a></code><code class="K">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="m"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelAll()">cancelAll</a></code><code class="K">()</code><i class="m"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelNow(cointoss.order.Order)">cancelNow</a></code><code class="K">(<code><a href="api/cointoss.order.Order.html">Order</a></code> <code class="parameterName">order</code>)</code><i class="m"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelNow(java.util.List)">cancelNow</a></code><code class="K">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code> <code class="parameterName">orders</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#cancelAllNow()">cancelAllNow</a></code><code class="K">()</code><i class="m"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#hasActiveOrder()">hasActiveOrder</a></code><code class="K">()</code><i class="m"><code>boolean</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.html#hasNoActiveOrder()">hasNoActiveOrder</a></code><code class="K">()</code><i class="m"><code>boolean</code></i></li>
 					</ul>
 				</div>
 			</aside>
