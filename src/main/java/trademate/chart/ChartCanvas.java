@@ -624,13 +624,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             chart.ticker.to(ticker -> {
                 // estimate visible range
                 chart.ticker.map(Ticker::latest).map(t -> t.openTime() - ticker.span.seconds).to(end -> {
-                    // long start = (long) axisX.computeVisibleMinValue();
-                    long start = ticker.ticks.computeLogicalFirstCacheTime();
+                    long start = (long) axisX.computeVisibleMinValue();
+                    // long start = ticker.ticks.computeLogicalFirstCacheTime();
 
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
                     // the array of capacity increase.
                     double tickSize = ((end - start) / ticker.span.seconds) + 2;
-                    boolean needDrawingOpenAndClose = tickSize * 0.3 < candles.getWidth();
+                    boolean needDrawingOpenAndClose = tickSize * 0.4 < candles.getWidth();
 
                     // redraw all candles.
                     GraphicsContext gc = candles.getGraphicsContext2D();

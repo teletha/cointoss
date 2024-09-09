@@ -34,11 +34,23 @@ public class SMAIndicator extends PlotScript {
     protected void declare(Market market, Ticker ticker) {
         int base = market.service.setting.base.scale;
 
-        line(market.tickers.on(Minute5), shortDays, base, style.SMA5M);
-        line(market.tickers.on(Minute15), shortDays, base, style.SMA15M);
-        line(market.tickers.on(Hour1), shortDays, base, style.SMA1H);
-        line(market.tickers.on(Hour4), shortDays, base, style.SMA4H);
-        line(market.tickers.on(Day), longDays, base, style.SMA1D);
+        switch (ticker.span) {
+        case Minute1:
+        case Minute5:
+            line(market.tickers.on(Minute5), shortDays, base, style.SMA5M);
+
+        case Minute15:
+            line(market.tickers.on(Minute15), shortDays, base, style.SMA15M);
+
+        case Hour1:
+            line(market.tickers.on(Hour1), shortDays, base, style.SMA1H);
+
+        case Hour4:
+            line(market.tickers.on(Hour4), shortDays, base, style.SMA4H);
+
+        case Day:
+            line(market.tickers.on(Day), longDays, base, style.SMA1DL);
+        }
     }
 
     private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {
@@ -57,7 +69,7 @@ public class SMAIndicator extends PlotScript {
      * 
      */
     interface style extends StyleDSL {
-        double alpha = 0.7;
+        double alpha = 0.75;
 
         Style SMA5M = () -> {
             stroke.color(Color.rgb(207, 89, 71, alpha));
@@ -79,7 +91,11 @@ public class SMAIndicator extends PlotScript {
             stroke.color(Color.rgb(57, 80, 195, alpha));
         };
 
-        Style SMA1D = () -> {
+        Style SMA1DS = () -> {
+            stroke.color(Color.rgb(176, 104, 225, alpha));
+        };
+
+        Style SMA1DL = () -> {
             stroke.color(Color.rgb(234, 80, 195, alpha));
         };
     }
