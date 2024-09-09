@@ -436,7 +436,7 @@ public class ExecutionLog {
 
                 return readNormal();
             } else if (service.externalRepository() != ExecutionLogRepository.NOP) {
-                return readExternalRepository(service.externalRepository());
+                return readExternalRepository(service.externalRepository()).effectOnComplete(() -> convertNormalToCompact(true));
             } else {
                 return I.signal();
             }
@@ -539,12 +539,13 @@ public class ExecutionLog {
         Signal<Execution> readExternalRepository(ExecutionLogRepository external) {
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
-            return writeNormal(external.convert(date)
-                    .effectOnError(e -> I.error("Fail to download external log " + service + " [" + date + "]."))
+            return writeNormal(external.convert(date)) //
                     .effectOnObserve(stopwatch::start)
+                    .effectOnError(e -> I.error("Fail to download external log " + service + " [" + date + "]."))
                     .effectOnComplete(() -> {
-                        I.info("Donwload external log " + service + " [" + date + "] " + stopwatch.stop().elapsed());
-                    }));
+                        I.info("Donwload external log " + service + " [" + date + "] " + Chrono
+                                .formatAsDuration(stopwatch.stop().elapsed()));
+                    });
         }
 
         /**

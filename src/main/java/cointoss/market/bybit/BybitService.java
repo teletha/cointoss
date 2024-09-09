@@ -327,7 +327,7 @@ public class BybitService extends MarketService {
                 Num price = Num.of(values[4]);
 
                 return Support.createExecution(side, size, price, time, context);
-            });
+            }).waitForTerminate();
         }
 
         /**

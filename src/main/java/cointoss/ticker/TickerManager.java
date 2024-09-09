@@ -249,6 +249,17 @@ public class TickerManager implements Disposable {
         start = start.truncatedTo(ChronoUnit.DAYS);
         end = end.truncatedTo(ChronoUnit.DAYS);
 
+        // correct order
+        if (start.isAfter(end)) {
+            ZonedDateTime temp = start;
+            start = end;
+            end = temp;
+        }
+
+        // check range of execution log
+        start = Chrono.max(service.log.firstCacheDate(), start);
+        end = Chrono.min(service.log.lastCacheDate(), end);
+
         Signal<ZonedDateTime> process = I.signal();
         if (forceRebuild) {
             process = buildCache(start, end);
