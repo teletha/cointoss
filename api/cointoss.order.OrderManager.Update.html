@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="P">
-		<header class="M">
-			<h1 class="V" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
-			<nav class="J"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="h">
+		<header class="b">
+			<h1 class="W" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
+			<nav class="f"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="R" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="S" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,115 +31,115 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="X">
-			<nav class="b">
+		<main class="g">
+			<nav class="T">
 				<div></div>
 			</nav>
-			<article class="g" id="Article">
-				<section class="j"><code class="N">cointoss.order</code>
-					<h2 class="Class U"><code class="O">OrderManager.Update</code></h2>
-					<div class="W"></div><span class="B"><p>Builder collections for the updating order.</p>
+			<article class="Y" id="Article">
+				<section class="Q"><code class="U">cointoss.order</code>
+					<h2 class="Class O"><code class="a">OrderManager.Update</code></h2>
+					<div class="R"></div><span class="B"><p>Builder collections for the updating order.</p>
 </span></section>
-				<section class="j" id="Update()">
-					<h2 class="d"><i class="PUBLIC"></i><code class="O">Update</code><code class="k">()</code></h2>
+				<section class="Q" id="Update()">
+					<h2 class="M"><i class="PUBLIC"></i><code class="a">Update</code><code class="e">()</code></h2>
 				</section>
-				<section class="j" id="create(java.lang.String,cointoss.Direction,hypatia.Num,hypatia.Num)">
-					<h2 class="d"><i class="STATIC PUBLIC"></i><code class="O">create</code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>)</code><i class="l"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
-					<table class="Q">
-						<tr class="m">
+				<section class="Q" id="create(java.lang.String,cointoss.Direction,hypatia.Num,hypatia.Num)">
+					<h2 class="M"><i class="PUBLIC STATIC"></i><code class="a">create</code><code class="e">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>)</code><i class="K"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
+					<table class="i">
+						<tr class="k">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>id</code></td>
 							<td><span><p>An order id that you want to add.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code><a href="api/cointoss.Direction.html">Direction</a></code> <code>side</code></td>
 							<td><span><p>A order&#39;s direction.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code>hypatia.Num</code> <code>size</code></td>
 							<td><span><p>A order&#39;s size.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code>hypatia.Num</code> <code>price</code></td>
 							<td><span><p>A order&#39;s price.</p>
 </span></td>
 						</tr>
-						<tr class="h">
+						<tr class="j">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code></td>
 							<td><span><p>The updater.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Create the updater to add the specified order.</p>
 </span></section>
-				<section class="j" id="cancel(java.lang.String)">
-					<h2 class="d"><i class="STATIC PUBLIC"></i><code class="O">cancel</code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>)</code><i class="l"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
-					<table class="Q">
-						<tr class="m">
+				<section class="Q" id="cancel(java.lang.String)">
+					<h2 class="M"><i class="PUBLIC STATIC"></i><code class="a">cancel</code><code class="e">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>)</code><i class="K"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
+					<table class="i">
+						<tr class="k">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>id</code></td>
 							<td><span><p>An order id that you want to cancel.</p>
 </span></td>
 						</tr>
-						<tr class="h">
+						<tr class="j">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code></td>
 							<td><span><p>The updater.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Create the updater to cancle the specified order.</p>
 </span></section>
-				<section class="j" id="execute(java.lang.String,hypatia.Num,hypatia.Num,hypatia.Num)">
-					<h2 class="d"><i class="STATIC PUBLIC"></i><code class="O">execute</code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>hypatia.Num</code> <code class="parameterName">commission</code>)</code><i class="l"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
-					<table class="Q">
-						<tr class="m">
+				<section class="Q" id="execute(java.lang.String,hypatia.Num,hypatia.Num,hypatia.Num)">
+					<h2 class="M"><i class="PUBLIC STATIC"></i><code class="a">execute</code><code class="e">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>hypatia.Num</code> <code class="parameterName">commission</code>)</code><i class="K"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
+					<table class="i">
+						<tr class="k">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>id</code></td>
 							<td><span><p>An order id that you want to execute.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code>hypatia.Num</code> <code>size</code></td>
 							<td><span><p>A order&#39;s total executed size.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code>hypatia.Num</code> <code>price</code></td>
 							<td><span><p>A order&#39;s average executed price.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code>hypatia.Num</code> <code>commission</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="j">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code></td>
 							<td><span><p>The updater.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Create the updater to execute the specified order.</p>
 </span></section>
-				<section class="j" id="executePartially(java.lang.String,hypatia.Num,hypatia.Num,hypatia.Num)">
-					<h2 class="d"><i class="STATIC PUBLIC"></i><code class="O">executePartially</code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>hypatia.Num</code> <code class="parameterName">commission</code>)</code><i class="l"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
-					<table class="Q">
-						<tr class="m">
+				<section class="Q" id="executePartially(java.lang.String,hypatia.Num,hypatia.Num,hypatia.Num)">
+					<h2 class="M"><i class="PUBLIC STATIC"></i><code class="a">executePartially</code><code class="e">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>hypatia.Num</code> <code class="parameterName">commission</code>)</code><i class="K"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></h2>
+					<table class="i">
+						<tr class="k">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>id</code></td>
 							<td><span><p>An order id that you want to execute.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code>hypatia.Num</code> <code>size</code></td>
 							<td><span><p>A order&#39;s current executed size.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code>hypatia.Num</code> <code>price</code></td>
 							<td><span><p>A order&#39;s current executed price.</p>
 </span></td>
 						</tr>
-						<tr class="m">
+						<tr class="k">
 							<td><code>hypatia.Num</code> <code>commission</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="j">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code></td>
 							<td><span><p>The updater.</p>
 </span></td>
@@ -147,18 +147,18 @@
 					</table><span class="B"><p>Create the updater to execute the specified order.</p>
 </span></section>
 			</article>
-			<aside class="K" id="SubNavi">
-				<div class="Y">
-					<h5 class="a">Constructors</h5>
+			<aside class="X" id="SubNavi">
+				<div class="P">
+					<h5 class="Z">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#Update()">Update</a></code><code class="k">()</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#Update()">Update</a></code><code class="e">()</code></li>
 					</ul>
-					<h5 class="a">Static Methods</h5>
+					<h5 class="Z">Static Methods</h5>
 					<ul>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#create(java.lang.String,cointoss.Direction,hypatia.Num,hypatia.Num)">create</a></code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>)</code><i class="e"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#cancel(java.lang.String)">cancel</a></code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>)</code><i class="e"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#execute(java.lang.String,hypatia.Num,hypatia.Num,hypatia.Num)">execute</a></code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>hypatia.Num</code> <code class="parameterName">commission</code>)</code><i class="e"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#executePartially(java.lang.String,hypatia.Num,hypatia.Num,hypatia.Num)">executePartially</a></code><code class="k">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>hypatia.Num</code> <code class="parameterName">commission</code>)</code><i class="e"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#create(java.lang.String,cointoss.Direction,hypatia.Num,hypatia.Num)">create</a></code><code class="e">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>)</code><i class="c"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#cancel(java.lang.String)">cancel</a></code><code class="e">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>)</code><i class="c"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#execute(java.lang.String,hypatia.Num,hypatia.Num,hypatia.Num)">execute</a></code><code class="e">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>hypatia.Num</code> <code class="parameterName">commission</code>)</code><i class="c"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.order.OrderManager.Update.html#executePartially(java.lang.String,hypatia.Num,hypatia.Num,hypatia.Num)">executePartially</a></code><code class="e">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">id</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>hypatia.Num</code> <code class="parameterName">commission</code>)</code><i class="c"><code><a href="api/cointoss.order.Order.html">Order</a></code></i></li>
 					</ul>
 				</div>
 			</aside>
