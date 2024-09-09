@@ -27,7 +27,6 @@ import cointoss.order.Order;
 import cointoss.order.OrderManager;
 import cointoss.order.Orderable;
 import cointoss.orderbook.OrderBookManager;
-import cointoss.ticker.TickerBuilder;
 import cointoss.ticker.TickerManager;
 import cointoss.trade.Funds;
 import cointoss.trade.Trader;
@@ -123,7 +122,7 @@ public class Market implements Disposable {
         this.orderBook = createOrderBookManager();
         this.priceVolume = createPriceRangedVolumeManager();
         this.tickers = createTickerManager();
-        this.log = service.log.registerConverter(new TickerBuilder(service, tickers));
+        this.log = service.log;
         this.priceMatcher = new PriceEngine(this);
 
         // build tickers for each span

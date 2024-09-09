@@ -98,31 +98,4 @@ class ExecutionLogTest {
         log.cache(date).writeCompact(I.signal(list)).to();
         return list;
     }
-
-    @Test
-    void registerFastConverter() {
-        AtomicInteger counter = new AtomicInteger();
-
-        log.registerConverter(disposer -> {
-            return e -> counter.incrementAndGet();
-        });
-
-        Cache cache = log.cache(2025, 12, 15);
-        cache.writeNormal(Executions.random(10, Span.Hour1)).convertNormalToCompact(false);
-        assert counter.get() == 10;
-    }
-
-    @Test
-    void registerFastConverters() {
-        AtomicInteger counter1 = new AtomicInteger();
-        log.registerConverter(disposer -> e -> counter1.incrementAndGet());
-
-        AtomicInteger counter2 = new AtomicInteger();
-        log.registerConverter(disposer -> e -> counter2.incrementAndGet());
-
-        Cache cache = log.cache(2025, 12, 15);
-        cache.writeNormal(Executions.random(10, Span.Hour1)).convertNormalToCompact(false);
-        assert counter1.get() == 10;
-        assert counter2.get() == 10;
-    }
 }
