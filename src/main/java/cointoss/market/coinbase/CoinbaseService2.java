@@ -17,6 +17,7 @@ import java.net.http.HttpRequest.Builder;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import cointoss.Direction;
@@ -41,14 +42,14 @@ public class CoinbaseService2 extends MarketService {
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter
             .ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]X");
 
+    private static Comparator<Execution> SORTER = Comparator.<Execution, ZonedDateTime> comparing(e -> e.date).thenComparingLong(e -> e.id);
+
     /** The API limit. */
     private static final APILimiter LIMITER = APILimiter.with.limit(3).refresh(1000, MILLISECONDS);
 
     /** The realtime communicator. */
     private final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://advanced-trade-ws.coinbase.com")
-            .extractId(json -> json.text("channel"))
-            .enableDebug();
-    // .ignoreMessageIf(json -> json.has("type", "snapshot"));
+            .extractId(json -> json.text("channel"));
 
     /**
      * @param marketName
@@ -75,10 +76,10 @@ public class CoinbaseService2 extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         long[] context = new long[3];
 
-        return call("GET", "market/products/" + marketName + "/ticker?limit=1000&start=" + startId + "&end=" + endId)
-                .effect(e -> System.out.println(e))
+        System.out.println(startId + "  " + endId);
+        return call("GET", "ticker?limit=1000&start=" + startId + "&end=" + endId).effect(e -> System.out.println(e))
                 .flatIterable(e -> e.find("trades", "$"))
-                .map(json -> createExecution(json, false, context));
+                .plug(e -> createExecutionForREST(e, context));
     }
 
     /**
@@ -90,7 +91,7 @@ public class CoinbaseService2 extends MarketService {
 
         return clientRealtimely().subscribe(new Topic("market_trades", marketName))
                 .flatIterable(e -> e.find("events", "*", "trades", "$"))
-                .map(e -> createExecution(e, true, context));
+                .map(e -> createExecution(e, context));
     }
 
     /**
@@ -98,9 +99,9 @@ public class CoinbaseService2 extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "market/products/" + marketName + "/ticker?limit=1").flatIterable(e -> e.find("trades", "*")).map(e -> {
-            return createExecution(e, false, new long[3]);
-        });
+        return call("GET", "market/products/" + marketName + "/ticker?limit=15").flatIterable(e -> e.find("trades", "*"))
+                .plug(e -> createExecutionForREST(e, new long[3]))
+                .last();
     }
 
     /**
@@ -110,8 +111,8 @@ public class CoinbaseService2 extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         long[] context = new long[3];
 
-        return call("GET", "products/" + marketName + "/trades?after=" + id).flatIterable(e -> e.find("$"))
-                .map(json -> createExecution(json, false, context));
+        return call("GET", "market/products/" + marketName + "/ticker?limit=15").flatIterable(e -> e.find("trades", "*"))
+                .plug(e -> createExecutionForREST(e, context));
     }
 
     /**
@@ -120,25 +121,46 @@ public class CoinbaseService2 extends MarketService {
     @Override
     public Signal<Execution> searchInitialExecution() {
         return call("GET", "products/" + marketName + "/trades?after=2").flatIterable(e -> e.find("*"))
-                .map(json -> createExecution(json, false, new long[3]));
+                .map(json -> createExecution(json, new long[3]));
     }
 
     /**
-     * Convert to {@link Execution}.
+     * In the REST API, the following events can occur.
+     * - IDs at the same time are not in the same order.
+     * - The side is “UNKNOWN_ORDER_SIDE”.
+     * - A trade_id that is too small is mixed in.
+     * Cannot happen in WESOCKET API.
      * 
      * @param json
      * @param previous
      * @return
      */
-    private Execution createExecution(JSON e, boolean realtime, long[] previous) {
+    private Signal<Execution> createExecutionForREST(Signal<JSON> signal, long[] previous) {
+        return signal.map(e -> createExecution(e, previous)).skipNull().sort(SORTER);
+    }
+
+    /**
+     * In the REST API, the following events can occur.
+     * - IDs at the same time are not in the same order.
+     * - The side is “UNKNOWN_ORDER_SIDE”.
+     * - A trade_id that is too small is mixed in.
+     * Cannot happen in WESOCKET API.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution createExecution(JSON e, long[] previous) {
         String textSide = e.text("side");
-        if (textSide.equals("UNKNOWN_ORDER_SIDE")) {
-            // OTC trade?
-            // Sometimes it contains unintelligible formats such as
+        if (textSide.charAt(0) == 'U' /* UNKNOWN_ORDER_SIDE */) {
+            // It seems OTC trade, so we should discard it.
+            //
+            // TradeID contains unintelligible formats such as
             // 2022-09-13T07:10:00.06Z-BTC/USD-22343.5-1.22
+            return null;
         } else {
             long id = Long.parseLong(e.text("trade_id"));
-            Direction side = Direction.parse(e.text("side"));
+            Direction side = Direction.parse(textSide);
             Num size = Num.of(e.text("size"));
             Num price = Num.of(e.text("price"));
             ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
@@ -186,20 +208,36 @@ public class CoinbaseService2 extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Builder builder = HttpRequest.newBuilder(URI.create("https://api.coinbase.com/api/v3/brokerage/" + path));
+        Builder builder = HttpRequest.newBuilder(URI.create("https://api.exchange.coinbase.com/products/" + marketName + "/" + path));
 
         return Network.rest(builder, LIMITER, client()).retry(withPolicy());
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        ZonedDateTime now = Chrono.utcNow().minusYears(2);
-        ZonedDateTime start = now.minusHours(3);
-
-        Coinbase.BTCUSD.executions(start.toEpochSecond(), now.toEpochSecond()).to(e -> {
+    public static void main2(String[] args) throws InterruptedException {
+        Coinbase.BTCUSD.executionsRealtimely().to(e -> {
             System.out.println(e);
         });
 
-        Thread.sleep(1000 * 5);
+        Thread.sleep(1000 * 500);
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        ZonedDateTime now = Chrono.utcNow().minusYears(2);
+        ZonedDateTime start = now.minusMinutes(1);
+
+        Coinbase.BTCUSD.executions(690208534, now.toEpochSecond()).to(e -> {
+            System.out.println(e);
+        });
+
+        Thread.sleep(1000 * 3);
+    }
+
+    public static void main1(String[] args) throws InterruptedException {
+        Coinbase.BTCUSD.executions().to(e -> {
+            System.out.println(e);
+        });
+
+        Thread.sleep(1000 * 500);
     }
 
     /**

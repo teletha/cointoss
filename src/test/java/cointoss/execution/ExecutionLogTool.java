@@ -19,7 +19,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.binance.Binance;
+import cointoss.market.coinbase.Coinbase;
 import cointoss.util.Chrono;
 import kiss.I;
 import psychopath.File;
@@ -32,7 +32,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        createFastLog(Binance.BTC_USDT, Chrono.utc(2022, 2, 7));
+        restoreNormal(Coinbase.BTCUSD, Chrono.utc(2024, 9, 10));
     }
 
     /**
