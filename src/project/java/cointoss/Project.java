@@ -25,6 +25,7 @@ public class Project extends bee.api.Project {
         require("org.apache.commons", "commons-lang3");
         require("commons-net", "commons-net");
         require("com.google.guava", "guava");
+        // require("com.github.ben-manes.caffeine", "caffeine");
         unrequire("com.google.code.findbugs", "jsr305");
         unrequire("com.google.errorprone", "error_prone_annotations");
         unrequire("com.google.guava", "listenablefuture");
@@ -32,8 +33,6 @@ public class Project extends bee.api.Project {
         unrequire("org.checkerframework", "checker-qual");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
-        require("org.duckdb", "duckdb_jdbc");
-        require("com.github.ben-manes.caffeine", "caffeine");
         // require("org.jooq", "jooq");
         require("io.fair-acc", "chartfx");
         // require("org.apache.iotdb", "iotdb-session");

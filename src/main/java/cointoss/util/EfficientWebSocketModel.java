@@ -251,6 +251,7 @@ public abstract class EfficientWebSocketModel {
                                 ws.sendText(command, true);
                                 I.trace("Sent websocket command " + command + " to " + address() + ". @" + count);
                             } else {
+                                if (debug) debugSendMessage("subscribe", I.write(topic));
                                 ws.sendText(I.write(topic), true);
                                 I.trace("Sent websocket command " + topic + " to " + address() + ". @" + count);
                             }
@@ -438,6 +439,11 @@ public abstract class EfficientWebSocketModel {
      */
     private void outputTestCode(String text) {
         System.out.println("server.sendJSON(\"" + text.replace('"', '\'') + "\");");
+    }
+
+    private void debugSendMessage(String type, String message) {
+        System.out.println("user.sendJSON as " + type);
+        System.out.println(message);
     }
 
     /**

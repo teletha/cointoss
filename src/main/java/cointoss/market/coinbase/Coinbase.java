@@ -22,7 +22,7 @@ public final class Coinbase extends MarketServiceProvider {
     /** Limitation */
     private static final int AcquirableSize = 100;
 
-    public static final MarketService BTCUSD = new CoinbaseService("BTC-USD", MarketSetting.with.spot()
+    public static final MarketService BTCUSD = new CoinbaseService2("BTC-USD", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.1))
             .priceRangeModifier(50)
