@@ -64,34 +64,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.github.ben-manes.caffeine</groupId>
-			<artifactId>caffeine</artifactId>
-			<version>3.1.8</version>
-			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.errorprone</groupId>
-					<artifactId>error_prone_annotations</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.checkerframework</groupId>
-					<artifactId>checker-qual</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>listenablefuture</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.code.findbugs</groupId>
-					<artifactId>jsr305</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.j2objc</groupId>
-					<artifactId>j2objc-annotations</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>io.fair-acc</groupId>
 			<artifactId>chartfx</artifactId>
 			<version>11.3.1</version>
@@ -180,34 +152,6 @@
 			<artifactId>decimal4j</artifactId>
 			<version>1.0.3</version>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.errorprone</groupId>
-					<artifactId>error_prone_annotations</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.checkerframework</groupId>
-					<artifactId>checker-qual</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>listenablefuture</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.code.findbugs</groupId>
-					<artifactId>jsr305</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.j2objc</groupId>
-					<artifactId>j2objc-annotations</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.duckdb</groupId>
-			<artifactId>duckdb_jdbc</artifactId>
-			<version>1.0.0</version>
-			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.errorprone</groupId>
