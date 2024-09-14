@@ -87,6 +87,16 @@ interface MarketSettingModel {
     }
 
     /**
+     * Configure max acquirable execution size per one request.
+     * 
+     * @return
+     */
+    @Icy.Property
+    default long acquirableExecutionIncrement() {
+        return acquirableExecutionSize();
+    }
+
+    /**
      * Configure {@link ExecutionLogger} parser.
      * 
      * @return

@@ -72,6 +72,9 @@ public class MarketSetting implements MarketSettingModel {
     private static final MethodHandle acquirableExecutionSizeUpdater = updater("acquirableExecutionSize");
 
     /** The final property updater. */
+    private static final MethodHandle acquirableExecutionIncrementUpdater = updater("acquirableExecutionIncrement");
+
+    /** The final property updater. */
     private static final MethodHandle executionLoggerUpdater = updater("executionLogger");
 
     /** The final property updater. */
@@ -108,6 +111,9 @@ public class MarketSetting implements MarketSettingModel {
     public final int acquirableExecutionSize;
 
     /** The exposed property. */
+    public final long acquirableExecutionIncrement;
+
+    /** The exposed property. */
     public final Class<? extends ExecutionLogger> executionLogger;
 
     /** The exposed property. */
@@ -133,6 +139,7 @@ public class MarketSetting implements MarketSettingModel {
         this.priceRangeModifier = cointoss.MarketSettingModel.super.priceRangeModifier();
         this.orderbookMaxSize = cointoss.MarketSettingModel.super.orderbookMaxSize();
         this.acquirableExecutionSize = cointoss.MarketSettingModel.super.acquirableExecutionSize();
+        this.acquirableExecutionIncrement = cointoss.MarketSettingModel.super.acquirableExecutionIncrement();
         this.executionLogger = cointoss.MarketSettingModel.super.executionLogger();
         this.takerFee = cointoss.MarketSettingModel.super.takerFee();
         this.makerFee = cointoss.MarketSettingModel.super.makerFee();
@@ -379,6 +386,40 @@ public class MarketSetting implements MarketSettingModel {
     }
 
     /**
+     * Configure max acquirable execution size per one request.
+     *  
+     *  @return
+     */
+    @Override
+    public final long acquirableExecutionIncrement() {
+        return this.acquirableExecutionIncrement;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of acquirableExecutionIncrement property.
+     */
+    @SuppressWarnings("unused")
+    private final long getAcquirableExecutionIncrement() {
+        return this.acquirableExecutionIncrement;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of acquirableExecutionIncrement property to assign.
+     */
+    private final void setAcquirableExecutionIncrement(long value) {
+        try {
+            acquirableExecutionIncrementUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Configure {@link ExecutionLogger} parser.
      *  
      *  @return
@@ -562,6 +603,7 @@ public class MarketSetting implements MarketSettingModel {
         builder.append("priceRangeModifier=").append(priceRangeModifier).append(", ");
         builder.append("orderbookMaxSize=").append(orderbookMaxSize).append(", ");
         builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
+        builder.append("acquirableExecutionIncrement=").append(acquirableExecutionIncrement).append(", ");
         builder.append("executionLogger=").append(executionLogger).append(", ");
         builder.append("takerFee=").append(takerFee).append(", ");
         builder.append("makerFee=").append(makerFee).append(", ");
@@ -577,7 +619,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, orderbookMaxSize, acquirableExecutionSize, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
+        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, orderbookMaxSize, acquirableExecutionSize, acquirableExecutionIncrement, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
     }
 
     /**
@@ -599,6 +641,7 @@ public class MarketSetting implements MarketSettingModel {
         if (priceRangeModifier != other.priceRangeModifier) return false;
         if (orderbookMaxSize != other.orderbookMaxSize) return false;
         if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
+        if (acquirableExecutionIncrement != other.acquirableExecutionIncrement) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
         if (!Objects.equals(takerFee, other.takerFee)) return false;
         if (!Objects.equals(makerFee, other.makerFee)) return false;
@@ -631,17 +674,6 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
-            Åssignable o = new Åssignable();
-            o.spot();
-            return o;
-        }
-
-        /**
-         * Create new {@link MarketSetting} with the specified type property.
-         * 
-         * @return The next assignable model.
-         */
         public ÅssignableTarget<ÅssignableBase<Self>> derivative() {
             Åssignable o = new Åssignable();
             o.derivative();
@@ -656,6 +688,17 @@ public class MarketSetting implements MarketSettingModel {
         public ÅssignableTarget<ÅssignableBase<Self>> future() {
             Åssignable o = new Åssignable();
             o.future();
+            return o;
+        }
+
+        /**
+         * Create new {@link MarketSetting} with the specified type property.
+         * 
+         * @return The next assignable model.
+         */
+        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
+            Åssignable o = new Åssignable();
+            o.spot();
             return o;
         }
     }
@@ -681,15 +724,6 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        default Next spot() {
-            return type(cointoss.MarketType.SPOT);
-        }
-
-        /**
-         * Assign type property.
-         * 
-         * @return The next assignable model.
-         */
         default Next derivative() {
             return type(cointoss.MarketType.DERIVATIVE);
         }
@@ -701,6 +735,15 @@ public class MarketSetting implements MarketSettingModel {
          */
         default Next future() {
             return type(cointoss.MarketType.FUTURE);
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next spot() {
+            return type(cointoss.MarketType.SPOT);
         }
     }
 
@@ -797,6 +840,17 @@ public class MarketSetting implements MarketSettingModel {
         }
 
         /**
+         * Assign acquirableExecutionIncrement property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next acquirableExecutionIncrement(long value) {
+            ((MarketSetting) this).setAcquirableExecutionIncrement(value);
+            return (Next) this;
+        }
+
+        /**
          * Assign executionLogger property.
          * 
          * @param value A new value to assign.
@@ -875,6 +929,7 @@ public class MarketSetting implements MarketSettingModel {
         static final String PriceRangeModifier = "priceRangeModifier";
         static final String OrderbookMaxSize = "orderbookMaxSize";
         static final String AcquirableExecutionSize = "acquirableExecutionSize";
+        static final String AcquirableExecutionIncrement = "acquirableExecutionIncrement";
         static final String ExecutionLogger = "executionLogger";
         static final String TakerFee = "takerFee";
         static final String MakerFee = "makerFee";

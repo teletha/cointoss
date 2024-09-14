@@ -16,8 +16,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import cointoss.Direction;
@@ -39,10 +39,10 @@ import kiss.Signal;
 
 public class CoinbaseService2 extends MarketService {
 
+    static final TimestampBasedMarketServiceSupporter support = new TimestampBasedMarketServiceSupporter(10000, true, true);
+
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter
             .ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]X");
-
-    private static Comparator<Execution> SORTER = Comparator.<Execution, ZonedDateTime> comparing(e -> e.date).thenComparingLong(e -> e.id);
 
     /** The API limit. */
     private static final APILimiter LIMITER = APILimiter.with.limit(3).refresh(1000, MILLISECONDS);
@@ -56,7 +56,7 @@ public class CoinbaseService2 extends MarketService {
      * @param setting
      */
     protected CoinbaseService2(String marketName, MarketSetting setting) {
-        super(Exchange.Coinbase, marketName, setting);
+        super(Exchange.Coinbase2, marketName, setting);
 
         Realtime.subscribe(new Topic("heartbeats", marketName)).to(I.NoOP);
     }
@@ -74,11 +74,28 @@ public class CoinbaseService2 extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
+        long startSec = support.computeEpochSecond(startId);
+        long endSec = support.computeEpochSecond(endId);
+        long currentSec = endSec;
+        long startMill = startSec * 1000;
+        long[] currentMill = {currentSec * 1000};
+
+        ArrayDeque<Execution> buffer = new ArrayDeque();
+        while (startSec < currentSec) {
+            query(startSec, currentSec).take(e -> startMill <= e.mills && e.mills < currentMill[0]).waitForTerminate().to(buffer::addFirst);
+
+            Execution first = buffer.getFirst();
+            currentSec = support.computeEpochSecond(first.id);
+            currentMill[0] = first.mills;
+        }
+        return I.signal(buffer);
+    }
+
+    private Signal<Execution> query(long startTime, long endTime) {
         long[] context = new long[3];
 
-        System.out.println(startId + "  " + endId);
-        return call("GET", "ticker?limit=1000&start=" + startId + "&end=" + endId).effect(e -> System.out.println(e))
-                .flatIterable(e -> e.find("trades", "$"))
+        return call("GET", "market/products/" + marketName + "/ticker?limit=1000&start=" + startTime + "&end=" + endTime)
+                .flatIterable(e -> e.find("trades", "*"))
                 .plug(e -> createExecutionForREST(e, context));
     }
 
@@ -136,7 +153,7 @@ public class CoinbaseService2 extends MarketService {
      * @return
      */
     private Signal<Execution> createExecutionForREST(Signal<JSON> signal, long[] previous) {
-        return signal.map(e -> createExecution(e, previous)).skipNull().sort(SORTER);
+        return signal.map(e -> createExecution(e, previous)).skipNull();
     }
 
     /**
@@ -159,14 +176,12 @@ public class CoinbaseService2 extends MarketService {
             // 2022-09-13T07:10:00.06Z-BTC/USD-22343.5-1.22
             return null;
         } else {
-            long id = Long.parseLong(e.text("trade_id"));
             Direction side = Direction.parse(textSide);
             Num size = Num.of(e.text("size"));
             Num price = Num.of(e.text("price"));
             ZonedDateTime date = ZonedDateTime.parse(e.text("time"), TimeFormat);
-            int consecutive = TimestampBasedMarketServiceSupporter.computeConsecutive(side, date.toInstant().toEpochMilli(), previous);
 
-            return Execution.with.direction(side, size).price(price).id(id).date(date).consecutive(consecutive);
+            return support.createExecution(side, size, price, date, previous);
         }
     }
 
@@ -208,32 +223,32 @@ public class CoinbaseService2 extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Builder builder = HttpRequest.newBuilder(URI.create("https://api.exchange.coinbase.com/products/" + marketName + "/" + path));
+        Builder builder = HttpRequest.newBuilder(URI.create("https://api.coinbase.com/api/v3/brokerage/" + path));
 
         return Network.rest(builder, LIMITER, client()).retry(withPolicy());
     }
 
-    public static void main2(String[] args) throws InterruptedException {
-        Coinbase.BTCUSD.executionsRealtimely().to(e -> {
+    public static void main1(String[] args) throws InterruptedException {
+        Coinbase2.BTCUSD.executionsRealtimely().to(e -> {
             System.out.println(e);
         });
 
         Thread.sleep(1000 * 500);
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main3(String[] args) throws InterruptedException {
         ZonedDateTime now = Chrono.utcNow().minusYears(2);
-        ZonedDateTime start = now.minusMinutes(1);
+        ZonedDateTime start = now.minusMinutes(15);
 
-        Coinbase.BTCUSD.executions(690208534, now.toEpochSecond()).to(e -> {
+        Coinbase2.BTCUSD.executions(support.computeID(start), support.computeID(now)).to(e -> {
             System.out.println(e);
         });
 
         Thread.sleep(1000 * 3);
     }
 
-    public static void main1(String[] args) throws InterruptedException {
-        Coinbase.BTCUSD.executions().to(e -> {
+    public static void main(String[] args) throws InterruptedException {
+        Coinbase2.BTCUSD.executions().to(e -> {
             System.out.println(e);
         });
 

@@ -19,9 +19,12 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.market.coinbase.Coinbase;
+import cointoss.market.coinbase.Coinbase2;
 import cointoss.util.Chrono;
 import kiss.I;
+import kiss.Signal;
 import psychopath.File;
 
 /**
@@ -32,7 +35,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        restoreNormal(Coinbase.BTCUSD, Chrono.utc(2024, 9, 10));
+        convertToTimestampBasedId(Coinbase.ETHUSD, Coinbase2.ETHUSD);
     }
 
     /**
@@ -45,6 +48,24 @@ public class ExecutionLogTool {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.repair(false);
+    }
+
+    public static void convertToTimestampBasedId(MarketService idBased, MarketService timeBased) {
+        long[] context = new long[3];
+        TimestampBasedMarketServiceSupporter support = new TimestampBasedMarketServiceSupporter();
+
+        idBased.log.caches().to(cache -> {
+            LocalDate date = cache.date;
+            if (!timeBased.log.cache(date).existCompact()) {
+                Signal<Execution> exe = idBased.log.cache(date)
+                        .read(LogType.Normal)
+                        .map(x -> support.createExecution(x.orientation, x.price, x.size, x.date, context));
+
+                Cache destCache = timeBased.log.cache(date);
+                destCache.writeFast(destCache.writeCompact(exe)).to(I.NoOP);
+                System.out.println("Convert to " + timeBased + " " + date);
+            }
+        });
     }
 
     /**
