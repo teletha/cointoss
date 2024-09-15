@@ -113,7 +113,7 @@ public class GlobalVolumeView extends View {
     interface style extends StyleDSL {
         Style name = () -> {
             font.size(10.5, px).weight.bold();
-            display.width(45, px);
+            display.width(48, px);
             padding.top(1, px);
         };
     }
@@ -129,7 +129,7 @@ public class GlobalVolumeView extends View {
         drawSample(bitfyler, Exchange.BitFlyer, Pastel10[3]);
         drawSample(bitmex, Exchange.BitMEX, Pastel10[4]);
         drawSample(bybit, Exchange.Bybit, Pastel10[5]);
-        drawSample(coinbase, Exchange.Coinbase1, Pastel10[6]);
+        drawSample(coinbase, Exchange.Coinbase, Pastel10[6]);
         drawSample(gmo, Exchange.GMO, Pastel10[8]);
 
         List<Currency> currencies = List.of(BTC, ETH, XRP, EOS, COMP, SRM, DOGE);
