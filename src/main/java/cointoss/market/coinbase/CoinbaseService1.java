@@ -34,7 +34,7 @@ import hypatia.Num;
 import kiss.JSON;
 import kiss.Signal;
 
-public class CoinbaseService extends MarketService {
+public class CoinbaseService1 extends MarketService {
 
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter
             .ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]X");
@@ -51,7 +51,7 @@ public class CoinbaseService extends MarketService {
      * @param marketName
      * @param setting
      */
-    protected CoinbaseService(String marketName, MarketSetting setting) {
+    protected CoinbaseService1(String marketName, MarketSetting setting) {
         super(Exchange.Coinbase, marketName, setting);
     }
 

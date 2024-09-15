@@ -20,7 +20,7 @@ import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.market.coinbase.Coinbase;
+import cointoss.market.coinbase.Coinbase1;
 import cointoss.market.coinbase.Coinbase2;
 import cointoss.util.Chrono;
 import kiss.I;
@@ -35,7 +35,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        convertToTimestampBasedId(Coinbase.ETHUSD, Coinbase2.ETHUSD);
+        convertToTimestampBasedId(Coinbase1.ETHUSD, Coinbase2.ETHUSD);
     }
 
     /**
