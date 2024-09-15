@@ -461,14 +461,7 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Coinbase1",
-			"packageName": "cointoss.market.coinbase",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Coinbase2",
+			"name": "Coinbase",
 			"packageName": "cointoss.market.coinbase",
 			"type": "Class"
 		},
@@ -482,14 +475,14 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "CoinbaseService1",
+			"name": "CoinbaseService",
 			"packageName": "cointoss.market.coinbase",
 			"type": "Class"
 		},
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "CoinbaseService2",
+			"name": "CoinbaseService1",
 			"packageName": "cointoss.market.coinbase",
 			"type": "Class"
 		},
