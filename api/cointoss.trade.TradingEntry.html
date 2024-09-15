@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="g">
-		<header class="N">
-			<h1 class="H" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
-			<nav class="P"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="M">
+		<header class="m">
+			<h1 class="P" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
+			<nav class="e"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="c" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="W" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,14 +31,14 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="S">
-			<nav class="a">
+		<main class="i">
+			<nav class="f">
 				<div></div>
 			</nav>
-			<article class="U" id="Article">
-				<section class="R"><code class="l">cointoss.trade</code>
-					<h2 class="Interface Y"><code class="W">TradingEntry</code></h2>
-					<div class="L">
+			<article class="b" id="Article">
+				<section class="X"><code class="d">cointoss.trade</code>
+					<h2 class="Interface Y"><code class="T">TradingEntry</code></h2>
+					<div class="j">
 						<ul class="C G">
 							<li><code><a href="api/cointoss.trade.bot.Arbitrager.html">Arbitrager</a></code></li>
 							<li><code><a href="api/cointoss.trade.bot.CrossOrder.html">CrossOrder</a></code></li>
@@ -51,29 +51,29 @@
 						</ul>
 					</div>
 				</section>
-				<section class="R" id="market()">
-					<h2 class="i"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="W">market</code><code class="d">()</code><i class="Z"><code><a href="api/cointoss.Market.html">Market</a></code></i></h2>
-					<table class="h">
-						<tr class="f">
+				<section class="X" id="market()">
+					<h2 class="c"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="T">market</code><code class="N">()</code><i class="J"><code><a href="api/cointoss.Market.html">Market</a></code></i></h2>
+					<table class="R">
+						<tr class="k">
 							<td><code><a href="api/cointoss.Market.html">Market</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>The current market.</p>
 </span></section>
-				<section class="R" id="entry(hypatia.Orientational,long)">
-					<h2 class="i"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="W">entry</code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="h">
-						<tr class="b">
+				<section class="X" id="entry(hypatia.Orientational,long)">
+					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="T">entry</code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="R">
+						<tr class="S">
 							<td><code>hypatia.Orientational</code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code>long</code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 </span></td>
 						</tr>
-						<tr class="f">
+						<tr class="k">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
@@ -81,25 +81,25 @@
 					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.Takable.html">Takable</a></code>
 <code><a href="api/cointoss.order.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 </span></section>
-				<section class="R" id="entry(hypatia.Orientational,long,java.util.function.Consumer)">
-					<h2 class="i"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="W">entry</code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="h">
-						<tr class="b">
+				<section class="X" id="entry(hypatia.Orientational,long,java.util.function.Consumer)">
+					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="T">entry</code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="J"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="R">
+						<tr class="S">
 							<td><code>hypatia.Orientational</code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code>long</code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code>declaration</code></td>
 							<td><span><p>This entry&#39;s order strategy.</p>
 </span></td>
 						</tr>
-						<tr class="f">
+						<tr class="k">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
@@ -107,20 +107,20 @@
 					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.Takable.html">Takable</a></code>
 <code><a href="api/cointoss.order.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 </span></section>
-				<section class="R" id="entry(hypatia.Orientational,double)">
-					<h2 class="i"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="W">entry</code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="h">
-						<tr class="b">
+				<section class="X" id="entry(hypatia.Orientational,double)">
+					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="T">entry</code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="R">
+						<tr class="S">
 							<td><code>hypatia.Orientational</code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code>double</code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 </span></td>
 						</tr>
-						<tr class="f">
+						<tr class="k">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
@@ -128,25 +128,25 @@
 					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.Takable.html">Takable</a></code>
 <code><a href="api/cointoss.order.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 </span></section>
-				<section class="R" id="entry(hypatia.Orientational,double,java.util.function.Consumer)">
-					<h2 class="i"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="W">entry</code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="h">
-						<tr class="b">
+				<section class="X" id="entry(hypatia.Orientational,double,java.util.function.Consumer)">
+					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="T">entry</code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="J"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="R">
+						<tr class="S">
 							<td><code>hypatia.Orientational</code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code>double</code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code>declaration</code></td>
 							<td><span><p>This entry&#39;s order strategy.</p>
 </span></td>
 						</tr>
-						<tr class="f">
+						<tr class="k">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
@@ -154,20 +154,20 @@
 					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.Takable.html">Takable</a></code>
 <code><a href="api/cointoss.order.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 </span></section>
-				<section class="R" id="entry(hypatia.Orientational,hypatia.Num)">
-					<h2 class="i"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="W">entry</code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="h">
-						<tr class="b">
+				<section class="X" id="entry(hypatia.Orientational,hypatia.Num)">
+					<h2 class="c"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="T">entry</code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>)</code><i class="J"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="R">
+						<tr class="S">
 							<td><code>hypatia.Orientational</code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code>hypatia.Num</code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 </span></td>
 						</tr>
-						<tr class="f">
+						<tr class="k">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
@@ -175,25 +175,25 @@
 					</table><span class="B"><p>We will order with the specified quantity. Use the return the <code><a href="api/cointoss.order.Takable.html">Takable</a></code>
 <code><a href="api/cointoss.order.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 </span></section>
-				<section class="R" id="entry(hypatia.Orientational,hypatia.Num,java.util.function.Consumer)">
-					<h2 class="i"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="W">entry</code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
-					<table class="h">
-						<tr class="b">
+				<section class="X" id="entry(hypatia.Orientational,hypatia.Num,java.util.function.Consumer)">
+					<h2 class="c"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="T">entry</code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="J"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></h2>
+					<table class="R">
+						<tr class="S">
 							<td><code>hypatia.Orientational</code> <code>directional</code></td>
 							<td><span><p>This entry&#39;s direction.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code>hypatia.Num</code> <code>size</code></td>
 							<td><span><p>This entry&#39;s size.</p>
 </span></td>
 						</tr>
-						<tr class="b">
+						<tr class="S">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code>declaration</code></td>
 							<td><span><p>This entry&#39;s order strategy.</p>
 </span></td>
 						</tr>
-						<tr class="f">
+						<tr class="k">
 							<td><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
@@ -202,17 +202,17 @@
 <code><a href="api/cointoss.order.Makable.html">Makable</a></code> value to define the details of the ordering method.</p>
 </span></section>
 			</article>
-			<aside class="O" id="SubNavi">
-				<div class="V">
-					<h5 class="Q">Methods</h5>
+			<aside class="Q" id="SubNavi">
+				<div class="O">
+					<h5 class="U">Methods</h5>
 					<ul>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#market()">market</a></code><code class="d">()</code><i class="e"><code><a href="api/cointoss.Market.html">Market</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,long)">entry</a></code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,long,java.util.function.Consumer)">entry</a></code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,double)">entry</a></code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,double,java.util.function.Consumer)">entry</a></code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,hypatia.Num)">entry</a></code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,hypatia.Num,java.util.function.Consumer)">entry</a></code><code class="d">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="e"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#market()">market</a></code><code class="N">()</code><i class="Z"><code><a href="api/cointoss.Market.html">Market</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,long)">entry</a></code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,long,java.util.function.Consumer)">entry</a></code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>long</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,double)">entry</a></code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,double,java.util.function.Consumer)">entry</a></code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>double</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,hypatia.Num)">entry</a></code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.trade.TradingEntry.html#entry(hypatia.Orientational,hypatia.Num,java.util.function.Consumer)">entry</a></code><code class="N">(<code>hypatia.Orientational</code> <code class="parameterName">directional</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></code></code> <code class="parameterName">declaration</code>)</code><i class="Z"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></i></li>
 					</ul>
 				</div>
 			</aside>
