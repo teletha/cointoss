@@ -80,7 +80,7 @@ public class CoinbaseService extends MarketService {
         // Since only a maximum of 1,000 items can be retrieved in a single request, multiple
         // requests must be made to retrieve all the data in the specified range.
         long[] context = new long[3];
-        Deque<List<Execution>> children = new ArrayDeque(10);
+        Deque<List<Execution>> children = new ArrayDeque();
 
         while (startSec < endSec) {
             List<Execution> child = new ArrayList(1000);
@@ -257,7 +257,7 @@ public class CoinbaseService extends MarketService {
         Coinbase.SOLUSD.executions().to(e -> {
         });
 
-        Thread.sleep(1000 * 60 * 60 * 6);
+        Thread.sleep(1000 * 60 * 60 * 24);
     }
 
     /**
