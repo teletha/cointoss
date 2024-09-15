@@ -43,6 +43,14 @@ public final class Coinbase extends MarketServiceProvider {
             .acquirableExecutionBulkModifier(8)
             .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
 
+    public static final MarketService SOLUSD = new CoinbaseService("SOL-USD", MarketSetting.with.spot()
+            .target(Currency.SOL.minimumSize(0.00000001))
+            .base(Currency.USD.minimumSize(0.01))
+            .priceRangeModifier(1)
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
+
     /**
      * {@inheritDoc}
      */

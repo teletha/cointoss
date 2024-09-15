@@ -254,7 +254,7 @@ public class CoinbaseService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Coinbase.XRPUSD.executions().to(e -> {
+        Coinbase.SOLUSD.executions().to(e -> {
         });
 
         Thread.sleep(1000 * 60 * 60 * 6);
