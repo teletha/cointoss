@@ -35,6 +35,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
+        convertToTimestampBasedId(Coinbase.BTCUSD, Coinbase2.BTCUSD);
         convertToTimestampBasedId(Coinbase.ETHUSD, Coinbase2.ETHUSD);
     }
 
@@ -59,7 +60,7 @@ public class ExecutionLogTool {
             if (!timeBased.log.cache(date).existCompact()) {
                 Signal<Execution> exe = idBased.log.cache(date)
                         .read(LogType.Normal)
-                        .map(x -> support.createExecution(x.orientation, x.price, x.size, x.date, context));
+                        .map(x -> support.createExecution(x.orientation, x.size, x.price, x.date, context));
 
                 Cache destCache = timeBased.log.cache(date);
                 destCache.writeFast(destCache.writeCompact(exe)).to(I.NoOP);

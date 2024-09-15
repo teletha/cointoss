@@ -24,13 +24,24 @@ public final class Coinbase2 extends MarketServiceProvider {
             .base(Currency.USD.minimumSize(0.1))
             .priceRangeModifier(50)
             .acquirableExecutionSize(1000)
-            .acquirableExecutionIncrement(1000 * 60 * 10 * CoinbaseService2.support.padding));
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService2.support.padding));
 
     public static final MarketService ETHUSD = new CoinbaseService2("ETH-USD", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.01))
             .priceRangeModifier(100)
-            .acquirableExecutionSize(1000));
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService2.support.padding));
+
+    public static final MarketService XRPUSD = new CoinbaseService2("XRP-USD", MarketSetting.with.spot()
+            .target(Currency.XRP.minimumSize(0.000001))
+            .base(Currency.USD.minimumSize(0.0001))
+            .priceRangeModifier(1)
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService2.support.padding));
 
     /**
      * {@inheritDoc}

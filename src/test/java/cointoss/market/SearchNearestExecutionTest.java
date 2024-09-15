@@ -17,7 +17,7 @@ import cointoss.market.binance.Binance;
 import cointoss.market.bitfinex.Bitfinex;
 import cointoss.market.bitmex.BitMex;
 import cointoss.market.bybit.Bybit;
-import cointoss.market.coinbase.Coinbase;
+import cointoss.market.coinbase.Coinbase2;
 import cointoss.util.Chrono;
 
 @Disabled
@@ -32,7 +32,7 @@ class SearchNearestExecutionTest {
     @Test
     @Timeout(value = 15)
     void coinbase() {
-        assert Coinbase.BTCUSD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 111789000;
+        assert Coinbase2.BTCUSD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 111789000;
     }
 
     @Test

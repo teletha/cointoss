@@ -92,6 +92,16 @@ interface MarketSettingModel {
      * @return
      */
     @Icy.Property
+    default int acquirableExecutionBulkModifier() {
+        return 1;
+    }
+
+    /**
+     * Configure max acquirable execution size per one request.
+     * 
+     * @return
+     */
+    @Icy.Property
     default long acquirableExecutionIncrement() {
         return acquirableExecutionSize();
     }

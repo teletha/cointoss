@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Timeout;
 import cointoss.market.bitfinex.Bitfinex;
 import cointoss.market.bitmex.BitMex;
 import cointoss.market.bybit.Bybit;
-import cointoss.market.coinbase.Coinbase;
+import cointoss.market.coinbase.Coinbase2;
 
 @Disabled
 class SearchInitialExecutionTest {
@@ -30,7 +30,7 @@ class SearchInitialExecutionTest {
     @Test
     @Timeout(value = 10)
     void coinbase() {
-        assert Coinbase.ETHUSD.searchInitialExecution().waitForTerminate().to().exact().id == 1;
+        assert Coinbase2.ETHUSD.searchInitialExecution().waitForTerminate().to().exact().id == 1;
     }
 
     @Test

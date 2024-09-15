@@ -125,7 +125,7 @@ public enum Direction implements Orientational<Direction> {
             return SELL;
         }
         char c = value.charAt(0);
-        return c == 'S' || c == 's' ? SELL : BUY;
+        return c == 'B' || c == 'b' ? BUY : SELL;
     }
 
     /**

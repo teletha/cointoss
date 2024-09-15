@@ -72,6 +72,9 @@ public class MarketSetting implements MarketSettingModel {
     private static final MethodHandle acquirableExecutionSizeUpdater = updater("acquirableExecutionSize");
 
     /** The final property updater. */
+    private static final MethodHandle acquirableExecutionBulkModifierUpdater = updater("acquirableExecutionBulkModifier");
+
+    /** The final property updater. */
     private static final MethodHandle acquirableExecutionIncrementUpdater = updater("acquirableExecutionIncrement");
 
     /** The final property updater. */
@@ -111,6 +114,9 @@ public class MarketSetting implements MarketSettingModel {
     public final int acquirableExecutionSize;
 
     /** The exposed property. */
+    public final int acquirableExecutionBulkModifier;
+
+    /** The exposed property. */
     public final long acquirableExecutionIncrement;
 
     /** The exposed property. */
@@ -139,6 +145,7 @@ public class MarketSetting implements MarketSettingModel {
         this.priceRangeModifier = cointoss.MarketSettingModel.super.priceRangeModifier();
         this.orderbookMaxSize = cointoss.MarketSettingModel.super.orderbookMaxSize();
         this.acquirableExecutionSize = cointoss.MarketSettingModel.super.acquirableExecutionSize();
+        this.acquirableExecutionBulkModifier = cointoss.MarketSettingModel.super.acquirableExecutionBulkModifier();
         this.acquirableExecutionIncrement = cointoss.MarketSettingModel.super.acquirableExecutionIncrement();
         this.executionLogger = cointoss.MarketSettingModel.super.executionLogger();
         this.takerFee = cointoss.MarketSettingModel.super.takerFee();
@@ -391,6 +398,40 @@ public class MarketSetting implements MarketSettingModel {
      *  @return
      */
     @Override
+    public final int acquirableExecutionBulkModifier() {
+        return this.acquirableExecutionBulkModifier;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of acquirableExecutionBulkModifier property.
+     */
+    @SuppressWarnings("unused")
+    private final int getAcquirableExecutionBulkModifier() {
+        return this.acquirableExecutionBulkModifier;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of acquirableExecutionBulkModifier property to assign.
+     */
+    private final void setAcquirableExecutionBulkModifier(int value) {
+        try {
+            acquirableExecutionBulkModifierUpdater.invoke(this, value);
+        } catch (UnsupportedOperationException e) {
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Configure max acquirable execution size per one request.
+     *  
+     *  @return
+     */
+    @Override
     public final long acquirableExecutionIncrement() {
         return this.acquirableExecutionIncrement;
     }
@@ -603,6 +644,7 @@ public class MarketSetting implements MarketSettingModel {
         builder.append("priceRangeModifier=").append(priceRangeModifier).append(", ");
         builder.append("orderbookMaxSize=").append(orderbookMaxSize).append(", ");
         builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
+        builder.append("acquirableExecutionBulkModifier=").append(acquirableExecutionBulkModifier).append(", ");
         builder.append("acquirableExecutionIncrement=").append(acquirableExecutionIncrement).append(", ");
         builder.append("executionLogger=").append(executionLogger).append(", ");
         builder.append("takerFee=").append(takerFee).append(", ");
@@ -619,7 +661,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, orderbookMaxSize, acquirableExecutionSize, acquirableExecutionIncrement, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
+        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, orderbookMaxSize, acquirableExecutionSize, acquirableExecutionBulkModifier, acquirableExecutionIncrement, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
     }
 
     /**
@@ -641,6 +683,7 @@ public class MarketSetting implements MarketSettingModel {
         if (priceRangeModifier != other.priceRangeModifier) return false;
         if (orderbookMaxSize != other.orderbookMaxSize) return false;
         if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
+        if (acquirableExecutionBulkModifier != other.acquirableExecutionBulkModifier) return false;
         if (acquirableExecutionIncrement != other.acquirableExecutionIncrement) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
         if (!Objects.equals(takerFee, other.takerFee)) return false;
@@ -840,6 +883,17 @@ public class MarketSetting implements MarketSettingModel {
         }
 
         /**
+         * Assign acquirableExecutionBulkModifier property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next acquirableExecutionBulkModifier(int value) {
+            ((MarketSetting) this).setAcquirableExecutionBulkModifier(value);
+            return (Next) this;
+        }
+
+        /**
          * Assign acquirableExecutionIncrement property.
          * 
          * @param value A new value to assign.
@@ -929,6 +983,7 @@ public class MarketSetting implements MarketSettingModel {
         static final String PriceRangeModifier = "priceRangeModifier";
         static final String OrderbookMaxSize = "orderbookMaxSize";
         static final String AcquirableExecutionSize = "acquirableExecutionSize";
+        static final String AcquirableExecutionBulkModifier = "acquirableExecutionBulkModifier";
         static final String AcquirableExecutionIncrement = "acquirableExecutionIncrement";
         static final String ExecutionLogger = "executionLogger";
         static final String TakerFee = "takerFee";

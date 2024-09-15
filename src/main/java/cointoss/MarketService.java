@@ -140,7 +140,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 boolean activeRealtime = false;
 
                 // read from REST API
-                int size = setting.acquirableExecutionSize();
+                int size = setting.acquirableExecutionSize() * setting.acquirableExecutionBulkModifier;
                 long cacheId = log.estimateLastID();
                 long startId = cacheId != -1 ? cacheId : searchInitialExecution().map(e -> e.id).to().next();
                 Num coefficient = Num.ONE;
@@ -149,7 +149,6 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                     rests.clear();
 
                     long range = Math.round(setting.acquirableExecutionIncrement * coefficient.doubleValue());
-                    System.out.println(range + "   " + setting.acquirableExecutionIncrement + "  " + coefficient);
                     executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
 
                     // Since the synchronous REST API did not return an error, it can be determined
@@ -204,6 +203,10 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                                 coefficient = coefficient.plus("0.5");
                             } else if (retrieved < size * 0.7) {
                                 coefficient = coefficient.plus("0.1");
+                            } else if (retrieved < size * 2) {
+                                // The number of acquired data is too large,
+                                // shrink the data range slightly from next time.
+                                coefficient = Num.max(coefficient.minus("0.1"), Num.of("0.1"));
                             }
                         }
                     } else {
@@ -407,13 +410,13 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     private Signal<Execution> searchInitialExecution(long start, Execution end) {
         long middle = (start + end.id) / 2;
-        I.info(this + " searches for the initial execution log. [" + start + " ~ " + middle + " ~ " + end.date + "]");
 
         return executionsBefore(middle).buffer().or(List.of()).recover(List.of()).flatMap(result -> {
             int size = result.size();
+            I.info(this + " searches the initial execution (" + size + "). [" + start + " ~ " + middle + " ~ " + end.id + " at " + end.date + "]");
             if (size == 0) {
                 // Since there is no log prior to the middle ID, we can assume that
-                // the initial execution exists between middle and latest.
+                // the initial execution exists between middle and latest
                 return searchInitialExecution(middle, end);
             } else if (setting.acquirableExecutionSize <= size) {
                 // Since it is equal to the maximum number of execution log that can be

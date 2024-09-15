@@ -38,8 +38,6 @@ public class TimestampBasedMarketServiceSupporter {
 
     private final boolean milliBase;
 
-    private final boolean reverse;
-
     /**
      * Construct with millisecond based padding (10000).
      */
@@ -53,7 +51,7 @@ public class TimestampBasedMarketServiceSupporter {
      * @param padding A padding size.
      */
     public TimestampBasedMarketServiceSupporter(long padding) {
-        this(padding, true, false);
+        this(padding, true);
     }
 
     /**
@@ -62,14 +60,13 @@ public class TimestampBasedMarketServiceSupporter {
      * @param padding A padding size.
      * @param milliBase A timestamp base.
      */
-    public TimestampBasedMarketServiceSupporter(long padding, boolean milliBase, boolean reverse) {
+    public TimestampBasedMarketServiceSupporter(long padding, boolean milliBase) {
         if (padding <= 0) {
             throw new IllegalArgumentException("Padding size must be positive.");
         }
 
         this.padding = padding;
         this.milliBase = milliBase;
-        this.reverse = reverse;
     }
 
     /**
@@ -201,13 +198,11 @@ public class TimestampBasedMarketServiceSupporter {
             id = computeID(epochMillis);
             consecutive = Execution.ConsecutiveDifference;
 
-            long pad = reverse ? padding - 1 : 0;
-
-            threeLength[0] = time + pad;
+            threeLength[0] = time;
             threeLength[1] = sideType;
-            threeLength[2] = pad;
+            threeLength[2] = 0;
         } else {
-            id = computeID(epochMillis) + (reverse ? --threeLength[2] : ++threeLength[2]);
+            id = computeID(epochMillis) + ++threeLength[2];
             consecutive = sideType != threeLength[1] ? Execution.ConsecutiveDifference
                     : side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
 
