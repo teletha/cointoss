@@ -10,5 +10,5 @@
 package cointoss.market;
 
 public enum Exchange {
-    Binance, BinanceF, BitBank, Bitfinex, BitFlyer, BitMEX, Bybit, Coinbase, Coinbase2, Coincheck, Finnhub, FTX, GMO, Huobi, TestNet, Liquid;
+    Binance, BinanceF, BitBank, Bitfinex, BitFlyer, BitMEX, Bybit, @Deprecated Coinbase1, Coinbase, Coincheck, Finnhub, FTX, GMO, Huobi, TestNet, Liquid;
 }

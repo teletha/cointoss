@@ -17,18 +17,19 @@ import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
 import kiss.I;
 
-public final class Coinbase1 extends MarketServiceProvider {
+@Deprecated
+final class Coinbase1 extends MarketServiceProvider {
 
     /** Limitation */
     private static final int AcquirableSize = 100;
 
-    public static final MarketService BTCUSD = new CoinbaseService1("BTC-USD", MarketSetting.with.spot()
+    static final MarketService BTCUSD = new CoinbaseService1("BTC-USD", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.1))
             .priceRangeModifier(50)
             .acquirableExecutionSize(1000));
 
-    public static final MarketService ETHUSD = new CoinbaseService1("ETH-USD", MarketSetting.with.spot()
+    static final MarketService ETHUSD = new CoinbaseService1("ETH-USD", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.01))
             .priceRangeModifier(100)
@@ -39,7 +40,7 @@ public final class Coinbase1 extends MarketServiceProvider {
      */
     @Override
     public Exchange exchange() {
-        return Exchange.Coinbase;
+        return Exchange.Coinbase1;
     }
 
     /**

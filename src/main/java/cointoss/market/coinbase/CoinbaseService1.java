@@ -34,6 +34,7 @@ import hypatia.Num;
 import kiss.JSON;
 import kiss.Signal;
 
+@Deprecated
 public class CoinbaseService1 extends MarketService {
 
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter
@@ -52,7 +53,7 @@ public class CoinbaseService1 extends MarketService {
      * @param setting
      */
     protected CoinbaseService1(String marketName, MarketSetting setting) {
-        super(Exchange.Coinbase, marketName, setting);
+        super(Exchange.Coinbase1, marketName, setting);
     }
 
     /**

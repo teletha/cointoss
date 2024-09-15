@@ -37,7 +37,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
-public class CoinbaseService2 extends MarketService {
+public class CoinbaseService extends MarketService {
 
     static final TimestampBasedMarketServiceSupporter support = new TimestampBasedMarketServiceSupporter();
 
@@ -55,8 +55,8 @@ public class CoinbaseService2 extends MarketService {
      * @param marketName
      * @param setting
      */
-    protected CoinbaseService2(String marketName, MarketSetting setting) {
-        super(Exchange.Coinbase2, marketName, setting);
+    protected CoinbaseService(String marketName, MarketSetting setting) {
+        super(Exchange.Coinbase, marketName, setting);
         this.enoughExecutionRequest = true;
         Realtime.subscribe(new Topic("heartbeats", marketName)).to(I.NoOP);
     }
@@ -239,14 +239,14 @@ public class CoinbaseService2 extends MarketService {
     }
 
     public static void main2(String[] args) throws InterruptedException {
-        Coinbase2.BTCUSD.executionsRealtimely().to(e -> {
+        Coinbase.BTCUSD.executionsRealtimely().to(e -> {
         });
 
         Thread.sleep(1000 * 500);
     }
 
     public static void main1(String[] args) throws InterruptedException {
-        Coinbase2.BTCUSD.orderBookRealtimely().to(e -> {
+        Coinbase.BTCUSD.orderBookRealtimely().to(e -> {
             System.out.println(e);
         });
 
@@ -254,7 +254,7 @@ public class CoinbaseService2 extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Coinbase2.XRPUSD.executions().to(e -> {
+        Coinbase.XRPUSD.executions().to(e -> {
         });
 
         Thread.sleep(1000 * 60 * 60 * 6);
