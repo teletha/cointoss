@@ -35,7 +35,6 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        convertToTimestampBasedId(Coinbase.BTCUSD, Coinbase2.BTCUSD);
         convertToTimestampBasedId(Coinbase.ETHUSD, Coinbase2.ETHUSD);
     }
 

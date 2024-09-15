@@ -85,8 +85,12 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     /** The shared stream. */
     private Signal<Liquidation> liquidationRealtimely;
 
-    /** Whether or not the current process has write access to the data. */
-    protected boolean writable;
+    /**
+     * If this service obtains all Executions in the specified ID range for an Execution
+     * request without excess or deficiency, setting the value to True can be expected
+     * to result in efficient Log acquisition.
+     */
+    protected boolean enoughExecutionRequest;
 
     /**
      * @param exchange
@@ -162,11 +166,11 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
 
                     if (retrieved != 0) {
                         // REST API returns some executions
-                        if (size <= retrieved && coefficient.isGreaterThan(1)) {
+                        if (!enoughExecutionRequest && size <= retrieved && coefficient.isGreaterThan(1)) {
                             // Since there are too many data acquired,
                             // narrow the data range and get it again.
                             coefficient = Num
-                                    .max(Num.ONE, coefficient.isGreaterThan(50) ? coefficient.divide(2).scale(0) : coefficient.minus(5));
+                                    .max(Num.ONE, coefficient.isGreaterThan(30) ? coefficient.divide(2).scale(0) : coefficient.minus(6));
                             continue;
                         } else {
                             I.info(id + " \t" + rests.getFirst().date + " size " + retrieved + "(" + coefficient + ")");
@@ -194,9 +198,9 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                             // The number of acquired data is too small,
                             // expand the data range slightly from next time.
                             if (retrieved < size * 0.05) {
-                                coefficient = coefficient.plus("50");
+                                coefficient = coefficient.plus("6");
                             } else if (retrieved < size * 0.1) {
-                                coefficient = coefficient.plus("5");
+                                coefficient = coefficient.plus("4");
                             } else if (retrieved < size * 0.3) {
                                 coefficient = coefficient.plus("2");
                             } else if (retrieved < size * 0.5) {

@@ -57,7 +57,7 @@ public class CoinbaseService2 extends MarketService {
      */
     protected CoinbaseService2(String marketName, MarketSetting setting) {
         super(Exchange.Coinbase2, marketName, setting);
-
+        this.enoughExecutionRequest = true;
         Realtime.subscribe(new Topic("heartbeats", marketName)).to(I.NoOP);
     }
 
@@ -245,7 +245,7 @@ public class CoinbaseService2 extends MarketService {
         Thread.sleep(1000 * 500);
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main1(String[] args) throws InterruptedException {
         Coinbase2.BTCUSD.orderBookRealtimely().to(e -> {
             System.out.println(e);
         });
@@ -253,11 +253,11 @@ public class CoinbaseService2 extends MarketService {
         Thread.sleep(1000 * 30);
     }
 
-    public static void main1(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         Coinbase2.XRPUSD.executions().to(e -> {
         });
 
-        Thread.sleep(1000 * 60 * 20);
+        Thread.sleep(1000 * 60 * 60 * 6);
     }
 
     /**
