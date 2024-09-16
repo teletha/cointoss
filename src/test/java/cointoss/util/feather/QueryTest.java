@@ -86,6 +86,72 @@ class QueryTest extends FeatherStoreTestBase {
     }
 
     @Test
+    void endTimeOnMemoryAndDisk() {
+        FeatherStore<Value> store = createStore(values(30, 50), values(20, 30));
+        assert equality(store.query(20, 40), "20~40");
+        assert equality(store.query(10, 40), "20~40");
+        assert equality(store.query(0, 40), "20~40");
+    }
+
+    @Test
+    void rangeUnderflowMemory() {
+        FeatherStore<Value> store = createStore(values(30, 40), null);
+        assert equality(store.query(0, 10), EMPTY);
+        assert equality(store.query(0, 20), EMPTY);
+        assert equality(store.query(0, 30), 30);
+        assert equality(store.query(0, 40), "30~40");
+        assert equality(store.query(0, 50), "30~40");
+    }
+
+    @Test
+    void rangeOverflowMemory() {
+        FeatherStore<Value> store = createStore(values(30, 40), null);
+        assert equality(store.query(50, 70), EMPTY);
+        assert equality(store.query(40, 70), 40);
+        assert equality(store.query(30, 70), "30~40");
+        assert equality(store.query(20, 70), "30~40");
+    }
+
+    @Test
+    void rangeUnderflowDisk() {
+        FeatherStore<Value> store = createStore(null, values(30, 40));
+        assert equality(store.query(0, 10), EMPTY);
+        assert equality(store.query(0, 20), EMPTY);
+        assert equality(store.query(0, 30), 30);
+        assert equality(store.query(0, 40), "30~40");
+        assert equality(store.query(0, 50), "30~40");
+    }
+
+    @Test
+    void rangeOverflowDisk() {
+        FeatherStore<Value> store = createStore(null, values(30, 40));
+        assert equality(store.query(50, 70), EMPTY);
+        assert equality(store.query(40, 70), 40);
+        assert equality(store.query(30, 70), "30~40");
+        assert equality(store.query(20, 70), "30~40");
+    }
+
+    @Test
+    void rangeUnderflowMemoryAndDisk() {
+        FeatherStore<Value> store = createStore(values(20, 30), values(30, 40));
+        assert equality(store.query(0, 10), EMPTY);
+        assert equality(store.query(0, 20), 20);
+        assert equality(store.query(0, 30), "20~30");
+        assert equality(store.query(0, 40), "20~40");
+        assert equality(store.query(0, 50), "20~40");
+    }
+
+    @Test
+    void rangeOverflowMemoryAndDisk() {
+        FeatherStore<Value> store = createStore(values(20, 30), values(30, 40));
+        assert equality(store.query(50, 70), EMPTY);
+        assert equality(store.query(40, 70), 40);
+        assert equality(store.query(30, 70), "30~40");
+        assert equality(store.query(20, 70), "20~40");
+        assert equality(store.query(10, 70), "20~40");
+    }
+
+    @Test
     void latest() {
         FeatherStore<Value> store = createStore(values(0, 20), null);
         assert equality(store.query(10), "10~20");

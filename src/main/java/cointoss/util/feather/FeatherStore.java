@@ -773,7 +773,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * Load data on the specified segment from DB.
      */
     private OnHeap<E> loadData(OnHeap<E> heap, boolean idealSafe, long timestamp) {
-        if (db != null && firstDisk <= timestamp && timestamp <= lastDisk && (!idealSafe || computeLogicalFirstCacheTime() <= heap.startTime)) {
+        if (db != null && (!idealSafe || computeLogicalFirstCacheTime() <= heap.startTime)) {
             db.findBy(E::getId, x -> x.isOrMoreThan(heap.startTime).isLessThan(heap.startTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
                 heap.set((int) index[1], item);
