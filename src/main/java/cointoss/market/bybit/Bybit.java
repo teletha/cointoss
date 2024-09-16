@@ -22,9 +22,24 @@ public final class Bybit extends MarketServiceProvider {
     /** Limitation */
     static final int AcquirableSize = 1000;
 
+    public static final MarketService AAVE_USDT = new BybitService("AAVEUSDT", MarketSetting.with.derivative()
+            .target(Currency.AAVE.minimumSize(1).scale(3))
+            .base(Currency.USDT.minimumSize(0.001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService ARB_USDT = new BybitService("ARBUSDT", MarketSetting.with.derivative()
+            .target(Currency.ARB.minimumSize(1).scale(2))
+            .base(Currency.USDT.minimumSize(0.001))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService BTC_USDT = new BybitService("BTCUSDT", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(1).scale(5))
             .base(Currency.USDT.minimumSize(0.5))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService CAKE_USDT = new BybitService("CAKEUSDT", MarketSetting.with.derivative()
+            .target(Currency.CAKE.minimumSize(1).scale(3))
+            .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService EOS_USDT = new BybitService("EOSUSDT", MarketSetting.with.derivative()
@@ -38,29 +53,14 @@ public final class Bybit extends MarketServiceProvider {
             .priceRangeModifier(20)
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService XRP_USDT = new BybitService("XRPUSDT", MarketSetting.with.derivative()
-            .target(Currency.XRP.minimumSize(1).scale(5))
-            .base(Currency.USDT.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
-
-    public static final MarketService STRK_USDT = new BybitService("STRKUSDT", MarketSetting.with.derivative()
-            .target(Currency.STRK.minimumSize(1).scale(2))
-            .base(Currency.USDT.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
-
-    public static final MarketService ARB_USDT = new BybitService("ARBUSDT", MarketSetting.with.derivative()
-            .target(Currency.ARB.minimumSize(1).scale(2))
+    public static final MarketService FIL_USDT = new BybitService("FILUSDT", MarketSetting.with.derivative()
+            .target(Currency.FIL.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService AAVE_USDT = new BybitService("AAVEUSDT", MarketSetting.with.derivative()
-            .target(Currency.AAVE.minimumSize(1).scale(3))
+    public static final MarketService LDO_USDT = new BybitService("LDOUSDT", MarketSetting.with.derivative()
+            .target(Currency.LDO.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.001))
-            .acquirableExecutionSize(AcquirableSize));
-
-    public static final MarketService SOL_USDT = new BybitService("SOLUSDT", MarketSetting.with.derivative()
-            .target(Currency.SOL.minimumSize(1).scale(3))
-            .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService MATIC_USDT = new BybitService("MATICUSDT", MarketSetting.with.derivative()
@@ -73,13 +73,8 @@ public final class Bybit extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService CAKE_USDT = new BybitService("CAKEUSDT", MarketSetting.with.derivative()
-            .target(Currency.CAKE.minimumSize(1).scale(3))
-            .base(Currency.USDT.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
-
-    public static final MarketService FIL_USDT = new BybitService("FILUSDT", MarketSetting.with.derivative()
-            .target(Currency.FIL.minimumSize(1).scale(2))
+    public static final MarketService OP_USDT = new BybitService("OPUSDT", MarketSetting.with.derivative()
+            .target(Currency.OP.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));
 
@@ -88,18 +83,23 @@ public final class Bybit extends MarketServiceProvider {
             .base(Currency.USDT.minimumSize(0.001))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService OP_USDT = new BybitService("OPUSDT", MarketSetting.with.derivative()
-            .target(Currency.OP.minimumSize(1).scale(2))
-            .base(Currency.USDT.minimumSize(0.001))
+    public static final MarketService SOL_USDT = new BybitService("SOLUSDT", MarketSetting.with.derivative()
+            .target(Currency.SOL.minimumSize(1).scale(3))
+            .base(Currency.USDT.minimumSize(0.01))
             .acquirableExecutionSize(AcquirableSize));
 
-    public static final MarketService LDO_USDT = new BybitService("LDOUSDT", MarketSetting.with.derivative()
-            .target(Currency.LDO.minimumSize(1).scale(2))
-            .base(Currency.USDT.minimumSize(0.001))
+    public static final MarketService STRK_USDT = new BybitService("STRKUSDT", MarketSetting.with.derivative()
+            .target(Currency.STRK.minimumSize(1).scale(2))
+            .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
     public static final MarketService WLD_USDT = new BybitService("WLDUSDT", MarketSetting.with.derivative()
             .target(Currency.WLD.minimumSize(1).scale(2))
+            .base(Currency.USDT.minimumSize(0.0001))
+            .acquirableExecutionSize(AcquirableSize));
+
+    public static final MarketService XRP_USDT = new BybitService("XRPUSDT", MarketSetting.with.derivative()
+            .target(Currency.XRP.minimumSize(1).scale(5))
             .base(Currency.USDT.minimumSize(0.0001))
             .acquirableExecutionSize(AcquirableSize));
 
