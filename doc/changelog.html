@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="J">
-		<header class="M">
-			<h1 class="Q" date="2024-08-27" ver="1.7.0"><code>Cointoss</code></h1>
-			<nav class="W"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="H">
+		<header class="m">
+			<h1 class="j" date="2024-08-27" ver="1.8.0"><code>Cointoss</code></h1>
+			<nav class="M"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -31,29 +31,122 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="R">
-			<nav class="g">
+		<main class="T">
+			<nav class="U">
 				<div></div>
 			</nav>
-			<article class="f" id="Article">
-				<section class="U B" id="1.7.0(2024-08-27)">
-					<header class="B P">
-						<h2>1.7.0 (2024-08-27)</h2>
-						<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+			<article class="K" id="Article">
+				<section class="X B" id="1.8.0(2024-09-16)">
+					<header class="B N">
+						<h2>1.8.0 (2024-09-16)</h2>
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
-					<section class="B d" id="Features">
-						<header class="B Y">
+					<section class="B S" id="Features">
+						<header class="B d">
 							<h3>Features</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#twitter"/>
+									</svg>
+								</a></div>
+						</header>
+						<ul>
+
+							<li>add button to rebuild ticker (<a href="https://github.com/teletha/cointoss/commit/d77229d95582e8c42d59b5c5b404db6a5994f134">d77229d</a>)</li>
+
+							<li>add MarketService#hasExternalRepository (<a href="https://github.com/teletha/cointoss/commit/32f5cd7fa7c69492ad7ee78364f1f4881ecea00e">32f5cd7</a>)</li>
+
+							<li>add SOL-USD market on coinbase (<a href="https://github.com/teletha/cointoss/commit/7896581a054324e973d82927106f6070edaa1018">7896581</a>)</li>
+
+							<li>chart show data on the correct date-range (<a href="https://github.com/teletha/cointoss/commit/19f20a2a1497a52befb4c9029398dcd643f2f6b5">19f20a2</a>)</li>
+
+							<li>show ticker building process (<a href="https://github.com/teletha/cointoss/commit/49e6d4401a0dae253807b73438ecd29766e80e44">49e6d44</a>)</li>
+
+							<li>support the rebuilding ticker by date-range (<a href="https://github.com/teletha/cointoss/commit/70b2f092509d9224864c2293fe72987881a3c246">70b2f09</a>)</li>
+
+							<li>Update Coinbase API (<a href="https://github.com/teletha/cointoss/commit/764d5a8f6fda1508798fdf469d189227f7e84fd7">764d5a8</a>)</li>
+</ul>
+					</section>
+					<section class="B S" id="BugFixes">
+						<header class="B d">
+							<h3>Bug Fixes</h3>
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#copy"/>
+									</svg>
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#twitter"/>
+									</svg>
+								</a></div>
+						</header>
+						<ul>
+
+							<li>change span (<a href="https://github.com/teletha/cointoss/commit/396821942c956100ae995113bc995e58e23a289e">3968219</a>)</li>
+
+							<li>chart can show the full ticker (<a href="https://github.com/teletha/cointoss/commit/2e4de2667cc6d34fd450c98a549bd48e31adf436">2e4de26</a>)</li>
+
+							<li>correct query (<a href="https://github.com/teletha/cointoss/commit/df3b4e0b0ca378a70b3777670271d0e68fdf8fa2">df3b4e0</a>)</li>
+
+							<li>deprecate old Coinbase (<a href="https://github.com/teletha/cointoss/commit/5e6dd0d024488b6172048ebd9237544a887e4a89">5e6dd0d</a>)</li>
+
+							<li>drop old coinbase api (<a href="https://github.com/teletha/cointoss/commit/e4ab6f1ed6886a70d62059966f5be104718a10c7">e4ab6f1</a>)</li>
+
+							<li>hiding lower SMA indicators on upper ticker charts (<a href="https://github.com/teletha/cointoss/commit/98dcd7e851cb103ed1599cf3ecd2f36183a085ec">98dcd7e</a>)</li>
+
+							<li>make more testable (<a href="https://github.com/teletha/cointoss/commit/5617ed31483ce214489c424034aecb0a434c4365">5617ed3</a>)</li>
+
+							<li>memory leak in FastLog (<a href="https://github.com/teletha/cointoss/commit/e7a5064d4fad6c0e986db812d4d6258c1bd55800">e7a5064</a>)</li>
+
+							<li>refactoring ticker builder (<a href="https://github.com/teletha/cointoss/commit/a7c16cdb929061982369010544f5d498449b0419">a7c16cd</a>)</li>
+
+							<li>retrive external log smartly (<a href="https://github.com/teletha/cointoss/commit/0b5494ff7dd1030420783bb8cd72de724ce143a8">0b5494f</a>)</li>
+
+							<li>show full exchange name in GlobalVolumeView (<a href="https://github.com/teletha/cointoss/commit/36d497ca06bb7e9997b7c940d36e10a53269dcbd">36d497c</a>)</li>
+
+							<li>use TestableMarket more (<a href="https://github.com/teletha/cointoss/commit/5c4fd53b67eaa5ca8f2c12fb848b0e21e06a91b6">5c4fd53</a>)</li>
+</ul>
+					</section>
+					<section class="B S" id="Asserts">
+						<header class="B d">
+							<h3>Assets</h3>
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#copy"/>
+									</svg>
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#twitter"/>
+									</svg>
+								</a></div>
+						</header>
+						<ul>
+							<li><a href="https://github.com/teletha/cointoss/archive/refs/tags/v1.8.0.zip">Source code</a> (zip)</li>
+						</ul>
+					</section>
+				</section>
+				<section class="X B" id="1.7.0(2024-08-27)">
+					<header class="B N">
+						<h2>1.7.0 (2024-08-27)</h2>
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
+									<use href="main.svg#copy"/>
+								</svg>
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
+									<use href="main.svg#twitter"/>
+								</svg>
+							</a></div>
+					</header>
+					<section class="B S" id="Features">
+						<header class="B d">
+							<h3>Features</h3>
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
+										<use href="main.svg#copy"/>
+									</svg>
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -109,13 +202,13 @@
 							<li>update sinobu (<a href="https://github.com/teletha/cointoss/commit/062bc507b1c29668d674257cd3e9b07d600c412c">062bc50</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="BugFixes">
-						<header class="B Y">
+					<section class="B S" id="BugFixes">
+						<header class="B d">
 							<h3>Bug Fixes</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -159,13 +252,13 @@
 							<li>update typewriter (<a href="https://github.com/teletha/cointoss/commit/76f3629fcc8c981096d8947d12576b890e95b458">76f3629</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="Asserts">
-						<header class="B Y">
+					<section class="B S" id="Asserts">
+						<header class="B d">
 							<h3>Assets</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -175,24 +268,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="U B" id="1.6.0(2024-04-01)">
-					<header class="B P">
+				<section class="X B" id="1.6.0(2024-04-01)">
+					<header class="B N">
 						<h2>1.6.0 (2024-04-01)</h2>
-						<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
-					<section class="B d" id="Features">
-						<header class="B Y">
+					<section class="B S" id="Features">
+						<header class="B d">
 							<h3>Features</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -208,13 +301,13 @@
 							<li>remove order related events on OrderManager (<a href="https://github.com/teletha/cointoss/commit/58dd36db31f355c5416f38476c43cfec7ef3abbe">58dd36d</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="BugFixes">
-						<header class="B Y">
+					<section class="B S" id="BugFixes">
+						<header class="B d">
 							<h3>Bug Fixes</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -234,13 +327,13 @@
 							<li>VerifiableMarketService should use the partial order execution (<a href="https://github.com/teletha/cointoss/commit/aa0a968ad244e4bcaed164858c72cf97f19a1738">aa0a968</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="Asserts">
-						<header class="B Y">
+					<section class="B S" id="Asserts">
+						<header class="B d">
 							<h3>Assets</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -250,24 +343,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="U B" id="1.5.0(2024-03-28)">
-					<header class="B P">
+				<section class="X B" id="1.5.0(2024-03-28)">
+					<header class="B N">
 						<h2>1.5.0 (2024-03-28)</h2>
-						<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
-					<section class="B d" id="Features">
-						<header class="B Y">
+					<section class="B S" id="Features">
+						<header class="B d">
 							<h3>Features</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -331,13 +424,13 @@
 							<li>update commons-net (<a href="https://github.com/teletha/cointoss/commit/60df66b2140566cc863719590f5e47d597d54e7b">60df66b</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="BugFixes">
-						<header class="B Y">
+					<section class="B S" id="BugFixes">
+						<header class="B d">
 							<h3>Bug Fixes</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -383,13 +476,13 @@
 							<li>use .env (<a href="https://github.com/teletha/cointoss/commit/ac43b2e3859486dcca821fce2a21686cb55d484d">ac43b2e</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="Asserts">
-						<header class="B Y">
+					<section class="B S" id="Asserts">
+						<header class="B d">
 							<h3>Assets</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -399,24 +492,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="U B" id="1.4.0(2023-12-02)">
-					<header class="B P">
+				<section class="X B" id="1.4.0(2023-12-02)">
+					<header class="B N">
 						<h2>1.4.0 (2023-12-02)</h2>
-						<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
-					<section class="B d" id="Features">
-						<header class="B Y">
+					<section class="B S" id="Features">
+						<header class="B d">
 							<h3>Features</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -438,13 +531,13 @@
 							<li>update binance market (<a href="https://github.com/teletha/cointoss/commit/9cf0c88a1d27262558f06a4323e7b19ff5561bb5">9cf0c88</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="BugFixes">
-						<header class="B Y">
+					<section class="B S" id="BugFixes">
+						<header class="B d">
 							<h3>Bug Fixes</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -502,13 +595,13 @@
 							<li>Websocket api of coincheck is broken. (<a href="https://github.com/teletha/cointoss/commit/3c9a39e4e64b8535d45d66da5923e582ed08f5f7">3c9a39e</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="Asserts">
-						<header class="B Y">
+					<section class="B S" id="Asserts">
+						<header class="B d">
 							<h3>Assets</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -518,24 +611,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="U B" id="1.3.0(2022-03-28)">
-					<header class="B P">
+				<section class="X B" id="1.3.0(2022-03-28)">
+					<header class="B N">
 						<h2>1.3.0 (2022-03-28)</h2>
-						<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
-					<section class="B d" id="Features">
-						<header class="B Y">
+					<section class="B S" id="Features">
+						<header class="B d">
 							<h3>Features</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -561,13 +654,13 @@
 							<li>Optimize memory and performance for orderbook related system. (<a href="https://www.github.com/teletha/cointoss/commit/23be4550b22102b4e5f6d0aee84381db8cb4e53a">23be455</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="BugFixes">
-						<header class="B Y">
+					<section class="B S" id="BugFixes">
+						<header class="B d">
 							<h3>Bug Fixes</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -605,13 +698,13 @@
 							<li>Update Bybit. (<a href="https://www.github.com/teletha/cointoss/commit/e351f76977c1dd943bf9d54d67606894b1dc2295">e351f76</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="Asserts">
-						<header class="B Y">
+					<section class="B S" id="Asserts">
+						<header class="B d">
 							<h3>Assets</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -621,24 +714,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="U B" id="1.2.0(2022-03-10)">
-					<header class="B P">
+				<section class="X B" id="1.2.0(2022-03-10)">
+					<header class="B N">
 						<h2>1.2.0 (2022-03-10)</h2>
-						<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
-					<section class="B d" id="Features">
-						<header class="B Y">
+					<section class="B S" id="Features">
+						<header class="B d">
 							<h3>Features</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -662,13 +755,13 @@
 							<li>Tick uses Num no longer. (<a href="https://www.github.com/teletha/cointoss/commit/a70c912e1d6adc0a5b973a35b87f2a925a03ba50">a70c912</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="BugFixes">
-						<header class="B Y">
+					<section class="B S" id="BugFixes">
+						<header class="B d">
 							<h3>Bug Fixes</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -692,13 +785,13 @@
 							<li>Y-axis is no longer able to zoom. (<a href="https://www.github.com/teletha/cointoss/commit/d8019cee9d4408131922ce879394fcdcecb30afd">d8019ce</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="Asserts">
-						<header class="B Y">
+					<section class="B S" id="Asserts">
+						<header class="B d">
 							<h3>Assets</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -708,24 +801,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="U B" id="1.1.0(2022-02-17)">
-					<header class="B P">
+				<section class="X B" id="1.1.0(2022-02-17)">
+					<header class="B N">
 						<h2>1.1.0 (2022-02-17)</h2>
-						<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
-					<section class="B d" id="Features">
-						<header class="B Y">
+					<section class="B S" id="Features">
+						<header class="B d">
 							<h3>Features</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -745,13 +838,13 @@
 							<li>Suggest interval value smartly on bot parameter. (<a href="https://www.github.com/teletha/cointoss/commit/e413c54dc6bb03bde05d9cbaca1ff4526df58661">e413c54</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="BugFixes">
-						<header class="B Y">
+					<section class="B S" id="BugFixes">
+						<header class="B d">
 							<h3>Bug Fixes</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -769,13 +862,13 @@
 							<li>Update sinobu. (<a href="https://www.github.com/teletha/cointoss/commit/f8bf41ca4079852d9b331e3eae45bb33c60ad98b">f8bf41c</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="Asserts">
-						<header class="B Y">
+					<section class="B S" id="Asserts">
+						<header class="B d">
 							<h3>Assets</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -785,24 +878,24 @@
 						</ul>
 					</section>
 				</section>
-				<section class="U B" id="1.0.0(2022-02-04)">
-					<header class="B P">
+				<section class="X B" id="1.0.0(2022-02-04)">
+					<header class="B N">
 						<h2>1.0.0 (2022-02-04)</h2>
-						<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+						<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#copy"/>
 								</svg>
-							</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+							</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 									<use href="main.svg#twitter"/>
 								</svg>
 							</a></div>
 					</header>
-					<section class="B d" id="Features">
-						<header class="B Y">
+					<section class="B S" id="Features">
+						<header class="B d">
 							<h3>Features</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -826,13 +919,13 @@
 							<li>update javafx. (<a href="https://www.github.com/teletha/cointoss/commit/23834c5811857ae4b2eba0dcd931e75d537fd079">23834c5</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="BugFixes">
-						<header class="B Y">
+					<section class="B S" id="BugFixes">
+						<header class="B d">
 							<h3>Bug Fixes</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -916,13 +1009,13 @@
 							<li>Websocket can&#39;t retry when connecting error. (<a href="https://www.github.com/teletha/cointoss/commit/fd5306b655e6314504eab6aa7240e1601b0cac68">fd5306b</a>)</li>
 </ul>
 					</section>
-					<section class="B d" id="Asserts">
-						<header class="B Y">
+					<section class="B S" id="Asserts">
+						<header class="B d">
 							<h3>Assets</h3>
-							<div class="c"><span class="perp b"><svg class="A svg" viewBox="0 0 24 24">
+							<div class="I"><span class="perp P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#copy"/>
 									</svg>
-								</span><a class="tweet b"><svg class="A svg" viewBox="0 0 24 24">
+								</span><a class="tweet P"><svg class="A svg" viewBox="0 0 24 24">
 										<use href="main.svg#twitter"/>
 									</svg>
 								</a></div>
@@ -933,9 +1026,10 @@
 					</section>
 				</section>
 			</article>
-			<aside class="m" id="SubNavi">
-				<div class="I">
+			<aside class="h" id="SubNavi">
+				<div class="i">
 					<ul>
+						<li><a href="doc/changelog.html#1.8.0(2024-09-16)">1.8.0 (2024-09-16)</a></li>
 						<li><a href="doc/changelog.html#1.7.0(2024-08-27)">1.7.0 (2024-08-27)</a></li>
 						<li><a href="doc/changelog.html#1.6.0(2024-04-01)">1.6.0 (2024-04-01)</a></li>
 						<li><a href="doc/changelog.html#1.5.0(2024-03-28)">1.5.0 (2024-03-28)</a></li>
