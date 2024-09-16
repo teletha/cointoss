@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.8.0](https://github.com/teletha/cointoss/compare/v1.7.0...v1.8.0) (2024-09-16)
+
+
+### Features
+
+* add button to rebuild ticker ([d77229d](https://github.com/teletha/cointoss/commit/d77229d95582e8c42d59b5c5b404db6a5994f134))
+* add MarketService#hasExternalRepository ([32f5cd7](https://github.com/teletha/cointoss/commit/32f5cd7fa7c69492ad7ee78364f1f4881ecea00e))
+* add SOL-USD market on coinbase ([7896581](https://github.com/teletha/cointoss/commit/7896581a054324e973d82927106f6070edaa1018))
+* chart show data on the correct date-range ([19f20a2](https://github.com/teletha/cointoss/commit/19f20a2a1497a52befb4c9029398dcd643f2f6b5))
+* show ticker building process ([49e6d44](https://github.com/teletha/cointoss/commit/49e6d4401a0dae253807b73438ecd29766e80e44))
+* support the rebuilding ticker by date-range ([70b2f09](https://github.com/teletha/cointoss/commit/70b2f092509d9224864c2293fe72987881a3c246))
+* Update Coinbase API ([764d5a8](https://github.com/teletha/cointoss/commit/764d5a8f6fda1508798fdf469d189227f7e84fd7))
+
+
+### Bug Fixes
+
+* change span ([3968219](https://github.com/teletha/cointoss/commit/396821942c956100ae995113bc995e58e23a289e))
+* chart can show the full ticker ([2e4de26](https://github.com/teletha/cointoss/commit/2e4de2667cc6d34fd450c98a549bd48e31adf436))
+* correct query ([df3b4e0](https://github.com/teletha/cointoss/commit/df3b4e0b0ca378a70b3777670271d0e68fdf8fa2))
+* deprecate old Coinbase ([5e6dd0d](https://github.com/teletha/cointoss/commit/5e6dd0d024488b6172048ebd9237544a887e4a89))
+* drop old coinbase api ([e4ab6f1](https://github.com/teletha/cointoss/commit/e4ab6f1ed6886a70d62059966f5be104718a10c7))
+* hiding lower SMA indicators on upper ticker charts ([98dcd7e](https://github.com/teletha/cointoss/commit/98dcd7e851cb103ed1599cf3ecd2f36183a085ec))
+* make more testable ([5617ed3](https://github.com/teletha/cointoss/commit/5617ed31483ce214489c424034aecb0a434c4365))
+* memory leak in FastLog ([e7a5064](https://github.com/teletha/cointoss/commit/e7a5064d4fad6c0e986db812d4d6258c1bd55800))
+* refactoring ticker builder ([a7c16cd](https://github.com/teletha/cointoss/commit/a7c16cdb929061982369010544f5d498449b0419))
+* retrive external log smartly ([0b5494f](https://github.com/teletha/cointoss/commit/0b5494ff7dd1030420783bb8cd72de724ce143a8))
+* show full exchange name in GlobalVolumeView ([36d497c](https://github.com/teletha/cointoss/commit/36d497ca06bb7e9997b7c940d36e10a53269dcbd))
+* use TestableMarket more ([5c4fd53](https://github.com/teletha/cointoss/commit/5c4fd53b67eaa5ca8f2c12fb848b0e21e06a91b6))
+
 ## [1.7.0](https://github.com/teletha/cointoss/compare/v1.6.0...v1.7.0) (2024-08-27)
 
 
