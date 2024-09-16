@@ -51,6 +51,14 @@ public final class Coinbase extends MarketServiceProvider {
             .acquirableExecutionBulkModifier(8)
             .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
 
+    public static final MarketService COMPUSDC = new CoinbaseService("COMP-USDC", MarketSetting.with.spot()
+            .target(Currency.COMP.minimumSize(0.001))
+            .base(Currency.USDC.minimumSize(0.01))
+            .priceRangeModifier(1)
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
+
     /**
      * {@inheritDoc}
      */
