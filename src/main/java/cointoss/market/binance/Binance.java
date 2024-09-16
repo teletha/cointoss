@@ -43,6 +43,11 @@ public final class Binance extends MarketServiceProvider {
             .priceRangeModifier(500)
             .acquirableExecutionSize(AcquirableSize));
 
+    public static final MarketService EOS_USDT = new BinanceService("EOSUSDT", MarketSetting.with.spot()
+            .target(Currency.ETH.minimumSize(0.0001))
+            .base(Currency.USDT.minimumSize(0.1))
+            .acquirableExecutionSize(AcquirableSize));
+
     public static final MarketService ETH_USDT = new BinanceService("ETHUSDT", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.00001))
             .base(Currency.USDT.minimumSize(0.01))
