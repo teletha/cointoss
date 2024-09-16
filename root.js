@@ -482,13 +482,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "CoinbaseService1",
-			"packageName": "cointoss.market.coinbase",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Coincheck",
 			"packageName": "cointoss.market.coincheck",
 			"type": "Class"
