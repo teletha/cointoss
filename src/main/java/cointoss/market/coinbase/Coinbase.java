@@ -43,6 +43,14 @@ public final class Coinbase extends MarketServiceProvider {
             .acquirableExecutionBulkModifier(8)
             .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
 
+    public static final MarketService DOGE_PERP = new CoinbaseService("DOGE-PERP-INTX", MarketSetting.with.derivative()
+            .target(Currency.DOGE.minimumSize(1))
+            .base(Currency.USDC.minimumSize(0.00001))
+            .priceRangeModifier(1)
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
+
     public static final MarketService ETHUSD = new CoinbaseService("ETH-USD", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.01))
@@ -70,6 +78,14 @@ public final class Coinbase extends MarketServiceProvider {
     public static final MarketService SOLUSD = new CoinbaseService("SOL-USD", MarketSetting.with.spot()
             .target(Currency.SOL.minimumSize(0.00000001))
             .base(Currency.USD.minimumSize(0.01))
+            .priceRangeModifier(1)
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
+
+    public static final MarketService SOL_PERP = new CoinbaseService("SOL-PERP-INTX", MarketSetting.with.derivative()
+            .target(Currency.SOL.minimumSize(0.001))
+            .base(Currency.USDC.minimumSize(0.001))
             .priceRangeModifier(1)
             .acquirableExecutionSize(1000)
             .acquirableExecutionBulkModifier(8)
