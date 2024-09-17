@@ -139,7 +139,9 @@ public class Axis extends Region {
         double currentAmount = scroll.getVisibleAmount();
         double range = computeVisibleMaxValue() - computeVisibleMinValue();
 
-        if (visibleMaxRange.get() <= range) {
+        if (range == 0) {
+            // stop zooming
+        } else if (visibleMaxRange.get() <= range) {
             zoom(currentAmount * (visibleMaxRange.get() / range), scroll.getValue());
         } else if (range <= visibleMinRange.get()) {
             zoom(currentAmount * (visibleMinRange.get() / range), scroll.getValue());
@@ -173,7 +175,7 @@ public class Axis extends Region {
      * @param newAmount
      */
     private void zoom(double newAmount, double newValue) {
-        newAmount = Primitives.between(0, newAmount, 1);
+        newAmount = Primitives.between(0.0001, newAmount, 1);
 
         double currentAmount = scroll.getVisibleAmount();
         if (currentAmount == newAmount) {
@@ -193,6 +195,8 @@ public class Axis extends Region {
                 return;
             }
         }
+
+        newValue = Primitives.between(0, newValue, 1);
 
         scroll.setValue(newValue);
         scroll.setVisibleAmount(newAmount);

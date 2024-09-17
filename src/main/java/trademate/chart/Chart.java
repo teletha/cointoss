@@ -17,8 +17,8 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Primitives;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
@@ -33,12 +33,6 @@ public class Chart extends Region {
 
     private static long D = M * 60 * 24;
 
-    /** The minimum number of ticks. */
-    public final LongProperty minimumTickNumber = new SimpleLongProperty(200);
-
-    /** The maximum number of ticks. */
-    public final LongProperty maximumTickNumber = new SimpleLongProperty(2000);
-
     /** The x-axis UI. */
     public final Axis axisX = new Axis(1, Side.BOTTOM)
             .units(M, 5 * M, 10 * M, 30 * M, 60 * M, 2 * 60 * M, 4 * 60 * M, 6 * 60 * M, 12 * 60 * M, D, 2 * D, 3 * D, 7 * D, 15 * D, 30 * D, 90 * D, 180 * D, 360 * D)
@@ -46,6 +40,12 @@ public class Chart extends Region {
 
     /** The y-axis UI. */
     public final Axis axisY = new Axis(4, Side.RIGHT).visibleScroll(false);
+
+    /** The minimum number of ticks. */
+    private final IntegerProperty minimumTickNumber = new SimpleIntegerProperty(25);
+
+    /** The maximum number of ticks. */
+    private final IntegerProperty maximumTickNumber = new SimpleIntegerProperty(2000);
 
     /** The chart view. */
     private final ChartView chart;
@@ -112,9 +112,6 @@ public class Chart extends Region {
     @Override
     protected final void layoutChildren() {
         layoutChart.layout(() -> {
-            setAxisXRange();
-            setAxisYRange();
-
             Insets insets = getInsets();
             double x = insets.getLeft();
             double y = insets.getTop();
@@ -124,6 +121,9 @@ public class Chart extends Region {
             double axisYWidth = axisY.prefWidth(height);
             double mainHeight = Math.max(0, height - axisXHeight);
             double mainWidth = Math.max(0, width - axisYWidth);
+
+            setAxisXRange((int) width);
+            setAxisYRange();
 
             // layout axis
             axisX.resizeRelocate(x, y + mainHeight, mainWidth, axisXHeight);
@@ -140,11 +140,13 @@ public class Chart extends Region {
     /**
      * Set x-axis range.
      */
-    private void setAxisXRange() {
+    private void setAxisXRange(int width) {
         chart.ticker.to(ticker -> {
             if (ticker.ticks.isEmpty()) {
                 return;
             }
+
+            minimumTickNumber.set(Math.round(width / 7));
 
             long seconds = ticker.span.seconds;
             axisX.logicalMinValue.set(ticker.ticks.computeLogicalFirstCacheTime());
