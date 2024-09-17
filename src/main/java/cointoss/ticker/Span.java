@@ -29,7 +29,12 @@ public enum Span {
 
     Minute1(1, MINUTE_OF_HOUR, 2, HOURS, 6, 1), // 60 * 2 * 6 = 720
 
-    Minute5(5, MINUTE_OF_HOUR, 8, HOURS, 10, 1), // 12 * 8 * 10 = 960
+    /**
+     * The total 5-minute time is adjusted to be within 72 hours. This is because we expect to read
+     * at least 3 days of logs when the market is initialized. In this way, the need to write the
+     * 5-minute ticker data to the disk cache is eliminated.
+     */
+    Minute5(5, MINUTE_OF_HOUR, 8, HOURS, 8, 1), // 12 * 8 * 8 = 768
 
     Minute15(15, MINUTE_OF_HOUR, 1, DAYS, 10, 1), // 4 * 24 * 10 = 960
 
