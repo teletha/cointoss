@@ -19,6 +19,13 @@ import kiss.I;
 
 public final class Coinbase extends MarketServiceProvider {
 
+    public static final MarketService AAVEUSD = new CoinbaseService("AAVE-USD", MarketSetting.with.spot()
+            .target(Currency.AAVE.minimumSize(0.001))
+            .base(Currency.USD.minimumSize(0.01))
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
+
     public static final MarketService BTCUSD = new CoinbaseService("BTC-USD", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.1))
@@ -94,6 +101,14 @@ public final class Coinbase extends MarketServiceProvider {
     public static final MarketService SUIUSD = new CoinbaseService("SUI-USD", MarketSetting.with.spot()
             .target(Currency.SUI.minimumSize(0.1))
             .base(Currency.USD.minimumSize(0.0001))
+            .priceRangeModifier(1)
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
+
+    public static final MarketService SUI_PERP = new CoinbaseService("SUI-PERP-INTX", MarketSetting.with.derivative()
+            .target(Currency.SUI.minimumSize(0.1))
+            .base(Currency.USDC.minimumSize(0.0001))
             .priceRangeModifier(1)
             .acquirableExecutionSize(1000)
             .acquirableExecutionBulkModifier(8)
