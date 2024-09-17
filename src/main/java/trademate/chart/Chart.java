@@ -13,15 +13,16 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleFunction;
 
-import cointoss.ticker.Span;
-import cointoss.ticker.Ticker;
-import cointoss.util.Chrono;
-import hypatia.Primitives;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
+
+import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import hypatia.Primitives;
 import trademate.setting.PerformanceSetting;
 import viewtify.preference.Preferences;
 import viewtify.ui.helper.LayoutAssistant;
@@ -81,11 +82,7 @@ public class Chart extends Region {
                 int hour = time.getHour() * 60 * 60 - time.getOffset().getTotalSeconds();
 
                 if (time.getMinute() == 0 && hour == 0) {
-                    if (chart.ticker.isPresent() && chart.ticker.v.span.ordinal() >= Span.Hour4.ordinal()) {
-                        return time.format(Chrono.Date);
-                    } else {
-                        return time.format(Chrono.DateTimeWithoutSec);
-                    }
+                    return time.format(Chrono.Date);
                 } else {
                     return time.format(Chrono.TimeWithoutSec);
                 }
