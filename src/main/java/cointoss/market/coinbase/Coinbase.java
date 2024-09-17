@@ -35,6 +35,14 @@ public final class Coinbase extends MarketServiceProvider {
             .acquirableExecutionBulkModifier(8)
             .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
 
+    public static final MarketService COMPUSDC = new CoinbaseService("COMP-USDC", MarketSetting.with.spot()
+            .target(Currency.COMP.minimumSize(0.001))
+            .base(Currency.USDC.minimumSize(0.01))
+            .priceRangeModifier(1)
+            .acquirableExecutionSize(1000)
+            .acquirableExecutionBulkModifier(8)
+            .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
+
     public static final MarketService ETHUSD = new CoinbaseService("ETH-USD", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.01))
@@ -67,9 +75,9 @@ public final class Coinbase extends MarketServiceProvider {
             .acquirableExecutionBulkModifier(8)
             .acquirableExecutionIncrement(1000 * 60 * 5 * CoinbaseService.support.padding));
 
-    public static final MarketService COMPUSDC = new CoinbaseService("COMP-USDC", MarketSetting.with.spot()
-            .target(Currency.COMP.minimumSize(0.001))
-            .base(Currency.USDC.minimumSize(0.01))
+    public static final MarketService SUIUSD = new CoinbaseService("SUI-USD", MarketSetting.with.spot()
+            .target(Currency.SUI.minimumSize(0.1))
+            .base(Currency.USD.minimumSize(0.0001))
             .priceRangeModifier(1)
             .acquirableExecutionSize(1000)
             .acquirableExecutionBulkModifier(8)

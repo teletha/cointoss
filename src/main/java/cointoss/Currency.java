@@ -748,6 +748,8 @@ public enum Currency {
 
     SOL("SOL", "Solana"),
 
+    SUI("SUI", "SUI"),
+
     XHV("XHV", "Haven Protocol"),
 
     AMPL("AMPL", "Ampleforth"),
