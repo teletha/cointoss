@@ -61,7 +61,7 @@ public class Axis extends Region {
     public final Variable<DoubleFunction<String>> tickLabelFormatter = Variable.of(Primitives.DecimalScale2::format);
 
     /** The preferred visible number of ticks. */
-    public final int tickNumber = 20;
+    public final int tickMaximumSize;
 
     /** The visual distance between tick and label. */
     public final int tickLabelDistance;
@@ -109,11 +109,12 @@ public class Axis extends Region {
     /**
      * 
      */
-    public Axis(int tickLabelDistance, Side side) {
+    public Axis(int tickLabelDistance, int preferredMaximumTicks, Side side) {
         this.tickLabelDistance = tickLabelDistance;
+        this.tickMaximumSize = preferredMaximumTicks;
         this.side = side;
 
-        for (int i = 0; i < tickNumber; i++) {
+        for (int i = 0; i < tickMaximumSize; i++) {
             forGrid.add(new TickLable(ChartStyles.BackGrid));
         }
 
@@ -222,15 +223,6 @@ public class Axis extends Region {
     }
 
     /**
-     * Compute the length of this axis.
-     * 
-     * @return
-     */
-    public final double length() {
-        return (side.isHorizontal() ? getWidth() : getHeight()) - padding.get();
-    }
-
-    /**
      * Configure left and bottom padding.
      * 
      * @param padding A size of padding.
@@ -263,21 +255,13 @@ public class Axis extends Region {
         return this;
     }
 
-    public int tickSize() {
-        return tickLabels.getChildren().size();
-    }
-
-    public TickLable labelAt(int index) {
-        return (TickLable) tickLabels.getChildren().get(index);
-    }
-
     /**
      * Compute the visual position for the specified value.
      * 
      * @param value A value to search position.
      * @return A corresponding visual position.
      */
-    public double getPositionForValue(double value) {
+    public final double getPositionForValue(double value) {
         double position = uiRatio * (value - computeVisibleMinValue());
         return (isHorizontal() ? position : getHeight() - position);
     }
@@ -356,7 +340,7 @@ public class Axis extends Region {
             }
         }
 
-        int x = Math.min(tickNumber, (int) Math.round(length() / 50));
+        int x = Math.min(tickMaximumSize, (int) Math.round(computeAxisLength() / 50));
 
         // search nearest unit index
         int nextUnitIndex = findNearestUnitIndex(visualDiff / x);
@@ -391,11 +375,7 @@ public class Axis extends Region {
      * @return
      */
     private double computeAxisLength() {
-        if (isVertical()) {
-            return getHeight() - padding.doubleValue();
-        } else {
-            return getWidth() - padding.doubleValue();
-        }
+        return (isVertical() ? getHeight() : getWidth()) - padding.get();
     }
 
     /**
@@ -420,8 +400,8 @@ public class Axis extends Region {
      * @param height
      */
     private void layoutLabels(double width, double height) {
-        for (int i = 0, e = tickSize(); i < e; i++) {
-            TickLable label = labelAt(i);
+        for (int i = 0, e = tickLabels.getChildren().size(); i < e; i++) {
+            TickLable label = (TickLable) tickLabels.getChildren().get(i);
             label.setLayoutX(0);
             label.setLayoutY(0);
 
