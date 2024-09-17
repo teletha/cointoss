@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
-import hypatia.Primitives;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -30,6 +29,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
+
+import hypatia.Primitives;
 import kiss.Disposable;
 import kiss.Variable;
 import stylist.Style;
@@ -60,7 +61,7 @@ public class Axis extends Region {
     public final Variable<DoubleFunction<String>> tickLabelFormatter = Variable.of(Primitives.DecimalScale2::format);
 
     /** The preferred visible number of ticks. */
-    public final int tickNumber = 10;
+    public final int tickNumber = 20;
 
     /** The visual distance between tick and label. */
     public final int tickLabelDistance;
@@ -221,6 +222,15 @@ public class Axis extends Region {
     }
 
     /**
+     * Compute the length of this axis.
+     * 
+     * @return
+     */
+    public final double length() {
+        return (side.isHorizontal() ? getWidth() : getHeight()) - padding.get();
+    }
+
+    /**
      * Configure left and bottom padding.
      * 
      * @param padding A size of padding.
@@ -346,8 +356,10 @@ public class Axis extends Region {
             }
         }
 
+        int x = Math.min(tickNumber, (int) Math.round(length() / 50));
+
         // search nearest unit index
-        int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber);
+        int nextUnitIndex = findNearestUnitIndex(visualDiff / x);
         double nextUnitSize = units.get()[nextUnitIndex];
         double visibleTickBaseValue = Math.floor(low / nextUnitSize) * nextUnitSize;
 
