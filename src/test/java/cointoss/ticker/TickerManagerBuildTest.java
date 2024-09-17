@@ -36,7 +36,8 @@ public class TickerManagerBuildTest {
         assert manager.on(Span.Hour4).ticks.query(start, end).toList().size() == 12;
         assert manager.on(Span.Hour1).ticks.query(start, end).toList().size() == 48;
         assert manager.on(Span.Minute15).ticks.query(start, end).toList().size() == 192;
-        assert manager.on(Span.Minute5).ticks.query(start, end).toList().size() == 576;
+        assert manager.on(Span.Minute5).ticks.query(start, end).toList().size() == 0;
+        assert manager.on(Span.Minute1).ticks.query(start, end).toList().size() == 0;
     }
 
     @Test
@@ -53,7 +54,8 @@ public class TickerManagerBuildTest {
         assert manager.on(Span.Hour4).ticks.query(start, end).toList().size() == 12;
         assert manager.on(Span.Hour1).ticks.query(start, end).toList().size() == 48;
         assert manager.on(Span.Minute15).ticks.query(start, end).toList().size() == 192;
-        assert manager.on(Span.Minute5).ticks.query(start, end).toList().size() == 576;
+        assert manager.on(Span.Minute5).ticks.query(start, end).toList().size() == 0;
+        assert manager.on(Span.Minute1).ticks.query(start, end).toList().size() == 0;
     }
 
     @Test
