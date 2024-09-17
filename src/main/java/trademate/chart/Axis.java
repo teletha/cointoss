@@ -175,7 +175,7 @@ public class Axis extends Region {
      * @param newAmount
      */
     private void zoom(double newAmount, double newValue) {
-        newAmount = Primitives.between(0.0001, newAmount, 1);
+        newAmount = Primitives.between(0.03, newAmount, 1);
 
         double currentAmount = scroll.getVisibleAmount();
         if (currentAmount == newAmount) {
