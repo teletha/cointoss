@@ -59,6 +59,7 @@ public class BitfinexService extends MarketService {
      */
     protected BitfinexService(String marketName, MarketSetting setting) {
         super(Exchange.Bitfinex, marketName, setting);
+        this.executionRequestLimit = 10000;
     }
 
     /**
@@ -110,7 +111,7 @@ public class BitfinexService extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         long startTime = Support.computeEpochTime(id) + 1;
 
-        return call("GET", "trades/t" + marketName + "/hist?end=" + startTime + "&limit=" + setting.acquirableExecutionSize)
+        return call("GET", "trades/t" + marketName + "/hist?end=" + startTime + "&limit=" + executionRequestLimit)
                 .flatIterable(e -> e.find("$"))
                 .map(e -> createExecution(e, new long[3]));
     }

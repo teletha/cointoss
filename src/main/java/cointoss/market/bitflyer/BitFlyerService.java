@@ -127,6 +127,7 @@ public class BitFlyerService extends MarketService {
     protected BitFlyerService(String marketId, MarketSetting setting, boolean forTest) {
         super(Exchange.BitFlyer, marketId, setting);
 
+        this.executionRequestLimit = 499;
         this.forTest = forTest;
         this.intervalOrderCheck = I.schedule(0, 1, TimeUnit.SECONDS, false, scheduler()).map(v -> orders().toList()).share();
     }
@@ -287,7 +288,7 @@ public class BitFlyerService extends MarketService {
     public Signal<Execution> executions(long startId, long endId) {
         String[] previous = new String[] {"", ""};
 
-        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + setting.acquirableExecutionSize + "&after=" + startId + "&before=" + endId) //
+        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + executionRequestLimit + "&after=" + startId + "&before=" + endId) //
                 .flatIterable(e -> e.find("*"))
                 .reverse()
                 .map(e -> convertExecution(e, previous));
@@ -311,7 +312,7 @@ public class BitFlyerService extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         String[] previous = new String[] {"", ""};
 
-        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + setting.acquirableExecutionSize + "&before=" + id)
+        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + executionRequestLimit + "&before=" + id)
                 .flatIterable(e -> e.find("*"))
                 .map(e -> convertExecution(e, previous));
     }

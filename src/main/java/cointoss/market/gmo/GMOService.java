@@ -79,6 +79,7 @@ public class GMOService extends MarketService {
      */
     protected GMOService(String marketName, MarketSetting setting) {
         super(Exchange.GMO, marketName, setting);
+        this.executionRequestLimit = 10000;
     }
 
     /**

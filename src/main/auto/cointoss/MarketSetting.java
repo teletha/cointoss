@@ -69,9 +69,6 @@ public class MarketSetting implements MarketSettingModel {
     private static final MethodHandle orderbookMaxSizeUpdater = updater("orderbookMaxSize");
 
     /** The final property updater. */
-    private static final MethodHandle acquirableExecutionSizeUpdater = updater("acquirableExecutionSize");
-
-    /** The final property updater. */
     private static final MethodHandle executionLoggerUpdater = updater("executionLogger");
 
     /** The final property updater. */
@@ -105,9 +102,6 @@ public class MarketSetting implements MarketSettingModel {
     public final int orderbookMaxSize;
 
     /** The exposed property. */
-    public final int acquirableExecutionSize;
-
-    /** The exposed property. */
     public final Class<? extends ExecutionLogger> executionLogger;
 
     /** The exposed property. */
@@ -132,7 +126,6 @@ public class MarketSetting implements MarketSettingModel {
         this.targetCurrencyBidSizes = cointoss.MarketSettingModel.super.targetCurrencyBidSizes();
         this.priceRangeModifier = cointoss.MarketSettingModel.super.priceRangeModifier();
         this.orderbookMaxSize = cointoss.MarketSettingModel.super.orderbookMaxSize();
-        this.acquirableExecutionSize = cointoss.MarketSettingModel.super.acquirableExecutionSize();
         this.executionLogger = cointoss.MarketSettingModel.super.executionLogger();
         this.takerFee = cointoss.MarketSettingModel.super.takerFee();
         this.makerFee = cointoss.MarketSettingModel.super.makerFee();
@@ -345,40 +338,6 @@ public class MarketSetting implements MarketSettingModel {
     }
 
     /**
-     * Configure max acquirable execution size per one request.
-     *  
-     *  @return
-     */
-    @Override
-    public final int acquirableExecutionSize() {
-        return this.acquirableExecutionSize;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of acquirableExecutionSize property.
-     */
-    @SuppressWarnings("unused")
-    private final int getAcquirableExecutionSize() {
-        return this.acquirableExecutionSize;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of acquirableExecutionSize property to assign.
-     */
-    private final void setAcquirableExecutionSize(int value) {
-        try {
-            acquirableExecutionSizeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
      * Configure {@link ExecutionLogger} parser.
      *  
      *  @return
@@ -561,7 +520,6 @@ public class MarketSetting implements MarketSettingModel {
         builder.append("targetCurrencyBidSizes=").append(targetCurrencyBidSizes).append(", ");
         builder.append("priceRangeModifier=").append(priceRangeModifier).append(", ");
         builder.append("orderbookMaxSize=").append(orderbookMaxSize).append(", ");
-        builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
         builder.append("executionLogger=").append(executionLogger).append(", ");
         builder.append("takerFee=").append(takerFee).append(", ");
         builder.append("makerFee=").append(makerFee).append(", ");
@@ -577,7 +535,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, orderbookMaxSize, acquirableExecutionSize, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
+        return Objects.hash(type, target, base, targetCurrencyBidSizes, priceRangeModifier, orderbookMaxSize, executionLogger, takerFee, makerFee, targetWithdrawingFee, baseWithdrawingFee);
     }
 
     /**
@@ -598,7 +556,6 @@ public class MarketSetting implements MarketSettingModel {
         if (!Objects.equals(targetCurrencyBidSizes, other.targetCurrencyBidSizes)) return false;
         if (priceRangeModifier != other.priceRangeModifier) return false;
         if (orderbookMaxSize != other.orderbookMaxSize) return false;
-        if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
         if (!Objects.equals(takerFee, other.takerFee)) return false;
         if (!Objects.equals(makerFee, other.makerFee)) return false;
@@ -786,17 +743,6 @@ public class MarketSetting implements MarketSettingModel {
         }
 
         /**
-         * Assign acquirableExecutionSize property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next acquirableExecutionSize(int value) {
-            ((MarketSetting) this).setAcquirableExecutionSize(value);
-            return (Next) this;
-        }
-
-        /**
          * Assign executionLogger property.
          * 
          * @param value A new value to assign.
@@ -874,7 +820,6 @@ public class MarketSetting implements MarketSettingModel {
         static final String TargetCurrencyBidSizes = "targetCurrencyBidSizes";
         static final String PriceRangeModifier = "priceRangeModifier";
         static final String OrderbookMaxSize = "orderbookMaxSize";
-        static final String AcquirableExecutionSize = "acquirableExecutionSize";
         static final String ExecutionLogger = "executionLogger";
         static final String TakerFee = "takerFee";
         static final String MakerFee = "makerFee";

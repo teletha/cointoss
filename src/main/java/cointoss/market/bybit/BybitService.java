@@ -60,6 +60,7 @@ public class BybitService extends MarketService {
      */
     protected BybitService(String marketName, MarketSetting setting) {
         super(Exchange.Bybit, marketName, setting);
+        this.executionRequestLimit = 1000;
     }
 
     /**

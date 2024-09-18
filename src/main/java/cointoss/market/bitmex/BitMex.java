@@ -19,24 +19,18 @@ import kiss.I;
 
 public final class BitMex extends MarketServiceProvider {
 
-    /** Limitation */
-    private static final int AcquirableSize = 1000;
-
     public static final MarketService XBT_USD = new BitMexService(88, "XBTUSD", MarketSetting.with.derivative()
             .target(Currency.BTC.minimumSize(0.00001))
-            .base(Currency.USD.minimumSize(0.5))
-            .acquirableExecutionSize(AcquirableSize));
+            .base(Currency.USD.minimumSize(0.5)));
 
     public static final MarketService ETH_USD = new BitMexService(297, "ETHUSD", MarketSetting.with.derivative()
             .target(Currency.ETH.minimumSize(0.00001))
             .base(Currency.USD.minimumSize(0.05))
-            .priceRangeModifier(20)
-            .acquirableExecutionSize(AcquirableSize));
+            .priceRangeModifier(20));
 
     public static final MarketService XRP_USD = new BitMexService(377, "XRPUSD", MarketSetting.with.derivative()
             .target(Currency.XRP.minimumSize(0.00001))
-            .base(Currency.USD.minimumSize(0.0001))
-            .acquirableExecutionSize(AcquirableSize));
+            .base(Currency.USD.minimumSize(0.0001)));
 
     /**
      * {@inheritDoc}

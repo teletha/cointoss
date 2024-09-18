@@ -928,11 +928,11 @@ public class ExecutionLog {
 
                 long startTime = Chrono.utc(date).toInstant().toEpochMilli();
                 long endTime = startTime + 24 * 60 * 60 * 1000;
-                List<Execution> executions = new ArrayList(service.setting.acquirableExecutionSize);
+                List<Execution> executions = new ArrayList(service.executionRequestLimit());
 
                 while (!completed) {
                     // retrive the execution log from server
-                    service.executions(id, id + service.setting.acquirableExecutionSize).waitForTerminate().toCollection(executions);
+                    service.executions(id, id + service.executionRequestLimit()).waitForTerminate().toCollection(executions);
 
                     // Since the execution log after the specified ID does not exist on the server,
                     // it is not possible to create the completed normal log.
