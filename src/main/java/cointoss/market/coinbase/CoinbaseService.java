@@ -58,6 +58,8 @@ public class CoinbaseService extends MarketService {
     protected CoinbaseService(String marketName, MarketSetting setting) {
         super(Exchange.Coinbase, marketName, setting);
         this.enoughExecutionRequest = true;
+        this.executionRequestCoefficient = 8;
+
         Realtime.subscribe(new Topic("heartbeats", marketName)).to(I.NoOP);
     }
 

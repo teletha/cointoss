@@ -93,6 +93,20 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     protected boolean enoughExecutionRequest;
 
     /**
+     * Normally, when acquiring execution history, the range of acquisition is specified by ID.
+     * However, if the market API only allows specifying the range by date and time, some markets
+     * may only be able to retrieve data below the specified end value. In this case, it is possible
+     * that all data from the specified start value has not been retrieved, so the data is divided
+     * into multiple requests.
+     * 
+     * If the amount of data to be acquired is set to the maximum value specified by the API, there
+     * will be a lot of data to discard, which is inefficient. By setting this value to 1 or more,
+     * the number of data that can be acquired at one time may be greater than the API's maximum
+     * value, enabling efficient data collection.
+     */
+    protected int executionRequestCoefficient = 1;
+
+    /**
      * @param exchange
      * @param marketName
      * @param setting
@@ -144,7 +158,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 boolean activeRealtime = false;
 
                 // read from REST API
-                int size = setting.acquirableExecutionSize() * setting.acquirableExecutionBulkModifier;
+                int size = setting.acquirableExecutionSize() * executionRequestCoefficient;
                 long cacheId = log.estimateLastID();
                 long startId = cacheId != -1 ? cacheId : searchInitialExecution().map(e -> e.id).to().next();
                 Num coefficient = Num.ONE;
