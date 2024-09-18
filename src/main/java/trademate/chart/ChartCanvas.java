@@ -19,6 +19,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -32,16 +43,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import hypatia.Primitives;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -622,7 +623,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layout(() -> {
             chart.ticker.to(ticker -> {
                 // estimate visible range
-                chart.ticker.map(Ticker::latest).map(t -> t.openTime() - ticker.span.seconds).to(end -> {
+                chart.ticker.map(t -> t.latest().openTime() - ticker.span.seconds).to(end -> {
                     long start = (long) axisX.computeVisibleMinValue();
                     // long start = ticker.ticks.computeLogicalFirstCacheTime();
 

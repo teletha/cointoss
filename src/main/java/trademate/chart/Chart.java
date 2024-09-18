@@ -146,7 +146,7 @@ public class Chart extends Region {
             minimumTickNumber.set(Math.round(width / 7));
 
             long seconds = ticker.span.seconds;
-            axisX.logicalMinValue.set(ticker.ticks.computeLogicalFirstCacheTime());
+            axisX.logicalMinValue.set(Math.max(ticker.ticks.firstTime(), ticker.ticks.computeLogicalFirstCacheTime()));
             axisX.logicalMaxValue.set(ticker.latest().openTime());
             axisX.visibleMinRange.set(minimumTickNumber.doubleValue() * seconds);
             axisX.visibleMaxRange.set(maximumTickNumber.doubleValue() * seconds);
