@@ -152,7 +152,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 while (!disposer.isDisposed()) {
                     rests.clear();
 
-                    long range = Math.round(setting.acquirableExecutionIncrement * coefficient.doubleValue());
+                    long range = Math.round(setting.acquirableExecutionSize * coefficient.doubleValue());
                     executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
 
                     // Since the synchronous REST API did not return an error, it can be determined

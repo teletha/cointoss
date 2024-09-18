@@ -74,8 +74,16 @@ public class CoinbaseService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
+        /*
+         * The expected ID range is equal to [modifier * acquirableExecutionSize].
+         * The expected Time range is equal to [modifier * 1000 * 60 * 5 * support.padding]
+         * The acquirableExecutionSize is 1000 in coinbase. So
+         */
+        long expectedIdRange = endId - startId;
+        long expectedTimeRange = expectedIdRange * 60 * 5 * support.padding;
+
         long startSec = support.computeEpochSecond(startId) + 1;
-        long endSec = support.computeEpochSecond(endId);
+        long endSec = support.computeEpochSecond(startId + expectedTimeRange);
 
         // Since only a maximum of 1,000 items can be retrieved in a single request, multiple
         // requests must be made to retrieve all the data in the specified range.
@@ -256,7 +264,6 @@ public class CoinbaseService extends MarketService {
     public static void main(String[] args) throws InterruptedException {
         Coinbase.SOLUSD.executions().to(e -> {
         });
-
         Thread.sleep(1000 * 60 * 60 * 24);
     }
 
