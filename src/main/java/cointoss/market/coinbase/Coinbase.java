@@ -78,6 +78,11 @@ public final class Coinbase extends MarketServiceProvider {
             .base(Currency.USDC.minimumSize(0.0001))
             .priceRangeModifier(1));
 
+    public static final MarketService UNIUSD = new CoinbaseService("UNI-USD", MarketSetting.with.spot()
+            .target(Currency.UNI.minimumSize(0.000001))
+            .base(Currency.USD.minimumSize(0.001))
+            .priceRangeModifier(1));
+
     /**
      * {@inheritDoc}
      */
