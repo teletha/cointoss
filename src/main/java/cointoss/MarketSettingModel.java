@@ -16,7 +16,6 @@ import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLogger;
 import hypatia.Num;
 import icy.manipulator.Icy;
-import kiss.I;
 
 @Icy
 interface MarketSettingModel {
@@ -116,15 +115,6 @@ interface MarketSettingModel {
     @Icy.Property
     default UnaryOperator<Num> baseWithdrawingFee() {
         return size -> Num.ZERO;
-    }
-
-    /**
-     * Create new {@link ExecutionLogger}.
-     * 
-     * @return
-     */
-    default ExecutionLogger createExecutionLogger() {
-        return I.make(executionLogger());
     }
 
     /**
