@@ -624,13 +624,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             chart.ticker.to(ticker -> {
                 // estimate visible range
                 chart.ticker.map(t -> t.latest().openTime() - ticker.span.seconds).to(end -> {
-                    long start = (long) axisX.computeVisibleMinValue();
-                    // long start = ticker.ticks.computeLogicalFirstCacheTime();
+                    long startVisible = (long) axisX.computeVisibleMinValue();
+                    long endVisible = Math.min((long) axisX.computeVisibleMaxValue(true), end);
 
                     // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying
                     // the array of capacity increase.
-                    double tickSize = ((end - start) / ticker.span.seconds) + 2;
-                    boolean needDrawingOpenAndClose = tickSize * 0.4 < candles.getWidth();
+                    double tickSize = ((endVisible - startVisible) / ticker.span.seconds) + 2;
+                    boolean needDrawingOpenAndClose = tickSize * 0.4 <= candles.getWidth();
 
                     // redraw all candles.
                     GraphicsContext gc = candles.getGraphicsContext2D();
@@ -654,7 +654,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     DoubleList valueX = new DoubleList((int) tickSize);
                     Indicator<double[]> candle = candleType.candles.apply(ticker);
 
-                    ticker.ticks.query(start, end).to(tick -> {
+                    ticker.ticks.query(startVisible, endVisible).to(tick -> {
                         double[] values = candle.valueAt(tick);
                         double x = axisX.getPositionForValue(tick.openTime());
                         double high = axisY.getPositionForValue(values[1]);

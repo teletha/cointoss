@@ -295,10 +295,21 @@ public class Axis extends Region {
      * @return
      */
     public final double computeVisibleMaxValue() {
+        return computeVisibleMaxValue(false);
+    }
+
+    /**
+     * Compute visible max value.
+     * 
+     * @return
+     */
+    public final double computeVisibleMaxValue(boolean includePadding) {
         double max = logicalMaxValue.get();
         double min = logicalMinValue.get();
         double amount = scroll.getVisibleAmount();
-        return Math.min(computeVisibleMinValue() + (max - min) * amount, max);
+        double value = Math.min(computeVisibleMinValue() + (max - min) * amount, max);
+
+        return !includePadding ? value : getValueForPosition(getPositionForValue(value) + padding.get());
     }
 
     /**

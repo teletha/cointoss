@@ -95,6 +95,10 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
+        ZonedDateTime startDay = Support.computeDateTime(startId);
+        ZonedDateTime endDay = Support.computeDateTime(endId);
+        System.out.println(startDay + "  " + endDay);
+
         ZonedDateTime start = Chrono.max(Support.computeDateTime(startId), ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(2));
         Variable<Long> counter = Variable.of(1L);
         long[] prev = new long[3];
@@ -194,7 +198,7 @@ public class GMOService extends MarketService {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coin.z.com/public/v1/" + path)).timeout(Duration.ofSeconds(60));
         return Network.rest(builder, LIMITER, client()).flatMap(json -> {
             if (json.get(int.class, "status") != 0) {
-                String message = json.get("messages").get("0").text("message_string") + " [" + path + "]";
+                String message = json.get("messages").get("0").text("message_string") + " [https://api.coin.z.com/public/v1/" + path + "]";
                 return I.signalError(ERRORS.convert(message, this));
             } else {
                 return I.signal(json);
@@ -216,6 +220,14 @@ public class GMOService extends MarketService {
     @Override
     public boolean supportOrderBookFix() {
         return true;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        GMO.BTC.executions().to(x -> {
+            System.out.println(x);
+        });
+
+        Thread.sleep(1000 * 150);
     }
 
     /**

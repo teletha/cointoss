@@ -20,7 +20,7 @@ import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.market.binance.BinanceFuture;
+import cointoss.market.gmo.GMO;
 import cointoss.util.Chrono;
 import kiss.I;
 import kiss.Signal;
@@ -34,7 +34,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        restoreNormal(BinanceFuture.FUTURE_EHT_USDT, Chrono.utc(2022, 2, 8));
+        restoreNormal(GMO.BTC, Chrono.utc(2024, 9, 17));
     }
 
     /**
