@@ -699,13 +699,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "ExecutionLogRepository",
-			"packageName": "cointoss.execution",
-			"type": "AbstractClass"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "ExecutionLogger",
 			"packageName": "cointoss.execution",
 			"type": "Class"
@@ -772,6 +765,13 @@ const root = {
 			"name": "GlobalVolumeView",
 			"packageName": "trademate",
 			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "HttpLogHouse",
+			"packageName": "cointoss.execution",
+			"type": "AbstractClass"
 		},
 		{
 			"modifiers": {
@@ -884,6 +884,13 @@ const root = {
 			"name": "LiquidationEater",
 			"packageName": "cointoss.trade.bot",
 			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "LogHouse",
+			"packageName": "cointoss.execution",
+			"type": "AbstractClass"
 		},
 		{
 			"modifiers": {
