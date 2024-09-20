@@ -79,14 +79,17 @@ class ChronoTest {
 
     @Test
     void formatAsDuration() {
-        assert Chrono.formatAsDuration(1 * 1000).equals("1");
-        assert Chrono.formatAsDuration(10 * 1000).equals("10");
+        assert Chrono.formatAsDuration(234).equals("0.234sec");
+        assert Chrono.formatAsDuration(1 * 1000).equals("1sec");
+        assert Chrono.formatAsDuration(10 * 1000).equals("10sec");
         assert Chrono.formatAsDuration(64 * 1000).equals("1:04");
         assert Chrono.formatAsDuration(13 * 60 * 1000).equals("13:00");
         assert Chrono.formatAsDuration(60 * 60 * 1000 + 1 * 1000).equals("1:00:01");
         assert Chrono.formatAsDuration(22 * 60 * 60 * 1000 + 12 * 1000).equals("22:00:12");
-        assert Chrono.formatAsDuration(24 * 60 * 60 * 1000).equals("1:00:00:00");
-        assert Chrono.formatAsDuration(11 * 24 * 60 * 60 * 1000).equals("11:00:00:00");
+        assert Chrono.formatAsDuration(24 * 60 * 60 * 1000).equals("1T00:00:00");
+        assert Chrono.formatAsDuration(11 * 24 * 60 * 60 * 1000).equals("11T00:00:00");
+        assert Chrono.formatAsDuration(65L * 24 * 60 * 60 * 1000).equals("2/05T00:00:00");
+        assert Chrono.formatAsDuration(400L * 24 * 60 * 60 * 1000).equals("1/01/10T00:00:00");
     }
 
     @Test

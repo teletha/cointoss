@@ -9,6 +9,9 @@
  */
 package trademate;
 
+import org.sqlite.SQLiteConfig.JournalMode;
+import org.sqlite.SQLiteConfig.SynchronousMode;
+
 import cointoss.Market;
 import cointoss.util.EfficientWebSocket;
 import kiss.I;
@@ -16,6 +19,7 @@ import kiss.Managed;
 import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
+import typewriter.sqlite.SQLite;
 import viewtify.Viewtify;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -58,6 +62,10 @@ public class TradeTester extends View {
     public static void main(String[] args) throws InterruptedException {
         I.load(Market.class);
         I.env("typewriter.sqlite", "jdbc:sqlite:.log/market.sqlite");
+        SQLite.configure(config -> {
+            config.setJournalMode(JournalMode.WAL);
+            config.setSynchronous(SynchronousMode.OFF);
+        });
 
         // activate application
         Viewtify.application().icon("icon/tester.png").onTerminating(EfficientWebSocket::shutdownNow).activate(TradeTester.class);

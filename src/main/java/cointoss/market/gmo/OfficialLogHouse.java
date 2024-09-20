@@ -12,12 +12,14 @@ package cointoss.market.gmo;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.execution.HttpLogHouse;
+import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import kiss.I;
@@ -25,6 +27,9 @@ import kiss.Signal;
 import kiss.XML;
 
 class OfficialLogHouse extends HttpLogHouse {
+
+    /** The API limit. */
+    private static final APILimiter LIMITER = APILimiter.with.limit(2).refresh(250, TimeUnit.MILLISECONDS);
 
     OfficialLogHouse(MarketService service) {
         super(service);
@@ -68,6 +73,8 @@ class OfficialLogHouse extends HttpLogHouse {
 
         long[] prev = new long[3];
         DateTimeFormatter timeFormatOnLog = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss.SSS");
+
+        LIMITER.acquire();
 
         return downloadCSV(date).concat(downloadCSV(following)).map(values -> {
             Direction side = Direction.parse(values[1]);

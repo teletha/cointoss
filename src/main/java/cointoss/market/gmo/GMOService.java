@@ -15,12 +15,12 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -207,8 +207,8 @@ public class GMOService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        boolean has = GMO.BTC.loghouse().has(LocalDate.of(2024, 8, 3));
-        System.out.println(has);
+        Market.of(GMO.BTC_DERIVATIVE).tickers.buildFully(false).to(x -> {
+        });
     }
 
     /**

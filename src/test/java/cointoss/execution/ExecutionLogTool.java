@@ -34,7 +34,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        restoreNormal(GMO.BTC, Chrono.utc(2024, 9, 17));
+        restoreNormal(GMO.BTC_DERIVATIVE, Chrono.utc(2020, 3, 30));
     }
 
     /**

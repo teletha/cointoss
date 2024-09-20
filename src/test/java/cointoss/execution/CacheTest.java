@@ -149,7 +149,7 @@ class CacheTest {
         };
 
         Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
-        List<Execution> executions = cache.readExternalRepository(external).toList();
+        List<Execution> executions = cache.readExternal(external).toList();
         assert executions.size() == 2;
         assert executions.get(0).equals(e1);
         assert executions.get(1).equals(e2);

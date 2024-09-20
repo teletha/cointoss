@@ -583,15 +583,27 @@ public class Chrono {
         long minutes = seconds / minute;
         seconds = seconds % minute;
 
-        if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
-            return "." + mills;
+        long months = days / 30;
+        days = days % 30;
+        long years = months / 12;
+        months = months % 12;
+
+        if (years == 0 && months == 0 && days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
+            return "0." + mills + "sec";
         } else {
-            return new StringBuilder() //
-                    .append(formatAsTime(days, false, true))
-                    .append(formatAsTime(hours, 0 < days, true))
-                    .append(formatAsTime(minutes, 0 < days || 0 < hours, true))
-                    .append(formatAsTime(seconds, 0 < days || 0 < hours || 0 < minutes, false))
-                    .toString();
+            StringBuilder builder = new StringBuilder();
+            formatAsTime(builder, years, "/");
+            formatAsTime(builder, months, "/");
+            formatAsTime(builder, days, "T");
+            formatAsTime(builder, hours, ":");
+            formatAsTime(builder, minutes, ":");
+            formatAsTime(builder, seconds, "");
+
+            if (builder.length() <= 2) {
+                builder.append("sec");
+            }
+
+            return builder.toString();
         }
     }
 
@@ -600,21 +612,16 @@ public class Chrono {
      * 
      * @param value
      * @param hasPrev
-     * @return
      */
-    private static String formatAsTime(long value, boolean hasPrev, boolean hasNext) {
-        String expression;
-
-        if (0 == value && !hasPrev) {
-            return "";
+    private static void formatAsTime(StringBuilder builder, long value, String unit) {
+        if (0 == value && builder.isEmpty()) {
+            // ignore
         } else {
-            expression = String.valueOf(value);
-
-            if (expression.length() == 1 && hasPrev) {
-                expression = "0".concat(expression);
+            if (value < 10 && !builder.isEmpty()) {
+                builder.append('0');
             }
+            builder.append(value).append(unit);
         }
-        return hasNext ? expression.concat(":") : expression;
     }
 
     /**
@@ -626,9 +633,9 @@ public class Chrono {
      */
     public static ZonedDateTime randomDate(ZonedDateTime start, ZonedDateTime end) {
         if (start.isBefore(end)) {
-            return start.plusDays(RandomUtils.nextLong(0, Duration.between(start, end).toDays()));
+            return start.plusDays(RandomUtils.secure().randomLong(0, Duration.between(start, end).toDays()));
         } else {
-            return end.plusDays(RandomUtils.nextLong(0, Duration.between(end, start).toDays()));
+            return end.plusDays(RandomUtils.secure().randomLong(0, Duration.between(end, start).toDays()));
         }
     }
 }

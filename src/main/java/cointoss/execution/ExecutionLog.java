@@ -435,8 +435,8 @@ public class ExecutionLog {
                 repair(true);
 
                 return readNormal();
-            } else if (service.loghouse() != LogHouse.INVALID) {
-                return readExternalRepository(service.loghouse()).effectOnComplete(() -> convertNormalToCompact(true));
+            } else if (service.loghouse().isValid()) {
+                return readExternal(service.loghouse()).effectOnComplete(() -> convertNormalToCompact(true));
             } else {
                 return I.signal();
             }
@@ -532,20 +532,23 @@ public class ExecutionLog {
         }
 
         /**
-         * Read log from the external repository.
+         * Read log from the external {@link LogHouse}.
          * 
          * @return
          */
-        Signal<Execution> readExternalRepository(LogHouse external) {
+        Signal<Execution> readExternal(LogHouse external) {
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
             return writeNormal(external.convert(date)) //
+                    .timeout(10, TimeUnit.SECONDS)
                     .effectOnObserve(stopwatch::start)
                     .effectOnError(e -> I.error("Fail to download external log " + service + " [" + date + "]."))
+                    .retry(e -> e.effect(x -> System.out.println(x)).take(3).delay(500, TimeUnit.MILLISECONDS))
                     .effectOnComplete(() -> {
-                        I.info("Donwload external log " + service + " [" + date + "] " + Chrono
+                        I.info("Donwload external log " + service + " [" + date + "] in " + Chrono
                                 .formatAsDuration(stopwatch.stop().elapsed()));
-                    });
+                    })
+                    .waitForTerminate();
         }
 
         /**
@@ -912,7 +915,7 @@ public class ExecutionLog {
             // imcompleted or no normal log
             LogHouse external = service.loghouse();
             if (external.has(date)) {
-                readExternalRepository(external).waitForTerminate().to(I.NoOP, I::error, () -> convertNormalToCompact(async));
+                readExternal(external).waitForTerminate().to(I.NoOP, I::error, () -> convertNormalToCompact(async));
                 return true;
             }
 
