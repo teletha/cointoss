@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
-import cointoss.execution.ExecutionLogRepository;
+import cointoss.execution.LogHouse;
 import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
@@ -427,8 +427,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     public Signal<Execution> searchInitialExecution() {
-        ExecutionLogRepository external = externalRepository();
-        if (external.exist()) {
+        LogHouse external = loghouse();
+        if (external.isValid()) {
             return external.first().flatMap(external::convert).first();
         } else {
             return executionLatest().flatMap(latest -> searchInitialExecution(1, latest));
@@ -469,8 +469,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     public Signal<Execution> searchNearestExecution(ZonedDateTime target) {
-        ExecutionLogRepository external = externalRepository();
-        if (external.exist()) {
+        LogHouse external = loghouse();
+        if (external.isValid()) {
             return external.convert(target).first();
         } else {
             return executionLatest().concatMap(latest -> executionsBefore(latest.id))
@@ -661,21 +661,12 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * Check the existence of external log repository.
+     * Get the external {@link LogHouse}.
      * 
      * @return
      */
-    public boolean hasExternalRepository() {
-        return externalRepository() != ExecutionLogRepository.NOP;
-    }
-
-    /**
-     * Get the external log repository.
-     * 
-     * @return
-     */
-    public ExecutionLogRepository externalRepository() {
-        return ExecutionLogRepository.NOP;
+    public LogHouse loghouse() {
+        return LogHouse.INVALID;
     }
 
     /**

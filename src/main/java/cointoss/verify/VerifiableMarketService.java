@@ -31,7 +31,7 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionLogRepository;
+import cointoss.execution.LogHouse;
 import cointoss.market.Exchange;
 import cointoss.order.Order;
 import cointoss.order.OrderManager;
@@ -85,7 +85,7 @@ public class VerifiableMarketService extends MarketService {
     private final PriorityQueue<Task> tasks = new PriorityQueue();
 
     /** The external repository. */
-    public ExecutionLogRepository external;
+    public LogHouse external;
 
     /** The emulation for lag. */
     public Latency latency = Latency.zero();
@@ -124,8 +124,8 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public ExecutionLogRepository externalRepository() {
-        return external == null ? ExecutionLogRepository.NOP : external;
+    public LogHouse loghouse() {
+        return external == null ? LogHouse.INVALID : external;
     }
 
     /**

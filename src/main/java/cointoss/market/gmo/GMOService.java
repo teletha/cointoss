@@ -11,28 +11,20 @@ package cointoss.market.gmo;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedHashSet;
-import java.util.function.Function;
-import java.util.zip.GZIPInputStream;
-
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionLogRepository;
+import cointoss.execution.LogHouse;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
@@ -48,11 +40,10 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 import kiss.Variable;
-import kiss.XML;
 
 public class GMOService extends MarketService {
 
-    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter(1000);
+    static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter(1000);
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -63,9 +54,6 @@ public class GMOService extends MarketService {
 
     /** The API limit. */
     private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(200, MILLISECONDS);
-
-    /** The API limit. */
-    private static final APILimiter REPOSITORY_LIMITER = APILimiter.with.limit(2).refresh(100, MILLISECONDS);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
@@ -95,10 +83,6 @@ public class GMOService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        ZonedDateTime startDay = Support.computeDateTime(startId);
-        ZonedDateTime endDay = Support.computeDateTime(endId);
-        System.out.println(startDay + "  " + endDay);
-
         ZonedDateTime start = Chrono.max(Support.computeDateTime(startId), ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(2));
         Variable<Long> counter = Variable.of(1L);
         long[] prev = new long[3];
@@ -140,7 +124,7 @@ public class GMOService extends MarketService {
     @Override
     public Signal<Execution> executionsBefore(long id) {
         ZonedDateTime date = Support.computeDateTime(id);
-        ExecutionLogRepository repo = externalRepository();
+        LogHouse repo = loghouse();
 
         return repo.convert(date).takeUntil(e -> id <= e.id).waitForTerminate();
     }
@@ -210,8 +194,8 @@ public class GMOService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public ExecutionLogRepository externalRepository() {
-        return new OfficialRepository(this);
+    public LogHouse loghouse() {
+        return new OfficialLogHouse(this);
     }
 
     /**
@@ -223,11 +207,8 @@ public class GMOService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        GMO.BTC.executions().to(x -> {
-            System.out.println(x);
-        });
-
-        Thread.sleep(1000 * 150);
+        boolean has = GMO.BTC.loghouse().has(LocalDate.of(2024, 8, 3));
+        System.out.println(has);
     }
 
     /**
@@ -263,92 +244,6 @@ public class GMOService extends MarketService {
         @Override
         protected void buildUnsubscribeMessage(Topic topic) {
             topic.command = "unsubscribe";
-        }
-    }
-
-    /**
-     * 
-     */
-    private class OfficialRepository extends ExecutionLogRepository {
-
-        /**
-         * @param service
-         */
-        private OfficialRepository(MarketService service) {
-            super(service);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Signal<ZonedDateTime> collect() {
-            String uri = "https://api.coin.z.com/data/trades/" + service.marketName + "/";
-            Function<Signal<XML>, Signal<String>> collect = s -> s.flatIterable(x -> x.find("ul li a"))
-                    .map(XML::text)
-                    .buffer()
-                    .flatMap(x -> {
-                        if (x.isEmpty()) {
-                            return I.signal();
-                        } else {
-                            LinkedHashSet<String> set = new LinkedHashSet();
-                            set.add(x.get(0));
-                            set.add(x.get(x.size() - 1));
-                            return I.signal(set);
-                        }
-                    });
-
-            return I.http(uri, XML.class).plug(collect).flatMap(year -> {
-                return I.http(uri + year + "/", XML.class).plug(collect).flatMap(month -> {
-                    return I.http(uri + year + "/" + month + "/", XML.class).plug(collect).map(name -> {
-                        return Chrono.utc(name.substring(0, name.indexOf("_")));
-                    });
-                });
-            });
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Signal<Execution> convert(ZonedDateTime date) {
-            ZonedDateTime following = date.plusDays(1);
-
-            long[] prev = new long[3];
-            DateTimeFormatter timeFormatOnLog = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss.SSS");
-
-            return downloadAt(date).concat(downloadAt(following)).map(values -> {
-                Direction side = Direction.parse(values[1]);
-                Num size = Num.of(values[2]);
-                Num price = Num.of(values[3]);
-                ZonedDateTime time = LocalDateTime.parse(values[4], timeFormatOnLog).atZone(Chrono.UTC);
-
-                return Support.createExecution(side, size, price, time, prev);
-            }).skipUntil(e -> e.date.isAfter(date)).takeWhile(e -> e.date.isBefore(following));
-        }
-
-        /**
-         * Download data and parse it as csv.
-         * 
-         * @param target
-         * @return
-         */
-        private Signal<String[]> downloadAt(ZonedDateTime target) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy'/'MM'/'yyyyMMdd");
-            String uri = "https://api.coin.z.com/data/trades/" + service.marketName + "/" + formatter
-                    .format(target) + "_" + service.marketName + ".csv.gz";
-
-            CsvParserSettings setting = new CsvParserSettings();
-            setting.getFormat().setDelimiter(',');
-            setting.getFormat().setLineSeparator("\n");
-            setting.setHeaderExtractionEnabled(true);
-            CsvParser parser = new CsvParser(setting);
-
-            REPOSITORY_LIMITER.acquire();
-
-            return I.http(uri, InputStream.class)
-                    .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
-                    .effectOnComplete(parser::stopParsing);
         }
     }
 }

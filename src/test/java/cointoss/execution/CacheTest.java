@@ -135,7 +135,7 @@ class CacheTest {
         Execution e1 = Execution.with.buy(1).price(10);
         Execution e2 = Execution.with.buy(1).price(12);
 
-        ExecutionLogRepository external = new ExecutionLogRepository(market.service) {
+        LogHouse external = new LogHouse(market.service) {
 
             @Override
             public Signal<Execution> convert(ZonedDateTime date) {
@@ -309,15 +309,15 @@ class CacheTest {
     }
 
     /**
-     * Helper to create {@link ExecutionLogRepository} which has the completed log at the specified
+     * Helper to create {@link LogHouse} which has the completed log at the specified
      * date.
      * 
      * @return
      */
-    private ExecutionLogRepository useExternalRepository(ZonedDateTime target) {
+    private LogHouse useExternalRepository(ZonedDateTime target) {
         Objects.requireNonNull(target);
 
-        return new ExecutionLogRepository(market.service) {
+        return new LogHouse(market.service) {
 
             @Override
             public Signal<Execution> convert(ZonedDateTime date) {

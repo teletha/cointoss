@@ -120,9 +120,9 @@ class Repository implements Storable<Repository> {
      * Scan logs in the external repository.
      */
     private void scanExternalRepository() {
-        ExecutionLogRepository external = service.externalRepository();
+        LogHouse external = service.loghouse();
 
-        if (!external.exist()) {
+        if (!external.isValid()) {
             return;
         }
 

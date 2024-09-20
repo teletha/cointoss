@@ -17,9 +17,10 @@ import cointoss.util.Chrono;
 import kiss.I;
 import kiss.Signal;
 
-public abstract class ExecutionLogRepository {
+public abstract class LogHouse {
 
-    public static final ExecutionLogRepository NOP = new ExecutionLogRepository(null) {
+    /** The invalid log house. */
+    public static final LogHouse INVALID = new LogHouse(null) {
 
         @Override
         public Signal<Execution> convert(ZonedDateTime date) {
@@ -38,11 +39,16 @@ public abstract class ExecutionLogRepository {
     /**
      * @param service
      */
-    protected ExecutionLogRepository(MarketService service) {
+    protected LogHouse(MarketService service) {
         this.service = service;
     }
 
-    public final boolean exist() {
+    /**
+     * Check whether this log house is valid or not.
+     * 
+     * @return
+     */
+    public final boolean isValid() {
         return service != null;
     }
 
@@ -51,8 +57,17 @@ public abstract class ExecutionLogRepository {
      * 
      * @return
      */
-    public final Signal<ZonedDateTime> first() {
+    public Signal<ZonedDateTime> first() {
         return collect().first();
+    }
+
+    /**
+     * Get the last day.
+     * 
+     * @return
+     */
+    public Signal<ZonedDateTime> last() {
+        return collect().last();
     }
 
     /**
@@ -78,7 +93,7 @@ public abstract class ExecutionLogRepository {
      * @param date
      * @return
      */
-    public final boolean has(ZonedDateTime date) {
+    public boolean has(ZonedDateTime date) {
         return collect().any(v -> v.isEqual(date)).waitForTerminate().to().exact();
     }
 

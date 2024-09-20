@@ -9,25 +9,19 @@
  */
 package cointoss.market.bybit;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
-
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionLogRepository;
+import cointoss.execution.LogHouse;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
@@ -38,14 +32,12 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import hypatia.Num;
-import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import kiss.XML;
 
 public class BybitService extends MarketService {
 
-    private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
+    static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
@@ -261,16 +253,8 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public boolean hasExternalRepository() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ExecutionLogRepository externalRepository() {
-        return new OfficialRepository(this);
+    public LogHouse loghouse() {
+        return new OfficialLogHouse(this);
     }
 
     /**
@@ -279,101 +263,6 @@ public class BybitService extends MarketService {
     @Override
     public boolean supportRecentExecutionOnly() {
         return true;
-    }
-
-    /**
-     * 
-     */
-    private static class OfficialRepository extends ExecutionLogRepository {
-
-        /**
-         * @param service
-         */
-        private OfficialRepository(MarketService service) {
-            super(service);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Signal<ZonedDateTime> collect() {
-            String uri = "https://public.bybit.com/trading/" + service.marketName + "/";
-
-            return I.http(uri, XML.class).flatIterable(o -> o.find("li a")).map(XML::text).map(name -> {
-                return Chrono.utc(name.substring(service.marketName.length(), name.indexOf(".")));
-            });
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Signal<Execution> convert(ZonedDateTime date) {
-            String uri = "https://public.bybit.com/trading/" + service.marketName + "/" + service.marketName + Chrono.Date
-                    .format(date) + ".csv.gz";
-
-            CsvParserSettings setting = new CsvParserSettings();
-            setting.getFormat().setDelimiter(',');
-            setting.getFormat().setLineSeparator("\n");
-            setting.setHeaderExtractionEnabled(true);
-            CsvParser parser = new CsvParser(setting);
-
-            long[] context = new long[3];
-
-            Signal<String[]> signal = I.http(uri, InputStream.class)
-                    .flatIterable(in -> parser.iterate(new GZIPInputStream(in), StandardCharsets.ISO_8859_1))
-                    .effectOnComplete(parser::stopParsing);
-
-            if (date.isBefore(Chrono.utc(2021, 12, 7))) {
-                signal = signal.reverse();
-            }
-
-            return signal.map(values -> {
-                ZonedDateTime time = parseTime(values[0]);
-                Direction side = Direction.parse(values[2]);
-                Num size = Num.of(values[9]);
-                Num price = Num.of(values[4]);
-
-                return Support.createExecution(side, size, price, time, context);
-            }).waitForTerminate();
-        }
-
-        /**
-         * Parse date-time expression.
-         * 
-         * @param dateTime
-         * @return
-         */
-        private ZonedDateTime parseTime(String dateTime) {
-            dateTime = dateTime.replace(".", "");
-
-            long modifier;
-            switch (16 - dateTime.length()) {
-            case 1:
-                modifier = 10;
-                break;
-            case 2:
-                modifier = 100;
-                break;
-            case 3:
-                modifier = 1000;
-                break;
-            case 4:
-                modifier = 10000;
-                break;
-            case 5:
-                modifier = 100000;
-                break;
-            case 6:
-                modifier = 1000000;
-                break;
-            default:
-                modifier = 1;
-                break;
-            }
-            return Chrono.utcByMicros(Long.parseLong(dateTime) * modifier);
-        }
     }
 
     /**

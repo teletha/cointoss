@@ -19,7 +19,7 @@ import java.time.temporal.ChronoUnit;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionLogRepository;
+import cointoss.execution.LogHouse;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
@@ -65,7 +65,7 @@ public class BitbankService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public ExecutionLogRepository externalRepository() {
+    public LogHouse loghouse() {
         return new OfficialRepository(this);
     }
 
@@ -224,7 +224,7 @@ public class BitbankService extends MarketService {
     /**
      * 
      */
-    private class OfficialRepository extends ExecutionLogRepository {
+    private class OfficialRepository extends LogHouse {
 
         /**
          * @param service

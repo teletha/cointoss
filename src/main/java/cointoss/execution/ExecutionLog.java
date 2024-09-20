@@ -435,8 +435,8 @@ public class ExecutionLog {
                 repair(true);
 
                 return readNormal();
-            } else if (service.externalRepository() != ExecutionLogRepository.NOP) {
-                return readExternalRepository(service.externalRepository()).effectOnComplete(() -> convertNormalToCompact(true));
+            } else if (service.loghouse() != LogHouse.INVALID) {
+                return readExternalRepository(service.loghouse()).effectOnComplete(() -> convertNormalToCompact(true));
             } else {
                 return I.signal();
             }
@@ -536,7 +536,7 @@ public class ExecutionLog {
          * 
          * @return
          */
-        Signal<Execution> readExternalRepository(ExecutionLogRepository external) {
+        Signal<Execution> readExternalRepository(LogHouse external) {
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
             return writeNormal(external.convert(date)) //
@@ -910,7 +910,7 @@ public class ExecutionLog {
             // }
 
             // imcompleted or no normal log
-            ExecutionLogRepository external = service.externalRepository();
+            LogHouse external = service.loghouse();
             if (external.has(date)) {
                 readExternalRepository(external).waitForTerminate().to(I.NoOP, I::error, () -> convertNormalToCompact(async));
                 return true;
