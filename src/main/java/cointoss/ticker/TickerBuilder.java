@@ -43,10 +43,6 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
                 // save all ticks to disk
                 ticker.ticks.commit();
             });
-
-            manager.tickers().to(ticker -> {
-                ticker.ticks.updateMeta();
-            });
         });
         return temporary::update;
     }
