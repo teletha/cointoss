@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="f">
+		<header class="i">
+			<h1 class="U" date="2024-09-16" ver="1.8.0"><code>Cointoss</code></h1>
+			<nav class="K"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="H" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="Z">
+			<nav class="J">
+				<div></div>
+			</nav>
+			<article class="L" id="Article">
+				<section class="Q"><code class="T">cointoss.util.feather</code>
+					<h2 class="Class N"><code class="M">Holder</code><code class="m">&#60;<code>V</code>&#62;</code></h2>
+					<div class="I">
+						<ul class="C D">
+							<li><code>V</code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="Q" id="Holder(kiss.WiseSupplier)">
+					<h2 class="l"><i class="PUBLIC"></i><code class="M">Holder</code><code class="m">(<code>kiss.WiseSupplier<code class="parameters"><code>V</code></code></code> <code class="parameterName">supplier</code>)</code></h2>
+					<table class="R">
+						<tr class="X">
+							<td><code>kiss.WiseSupplier<code class="parameters"><code>V</code></code></code> <code>supplier</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Default data holder with 15 sec margin.</p>
+</span></section>
+				<section class="Q" id="Holder(kiss.WiseSupplier,java.util.function.LongSupplier,long)">
+					<h2 class="l"><i class="PUBLIC"></i><code class="M">Holder</code><code class="m">(<code>kiss.WiseSupplier<code class="parameters"><code>V</code></code></code> <code class="parameterName">supplier</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/LongSupplier.html">LongSupplier</a></code> <code class="parameterName">timer</code>, <code>long</code> <code class="parameterName">margin</code>)</code></h2>
+					<table class="R">
+						<tr class="X">
+							<td><code>kiss.WiseSupplier<code class="parameters"><code>V</code></code></code> <code>supplier</code></td>
+							<td></td>
+						</tr>
+						<tr class="X">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/LongSupplier.html">LongSupplier</a></code> <code>timer</code></td>
+							<td></td>
+						</tr>
+						<tr class="X">
+							<td><code>long</code> <code>margin</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Create data holder.</p>
+</span></section>
+				<section class="Q" id="compute()">
+					<h2 class="l"><i class="PUBLIC"></i><code class="M">compute</code><code class="m">()</code><i class="P"><code>V</code></i></h2>
+					<table class="R">
+						<tr class="Y">
+							<td><code>V</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Compute the current value.</p>
+</span></section>
+				<section class="Q" id="clear()">
+					<h2 class="l"><i class="PUBLIC"></i><code class="M">clear</code><code class="m">()</code><i class="P"><code>void</code></i></h2><span class="B"><p>Clear cache.</p>
+</span></section>
+			</article>
+			<aside class="e" id="SubNavi">
+				<div class="b">
+					<h5 class="V">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.Holder.html#Holder(kiss.WiseSupplier)">Holder</a></code><code class="m">(<code>kiss.WiseSupplier<code class="parameters"><code>V</code></code></code> <code class="parameterName">supplier</code>)</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.Holder.html#Holder(kiss.WiseSupplier,java.util.function.LongSupplier,long)">Holder</a></code><code class="m">(<code>kiss.WiseSupplier<code class="parameters"><code>V</code></code></code> <code class="parameterName">supplier</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/LongSupplier.html">LongSupplier</a></code> <code class="parameterName">timer</code>, <code>long</code> <code class="parameterName">margin</code>)</code></li>
+					</ul>
+					<h5 class="V">Methods</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.Holder.html#compute()">compute</a></code><code class="m">()</code><i class="O"><code>V</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.Holder.html#clear()">clear</a></code><code class="m">()</code><i class="O"><code>void</code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

@@ -769,6 +769,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Holder",
+			"packageName": "cointoss.util.feather",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "HttpLogHouse",
 			"packageName": "cointoss.execution",
 			"type": "AbstractClass"
