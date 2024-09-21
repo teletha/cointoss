@@ -374,7 +374,7 @@
 		<dependency>
 			<groupId>com.github.teletha</groupId>
 			<artifactId>typewriter</artifactId>
-			<version>1.11.0</version>
+			<version>1.12.0</version>
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
