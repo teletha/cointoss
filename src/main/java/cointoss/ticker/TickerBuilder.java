@@ -21,11 +21,8 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
 
     private final MarketService service;
 
-    private final TickerManager manager;
-
-    public TickerBuilder(MarketService service, TickerManager manager) {
+    public TickerBuilder(MarketService service) {
         this.service = Objects.requireNonNull(service);
-        this.manager = Objects.requireNonNull(manager);
     }
 
     /**

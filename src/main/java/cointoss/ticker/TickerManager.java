@@ -286,7 +286,7 @@ public class TickerManager implements Disposable {
 
     private Signal<ZonedDateTime> buildCache(ZonedDateTime start, ZonedDateTime end) {
         return Chrono.range(end, start).effect(date -> {
-            service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service, this)).to(I.NoOP);
+            service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP);
         });
     }
 
