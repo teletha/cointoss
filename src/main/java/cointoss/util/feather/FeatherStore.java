@@ -119,7 +119,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         this.itemSize = itemSize;
         this.segmentSize = segmentSize;
         this.segmentDuration = itemDuration * itemSize;
-        this.eviction = EvictionPolicy.byLRU(segmentSize);
+        this.eviction = EvictionPolicy.byEldest(segmentSize);
     }
 
     /**

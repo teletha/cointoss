@@ -60,7 +60,13 @@ public interface EvictionPolicy {
         };
     }
 
-    static EvictionPolicy eldest(int size) {
+    /**
+     * Provides an {@link EvictionPolicy} based on the eldest algorithm with a specified size.
+     * 
+     * @param size A cache size.
+     * @return A new {@link EvictionPolicy}.
+     */
+    static EvictionPolicy byEldest(int size) {
         return new EvictionPolicy() {
 
             /** The latest time. */
@@ -71,6 +77,7 @@ public interface EvictionPolicy {
 
             @Override
             public long access(long time) {
+
                 if (latest < time) {
                     latest = time;
                 }
@@ -78,7 +85,6 @@ public interface EvictionPolicy {
                 policy.add(time);
 
                 if (size < policy.size()) {
-                    System.out.println("evic");
                     return policy.pollFirst();
                 } else {
                     return -1;

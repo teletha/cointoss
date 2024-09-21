@@ -34,8 +34,8 @@ class IdealSegmentTimeTest extends FeatherStoreTestBase {
     void memoryOnlyLastEviction() {
         FeatherStore<Value> store = createStore(1, 3, value(15, 14, 13, 12, 11), null);
         long[] time = store.computeIdealSegmentTime();
-        assert time[1] == 13;
-        assert time[0] == 11;
+        assert time[1] == 15;
+        assert time[0] == 13;
     }
 
     @Test
@@ -50,8 +50,8 @@ class IdealSegmentTimeTest extends FeatherStoreTestBase {
     void memoryOnlyMiddleEviction() {
         FeatherStore<Value> store = createStore(1, 3, value(11, 12, 13, 15, 14, 11, 12), null);
         long[] time = store.computeIdealSegmentTime();
-        assert time[1] == 14;
-        assert time[0] == 12;
+        assert time[1] == 15;
+        assert time[0] == 13;
     }
 
     @Test

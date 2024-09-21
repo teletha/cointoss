@@ -296,7 +296,7 @@ class FeatherStoreTest {
         store.store(value(base * 2));
         assert store.at(base * 2).item == base * 2;
         assert store.existOnHeap(value(base * 14)) == false;
-        assert store.existOnHeap(value(base * 15)) == false;
+        assert store.existOnHeap(value(base * 15));
         assert store.existOnHeap(value(base * 16));
         assert store.existOnHeap(value(base * 17));
         assert store.existOnHeap(value(base * 18));

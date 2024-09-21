@@ -28,7 +28,7 @@ class LogicalFirstCacheTimeTest extends FeatherStoreTestBase {
     @Test
     void memoryOnlyLastEviction() {
         FeatherStore<Value> store = createStore(1, 3, value(15, 14, 13, 12, 11), null);
-        assert store.computeLogicalFirstCacheTime() == 11;
+        assert store.computeLogicalFirstCacheTime() == 13;
     }
 
     @Test
@@ -40,7 +40,7 @@ class LogicalFirstCacheTimeTest extends FeatherStoreTestBase {
     @Test
     void memoryOnlyMiddleEviction() {
         FeatherStore<Value> store = createStore(1, 3, value(11, 12, 13, 15, 14, 11, 12), null);
-        assert store.computeLogicalFirstCacheTime() == 12;
+        assert store.computeLogicalFirstCacheTime() == 13;
     }
 
     @Test
