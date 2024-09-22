@@ -80,8 +80,8 @@ class ChronoTest {
     @Test
     void formatAsDuration() {
         assert Chrono.formatAsDuration(234).equals("0.234sec");
-        assert Chrono.formatAsDuration(1 * 1000).equals("1sec");
-        assert Chrono.formatAsDuration(10 * 1000).equals("10sec");
+        assert Chrono.formatAsDuration(1 * 1000).equals("1");
+        assert Chrono.formatAsDuration(10 * 1000).equals("10");
         assert Chrono.formatAsDuration(64 * 1000).equals("1:04");
         assert Chrono.formatAsDuration(13 * 60 * 1000).equals("13:00");
         assert Chrono.formatAsDuration(60 * 60 * 1000 + 1 * 1000).equals("1:00:01");

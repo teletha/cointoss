@@ -598,11 +598,6 @@ public class Chrono {
             formatAsTime(builder, hours, ":");
             formatAsTime(builder, minutes, ":");
             formatAsTime(builder, seconds, "");
-
-            if (builder.length() <= 2) {
-                builder.append("sec");
-            }
-
             return builder.toString();
         }
     }
