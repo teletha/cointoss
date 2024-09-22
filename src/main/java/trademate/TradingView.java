@@ -118,9 +118,7 @@ public class TradingView extends View {
         Job.TickerGenerator.run(service.exchange, job -> {
             int size = (int) start.until(end, ChronoUnit.DAYS);
 
-            Monitor monitor = Monitor.title(en("Build ticker from historical log."))
-                    .totalProgress(size)
-                    .whenCompleted(market.tickers::expire);
+            Monitor monitor = Monitor.title(en("Build ticker from historical log.")).totalProgress(size);
 
             Toast.show(monitor, market.tickers.build(start, end, forceRebuild)).to(date -> {
                 String text = service + " [" + date.toLocalDate() + "]";

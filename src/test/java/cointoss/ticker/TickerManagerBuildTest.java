@@ -41,6 +41,29 @@ public class TickerManagerBuildTest {
     }
 
     @Test
+    void estimate() {
+        ZonedDateTime start = Chrono.utc(2020, 1, 1);
+        ZonedDateTime end = Chrono.utc(2020, 1, 20);
+
+        TestableMarketService service = new TestableMarketService();
+        service.log.generateFastLog(start, end, Span.Hour1);
+
+        TickerManager manager = new TickerManager(service);
+        ZonedDateTime[] estimates = manager.estimateFullBuild();
+        assert estimates[0].isEqual(start);
+        assert estimates[1].isEqual(end);
+
+        // build a part
+        ZonedDateTime partStart = Chrono.utc(2020, 1, 4);
+        ZonedDateTime partEnd = Chrono.utc(2020, 1, 7);
+        manager.build(partStart, partEnd, false);
+
+        estimates = manager.estimateFullBuild();
+        assert estimates[0].isEqual(start);
+        assert estimates[1].isEqual(end);
+    }
+
+    @Test
     void buildByRange() {
         ZonedDateTime start = Chrono.utc(2020, 1, 1);
         ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);
@@ -115,7 +138,7 @@ public class TickerManagerBuildTest {
         TickerManager manager = new TickerManager(service);
         FeatherStore<Tick> ticks = manager.on(Span.Day).ticks;
 
-        // build inaide only
+        // build inside only
         manager.build(insideStart, insideEnd, false).to();
         assert ticks.first().date().equals(insideStart);
         assert ticks.last().date().equals(insideEnd);
@@ -132,5 +155,35 @@ public class TickerManagerBuildTest {
         assert ticks.first().date().equals(start);
         assert ticks.last().date().equals(end);
         assert same(inside, ticks.query(insideStart, insideEnd).toList());
+    }
+
+    @Test
+    void discrete() {
+        ZonedDateTime start = Chrono.utc(2020, 1, 1);
+        ZonedDateTime end = Chrono.utc(2020, 1, 15);
+        ZonedDateTime inside1Start = Chrono.utc(2020, 1, 4);
+        ZonedDateTime inside1End = Chrono.utc(2020, 1, 7);
+        ZonedDateTime inside2Start = Chrono.utc(2020, 1, 10);
+        ZonedDateTime inside2End = Chrono.utc(2020, 1, 13);
+
+        // generate fast log
+        TestableMarketService service = new TestableMarketService();
+        service.log.generateFastLog(start, end, Span.Hour1);
+
+        TickerManager manager = new TickerManager(service);
+        FeatherStore<Tick> ticks = manager.on(Span.Day).ticks;
+        assert ticks.query(start, end).toList().size() == 0;
+
+        // build inside only
+        manager.build(inside1Start, inside1End, false).to();
+        assert ticks.query(start, end).toList().size() == 4;
+        manager.build(inside2Start, inside2End, false).to();
+        assert ticks.query(start, end).toList().size() == 10;
+
+        // build with full data
+        manager.build(start, end, false).to();
+        assert ticks.first().date().equals(start);
+        assert ticks.last().date().equals(end);
+        assert ticks.query(start, end).toList().size() == 15;
     }
 }

@@ -291,15 +291,6 @@ public class TickerManager implements Disposable {
     }
 
     /**
-     * Expire all cache on memory.
-     */
-    public void expire() {
-        for (Ticker ticker : tickers) {
-            ticker.ticks.expire();
-        }
-    }
-
-    /**
      * Clear all cache on memory.
      */
     public void clear() {
