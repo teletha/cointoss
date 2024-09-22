@@ -29,10 +29,10 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
      * {@inheritDoc}
      */
     @Override
-    public WiseConsumer<Execution> APPLY(Disposable param) throws Throwable {
+    public WiseConsumer<Execution> APPLY(Disposable disposer) throws Throwable {
         TickerManager temporary = new TickerManager(service);
 
-        param.add(() -> {
+        disposer.add(() -> {
             temporary.tickers().to(ticker -> {
                 // update the close price by the latest price
                 if (ticker.current != null) ticker.current.freeze();

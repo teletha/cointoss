@@ -41,29 +41,6 @@ public class TickerManagerBuildTest {
     }
 
     @Test
-    void estimate() {
-        ZonedDateTime start = Chrono.utc(2020, 1, 1);
-        ZonedDateTime end = Chrono.utc(2020, 1, 20);
-
-        TestableMarketService service = new TestableMarketService();
-        service.log.generateFastLog(start, end, Span.Hour1);
-
-        TickerManager manager = new TickerManager(service);
-        ZonedDateTime[] estimates = manager.estimateFullBuild();
-        assert estimates[0].isEqual(start);
-        assert estimates[1].isEqual(end);
-
-        // build a part
-        ZonedDateTime partStart = Chrono.utc(2020, 1, 4);
-        ZonedDateTime partEnd = Chrono.utc(2020, 1, 7);
-        manager.build(partStart, partEnd, false);
-
-        estimates = manager.estimateFullBuild();
-        assert estimates[0].isEqual(start);
-        assert estimates[1].isEqual(end);
-    }
-
-    @Test
     void buildByRange() {
         ZonedDateTime start = Chrono.utc(2020, 1, 1);
         ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);

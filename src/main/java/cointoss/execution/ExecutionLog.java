@@ -43,6 +43,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.ticker.TickerBuilder;
 import cointoss.util.Chrono;
 import cointoss.util.JobType;
 import hypatia.Num;
@@ -811,7 +812,7 @@ public class ExecutionLog {
                 if (async) {
                     I.schedule(5, TimeUnit.SECONDS).to(() -> convertNormalToCompact(false));
                 } else {
-                    writeFast(writeCompact(readNormal())).to(I.NoOP, e -> {
+                    writeFast(writeCompact(readNormal())).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP, e -> {
                         I.error(service + " fails to compact the normal log. [" + date + "]");
                         I.error(e);
                     }, () -> {
