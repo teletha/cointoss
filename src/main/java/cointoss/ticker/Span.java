@@ -59,6 +59,9 @@ public enum Span {
     /** The maximum size of the segment. */
     public final int segmentSize;
 
+    /** The extra type. */
+    public final boolean sustainable;
+
     /** The indexes of associated upper tickers. */
     final int[] uppers;
 
@@ -83,6 +86,7 @@ public enum Span {
         this.itemSize = segment;
         this.segmentSeconds = Duration.of(segment, segmentUnit).toSeconds();
         this.segmentSize = maximumSegmentSize;
+        this.sustainable = 600 < seconds;
         this.uppers = new int[uppers.length];
         this.unitName = unit();
 

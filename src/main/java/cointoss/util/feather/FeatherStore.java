@@ -834,6 +834,76 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     }
 
     /**
+     * Clear data at the specified timestamp.
+     * 
+     * @param timestamp A target date to clear.
+     */
+    public void clear(Timelinable timestamp) {
+        clear(timestamp.seconds());
+    }
+
+    /**
+     * Clear data at the specified timestamp.
+     * 
+     * @param timestamp A target date to clear.
+     */
+    public void clear(ZonedDateTime timestamp) {
+        clear(timestamp.toEpochSecond());
+    }
+
+    /**
+     * Clear data at the specified timestamp.
+     * 
+     * @param timestamp A target date to clear.
+     */
+    public void clear(long timestamp) {
+        clear(timestamp, timestamp);
+    }
+
+    /**
+     * Clear data at the specified timestamp.
+     * 
+     * @param start A starting time.
+     * @param end A ending time.
+     */
+    public void clear(Timelinable start, Timelinable end) {
+        clear(start.seconds(), end.seconds());
+    }
+
+    /**
+     * Clear data at the specified timestamp.
+     * 
+     * @param start A target date to clear.
+     */
+    public void clear(ZonedDateTime start, ZonedDateTime end) {
+        clear(start.toEpochSecond(), end.toEpochSecond());
+    }
+
+    /**
+     * Clear data at the specified timestamp.
+     * 
+     * @param start A target date to clear.
+     */
+    public void clear(long start, long end) {
+        long[] startIndex = index(start);
+        long[] endIndex = index(end);
+
+        if (startIndex[0] == endIndex[0]) {
+            indexed.get(startIndex[0]).clear(startIndex[1], endIndex[1]);
+        } else {
+            for (OnHeap segment : indexed.subMap(startIndex[0], true, endIndex[0], true).values()) {
+                if (segment.startTime == startIndex[0]) {
+                    segment.clear(startIndex[1], itemSize);
+                } else if (segment.startTime == endIndex[0]) {
+                    segment.clear(0, endIndex[1]);
+                } else {
+                    segment.clear(0, itemSize);
+                }
+            }
+        }
+    }
+
+    /**
      * Forcibly saves all data that currently exists on the heap to disk immediately. All data on
      * disk will be overwritten. If the disk store is not enabled, nothing will happen.
      */
@@ -1055,6 +1125,54 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
          */
         T last() {
             return items == null || max < 0 || max == Integer.MIN_VALUE ? null : items[max];
+        }
+
+        /**
+         * Clear items in the specified range.
+         */
+        void clear(long start, long end) {
+            clear((int) start, (int) end);
+        }
+
+        /**
+         * Clear items in the specified range.
+         */
+        void clear(int start, int end) {
+            System.out.println("Clear " + start + "  " + end);
+            for (int i = start; i <= end; i++) {
+                clear(i);
+            }
+        }
+
+        /**
+         * Clear items at the specified index.
+         * 
+         * @param index
+         */
+        void clear(int index) {
+            items[index] = null;
+
+            // FAILSAFE : update min and max index after inserting item
+            if (index == min) min = nextMin();
+            if (max == index) max = nextMax();
+        }
+
+        private int nextMin() {
+            for (int i = min + 1; i < items.length; i++) {
+                if (items[i] != null) {
+                    return i;
+                }
+            }
+            return Integer.MAX_VALUE;
+        }
+
+        private int nextMax() {
+            for (int i = max - 1; 0 <= i; --i) {
+                if (items[i] != null) {
+                    return i;
+                }
+            }
+            return Integer.MIN_VALUE;
         }
 
         /**

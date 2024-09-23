@@ -73,7 +73,7 @@ public final class Ticker implements Disposable {
         this.ticks = FeatherStore.create(Tick.class, span);
         this.manager = manager;
 
-        if (manager != null && manager.service != null && 300 < span.seconds) {
+        if (manager != null && manager.service != null && span.sustainable) {
             ticks.enablePersistence(manager.service.formattedId, span.name());
         }
     }
