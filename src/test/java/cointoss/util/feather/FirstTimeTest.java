@@ -29,7 +29,7 @@ class FirstTimeTest extends FeatherStoreTestBase {
     @Test
     void memoryOnlyLastEviction() {
         FeatherStore<Value> store = createStore(1, 3, value(5, 4, 3, 2, 1), null);
-        assert store.firstTime() == 1;
+        assert store.firstTime() == 3;
     }
 
     @Test
@@ -41,7 +41,7 @@ class FirstTimeTest extends FeatherStoreTestBase {
     @Test
     void memoryOnlyMiddleEviction() {
         FeatherStore<Value> store = createStore(1, 3, value(1, 2, 3, 5, 4, 1, 2), null);
-        assert store.firstTime() == 1;
+        assert store.firstTime() == 3;
     }
 
     @Test

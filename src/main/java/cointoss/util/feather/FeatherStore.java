@@ -273,6 +273,17 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         }
 
         long time = item.seconds();
+        int size = indexed.size();
+        if (size < segmentSize) {
+            // ok
+        } else {
+            long first = indexed.firstLongKey();
+            if (first <= time) {
+                // ok
+            } else {
+                return; // deny
+            }
+        }
         long[] index = index(time);
 
         OnHeap<E> segment = loadSegment(false, index[0], index[1], time);
