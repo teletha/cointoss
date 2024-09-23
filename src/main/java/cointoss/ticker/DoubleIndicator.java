@@ -12,7 +12,6 @@ package cointoss.ticker;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
 import hypatia.Primitives;
@@ -24,8 +23,8 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      * 
      * @param ticker A target ticker.
      */
-    protected DoubleIndicator(Ticker ticker, Function<Tick, Tick> normalizer) {
-        super(ticker, normalizer);
+    protected DoubleIndicator(Ticker ticker) {
+        super(ticker);
     }
 
     /**
@@ -33,7 +32,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     public Double valueAt(Tick timestamp) {
-        return valueAtRounded(normalizer.apply(timestamp));
+        return valueAtRounded(timestamp);
     }
 
     /**
@@ -43,7 +42,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      * @return
      */
     protected final double doubleAt(Tick timestamp) {
-        return valueAtRounded(normalizer.apply(timestamp));
+        return valueAtRounded(timestamp);
     }
 
     /**
@@ -60,7 +59,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     protected DoubleIndicator build(BiFunction<Tick, DoubleIndicator, Double> delegator) {
-        return new DoubleIndicator(ticker, normalizer) {
+        return new DoubleIndicator(ticker) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -74,7 +73,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     public final DoubleIndicator scale(int size) {
-        return new DoubleIndicator(ticker, normalizer) {
+        return new DoubleIndicator(ticker) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -128,7 +127,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     public final DoubleIndicator sma(int size) {
-        return new DoubleIndicator(ticker, normalizer) {
+        return new DoubleIndicator(ticker) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -148,7 +147,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      */
     @Override
     public final DoubleIndicator wma(int size) {
-        return new DoubleIndicator(ticker, normalizer) {
+        return new DoubleIndicator(ticker) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -173,12 +172,7 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
     public static DoubleIndicator build(Ticker ticker, ToDoubleFunction<Tick> calculator) {
         Objects.requireNonNull(calculator);
 
-        Function<Tick, Tick> normalizer = tick -> {
-            Tick rounded = ticker.ticks.at(tick.openTime);
-            return rounded == null ? ticker.ticks.firstCache() : rounded;
-        };
-
-        return new DoubleIndicator(ticker, normalizer) {
+        return new DoubleIndicator(ticker) {
 
             @Override
             protected double valueAtRounded(Tick tick) {

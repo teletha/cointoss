@@ -20,19 +20,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
      * @param ticker A target ticker.
      */
     protected Indicator(Ticker ticker) {
-        this(ticker, tick -> {
-            Tick rounded = ticker.ticks.at(tick.openTime);
-            return rounded == null ? ticker.ticks.firstCache() : rounded;
-        });
-    }
-
-    /**
-     * Build with the target {@link Ticker}.
-     * 
-     * @param ticker A target ticker.
-     */
-    protected Indicator(Ticker ticker, Function<Tick, Tick> normalizer) {
-        super(ticker, normalizer);
+        super(ticker);
     }
 
     /**
@@ -43,7 +31,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
      */
     @Override
     public T valueAt(Tick timestamp) {
-        return valueAtRounded(normalizer.apply(timestamp));
+        return valueAtRounded(timestamp);
     }
 
     /**
@@ -60,7 +48,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
      */
     @Override
     protected Indicator<T> build(BiFunction<Tick, Indicator<T>, T> delegator) {
-        return new Indicator<>(ticker, normalizer) {
+        return new Indicator<>(ticker) {
 
             @Override
             protected T valueAtRounded(Tick tick) {
@@ -85,7 +73,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
             return rounded == null ? ticker.ticks.firstCache() : rounded;
         };
 
-        return new Indicator<>(ticker, normalizer) {
+        return new Indicator<>(ticker) {
 
             @Override
             protected T valueAtRounded(Tick tick) {

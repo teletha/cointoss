@@ -9,8 +9,6 @@
  */
 package cointoss.ticker;
 
-import java.util.function.Function;
-
 import kiss.Variable;
 
 public abstract class AbstractNumberIndicator<N extends Number, Self extends AbstractNumberIndicator<N, Self>>
@@ -21,13 +19,6 @@ public abstract class AbstractNumberIndicator<N extends Number, Self extends Abs
      */
     protected AbstractNumberIndicator(Ticker ticker) {
         super(ticker);
-    }
-
-    /**
-     * @param normalizer
-     */
-    protected AbstractNumberIndicator(Ticker ticker, Function<Tick, Tick> normalizer) {
-        super(ticker, normalizer);
     }
 
     /**

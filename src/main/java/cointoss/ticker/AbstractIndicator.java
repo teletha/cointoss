@@ -37,9 +37,6 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     /** The datastore. */
     protected final Ticker ticker;
 
-    /** The mapper from timestamp to tick. */
-    protected final Function<Tick, Tick> normalizer;
-
     /** The state of memoization. */
     boolean memoized = false;
 
@@ -49,17 +46,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @param ticker A target ticker.
      */
     protected AbstractIndicator(Ticker ticker) {
-        this(ticker, null);
-    }
-
-    /**
-     * Build with the target {@link Ticker}.
-     * 
-     * @param ticker A target ticker.
-     */
-    protected AbstractIndicator(Ticker ticker, Function<Tick, Tick> normalizer) {
         this.ticker = ticker;
-        this.normalizer = normalizer == null ? Function.identity() : normalizer;
     }
 
     /**
@@ -157,7 +144,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final <Out> Indicator<Out> map(Function<T, Out> mapper) {
-        return new Indicator<>(ticker, normalizer) {
+        return new Indicator<>(ticker) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
                 return mapper.apply(AbstractIndicator.this.valueAt(timestamp));
@@ -179,7 +166,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final <With, Out> Indicator<Out> map(AbstractIndicator<With, ?> combinator, WiseBiFunction<T, With, Out> mapper) {
-        return new Indicator<Out>(ticker, normalizer) {
+        return new Indicator<Out>(ticker) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
                 return mapper.apply(AbstractIndicator.this.valueAt(timestamp), combinator.valueAt(timestamp));
@@ -202,7 +189,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final <With1, With2, Out> Indicator<Out> map(AbstractIndicator<With1, ?> combinator1, AbstractIndicator<With2, ?> combinator2, WiseTriFunction<T, With1, With2, Out> mapper) {
-        return new Indicator<Out>(ticker, normalizer) {
+        return new Indicator<Out>(ticker) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
                 return mapper
@@ -223,7 +210,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final DoubleIndicator dmap(ToDoubleFunction<T> mapper) {
-        return new DoubleIndicator(ticker, normalizer) {
+        return new DoubleIndicator(ticker) {
             @Override // override to avoid unnecessary calculations
             public Double valueAt(Tick timestamp) {
                 return mapper.applyAsDouble(AbstractIndicator.this.valueAt(timestamp));
@@ -244,7 +231,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final <With> DoubleIndicator dmap(AbstractIndicator<With, ?> combinator, ToDoubleBiFunction<T, With> mapper) {
-        return new DoubleIndicator(ticker, normalizer) {
+        return new DoubleIndicator(ticker) {
             @Override // override to avoid unnecessary calculations
             public Double valueAt(Tick timestamp) {
                 return mapper.applyAsDouble(AbstractIndicator.this.valueAt(timestamp), combinator.valueAt(timestamp));
@@ -266,7 +253,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final <With1, With2> DoubleIndicator dmap(AbstractIndicator<With1, ?> combinator1, AbstractIndicator<With2, ?> combinator2, ToDoubleTriFunction<T, With1, With2> mapper) {
-        return new DoubleIndicator(ticker, normalizer) {
+        return new DoubleIndicator(ticker) {
             @Override // override to avoid unnecessary calculations
             public Double valueAt(Tick timestamp) {
                 return mapper.applyAsDouble(AbstractIndicator.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2
@@ -287,7 +274,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final NumIndicator nmap(Function<T, Num> mapper) {
-        return new NumIndicator(ticker, normalizer) {
+        return new NumIndicator(ticker) {
             @Override // override to avoid unnecessary calculations
             public Num valueAt(Tick timestamp) {
                 return mapper.apply(AbstractIndicator.this.valueAt(timestamp));
@@ -309,7 +296,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final <With> NumIndicator nmap(AbstractIndicator<With, ?> combinator, WiseBiFunction<T, With, Num> mapper) {
-        return new NumIndicator(ticker, normalizer) {
+        return new NumIndicator(ticker) {
             @Override // override to avoid unnecessary calculations
             public Num valueAt(Tick timestamp) {
                 return mapper.apply(AbstractIndicator.this.valueAt(timestamp), combinator.valueAt(timestamp));
@@ -331,7 +318,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Mapped indicator.
      */
     public final <With1, With2> NumIndicator nmap(AbstractIndicator<With1, ?> combinator1, AbstractIndicator<With2, ?> combinator2, WiseTriFunction<T, With1, With2, Num> mapper) {
-        return new NumIndicator(ticker, normalizer) {
+        return new NumIndicator(ticker) {
             @Override // override to avoid unnecessary calculations
             public Num valueAt(Tick timestamp) {
                 return mapper

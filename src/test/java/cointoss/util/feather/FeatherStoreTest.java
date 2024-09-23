@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -307,7 +308,7 @@ class FeatherStoreTest {
 
     @Test
     void persist() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("persist");
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence(randomName());
 
         store.store(value(0));
         assert store.existOnDisk(value(0)) == false;
@@ -317,7 +318,7 @@ class FeatherStoreTest {
 
     @Test
     void readDataFromDiskCache() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("readDataFromDiskCache");
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence(randomName());
 
         store.store(value(0));
         store.commit();
@@ -329,7 +330,7 @@ class FeatherStoreTest {
 
     @Test
     void queryDataFromDiskCache() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("queryDataFromDiskCache");
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence(randomName());
 
         store.store(value(0));
         store.commit();
@@ -345,7 +346,7 @@ class FeatherStoreTest {
         e.type = MarketType.DERIVATIVE;
         e.currency = Currency.BTC;
 
-        FeatherStore<Enums> store = FeatherStore.create(Enums.class, Span.Minute1).enablePersistence("supportEnum");
+        FeatherStore<Enums> store = FeatherStore.create(Enums.class, Span.Minute1).enablePersistence(randomName());
         store.store(e);
         store.commit();
         store.clear();
@@ -378,7 +379,7 @@ class FeatherStoreTest {
 
     @Test
     void supportZonedDateTime() {
-        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute1).enablePersistence("supportZonedDateTime");
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Minute1).enablePersistence(randomName());
         OpenInterest oi = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         store.store(oi);
         store.commit();
@@ -388,7 +389,7 @@ class FeatherStoreTest {
 
     @Test
     void storeSparsedDisk() {
-        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day).enablePersistence("storeSparsedDisk");
+        FeatherStore<OpenInterest> store = FeatherStore.create(OpenInterest.class, Span.Day).enablePersistence(randomName());
         OpenInterest oi1 = OpenInterest.with.date(Chrono.utc(2020, 1, 1)).size(10);
         OpenInterest oi2 = OpenInterest.with.date(Chrono.utc(2020, 2, 1)).size(20);
         OpenInterest oi3 = OpenInterest.with.date(Chrono.utc(2020, 3, 1)).size(30);
@@ -419,7 +420,7 @@ class FeatherStoreTest {
 
     @Test
     void endTimeWithDisk() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence("endTimeWithDisk");
+        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence(randomName());
         assert store.lastTime() == -1;
 
         store.store(new Value(60));
@@ -445,5 +446,9 @@ class FeatherStoreTest {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
         store.query(1, 20); // try to create empty segment
         assert store.isEmpty();
+    }
+
+    String randomName() {
+        return RandomStringUtils.insecure().nextAlphabetic(20);
     }
 }

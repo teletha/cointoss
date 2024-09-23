@@ -24,19 +24,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      * @param ticker A target ticker.
      */
     protected NumIndicator(Ticker ticker) {
-        this(ticker, tick -> {
-            Tick rounded = ticker.ticks.at(tick.openTime);
-            return rounded == null ? ticker.ticks.firstCache() : rounded;
-        });
-    }
-
-    /**
-     * Build with the target {@link Ticker}.
-     * 
-     * @param ticker A target ticker.
-     */
-    protected NumIndicator(Ticker ticker, Function<Tick, Tick> normalizer) {
-        super(ticker, normalizer);
+        super(ticker);
     }
 
     /**
@@ -44,7 +32,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     public Num valueAt(Tick timestamp) {
-        return valueAtRounded(normalizer.apply(timestamp));
+        return valueAtRounded(timestamp);
     }
 
     /**
@@ -61,7 +49,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     protected NumIndicator build(BiFunction<Tick, NumIndicator, Num> delegator) {
-        return new NumIndicator(ticker, normalizer) {
+        return new NumIndicator(ticker) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -75,7 +63,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     public final NumIndicator scale(int size) {
-        return new NumIndicator(ticker, normalizer) {
+        return new NumIndicator(ticker) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -129,7 +117,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     public final NumIndicator sma(int size) {
-        return new NumIndicator(ticker, normalizer) {
+        return new NumIndicator(ticker) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -149,7 +137,7 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      */
     @Override
     public final NumIndicator wma(int size) {
-        return new NumIndicator(ticker, normalizer) {
+        return new NumIndicator(ticker) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
