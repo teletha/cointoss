@@ -161,6 +161,14 @@ public class DateRange {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "DateRange [start=" + start + ", end=" + end + "]";
+    }
+
+    /**
      * Build the normalized and sorted data range.
      * 
      * @param start
