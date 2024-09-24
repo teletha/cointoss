@@ -123,7 +123,7 @@ Cointoss depends on the following products on runtime.
 * [controlsfx-11.2.1](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.1)
 * [dataset-11.3.1](https://mvnrepository.com/artifact/io.fair-acc/dataset/11.3.1)
 * [failureaccess-1.0.2](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.2)
-* [guava-33.3.0-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.3.0-jre)
+* [guava-33.3.1-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.3.1-jre)
 * [hypatia-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/hypatia/1.1.0)
 * [ikonli-core-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-core/12.3.1)
 * [ikonli-fontawesome-pack-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome-pack/12.3.1)
