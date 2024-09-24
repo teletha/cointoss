@@ -542,7 +542,7 @@ public class ExecutionLog {
 
             return writeNormal(external.convert(date)) //
                     .timeout(10, TimeUnit.SECONDS)
-                    .effectOnObserve(stopwatch::start)
+                    .effectOnObserve(() -> stopwatch.reset().start())
                     .effectOnError(e -> I.error("Fail to download external log " + service + " [" + date + "]."))
                     .retry(e -> e.effect(x -> System.out.println(x)).take(3).delay(500, TimeUnit.MILLISECONDS))
                     .effectOnComplete(() -> {

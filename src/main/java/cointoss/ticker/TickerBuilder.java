@@ -9,8 +9,6 @@
  */
 package cointoss.ticker;
 
-import java.util.Objects;
-
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import kiss.Disposable;
@@ -19,10 +17,25 @@ import kiss.WiseFunction;
 
 public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Execution>> {
 
-    private final MarketService service;
+    /** The temporary data holder. */
+    private final TickerManager temporary;
 
+    /**
+     * Build with the specified service.
+     * 
+     * @param service
+     */
     public TickerBuilder(MarketService service) {
-        this.service = Objects.requireNonNull(service);
+        this(new TickerManager(service));
+    }
+
+    /**
+     * Build with the specified data holder.
+     * 
+     * @param temporary
+     */
+    public TickerBuilder(TickerManager temporary) {
+        this.temporary = temporary;
     }
 
     /**
@@ -30,8 +43,6 @@ public class TickerBuilder implements WiseFunction<Disposable, WiseConsumer<Exec
      */
     @Override
     public WiseConsumer<Execution> APPLY(Disposable disposer) throws Throwable {
-        TickerManager temporary = new TickerManager(service);
-
         disposer.add(() -> {
             temporary.tickers().to(ticker -> {
                 // update the close price by the latest price

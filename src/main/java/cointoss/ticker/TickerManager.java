@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.function.Function;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -55,17 +56,24 @@ public class TickerManager implements Disposable {
     private boolean initialized;
 
     public TickerManager() {
-        this(null);
+        this((MarketService) null);
     }
 
     /**
      * Create {@link TickerManager}.
      */
     public TickerManager(MarketService service) {
+        this(service, null);
+    }
+
+    /**
+     * Create {@link TickerManager}.
+     */
+    public TickerManager(MarketService service, Function<Span, FeatherStore<Tick>> source) {
         this.service = service;
 
         for (int i = size - 1; 0 <= i; i--) {
-            Ticker ticker = tickers[i] = new Ticker(Span.values()[i], this);
+            Ticker ticker = tickers[i] = new Ticker(Span.values()[i], this, source);
 
             // cache associated upper tickers
             int index = 0;
@@ -286,13 +294,9 @@ public class TickerManager implements Disposable {
 
     private Signal<ZonedDateTime> buildCache(ZonedDateTime start, ZonedDateTime end) {
         return Chrono.range(end, start).effect(date -> {
-            service.log.at(date, LogType.Fast).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP);
-        }).effectOnComplete(() -> {
-            for (Ticker ticker : tickers) {
-                if (ticker.span.sustainable) {
-                    ticker.ticks.clear(start, end);
-                }
-            }
+            service.log.at(date, LogType.Fast)
+                    .effectOnLifecycle(new TickerBuilder(new TickerManager(service, span -> on(span).ticks)))
+                    .to(I.NoOP);
         });
     }
 

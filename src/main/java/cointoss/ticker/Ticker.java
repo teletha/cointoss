@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.function.Function;
 
 import cointoss.analyze.OnlineStats;
 import cointoss.execution.Execution;
@@ -68,9 +69,18 @@ public final class Ticker implements Disposable {
      * @param span An associated span.
      */
     Ticker(Span span, TickerManager manager) {
+        this(span, manager, null);
+    }
+
+    /**
+     * Create {@link Ticker}.
+     * 
+     * @param span An associated span.
+     */
+    Ticker(Span span, TickerManager manager, Function<Span, FeatherStore<Tick>> store) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
-        this.ticks = FeatherStore.create(Tick.class, span);
+        this.ticks = store == null ? FeatherStore.create(Tick.class, span) : store.apply(span);
         this.manager = manager;
 
         if (manager != null && manager.service != null && span.sustainable) {
