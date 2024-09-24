@@ -552,6 +552,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "DateRange",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Direction",
 			"packageName": "cointoss",
 			"type": "Enum"

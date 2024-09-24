@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="V">
+		<header class="X">
+			<h1 class="M" date="2024-09-16" ver="1.8.0"><code>Cointoss</code></h1>
+			<nav class="j"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="c" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="P">
+			<nav class="a">
+				<div></div>
+			</nav>
+			<article class="O" id="Article">
+				<section class="T"><code class="J">cointoss.util</code>
+					<h2 class="Class H"><code class="e">DateRange</code></h2>
+					<div class="m"></div>
+				</section>
+				<section class="T" id="start">
+					<h2 class="N"><i class="FINAL"><i class="PUBLIC"></i></i><code class="e">start</code><i class="f"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The starting date.</p>
+</span></section>
+				<section class="T" id="end">
+					<h2 class="N"><i class="FINAL"><i class="PUBLIC"></i></i><code class="e">end</code><i class="f"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The ending date.</p>
+</span></section>
+				<section class="T" id="start(java.time.ZonedDateTime)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">start</code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>)</code><i class="f"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>start</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Reset the starting date.</p>
+</span></section>
+				<section class="T" id="start(long,java.time.temporal.ChronoUnit)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">start</code><code class="I">(<code>long</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code> <code class="parameterName">unit</code>)</code><i class="f"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code>long</code> <code>time</code></td>
+							<td><span><p>The epoch time.</p>
+</span></td>
+						</tr>
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code> <code>unit</code></td>
+							<td><span><p>The time unit.</p>
+</span></td>
+						</tr>
+						<tr class="b">
+							<td><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Reset the starting date.</p>
+</span></section>
+				<section class="T" id="end(java.time.ZonedDateTime)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">end</code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>)</code><i class="f"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>end</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Reset the ending date.</p>
+</span></section>
+				<section class="T" id="end(long,java.time.temporal.ChronoUnit)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">end</code><code class="I">(<code>long</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code> <code class="parameterName">unit</code>)</code><i class="f"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code>long</code> <code>time</code></td>
+							<td><span><p>The epoch time.</p>
+</span></td>
+						</tr>
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code> <code>unit</code></td>
+							<td><span><p>The time unit.</p>
+</span></td>
+						</tr>
+						<tr class="b">
+							<td><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Reset the ending date.</p>
+</span></section>
+				<section class="T" id="min(java.time.ZonedDateTime)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">min</code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">min</code>)</code><i class="f"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>min</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Set the minimum date.</p>
+</span></section>
+				<section class="T" id="max(java.time.ZonedDateTime)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">max</code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">max</code>)</code><i class="f"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>max</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Set the maximum date.</p>
+</span></section>
+				<section class="T" id="maxByFuture(int)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">maxByFuture</code><code class="I">(<code>int</code> <code class="parameterName">days</code>)</code><i class="f"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code>int</code> <code>days</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Limit upper bounds from today.</p>
+</span></section>
+				<section class="T" id="countDays()">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">countDays</code><code class="I">()</code><i class="f"><code>int</code></i></h2>
+					<table class="W">
+						<tr class="b">
+							<td><code>int</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Count days from start to end.</p>
+</span></section>
+				<section class="T" id="countDaysFrom(java.time.ZonedDateTime)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">countDaysFrom</code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>)</code><i class="f"><code>int</code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>start</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code>int</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Count days from the specified day to end.</p>
+</span></section>
+				<section class="T" id="countDaysTo(java.time.ZonedDateTime)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">countDaysTo</code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>)</code><i class="f"><code>int</code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>end</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code>int</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Count days from start to the specified day.</p>
+</span></section>
+				<section class="T" id="days(boolean)">
+					<h2 class="N"><i class="PUBLIC"></i><code class="e">days</code><code class="I">(<code>boolean</code> <code class="parameterName">startToEnd</code>)</code><i class="f"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code>boolean</code> <code>startToEnd</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Build the date stream.</p>
+</span></section>
+				<section class="T" id="between(java.time.ZonedDateTime,java.time.ZonedDateTime)">
+					<h2 class="N"><i class="STATIC PUBLIC"></i><code class="e">between</code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>)</code><i class="f"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></h2>
+					<table class="W">
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>start</code></td>
+							<td></td>
+						</tr>
+						<tr class="L">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>end</code></td>
+							<td></td>
+						</tr>
+						<tr class="b">
+							<td><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Build the normalized and sorted data range.</p>
+</span></section>
+			</article>
+			<aside class="g" id="SubNavi">
+				<div class="k">
+					<h5 class="U">Fields</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.DateRange.html#start">start</a></code><i class="l"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.DateRange.html#end">end</a></code><i class="l"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+					</ul>
+					<h5 class="U">Static Methods</h5>
+					<ul>
+						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#between(java.time.ZonedDateTime,java.time.ZonedDateTime)">between</a></code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>)</code><i class="l"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></li>
+					</ul>
+					<h5 class="U">Methods</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#start(java.time.ZonedDateTime)">start</a></code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>)</code><i class="l"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#start(long,java.time.temporal.ChronoUnit)">start</a></code><code class="I">(<code>long</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code> <code class="parameterName">unit</code>)</code><i class="l"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#end(java.time.ZonedDateTime)">end</a></code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>)</code><i class="l"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#end(long,java.time.temporal.ChronoUnit)">end</a></code><code class="I">(<code>long</code> <code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code> <code class="parameterName">unit</code>)</code><i class="l"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#min(java.time.ZonedDateTime)">min</a></code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">min</code>)</code><i class="l"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#max(java.time.ZonedDateTime)">max</a></code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">max</code>)</code><i class="l"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#maxByFuture(int)">maxByFuture</a></code><code class="I">(<code>int</code> <code class="parameterName">days</code>)</code><i class="l"><code><a href="api/cointoss.util.DateRange.html">DateRange</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#countDays()">countDays</a></code><code class="I">()</code><i class="l"><code>int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#countDaysFrom(java.time.ZonedDateTime)">countDaysFrom</a></code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>)</code><i class="l"><code>int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#countDaysTo(java.time.ZonedDateTime)">countDaysTo</a></code><code class="I">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>)</code><i class="l"><code>int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.DateRange.html#days(boolean)">days</a></code><code class="I">(<code>boolean</code> <code class="parameterName">startToEnd</code>)</code><i class="l"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></code></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>
