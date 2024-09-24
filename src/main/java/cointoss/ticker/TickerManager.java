@@ -9,8 +9,9 @@
  */
 package cointoss.ticker;
 
+import static java.time.temporal.ChronoUnit.*;
+
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 
 import cointoss.Direction;
@@ -19,6 +20,7 @@ import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.execution.LogType;
 import cointoss.util.Chrono;
+import cointoss.util.DateRange;
 import cointoss.util.feather.FeatherStore;
 import hypatia.Num;
 import kiss.Disposable;
@@ -215,23 +217,12 @@ public class TickerManager implements Disposable {
      * 
      * @return
      */
-    public ZonedDateTime[] estimateFullBuild() {
+    public DateRange estimateFullBuild() {
         Ticker ticker = on(Span.Day);
-
-        // ideal cache's range
         long[] times = ticker.ticks.computeIdealSegmentTime();
         ZonedDateTime startCache = Chrono.utcBySeconds(times[0]);
         ZonedDateTime endCache = Chrono.utcBySeconds(times[1]);
-
-        // log's range
-        ZonedDateTime startLog = service.log.firstCacheDate();
-        ZonedDateTime endLog = service.log.lastCacheDate();
-
-        // compute the suitable log range
-        ZonedDateTime start = Chrono.min(startLog, Chrono.between(startLog, startCache, endLog));
-        ZonedDateTime end = Chrono.max(endLog, Chrono.between(startLog, endCache, endLog));
-
-        return new ZonedDateTime[] {start, end};
+        return DateRange.between(startCache, endCache).min(service.log.firstCacheDate()).max(service.log.lastCacheDate());
     }
 
     /**
@@ -241,50 +232,36 @@ public class TickerManager implements Disposable {
      * @return
      */
     public Signal<ZonedDateTime> buildFully(boolean forceRebuild) {
-        ZonedDateTime[] dates = estimateFullBuild();
-        return build(dates[0], dates[1], forceRebuild);
+        return build(estimateFullBuild(), forceRebuild);
     }
 
     /**
      * Build ticker data from execution log by your specified date-range.
      * 
-     * @param start
-     * @param end
+     * @param range
      * @param forceRebuild
      * @return
      */
-    public Signal<ZonedDateTime> build(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
-        start = start.truncatedTo(ChronoUnit.DAYS);
-        end = end.truncatedTo(ChronoUnit.DAYS);
-
-        // correct order
-        if (start.isAfter(end)) {
-            ZonedDateTime temp = start;
-            start = end;
-            end = temp;
-        }
-
-        // check range of execution log
-        start = Chrono.max(service.log.firstCacheDate(), start);
-        end = Chrono.min(service.log.lastCacheDate(), end);
+    public Signal<ZonedDateTime> build(DateRange range, boolean forceRebuild) {
+        range = range.min(service.log.firstCacheDate()).max(service.log.lastCacheDate()).maxByFuture(-1);
 
         Signal<ZonedDateTime> process = I.signal();
         if (forceRebuild) {
-            process = buildCache(start, end);
+            process = buildCache(range);
         } else {
             FeatherStore<Tick> ticks = on(Span.Day).ticks;
             long firstTime = ticks.firstTime();
             long lastTime = ticks.lastTime();
 
             if (firstTime == -1 && lastTime == -1) {
-                process = buildCache(start, end);
+                process = buildCache(range);
             } else {
-                if (lastTime < end.toEpochSecond()) {
-                    process = process.merge(buildCache(Chrono.utcBySeconds(lastTime), end));
+                if (lastTime < range.end.toEpochSecond()) {
+                    process = process.merge(buildCache(range.start(lastTime, SECONDS)));
                 }
 
-                if (start.toEpochSecond() < firstTime) {
-                    process = process.merge(buildCache(start, Chrono.utcBySeconds(firstTime)));
+                if (range.start.toEpochSecond() < firstTime) {
+                    process = process.merge(buildCache(range.end(firstTime, SECONDS)));
                 }
             }
         }
@@ -292,8 +269,8 @@ public class TickerManager implements Disposable {
         return process;
     }
 
-    private Signal<ZonedDateTime> buildCache(ZonedDateTime start, ZonedDateTime end) {
-        return Chrono.range(end, start).effect(date -> {
+    private Signal<ZonedDateTime> buildCache(DateRange range) {
+        return range.days(false).effect(date -> {
             service.log.at(date, LogType.Fast)
                     .effectOnLifecycle(new TickerBuilder(new TickerManager(service, span -> on(span).ticks)))
                     .to(I.NoOP);

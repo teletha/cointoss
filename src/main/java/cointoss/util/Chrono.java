@@ -177,6 +177,38 @@ public class Chrono {
     }
 
     /**
+     * UTC {@link ZonedDateTime} from time and unit.
+     * 
+     * @param time
+     * @param unit
+     * @return
+     */
+    public static ZonedDateTime utc(long time, ChronoUnit unit) {
+        switch (unit) {
+        case MICROS:
+            return utcByMicros(time);
+
+        case MILLIS:
+            return utcByMills(time);
+
+        case SECONDS:
+            return utcByMills(time * 1000);
+
+        case MINUTES:
+            return utcByMills(time * 1000 * 60);
+
+        case HOURS:
+            return utcByMills(time * 1000 * 60 * 60);
+
+        case DAYS:
+            return utcByMills(time * 1000 * 60 * 60 * 24);
+
+        default:
+            throw new UnsupportedOperationException(unit + " is not supported.");
+        }
+    }
+
+    /**
      * UTC {@link ZonedDateTime} from epoch micros.
      * 
      * @return
@@ -631,6 +663,20 @@ public class Chrono {
             return start.plusDays(RandomUtils.secure().randomLong(0, Duration.between(start, end).toDays()));
         } else {
             return end.plusDays(RandomUtils.secure().randomLong(0, Duration.between(end, start).toDays()));
+        }
+    }
+
+    /**
+     * 
+     * @param one
+     * @param other
+     * @return
+     */
+    public static ZonedDateTime[] sort(ZonedDateTime one, ZonedDateTime other) {
+        if (one.isBefore(other)) {
+            return new ZonedDateTime[] {one, other};
+        } else {
+            return new ZonedDateTime[] {other, one};
         }
     }
 }

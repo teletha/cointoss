@@ -9,13 +9,11 @@
  */
 package trademate;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
 import cointoss.util.Coordinator;
+import cointoss.util.DateRange;
 import cointoss.util.Job;
 import kiss.I;
 import stylist.Style;
@@ -107,25 +105,22 @@ public class TradingView extends View {
      * Build ticker.
      */
     public void buildTicker(boolean forceRebuild) {
-        ZonedDateTime[] dates = market.tickers.estimateFullBuild();
-        buildTicker(dates[0], dates[1], forceRebuild);
+        buildTicker(market.tickers.estimateFullBuild(), forceRebuild);
     }
 
     /**
      * Build ticker.
      */
-    public void buildTicker(ZonedDateTime start, ZonedDateTime end, boolean forceRebuild) {
+    public void buildTicker(DateRange range, boolean forceRebuild) {
         Job.TickerGenerator.run(service.exchange, job -> {
-            int size = (int) start.until(end, ChronoUnit.DAYS);
+            Monitor monitor = Monitor.title(en("Build ticker from historical log."))
+                    .totalProgress(range.countDays() + 1)
+                    .whenCompleted(chart.chart::layoutForcely);
 
-            Monitor monitor = Monitor.title(en("Build ticker from historical log.")).totalProgress(size).whenCompleted(() -> {
-                chart.chart.layoutForcely();
-            });
-
-            Toast.show(monitor, market.tickers.build(start, end, forceRebuild)).to(date -> {
+            Toast.show(monitor, market.tickers.build(range, forceRebuild)).to(date -> {
                 String text = service + " [" + date.toLocalDate() + "]";
                 I.debug("Build ticker on " + text);
-                monitor.message(text).setProgress((int) date.until(end, ChronoUnit.DAYS));
+                monitor.message(text).setProgress(range.countDaysFrom(date));
             });
         });
     }

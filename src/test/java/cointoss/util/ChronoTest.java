@@ -136,6 +136,12 @@ class ChronoTest {
     }
 
     @Test
+    void rangeBySameDate() {
+        List<ZonedDateTime> list = Chrono.range(Chrono.utc(2022, 1, 1), Chrono.utc(2022, 1, 1)).toList();
+        assert list.size() == 1;
+    }
+
+    @Test
     void rangeByDateReverse() {
         List<ZonedDateTime> list = Chrono.range(Chrono.utc(2022, 1, 3), Chrono.utc(2022, 1, 1)).toList();
         assert list.size() == 3;
