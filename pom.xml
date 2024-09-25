@@ -64,34 +64,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.jerolba</groupId>
-			<artifactId>carpet-record</artifactId>
-			<version>0.2.0</version>
-			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.errorprone</groupId>
-					<artifactId>error_prone_annotations</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.checkerframework</groupId>
-					<artifactId>checker-qual</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>listenablefuture</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.code.findbugs</groupId>
-					<artifactId>jsr305</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.j2objc</groupId>
-					<artifactId>j2objc-annotations</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>io.fair-acc</groupId>
 			<artifactId>chartfx</artifactId>
 			<version>11.3.1</version>
@@ -374,7 +346,7 @@
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.46.1.1</version>
+			<version>3.46.1.2</version>
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
