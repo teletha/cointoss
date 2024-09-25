@@ -20,7 +20,7 @@ import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.market.gmo.GMO;
+import cointoss.market.binance.BinanceFuture;
 import cointoss.util.Chrono;
 import kiss.I;
 import kiss.Signal;
@@ -34,7 +34,8 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        restoreNormal(GMO.BTC_DERIVATIVE, Chrono.utc(2020, 3, 30));
+        // convertCompactLevel(BinanceFuture.FUTURE_BTC_USDT, 7);
+        restoreNormal(BinanceFuture.FUTURE_BTC_USDT, Chrono.utc(2024, 9, 22));
     }
 
     /**
@@ -96,6 +97,33 @@ public class ExecutionLogTool {
         cache.convertCompactToNormal();
 
         return new Operated(cache.normal);
+    }
+
+    /**
+     * Change the compression level of compact log.
+     * 
+     * @param service
+     * @param level
+     */
+    public static void convertCompactLevel(MarketService service, int level) {
+        ExecutionLog log = new ExecutionLog(service);
+        log.caches().to(e -> {
+            System.out.println("Convert compression level " + e.date);
+            e.convertCompactLevel(level);
+        });
+    }
+
+    /**
+     * Change the compression level of compact log.
+     * 
+     * @param service
+     * @param date
+     * @param level
+     */
+    public static void convertCompactLevel(MarketService service, ZonedDateTime date, int level) {
+        ExecutionLog log = new ExecutionLog(service);
+        Cache cache = log.cache(date);
+        cache.convertCompactLevel(level);
     }
 
     /**

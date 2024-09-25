@@ -473,19 +473,22 @@ public class ExecutionLog {
          * @return
          */
         Signal<Execution> readCompact() {
+            return readCompact(compactLog());
+        }
+
+        private Signal<Execution> readCompact(File file) {
             CsvParser parser = buildCsvParser();
             Stopwatch stopwatch = Stopwatch.createUnstarted();
-            File compact = compactLog();
 
             try {
-                return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
+                return I.signal(parser.iterate(new ZstdInputStream(file.newInputStream()), ISO_8859_1))
                         .scan(() -> Market.BASE, logger::decode)
                         .effectOnComplete(parser::stopParsing)
                         .effectOnObserve(stopwatch::start)
                         .effectOnError(e -> {
-                            I.error("Fail to read compact log. [" + compact + "]");
+                            I.error("Fail to read compact log. [" + file + "]");
                             if (existNormal()) {
-                                compact.delete();
+                                file.delete();
                             }
                         })
                         .effectOnComplete(() -> {
@@ -712,11 +715,21 @@ public class ExecutionLog {
          * @return Wrapped {@link Signal}.
          */
         Signal<Execution> writeCompact(Signal<Execution> executions) {
+            return writeCompact(executions, 7);
+        }
+
+        /**
+         * Write the execution log to the fast log.
+         * 
+         * @param executions A stream of executions to write.
+         * @return Wrapped {@link Signal}.
+         */
+        private Signal<Execution> writeCompact(Signal<Execution> executions, int level) {
             File compact = compactLog();
 
             try {
                 Execution[] prev = {Market.BASE};
-                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), 1));
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(ATOMIC_WRITE), level));
 
                 return executions.plug(new CompactLog()).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
@@ -750,6 +763,46 @@ public class ExecutionLog {
             writeFast(I.signal(executions)).to(I.NoOP);
 
             return this;
+        }
+
+        File createCompact(int level) {
+            File file = normal.extension("log" + level);
+
+            try {
+                Execution[] prev = {Market.BASE};
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(file.newOutputStream(ATOMIC_WRITE), level));
+
+                readCompact().plug(new CompactLog()).effect(e -> {
+                    writer.writeRow(logger.encode(prev[0], e));
+                    prev[0] = e;
+                }).effectOnComplete(() -> {
+                    writer.close();
+                }).to(I.NoOP);
+
+                return file;
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        Signal<Execution> read(File file) {
+            CsvParser parser = buildCsvParser();
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
+
+            try {
+                return I.signal(parser.iterate(new ZstdInputStream(file.newInputStream()), ISO_8859_1))
+                        .scan(() -> Market.BASE, logger::decode)
+                        .effectOnComplete(parser::stopParsing)
+                        .effectOnObserve(stopwatch::start)
+                        .effectOnError(e -> {
+                            I.error("Fail to read compact log. [" + file + "]");
+                        })
+                        .effectOnComplete(() -> {
+                            I.trace("Read compact log " + service.id + " [" + date + "] " + stopwatch.stop().elapsed());
+                        });
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
         }
 
         /**
@@ -839,6 +892,21 @@ public class ExecutionLog {
                 });
             }
             return this;
+        }
+
+        /**
+         * Convert compression level of compact log.
+         * 
+         * @param level
+         */
+        void convertCompactLevel(int level) {
+            if (existCompact()) {
+                File compact = compactLog();
+                File temp = compact.renameTo(compact.base() + ".temp");
+                writeCompact(readCompact(temp)).effectOnComplete(() -> {
+                    temp.delete();
+                }).to();
+            }
         }
 
         /**
