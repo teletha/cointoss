@@ -63,7 +63,7 @@ public class TradeTester extends View {
         I.load(Market.class);
         I.env("typewriter.sqlite", "jdbc:sqlite:.log/market.sqlite");
         SQLite.configure(config -> {
-            config.setJournalMode(JournalMode.WAL);
+            config.setJournalMode(JournalMode.PERSIST);
             config.setSynchronous(SynchronousMode.OFF);
         });
 
