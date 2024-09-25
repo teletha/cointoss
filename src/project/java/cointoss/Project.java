@@ -48,6 +48,13 @@ public class Project extends bee.api.Project {
         // require("org.nd4j", "nd4j-native-platform");
         // require("org.deeplearning4j", "rl4j-core");
 
+        require("com.jerolba", "carpet-record");
+        // require("org.apache.parquet", "parquet-avro");
+        // require("org.apache.parquet", "parquet-hadoop");
+        // require("org.apache.parquet", "parquet-column");
+        // require("org.apache.hadoop", "hadoop-common");
+        // require("org.apache.hadoop", "hadoop-mapreduce-client-core");
+
         repository("https://www.javaxt.com/maven");
     }
 }
