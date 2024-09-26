@@ -148,7 +148,7 @@ Cointoss depends on the following products on runtime.
 * [reincarnation-1.8.0](https://mvnrepository.com/artifact/com.github.teletha/reincarnation/1.8.0)
 * [sinobu-3.13.0](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.13.0)
 * [slf4j-api-2.0.9](https://mvnrepository.com/artifact/org.slf4j/slf4j-api/2.0.9)
-* [sqlite-jdbc-3.46.1.2](https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.46.1.2)
+* [sqlite-jdbc-3.46.1.3](https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.46.1.3)
 * [stylist-1.10.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.10.0)
 * [typewriter-1.12.0](https://mvnrepository.com/artifact/com.github.teletha/typewriter/1.12.0)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
