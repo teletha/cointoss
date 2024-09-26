@@ -9,25 +9,28 @@
  */
 package cointoss.execution;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 
 import kiss.I;
 import psychopath.File;
 
 class NormalLog implements AutoCloseable {
 
-    private final RandomAccessFile file;
+    private final SeekableByteChannel file;
 
     /**
      * 
      */
     NormalLog(File file) {
         try {
-            this.file = new RandomAccessFile(file.create().asJavaFile(), "rw");
-        } catch (FileNotFoundException e) {
+            this.file = Files.newByteChannel(file.create()
+                    .asJavaPath(), StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.WRITE);
+        } catch (Exception e) {
             throw I.quiet(e);
         }
     }
@@ -51,12 +54,12 @@ class NormalLog implements AutoCloseable {
 
         try {
             // no data
-            if (file.length() == 0) {
+            if (file.size() == 0) {
                 return -1;
             }
 
             // read value at head
-            file.seek(0);
+            file.position(0);
             return Long.parseLong(readColumn());
         } catch (NumberFormatException e) {
             return -1;
@@ -76,7 +79,7 @@ class NormalLog implements AutoCloseable {
 
         try {
             // no data
-            if (file.length() == 0) {
+            if (file.size() == 0) {
                 return -1;
             }
 
@@ -97,7 +100,7 @@ class NormalLog implements AutoCloseable {
      */
     boolean isCorrupted() {
         try {
-            long length = file.length();
+            long length = file.size();
 
             if (length == 0) {
                 return false;
@@ -106,7 +109,7 @@ class NormalLog implements AutoCloseable {
             }
 
             // move to tail
-            file.seek(length);
+            file.position(length);
 
             // tail must be '\r\n'
             byte[] bytes = readBack(2);
@@ -123,8 +126,8 @@ class NormalLog implements AutoCloseable {
         if (isCorrupted()) {
             try {
                 moveToLineHead();
-                file.setLength(file.getFilePointer());
-                file.seek(file.length() - 2);
+                file.truncate(file.position());
+                file.position(file.size() - 2);
             } catch (IOException e) {
                 throw I.quiet(e);
             }
@@ -138,8 +141,8 @@ class NormalLog implements AutoCloseable {
      * @throws IOException
      */
     void append(String text) throws IOException {
-        file.seek(file.length());
-        file.write(text.getBytes(StandardCharsets.ISO_8859_1));
+        file.position(file.size());
+        file.write(ByteBuffer.wrap(text.getBytes(StandardCharsets.ISO_8859_1)));
     }
 
     /**
@@ -151,7 +154,7 @@ class NormalLog implements AutoCloseable {
         byte[] bytes = readBack(128);
         for (int i = bytes.length - 2; 0 <= i; i--) {
             if (bytes[i] == 0x00D && bytes[i + 1] == 0x00A) {
-                file.seek(file.getFilePointer() + i + 2);
+                file.position(file.position() + i + 2);
                 return;
             }
         }
@@ -164,13 +167,13 @@ class NormalLog implements AutoCloseable {
      * @return
      */
     private byte[] readBack(int size) throws IOException {
-        long end = file.getFilePointer();
+        long end = file.position();
         long start = Math.max(0, end - size);
-        byte[] bytes = new byte[(int) (end - start)];
-        file.seek(start);
+        ByteBuffer bytes = ByteBuffer.allocate((int) (end - start));
+        file.position(start);
         file.read(bytes);
-        file.seek(start);
-        return bytes;
+        file.position(start);
+        return bytes.array();
     }
 
     /**
@@ -181,12 +184,13 @@ class NormalLog implements AutoCloseable {
      */
     private String readColumn() throws IOException {
         // The longest date and time item can be read if it has 26 bytes.
-        byte[] bytes = new byte[32];
-        long pos = file.getFilePointer();
-        int read = file.read(bytes);
+        ByteBuffer buffer = ByteBuffer.allocate(32);
+        long pos = file.position();
+        int read = file.read(buffer);
+        byte[] bytes = buffer.array();
         for (int i = 0; i < read; i++) {
             if (bytes[i] == 0x20) {
-                file.seek(pos + i);
+                file.position(pos + i);
                 return new String(bytes, 0, i);
             }
         }

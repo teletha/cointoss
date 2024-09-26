@@ -38,7 +38,7 @@ public class VerifiableMarket extends Market {
      * Create {@link VerifiableMarket} with default {@link VerifiableMarketService}.
      */
     public VerifiableMarket(MarketService service) {
-        super(new VerifiableMarketService(service));
+        super(service instanceof VerifiableMarketService ? service : new VerifiableMarketService(service));
 
         this.service = (VerifiableMarketService) super.service;
     }

@@ -33,6 +33,10 @@ public class TestableMarketService extends VerifiableMarketService {
         super(RandomStringUtils.secure().nextAlphanumeric(10));
     }
 
+    public TestableMarketService(MarketSetting setting) {
+        super(RandomStringUtils.secure().nextAlphanumeric(10));
+    }
+
     /**
      * {@inheritDoc}
      */

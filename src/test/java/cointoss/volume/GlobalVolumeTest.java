@@ -12,14 +12,13 @@ package cointoss.volume;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.MarketService;
-import cointoss.verify.VerifiableMarketService;
+import cointoss.TestableMarketService;
 
 class GlobalVolumeTest {
 
-    final MarketService service1 = new VerifiableMarketService();
+    final TestableMarketService service1 = new TestableMarketService();
 
-    final MarketService service2 = new VerifiableMarketService();
+    final TestableMarketService service2 = new TestableMarketService();
 
     @Test
     void add() {

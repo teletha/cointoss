@@ -15,12 +15,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Currency;
 import cointoss.MarketSetting;
-import cointoss.orderbook.OrderBookManager;
-import cointoss.verify.VerifiableMarketService;
+import cointoss.TestableMarketService;
 
 class OrderBookManagerTest {
 
-    private VerifiableMarketService service = new VerifiableMarketService(MarketSetting.with.derivative()
+    private TestableMarketService service = new TestableMarketService(MarketSetting.with.derivative()
             .target(Currency.UNKNOWN.minimumSize(1).scale(1))
             .base(Currency.UNKNOWN.minimumSize(1).scale(1)));
 

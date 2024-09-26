@@ -15,12 +15,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
 
 import cointoss.TestableMarket;
 import cointoss.execution.ExecutionLog.Cache;
@@ -481,7 +478,7 @@ class CacheTest {
 
         Cache cache = market.log.cache(Chrono.utc(2020, 12, 15));
         cache.writeNormal(executions);
-        HashCode hashOriginal = Files.asByteSource(cache.normal.asJavaFile()).hash(Hashing.sha256());
+        String hashOriginal = DigestUtils.sha256Hex(cache.normal.newInputStream());
 
         // encode and decode
         cache.convertNormalToCompact(false);
@@ -489,7 +486,7 @@ class CacheTest {
         cache.convertCompactToNormal();
 
         // check hash
-        HashCode hashRestored = Files.asByteSource(cache.normal.asJavaFile()).hash(Hashing.sha256());
+        String hashRestored = DigestUtils.sha256Hex(cache.normal.newInputStream());
         assert hashOriginal.equals(hashRestored);
 
         // check object
