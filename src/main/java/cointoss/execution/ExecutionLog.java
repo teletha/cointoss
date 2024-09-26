@@ -903,9 +903,7 @@ public class ExecutionLog {
             if (existCompact()) {
                 File compact = compactLog();
                 File temp = compact.renameTo(compact.base() + ".temp");
-                writeCompact(readCompact(temp)).effectOnComplete(() -> {
-                    temp.delete();
-                }).to();
+                writeCompact(readCompact(temp)).effectOnComplete(temp::delete).to(I.NoOP);
             }
         }
 

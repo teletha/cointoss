@@ -18,9 +18,9 @@ import java.util.function.Consumer;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
+import cointoss.market.Exchange;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.market.binance.BinanceFuture;
 import cointoss.util.Chrono;
 import kiss.I;
 import kiss.Signal;
@@ -34,8 +34,7 @@ public class ExecutionLogTool {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        // convertCompactLevel(BinanceFuture.FUTURE_BTC_USDT, 7);
-        restoreNormal(BinanceFuture.FUTURE_BTC_USDT, Chrono.utc(2024, 9, 22));
+        convertCompactLevel(7);
     }
 
     /**
@@ -99,6 +98,12 @@ public class ExecutionLogTool {
         return new Operated(cache.normal);
     }
 
+    public static void convertCompactLevel(int level) {
+        MarketServiceProvider.availableMarketServices().skip(service -> service.exchange == Exchange.BinanceF).to(service -> {
+            convertCompactLevel(service, level);
+        });
+    }
+
     /**
      * Change the compression level of compact log.
      * 
@@ -107,23 +112,46 @@ public class ExecutionLogTool {
      */
     public static void convertCompactLevel(MarketService service, int level) {
         ExecutionLog log = new ExecutionLog(service);
-        log.caches().to(e -> {
-            System.out.println("Convert compression level " + e.date);
-            e.convertCompactLevel(level);
+        long[] total = {0, 0};
+
+        log.caches().to(cache -> {
+            if (cache.existCompact()) {
+                long old = cache.compactLog().size();
+                cache.convertCompactLevel(level);
+                long renew = cache.compactLog().size();
+
+                total[0] += old;
+                total[1] += renew;
+
+                show(service + " convert the compression level at " + cache.date + ".", old, renew);
+            }
         });
+        show(service + " compress log.", total[0], total[1]);
     }
 
     /**
-     * Change the compression level of compact log.
+     * Show message with compression ratio.
      * 
-     * @param service
-     * @param date
-     * @param level
+     * @param message
+     * @param old
+     * @param renew
      */
-    public static void convertCompactLevel(MarketService service, ZonedDateTime date, int level) {
-        ExecutionLog log = new ExecutionLog(service);
-        Cache cache = log.cache(date);
-        cache.convertCompactLevel(level);
+    private static void show(String message, long old, long renew) {
+        long ratio = Math.round(renew * 100 / old);
+        System.out.println(message + " (" + formatSize(old) + " -> " + formatSize(renew) + "  " + ratio + "%)");
+    }
+
+    /**
+     * Format the file size.
+     * 
+     * @param bytes
+     * @return
+     */
+    private static String formatSize(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(1024));
+        char prefix = "KMGTPE".charAt(exp - 1);
+        return String.format("%.1f%sB", bytes / Math.pow(1024, exp), prefix);
     }
 
     /**
