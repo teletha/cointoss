@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.9.0](https://github.com/teletha/cointoss/compare/v1.8.0...v1.9.0) (2024-09-26)
+
+
+### Features
+
+* add AAVE and SUI perp markets on Coinbase ([de4b580](https://github.com/teletha/cointoss/commit/de4b580eae0a252efcd2f14986938f9f45e26050))
+* add BNB and SOI on global volume view ([b421424](https://github.com/teletha/cointoss/commit/b421424f4d6a1dfbed0db1e818936b13dcb075b8))
+* add BTC and ETH perp markets in Coinbase ([ff47155](https://github.com/teletha/cointoss/commit/ff47155870ca6c95675b3677db8dbb63b76828ca))
+* add COMP-USDC market on Coinbase ([92d5271](https://github.com/teletha/cointoss/commit/92d527131b32485e516ec20fecb35d017e050809))
+* add DateRange ([afef143](https://github.com/teletha/cointoss/commit/afef14339423d13f1f22a737b30ef30232698da1))
+* add EOS-USDT market on Binance ([c8d3dfc](https://github.com/teletha/cointoss/commit/c8d3dfc1525fd43f10b8b09886b73c1382800d73))
+* add Holder ([458fa87](https://github.com/teletha/cointoss/commit/458fa87ae0f37b8bede8f16a0d26898211e71ec7))
+* add SOL and DOGE perp markets on Coinbase ([6e0db3e](https://github.com/teletha/cointoss/commit/6e0db3e723d4aabcec243375872cf30635ad7de5))
+* add SUI-USD market on Coinbase ([f7fc697](https://github.com/teletha/cointoss/commit/f7fc697edfb3b950a3f44cb139e363659abe6665))
+* add UNI-USD market on Coinbase ([817cfe4](https://github.com/teletha/cointoss/commit/817cfe4ea89ad6302f46d19aeb20086d8726dac8))
+* adjust size of 5 minutes span ([c8e1555](https://github.com/teletha/cointoss/commit/c8e1555cdea1b5c27c649f1708f7b4fcdcf3d656))
+* build tickers when building the fast log ([defb428](https://github.com/teletha/cointoss/commit/defb4283f30da95b94d83103121d8110862895f6))
+* change compression level of compact log ([66208ff](https://github.com/teletha/cointoss/commit/66208ffc86dfd02d9ed05179b51b29b9ebce40cc))
+* default eviction policy is Eldest ([6d8d002](https://github.com/teletha/cointoss/commit/6d8d002d90c35b5830ab4a2fd1fd1ff8c14e920d))
+* enhance ExecutionLogTool ([5593527](https://github.com/teletha/cointoss/commit/55935279b4c6a19ec09a88ef0d874a8f1e0285c5))
+* enhance log building process ([e88ecda](https://github.com/teletha/cointoss/commit/e88ecda21511d832a5c1eefa14427051ff178767))
+* ExecutionLogRepository is rebuild as LogHouse ([e46b87e](https://github.com/teletha/cointoss/commit/e46b87e9b70f9e58d5cc4f08cf3af71fd20193fb))
+* FeatherStore behaves like cache more ([8083836](https://github.com/teletha/cointoss/commit/8083836895ab656a9d117e4f81239c705e51440d))
+* NormalLog uses SeekableByteChannel instead of RandomAccessFile ([020fcbe](https://github.com/teletha/cointoss/commit/020fcbe76bf78076074725fa98d91c210d62a375))
+* Tool API to manipulate log flexibly ([79ed25c](https://github.com/teletha/cointoss/commit/79ed25c50bf39283a49aeb227c592a0b1cc358cc))
+
+
+### Bug Fixes
+
+* axis can show variable ticks ([ecccc7f](https://github.com/teletha/cointoss/commit/ecccc7f6646c3d40f8c82869e61b3fe25836391d))
+* change sqlite mode ([196dfe0](https://github.com/teletha/cointoss/commit/196dfe0403eb3906061835f2ddb415711e14d960))
+* chart can adjust ticker's range ([450ad88](https://github.com/teletha/cointoss/commit/450ad88381963feed7c8814b05400bc5984c8343))
+* chart zoom bug ([1846839](https://github.com/teletha/cointoss/commit/184683992386a47a12dc97aa2f213819f7796ec5))
+* duration's format ([4cbbfc5](https://github.com/teletha/cointoss/commit/4cbbfc52de5540e5f107ceedab6ae85daddb7ed5))
+* reduce the range of chart rendering ([4a5ed16](https://github.com/teletha/cointoss/commit/4a5ed16c991e44de758d6b15a366fc0c95d0b91e))
+* refactoring market setting model ([df57e2c](https://github.com/teletha/cointoss/commit/df57e2c65bb4f71abade09509ad1efba2c5ad949))
+* remove acquirable execution size from service setting model ([45dc622](https://github.com/teletha/cointoss/commit/45dc622af1c2ad2fce72dd5e8d96f4e522f8dd0a))
+* remove bulk modifier from market setting model ([7cfbc0b](https://github.com/teletha/cointoss/commit/7cfbc0bf43163c0cba13414ad830ab7157372d69))
+* remove MarketSettingModel#createExecutionLogger ([086ca40](https://github.com/teletha/cointoss/commit/086ca40aef379b3810ab1b6d20c4fabb3f4ac1bb))
+* remove time normalizer from indicator ([bca1aa3](https://github.com/teletha/cointoss/commit/bca1aa332837b5851168ebcb5c5500cd50fc2be1))
+* show date only ([ecac703](https://github.com/teletha/cointoss/commit/ecac70310acd261acf2db5d7536ce9f53b99294b))
+
 ## [1.8.0](https://github.com/teletha/cointoss/compare/v1.7.0...v1.8.0) (2024-09-16)
 
 
