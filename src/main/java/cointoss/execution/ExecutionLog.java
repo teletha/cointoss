@@ -180,13 +180,6 @@ public class ExecutionLog {
     /**
      * Clear all fast log.
      */
-    public final void clearFastCache() {
-        root.delete("**.flog");
-    }
-
-    /**
-     * Clear all fast log.
-     */
     public final void clearRepositoryInfo() {
         root.file("repository.json").delete();
     }

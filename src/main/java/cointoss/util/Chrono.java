@@ -457,6 +457,18 @@ public class Chrono {
     }
 
     /**
+     * List up all days at the specified year.
+     * 
+     * @param year
+     * @return
+     */
+    public static Signal<ZonedDateTime> range(int year) {
+        ZonedDateTime start = utc(year, 1, 1);
+        ZonedDateTime end = utc(year, 12, 31);
+        return range(start, end);
+    }
+
+    /**
      * List up all days at the specified month.
      * 
      * @param year

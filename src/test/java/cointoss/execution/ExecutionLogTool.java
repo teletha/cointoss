@@ -9,22 +9,15 @@
  */
 package cointoss.execution;
 
-import java.awt.Desktop;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.function.Consumer;
 
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
-import cointoss.market.Exchange;
-import cointoss.market.MarketServiceProvider;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.util.Chrono;
+import cointoss.market.binance.Binance;
 import kiss.I;
 import kiss.Signal;
-import psychopath.File;
 
 /**
  * Migration Tool.
@@ -32,31 +25,17 @@ import psychopath.File;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        I.load(Market.class);
-
-        convertCompactLevel(7);
+        Tool.defineTask().on(Binance.AAVE_USDT).at(2024, 9, 24).run(ExecutionLogTool::restoreNormal);
     }
 
-    /**
-     * Restore normal log of the specified market and date.
-     * 
-     * @param service
-     * @param date
-     */
-    public static void repairLog(MarketService service, ZonedDateTime date) {
-        ExecutionLog log = new ExecutionLog(service);
-        Cache cache = log.cache(date);
-        cache.repair(false);
-    }
-
-    public static void convertToTimestampBasedId(MarketService idBased, MarketService timeBased) {
+    public static void convertToTimestampBasedId(ExecutionLog idBased, MarketService timeBased) {
         long[] context = new long[3];
         TimestampBasedMarketServiceSupporter support = new TimestampBasedMarketServiceSupporter();
 
-        idBased.log.caches().to(cache -> {
+        idBased.caches().to(cache -> {
             LocalDate date = cache.date;
             if (!timeBased.log.cache(date).existCompact()) {
-                Signal<Execution> exe = idBased.log.cache(date)
+                Signal<Execution> exe = idBased.cache(date)
                         .read(LogType.Normal)
                         .map(x -> support.createExecution(x.orientation, x.size, x.price, x.date, context));
 
@@ -68,50 +47,35 @@ public class ExecutionLogTool {
     }
 
     /**
-     * Create the fast log from normal log.
+     * Restore normal log of the specified market and date.
      */
-    public static void createFastLog(MarketService service) {
-        ExecutionLog log = new ExecutionLog(service);
-        log.caches().effect(e -> System.out.println(e)).to(Cache::buildFast);
+    public static void repairLog(ExecutionLog log, ZonedDateTime date) {
+        Cache cache = log.cache(date);
+        cache.repair(false);
     }
 
     /**
      * Create the fast log from normal log.
      */
-    public static void createFastLog(MarketService service, ZonedDateTime date) {
-        ExecutionLog log = new ExecutionLog(service);
+    public static void createFastLog(ExecutionLog log, ZonedDateTime date) {
         Cache cache = log.cache(date);
         cache.buildFast();
     }
 
     /**
      * Restore normal log of the specified market and date.
-     * 
-     * @param service
-     * @param date
      */
-    public static Operated restoreNormal(MarketService service, ZonedDateTime date) {
-        ExecutionLog log = new ExecutionLog(service);
+    public static void restoreNormal(ExecutionLog log, ZonedDateTime date) {
         Cache cache = log.cache(date);
         cache.convertCompactToNormal();
-
-        return new Operated(cache.normal);
-    }
-
-    public static void convertCompactLevel(int level) {
-        MarketServiceProvider.availableMarketServices().skip(service -> service.exchange == Exchange.BinanceF).to(service -> {
-            convertCompactLevel(service, level);
-        });
     }
 
     /**
      * Change the compression level of compact log.
      * 
-     * @param service
      * @param level
      */
-    public static void convertCompactLevel(MarketService service, int level) {
-        ExecutionLog log = new ExecutionLog(service);
+    public static void convertCompactLevel(ExecutionLog log, int level) {
         long[] total = {0, 0};
 
         log.caches().to(cache -> {
@@ -123,10 +87,10 @@ public class ExecutionLogTool {
                 total[0] += old;
                 total[1] += renew;
 
-                show(service + " convert the compression level at " + cache.date + ".", old, renew);
+                show(log.service + " convert the compression level at " + cache.date + ".", old, renew);
             }
         });
-        show(service + " compress log.", total[0], total[1]);
+        show(log.service + " compress log.", total[0], total[1]);
     }
 
     /**
@@ -157,58 +121,21 @@ public class ExecutionLogTool {
     /**
      * Delete all fast logs.
      */
-    public static void deleteRepositoryInfo() {
-        processLog(log -> {
-            log.clearRepositoryInfo();
-        });
+    public static void deleteRepositoryInfo(ExecutionLog log) {
+        log.clearRepositoryInfo();
     }
 
     /**
-     * Delete all fast logs.
+     * Delete fast log.
      */
-    public static void deleteFastLog() {
-        processLog(log -> {
-            log.clearFastCache();
-        });
+    public static void deleteFastLog(ExecutionLog log, ZonedDateTime date) {
+        log.cache(date).fastLog().delete();
     }
 
     /**
-     * Reads the last ID from latest compact logs and sets it as the creation date of the file.
+     * Delete compact log.
      */
-    public static void setLastIdOnCompactLog() {
-        LocalDate start = Chrono.utcToday().minusDays(15).toLocalDate();
-
-        processLog(log -> {
-            log.caches().take(c -> c.date.isAfter(start)).to(c -> {
-                c.readCompact().last().to(e -> {
-                    c.compactLog().creationTime(e.id);
-                    System.out.println("Set last ID as compact log's creation time on " + c);
-                });
-            });
-        });
-    }
-
-    /**
-     * Template.
-     */
-    private static void processLog(Consumer<ExecutionLog> service) {
-        I.load(Market.class);
-        MarketServiceProvider.availableMarketServices().map(ExecutionLog::new).to(service);
-    }
-
-    private static class Operated {
-        private File file;
-
-        Operated(File file) {
-            this.file = file;
-        }
-
-        private void open() {
-            try {
-                Desktop.getDesktop().open(file.asJavaFile());
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        }
+    public static void deleteCompactLog(ExecutionLog log, ZonedDateTime date) {
+        log.cache(date).compactLog().delete();
     }
 }
