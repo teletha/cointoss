@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="X">
-		<header class="b">
-			<h1 class="f" date="2024-09-16" ver="1.8.0"><code>Cointoss</code></h1>
-			<nav class="P"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="U">
+		<header class="L">
+			<h1 class="W" date="2024-09-16" ver="1.8.0"><code>Cointoss</code></h1>
+			<nav class="a"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="M" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="i" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,13 +31,13 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="d">
-			<nav class="i">
+		<main class="R">
+			<nav class="X">
 				<div></div>
 			</nav>
-			<article class="S" id="Article">
-				<section class="T"><code class="k">cointoss.market</code>
-					<h2 class="Class h"><code class="U">TimestampBasedMarketServiceSupporter</code></h2>
+			<article class="T" id="Article">
+				<section class="Q"><code class="j">cointoss.market</code>
+					<h2 class="Class Y"><code class="k">TimestampBasedMarketServiceSupporter</code></h2>
 					<div class="l"></div><span class="B"><p>This class is useful to use in the following cases</p>
  <ul>
  
@@ -49,369 +49,369 @@
  instead.</li>
  </ul>
 </span></section>
-				<section class="T" id="padding">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">padding</code><i class="R"><code class="return">long</code></i></h2><span class="B"><p>The padding to avoid equating multiple trades occurring at the same time.</p>
+				<section class="Q" id="padding">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">padding</code><i class="m"><code class="return">long</code></i></h2><span class="B"><p>The padding to avoid equating multiple trades occurring at the same time.</p>
 </span></section>
-				<section class="T" id="TimestampBasedMarketServiceSupporter()">
-					<h2 class="Q"><i class="PUBLIC"></i><code class="U">TimestampBasedMarketServiceSupporter</code><code class="j">()</code></h2><span class="B"><p>Construct with millisecond based padding (10000).</p>
+				<section class="Q" id="TimestampBasedMarketServiceSupporter()">
+					<h2 class="I"><i class="PUBLIC"></i><code class="k">TimestampBasedMarketServiceSupporter</code><code class="g">()</code></h2><span class="B"><p>Construct with millisecond based padding (10000).</p>
 </span></section>
-				<section class="T" id="TimestampBasedMarketServiceSupporter(long)">
-					<h2 class="Q"><i class="PUBLIC"></i><code class="U">TimestampBasedMarketServiceSupporter</code><code class="j">(<code>long</code> <code class="parameterName">padding</code>)</code></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="TimestampBasedMarketServiceSupporter(long)">
+					<h2 class="I"><i class="PUBLIC"></i><code class="k">TimestampBasedMarketServiceSupporter</code><code class="g">(<code>long</code> <code class="parameterName">padding</code>)</code></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>long</code> <code>padding</code></td>
 							<td><span><p>A padding size.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Construct with millisecond based padding.</p>
 </span></section>
-				<section class="T" id="TimestampBasedMarketServiceSupporter(long,boolean)">
-					<h2 class="Q"><i class="PUBLIC"></i><code class="U">TimestampBasedMarketServiceSupporter</code><code class="j">(<code>long</code> <code class="parameterName">padding</code>, <code>boolean</code> <code class="parameterName">milliBase</code>)</code></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="TimestampBasedMarketServiceSupporter(long,boolean)">
+					<h2 class="I"><i class="PUBLIC"></i><code class="k">TimestampBasedMarketServiceSupporter</code><code class="g">(<code>long</code> <code class="parameterName">padding</code>, <code>boolean</code> <code class="parameterName">milliBase</code>)</code></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>long</code> <code>padding</code></td>
 							<td><span><p>A padding size.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>boolean</code> <code>milliBase</code></td>
 							<td><span><p>A timestamp base.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Construct with your padding.</p>
 </span></section>
-				<section class="T" id="computeEpochTime(long)">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">computeEpochTime</code><code class="j">(<code>long</code> <code class="parameterName">id</code>)</code><i class="R"><code>long</code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="computeEpochTime(long)">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">computeEpochTime</code><code class="g">(<code>long</code> <code class="parameterName">id</code>)</code><i class="m"><code>long</code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>long</code> <code>id</code></td>
 							<td><span><p>A target ID.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td><span><p>Epoch time.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Convert from id to epoch time.</p>
 </span></section>
-				<section class="T" id="computeEpochSecond(long)">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">computeEpochSecond</code><code class="j">(<code>long</code> <code class="parameterName">id</code>)</code><i class="R"><code>long</code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="computeEpochSecond(long)">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">computeEpochSecond</code><code class="g">(<code>long</code> <code class="parameterName">id</code>)</code><i class="m"><code>long</code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>long</code> <code>id</code></td>
 							<td><span><p>A target ID.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td><span><p>Epoch second.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Convert from id to epoch second.</p>
 </span></section>
-				<section class="T" id="computeDateTime(long)">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">computeDateTime</code><code class="j">(<code>long</code> <code class="parameterName">id</code>)</code><i class="R"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="computeDateTime(long)">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">computeDateTime</code><code class="g">(<code>long</code> <code class="parameterName">id</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>long</code> <code>id</code></td>
 							<td><span><p>A target ID.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></td>
 							<td><span><p>Epoch time.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Convert from id to <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code>.</p>
 </span></section>
-				<section class="T" id="computeID(java.time.ZonedDateTime)">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">computeID</code><code class="j">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">time</code>)</code><i class="R"><code>long</code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="computeID(java.time.ZonedDateTime)">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">computeID</code><code class="g">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">time</code>)</code><i class="m"><code>long</code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>time</code></td>
 							<td><span><p>A target date-time.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td><span><p>The computed ID.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Convert from <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> to id.</p>
 </span></section>
-				<section class="T" id="computeID(long)">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">computeID</code><code class="j">(<code>long</code> <code class="parameterName">epochMilli</code>)</code><i class="R"><code>long</code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="computeID(long)">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">computeID</code><code class="g">(<code>long</code> <code class="parameterName">epochMilli</code>)</code><i class="m"><code>long</code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>long</code> <code>epochMilli</code></td>
 							<td><span><p>A target date-time.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td><span><p>The computed ID.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Convert from epoch time to id.</p>
 </span></section>
-				<section class="T" id="createExecution(kiss.JSON,java.lang.String,java.lang.String,java.lang.String,java.lang.String)">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">createExecution</code><code class="j">(<code>kiss.JSON</code> <code class="parameterName">json</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">side</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">epochMillis</code>)</code><i class="R"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="createExecution(kiss.JSON,java.lang.String,java.lang.String,java.lang.String,java.lang.String)">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">createExecution</code><code class="g">(<code>kiss.JSON</code> <code class="parameterName">json</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">side</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">epochMillis</code>)</code><i class="m"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>kiss.JSON</code> <code>json</code></td>
 							<td></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>side</code></td>
 							<td><span><p>A side of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>size</code></td>
 							<td><span><p>A size of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>price</code></td>
 							<td><span><p>A price of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>epochMillis</code></td>
 							<td><span><p>A time of execution.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Create <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> with context from JSON.</p>
 </span></section>
-				<section class="T" id="createExecution(kiss.JSON,java.lang.String,java.lang.String,java.lang.String,java.lang.String,long[])">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">createExecution</code><code class="j">(<code>kiss.JSON</code> <code class="parameterName">json</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">side</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="R"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="createExecution(kiss.JSON,java.lang.String,java.lang.String,java.lang.String,java.lang.String,long[])">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">createExecution</code><code class="g">(<code>kiss.JSON</code> <code class="parameterName">json</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">side</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="m"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>kiss.JSON</code> <code>json</code></td>
 							<td></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>side</code></td>
 							<td><span><p>A side of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>size</code></td>
 							<td><span><p>A size of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>price</code></td>
 							<td><span><p>A price of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code>epochMillis</code></td>
 							<td><span><p>A time of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code array="fix">long</code> <code>threeLength</code></td>
 							<td></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Create <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> with context from JSON.</p>
 </span></section>
-				<section class="T" id="createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,long)">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">createExecution</code><code class="j">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>long</code> <code class="parameterName">epochMillis</code>)</code><i class="R"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,long)">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">createExecution</code><code class="g">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>long</code> <code class="parameterName">epochMillis</code>)</code><i class="m"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.Direction.html">Direction</a></code> <code>side</code></td>
 							<td><span><p>A side of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>size</code></td>
 							<td><span><p>A size of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>price</code></td>
 							<td><span><p>A price of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>long</code> <code>epochMillis</code></td>
 							<td><span><p>A time of execution.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Create <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> with context.</p>
 </span></section>
-				<section class="T" id="createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,java.time.ZonedDateTime,long[])">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">createExecution</code><code class="j">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="R"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,java.time.ZonedDateTime,long[])">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">createExecution</code><code class="g">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="m"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.Direction.html">Direction</a></code> <code>side</code></td>
 							<td><span><p>A side of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>size</code></td>
 							<td><span><p>A size of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>price</code></td>
 							<td><span><p>A price of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>date</code></td>
 							<td><span><p>A time of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code array="fix">long</code> <code>threeLength</code></td>
 							<td><span><p>The context data which must be 3 length long array.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Create <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> with context.</p>
 </span></section>
-				<section class="T" id="createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,long,long[])">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">createExecution</code><code class="j">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>long</code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="R"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,long,long[])">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">createExecution</code><code class="g">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>long</code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="m"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.Direction.html">Direction</a></code> <code>side</code></td>
 							<td><span><p>A side of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>size</code></td>
 							<td><span><p>A size of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>price</code></td>
 							<td><span><p>A price of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>long</code> <code>epochMillis</code></td>
 							<td><span><p>A time of execution.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code array="fix">long</code> <code>threeLength</code></td>
 							<td><span><p>The context data which must be 3 length long array.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Create <code><a href="api/cointoss.execution.Execution.html">Execution</a></code> with context.</p>
 </span></section>
-				<section class="T" id="computeConsecutive(cointoss.Direction,long,long[])">
-					<h2 class="Q"><i class="PUBLIC STATIC"></i><code class="U">computeConsecutive</code><code class="j">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>long</code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="R"><code>int</code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="computeConsecutive(cointoss.Direction,long,long[])">
+					<h2 class="I"><i class="STATIC PUBLIC"></i><code class="k">computeConsecutive</code><code class="g">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>long</code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="m"><code>int</code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.Direction.html">Direction</a></code> <code>side</code></td>
 							<td></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>long</code> <code>epochMillis</code></td>
 							<td></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code array="fix">long</code> <code>threeLength</code></td>
 							<td></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code>int</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Helper method to calculate consecutive type.</p>
 </span></section>
-				<section class="T" id="createExecutions(hypatia.Num,hypatia.Num,hypatia.Num,hypatia.Num,hypatia.Num,long)">
-					<h2 class="Q"><i class="FINAL"><i class="PUBLIC"></i></i><code class="U">createExecutions</code><code class="j">(<code>hypatia.Num</code> <code class="parameterName">open</code>, <code>hypatia.Num</code> <code class="parameterName">high</code>, <code>hypatia.Num</code> <code class="parameterName">low</code>, <code>hypatia.Num</code> <code class="parameterName">close</code>, <code>hypatia.Num</code> <code class="parameterName">volume</code>, <code>long</code> <code class="parameterName">epochMillis</code>)</code><i class="R"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
-					<table class="L">
-						<tr class="O">
+				<section class="Q" id="createExecutions(hypatia.Num,hypatia.Num,hypatia.Num,hypatia.Num,hypatia.Num,long)">
+					<h2 class="I"><i class="FINAL"><i class="PUBLIC"></i></i><code class="k">createExecutions</code><code class="g">(<code>hypatia.Num</code> <code class="parameterName">open</code>, <code>hypatia.Num</code> <code class="parameterName">high</code>, <code>hypatia.Num</code> <code class="parameterName">low</code>, <code>hypatia.Num</code> <code class="parameterName">close</code>, <code>hypatia.Num</code> <code class="parameterName">volume</code>, <code>long</code> <code class="parameterName">epochMillis</code>)</code><i class="m"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>open</code></td>
 							<td><span><p>The open price.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>high</code></td>
 							<td><span><p>The highest price.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>low</code></td>
 							<td><span><p>The lowest price.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>close</code></td>
 							<td><span><p>The close price.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>hypatia.Num</code> <code>volume</code></td>
 							<td><span><p>A spaned valume.</p>
 </span></td>
 						</tr>
-						<tr class="O">
+						<tr class="N">
 							<td><code>long</code> <code>epochMillis</code></td>
 							<td><span><p>A starting time.</p>
 </span></td>
 						</tr>
-						<tr class="K">
+						<tr class="Z">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Create pseudo <code><a href="api/cointoss.execution.Execution.html">Execution</a></code>s from OHLCV candle.</p>
 </span></section>
 			</article>
-			<aside class="m" id="SubNavi">
-				<div class="I">
-					<h5 class="N">Constructors</h5>
+			<aside class="f" id="SubNavi">
+				<div class="P">
+					<h5 class="e">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#TimestampBasedMarketServiceSupporter()">TimestampBasedMarketServiceSupporter</a></code><code class="j">()</code></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#TimestampBasedMarketServiceSupporter(long)">TimestampBasedMarketServiceSupporter</a></code><code class="j">(<code>long</code> <code class="parameterName">padding</code>)</code></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#TimestampBasedMarketServiceSupporter(long,boolean)">TimestampBasedMarketServiceSupporter</a></code><code class="j">(<code>long</code> <code class="parameterName">padding</code>, <code>boolean</code> <code class="parameterName">milliBase</code>)</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#TimestampBasedMarketServiceSupporter()">TimestampBasedMarketServiceSupporter</a></code><code class="g">()</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#TimestampBasedMarketServiceSupporter(long)">TimestampBasedMarketServiceSupporter</a></code><code class="g">(<code>long</code> <code class="parameterName">padding</code>)</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#TimestampBasedMarketServiceSupporter(long,boolean)">TimestampBasedMarketServiceSupporter</a></code><code class="g">(<code>long</code> <code class="parameterName">padding</code>, <code>boolean</code> <code class="parameterName">milliBase</code>)</code></li>
 					</ul>
-					<h5 class="N">Fields</h5>
+					<h5 class="e">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#padding">padding</a></code><i class="a"><code class="return">long</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#padding">padding</a></code><i class="M"><code class="return">long</code></i></li>
 					</ul>
-					<h5 class="N">Static Methods</h5>
+					<h5 class="e">Static Methods</h5>
 					<ul>
-						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeConsecutive(cointoss.Direction,long,long[])">computeConsecutive</a></code><code class="j">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>long</code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="a"><code>int</code></i></li>
+						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeConsecutive(cointoss.Direction,long,long[])">computeConsecutive</a></code><code class="g">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>long</code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="M"><code>int</code></i></li>
 					</ul>
-					<h5 class="N">Methods</h5>
+					<h5 class="e">Methods</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeEpochTime(long)">computeEpochTime</a></code><code class="j">(<code>long</code> <code class="parameterName">id</code>)</code><i class="a"><code>long</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeEpochSecond(long)">computeEpochSecond</a></code><code class="j">(<code>long</code> <code class="parameterName">id</code>)</code><i class="a"><code>long</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeDateTime(long)">computeDateTime</a></code><code class="j">(<code>long</code> <code class="parameterName">id</code>)</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeID(java.time.ZonedDateTime)">computeID</a></code><code class="j">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">time</code>)</code><i class="a"><code>long</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeID(long)">computeID</a></code><code class="j">(<code>long</code> <code class="parameterName">epochMilli</code>)</code><i class="a"><code>long</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(kiss.JSON,java.lang.String,java.lang.String,java.lang.String,java.lang.String)">createExecution</a></code><code class="j">(<code>kiss.JSON</code> <code class="parameterName">json</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">side</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">epochMillis</code>)</code><i class="a"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(kiss.JSON,java.lang.String,java.lang.String,java.lang.String,java.lang.String,long[])">createExecution</a></code><code class="j">(<code>kiss.JSON</code> <code class="parameterName">json</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">side</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="a"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,long)">createExecution</a></code><code class="j">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>long</code> <code class="parameterName">epochMillis</code>)</code><i class="a"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,java.time.ZonedDateTime,long[])">createExecution</a></code><code class="j">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="a"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,long,long[])">createExecution</a></code><code class="j">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>long</code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="a"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecutions(hypatia.Num,hypatia.Num,hypatia.Num,hypatia.Num,hypatia.Num,long)">createExecutions</a></code><code class="j">(<code>hypatia.Num</code> <code class="parameterName">open</code>, <code>hypatia.Num</code> <code class="parameterName">high</code>, <code>hypatia.Num</code> <code class="parameterName">low</code>, <code>hypatia.Num</code> <code class="parameterName">close</code>, <code>hypatia.Num</code> <code class="parameterName">volume</code>, <code>long</code> <code class="parameterName">epochMillis</code>)</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeEpochTime(long)">computeEpochTime</a></code><code class="g">(<code>long</code> <code class="parameterName">id</code>)</code><i class="M"><code>long</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeEpochSecond(long)">computeEpochSecond</a></code><code class="g">(<code>long</code> <code class="parameterName">id</code>)</code><i class="M"><code>long</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeDateTime(long)">computeDateTime</a></code><code class="g">(<code>long</code> <code class="parameterName">id</code>)</code><i class="M"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeID(java.time.ZonedDateTime)">computeID</a></code><code class="g">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">time</code>)</code><i class="M"><code>long</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#computeID(long)">computeID</a></code><code class="g">(<code>long</code> <code class="parameterName">epochMilli</code>)</code><i class="M"><code>long</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(kiss.JSON,java.lang.String,java.lang.String,java.lang.String,java.lang.String)">createExecution</a></code><code class="g">(<code>kiss.JSON</code> <code class="parameterName">json</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">side</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">epochMillis</code>)</code><i class="M"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(kiss.JSON,java.lang.String,java.lang.String,java.lang.String,java.lang.String,long[])">createExecution</a></code><code class="g">(<code>kiss.JSON</code> <code class="parameterName">json</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">side</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">size</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="M"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,long)">createExecution</a></code><code class="g">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>long</code> <code class="parameterName">epochMillis</code>)</code><i class="M"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,java.time.ZonedDateTime,long[])">createExecution</a></code><code class="g">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="M"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecution(cointoss.Direction,hypatia.Num,hypatia.Num,long,long[])">createExecution</a></code><code class="g">(<code><a href="api/cointoss.Direction.html">Direction</a></code> <code class="parameterName">side</code>, <code>hypatia.Num</code> <code class="parameterName">size</code>, <code>hypatia.Num</code> <code class="parameterName">price</code>, <code>long</code> <code class="parameterName">epochMillis</code>, <code array="fix">long</code> <code class="parameterName">threeLength</code>)</code><i class="M"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.market.TimestampBasedMarketServiceSupporter.html#createExecutions(hypatia.Num,hypatia.Num,hypatia.Num,hypatia.Num,hypatia.Num,long)">createExecutions</a></code><code class="g">(<code>hypatia.Num</code> <code class="parameterName">open</code>, <code>hypatia.Num</code> <code class="parameterName">high</code>, <code>hypatia.Num</code> <code class="parameterName">low</code>, <code>hypatia.Num</code> <code class="parameterName">close</code>, <code>hypatia.Num</code> <code class="parameterName">volume</code>, <code>long</code> <code class="parameterName">epochMillis</code>)</code><i class="M"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
 					</ul>
 				</div>
 			</aside>
