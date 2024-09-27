@@ -269,6 +269,10 @@ public class ExecutionLog {
         return new Cache(date).read(type);
     }
 
+    public final void repair(ZonedDateTime date) {
+        cache(date).repair(false);
+    }
+
     /**
      * 
      */

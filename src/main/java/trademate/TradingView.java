@@ -105,19 +105,19 @@ public class TradingView extends View {
      * Build ticker.
      */
     public void buildTicker(boolean forceRebuild) {
-        buildTicker(market.tickers.estimateFullBuild(), forceRebuild);
+        buildTicker(market.tickers.estimateFullBuild(), forceRebuild, false);
     }
 
     /**
      * Build ticker.
      */
-    public void buildTicker(DateRange range, boolean forceRebuild) {
+    public void buildTicker(DateRange range, boolean forceRebuild, boolean forceRebuildLog) {
         Job.TickerGenerator.run(service.exchange, job -> {
             Monitor monitor = Monitor.title(en("Build ticker from historical log."))
                     .totalProgress(range.countDays() + 1)
                     .whenCompleted(chart.chart::layoutForcely);
 
-            Toast.show(monitor, market.tickers.build(range, forceRebuild)).to(date -> {
+            Toast.show(monitor, market.tickers.build(range, forceRebuild, forceRebuildLog)).to(date -> {
                 String text = service + " [" + date.toLocalDate() + "]";
                 I.debug("Build ticker on " + text);
                 monitor.message(text).setProgress(range.countDaysFrom(date));
