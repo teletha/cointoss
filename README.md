@@ -7,25 +7,14 @@
 </p>
 
 
-## Summary
-
-<p align="right"><a href="#top">back to top</a></p>
 
 
-## Usage
 
-<p align="right"><a href="#top">back to top</a></p>
 
 
 ## Prerequisites
 Cointoss runs on all major operating systems and requires only [Java version 21](https://docs.oracle.com/en/java/javase/21/) or later to run.
-To check, please run `java -version` from the command line interface. You should see something like this:
-```
-> java -version
-openjdk version "16" 2021-03-16
-OpenJDK Runtime Environment (build 16+36-2231)
-OpenJDK 64-Bit Server VM (build 16+36-2231, mixed mode, sharing)
-```
+To check, please run `java -version` on your terminal.
 <p align="right"><a href="#top">back to top</a></p>
 
 ## Install
@@ -146,7 +135,7 @@ Cointoss depends on the following products on runtime.
 * [primavera-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/primavera/1.1.0)
 * [psychopath-1.13.0](https://mvnrepository.com/artifact/com.github.teletha/psychopath/1.13.0)
 * [reincarnation-1.8.0](https://mvnrepository.com/artifact/com.github.teletha/reincarnation/1.8.0)
-* [sinobu-3.13.0](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.13.0)
+* [sinobu-3.14.1](https://mvnrepository.com/artifact/com.github.teletha/sinobu/3.14.1)
 * [slf4j-api-2.0.9](https://mvnrepository.com/artifact/org.slf4j/slf4j-api/2.0.9)
 * [sqlite-jdbc-3.46.1.3](https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.46.1.3)
 * [stylist-1.10.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.10.0)

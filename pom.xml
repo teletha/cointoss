@@ -346,7 +346,7 @@
 		<dependency>
 			<groupId>com.github.teletha</groupId>
 			<artifactId>sinobu</artifactId>
-			<version>3.13.0</version>
+			<version>3.14.1</version>
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
