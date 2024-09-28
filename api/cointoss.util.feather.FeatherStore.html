@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="M">
-		<header class="I">
-			<h1 class="h" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
-			<nav class="J"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="W">
+		<header class="d">
+			<h1 class="j" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="h"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="T" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="f" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,14 +31,14 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="W">
-			<nav class="S">
+		<main class="k">
+			<nav class="T">
 				<div></div>
 			</nav>
-			<article class="e" id="Article">
-				<section class="c"><code class="j">cointoss.util.feather</code>
-					<h2 class="Class d"><code class="O">FeatherStore</code><code class="i">&#60;<code>E</code>&#62;</code></h2>
-					<div class="P">
+			<article class="Q" id="Article">
+				<section class="K"><code class="e">cointoss.util.feather</code>
+					<h2 class="Class U"><code class="Y">FeatherStore</code><code class="c">&#60;<code>E</code>&#62;</code></h2>
+					<div class="H">
 						<ul class="C D">
 							<li><code>E</code><code class="extends"><code>typewriter.api.model.IdentifiableModel</code> &#38; <code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code></code></li>
 						</ul>
@@ -47,687 +47,687 @@
 						</ul>
 					</div>
 				</section>
-				<section class="c" id="create(java.lang.Class,cointoss.ticker.Span)">
-					<h2 class="U"><i class="STATIC PUBLIC"></i><code class="O">create</code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">type</code>, <code><a href="api/cointoss.ticker.Span.html">Span</a></code> <code class="parameterName">span</code>)</code><i class="Q"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="a">
+				<section class="K" id="create(java.lang.Class,cointoss.ticker.Span)">
+					<h2 class="X"><i class="STATIC PUBLIC"></i><code class="Y">create</code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">type</code>, <code><a href="api/cointoss.ticker.Span.html">Span</a></code> <code class="parameterName">span</code>)</code><i class="S"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="P">
 							<td><code>E</code><code class="extends"><code>typewriter.api.model.IdentifiableModel</code> &#38; <code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code></code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code>type</code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code><a href="api/cointoss.ticker.Span.html">Span</a></code> <code>span</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Create the store for timeseries data.</p>
 </span></section>
-				<section class="c" id="create(java.lang.Class,long,int,int)">
-					<h2 class="U"><i class="STATIC PUBLIC"></i><code class="O">create</code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">type</code>, <code>long</code> <code class="parameterName">itemDuration</code>, <code>int</code> <code class="parameterName">itemSize</code>, <code>int</code> <code class="parameterName">segmentSize</code>)</code><i class="Q"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="a">
+				<section class="K" id="create(java.lang.Class,long,int,int)">
+					<h2 class="X"><i class="STATIC PUBLIC"></i><code class="Y">create</code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">type</code>, <code>long</code> <code class="parameterName">itemDuration</code>, <code>int</code> <code class="parameterName">itemSize</code>, <code>int</code> <code class="parameterName">segmentSize</code>)</code><i class="S"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="P">
 							<td><code>E</code><code class="extends"><code>typewriter.api.model.IdentifiableModel</code> &#38; <code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code></code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code>type</code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code>long</code> <code>itemDuration</code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code>int</code> <code>itemSize</code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code>int</code> <code>segmentSize</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Create the store for timeseries data.</p>
 </span></section>
-				<section class="c" id="vandalize()">
-					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="O">vandalize</code><code class="i">()</code><i class="Q"><code>void</code></i></h2>
+				<section class="K" id="vandalize()">
+					<h2 class="X"><i class="OVERRIDE PUBLIC"></i><code class="Y">vandalize</code><code class="c">()</code><i class="S"><code>void</code></i></h2>
 				</section>
-				<section class="c" id="enablePersistence(java.lang.Object...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">enablePersistence</code><code class="i">(<code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">qualifers</code>)</code><i class="Q"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="enablePersistence(java.lang.Object...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">enablePersistence</code><code class="c">(<code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">qualifers</code>)</code><i class="S"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code>qualifers</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Enable the transparent disk persistence.</p>
 </span></section>
-				<section class="c" id="enablePersistence(cointoss.util.JobType,cointoss.MarketService,java.lang.Object...)">
-					<h2 class="U"><i class="SYNCHRONIZED"><i class="PUBLIC"></i></i><code class="O">enablePersistence</code><code class="i">(<code><a href="api/cointoss.util.JobType.html">JobType</a></code> <code class="parameterName">autoCommitJob</code>, <code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">qualifers</code>)</code><i class="Q"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="enablePersistence(cointoss.util.JobType,cointoss.MarketService,java.lang.Object...)">
+					<h2 class="X"><i class="SYNCHRONIZED"><i class="PUBLIC"></i></i><code class="Y">enablePersistence</code><code class="c">(<code><a href="api/cointoss.util.JobType.html">JobType</a></code> <code class="parameterName">autoCommitJob</code>, <code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">qualifers</code>)</code><i class="S"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="api/cointoss.util.JobType.html">JobType</a></code> <code>autoCommitJob</code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code>service</code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code>qualifers</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Enable the transparent disk persistence.</p>
 </span></section>
-				<section class="c" id="disableMemoryCompaction()">
-					<h2 class="U"><i class="SYNCHRONIZED"><i class="PUBLIC"></i></i><code class="O">disableMemoryCompaction</code><code class="i">()</code><i class="Q"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="disableMemoryCompaction()">
+					<h2 class="X"><i class="SYNCHRONIZED"><i class="PUBLIC"></i></i><code class="Y">disableMemoryCompaction</code><code class="c">()</code><i class="S"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Disable the automatic memory saving.</p>
 </span></section>
-				<section class="c" id="enableAccumulator(java.util.function.BiFunction)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">enableAccumulator</code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code>E</code>, <code>E</code>, <code>E</code></code></code> <code class="parameterName">accumulator</code>)</code><i class="Q"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="enableAccumulator(java.util.function.BiFunction)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">enableAccumulator</code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code>E</code>, <code>E</code>, <code>E</code></code></code> <code class="parameterName">accumulator</code>)</code><i class="S"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code>E</code>, <code>E</code>, <code>E</code></code></code> <code>accumulator</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Enable data accumulator.</p>
 </span></section>
-				<section class="c" id="enableInterpolation(int)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">enableInterpolation</code><code class="i">(<code>int</code> <code class="parameterName">range</code>)</code><i class="Q"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="enableInterpolation(int)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">enableInterpolation</code><code class="c">(<code>int</code> <code class="parameterName">range</code>)</code><i class="S"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>int</code> <code>range</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Enable empty data interpolation.</p>
 </span></section>
-				<section class="c" id="disableAccumulator()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">disableAccumulator</code><code class="i">()</code><i class="Q"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="disableAccumulator()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">disableAccumulator</code><code class="c">()</code><i class="S"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>Chainable API.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Disable data accumulator.</p>
 </span></section>
-				<section class="c" id="size()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">size</code><code class="i">()</code><i class="Q"><code>int</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="size()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">size</code><code class="c">()</code><i class="S"><code>int</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>int</code></td>
 							<td><span><p>A positive size or zero.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Return the size of this <code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a></code>.</p>
 </span></section>
-				<section class="c" id="segmentSize()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">segmentSize</code><code class="i">()</code><i class="Q"><code>int</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="segmentSize()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">segmentSize</code><code class="c">()</code><i class="S"><code>int</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>int</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Return the size of the segments.</p>
 </span></section>
-				<section class="c" id="isEmpty()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">isEmpty</code><code class="i">()</code><i class="Q"><code>boolean</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="isEmpty()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">isEmpty</code><code class="c">()</code><i class="S"><code>boolean</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>boolean</code></td>
 							<td><span><p>Result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Check whether this <code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a></code> is empty or not.</p>
 </span></section>
-				<section class="c" id="isNotEmpty()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">isNotEmpty</code><code class="i">()</code><i class="Q"><code>boolean</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="isNotEmpty()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">isNotEmpty</code><code class="c">()</code><i class="S"><code>boolean</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>boolean</code></td>
 							<td><span><p>Result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Check whether this <code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a></code> is empty or not.</p>
 </span></section>
-				<section class="c" id="isFilled()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">isFilled</code><code class="i">()</code><i class="Q"><code>boolean</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="isFilled()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">isFilled</code><code class="c">()</code><i class="S"><code>boolean</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>boolean</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Test whether the heap are filled or not.</p>
 </span></section>
-				<section class="c" id="isPersistable()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">isPersistable</code><code class="i">()</code><i class="Q"><code>boolean</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="isPersistable()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">isPersistable</code><code class="c">()</code><i class="S"><code>boolean</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>boolean</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Test wheterh the persistence is active or not.</p>
 </span></section>
-				<section class="c" id="store(java.lang.Object)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">store</code><code class="i">(<code>E</code> <code class="parameterName">item</code>)</code><i class="Q"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="store(java.lang.Object)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">store</code><code class="c">(<code>E</code> <code class="parameterName">item</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>E</code> <code>item</code></td>
 							<td><span><p>Time series items to store.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Stores the specified time series item.</p>
 </span></section>
-				<section class="c" id="store(java.lang.Object...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">store</code><code class="i">(<code array="var">E</code> <code class="parameterName">items</code>)</code><i class="Q"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="store(java.lang.Object...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">store</code><code class="c">(<code array="var">E</code> <code class="parameterName">items</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code array="var">E</code> <code>items</code></td>
 							<td><span><p>Time series items to store.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Stores the specified time series items.</p>
 </span></section>
-				<section class="c" id="store(java.util.List)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">store</code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">items</code>)</code><i class="Q"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="store(java.util.List)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">store</code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">items</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>E</code></code></code> <code>items</code></td>
 							<td><span><p>Time series items to store.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Stores the specified time series items.</p>
 </span></section>
-				<section class="c" id="store(kiss.Signal)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">store</code><code class="i">(<code>kiss.Signal<code class="parameters"><code>E</code></code></code> <code class="parameterName">items</code>)</code><i class="Q"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="store(kiss.Signal)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">store</code><code class="c">(<code>kiss.Signal<code class="parameters"><code>E</code></code></code> <code class="parameterName">items</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>kiss.Signal<code class="parameters"><code>E</code></code></code> <code>items</code></td>
 							<td><span><p>Time series items to store.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Stores the specified time series items.</p>
 </span></section>
-				<section class="c" id="firstTime()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">firstTime</code><code class="i">()</code><i class="Q"><code>long</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="firstTime()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">firstTime</code><code class="c">()</code><i class="S"><code>long</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the date and time of the first element from all stored data, including secondary
 cache.This store without items will return -1.</p>
 </span></section>
-				<section class="c" id="lastTime()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">lastTime</code><code class="i">()</code><i class="Q"><code>long</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="lastTime()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">lastTime</code><code class="c">()</code><i class="S"><code>long</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the date and time of the last element from all stored data, including secondary cache.
 This store without items will return -1.</p>
 </span></section>
-				<section class="c" id="firstCacheTime()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">firstCacheTime</code><code class="i">()</code><i class="Q"><code>long</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="firstCacheTime()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">firstCacheTime</code><code class="c">()</code><i class="S"><code>long</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Retrieves the time of the first element from the memory cache only. This store without items
 will return -1.</p>
 </span></section>
-				<section class="c" id="lastCacheTime()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">lastCacheTime</code><code class="i">()</code><i class="Q"><code>long</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="lastCacheTime()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">lastCacheTime</code><code class="c">()</code><i class="S"><code>long</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Retrieves the time of the last element from the memory cache only. This store without items
 will return -1.</p>
 </span></section>
-				<section class="c" id="computeLogicalFirstCacheTime()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">computeLogicalFirstCacheTime</code><code class="i">()</code><i class="Q"><code>long</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="computeLogicalFirstCacheTime()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">computeLogicalFirstCacheTime</code><code class="c">()</code><i class="S"><code>long</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>long</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute the first segment time logically in the current state.</p>
 </span></section>
-				<section class="c" id="computeIdealSegmentTime()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">computeIdealSegmentTime</code><code class="i">()</code><i class="Q"><code array="fix">long</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="computeIdealSegmentTime()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">computeIdealSegmentTime</code><code class="c">()</code><i class="S"><code array="fix">long</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code array="fix">long</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Compute the first and last segment time logically in the current state.</p>
 </span></section>
-				<section class="c" id="first()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">first</code><code class="i">()</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="first()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">first</code><code class="c">()</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td><span><p>The first stored time series item.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Retrieve the first element from all stored data, including secondary cache.</p>
 </span></section>
-				<section class="c" id="last()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">last</code><code class="i">()</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="last()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">last</code><code class="c">()</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td><span><p>The last stored time series item.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Retrieve the last element from all stored data, including secondary cache.</p>
 </span></section>
-				<section class="c" id="firstCache()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">firstCache</code><code class="i">()</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="firstCache()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">firstCache</code><code class="c">()</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Retrieve the item at <code><a href="api/cointoss.util.feather.FeatherStore.html#firstCacheTime()">#firstCacheTime()</a></code>.</p>
 </span></section>
-				<section class="c" id="lastCache()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">lastCache</code><code class="i">()</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="lastCache()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">lastCache</code><code class="c">()</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Retrieve the item at <code><a href="api/cointoss.util.feather.FeatherStore.html#lastCacheTime()">#lastCacheTime()</a></code>.</p>
 </span></section>
-				<section class="c" id="at(cointoss.util.feather.Timelinable)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">at</code><code class="i">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">timestamp</code>)</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="at(cointoss.util.feather.Timelinable)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">at</code><code class="c">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">timestamp</code>)</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code>timestamp</code></td>
 							<td><span><p>A time stamp.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the item for the specified timestamp (epoch seconds).</p>
 </span></section>
-				<section class="c" id="at(java.time.ZonedDateTime)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">at</code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="at(java.time.ZonedDateTime)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">at</code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>date</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the item for the specified date.</p>
 </span></section>
-				<section class="c" id="at(long)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">at</code><code class="i">(<code>long</code> <code class="parameterName">timestamp</code>)</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="at(long)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">at</code><code class="c">(<code>long</code> <code class="parameterName">timestamp</code>)</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>long</code> <code>timestamp</code></td>
 							<td><span><p>A time stamp.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the item for the specified timestamp (epoch seconds).</p>
 </span></section>
-				<section class="c" id="before(java.lang.Object)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">before</code><code class="i">(<code>E</code> <code class="parameterName">item</code>)</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="before(java.lang.Object)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">before</code><code class="c">(<code>E</code> <code class="parameterName">item</code>)</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>E</code> <code>item</code></td>
 							<td><span><p>An indexable item.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the item just before the specified item.</p>
 </span></section>
-				<section class="c" id="before(long)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">before</code><code class="i">(<code>long</code> <code class="parameterName">timestamp</code>)</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="before(long)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">before</code><code class="c">(<code>long</code> <code class="parameterName">timestamp</code>)</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>long</code> <code>timestamp</code></td>
 							<td><span><p>A time stamp.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Get the item just before the specified timestamp (epoch seconds).</p>
 </span></section>
-				<section class="c" id="before(java.lang.Object,java.util.function.Predicate)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">before</code><code class="i">(<code>E</code> <code class="parameterName">item</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">condition</code>)</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="before(java.lang.Object,java.util.function.Predicate)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">before</code><code class="c">(<code>E</code> <code class="parameterName">item</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">condition</code>)</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>E</code> <code>item</code></td>
 							<td><span><p>An indexable item.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code>condition</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td><span><p>A matched item or null.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Get the most recent item that matches the conditions before the indexable item.</p>
 </span></section>
-				<section class="c" id="before(long,java.util.function.Predicate)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">before</code><code class="i">(<code>long</code> <code class="parameterName">timestamp</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">condition</code>)</code><i class="Q"><code>E</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="before(long,java.util.function.Predicate)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">before</code><code class="c">(<code>long</code> <code class="parameterName">timestamp</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">condition</code>)</code><i class="S"><code>E</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>long</code> <code>timestamp</code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code>condition</code></td>
 							<td></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>E</code></td>
 							<td><span><p>A matched item or null.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Get the most recent item that matches the conditions before the indexable item.</p>
 </span></section>
-				<section class="c" id="query(cointoss.util.feather.Timelinable,java.util.function.Consumer...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">query</code><code class="i">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="Q"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="query(cointoss.util.feather.Timelinable,java.util.function.Consumer...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">query</code><code class="c">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code>start</code></td>
 							<td><span><p>A starting time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code>option</code></td>
 							<td><span><p>Your options.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>kiss.Signal<code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>A result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Query items by temporal options.</p>
 </span></section>
-				<section class="c" id="query(java.time.ZonedDateTime,java.util.function.Consumer...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">query</code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="Q"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="query(java.time.ZonedDateTime,java.util.function.Consumer...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">query</code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>start</code></td>
 							<td><span><p>A starting time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code>option</code></td>
 							<td><span><p>Your options.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>kiss.Signal<code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>A result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Query items by temporal options.</p>
 </span></section>
-				<section class="c" id="query(long,java.util.function.Consumer...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">query</code><code class="i">(<code>long</code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="Q"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="query(long,java.util.function.Consumer...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">query</code><code class="c">(<code>long</code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>long</code> <code>start</code></td>
 							<td><span><p>A starting time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code>option</code></td>
 							<td><span><p>Your options.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>kiss.Signal<code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>A result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Query items by temporal options.</p>
 </span></section>
-				<section class="c" id="query(cointoss.util.feather.Timelinable,cointoss.util.feather.Timelinable,java.util.function.Consumer...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">query</code><code class="i">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">start</code>, <code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="Q"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="query(cointoss.util.feather.Timelinable,cointoss.util.feather.Timelinable,java.util.function.Consumer...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">query</code><code class="c">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">start</code>, <code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code>start</code></td>
 							<td><span><p>A starting time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code>end</code></td>
 							<td><span><p>A ending time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code>option</code></td>
 							<td><span><p>Your options.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>kiss.Signal<code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>A result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Query items by temporal options.</p>
 </span></section>
-				<section class="c" id="query(java.time.ZonedDateTime,java.time.ZonedDateTime,java.util.function.Consumer...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">query</code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="Q"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="query(java.time.ZonedDateTime,java.time.ZonedDateTime,java.util.function.Consumer...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">query</code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>start</code></td>
 							<td><span><p>A starting time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code>end</code></td>
 							<td><span><p>A ending time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code>option</code></td>
 							<td><span><p>Your options.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>kiss.Signal<code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>A result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Query items by temporal options.</p>
 </span></section>
-				<section class="c" id="query(long,long,java.util.function.Consumer...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">query</code><code class="i">(<code>long</code> <code class="parameterName">start</code>, <code>long</code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="Q"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="query(long,long,java.util.function.Consumer...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">query</code><code class="c">(<code>long</code> <code class="parameterName">start</code>, <code>long</code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>long</code> <code>start</code></td>
 							<td><span><p>A starting time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code>long</code> <code>end</code></td>
 							<td><span><p>A ending time.</p>
 </span></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code>option</code></td>
 							<td><span><p>Your options.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>kiss.Signal<code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>A result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Query items by temporal options.</p>
 </span></section>
-				<section class="c" id="queryLatest(java.util.function.Consumer...)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">queryLatest</code><code class="i">(<code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="Q"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="queryLatest(java.util.function.Consumer...)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">queryLatest</code><code class="c">(<code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code>option</code></td>
 							<td><span><p>Your options.</p>
 </span></td>
 						</tr>
-						<tr class="N">
+						<tr class="Z">
 							<td><code>kiss.Signal<code class="parameters"><code>E</code></code></code></td>
 							<td><span><p>A result.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Query the latest items with temporal options.</p>
 </span></section>
-				<section class="c" id="merge(cointoss.util.feather.FeatherStore)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">merge</code><code class="i">(<code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">other</code>)</code><i class="Q"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="merge(cointoss.util.feather.FeatherStore)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">merge</code><code class="c">(<code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">other</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code> <code>other</code></td>
 							<td><span><p>Time series store.</p>
 </span></td>
 						</tr>
 					</table><span class="B"><p>Import time series items from other store.</p>
 </span></section>
-				<section class="c" id="clear()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">clear</code><code class="i">()</code><i class="Q"><code>void</code></i></h2><span class="B"><p>Clear all items from heap.</p>
+				<section class="K" id="clear()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">clear</code><code class="c">()</code><i class="S"><code>void</code></i></h2><span class="B"><p>Clear all items from heap.</p>
 </span></section>
-				<section class="c" id="commit()">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">commit</code><code class="i">()</code><i class="Q"><code>void</code></i></h2><span class="B"><p>Forcibly saves all data that currently exists on the heap to disk immediately. All data on
+				<section class="K" id="commit()">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">commit</code><code class="c">()</code><i class="S"><code>void</code></i></h2><span class="B"><p>Forcibly saves all data that currently exists on the heap to disk immediately. All data on
 disk will be overwritten. If the disk store is not enabled, nothing will happen.</p>
 </span></section>
-				<section class="c" id="restore(long,long)">
-					<h2 class="U"><i class="PUBLIC"></i><code class="O">restore</code><code class="i">(<code>long</code> <code class="parameterName">start</code>, <code>long</code> <code class="parameterName">end</code>)</code><i class="Q"><code>void</code></i></h2>
-					<table class="R">
-						<tr class="Z">
+				<section class="K" id="restore(long,long)">
+					<h2 class="X"><i class="PUBLIC"></i><code class="Y">restore</code><code class="c">(<code>long</code> <code class="parameterName">start</code>, <code>long</code> <code class="parameterName">end</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="O">
+						<tr class="V">
 							<td><code>long</code> <code>start</code></td>
 							<td></td>
 						</tr>
-						<tr class="Z">
+						<tr class="V">
 							<td><code>long</code> <code>end</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Restore data from disk.</p>
 </span></section>
-				<section class="c" id="toString()">
-					<h2 class="U"><i class="OVERRIDE PUBLIC"></i><code class="O">toString</code><code class="i">()</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="R">
-						<tr class="N">
+				<section class="K" id="toString()">
+					<h2 class="X"><i class="OVERRIDE PUBLIC"></i><code class="Y">toString</code><code class="c">()</code><i class="S"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="O">
+						<tr class="Z">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
 			</article>
-			<aside class="H" id="SubNavi">
-				<div class="X">
-					<h5 class="m">Static Methods</h5>
+			<aside class="I" id="SubNavi">
+				<div class="i">
+					<h5 class="R">Static Methods</h5>
 					<ul>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#create(java.lang.Class,cointoss.ticker.Span)">create</a></code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">type</code>, <code><a href="api/cointoss.ticker.Span.html">Span</a></code> <code class="parameterName">span</code>)</code><i class="V"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#create(java.lang.Class,long,int,int)">create</a></code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">type</code>, <code>long</code> <code class="parameterName">itemDuration</code>, <code>int</code> <code class="parameterName">itemSize</code>, <code>int</code> <code class="parameterName">segmentSize</code>)</code><i class="V"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#create(java.lang.Class,cointoss.ticker.Span)">create</a></code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">type</code>, <code><a href="api/cointoss.ticker.Span.html">Span</a></code> <code class="parameterName">span</code>)</code><i class="g"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#create(java.lang.Class,long,int,int)">create</a></code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Class.html">Class</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">type</code>, <code>long</code> <code class="parameterName">itemDuration</code>, <code>int</code> <code class="parameterName">itemSize</code>, <code>int</code> <code class="parameterName">segmentSize</code>)</code><i class="g"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
 					</ul>
-					<h5 class="m">Methods</h5>
+					<h5 class="R">Methods</h5>
 					<ul>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#vandalize()">vandalize</a></code><code class="i">()</code><i class="V"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#enablePersistence(java.lang.Object...)">enablePersistence</a></code><code class="i">(<code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">qualifers</code>)</code><i class="V"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="SYNCHRONIZED"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.FeatherStore.html#enablePersistence(cointoss.util.JobType,cointoss.MarketService,java.lang.Object...)">enablePersistence</a></code><code class="i">(<code><a href="api/cointoss.util.JobType.html">JobType</a></code> <code class="parameterName">autoCommitJob</code>, <code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">qualifers</code>)</code><i class="V"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="SYNCHRONIZED"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.FeatherStore.html#disableMemoryCompaction()">disableMemoryCompaction</a></code><code class="i">()</code><i class="V"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#enableAccumulator(java.util.function.BiFunction)">enableAccumulator</a></code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code>E</code>, <code>E</code>, <code>E</code></code></code> <code class="parameterName">accumulator</code>)</code><i class="V"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#enableInterpolation(int)">enableInterpolation</a></code><code class="i">(<code>int</code> <code class="parameterName">range</code>)</code><i class="V"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#disableAccumulator()">disableAccumulator</a></code><code class="i">()</code><i class="V"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#size()">size</a></code><code class="i">()</code><i class="V"><code>int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#segmentSize()">segmentSize</a></code><code class="i">()</code><i class="V"><code>int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#isEmpty()">isEmpty</a></code><code class="i">()</code><i class="V"><code>boolean</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#isNotEmpty()">isNotEmpty</a></code><code class="i">()</code><i class="V"><code>boolean</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#isFilled()">isFilled</a></code><code class="i">()</code><i class="V"><code>boolean</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#isPersistable()">isPersistable</a></code><code class="i">()</code><i class="V"><code>boolean</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#store(java.lang.Object)">store</a></code><code class="i">(<code>E</code> <code class="parameterName">item</code>)</code><i class="V"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#store(java.lang.Object...)">store</a></code><code class="i">(<code array="var">E</code> <code class="parameterName">items</code>)</code><i class="V"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#store(java.util.List)">store</a></code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">items</code>)</code><i class="V"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#store(kiss.Signal)">store</a></code><code class="i">(<code>kiss.Signal<code class="parameters"><code>E</code></code></code> <code class="parameterName">items</code>)</code><i class="V"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#firstTime()">firstTime</a></code><code class="i">()</code><i class="V"><code>long</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#lastTime()">lastTime</a></code><code class="i">()</code><i class="V"><code>long</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#firstCacheTime()">firstCacheTime</a></code><code class="i">()</code><i class="V"><code>long</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#lastCacheTime()">lastCacheTime</a></code><code class="i">()</code><i class="V"><code>long</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#computeLogicalFirstCacheTime()">computeLogicalFirstCacheTime</a></code><code class="i">()</code><i class="V"><code>long</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#computeIdealSegmentTime()">computeIdealSegmentTime</a></code><code class="i">()</code><i class="V"><code array="fix">long</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#first()">first</a></code><code class="i">()</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#last()">last</a></code><code class="i">()</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#firstCache()">firstCache</a></code><code class="i">()</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#lastCache()">lastCache</a></code><code class="i">()</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#at(cointoss.util.feather.Timelinable)">at</a></code><code class="i">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">timestamp</code>)</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#at(java.time.ZonedDateTime)">at</a></code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#at(long)">at</a></code><code class="i">(<code>long</code> <code class="parameterName">timestamp</code>)</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#before(java.lang.Object)">before</a></code><code class="i">(<code>E</code> <code class="parameterName">item</code>)</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#before(long)">before</a></code><code class="i">(<code>long</code> <code class="parameterName">timestamp</code>)</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#before(java.lang.Object,java.util.function.Predicate)">before</a></code><code class="i">(<code>E</code> <code class="parameterName">item</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">condition</code>)</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#before(long,java.util.function.Predicate)">before</a></code><code class="i">(<code>long</code> <code class="parameterName">timestamp</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">condition</code>)</code><i class="V"><code>E</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(cointoss.util.feather.Timelinable,java.util.function.Consumer...)">query</a></code><code class="i">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="V"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(java.time.ZonedDateTime,java.util.function.Consumer...)">query</a></code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="V"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(long,java.util.function.Consumer...)">query</a></code><code class="i">(<code>long</code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="V"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(cointoss.util.feather.Timelinable,cointoss.util.feather.Timelinable,java.util.function.Consumer...)">query</a></code><code class="i">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">start</code>, <code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="V"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(java.time.ZonedDateTime,java.time.ZonedDateTime,java.util.function.Consumer...)">query</a></code><code class="i">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="V"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(long,long,java.util.function.Consumer...)">query</a></code><code class="i">(<code>long</code> <code class="parameterName">start</code>, <code>long</code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="V"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#queryLatest(java.util.function.Consumer...)">queryLatest</a></code><code class="i">(<code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="V"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#merge(cointoss.util.feather.FeatherStore)">merge</a></code><code class="i">(<code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">other</code>)</code><i class="V"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#clear()">clear</a></code><code class="i">()</code><i class="V"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#commit()">commit</a></code><code class="i">()</code><i class="V"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#restore(long,long)">restore</a></code><code class="i">(<code>long</code> <code class="parameterName">start</code>, <code>long</code> <code class="parameterName">end</code>)</code><i class="V"><code>void</code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#toString()">toString</a></code><code class="i">()</code><i class="V"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#vandalize()">vandalize</a></code><code class="c">()</code><i class="g"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#enablePersistence(java.lang.Object...)">enablePersistence</a></code><code class="c">(<code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">qualifers</code>)</code><i class="g"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="SYNCHRONIZED"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.FeatherStore.html#enablePersistence(cointoss.util.JobType,cointoss.MarketService,java.lang.Object...)">enablePersistence</a></code><code class="c">(<code><a href="api/cointoss.util.JobType.html">JobType</a></code> <code class="parameterName">autoCommitJob</code>, <code><a href="api/cointoss.MarketService.html">MarketService</a></code> <code class="parameterName">service</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code> <code class="parameterName">qualifers</code>)</code><i class="g"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="SYNCHRONIZED"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.feather.FeatherStore.html#disableMemoryCompaction()">disableMemoryCompaction</a></code><code class="c">()</code><i class="g"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#enableAccumulator(java.util.function.BiFunction)">enableAccumulator</a></code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code>E</code>, <code>E</code>, <code>E</code></code></code> <code class="parameterName">accumulator</code>)</code><i class="g"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#enableInterpolation(int)">enableInterpolation</a></code><code class="c">(<code>int</code> <code class="parameterName">range</code>)</code><i class="g"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#disableAccumulator()">disableAccumulator</a></code><code class="c">()</code><i class="g"><code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#size()">size</a></code><code class="c">()</code><i class="g"><code>int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#segmentSize()">segmentSize</a></code><code class="c">()</code><i class="g"><code>int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#isEmpty()">isEmpty</a></code><code class="c">()</code><i class="g"><code>boolean</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#isNotEmpty()">isNotEmpty</a></code><code class="c">()</code><i class="g"><code>boolean</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#isFilled()">isFilled</a></code><code class="c">()</code><i class="g"><code>boolean</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#isPersistable()">isPersistable</a></code><code class="c">()</code><i class="g"><code>boolean</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#store(java.lang.Object)">store</a></code><code class="c">(<code>E</code> <code class="parameterName">item</code>)</code><i class="g"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#store(java.lang.Object...)">store</a></code><code class="c">(<code array="var">E</code> <code class="parameterName">items</code>)</code><i class="g"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#store(java.util.List)">store</a></code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">items</code>)</code><i class="g"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#store(kiss.Signal)">store</a></code><code class="c">(<code>kiss.Signal<code class="parameters"><code>E</code></code></code> <code class="parameterName">items</code>)</code><i class="g"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#firstTime()">firstTime</a></code><code class="c">()</code><i class="g"><code>long</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#lastTime()">lastTime</a></code><code class="c">()</code><i class="g"><code>long</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#firstCacheTime()">firstCacheTime</a></code><code class="c">()</code><i class="g"><code>long</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#lastCacheTime()">lastCacheTime</a></code><code class="c">()</code><i class="g"><code>long</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#computeLogicalFirstCacheTime()">computeLogicalFirstCacheTime</a></code><code class="c">()</code><i class="g"><code>long</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#computeIdealSegmentTime()">computeIdealSegmentTime</a></code><code class="c">()</code><i class="g"><code array="fix">long</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#first()">first</a></code><code class="c">()</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#last()">last</a></code><code class="c">()</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#firstCache()">firstCache</a></code><code class="c">()</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#lastCache()">lastCache</a></code><code class="c">()</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#at(cointoss.util.feather.Timelinable)">at</a></code><code class="c">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">timestamp</code>)</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#at(java.time.ZonedDateTime)">at</a></code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">date</code>)</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#at(long)">at</a></code><code class="c">(<code>long</code> <code class="parameterName">timestamp</code>)</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#before(java.lang.Object)">before</a></code><code class="c">(<code>E</code> <code class="parameterName">item</code>)</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#before(long)">before</a></code><code class="c">(<code>long</code> <code class="parameterName">timestamp</code>)</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#before(java.lang.Object,java.util.function.Predicate)">before</a></code><code class="c">(<code>E</code> <code class="parameterName">item</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">condition</code>)</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#before(long,java.util.function.Predicate)">before</a></code><code class="c">(<code>long</code> <code class="parameterName">timestamp</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Predicate.html">Predicate</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">condition</code>)</code><i class="g"><code>E</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(cointoss.util.feather.Timelinable,java.util.function.Consumer...)">query</a></code><code class="c">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="g"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(java.time.ZonedDateTime,java.util.function.Consumer...)">query</a></code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="g"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(long,java.util.function.Consumer...)">query</a></code><code class="c">(<code>long</code> <code class="parameterName">start</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="g"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(cointoss.util.feather.Timelinable,cointoss.util.feather.Timelinable,java.util.function.Consumer...)">query</a></code><code class="c">(<code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">start</code>, <code><a href="api/cointoss.util.feather.Timelinable.html">Timelinable</a></code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="g"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(java.time.ZonedDateTime,java.time.ZonedDateTime,java.util.function.Consumer...)">query</a></code><code class="c">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">start</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="g"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#query(long,long,java.util.function.Consumer...)">query</a></code><code class="c">(<code>long</code> <code class="parameterName">start</code>, <code>long</code> <code class="parameterName">end</code>, <code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="g"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#queryLatest(java.util.function.Consumer...)">queryLatest</a></code><code class="c">(<code array="var"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Consumer.html">Consumer</a><code class="parameters"><code><a href="api/cointoss.util.feather.Option.html">Option</a></code></code></code> <code class="parameterName">option</code>)</code><i class="g"><code>kiss.Signal<code class="parameters"><code>E</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#merge(cointoss.util.feather.FeatherStore)">merge</a></code><code class="c">(<code><a href="api/cointoss.util.feather.FeatherStore.html">FeatherStore</a><code class="parameters"><code>E</code></code></code> <code class="parameterName">other</code>)</code><i class="g"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#clear()">clear</a></code><code class="c">()</code><i class="g"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#commit()">commit</a></code><code class="c">()</code><i class="g"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#restore(long,long)">restore</a></code><code class="c">(<code>long</code> <code class="parameterName">start</code>, <code>long</code> <code class="parameterName">end</code>)</code><i class="g"><code>void</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.util.feather.FeatherStore.html#toString()">toString</a></code><code class="c">()</code><i class="g"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
 					</ul>
 				</div>
 			</aside>
