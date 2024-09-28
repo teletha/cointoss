@@ -206,8 +206,8 @@ public class CoincheckService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public boolean supportRecentExecutionOnly() {
-        return true;
+    public boolean supportStableExecutionQuery() {
+        return false;
     }
 
     /**

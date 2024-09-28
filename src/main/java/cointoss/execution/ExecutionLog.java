@@ -195,7 +195,7 @@ public class ExecutionLog {
 
             if (e.mills < cache.startTime || cache.endTime <= e.mills) {
                 cache.disableAutoSave();
-                cache.convertNormalToCompact(true);
+                if (service.supportStableExecutionQuery()) cache.convertNormalToCompact(true);
                 cache = new Cache(e.date).enableAutoSave();
             }
             cache.queue.add(e);

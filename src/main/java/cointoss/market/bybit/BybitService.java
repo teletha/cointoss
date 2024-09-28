@@ -261,7 +261,15 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public boolean supportRecentExecutionOnly() {
+    public boolean supportStableExecutionQuery() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean supportExternalLogHouse() {
         return true;
     }
 

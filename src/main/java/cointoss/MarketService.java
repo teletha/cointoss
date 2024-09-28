@@ -206,7 +206,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                             }
 
                             long latestId = rests.peekLast().id;
-                            if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId || supportRecentExecutionOnly()) {
+                            if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId || !supportStableExecutionQuery()) {
                                 // REST API has caught up with the real-time API,
                                 // we must switch to realtime API.
                                 buffer.switchToRealtime(latestId, observer);
@@ -234,7 +234,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                         }
                     } else {
                         // REST API returns empty execution
-                        if (startId < buffer.realtimeFirstId() && !supportRecentExecutionOnly()) {
+                        if (startId < buffer.realtimeFirstId() && supportStableExecutionQuery()) {
                             // Although there is no data in the current search range,
                             // since it has not yet reached the latest execution,
                             // shift the range backward and search again.
@@ -753,16 +753,27 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     }
 
     /**
-     * Indicates whether the trade record that can be retrieved is the most recent one only.
+     * Check for support of retriving execution history over time, which is capable of building
+     * execution history.
      * 
      * @return
      */
-    public boolean supportRecentExecutionOnly() {
+    public boolean supportStableExecutionQuery() {
+        return true;
+    }
+
+    /**
+     * Check for support of external log repositories, which is capable of building execution
+     * history.
+     * 
+     * @return
+     */
+    public boolean supportExternalLogHouse() {
         return false;
     }
 
     /**
-     * Checking support for the realtime orderbook fixing. The specific API does not tell you the
+     * Check for support for of realtime orderbook fixing. The specific API does not tell you the
      * information that the quantity has reached zero, so you should erase any existing data that is
      * within the range of the retrieved data.
      * 

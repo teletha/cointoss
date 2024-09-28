@@ -193,6 +193,14 @@ public class BitbankService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean supportExternalLogHouse() {
+        return true;
+    }
+
+    /**
      * 
      */
     static class Topic extends IdentifiableTopic<Topic> {
