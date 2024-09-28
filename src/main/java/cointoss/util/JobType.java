@@ -29,9 +29,7 @@ import kiss.WiseConsumer;
 
 public enum JobType {
 
-    ExecutionLogWriter(1, 3, "Saved execution log"),
-
-    TickerGeneration(0, 0, "Generate ticker");
+    ExecutionLogWriter(1, 3, "Saved execution log");
 
     /** NOOP TASK */
     public static final ScheduledFuture<Object> NOOP = new ScheduledFuture<Object>() {

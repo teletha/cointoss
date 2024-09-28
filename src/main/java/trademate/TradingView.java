@@ -9,6 +9,8 @@
  */
 package trademate;
 
+import java.time.ZonedDateTime;
+
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
@@ -27,7 +29,6 @@ import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
 import viewtify.ui.toast.Toast;
-import viewtify.ui.toast.Toast.Monitor;
 
 public class TradingView extends View {
 
@@ -113,15 +114,16 @@ public class TradingView extends View {
      */
     public void buildTicker(DateRange range, boolean forceRebuild, boolean forceRebuildLog) {
         Job.TickerGenerator.run(service.exchange, job -> {
-            Monitor monitor = Monitor.title(en("Build ticker from historical log."))
+            Toast<ZonedDateTime> toast = Toast.<ZonedDateTime> title(en("Build ticker from historical log."))
                     .totalProgress(range.countDays() + 1)
-                    .whenCompleted(chart.chart::layoutForcely);
+                    .whenCompleted(chart.chart::layoutForcely)
+                    .whenProgressed((m, date) -> {
+                        String text = service + " [" + date.toLocalDate() + "]";
+                        I.debug("Build ticker on " + text);
+                        m.message(text).setProgress(range.countDaysFrom(date));
+                    });
 
-            Toast.show(monitor, market.tickers.build(range, forceRebuild, forceRebuildLog)).to(date -> {
-                String text = service + " [" + date.toLocalDate() + "]";
-                I.debug("Build ticker on " + text);
-                monitor.message(text).setProgress(range.countDaysFrom(date));
-            });
+            market.tickers.build(range, forceRebuild, forceRebuildLog).plug(toast).to(I.NoOP);
         });
     }
 

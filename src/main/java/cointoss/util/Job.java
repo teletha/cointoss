@@ -25,8 +25,6 @@ public class Job {
         return schedulers.computeIfAbsent(key, Job::new);
     }
 
-    public static final Job ExecutionWriter = by("ExecutionWriter");
-
     public static final Job TickerGenerator = by("TickerGenerator");
 
     private final ScheduledExecutorService service;

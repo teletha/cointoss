@@ -44,11 +44,6 @@ public class Coordinator {
         });
     }
 
-    public static void invokeOnFinish(MarketService service, WiseRunnable finisher) {
-        List<WiseRunnable> list = finishers.computeIfAbsent(service, key -> new ArrayList());
-        list.add(finisher);
-    }
-
     /** The waiting list. */
     private final LinkedList<Ⅱ<MarketService, WiseConsumer<Runnable>>> tasks = new LinkedList();
 
