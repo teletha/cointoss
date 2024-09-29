@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.LogType;
-import cointoss.util.Coordinator;
 import cointoss.util.DateRange;
 import cointoss.util.Mediator;
 import kiss.I;
@@ -88,15 +87,14 @@ public class TradingView extends View {
         Viewtify.observing(tab.selectedProperty()).to(chart.showRealtimeUpdate::set);
 
         chart.showRealtimeUpdate.set(false);
-        Coordinator.request(service, next -> {
-            market.readLog(x -> x.fromLast(3, LogType.Fast).subscribeOn(Viewtify.WorkerThread).concat(service.executions()));
+
+        Mediator.ExecutionCollector.schedule(service, () -> {
+            market.readLog(x -> x.fromLast(3, LogType.Fast).concat(service.executions()));
             buildTicker(false);
 
             chart.market.set(market);
             chart.showRealtimeUpdate.set(tab.isSelected());
             chart.ticker.observing().to(ticker -> chart.chart.layoutForcely());
-
-            next.run();
         });
 
         UserActionHelper.of(ui()).when(User.DoubleClick, () -> OrderView.ActiveMarket.set(market));
