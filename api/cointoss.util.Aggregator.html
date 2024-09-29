@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="m">
+		<header class="T">
+			<h1 class="Q" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="l"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="L" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="H">
+			<nav class="R">
+				<div></div>
+			</nav>
+			<article class="b" id="Article">
+				<section class="P"><code class="I">cointoss.util</code>
+					<h2 class="Class g"><code class="h">Aggregator</code><code class="M">&#60;<code>C</code>&#62;</code></h2>
+					<div class="e">
+						<ul class="C D">
+							<li><code>C</code></li>
+						</ul>
+					</div>
+				</section>
+				<section class="P" id="Aggregator(java.util.function.Function,java.util.function.Function,java.util.function.BiConsumer)">
+					<h2 class="f"><i class="PUBLIC"></i><code class="h">Aggregator</code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>C</code>, <code>K</code></code></code> <code class="parameterName">keySelector</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>C</code>, <code>V</code></code></code> <code class="parameterName">valueSelector</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiConsumer.html">BiConsumer</a><code class="parameters"><code>K</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Collection.html">Collection</a><code class="parameters"><code>V</code></code></code></code></code> <code class="parameterName">builder</code>)</code></h2>
+					<table class="c">
+						<tr class="W">
+							<td><code>K</code><code class="extends"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Comparable.html">Comparable</a></code></code></td>
+							<td></td>
+						</tr>
+						<tr class="W">
+							<td><code>V</code><code class="extends"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Comparable.html">Comparable</a></code></code></td>
+							<td></td>
+						</tr>
+						<tr class="Y">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>C</code>, <code>K</code></code></code> <code>keySelector</code></td>
+							<td></td>
+						</tr>
+						<tr class="Y">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>C</code>, <code>V</code></code></code> <code>valueSelector</code></td>
+							<td></td>
+						</tr>
+						<tr class="Y">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiConsumer.html">BiConsumer</a><code class="parameters"><code>K</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Collection.html">Collection</a><code class="parameters"><code>V</code></code></code></code></code> <code>builder</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Build aggregator with time-based sliding windoww.</p>
+</span></section>
+				<section class="P" id="commit(java.lang.Object)">
+					<h2 class="f"><i class="PUBLIC"></i><code class="h">commit</code><code class="M">(<code>C</code> <code class="parameterName">value</code>)</code><i class="K"><code>void</code></i></h2>
+					<table class="c">
+						<tr class="Y">
+							<td><code>C</code> <code>value</code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Send your message to aggregator.</p>
+</span></section>
+			</article>
+			<aside class="Z" id="SubNavi">
+				<div class="k">
+					<h5 class="i">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Aggregator.html#Aggregator(java.util.function.Function,java.util.function.Function,java.util.function.BiConsumer)">Aggregator</a></code><code class="M">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>C</code>, <code>K</code></code></code> <code class="parameterName">keySelector</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code>C</code>, <code>V</code></code></code> <code class="parameterName">valueSelector</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiConsumer.html">BiConsumer</a><code class="parameters"><code>K</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Collection.html">Collection</a><code class="parameters"><code>V</code></code></code></code></code> <code class="parameterName">builder</code>)</code></li>
+					</ul>
+					<h5 class="i">Methods</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Aggregator.html#commit(java.lang.Object)">commit</a></code><code class="M">(<code>C</code> <code class="parameterName">value</code>)</code><i class="a"><code>void</code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

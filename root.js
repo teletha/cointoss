@@ -132,6 +132,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Aggregator",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Analyzer",
 			"packageName": "cointoss.analyze",
 			"type": "Functional"
@@ -804,27 +811,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Job",
-			"packageName": "cointoss.util",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "JobProcess",
-			"packageName": "cointoss.util",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "JobType",
-			"packageName": "cointoss.util",
-			"type": "Enum"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Latency",
 			"packageName": "cointoss.verify",
 			"type": "Interface"
@@ -1016,6 +1002,34 @@ const root = {
 				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "MatchingEngine",
 			"packageName": "cointoss.verify",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Mediator",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Mediator.TaskType",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Mediator.WithContext",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Mediator.WithoutContext",
+			"packageName": "cointoss.util",
 			"type": "Class"
 		},
 		{
