@@ -16,7 +16,7 @@ import cointoss.MarketService;
 import cointoss.execution.LogType;
 import cointoss.util.Coordinator;
 import cointoss.util.DateRange;
-import cointoss.util.Job;
+import cointoss.util.Mediator;
 import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -113,17 +113,16 @@ public class TradingView extends View {
      * Build ticker.
      */
     public void buildTicker(DateRange range, boolean forceRebuild, boolean forceRebuildLog) {
-        Job.TickerGenerator.run(service.exchange, job -> {
-            Toast<ZonedDateTime> toast = Toast.<ZonedDateTime> title(en("Build ticker from historical log."))
+        Mediator.TickerGenerator.schedule(() -> {
+            Toast.<ZonedDateTime> title(en("Build ticker from historical log."))
                     .totalProgress(range.countDays() + 1)
                     .whenCompleted(chart.chart::layoutForcely)
                     .whenProgressed((m, date) -> {
                         String text = service + " [" + date.toLocalDate() + "]";
                         I.debug("Build ticker on " + text);
                         m.message(text).setProgress(range.countDaysFrom(date));
-                    });
-
-            market.tickers.build(range, forceRebuild, forceRebuildLog).plug(toast).to(I.NoOP);
+                    })
+                    .show(market.tickers.build(range, forceRebuild, forceRebuildLog));
         });
     }
 

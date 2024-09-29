@@ -21,9 +21,7 @@ import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import cointoss.MarketService;
 import cointoss.ticker.Span;
-import cointoss.util.JobType;
 import kiss.Disposable;
 import kiss.Model;
 import kiss.Signal;
@@ -78,9 +76,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
     /** The disk store. */
     private RDB<E> db;
 
-    /** The auto commit job. */
-    private JobType auto;
-
     private Holder<Variable<Long>> firstDisk;
 
     private Holder<Variable<Long>> lastDisk;
@@ -132,26 +127,10 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * 
      * @return Chainable API.
      */
-    public FeatherStore<E> enablePersistence(Object... qualifers) {
-        return enablePersistence((JobType) null, (MarketService) null, qualifers);
-    }
-
-    /**
-     * Enable the transparent disk persistence.
-     * 
-     * @return Chainable API.
-     */
-    public synchronized FeatherStore<E> enablePersistence(JobType autoCommitJob, MarketService service, Object... qualifers) {
+    public synchronized FeatherStore<E> enablePersistence(Object... qualifers) {
         db = RDB.of(model.type, qualifers);
         firstDisk = new Holder(() -> db.min(E::getId), db::lastModified, 0);
         lastDisk = new Holder(() -> db.max(E::getId), db::lastModified, 0);
-
-        if (autoCommitJob != null) {
-            auto = autoCommitJob;
-            auto.schedule(service, process -> {
-                commit();
-            });
-        }
         return this;
     }
 

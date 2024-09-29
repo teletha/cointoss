@@ -44,8 +44,9 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.ticker.TickerBuilder;
+import cointoss.util.Aggregator;
 import cointoss.util.Chrono;
-import cointoss.util.JobType;
+import cointoss.util.Mediator;
 import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
@@ -57,6 +58,11 @@ import psychopath.File;
  * {@link Execution} Log Manager.
  */
 public class ExecutionLog {
+
+    /** The log aggregator. */
+    private static final Aggregator<MarketService> log = new Aggregator<>(m -> m.exchange, m -> m.marketName, (key, values) -> {
+        I.info("Saved execution log  for " + values.size() + " markets in " + key + ". " + values);
+    });
 
     /** The market provider. */
     public final MarketService service;
@@ -291,7 +297,7 @@ public class ExecutionLog {
         final File normal;
 
         /** The log writing task. */
-        private ScheduledFuture task = JobType.NOOP;
+        private ScheduledFuture task;
 
         /** The writing execution queue. */
         private LinkedList<Execution> queue = new LinkedList();
@@ -392,9 +398,10 @@ public class ExecutionLog {
          * @return Chainable API
          */
         private Cache enableAutoSave() {
-            if (task == JobType.NOOP) {
-                task = JobType.ExecutionLogWriter.schedule(service, process -> {
+            if (task == null) {
+                task = Mediator.ExecutionWriter.schedule(1000 * 60, 1000 * 60 * 3, () -> {
                     write();
+                    log.commit(service);
                 });
             }
             return this;
@@ -406,9 +413,9 @@ public class ExecutionLog {
          * @return
          */
         private Cache disableAutoSave() {
-            if (task != JobType.NOOP) {
+            if (task != null) {
                 task.cancel(false);
-                task = JobType.NOOP;
+                task = null;
                 write();
             }
             return this;

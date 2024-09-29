@@ -11,14 +11,12 @@ package cointoss.util;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cointoss.MarketService;
 import cointoss.market.Exchange;
 import kiss.I;
 import kiss.WiseConsumer;
-import kiss.WiseRunnable;
 import kiss.Ⅱ;
 import trademate.TradeMate;
 import viewtify.Viewtify;
@@ -27,8 +25,6 @@ public class Coordinator {
 
     /** The waiting queue for each keys. */
     private static final ConcurrentHashMap<Exchange, Coordinator> coordinators = new ConcurrentHashMap();
-
-    private static final ConcurrentHashMap<MarketService, List<WiseRunnable>> finishers = new ConcurrentHashMap();
 
     /**
      * Register the specified market in the loading queue.
@@ -64,11 +60,6 @@ public class Coordinator {
         if (processing == null && !tasks.isEmpty()) {
             processing = tasks.remove(0);
             processing.ⅱ.accept(() -> {
-                List<WiseRunnable> list = finishers.get(processing.ⅰ);
-                if (list != null) {
-                    list.forEach(WiseRunnable::run);
-                    finishers.remove(processing.ⅰ);
-                }
                 processing = null;
                 tryProcess();
             });
