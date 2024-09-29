@@ -685,7 +685,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
             if (forward) {
                 for (long time = segmentStart; time <= segmentEnd && 0 < remaining && !disposer.isDisposed(); time += segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0, actualStart);
+                    OnHeap<E> heap = loadSegment(true, time, 0, Math.max(actualStart, time));
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -694,7 +694,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                 }
             } else {
                 for (long time = segmentEnd; segmentStart <= time && 0 < remaining && !disposer.isDisposed(); time -= segmentDuration) {
-                    OnHeap<E> heap = loadSegment(true, time, 0, actualEnd);
+                    OnHeap<E> heap = loadSegment(true, time, 0, Math.min(actualEnd, time));
                     if (heap != null) {
                         int open = heap.startTime == segmentStart ? (int) startIndex[1] : 0;
                         int close = heap.startTime == segmentEnd ? (int) endIndex[1] : itemSize;
@@ -753,7 +753,12 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      * Load data on the specified segment from DB.
      */
     private OnHeap<E> loadData(OnHeap<E> heap, boolean idealSafe, long timestamp) {
-        if (db != null && (!idealSafe || computeLogicalFirstCacheTime() <= heap.startTime)) {
+        long firstDisk = computeFirstDiskTime();
+        if (firstDisk == FIRST_INIT) {
+            return heap;
+        }
+
+        if (db != null && firstDisk <= timestamp && (!idealSafe || computeLogicalFirstCacheTime() <= heap.startTime)) {
             db.findBy(E::getId, x -> x.isOrMoreThan(heap.startTime).isLessThan(heap.startTime + itemSize * itemDuration)).to(item -> {
                 long[] index = index(item.seconds());
                 heap.set((int) index[1], item);

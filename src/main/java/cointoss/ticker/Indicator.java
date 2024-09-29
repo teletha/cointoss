@@ -68,11 +68,6 @@ public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
     public static <T> Indicator<T> build(Ticker ticker, Function<Tick, T> calculator) {
         Objects.requireNonNull(calculator);
 
-        Function<Tick, Tick> normalizer = tick -> {
-            Tick rounded = ticker.ticks.at(tick.openTime);
-            return rounded == null ? ticker.ticks.firstCache() : rounded;
-        };
-
         return new Indicator<>(ticker) {
 
             @Override
