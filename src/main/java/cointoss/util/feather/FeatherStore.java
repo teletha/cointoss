@@ -129,8 +129,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public synchronized FeatherStore<E> enablePersistence(Object... qualifers) {
         db = RDB.of(model.type, qualifers);
-        firstDisk = new Holder(() -> db.min(E::getId), db::lastModified, 0);
-        lastDisk = new Holder(() -> db.max(E::getId), db::lastModified, 0);
+        firstDisk = new Holder(() -> db.min(E::getId), db::stamp, 0);
+        lastDisk = new Holder(() -> db.max(E::getId), db::stamp, 0);
         return this;
     }
 
