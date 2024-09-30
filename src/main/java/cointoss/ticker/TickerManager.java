@@ -255,7 +255,7 @@ public class TickerManager implements Disposable {
      * @return
      */
     public Signal<ZonedDateTime> build(DateRange range, boolean forceRebuild, boolean forceRebuildLog) {
-        range = range.min(service.log.firstCacheDate()).max(service.log.lastCacheDate()).maxByFuture(-1);
+        range = range.min(service.log.firstCacheDate()).max(service.log.lastCacheDate()).maxByFuture(0);
 
         Signal<ZonedDateTime> process = I.signal();
         if (forceRebuild) {
