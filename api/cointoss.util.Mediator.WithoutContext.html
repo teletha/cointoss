@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="m">
-		<header class="T">
-			<h1 class="Q" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
-			<nav class="l"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="N">
+		<header class="m">
+			<h1 class="W" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="e"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="L" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="i" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -31,78 +31,78 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="H">
-			<nav class="R">
+		<main class="O">
+			<nav class="T">
 				<div></div>
 			</nav>
-			<article class="b" id="Article">
-				<section class="P"><code class="I">cointoss.util</code>
-					<h2 class="Class g"><code class="h">Mediator.WithoutContext</code></h2>
-					<div class="e">
+			<article class="h" id="Article">
+				<section class="J"><code class="U">cointoss.util</code>
+					<h2 class="Class H"><code class="Q">Mediator.WithoutContext</code></h2>
+					<div class="f">
 						<ul class="C E">
 							<li><code><a href="api/cointoss.util.Mediator.TaskType.html">TaskType</a></code></li>
 						</ul>
 					</div><span class="B"><p>Task mediator on application context.</p>
 </span></section>
-				<section class="P" id="schedule(kiss.WiseRunnable)">
-					<h2 class="f"><i class="PUBLIC"></i><code class="h">schedule</code><code class="M">(<code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></h2>
-					<table class="c">
-						<tr class="Y">
+				<section class="J" id="schedule(kiss.WiseRunnable)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Q">schedule</code><code class="g">(<code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="S"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></h2>
+					<table class="l">
+						<tr class="K">
 							<td><code>kiss.WiseRunnable</code> <code>task</code></td>
 							<td></td>
 						</tr>
-						<tr class="d">
+						<tr class="c">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Request your task which will be exected only once immediately.</p>
 </span></section>
-				<section class="P" id="schedule(long,kiss.WiseRunnable)">
-					<h2 class="f"><i class="PUBLIC"></i><code class="h">schedule</code><code class="M">(<code>long</code> <code class="parameterName">delay</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></h2>
-					<table class="c">
-						<tr class="Y">
+				<section class="J" id="schedule(long,kiss.WiseRunnable)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Q">schedule</code><code class="g">(<code>long</code> <code class="parameterName">delay</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="S"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></h2>
+					<table class="l">
+						<tr class="K">
 							<td><code>long</code> <code>delay</code></td>
 							<td></td>
 						</tr>
-						<tr class="Y">
+						<tr class="K">
 							<td><code>kiss.WiseRunnable</code> <code>task</code></td>
 							<td></td>
 						</tr>
-						<tr class="d">
+						<tr class="c">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Request your task which will be executed only once after the specified delay.</p>
 </span></section>
-				<section class="P" id="schedule(long,long,kiss.WiseRunnable)">
-					<h2 class="f"><i class="PUBLIC"></i><code class="h">schedule</code><code class="M">(<code>long</code> <code class="parameterName">delay</code>, <code>long</code> <code class="parameterName">interval</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="K"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></h2>
-					<table class="c">
-						<tr class="Y">
+				<section class="J" id="schedule(long,long,kiss.WiseRunnable)">
+					<h2 class="j"><i class="PUBLIC"></i><code class="Q">schedule</code><code class="g">(<code>long</code> <code class="parameterName">delay</code>, <code>long</code> <code class="parameterName">interval</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="S"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></h2>
+					<table class="l">
+						<tr class="K">
 							<td><code>long</code> <code>delay</code></td>
 							<td></td>
 						</tr>
-						<tr class="Y">
+						<tr class="K">
 							<td><code>long</code> <code>interval</code></td>
 							<td></td>
 						</tr>
-						<tr class="Y">
+						<tr class="K">
 							<td><code>kiss.WiseRunnable</code> <code>task</code></td>
 							<td></td>
 						</tr>
-						<tr class="d">
+						<tr class="c">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Request your task which will be executed repeatedly after the specified delay.</p>
 </span></section>
 			</article>
-			<aside class="Z" id="SubNavi">
-				<div class="k">
-					<h5 class="i">Methods</h5>
+			<aside class="P" id="SubNavi">
+				<div class="a">
+					<h5 class="b">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Mediator.WithoutContext.html#schedule(kiss.WiseRunnable)">schedule</a></code><code class="M">(<code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Mediator.WithoutContext.html#schedule(long,kiss.WiseRunnable)">schedule</a></code><code class="M">(<code>long</code> <code class="parameterName">delay</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Mediator.WithoutContext.html#schedule(long,long,kiss.WiseRunnable)">schedule</a></code><code class="M">(<code>long</code> <code class="parameterName">delay</code>, <code>long</code> <code class="parameterName">interval</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Mediator.WithoutContext.html#schedule(kiss.WiseRunnable)">schedule</a></code><code class="g">(<code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="Y"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Mediator.WithoutContext.html#schedule(long,kiss.WiseRunnable)">schedule</a></code><code class="g">(<code>long</code> <code class="parameterName">delay</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="Y"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Mediator.WithoutContext.html#schedule(long,long,kiss.WiseRunnable)">schedule</a></code><code class="g">(<code>long</code> <code class="parameterName">delay</code>, <code>long</code> <code class="parameterName">interval</code>, <code>kiss.WiseRunnable</code> <code class="parameterName">task</code>)</code><i class="Y"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledFuture.html">ScheduledFuture</a><code class="parameters"><code>?</code></code></code></i></li>
 					</ul>
 				</div>
 			</aside>

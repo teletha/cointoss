@@ -531,13 +531,6 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
-			"name": "Coordinator",
-			"packageName": "cointoss.util",
-			"type": "Class"
-		},
-		{
-			"modifiers": {
-				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "CrossOrder",
 			"packageName": "cointoss.trade.bot",
 			"type": "Class"
