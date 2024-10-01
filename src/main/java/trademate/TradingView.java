@@ -112,15 +112,19 @@ public class TradingView extends View {
      */
     public void buildTicker(DateRange range, boolean forceRebuild, boolean forceRebuildLog) {
         Mediator.TickerGenerator.schedule(() -> {
-            Toast.<ZonedDateTime> title(en("Build ticker from historical log."))
+            Toast<ZonedDateTime> toast = Toast.<ZonedDateTime> title(en("Build ticker from historical log."))
                     .totalProgress(range.countDays() + 1)
                     .whenCompleted(chart.chart::layoutForcely)
                     .whenProgressed((m, date) -> {
                         String text = service + " [" + date.toLocalDate() + "]";
                         I.debug("Build ticker on " + text);
                         m.message(text).setProgress(range.countDaysFrom(date));
-                    })
-                    .show(market.tickers.build(range, forceRebuild, forceRebuildLog));
+                    });
+
+            market.tickers.enumerateBuildableDate(range, forceRebuild)
+                    .plug(toast)
+                    .effect(date -> market.tickers.build(date, forceRebuildLog))
+                    .to(I.NoOP);
         });
     }
 

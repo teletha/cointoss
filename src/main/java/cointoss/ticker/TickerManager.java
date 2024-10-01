@@ -227,6 +227,58 @@ public class TickerManager implements Disposable {
     }
 
     /**
+     * Enumerate buildable date from the specified date range.
+     * 
+     * @param range
+     * @param forceRebuild
+     * @return
+     */
+    public Signal<ZonedDateTime> enumerateBuildableDate(DateRange range, boolean forceRebuild) {
+        range = range.min(service.log.firstCacheDate()).max(service.log.lastCacheDate()).maxByFuture(0);
+
+        Signal<ZonedDateTime> process = I.signal();
+        if (forceRebuild) {
+            process = range.days(false);
+        } else {
+            FeatherStore<Tick> ticks = on(Span.Day).ticks;
+            long firstTime = ticks.firstTime();
+            long lastTime = ticks.lastTime();
+
+            if (firstTime == -1 && lastTime == -1) {
+                process = range.days(false);
+            } else {
+                if (lastTime < range.end.toEpochSecond()) {
+                    process = process.merge(range.start(lastTime, SECONDS).days(true));
+                }
+
+                if (range.start.toEpochSecond() < firstTime) {
+                    process = process.merge(range.end(firstTime, SECONDS).days(false));
+                }
+            }
+        }
+
+        return process;
+    }
+
+    /**
+     * Build ticker data from execution log.
+     * 
+     * @param date The target date.
+     * @param forceRebuildLog
+     */
+    public void build(ZonedDateTime date, boolean forceRebuildLog) {
+        if (forceRebuildLog) {
+            LogHouse house = service.loghouse();
+            if (house.isValid()) {
+            }
+        }
+
+        service.log.at(date, LogType.Fast)
+                .effectOnLifecycle(new TickerBuilder(new TickerManager(service, span -> on(span).ticks)))
+                .to(I.NoOP);
+    }
+
+    /**
      * Build ticker data from execution log.
      * 
      * @param forceRebuild
@@ -255,44 +307,7 @@ public class TickerManager implements Disposable {
      * @return
      */
     public Signal<ZonedDateTime> build(DateRange range, boolean forceRebuild, boolean forceRebuildLog) {
-        range = range.min(service.log.firstCacheDate()).max(service.log.lastCacheDate()).maxByFuture(0);
-
-        Signal<ZonedDateTime> process = I.signal();
-        if (forceRebuild) {
-            process = buildCache(range, forceRebuildLog);
-        } else {
-            FeatherStore<Tick> ticks = on(Span.Day).ticks;
-            long firstTime = ticks.firstTime();
-            long lastTime = ticks.lastTime();
-
-            if (firstTime == -1 && lastTime == -1) {
-                process = buildCache(range, forceRebuildLog);
-            } else {
-                if (lastTime < range.end.toEpochSecond()) {
-                    process = process.merge(buildCache(range.start(lastTime, SECONDS), forceRebuildLog));
-                }
-
-                if (range.start.toEpochSecond() < firstTime) {
-                    process = process.merge(buildCache(range.end(firstTime, SECONDS), forceRebuildLog));
-                }
-            }
-        }
-
-        return process;
-    }
-
-    private Signal<ZonedDateTime> buildCache(DateRange range, boolean forceRebuildLog) {
-        return range.days(false).effect(date -> {
-            if (forceRebuildLog) {
-                LogHouse house = service.loghouse();
-                if (house.isValid()) {
-                }
-            }
-
-            service.log.at(date, LogType.Fast)
-                    .effectOnLifecycle(new TickerBuilder(new TickerManager(service, span -> on(span).ticks)))
-                    .to(I.NoOP);
-        });
+        return enumerateBuildableDate(range, forceRebuild).effect(date -> build(date, forceRebuildLog));
     }
 
     /**
