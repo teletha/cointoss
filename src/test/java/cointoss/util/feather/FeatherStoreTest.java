@@ -402,22 +402,6 @@ class FeatherStoreTest {
     }
 
     @Test
-    void accumulator() {
-        FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1);
-        store.store(new Value(0));
-        assert store.at(0).item == 0;
-
-        // replaceable
-        store.store(new Value(1));
-        assert store.at(0).item == 1;
-
-        store.enableAccumulator((prev, now) -> prev);
-        // no replaceable
-        store.store(new Value(2));
-        assert store.at(0).item == 1;
-    }
-
-    @Test
     void endTimeWithDisk() {
         FeatherStore<Value> store = FeatherStore.create(Value.class, Span.Minute1).enablePersistence(randomName());
         assert store.lastTime() == -1;

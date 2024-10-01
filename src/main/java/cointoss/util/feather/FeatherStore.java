@@ -15,7 +15,6 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -54,12 +53,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
 
     /** The eviction policy. */
     private EvictionPolicy eviction;
-
-    /** The data accumulator. */
-    private BiFunction<E, E, E> accumulator;
-
-    /** The data interpolation. */
-    private int interpolation;
 
     /** The initial value. */
     private static final long FIRST_INIT = Long.MAX_VALUE;
@@ -141,37 +134,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
      */
     public synchronized FeatherStore<E> disableMemoryCompaction() {
         eviction = EvictionPolicy.never();
-        return this;
-    }
-
-    /**
-     * Enable data accumulator.
-     * 
-     * @param accumulator
-     * @return Chainable API.
-     */
-    public FeatherStore<E> enableAccumulator(BiFunction<E, E, E> accumulator) {
-        this.accumulator = accumulator;
-        return this;
-    }
-
-    /**
-     * Enable empty data interpolation.
-     * 
-     * @return Chainable API.
-     */
-    public FeatherStore<E> enableInterpolation(int range) {
-        this.interpolation = range;
-        return this;
-    }
-
-    /**
-     * Disable data accumulator.
-     * 
-     * @return Chainable API.
-     */
-    public FeatherStore<E> disableAccumulator() {
-        this.accumulator = null;
         return this;
     }
 
@@ -276,13 +238,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             indexed.put(index[0], segment);
         }
 
-        if (accumulator == null) {
-            segment.set((int) index[1], item);
-        } else {
-            E previous = segment.get((int) index[1]);
-            segment.set((int) index[1], previous == null ? item : accumulator.apply(previous, item));
-        }
-        segment.modified = true;
+        segment.set((int) index[1], item);
 
         // update managed cache time
         if (time < firstHeap) {
@@ -499,16 +455,7 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
         if (segment == null) {
             return null;
         }
-
-        E item = segment.get((int) index[1]);
-        if (item == null) {
-            if (0 < interpolation) {
-                for (int i = (int) index[1] - 1, j = interpolation; 0 <= i && 0 < j && item == null; i--, j--) {
-                    item = segment.get(i);
-                }
-            }
-        }
-        return item;
+        return segment.get((int) index[1]);
     }
 
     /**
@@ -805,7 +752,6 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
                         merged.set(i, e);
                     }
                 }
-                merged.modified = true;
             }
         }
 
@@ -1028,6 +974,8 @@ public final class FeatherStore<E extends IdentifiableModel & Timelinable> imple
             // FAILSAFE : update min and max index after inserting item
             if (index < min) min = index;
             if (max < index) max = index;
+
+            modified = true;
         }
 
         /**

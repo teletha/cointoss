@@ -34,21 +34,17 @@ public class Project extends bee.api.Project {
         unrequire("org.checkerframework", "checker-qual");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
-        // require("org.jooq", "jooq");
-        require("io.fair-acc", "chartfx");
-        // require("org.apache.iotdb", "iotdb-session");
-        // require("org.hibernate.orm", "hibernate-core");
 
         require("org.xerial", "sqlite-jdbc");
         // require("com.h2database", "h2");
         // require("org.duckdb", "duckdb_jdbc");
 
+        // require("io.fair-acc", "chartfx");
         // chartfx requires old jafafx, so override it
-        require("org.openjfx", "javafx-base");
-        require("org.openjfx", "javafx-controls");
+        // require("org.openjfx", "javafx-base");
+        // require("org.openjfx", "javafx-controls");
+
         // require("org.nd4j", "nd4j-native-platform");
         // require("org.deeplearning4j", "rl4j-core");
-
-        repository("https://www.javaxt.com/maven");
     }
 }
