@@ -16,6 +16,7 @@ import cointoss.MarketService;
 import cointoss.execution.LogType;
 import cointoss.util.DateRange;
 import cointoss.util.Mediator;
+import cointoss.util.maid.Progressive;
 import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -112,6 +113,8 @@ public class TradingView extends View {
      */
     public void buildTicker(DateRange range, boolean forceRebuild, boolean forceRebuildLog) {
         Mediator.TickerGenerator.schedule(() -> {
+            Progressive progress = Progressive.lock();
+
             Toast<ZonedDateTime> toast = Toast.<ZonedDateTime> title(en("Build ticker from historical log."))
                     .totalProgress(range.countDays() + 1)
                     .whenCompleted(chart.chart::layoutForcely)
@@ -119,12 +122,11 @@ public class TradingView extends View {
                         String text = service + " [" + date.toLocalDate() + "]";
                         I.debug("Build ticker on " + text);
                         m.message(text).setProgress(range.countDaysFrom(date));
+
+                        market.tickers.build(date, forceRebuildLog);
                     });
 
-            market.tickers.enumerateBuildableDate(range, forceRebuild)
-                    .plug(toast)
-                    .effect(date -> market.tickers.build(date, forceRebuildLog))
-                    .to(I.NoOP);
+            market.tickers.enumerateBuildableDate(range, forceRebuild).plug(toast).to(I.NoOP);
         });
     }
 

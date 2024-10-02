@@ -34,6 +34,7 @@ public class Project extends bee.api.Project {
         unrequire("org.checkerframework", "checker-qual");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
+        require("com.coreoz", "wisp");
 
         require("org.xerial", "sqlite-jdbc");
         // require("com.h2database", "h2");
