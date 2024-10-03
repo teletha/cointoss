@@ -16,14 +16,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import cointoss.util.maid.VirtualScheduler;
 import kiss.I;
 
 public class TestableExecutor extends VirtualScheduler {
 
     private Map<Object, Future> futures = new ConcurrentHashMap();
 
-    private long awaitingLimit = 3000;
+    private long awaitingLimit = 1000;
 
     /**
      * {@inheritDoc}
@@ -76,7 +75,7 @@ public class TestableExecutor extends VirtualScheduler {
     protected boolean awaitIdling() {
         long start = System.currentTimeMillis();
 
-        while (!taskQueue.isEmpty() || runningTask != 0) {
+        while (!taskQueue.isEmpty() || runningTask.get() != 0) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -84,7 +83,8 @@ public class TestableExecutor extends VirtualScheduler {
             }
 
             if (awaitingLimit <= System.currentTimeMillis() - start) {
-                throw new Error("Too long task is active.");
+                throw new Error("Too long task is active. TaskQueue:" + taskQueue.size() + " RunningTask:" + runningTask
+                        .get() + "  ExecutedTask:" + executedTask);
             }
         }
         return true;
@@ -99,7 +99,7 @@ public class TestableExecutor extends VirtualScheduler {
     protected boolean awaitExecutions(long required) {
         long start = System.currentTimeMillis();
 
-        while (executedTask < required) {
+        while (executedTask.get() < required) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {

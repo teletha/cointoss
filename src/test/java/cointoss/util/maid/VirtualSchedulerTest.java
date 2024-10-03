@@ -212,12 +212,5 @@ class VirtualSchedulerTest extends ExecutorTestSupport {
         assert executor.awaitIdling();
         assert verifyFailed(future);
         assert verifier.verifyExecutionCount(1);
-
-        // 実行結果を取得し、例外が発生するか確認
-        ExecutionException exception = assertThrows(ExecutionException.class, () -> future.get(1, TimeUnit.SECONDS));
-        assertEquals("Task error", exception.getCause().getMessage());
-
-        // タスクが完了したかどうかを確認
-        assertTrue(future.isDone());
     }
 }

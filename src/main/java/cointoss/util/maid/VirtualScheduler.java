@@ -30,6 +30,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class VirtualScheduler implements ScheduledExecutorService {
 
@@ -37,20 +38,20 @@ public class VirtualScheduler implements ScheduledExecutorService {
     protected final BlockingQueue<ScheduledFutureTask<?>> taskQueue = new PriorityBlockingQueue<>();
 
     /** The running state of task queue. */
-    private volatile boolean running = true;
+    private final AtomicBoolean running = new AtomicBoolean(true);
 
     /** The counter for the running tasks. */
-    protected volatile long runningTask;
+    protected final AtomicLong runningTask = new AtomicLong();
 
     /** The counter for the executed tasks. */
-    protected volatile long executedTask;
+    protected final AtomicLong executedTask = new AtomicLong();
 
     /**
      * Build simple task manager by virtual thread.
      */
     public VirtualScheduler() {
         Thread.ofVirtual().start(() -> {
-            while (running) {
+            while (running.get()) {
                 try {
                     executeTask(taskQueue.take());
                 } catch (InterruptedException e) {
@@ -68,7 +69,7 @@ public class VirtualScheduler implements ScheduledExecutorService {
      */
     private void executeTask(ScheduledFutureTask task) {
         if (!task.isCancelled()) {
-            runningTask++;
+            runningTask.incrementAndGet();
 
             Thread.ofVirtual().start(() -> {
                 try {
@@ -83,19 +84,19 @@ public class VirtualScheduler implements ScheduledExecutorService {
                             // reschedule task
                             if (task.period > 0) {
                                 // fixed rate
-                                task.time += task.period;
+                                task.time.updateAndGet(x -> x + task.period);
                             } else {
                                 // fixed delay
-                                task.time = calculateNext(-task.period, TimeUnit.NANOSECONDS);
+                                task.time.set(calculateNext(-task.period, TimeUnit.NANOSECONDS));
                             }
                             taskQueue.offer(task);
                         }
                     }
                 } catch (InterruptedException e) {
-                    // TODO: handle exception
+                    e.printStackTrace();
                 } finally {
-                    runningTask--;
-                    executedTask++;
+                    runningTask.decrementAndGet();
+                    executedTask.incrementAndGet();
                 }
             });
         }
@@ -150,7 +151,7 @@ public class VirtualScheduler implements ScheduledExecutorService {
      */
     @Override
     public void shutdown() {
-        running = false;
+        running.set(false);
     }
 
     /**
@@ -158,7 +159,7 @@ public class VirtualScheduler implements ScheduledExecutorService {
      */
     @Override
     public List<Runnable> shutdownNow() {
-        running = false;
+        running.set(false);
         List<Runnable> remainingTasks = new ArrayList<>();
         taskQueue.drainTo(remainingTasks);
         return remainingTasks;
@@ -169,7 +170,7 @@ public class VirtualScheduler implements ScheduledExecutorService {
      */
     @Override
     public boolean isShutdown() {
-        return !running;
+        return !running.get();
     }
 
     /**
@@ -295,14 +296,14 @@ public class VirtualScheduler implements ScheduledExecutorService {
         private final Callable<V> task;
 
         /** The next trigger time. */
-        private long time;
+        private final AtomicLong time;
 
         /** The interval time. */
         private final long period;
 
         private V result;
 
-        private Exception exception;
+        private Throwable exception;
 
         private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
@@ -310,7 +311,7 @@ public class VirtualScheduler implements ScheduledExecutorService {
 
         private ScheduledFutureTask(Callable<V> task, long time, long period) {
             this.task = Objects.requireNonNull(task);
-            this.time = time;
+            this.time = new AtomicLong(time);
             this.period = period;
         }
 
@@ -319,7 +320,7 @@ public class VirtualScheduler implements ScheduledExecutorService {
          */
         @Override
         public long getDelay(TimeUnit unit) {
-            return unit.convert(time - System.nanoTime(), TimeUnit.NANOSECONDS);
+            return unit.convert(time.get() - System.nanoTime(), TimeUnit.NANOSECONDS);
         }
 
         /**
@@ -331,7 +332,7 @@ public class VirtualScheduler implements ScheduledExecutorService {
                 return 0;
             }
             if (other instanceof ScheduledFutureTask task) {
-                long diff = time - task.time;
+                long diff = time.get() - task.time.get();
                 if (diff < 0) {
                     return -1;
                 } else if (diff > 0) {
@@ -352,7 +353,7 @@ public class VirtualScheduler implements ScheduledExecutorService {
             if (!cancelled.get()) {
                 try {
                     this.result = task.call();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     this.exception = e;
                 }
                 done.set(true);
@@ -432,6 +433,17 @@ public class VirtualScheduler implements ScheduledExecutorService {
         @Override
         public boolean isDone() {
             return done.get();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public State state() {
+            if (!isDone()) return State.RUNNING;
+            if (isCancelled()) return State.CANCELLED;
+            if (exception != null) return State.FAILED;
+            return State.SUCCESS;
         }
     }
 }
