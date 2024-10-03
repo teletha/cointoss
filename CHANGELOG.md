@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.10.0](https://github.com/teletha/cointoss/compare/v1.9.0...v1.10.0) (2024-10-01)
+
+
+### Features
+
+* Aggregator and Mediator are scheduler assets for general purpose ([8195149](https://github.com/teletha/cointoss/commit/81951492a1f7bb78e4470db98a87cddceccb8ce5))
+* remove old scheduler ([5cf5eef](https://github.com/teletha/cointoss/commit/5cf5eef1d31bf997511bf77676c64e511efb4022))
+
+
+### Bug Fixes
+
+* prepare to support unstable execution query ([c65113a](https://github.com/teletha/cointoss/commit/c65113aa76a07c3c3208f8f15e74af209115fd36))
+* reduce data loading ([5b39316](https://github.com/teletha/cointoss/commit/5b39316f496d12f070f2db6111ead0d63890d1b8))
+* remove unused functionality ([ad49b07](https://github.com/teletha/cointoss/commit/ad49b0758a4ad6ee8a0976215888b26ec38d67de))
+* ticker can update the latest tick ([6c46e2c](https://github.com/teletha/cointoss/commit/6c46e2ca227c7b6418b506271382a3bfb7292537))
+
 ## [1.9.0](https://github.com/teletha/cointoss/compare/v1.8.0...v1.9.0) (2024-09-26)
 
 
