@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+		<meta content="Explains how to use Cointoss and its API. " name="description"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<title>Cointoss API</title>
+		<base href="../"/>
+		<script src="mimic.js" type="module"></script>
+		<link href="main.css" rel="stylesheet"/>
+	</head>
+	<body class="I">
+		<header class="e">
+			<h1 class="N" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="m"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#package"/>
+					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#user"/>
+					</svg>Community</a><a href="doc/changelog.html"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#activity"/>
+					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#github"/>
+					</svg>Repository</a></nav>
+			<div class="k" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#sun"/>
+					</svg>
+				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
+						<use href="main.svg#moon"/>
+					</svg>
+				</a></div>
+		</header>
+		<main class="h">
+			<nav class="g">
+				<div></div>
+			</nav>
+			<article class="c" id="Article">
+				<section class="P"><code class="O">cointoss.util</code>
+					<h2 class="Class d"><code class="V">Progressive</code></h2>
+					<div class="l"></div>
+				</section>
+				<section class="P" id="title">
+					<h2 class="H"><i class="FINAL"><i class="PUBLIC"></i></i><code class="V">title</code><i class="b"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></i></h2><span class="B"><p>The title holder.</p>
+</span></section>
+				<section class="P" id="message">
+					<h2 class="H"><i class="FINAL"><i class="PUBLIC"></i></i><code class="V">message</code><i class="b"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></i></h2><span class="B"><p>The message holder.</p>
+</span></section>
+				<section class="P" id="Progressive()">
+					<h2 class="H"><i class="PUBLIC"></i><code class="V">Progressive</code><code class="Y">()</code></h2>
+				</section>
+				<section class="P" id="start(long)">
+					<h2 class="H"><i class="PUBLIC"></i><code class="V">start</code><code class="Y">(<code>long</code> <code class="parameterName">total</code>)</code><i class="b"><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></i></h2>
+					<table class="Q">
+						<tr class="f">
+							<td><code>long</code> <code>total</code></td>
+							<td><span><p>This must be positive. Negative or Zero will be ignored.</p>
+</span></td>
+						</tr>
+						<tr class="J">
+							<td><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Start with the given total progress.</p>
+</span></section>
+				<section class="P" id="progress(long)">
+					<h2 class="H"><i class="PUBLIC"></i><code class="V">progress</code><code class="Y">(<code>long</code> <code class="parameterName">current</code>)</code><i class="b"><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></i></h2>
+					<table class="Q">
+						<tr class="f">
+							<td><code>long</code> <code>current</code></td>
+							<td><span><p>This must be positive. Negative or Zero will be ignored.</p>
+</span></td>
+						</tr>
+						<tr class="J">
+							<td><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Set the current progress.</p>
+</span></section>
+				<section class="P" id="ratio()">
+					<h2 class="H"><i class="PUBLIC"></i><code class="V">ratio</code><code class="Y">()</code><i class="b"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/math/BigDecimal.html">BigDecimal</a></code></i></h2>
+					<table class="Q">
+						<tr class="J">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/math/BigDecimal.html">BigDecimal</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Calculate the progress ratio.</p>
+</span></section>
+				<section class="P" id="ratio(int)">
+					<h2 class="H"><i class="PUBLIC"></i><code class="V">ratio</code><code class="Y">(<code>int</code> <code class="parameterName">scale</code>)</code><i class="b"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/math/BigDecimal.html">BigDecimal</a></code></i></h2>
+					<table class="Q">
+						<tr class="f">
+							<td><code>int</code> <code>scale</code></td>
+							<td></td>
+						</tr>
+						<tr class="J">
+							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/math/BigDecimal.html">BigDecimal</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Calculate the progress ratio with your scale.</p>
+</span></section>
+				<section class="P" id="lock()">
+					<h2 class="H"><i class="STATIC PUBLIC"></i><code class="V">lock</code><code class="Y">()</code><i class="b"><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></i></h2>
+					<table class="Q">
+						<tr class="J">
+							<td><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></td>
+							<td></td>
+						</tr>
+					</table><span class="B"><p>Get the contextual <code><a href="api/cointoss.util.Progressive.html">Progressive</a></code>.</p>
+</span></section>
+			</article>
+			<aside class="Z" id="SubNavi">
+				<div class="j">
+					<h5 class="X">Constructors</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Progressive.html#Progressive()">Progressive</a></code><code class="Y">()</code></li>
+					</ul>
+					<h5 class="X">Fields</h5>
+					<ul>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.Progressive.html#title">title</a></code><i class="a"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.util.Progressive.html#message">message</a></code><i class="a"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></i></li>
+					</ul>
+					<h5 class="X">Static Methods</h5>
+					<ul>
+						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.util.Progressive.html#lock()">lock</a></code><code class="Y">()</code><i class="a"><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></i></li>
+					</ul>
+					<h5 class="X">Methods</h5>
+					<ul>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Progressive.html#start(long)">start</a></code><code class="Y">(<code>long</code> <code class="parameterName">total</code>)</code><i class="a"><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Progressive.html#progress(long)">progress</a></code><code class="Y">(<code>long</code> <code class="parameterName">current</code>)</code><i class="a"><code><a href="api/cointoss.util.Progressive.html">Progressive</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Progressive.html#ratio()">ratio</a></code><code class="Y">()</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/math/BigDecimal.html">BigDecimal</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.util.Progressive.html#ratio(int)">ratio</a></code><code class="Y">(<code>int</code> <code class="parameterName">scale</code>)</code><i class="a"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/math/BigDecimal.html">BigDecimal</a></code></i></li>
+					</ul>
+				</div>
+			</aside>
+		</main>
+		<script src="root.js"></script>
+		<script src="main.js" type="module"></script>
+	</body>
+</html>

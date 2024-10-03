@@ -1455,6 +1455,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "Progressive",
+			"packageName": "cointoss.util",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "QuantityCondition",
 			"packageName": "cointoss.order",
 			"type": "Enum"
