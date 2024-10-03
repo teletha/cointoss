@@ -16,7 +16,7 @@ import cointoss.MarketService;
 import cointoss.execution.LogType;
 import cointoss.util.DateRange;
 import cointoss.util.Mediator;
-import cointoss.util.maid.Progressive;
+import cointoss.util.Progressive;
 import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;

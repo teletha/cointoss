@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.util.maid;
+package cointoss.util;
 
 import java.math.BigDecimal;
 
