@@ -11,11 +11,11 @@ package cointoss.util;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import belldandy.Scheduler;
 import cointoss.MarketService;
 import kiss.WiseRunnable;
 
@@ -36,7 +36,7 @@ public class Mediator {
         protected final String type;
 
         /** The thread pool manager. */
-        private final ConcurrentHashMap<Object, ScheduledExecutorService> executors = new ConcurrentHashMap();
+        private final ConcurrentHashMap<Object, Scheduler> executors = new ConcurrentHashMap();
 
         /**
          * Define your task type.
@@ -52,17 +52,11 @@ public class Mediator {
          * 
          * @return
          */
+        @SuppressWarnings("resource")
         protected final ScheduledExecutorService findExecutor(Object key) {
             Objects.requireNonNull(key);
 
-            return executors.computeIfAbsent(Objects.hash(type, key), hash -> {
-                return Executors.newSingleThreadScheduledExecutor(run -> {
-                    Thread thread = new Thread(run);
-                    thread.setName(type);
-                    thread.setDaemon(true);
-                    return thread;
-                });
-            });
+            return executors.computeIfAbsent(Objects.hash(type, key), hash -> new Scheduler(1));
         }
 
         /**

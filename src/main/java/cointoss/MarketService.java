@@ -17,10 +17,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import belldandy.Scheduler;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.LogHouse;
@@ -71,7 +70,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     public final MarketSetting setting;
 
     /** The market specific scheduler. */
-    private final ScheduledThreadPoolExecutor scheduler;
+    private final Scheduler scheduler;
 
     /** The shared stream. */
     private Signal<Execution> executionCollector;
@@ -123,14 +122,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         this.id = exchange + " " + normalized;
         this.formattedId = String.format("%-10s %s", exchange, normalized);
         this.setting = setting;
-        this.scheduler = new ScheduledThreadPoolExecutor(2, task -> {
-            Thread thread = new Thread(task);
-            thread.setName(id + " Scheduler");
-            thread.setDaemon(true);
-            return thread;
-        });
-        this.scheduler.allowCoreThreadTimeOut(true);
-        this.scheduler.setKeepAliveTime(30, TimeUnit.SECONDS);
+        this.scheduler = new Scheduler();
         this.log = createExecutionLog();
     }
 

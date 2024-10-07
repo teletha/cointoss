@@ -84,9 +84,9 @@ public class Progressive {
      * @return
      */
     public static Progressive lock() {
-        if (!Thread.currentThread().isVirtual()) {
-            throw new Error(Progressive.class.getSimpleName() + " works on virtual thread only.");
-        }
+        // if (!Thread.currentThread().isVirtual()) {
+        // throw new Error(Progressive.class.getSimpleName() + " works on virtual thread only.");
+        // }
 
         Progressive now = source.get();
         if (now == null) {
