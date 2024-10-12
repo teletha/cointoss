@@ -16,7 +16,6 @@ import static psychopath.Option.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
@@ -303,7 +302,7 @@ public class ExecutionLog {
         private LinkedList<Execution> queue = new LinkedList();
 
         /** The lock file. */
-        private AsynchronousFileChannel lockChannel;
+        private FileChannel lockChannel;
 
         /**
          * @param date
@@ -586,7 +585,7 @@ public class ExecutionLog {
             }
 
             try {
-                lockChannel = AsynchronousFileChannel.open(root.file(".lock").asJavaPath(), CREATE, WRITE);
+                lockChannel = FileChannel.open(root.file(".lock").asJavaPath(), CREATE, WRITE);
                 FileLock lock = lockChannel.tryLock();
 
                 if (lock == null) {
