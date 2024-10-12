@@ -12,6 +12,7 @@ package cointoss.ticker;
 import static antibug.Tester.*;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,8 @@ public class TickerManagerBuildTest {
 
     @Test
     void buildFully() {
-        ZonedDateTime start = Chrono.utc(2020, 1, 1);
-        ZonedDateTime end = Chrono.utc(2020, 1, 2, 23, 59, 0, 0);
+        ZonedDateTime end = Chrono.utcNow().truncatedTo(ChronoUnit.DAYS).minusMinutes(1);
+        ZonedDateTime start = end.minusDays(1).truncatedTo(ChronoUnit.DAYS);
 
         TestableMarketService service = new TestableMarketService();
         service.log.generateFastLog(start, end, Span.Minute1);
