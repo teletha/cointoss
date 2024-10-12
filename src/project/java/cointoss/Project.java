@@ -16,7 +16,6 @@ public class Project extends bee.api.Project {
 
         require("com.github.teletha", "sinobu");
         require("com.github.teletha", "viewtify");
-        require("com.github.teletha", "belldandy");
         require("com.github.teletha", "typewriter");
         require("com.github.teletha", "hypatia");
         require("com.github.teletha", "icymanipulator").atAnnotation();

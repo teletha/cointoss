@@ -15,8 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import belldandy.Scheduler;
 import cointoss.MarketService;
+import kiss.Scheduler;
 import kiss.WiseRunnable;
 
 public class Mediator {

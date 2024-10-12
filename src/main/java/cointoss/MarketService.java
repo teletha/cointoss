@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
-import belldandy.Scheduler;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.LogHouse;
@@ -38,6 +37,7 @@ import kiss.Disposable;
 import kiss.Encoder;
 import kiss.I;
 import kiss.Observer;
+import kiss.Scheduler;
 import kiss.Signal;
 import psychopath.Directory;
 import psychopath.File;
