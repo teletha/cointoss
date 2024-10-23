@@ -13,16 +13,15 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleFunction;
 
+import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import hypatia.Primitives;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
-
-import cointoss.ticker.Span;
-import cointoss.ticker.Ticker;
-import cointoss.util.Chrono;
-import hypatia.Primitives;
 import trademate.setting.PerformanceSetting;
 import viewtify.preference.Preferences;
 import viewtify.ui.helper.LayoutAssistant;
@@ -72,7 +71,7 @@ public class Chart extends Region {
                 .layoutBy(chart.ticker.observe())
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.open.startWithNull())
-                        .throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime));
+                        .throttle(performance.refreshRate, TimeUnit.MILLISECONDS));
 
         // configure axis label
         chart.market.observe().to(m -> {

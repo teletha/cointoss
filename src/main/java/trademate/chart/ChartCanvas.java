@@ -211,8 +211,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layoutBy(chartAxisModification())
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
-                .layoutBy(chart.ticker.observe()
-                        .switchMap(ticker -> ticker.open.throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)))
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.throttle(performance.refreshRate, TimeUnit.MILLISECONDS)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
@@ -220,7 +219,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(userInterfaceModification())
                 .layoutBy(chart.candleType.observe(), chart.ticker.observe(), chart.showCandle.observe())
                 .layoutBy(chart.market.observe()
-                        .switchMap(market -> market.timeline.throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)))
+                        .switchMap(market -> market.timeline.throttle(performance.refreshRate, TimeUnit.MILLISECONDS)))
                 .layoutBy(ChartTheme.$.buy.observe(), ChartTheme.$.sell.observe())
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 

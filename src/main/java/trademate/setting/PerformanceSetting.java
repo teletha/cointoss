@@ -25,6 +25,6 @@ public class PerformanceSetting extends Preferences {
      * @return
      */
     public static <X> Function<Signal<X>, Signal<X>> applyUIRefreshRate() {
-        return signal -> signal.throttle(Preferences.of(PerformanceSetting.class).refreshRate, TimeUnit.MILLISECONDS, System::nanoTime);
+        return signal -> signal.throttle(Preferences.of(PerformanceSetting.class).refreshRate, TimeUnit.MILLISECONDS);
     }
 }

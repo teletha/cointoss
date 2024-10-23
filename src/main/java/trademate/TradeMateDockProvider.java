@@ -64,7 +64,7 @@ public class TradeMateDockProvider extends DockProvider {
 
         service.executionsRealtimely()
                 .startWith(service.executionLatest())
-                .throttle(performance.refreshRate, TimeUnit.MILLISECONDS, System::nanoTime)
+                .throttle(performance.refreshRate, TimeUnit.MILLISECONDS)
                 .diff()
                 .on(Viewtify.UIThread)
                 .to(e -> tab.text(service.id + "\n" + e.price), service);

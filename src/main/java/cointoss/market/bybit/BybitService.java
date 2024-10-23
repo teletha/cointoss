@@ -32,6 +32,7 @@ import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import hypatia.Num;
+import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
@@ -53,6 +54,8 @@ public class BybitService extends MarketService {
     protected BybitService(String marketName, MarketSetting setting) {
         super(Exchange.Bybit, marketName, setting);
         this.executionRequestLimit = 1000;
+
+        I.schedule("30 1 * * *", Chrono.UTC).to(() -> log.repair(Chrono.utcNow().minusDays(1)));
     }
 
     /**
@@ -174,7 +177,7 @@ public class BybitService extends MarketService {
         });
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main2(String[] args) throws InterruptedException {
         Bybit.BTC_USDT.orderBookRealtimely().to(x -> {
             System.out.println(x.bestBid());
         }, e -> {
