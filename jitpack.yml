@@ -1,14 +1,14 @@
 jdk:
-  - openjdk21
+  - openjdk23
 
 before_install: |
   source ~/.sdkman/bin/sdkman-init.sh
-  sdk install java 21-open
+  sdk install java 23-open
   source ~/.sdkman/bin/sdkman-init.sh
 
 install: |
   if [ -e "bee" ]; then
-    source bee install pom
+    source bee install maven
   else
     version=$(curl -SsL https://git.io/stable-bee)
     curl -SsL -o bee-${version}.jar https://jitpack.io/com/github/teletha/bee/${version}/bee-${version}.jar
