@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.10.0](https://github.com/teletha/cointoss/compare/v1.9.0...v1.10.0) (2024-10-24)
+
+
+### Features
+
+* Aggregator and Mediator are scheduler assets for general purpose ([8195149](https://github.com/teletha/cointoss/commit/81951492a1f7bb78e4470db98a87cddceccb8ce5))
+* Bybit can generate complete log. ([70e7408](https://github.com/teletha/cointoss/commit/70e7408042c19123896b1a2d3cc372adbd917e51))
+* export virtual scheduler to belldandy project ([c467477](https://github.com/teletha/cointoss/commit/c4674771a27b2ec42d336cccb034f55d43154278))
+* provide virtual thread scheduler ([170a4e4](https://github.com/teletha/cointoss/commit/170a4e40c82b88a0994a736a943d4bb2021fe8ef))
+* remove old scheduler ([5cf5eef](https://github.com/teletha/cointoss/commit/5cf5eef1d31bf997511bf77676c64e511efb4022))
+* update sinobu ([70e7408](https://github.com/teletha/cointoss/commit/70e7408042c19123896b1a2d3cc372adbd917e51))
+* update sinobu to 4.0.0 ([79b3169](https://github.com/teletha/cointoss/commit/79b3169a98ac5cde5e7c60e70d22e5c038c4ede5))
+* use virtual thread ([1a28bbe](https://github.com/teletha/cointoss/commit/1a28bbe49c2fce5324a777c724ea0f00da3fc134))
+
+
+### Bug Fixes
+
+* prepare to support unstable execution query ([c65113a](https://github.com/teletha/cointoss/commit/c65113aa76a07c3c3208f8f15e74af209115fd36))
+* reduce data loading ([5b39316](https://github.com/teletha/cointoss/commit/5b39316f496d12f070f2db6111ead0d63890d1b8))
+* remove unused functionality ([ad49b07](https://github.com/teletha/cointoss/commit/ad49b0758a4ad6ee8a0976215888b26ec38d67de))
+* ticker can update the latest tick ([6c46e2c](https://github.com/teletha/cointoss/commit/6c46e2ca227c7b6418b506271382a3bfb7292537))
+* use FileChannel to retrive file lock instead of async channel ([ca80d30](https://github.com/teletha/cointoss/commit/ca80d30c8763587eb57cadf0c5d5c824f1a6dc29))
+
 ## [1.9.0](https://github.com/teletha/cointoss/compare/v1.8.0...v1.9.0) (2024-09-26)
 
 
