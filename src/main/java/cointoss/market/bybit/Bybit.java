@@ -52,10 +52,6 @@ public final class Bybit extends MarketServiceProvider {
             .target(Currency.LDO.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.001)));
 
-    public static final MarketService MATIC_USDT = new BybitService("MATICUSDT", MarketSetting.with.derivative()
-            .target(Currency.MATIC.minimumSize(1).scale(2))
-            .base(Currency.USDT.minimumSize(0.0001)));
-
     public static final MarketService MNT_USDT = new BybitService("MNTUSDT", MarketSetting.with.derivative()
             .target(Currency.MNT.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.0001)));
