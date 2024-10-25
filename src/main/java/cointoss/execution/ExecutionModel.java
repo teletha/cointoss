@@ -22,7 +22,7 @@ import hypatia.Orientational;
 import icy.manipulator.Icy;
 
 @Icy(grouping = 2)
-abstract class ExecutionModel implements Orientational<Direction>, Timelinable {
+abstract class ExecutionModel<SELF extends ExecutionModel> implements Orientational<Direction>, Timelinable {
 
     /** The internal id counter. */
     private static final AtomicLong counter = new AtomicLong(1);
@@ -309,8 +309,8 @@ abstract class ExecutionModel implements Orientational<Direction>, Timelinable {
      * @param other
      * @return
      */
-    public boolean equals(cointoss.execution.Execution other) {
-        return id() == other.id;
+    public boolean equals(SELF other) {
+        return id() == other.id();
     }
 
     /**
