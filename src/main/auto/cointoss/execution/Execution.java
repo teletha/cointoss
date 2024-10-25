@@ -25,7 +25,7 @@ import java.util.function.UnaryOperator;
  * 
  * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
-public class Execution extends ExecutionModel {
+public class Execution extends ExecutionModel<Execution> {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
