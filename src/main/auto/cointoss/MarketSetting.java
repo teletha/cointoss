@@ -22,6 +22,9 @@ import java.util.function.UnaryOperator;
  */
 public class MarketSetting implements MarketSettingModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -40,10 +43,24 @@ public class MarketSetting implements MarketSettingModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = MarketSetting.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -51,67 +68,102 @@ public class MarketSetting implements MarketSettingModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle typeUpdater = updater("type");
+    private static final Field typeField = updater("type");
+
+    /** The fast final property updater. */
+    private static final MethodHandle typeUpdater = handler(typeField);
 
     /** The final property updater. */
-    private static final MethodHandle targetUpdater = updater("target");
+    private static final Field targetField = updater("target");
+
+    /** The fast final property updater. */
+    private static final MethodHandle targetUpdater = handler(targetField);
 
     /** The final property updater. */
-    private static final MethodHandle baseUpdater = updater("base");
+    private static final Field baseField = updater("base");
+
+    /** The fast final property updater. */
+    private static final MethodHandle baseUpdater = handler(baseField);
 
     /** The final property updater. */
-    private static final MethodHandle targetCurrencyBidSizesUpdater = updater("targetCurrencyBidSizes");
+    private static final Field targetCurrencyBidSizesField = updater("targetCurrencyBidSizes");
+
+    /** The fast final property updater. */
+    private static final MethodHandle targetCurrencyBidSizesUpdater = handler(targetCurrencyBidSizesField);
 
     /** The final property updater. */
-    private static final MethodHandle executionLoggerUpdater = updater("executionLogger");
+    private static final Field priceRangeModifierField = updater("priceRangeModifier");
+
+    /** The fast final property updater. */
+    private static final MethodHandle priceRangeModifierUpdater = handler(priceRangeModifierField);
 
     /** The final property updater. */
-    private static final MethodHandle takerFeeUpdater = updater("takerFee");
+    private static final Field orderbookMaxSizeField = updater("orderbookMaxSize");
+
+    /** The fast final property updater. */
+    private static final MethodHandle orderbookMaxSizeUpdater = handler(orderbookMaxSizeField);
 
     /** The final property updater. */
-    private static final MethodHandle makerFeeUpdater = updater("makerFee");
+    private static final Field executionLoggerField = updater("executionLogger");
+
+    /** The fast final property updater. */
+    private static final MethodHandle executionLoggerUpdater = handler(executionLoggerField);
 
     /** The final property updater. */
-    private static final MethodHandle targetWithdrawingFeeUpdater = updater("targetWithdrawingFee");
+    private static final Field takerFeeField = updater("takerFee");
+
+    /** The fast final property updater. */
+    private static final MethodHandle takerFeeUpdater = handler(takerFeeField);
 
     /** The final property updater. */
-    private static final MethodHandle baseWithdrawingFeeUpdater = updater("baseWithdrawingFee");
+    private static final Field makerFeeField = updater("makerFee");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle makerFeeUpdater = handler(makerFeeField);
+
+    /** The final property updater. */
+    private static final Field targetWithdrawingFeeField = updater("targetWithdrawingFee");
+
+    /** The fast final property updater. */
+    private static final MethodHandle targetWithdrawingFeeUpdater = handler(targetWithdrawingFeeField);
+
+    /** The final property updater. */
+    private static final Field baseWithdrawingFeeField = updater("baseWithdrawingFee");
+
+    /** The fast final property updater. */
+    private static final MethodHandle baseWithdrawingFeeUpdater = handler(baseWithdrawingFeeField);
+
+    /** The exposed property. */
     public final MarketType type;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final CurrencySetting target;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final cointoss.CurrencySetting base;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final List<Num> targetCurrencyBidSizes;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected int priceRangeModifier;
+    /** The exposed property. */
+    public final int priceRangeModifier;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected int orderbookMaxSize;
+    /** The exposed property. */
+    public final int orderbookMaxSize;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Class<? extends ExecutionLogger> executionLogger;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final UnaryOperator<Num> takerFee;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final UnaryOperator<Num> makerFee;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final UnaryOperator<Num> targetWithdrawingFee;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final UnaryOperator<Num> baseWithdrawingFee;
 
     /**
@@ -298,7 +350,11 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setPriceRangeModifier(int value) {
         try {
-            this.priceRangeModifier = (int) value;
+            if (NATIVE) {
+                priceRangeModifierField.setInt(this, (int) value);
+            } else {
+                priceRangeModifierUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -328,7 +384,11 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setOrderbookMaxSize(int value) {
         try {
-            this.orderbookMaxSize = (int) value;
+            if (NATIVE) {
+                orderbookMaxSizeField.setInt(this, (int) value);
+            } else {
+                orderbookMaxSizeUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

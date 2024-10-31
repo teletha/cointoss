@@ -19,6 +19,9 @@ import kiss.Signal;
  */
 public class ScenarioBase extends ScenarioBaseModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -37,10 +40,24 @@ public class ScenarioBase extends ScenarioBaseModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = ScenarioBase.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -48,33 +65,60 @@ public class ScenarioBase extends ScenarioBaseModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle entrySizeUpdater = updater("entrySize");
+    private static final Field entrySizeField = updater("entrySize");
+
+    /** The fast final property updater. */
+    private static final MethodHandle entrySizeUpdater = handler(entrySizeField);
 
     /** The final property updater. */
-    private static final MethodHandle entryExecutedSizeUpdater = updater("entryExecutedSize");
+    private static final Field entryExecutedSizeField = updater("entryExecutedSize");
+
+    /** The fast final property updater. */
+    private static final MethodHandle entryExecutedSizeUpdater = handler(entryExecutedSizeField);
 
     /** The final property updater. */
-    private static final MethodHandle entryPriceUpdater = updater("entryPrice");
+    private static final Field entryPriceField = updater("entryPrice");
+
+    /** The fast final property updater. */
+    private static final MethodHandle entryPriceUpdater = handler(entryPriceField);
 
     /** The final property updater. */
-    private static final MethodHandle entryCommissionUpdater = updater("entryCommission");
+    private static final Field entryCommissionField = updater("entryCommission");
+
+    /** The fast final property updater. */
+    private static final MethodHandle entryCommissionUpdater = handler(entryCommissionField);
 
     /** The final property updater. */
-    private static final MethodHandle exitSizeUpdater = updater("exitSize");
+    private static final Field exitSizeField = updater("exitSize");
+
+    /** The fast final property updater. */
+    private static final MethodHandle exitSizeUpdater = handler(exitSizeField);
 
     /** The final property updater. */
-    private static final MethodHandle exitExecutedSizeUpdater = updater("exitExecutedSize");
+    private static final Field exitExecutedSizeField = updater("exitExecutedSize");
+
+    /** The fast final property updater. */
+    private static final MethodHandle exitExecutedSizeUpdater = handler(exitExecutedSizeField);
 
     /** The final property updater. */
-    private static final MethodHandle exitPriceUpdater = updater("exitPrice");
+    private static final Field exitPriceField = updater("exitPrice");
+
+    /** The fast final property updater. */
+    private static final MethodHandle exitPriceUpdater = handler(exitPriceField);
 
     /** The final property updater. */
-    private static final MethodHandle exitCommissionUpdater = updater("exitCommission");
+    private static final Field exitCommissionField = updater("exitCommission");
+
+    /** The fast final property updater. */
+    private static final MethodHandle exitCommissionUpdater = handler(exitCommissionField);
 
     /** The final property updater. */
-    private static final MethodHandle realizedProfitUpdater = updater("realizedProfit");
+    private static final Field realizedProfitField = updater("realizedProfit");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle realizedProfitUpdater = handler(realizedProfitField);
+
+    /** The exposed property. */
     public final Num entrySize;
 
     /** The property customizer. */
@@ -86,7 +130,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num entryExecutedSize;
 
     /** The property customizer. */
@@ -98,7 +142,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num entryPrice;
 
     /** The property customizer. */
@@ -110,10 +154,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num entryCommission;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num exitSize;
 
     /** The property customizer. */
@@ -125,7 +169,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num exitExecutedSize;
 
     /** The property customizer. */
@@ -137,7 +181,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num exitPrice;
 
     /** The property customizer. */
@@ -149,10 +193,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num exitCommission;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num realizedProfit;
 
     /** The property customizer. */

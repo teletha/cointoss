@@ -21,6 +21,9 @@ import java.util.function.UnaryOperator;
  */
 public class Position extends PositionModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -39,10 +42,24 @@ public class Position extends PositionModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = Position.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -50,27 +67,39 @@ public class Position extends PositionModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle orientationUpdater = updater("orientation");
+    private static final Field orientationField = updater("orientation");
+
+    /** The fast final property updater. */
+    private static final MethodHandle orientationUpdater = handler(orientationField);
 
     /** The final property updater. */
-    private static final MethodHandle priceUpdater = updater("price");
+    private static final Field priceField = updater("price");
+
+    /** The fast final property updater. */
+    private static final MethodHandle priceUpdater = handler(priceField);
 
     /** The final property updater. */
-    private static final MethodHandle sizeUpdater = updater("size");
+    private static final Field sizeField = updater("size");
+
+    /** The fast final property updater. */
+    private static final MethodHandle sizeUpdater = handler(sizeField);
 
     /** The final property updater. */
-    private static final MethodHandle dateUpdater = updater("date");
+    private static final Field dateField = updater("date");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle dateUpdater = handler(dateField);
+
+    /** The exposed property. */
     public final Direction orientation;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num price;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num size;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final ZonedDateTime date;
 
     /**

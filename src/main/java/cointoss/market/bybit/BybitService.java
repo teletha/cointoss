@@ -83,7 +83,7 @@ public class BybitService extends MarketService {
 
                     return Support.createExecution(side, size, price, date, context);
                 })
-                .take(e -> startId <= e.id() && e.id() <= endId);
+                .take(e -> startId <= e.id && e.id <= endId);
     }
 
     /**
@@ -142,7 +142,7 @@ public class BybitService extends MarketService {
      */
     @Override
     public boolean checkEquality(Execution one, Execution other) {
-        return other.id() <= one.id();
+        return other.id <= one.id;
     }
 
     /**

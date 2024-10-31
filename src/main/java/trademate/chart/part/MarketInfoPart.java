@@ -68,7 +68,7 @@ public class MarketInfoPart extends ChartPart {
                     c.fillText(parent.chart.market.v.service.id, ChartCanvas.chartInfoLeftPadding, 20);
                     c.setFont(normal);
 
-                    long diff = Chrono.currentTimeMills() - e.mills();
+                    long diff = Chrono.currentTimeMills() - e.mills;
                     c.setFill(diff < 0 || 1000 < diff ? WarningColor : textColor);
                     c.fillText(DelayLabel.v + " " + diff + "ms", ChartCanvas.chartInfoLeftPadding, verticalOffset);
 

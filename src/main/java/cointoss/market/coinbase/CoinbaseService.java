@@ -120,7 +120,7 @@ public class CoinbaseService extends MarketService {
                 for (int i = 0; i < 1000; i++) {
                     Execution item = child.get(i);
                     if (item != null) {
-                        endSec = support.computeEpochSecond(item.id());
+                        endSec = support.computeEpochSecond(item.id);
                         break;
                     }
                 }

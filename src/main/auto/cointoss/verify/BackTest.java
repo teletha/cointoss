@@ -24,6 +24,9 @@ import java.util.Objects;
  */
 public class BackTest implements BackTestModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -77,10 +80,24 @@ public class BackTest implements BackTestModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = BackTest.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -88,50 +105,75 @@ public class BackTest implements BackTestModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle serviceUpdater = updater("service");
+    private static final Field serviceField = updater("service");
+
+    /** The fast final property updater. */
+    private static final MethodHandle serviceUpdater = handler(serviceField);
 
     /** The final property updater. */
-    private static final MethodHandle startUpdater = updater("start");
+    private static final Field startField = updater("start");
+
+    /** The fast final property updater. */
+    private static final MethodHandle startUpdater = handler(startField);
 
     /** The final property updater. */
-    private static final MethodHandle endUpdater = updater("end");
+    private static final Field endField = updater("end");
+
+    /** The fast final property updater. */
+    private static final MethodHandle endUpdater = handler(endField);
 
     /** The final property updater. */
-    private static final MethodHandle tradersUpdater = updater("traders");
+    private static final Field tradersField = updater("traders");
+
+    /** The fast final property updater. */
+    private static final MethodHandle tradersUpdater = handler(tradersField);
 
     /** The final property updater. */
-    private static final MethodHandle initialBaseCurrencyUpdater = updater("initialBaseCurrency");
+    private static final Field initialBaseCurrencyField = updater("initialBaseCurrency");
+
+    /** The fast final property updater. */
+    private static final MethodHandle initialBaseCurrencyUpdater = handler(initialBaseCurrencyField);
 
     /** The final property updater. */
-    private static final MethodHandle initialTargetCurrencyUpdater = updater("initialTargetCurrency");
+    private static final Field initialTargetCurrencyField = updater("initialTargetCurrency");
+
+    /** The fast final property updater. */
+    private static final MethodHandle initialTargetCurrencyUpdater = handler(initialTargetCurrencyField);
 
     /** The final property updater. */
-    private static final MethodHandle typeUpdater = updater("type");
+    private static final Field detailField = updater("detail");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle detailUpdater = handler(detailField);
+
+    /** The final property updater. */
+    private static final Field typeField = updater("type");
+
+    /** The fast final property updater. */
+    private static final MethodHandle typeUpdater = handler(typeField);
+
+    /** The exposed property. */
     public final MarketService service;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final ZonedDateTime start;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final ZonedDateTime end;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final List<Trader> traders;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num initialBaseCurrency;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num initialTargetCurrency;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected boolean detail;
+    /** The exposed property. */
+    public final boolean detail;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final LogType type;
 
     /**
@@ -397,7 +439,11 @@ public class BackTest implements BackTestModel {
      */
     private final void setDetail(boolean value) {
         try {
-            this.detail = (boolean) value;
+            if (NATIVE) {
+                detailField.setBoolean(this, (boolean) value);
+            } else {
+                detailUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

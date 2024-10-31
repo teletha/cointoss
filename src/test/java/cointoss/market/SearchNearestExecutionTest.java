@@ -26,30 +26,30 @@ class SearchNearestExecutionTest {
     @Test
     @Timeout(value = 15)
     void bitmex() {
-        assert BitMex.XBT_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id() == 160678079903700000L;
+        assert BitMex.XBT_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 160678079903700000L;
     }
 
     @Test
     @Timeout(value = 15)
     void coinbase() {
-        assert Coinbase.BTCUSD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id() == 111789000;
+        assert Coinbase.BTCUSD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 111789000;
     }
 
     @Test
     @Timeout(value = 15)
     void binance() {
-        assert Binance.BTC_USDT.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id() == 443629856;
+        assert Binance.BTC_USDT.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 443629856;
     }
 
     @Test
     @Timeout(value = 15)
     void bybit() {
-        assert Bybit.BTC_USDT.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id() == 16067808009190000L;
+        assert Bybit.BTC_USDT.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 16067808009190000L;
     }
 
     @Test
     @Timeout(value = 15)
     void bitfinex() {
-        assert Bitfinex.BTC_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id() == 16067807986740000L;
+        assert Bitfinex.BTC_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 16067807986740000L;
     }
 }

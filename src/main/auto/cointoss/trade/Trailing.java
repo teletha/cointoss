@@ -23,6 +23,9 @@ import kiss.Signal;
  */
 public class Trailing extends TrailingModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -76,10 +79,24 @@ public class Trailing extends TrailingModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = Trailing.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -87,21 +104,30 @@ public class Trailing extends TrailingModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle losscutUpdater = updater("losscut");
+    private static final Field losscutField = updater("losscut");
+
+    /** The fast final property updater. */
+    private static final MethodHandle losscutUpdater = handler(losscutField);
 
     /** The final property updater. */
-    private static final MethodHandle profitUpdater = updater("profit");
+    private static final Field profitField = updater("profit");
+
+    /** The fast final property updater. */
+    private static final MethodHandle profitUpdater = handler(profitField);
 
     /** The final property updater. */
-    private static final MethodHandle updateUpdater = updater("update");
+    private static final Field updateField = updater("update");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle updateUpdater = handler(updateField);
+
+    /** The exposed property. */
     public final Num losscut;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num profit;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Function<Market, Signal<Num>> update;
 
     /**

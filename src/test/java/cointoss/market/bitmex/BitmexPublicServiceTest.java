@@ -95,20 +95,20 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
 
         List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
-        assert e.id() == 144360343582800000L;
+        assert e.id == 144360343582800000L;
         assert e.orientation == Direction.SELL;
         assert e.price.is(235.74);
         assert e.size.is(0.023574);
         assert e.date.isEqual(Chrono.utc(2015, 9, 30, 8, 57, 15, 828));
-        assert e.consecutive() == Execution.ConsecutiveDifference;
+        assert e.consecutive == Execution.ConsecutiveDifference;
 
         e = list.get(1);
-        assert e.id() == 144360345635800000L;
+        assert e.id == 144360345635800000L;
         assert e.orientation == Direction.BUY;
         assert e.price.is(235.9);
         assert e.size.is(0.021231);
         assert e.date.isEqual(Chrono.utc(2015, 9, 30, 8, 57, 36, 358));
-        assert e.consecutive() == Execution.ConsecutiveDifference;
+        assert e.consecutive == Execution.ConsecutiveDifference;
     }
 
     /**
@@ -135,12 +135,12 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
                 """);
 
         Execution e = service.executionLatest().waitForTerminate().to().exact();
-        assert e.id() == 159543566732400000L;
+        assert e.id == 159543566732400000L;
         assert e.orientation == Direction.BUY;
         assert e.price.is(9344.5);
         assert e.size.is(0.00010701);
         assert e.date.isEqual(Chrono.utc(2020, 7, 22, 16, 34, 27, 324));
-        assert e.consecutive() == Execution.ConsecutiveDifference;
+        assert e.consecutive == Execution.ConsecutiveDifference;
     }
 
     /**
@@ -161,28 +161,28 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
         assert list.size() == 3;
 
         Execution exe = list.get(0);
-        assert exe.id() == 159543580344000000L;
+        assert exe.id == 159543580344000000L;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9344.5);
         assert exe.size.is(0.01091502);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
-        assert exe.consecutive() == Execution.ConsecutiveDifference;
+        assert exe.consecutive == Execution.ConsecutiveDifference;
 
         exe = list.get(1);
-        assert exe.id() == 159543580826400000L;
+        assert exe.id == 159543580826400000L;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9344.5);
         assert exe.size.is(0.53505);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 48, 264));
-        assert exe.consecutive() == Execution.ConsecutiveDifference;
+        assert exe.consecutive == Execution.ConsecutiveDifference;
 
         exe = list.get(2);
-        assert exe.id() == 159543581379200000L;
+        assert exe.id == 159543581379200000L;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9344);
         assert exe.size.is(0.00010702);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 53, 792));
-        assert exe.consecutive() == Execution.ConsecutiveDifference;
+        assert exe.consecutive == Execution.ConsecutiveDifference;
     }
 
     /**
@@ -202,20 +202,20 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
         assert list.size() == 2;
 
         Execution exe = list.get(0);
-        assert exe.id() == 159543580344000000L;
+        assert exe.id == 159543580344000000L;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9344.5);
         assert exe.size.is(0.01091502);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
-        assert exe.consecutive() == Execution.ConsecutiveDifference;
+        assert exe.consecutive == Execution.ConsecutiveDifference;
 
         exe = list.get(1);
-        assert exe.id() == 159543580344000001L;
+        assert exe.id == 159543580344000001L;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9344.5);
         assert exe.size.is(0.53505);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
-        assert exe.consecutive() == Execution.ConsecutiveSameBuyer;
+        assert exe.consecutive == Execution.ConsecutiveSameBuyer;
     }
 
     /**
@@ -235,20 +235,20 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
         assert list.size() == 2;
 
         Execution exe = list.get(0);
-        assert exe.id() == 159543580344000000L;
+        assert exe.id == 159543580344000000L;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9344.5);
         assert exe.size.is(0.01091502);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
-        assert exe.consecutive() == Execution.ConsecutiveDifference;
+        assert exe.consecutive == Execution.ConsecutiveDifference;
 
         exe = list.get(1);
-        assert exe.id() == 159543580344000001L;
+        assert exe.id == 159543580344000001L;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9344.5);
         assert exe.size.is(0.53505);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
-        assert exe.consecutive() == Execution.ConsecutiveSameSeller;
+        assert exe.consecutive == Execution.ConsecutiveSameSeller;
     }
 
     /**
@@ -268,11 +268,11 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
         assert list.size() == 1;
 
         Execution exe = list.get(0);
-        assert exe.id() == 159543580344000000L;
+        assert exe.id == 159543580344000000L;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9344.5);
         assert exe.size.is(0.01091502);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 36, 43, 440));
-        assert exe.consecutive() == Execution.ConsecutiveDifference;
+        assert exe.consecutive == Execution.ConsecutiveDifference;
     }
 }

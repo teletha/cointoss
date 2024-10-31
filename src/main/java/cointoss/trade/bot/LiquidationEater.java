@@ -48,16 +48,16 @@ public class LiquidationEater extends Trader {
     @Override
     protected void declareStrategy(Market market, Funds fund) {
         market.timeline.to(exe -> {
-            if (exe.delay() == Execution.DelayHuge) {
+            if (exe.delay == Execution.DelayHuge) {
                 if (exe.orientation == Direction.BUY) {
-                    startBuy = exe.mills();
+                    startBuy = exe.mills;
                     volumeBuy = volumeBuy.plus(exe.size);
                 } else {
-                    startSell = exe.mills();
+                    startSell = exe.mills;
                     volumeSell = volumeSell.plus(exe.size);
                 }
             } else {
-                if (exe.mills() - startBuy > liquidationWait * 1000) {
+                if (exe.mills - startBuy > liquidationWait * 1000) {
                     if (volumeBuy.isGreaterThan(liquidationVolume)) {
                         when(I.signal("now"), x -> trade(new Scenario() {
 
@@ -76,7 +76,7 @@ public class LiquidationEater extends Trader {
                     volumeBuy = Num.ZERO;
                 }
 
-                if (exe.mills() - startSell > liquidationWait * 1000) {
+                if (exe.mills - startSell > liquidationWait * 1000) {
                     if (volumeSell.isGreaterThan(liquidationVolume)) {
                         when(I.signal("now"), x -> trade(new Scenario() {
 

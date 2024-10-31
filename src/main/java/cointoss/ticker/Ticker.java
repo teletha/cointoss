@@ -109,7 +109,7 @@ public final class Ticker implements Disposable {
      */
     final boolean createTick(Execution execution) {
         // Make sure whether the execution does not exceed the end time of current tick.
-        if (currentTickEndTime <= execution.mills()) {
+        if (currentTickEndTime <= execution.mills) {
             // If the end time of current tick does not reach the start time of tick which
             // execution actually belongs to, it is assumed that there was a blank time
             // (i.e. server error, maintenance). So we complement them in advance.

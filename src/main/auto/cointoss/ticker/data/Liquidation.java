@@ -20,6 +20,9 @@ import java.util.Objects;
  */
 public class Liquidation implements LiquidationModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -38,10 +41,24 @@ public class Liquidation implements LiquidationModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = Liquidation.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -49,26 +66,39 @@ public class Liquidation implements LiquidationModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle dateUpdater = updater("date");
+    private static final Field dateField = updater("date");
+
+    /** The fast final property updater. */
+    private static final MethodHandle dateUpdater = handler(dateField);
 
     /** The final property updater. */
-    private static final MethodHandle orientationUpdater = updater("orientation");
+    private static final Field orientationField = updater("orientation");
+
+    /** The fast final property updater. */
+    private static final MethodHandle orientationUpdater = handler(orientationField);
 
     /** The final property updater. */
-    private static final MethodHandle priceUpdater = updater("price");
+    private static final Field sizeField = updater("size");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle sizeUpdater = handler(sizeField);
+
+    /** The final property updater. */
+    private static final Field priceField = updater("price");
+
+    /** The fast final property updater. */
+    private static final MethodHandle priceUpdater = handler(priceField);
+
+    /** The exposed property. */
     public final ZonedDateTime date;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Direction orientation;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected double size;
+    /** The exposed property. */
+    public final double size;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num price;
 
     /**
@@ -178,7 +208,11 @@ public class Liquidation implements LiquidationModel {
      */
     private final void setSize(double value) {
         try {
-            this.size = (double) value;
+            if (NATIVE) {
+                sizeField.setDouble(this, (double) value);
+            } else {
+                sizeUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

@@ -25,6 +25,9 @@ import kiss.JSON;
  */
 public class EfficientWebSocket extends EfficientWebSocketModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -43,10 +46,24 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = EfficientWebSocket.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -54,68 +71,102 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle addressUpdater = updater("address");
+    private static final Field addressField = updater("address");
+
+    /** The fast final property updater. */
+    private static final MethodHandle addressUpdater = handler(addressField);
 
     /** The final property updater. */
-    private static final MethodHandle extractIdUpdater = updater("extractId");
+    private static final Field extractIdField = updater("extractId");
+
+    /** The fast final property updater. */
+    private static final MethodHandle extractIdUpdater = handler(extractIdField);
 
     /** The final property updater. */
-    private static final MethodHandle updateIdUpdater = updater("updateId");
+    private static final Field updateIdField = updater("updateId");
+
+    /** The fast final property updater. */
+    private static final MethodHandle updateIdUpdater = handler(updateIdField);
 
     /** The final property updater. */
-    private static final MethodHandle ignoreMessageIfUpdater = updater("ignoreMessageIf");
+    private static final Field maximumSubscriptionsField = updater("maximumSubscriptions");
+
+    /** The fast final property updater. */
+    private static final MethodHandle maximumSubscriptionsUpdater = handler(maximumSubscriptionsField);
 
     /** The final property updater. */
-    private static final MethodHandle recconnectIfUpdater = updater("recconnectIf");
+    private static final Field ignoreMessageIfField = updater("ignoreMessageIf");
+
+    /** The fast final property updater. */
+    private static final MethodHandle ignoreMessageIfUpdater = handler(ignoreMessageIfField);
 
     /** The final property updater. */
-    private static final MethodHandle stopRecconnectIfUpdater = updater("stopRecconnectIf");
+    private static final Field recconnectIfField = updater("recconnectIf");
+
+    /** The fast final property updater. */
+    private static final MethodHandle recconnectIfUpdater = handler(recconnectIfField);
 
     /** The final property updater. */
-    private static final MethodHandle pongIfUpdater = updater("pongIf");
+    private static final Field stopRecconnectIfField = updater("stopRecconnectIf");
+
+    /** The fast final property updater. */
+    private static final MethodHandle stopRecconnectIfUpdater = handler(stopRecconnectIfField);
 
     /** The final property updater. */
-    private static final MethodHandle whenConnectedUpdater = updater("whenConnected");
+    private static final Field pongIfField = updater("pongIf");
+
+    /** The fast final property updater. */
+    private static final MethodHandle pongIfUpdater = handler(pongIfField);
 
     /** The final property updater. */
-    private static final MethodHandle clientUpdater = updater("client");
+    private static final Field whenConnectedField = updater("whenConnected");
+
+    /** The fast final property updater. */
+    private static final MethodHandle whenConnectedUpdater = handler(whenConnectedField);
 
     /** The final property updater. */
-    private static final MethodHandle schedulerUpdater = updater("scheduler");
+    private static final Field clientField = updater("client");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle clientUpdater = handler(clientField);
+
+    /** The final property updater. */
+    private static final Field schedulerField = updater("scheduler");
+
+    /** The fast final property updater. */
+    private static final MethodHandle schedulerUpdater = handler(schedulerField);
+
+    /** The exposed property. */
     public final String address;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Function<JSON, String> extractId;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Function<JSON, String> updateId;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected int maximumSubscriptions;
+    /** The exposed property. */
+    public final int maximumSubscriptions;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Predicate<JSON> ignoreMessageIf;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Predicate<JSON> recconnectIf;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Predicate<JSON> stopRecconnectIf;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Function<JSON, String> pongIf;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Consumer<WebSocket> whenConnected;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final HttpClient client;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final ScheduledExecutorService scheduler;
 
     /**
@@ -275,7 +326,11 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
      */
     private final void setMaximumSubscriptions(int value) {
         try {
-            this.maximumSubscriptions = (int) value;
+            if (NATIVE) {
+                maximumSubscriptionsField.setInt(this, (int) value);
+            } else {
+                maximumSubscriptionsUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

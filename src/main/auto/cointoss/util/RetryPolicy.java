@@ -23,6 +23,9 @@ import java.util.function.LongFunction;
  */
 public class RetryPolicy extends RetryPolicyModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -73,10 +76,24 @@ public class RetryPolicy extends RetryPolicyModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = RetryPolicy.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -84,38 +101,57 @@ public class RetryPolicy extends RetryPolicyModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle delayUpdater = updater("delay");
+    private static final Field limitField = updater("limit");
+
+    /** The fast final property updater. */
+    private static final MethodHandle limitUpdater = handler(limitField);
 
     /** The final property updater. */
-    private static final MethodHandle delayOnLimitOverflowUpdater = updater("delayOnLimitOverflow");
+    private static final Field delayField = updater("delay");
+
+    /** The fast final property updater. */
+    private static final MethodHandle delayUpdater = handler(delayField);
 
     /** The final property updater. */
-    private static final MethodHandle delayOnMaintenaceUpdater = updater("delayOnMaintenace");
+    private static final Field delayOnLimitOverflowField = updater("delayOnLimitOverflow");
+
+    /** The fast final property updater. */
+    private static final MethodHandle delayOnLimitOverflowUpdater = handler(delayOnLimitOverflowField);
 
     /** The final property updater. */
-    private static final MethodHandle nameUpdater = updater("name");
+    private static final Field delayOnMaintenaceField = updater("delayOnMaintenace");
+
+    /** The fast final property updater. */
+    private static final MethodHandle delayOnMaintenaceUpdater = handler(delayOnMaintenaceField);
 
     /** The final property updater. */
-    private static final MethodHandle schedulerUpdater = updater("scheduler");
+    private static final Field nameField = updater("name");
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected long limit;
+    /** The fast final property updater. */
+    private static final MethodHandle nameUpdater = handler(nameField);
 
-    /** The property holder.*/
+    /** The final property updater. */
+    private static final Field schedulerField = updater("scheduler");
+
+    /** The fast final property updater. */
+    private static final MethodHandle schedulerUpdater = handler(schedulerField);
+
+    /** The exposed property. */
+    final long limit;
+
+    /** The exposed property. */
     final LongFunction<Duration> delay;
 
-    /** The property holder.*/
+    /** The exposed property. */
     final LongFunction<Duration> delayOnLimitOverflow;
 
-    /** The property holder.*/
+    /** The exposed property. */
     final LongFunction<Duration> delayOnMaintenace;
 
-    /** The property holder.*/
+    /** The exposed property. */
     final String name;
 
-    /** The property holder.*/
+    /** The exposed property. */
     final ScheduledExecutorService scheduler;
 
     /**
@@ -157,7 +193,11 @@ public class RetryPolicy extends RetryPolicyModel {
      */
     private final void setLimit(long value) {
         try {
-            this.limit = (long) value;
+            if (NATIVE) {
+                limitField.setLong(this, (long) value);
+            } else {
+                limitUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

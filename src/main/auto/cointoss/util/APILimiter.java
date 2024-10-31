@@ -21,6 +21,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class APILimiter extends APILimiterModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -65,10 +68,24 @@ public class APILimiter extends APILimiterModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = APILimiter.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -76,20 +93,30 @@ public class APILimiter extends APILimiterModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle refreshUpdater = updater("refresh");
+    private static final Field limitField = updater("limit");
+
+    /** The fast final property updater. */
+    private static final MethodHandle limitUpdater = handler(limitField);
 
     /** The final property updater. */
-    private static final MethodHandle persistableUpdater = updater("persistable");
+    private static final Field refreshField = updater("refresh");
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected int limit;
+    /** The fast final property updater. */
+    private static final MethodHandle refreshUpdater = handler(refreshField);
 
-    /** The property holder.*/
+    /** The final property updater. */
+    private static final Field persistableField = updater("persistable");
+
+    /** The fast final property updater. */
+    private static final MethodHandle persistableUpdater = handler(persistableField);
+
+    /** The exposed property. */
+    public final int limit;
+
+    /** The exposed property. */
     public final Duration refresh;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final String persistable;
 
     /**
@@ -128,7 +155,11 @@ public class APILimiter extends APILimiterModel {
      */
     private final void setLimit(int value) {
         try {
-            this.limit = (int) value;
+            if (NATIVE) {
+                limitField.setInt(this, (int) value);
+            } else {
+                limitUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

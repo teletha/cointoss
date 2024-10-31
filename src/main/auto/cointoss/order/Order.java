@@ -24,6 +24,9 @@ import kiss.Signal;
  */
 public class Order extends OrderModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -95,10 +98,24 @@ public class Order extends OrderModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = Order.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -106,54 +123,87 @@ public class Order extends OrderModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle orientationUpdater = updater("orientation");
+    private static final Field orientationField = updater("orientation");
+
+    /** The fast final property updater. */
+    private static final MethodHandle orientationUpdater = handler(orientationField);
 
     /** The final property updater. */
-    private static final MethodHandle sizeUpdater = updater("size");
+    private static final Field sizeField = updater("size");
+
+    /** The fast final property updater. */
+    private static final MethodHandle sizeUpdater = handler(sizeField);
 
     /** The final property updater. */
-    private static final MethodHandle priceUpdater = updater("price");
+    private static final Field priceField = updater("price");
+
+    /** The fast final property updater. */
+    private static final MethodHandle priceUpdater = handler(priceField);
 
     /** The final property updater. */
-    private static final MethodHandle typeUpdater = updater("type");
+    private static final Field typeField = updater("type");
+
+    /** The fast final property updater. */
+    private static final MethodHandle typeUpdater = handler(typeField);
 
     /** The final property updater. */
-    private static final MethodHandle quantityConditionUpdater = updater("quantityCondition");
+    private static final Field quantityConditionField = updater("quantityCondition");
+
+    /** The fast final property updater. */
+    private static final MethodHandle quantityConditionUpdater = handler(quantityConditionField);
 
     /** The final property updater. */
-    private static final MethodHandle executedSizeUpdater = updater("executedSize");
+    private static final Field executedSizeField = updater("executedSize");
+
+    /** The fast final property updater. */
+    private static final MethodHandle executedSizeUpdater = handler(executedSizeField);
 
     /** The final property updater. */
-    private static final MethodHandle commissionUpdater = updater("commission");
+    private static final Field commissionField = updater("commission");
+
+    /** The fast final property updater. */
+    private static final MethodHandle commissionUpdater = handler(commissionField);
 
     /** The final property updater. */
-    private static final MethodHandle idUpdater = updater("id");
+    private static final Field idField = updater("id");
+
+    /** The fast final property updater. */
+    private static final MethodHandle idUpdater = handler(idField);
 
     /** The final property updater. */
-    private static final MethodHandle creationTimeUpdater = updater("creationTime");
+    private static final Field creationTimeField = updater("creationTime");
+
+    /** The fast final property updater. */
+    private static final MethodHandle creationTimeUpdater = handler(creationTimeField);
 
     /** The final property updater. */
-    private static final MethodHandle terminationTimeUpdater = updater("terminationTime");
+    private static final Field terminationTimeField = updater("terminationTime");
+
+    /** The fast final property updater. */
+    private static final MethodHandle terminationTimeUpdater = handler(terminationTimeField);
 
     /** The final property updater. */
-    private static final MethodHandle stateUpdater = updater("state");
+    private static final Field stateField = updater("state");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle stateUpdater = handler(stateField);
+
+    /** The exposed property. */
     public final Direction orientation;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num size;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num price;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final OrderType type;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final QuantityCondition quantityCondition;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num executedSize;
 
     /** The property customizer. */
@@ -165,13 +215,13 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num commission;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final String id;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final ZonedDateTime creationTime;
 
     /** The property customizer. */
@@ -183,7 +233,7 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final ZonedDateTime terminationTime;
 
     /** The property customizer. */
@@ -195,7 +245,7 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final cointoss.order.OrderState state;
 
     /** The property customizer. */

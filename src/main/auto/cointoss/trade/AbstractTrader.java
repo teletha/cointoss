@@ -20,6 +20,9 @@ import kiss.Signal;
  */
 public class AbstractTrader extends AbstractTraderModel {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -38,10 +41,24 @@ public class AbstractTrader extends AbstractTraderModel {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = AbstractTrader.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -49,18 +66,30 @@ public class AbstractTrader extends AbstractTraderModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle holdSizeUpdater = updater("holdSize");
+    private static final Field holdSizeField = updater("holdSize");
+
+    /** The fast final property updater. */
+    private static final MethodHandle holdSizeUpdater = handler(holdSizeField);
 
     /** The final property updater. */
-    private static final MethodHandle holdMaxSizeUpdater = updater("holdMaxSize");
+    private static final Field holdMaxSizeField = updater("holdMaxSize");
+
+    /** The fast final property updater. */
+    private static final MethodHandle holdMaxSizeUpdater = handler(holdMaxSizeField);
 
     /** The final property updater. */
-    private static final MethodHandle profitUpdater = updater("profit");
+    private static final Field profitField = updater("profit");
+
+    /** The fast final property updater. */
+    private static final MethodHandle profitUpdater = handler(profitField);
 
     /** The final property updater. */
-    private static final MethodHandle scenariosUpdater = updater("scenarios");
+    private static final Field scenariosField = updater("scenarios");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle scenariosUpdater = handler(scenariosField);
+
+    /** The exposed property. */
     public final Num holdSize;
 
     /** The property customizer. */
@@ -72,7 +101,7 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num holdMaxSize;
 
     /** The property customizer. */
@@ -84,7 +113,7 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num profit;
 
     /** The property customizer. */
@@ -96,7 +125,7 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The property holder.*/
+    /** The exposed property. */
     protected final List<Scenario> scenarios;
 
     /**

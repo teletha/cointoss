@@ -365,7 +365,7 @@ class VerifiableMarketTest {
         AtomicDouble size = new AtomicDouble();
 
         market.timelineByTaker.to(e -> {
-            size.set(e.accumulative());
+            size.set(e.accumulative);
         });
 
         market.performSequencially(4, Execution.with.sell(5).price(10));
@@ -378,7 +378,7 @@ class VerifiableMarketTest {
         AtomicDouble size = new AtomicDouble();
 
         market.timelineByTaker.to(e -> {
-            size.set(e.accumulative());
+            size.set(e.accumulative);
         });
 
         market.performSequencially(4, Execution.with.buy(5).price(10));

@@ -27,6 +27,9 @@ import java.util.function.UnaryOperator;
  */
 public class Execution extends ExecutionModel<Execution> {
 
+     /** Determines if the execution environment is a Native Image of GraalVM. */
+    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
      *
@@ -98,10 +101,24 @@ public class Execution extends ExecutionModel<Execution> {
      * @param name A target property name.
      * @return A special property updater.
      */
-    private static final MethodHandle updater(String name)  {
+    private static final Field updater(String name)  {
         try {
             Field field = Execution.class.getDeclaredField(name);
             field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Create fast property updater.
+     *
+     * @param field A target field.
+     * @return A fast property updater.
+     */
+    private static final MethodHandle handler(Field field)  {
+        try {
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
             throw quiet(e);
@@ -109,58 +126,93 @@ public class Execution extends ExecutionModel<Execution> {
     }
 
     /** The final property updater. */
-    private static final MethodHandle orientationUpdater = updater("orientation");
+    private static final Field orientationField = updater("orientation");
+
+    /** The fast final property updater. */
+    private static final MethodHandle orientationUpdater = handler(orientationField);
 
     /** The final property updater. */
-    private static final MethodHandle sizeUpdater = updater("size");
+    private static final Field sizeField = updater("size");
+
+    /** The fast final property updater. */
+    private static final MethodHandle sizeUpdater = handler(sizeField);
 
     /** The final property updater. */
-    private static final MethodHandle priceUpdater = updater("price");
+    private static final Field idField = updater("id");
+
+    /** The fast final property updater. */
+    private static final MethodHandle idUpdater = handler(idField);
 
     /** The final property updater. */
-    private static final MethodHandle dateUpdater = updater("date");
+    private static final Field priceField = updater("price");
+
+    /** The fast final property updater. */
+    private static final MethodHandle priceUpdater = handler(priceField);
 
     /** The final property updater. */
-    private static final MethodHandle infoUpdater = updater("info");
+    private static final Field accumulativeField = updater("accumulative");
 
-    /** The property holder.*/
+    /** The fast final property updater. */
+    private static final MethodHandle accumulativeUpdater = handler(accumulativeField);
+
+    /** The final property updater. */
+    private static final Field dateField = updater("date");
+
+    /** The fast final property updater. */
+    private static final MethodHandle dateUpdater = handler(dateField);
+
+    /** The final property updater. */
+    private static final Field millsField = updater("mills");
+
+    /** The fast final property updater. */
+    private static final MethodHandle millsUpdater = handler(millsField);
+
+    /** The final property updater. */
+    private static final Field consecutiveField = updater("consecutive");
+
+    /** The fast final property updater. */
+    private static final MethodHandle consecutiveUpdater = handler(consecutiveField);
+
+    /** The final property updater. */
+    private static final Field delayField = updater("delay");
+
+    /** The fast final property updater. */
+    private static final MethodHandle delayUpdater = handler(delayField);
+
+    /** The final property updater. */
+    private static final Field infoField = updater("info");
+
+    /** The fast final property updater. */
+    private static final MethodHandle infoUpdater = handler(infoField);
+
+    /** The exposed property. */
     public final Direction orientation;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num size;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected long id;
+    /** The exposed property. */
+    public final long id;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final Num price;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected double accumulative;
+    /** The exposed property. */
+    public final double accumulative;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final ZonedDateTime date;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected long mills;
+    /** The exposed property. */
+    public final long mills;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected int consecutive;
+    /** The exposed property. */
+    public final int consecutive;
 
-    /** The property holder.*/
-    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
-    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
-    protected int delay;
+    /** The exposed property. */
+    public final int delay;
 
-    /** The property holder.*/
+    /** The exposed property. */
     public final String info;
 
     /**
@@ -279,7 +331,11 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setId(long value) {
         try {
-            this.id = (long) value;
+            if (NATIVE) {
+                idField.setLong(this, (long) value);
+            } else {
+                idUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -372,7 +428,11 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setAccumulative(double value) {
         try {
-            this.accumulative = (double) value;
+            if (NATIVE) {
+                accumulativeField.setDouble(this, (double) value);
+            } else {
+                accumulativeUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -439,7 +499,11 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setMills(long value) {
         try {
-            this.mills = (long) value;
+            if (NATIVE) {
+                millsField.setLong(this, (long) value);
+            } else {
+                millsUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -473,7 +537,11 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setConsecutive(int value) {
         try {
-            this.consecutive = (int) value;
+            if (NATIVE) {
+                consecutiveField.setInt(this, (int) value);
+            } else {
+                consecutiveUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -529,7 +597,11 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setDelay(int value) {
         try {
-            this.delay = (int) value;
+            if (NATIVE) {
+                delayField.setInt(this, (int) value);
+            } else {
+                delayUpdater.invoke(this, value);
+            }
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
