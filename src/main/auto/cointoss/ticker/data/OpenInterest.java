@@ -70,14 +70,13 @@ public class OpenInterest extends OpenInterestModel {
     /** The final property updater. */
     private static final MethodHandle dateUpdater = updater("date");
 
-    /** The final property updater. */
-    private static final MethodHandle sizeUpdater = updater("size");
-
-    /** The exposed property. */
+    /** The property holder.*/
     public final ZonedDateTime date;
 
-    /** The exposed property. */
-    public final float size;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected float size;
 
     /**
      * HIDE CONSTRUCTOR
@@ -147,7 +146,7 @@ public class OpenInterest extends OpenInterestModel {
      */
     private final void setSize(float value) {
         try {
-            sizeUpdater.invoke(this, value);
+            this.size = (float) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

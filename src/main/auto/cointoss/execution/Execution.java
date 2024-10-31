@@ -115,57 +115,52 @@ public class Execution extends ExecutionModel<Execution> {
     private static final MethodHandle sizeUpdater = updater("size");
 
     /** The final property updater. */
-    private static final MethodHandle idUpdater = updater("id");
-
-    /** The final property updater. */
     private static final MethodHandle priceUpdater = updater("price");
-
-    /** The final property updater. */
-    private static final MethodHandle accumulativeUpdater = updater("accumulative");
 
     /** The final property updater. */
     private static final MethodHandle dateUpdater = updater("date");
 
     /** The final property updater. */
-    private static final MethodHandle millsUpdater = updater("mills");
-
-    /** The final property updater. */
-    private static final MethodHandle consecutiveUpdater = updater("consecutive");
-
-    /** The final property updater. */
-    private static final MethodHandle delayUpdater = updater("delay");
-
-    /** The final property updater. */
     private static final MethodHandle infoUpdater = updater("info");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Direction orientation;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num size;
 
-    /** The exposed property. */
-    public final long id;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected long id;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num price;
 
-    /** The exposed property. */
-    public final double accumulative;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected double accumulative;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final ZonedDateTime date;
 
-    /** The exposed property. */
-    public final long mills;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected long mills;
 
-    /** The exposed property. */
-    public final int consecutive;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected int consecutive;
 
-    /** The exposed property. */
-    public final int delay;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected int delay;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final String info;
 
     /**
@@ -284,7 +279,7 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setId(long value) {
         try {
-            idUpdater.invoke(this, value);
+            this.id = (long) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -377,7 +372,7 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setAccumulative(double value) {
         try {
-            accumulativeUpdater.invoke(this, value);
+            this.accumulative = (double) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -444,7 +439,7 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setMills(long value) {
         try {
-            millsUpdater.invoke(this, value);
+            this.mills = (long) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -478,7 +473,7 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setConsecutive(int value) {
         try {
-            consecutiveUpdater.invoke(this, value);
+            this.consecutive = (int) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -534,7 +529,7 @@ public class Execution extends ExecutionModel<Execution> {
      */
     private final void setDelay(int value) {
         try {
-            delayUpdater.invoke(this, value);
+            this.delay = (int) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

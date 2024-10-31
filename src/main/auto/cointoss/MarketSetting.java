@@ -63,12 +63,6 @@ public class MarketSetting implements MarketSettingModel {
     private static final MethodHandle targetCurrencyBidSizesUpdater = updater("targetCurrencyBidSizes");
 
     /** The final property updater. */
-    private static final MethodHandle priceRangeModifierUpdater = updater("priceRangeModifier");
-
-    /** The final property updater. */
-    private static final MethodHandle orderbookMaxSizeUpdater = updater("orderbookMaxSize");
-
-    /** The final property updater. */
     private static final MethodHandle executionLoggerUpdater = updater("executionLogger");
 
     /** The final property updater. */
@@ -83,37 +77,41 @@ public class MarketSetting implements MarketSettingModel {
     /** The final property updater. */
     private static final MethodHandle baseWithdrawingFeeUpdater = updater("baseWithdrawingFee");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final MarketType type;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final CurrencySetting target;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final cointoss.CurrencySetting base;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final List<Num> targetCurrencyBidSizes;
 
-    /** The exposed property. */
-    public final int priceRangeModifier;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected int priceRangeModifier;
 
-    /** The exposed property. */
-    public final int orderbookMaxSize;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected int orderbookMaxSize;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Class<? extends ExecutionLogger> executionLogger;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final UnaryOperator<Num> takerFee;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final UnaryOperator<Num> makerFee;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final UnaryOperator<Num> targetWithdrawingFee;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final UnaryOperator<Num> baseWithdrawingFee;
 
     /**
@@ -300,7 +298,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setPriceRangeModifier(int value) {
         try {
-            priceRangeModifierUpdater.invoke(this, value);
+            this.priceRangeModifier = (int) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);
@@ -330,7 +328,7 @@ public class MarketSetting implements MarketSettingModel {
      */
     private final void setOrderbookMaxSize(int value) {
         try {
-            orderbookMaxSizeUpdater.invoke(this, value);
+            this.orderbookMaxSize = (int) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

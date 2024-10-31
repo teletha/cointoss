@@ -91,28 +91,28 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
         assert list.size() == 3;
 
         Execution e = list.get(0);
-        assert e.id == 13581820430000000L;
+        assert e.id() == 13581820430000000L;
         assert e.orientation == Direction.BUY;
         assert e.price.is(14.5373664);
         assert e.size.is(0.2721858);
         assert e.date.isEqual(Chrono.utc(2013, 1, 14, 16, 47, 23, 0));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.consecutive() == Execution.ConsecutiveDifference;
 
         e = list.get(1);
-        assert e.id == 13581820440000000L;
+        assert e.id() == 13581820440000000L;
         assert e.orientation == Direction.BUY;
         assert e.price.is(14.5373664);
         assert e.size.is(103);
         assert e.date.isEqual(Chrono.utc(2013, 1, 14, 16, 47, 24, 0));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.consecutive() == Execution.ConsecutiveDifference;
 
         e = list.get(2);
-        assert e.id == 13581858560000000L;
+        assert e.id() == 13581858560000000L;
         assert e.orientation == Direction.SELL;
         assert e.price.is(14.5329498);
         assert e.size.is(20);
         assert e.date.isEqual(Chrono.utc(2013, 1, 14, 17, 50, 56, 0));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.consecutive() == Execution.ConsecutiveDifference;
     }
 
     /**
@@ -133,12 +133,12 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
                 """);
 
         Execution e = service.executionLatest().waitForTerminate().to().exact();
-        assert e.id == 15954286995100000L;
+        assert e.id() == 15954286995100000L;
         assert e.orientation == Direction.BUY;
         assert e.price.is(9342.2);
         assert e.size.is(0.0021);
         assert e.date.isEqual(Chrono.utc(2020, 7, 22, 14, 38, 19, 510));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.consecutive() == Execution.ConsecutiveDifference;
     }
 
     /**
@@ -165,28 +165,28 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
         assert list.size() == 3;
 
         Execution exe = list.get(0);
-        assert exe.id == 15954346403080000L;
+        assert exe.id() == 15954346403080000L;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9360.5);
         assert exe.size.is(0.61909792);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 17, 20, 308));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.consecutive() == Execution.ConsecutiveDifference;
 
         exe = list.get(1);
-        assert exe.id == 15954346485220000L;
+        assert exe.id() == 15954346485220000L;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9360.5);
         assert exe.size.is(0.61907935);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 17, 28, 522));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.consecutive() == Execution.ConsecutiveDifference;
 
         exe = list.get(2);
-        assert exe.id == 15954346580370000L;
+        assert exe.id() == 15954346580370000L;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9360);
         assert exe.size.is(0.61907373);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 16, 17, 38, 37));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.consecutive() == Execution.ConsecutiveDifference;
     }
 
     /**
@@ -211,20 +211,20 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
         assert list.size() == 2;
 
         Execution exe = list.get(0);
-        assert exe.id == 15954289072030000L;
+        assert exe.id() == 15954289072030000L;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9343.3);
         assert exe.size.is(0.05);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 14, 41, 47, 203));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.consecutive() == Execution.ConsecutiveDifference;
 
         exe = list.get(1);
-        assert exe.id == 15954289072030001L;
+        assert exe.id() == 15954289072030001L;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9343.3);
         assert exe.size.is(0.56969684);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 14, 41, 47, 203));
-        assert exe.consecutive == Execution.ConsecutiveSameBuyer;
+        assert exe.consecutive() == Execution.ConsecutiveSameBuyer;
     }
 
     /**
@@ -249,20 +249,20 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
         assert list.size() == 2;
 
         Execution exe = list.get(0);
-        assert exe.id == 15954289072030000L;
+        assert exe.id() == 15954289072030000L;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9343.3);
         assert exe.size.is(0.05);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 14, 41, 47, 203));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.consecutive() == Execution.ConsecutiveDifference;
 
         exe = list.get(1);
-        assert exe.id == 15954289072030001L;
+        assert exe.id() == 15954289072030001L;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9343.3);
         assert exe.size.is(0.56969684);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 14, 41, 47, 203));
-        assert exe.consecutive == Execution.ConsecutiveSameSeller;
+        assert exe.consecutive() == Execution.ConsecutiveSameSeller;
     }
 
     /**
@@ -286,11 +286,11 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
         assert list.size() == 1;
 
         Execution exe = list.get(0);
-        assert exe.id == 15954289072030000L;
+        assert exe.id() == 15954289072030000L;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9343.3);
         assert exe.size.is(0.56969684);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 14, 41, 47, 203));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.consecutive() == Execution.ConsecutiveDifference;
     }
 }

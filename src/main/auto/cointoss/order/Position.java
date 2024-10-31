@@ -61,16 +61,16 @@ public class Position extends PositionModel {
     /** The final property updater. */
     private static final MethodHandle dateUpdater = updater("date");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Direction orientation;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num price;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num size;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final ZonedDateTime date;
 
     /**

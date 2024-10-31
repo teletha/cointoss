@@ -63,9 +63,6 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
     private static final MethodHandle updateIdUpdater = updater("updateId");
 
     /** The final property updater. */
-    private static final MethodHandle maximumSubscriptionsUpdater = updater("maximumSubscriptions");
-
-    /** The final property updater. */
     private static final MethodHandle ignoreMessageIfUpdater = updater("ignoreMessageIf");
 
     /** The final property updater. */
@@ -86,37 +83,39 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
     /** The final property updater. */
     private static final MethodHandle schedulerUpdater = updater("scheduler");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final String address;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Function<JSON, String> extractId;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Function<JSON, String> updateId;
 
-    /** The exposed property. */
-    public final int maximumSubscriptions;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected int maximumSubscriptions;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Predicate<JSON> ignoreMessageIf;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Predicate<JSON> recconnectIf;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Predicate<JSON> stopRecconnectIf;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Function<JSON, String> pongIf;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Consumer<WebSocket> whenConnected;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final HttpClient client;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final ScheduledExecutorService scheduler;
 
     /**
@@ -276,7 +275,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
      */
     private final void setMaximumSubscriptions(int value) {
         try {
-            maximumSubscriptionsUpdater.invoke(this, value);
+            this.maximumSubscriptions = (int) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

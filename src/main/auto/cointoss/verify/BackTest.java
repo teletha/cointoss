@@ -106,33 +106,32 @@ public class BackTest implements BackTestModel {
     private static final MethodHandle initialTargetCurrencyUpdater = updater("initialTargetCurrency");
 
     /** The final property updater. */
-    private static final MethodHandle detailUpdater = updater("detail");
-
-    /** The final property updater. */
     private static final MethodHandle typeUpdater = updater("type");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final MarketService service;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final ZonedDateTime start;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final ZonedDateTime end;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final List<Trader> traders;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num initialBaseCurrency;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num initialTargetCurrency;
 
-    /** The exposed property. */
-    public final boolean detail;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected boolean detail;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final LogType type;
 
     /**
@@ -398,7 +397,7 @@ public class BackTest implements BackTestModel {
      */
     private final void setDetail(boolean value) {
         try {
-            detailUpdater.invoke(this, value);
+            this.detail = (boolean) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

@@ -490,7 +490,7 @@ public class VerifiableMarketService extends MarketService {
      */
     final void emulate(Execution e, Consumer<Execution> executor) {
         now = e.date;
-        nowMills = e.mills;
+        nowMills = e.mills();
 
         // emulate market execution
         Iterator<BackendOrder> iterator = orderActive.iterator();
@@ -499,12 +499,12 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder order = iterator.next();
 
             // time base filter
-            if (e.mills < order.createTimeMills) {
+            if (e.mills() < order.createTimeMills) {
                 continue;
             }
 
             // check canceling time
-            if (order.cancelTimeMills != 0 && order.cancelTimeMills <= e.mills) {
+            if (order.cancelTimeMills != 0 && order.cancelTimeMills <= e.mills()) {
                 order.cancel();
                 continue;
             }
@@ -551,17 +551,17 @@ public class VerifiableMarketService extends MarketService {
                 executor.accept(Execution.with.orientation(e.orientation, executedSize)
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date)
-                        .id(e.id)
-                        .consecutive(e.consecutive)
-                        .delay(e.delay));
+                        .id(e.id())
+                        .consecutive(e.consecutive())
+                        .delay(e.delay()));
 
                 if (executedSize.isNot(e.size)) {
                     emulate(Execution.with.orientation(e.orientation, e.size.minus(executedSize))
                             .price(e.price)
                             .date(e.date)
-                            .id(e.id)
-                            .consecutive(e.consecutive)
-                            .delay(e.delay), executor);
+                            .id(e.id())
+                            .consecutive(e.consecutive())
+                            .delay(e.delay()), executor);
                 }
                 return;
             }

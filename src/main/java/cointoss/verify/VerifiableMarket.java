@@ -88,9 +88,9 @@ public class VerifiableMarket extends Market {
             for (int i = 1; i < count; i++) {
                 Execution copy = Execution.with.orientation(e.orientation, e.size)
                         .price(e.price)
-                        .id(e.id ^ (97 + i))
+                        .id(e.id() ^ (97 + i))
                         .date(service.now())
-                        .delay(e.delay)
+                        .delay(e.delay())
                         .consecutive(e.orientation.isPositive() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller);
 
                 perform(copy);

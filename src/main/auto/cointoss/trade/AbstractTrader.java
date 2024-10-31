@@ -60,7 +60,7 @@ public class AbstractTrader extends AbstractTraderModel {
     /** The final property updater. */
     private static final MethodHandle scenariosUpdater = updater("scenarios");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num holdSize;
 
     /** The property customizer. */
@@ -72,7 +72,7 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num holdMaxSize;
 
     /** The property customizer. */
@@ -84,7 +84,7 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num profit;
 
     /** The property customizer. */
@@ -96,7 +96,7 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     protected final List<Scenario> scenarios;
 
     /**

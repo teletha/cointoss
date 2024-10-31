@@ -74,7 +74,7 @@ public class ScenarioBase extends ScenarioBaseModel {
     /** The final property updater. */
     private static final MethodHandle realizedProfitUpdater = updater("realizedProfit");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num entrySize;
 
     /** The property customizer. */
@@ -86,7 +86,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num entryExecutedSize;
 
     /** The property customizer. */
@@ -98,7 +98,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num entryPrice;
 
     /** The property customizer. */
@@ -110,10 +110,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num entryCommission;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num exitSize;
 
     /** The property customizer. */
@@ -125,7 +125,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num exitExecutedSize;
 
     /** The property customizer. */
@@ -137,7 +137,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num exitPrice;
 
     /** The property customizer. */
@@ -149,10 +149,10 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num exitCommission;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num realizedProfit;
 
     /** The property customizer. */

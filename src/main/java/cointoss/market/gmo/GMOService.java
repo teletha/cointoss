@@ -126,7 +126,7 @@ public class GMOService extends MarketService {
         ZonedDateTime date = Support.computeDateTime(id);
         LogHouse repo = loghouse();
 
-        return repo.convert(date).takeUntil(e -> id <= e.id).waitForTerminate();
+        return repo.convert(date).takeUntil(e -> id <= e.id()).waitForTerminate();
     }
 
     /**

@@ -84,9 +84,6 @@ public class RetryPolicy extends RetryPolicyModel {
     }
 
     /** The final property updater. */
-    private static final MethodHandle limitUpdater = updater("limit");
-
-    /** The final property updater. */
     private static final MethodHandle delayUpdater = updater("delay");
 
     /** The final property updater. */
@@ -101,22 +98,24 @@ public class RetryPolicy extends RetryPolicyModel {
     /** The final property updater. */
     private static final MethodHandle schedulerUpdater = updater("scheduler");
 
-    /** The exposed property. */
-    final long limit;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected long limit;
 
-    /** The exposed property. */
+    /** The property holder.*/
     final LongFunction<Duration> delay;
 
-    /** The exposed property. */
+    /** The property holder.*/
     final LongFunction<Duration> delayOnLimitOverflow;
 
-    /** The exposed property. */
+    /** The property holder.*/
     final LongFunction<Duration> delayOnMaintenace;
 
-    /** The exposed property. */
+    /** The property holder.*/
     final String name;
 
-    /** The exposed property. */
+    /** The property holder.*/
     final ScheduledExecutorService scheduler;
 
     /**
@@ -158,7 +157,7 @@ public class RetryPolicy extends RetryPolicyModel {
      */
     private final void setLimit(long value) {
         try {
-            limitUpdater.invoke(this, value);
+            this.limit = (long) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

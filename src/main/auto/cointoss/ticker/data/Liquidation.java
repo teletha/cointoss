@@ -55,21 +55,20 @@ public class Liquidation implements LiquidationModel {
     private static final MethodHandle orientationUpdater = updater("orientation");
 
     /** The final property updater. */
-    private static final MethodHandle sizeUpdater = updater("size");
-
-    /** The final property updater. */
     private static final MethodHandle priceUpdater = updater("price");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final ZonedDateTime date;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Direction orientation;
 
-    /** The exposed property. */
-    public final double size;
+    /** The property holder.*/
+    // A primitive property is hidden coz native-image builder can't cheat assigning to final field.
+    // If you want expose as public-final field, you must use the wrapper type instead of primitive type.
+    protected double size;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num price;
 
     /**
@@ -179,7 +178,7 @@ public class Liquidation implements LiquidationModel {
      */
     private final void setSize(double value) {
         try {
-            sizeUpdater.invoke(this, value);
+            this.size = (double) value;
         } catch (UnsupportedOperationException e) {
         } catch (Throwable e) {
             throw quiet(e);

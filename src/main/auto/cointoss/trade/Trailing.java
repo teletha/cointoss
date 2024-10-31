@@ -95,13 +95,13 @@ public class Trailing extends TrailingModel {
     /** The final property updater. */
     private static final MethodHandle updateUpdater = updater("update");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num losscut;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num profit;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Function<Market, Signal<Num>> update;
 
     /**

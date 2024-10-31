@@ -138,22 +138,22 @@ public class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle stateUpdater = updater("state");
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Direction orientation;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num size;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num price;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final OrderType type;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final QuantityCondition quantityCondition;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num executedSize;
 
     /** The property customizer. */
@@ -165,13 +165,13 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final Num commission;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final String id;
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final ZonedDateTime creationTime;
 
     /** The property customizer. */
@@ -183,7 +183,7 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final ZonedDateTime terminationTime;
 
     /** The property customizer. */
@@ -195,7 +195,7 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The exposed property. */
+    /** The property holder.*/
     public final cointoss.order.OrderState state;
 
     /** The property customizer. */
