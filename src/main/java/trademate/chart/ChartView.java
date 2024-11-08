@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import org.controlsfx.glyphfont.FontAwesome;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import cointoss.Market;
 import cointoss.ticker.Span;
@@ -113,6 +113,7 @@ public class ChartView extends View {
      * Style definition.
      */
     interface style extends StyleDSL {
+
         Style chart = () -> {
             display.width.fill().height.fill();
         };
@@ -154,7 +155,7 @@ public class ChartView extends View {
             }));
         }
 
-        config.text(FontAwesome.Glyph.GEAR).popup(new ViewDSL() {
+        config.icon(FontAwesomeSolid.COG).popup(new ViewDSL() {
             {
                 $(vbox, FormStyles.Label90, FormStyles.LabelCenter, () -> {
                     form(en("Ticker"), FormStyles.Column3, showCandle, candleType, rebuild);
