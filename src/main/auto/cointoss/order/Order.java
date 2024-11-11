@@ -493,29 +493,14 @@ public class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property diff.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeDiff() {
         return executedSizeCustomizer.observe$Diff();
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSize() {
         return executedSizeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<Num> observeExecutedSizeNow() {
         return executedSizeCustomizer.observe$Now();
     }
@@ -632,20 +617,10 @@ public class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTime() {
         return creationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return creationTimeCustomizer.observe$Now();
     }
@@ -688,20 +663,10 @@ public class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTime() {
         return terminationTimeCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<ZonedDateTime> observeTerminationTimeNow() {
         return terminationTimeCustomizer.observe$Now();
     }
@@ -744,20 +709,10 @@ public class Order extends OrderModel {
         }
     }
 
-    /**
-     * Observe property modification.
-     *  
-     *  @return
-     */
     public final Signal<cointoss.order.OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
-    /**
-     * Observe property modification with the current value.
-     *  
-     *  @return
-     */
     public final Signal<cointoss.order.OrderState> observeStateNow() {
         return stateCustomizer.observe$Now();
     }
@@ -1154,6 +1109,15 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next fillOrKill() {
+            return quantityCondition(cointoss.order.QuantityCondition.FillOrKill);
+        }
+
+        /**
+         * Assign quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
         default Next goodTillCanceled() {
             return quantityCondition(cointoss.order.QuantityCondition.GoodTillCanceled);
         }
@@ -1165,15 +1129,6 @@ public class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(cointoss.order.QuantityCondition.ImmediateOrCancel);
-        }
-
-        /**
-         * Assign quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(cointoss.order.QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1275,24 +1230,6 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next init() {
-            return state(cointoss.order.OrderState.INIT);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(cointoss.order.OrderState.REQUESTING);
-        }
-
-        /**
-         * Assign state property.
-         * 
-         * @return The next assignable model.
-         */
         default Next active() {
             return state(cointoss.order.OrderState.ACTIVE);
         }
@@ -1311,8 +1248,8 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next completed() {
-            return state(cointoss.order.OrderState.COMPLETED);
+        default Next canceled() {
+            return state(cointoss.order.OrderState.CANCELED);
         }
 
         /**
@@ -1320,8 +1257,8 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        default Next canceled() {
-            return state(cointoss.order.OrderState.CANCELED);
+        default Next completed() {
+            return state(cointoss.order.OrderState.COMPLETED);
         }
 
         /**
@@ -1338,8 +1275,26 @@ public class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
+        default Next init() {
+            return state(cointoss.order.OrderState.INIT);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
         default Next rejected() {
             return state(cointoss.order.OrderState.REJECTED);
+        }
+
+        /**
+         * Assign state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(cointoss.order.OrderState.REQUESTING);
         }
     }
 
