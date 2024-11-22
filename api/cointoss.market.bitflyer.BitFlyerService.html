@@ -11,10 +11,10 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="M">
-		<header class="j">
-			<h1 class="K" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
-			<nav class="b"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="P">
+		<header class="X">
+			<h1 class="i" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="k"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -23,7 +23,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="h" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="f" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -32,13 +32,13 @@
 				</a></div>
 		</header>
 		<main class="l">
-			<nav class="Y">
+			<nav class="K">
 				<div></div>
 			</nav>
-			<article class="g" id="Article">
-				<section class="N"><code class="e">cointoss.market.bitflyer</code>
-					<h2 class="Class a"><code class="k">BitFlyerService</code></h2>
-					<div class="Z">
+			<article class="O" id="Article">
+				<section class="g"><code class="I">cointoss.market.bitflyer</code>
+					<h2 class="Class m"><code class="c">BitFlyerService</code></h2>
+					<div class="W">
 						<ul class="C E">
 							<li><code><a href="api/cointoss.MarketService.html">MarketService</a></code></li>
 						</ul>
@@ -49,229 +49,229 @@
 					</div><span class="B"><p>Since the order API and the real-time execution API are completely separate systems, execution
 data may arrive before the order response, or execution data may arrive after the cancellation
 response.</p></span></section>
-				<section class="N" id="BitFlyerService(java.lang.String,cointoss.MarketSetting)">
-					<h2 class="f"><i class="PROTECTED"></i><code class="k">BitFlyerService</code><code class="L">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">type</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code class="parameterName">setting</code>)</code></h2>
-					<table class="i">
-						<tr class="U">
+				<section class="g" id="BitFlyerService(java.lang.String,cointoss.MarketSetting)">
+					<h2 class="R"><i class="PROTECTED"></i><code class="c">BitFlyerService</code><code class="Z">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">type</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code class="parameterName">setting</code>)</code></h2>
+					<table class="S">
+						<tr class="H">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code>type</code></td>
 							<td></td>
 						</tr>
-						<tr class="U">
+						<tr class="H">
 							<td><code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code>setting</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="BitFlyerService(java.lang.String,cointoss.MarketSetting,boolean)">
-					<h2 class="f"><i class="PROTECTED"></i><code class="k">BitFlyerService</code><code class="L">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">marketId</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code class="parameterName">setting</code>, <code>boolean</code><code class="parameterName">forTest</code>)</code></h2>
-					<table class="i">
-						<tr class="U">
+				<section class="g" id="BitFlyerService(java.lang.String,cointoss.MarketSetting,boolean)">
+					<h2 class="R"><i class="PROTECTED"></i><code class="c">BitFlyerService</code><code class="Z">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">marketId</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code class="parameterName">setting</code>, <code>boolean</code><code class="parameterName">forTest</code>)</code></h2>
+					<table class="S">
+						<tr class="H">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code>marketId</code></td>
 							<td><span><p>A market identifier.</p></span></td>
 						</tr>
-						<tr class="U">
+						<tr class="H">
 							<td><code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code>setting</code></td>
 							<td><span><p>A market setting.</p></span></td>
 						</tr>
-						<tr class="U">
+						<tr class="H">
 							<td><code>boolean</code><code>forTest</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Market service for bitFlyer.</p></span></section>
-				<section class="N" id="clientRealtimely()">
-					<h2 class="f"><i class="OVERRIDE PROTECTED"></i><code class="k">clientRealtimely</code><code class="L">()</code><i class="J"><code><a href="api/cointoss.util.EfficientWebSocket.html">EfficientWebSocket</a></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="clientRealtimely()">
+					<h2 class="R"><i class="OVERRIDE PROTECTED"></i><code class="c">clientRealtimely</code><code class="Z">()</code><i class="N"><code><a href="api/cointoss.util.EfficientWebSocket.html">EfficientWebSocket</a></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code><a href="api/cointoss.util.EfficientWebSocket.html">EfficientWebSocket</a></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="request(cointoss.order.Order)">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">request</code><code class="L">(<code><a href="api/cointoss.order.Order.html">Order</a></code><code class="parameterName">order</code>)</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="U">
+				<section class="g" id="request(cointoss.order.Order)">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">request</code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code><code class="parameterName">order</code>)</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="H">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code><code>order</code></td>
 							<td></td>
 						</tr>
-						<tr class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="cancel(cointoss.order.Order)">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">cancel</code><code class="L">(<code><a href="api/cointoss.order.Order.html">Order</a></code><code class="parameterName">order</code>)</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="U">
+				<section class="g" id="cancel(cointoss.order.Order)">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">cancel</code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code><code class="parameterName">order</code>)</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="H">
 							<td><code><a href="api/cointoss.order.Order.html">Order</a></code><code>order</code></td>
 							<td></td>
 						</tr>
-						<tr class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="cancelAll()">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">cancelAll</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="cancelAll()">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">cancelAll</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="connectExecutionRealtimely()">
-					<h2 class="f"><i class="OVERRIDE PROTECTED"></i><code class="k">connectExecutionRealtimely</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="connectExecutionRealtimely()">
+					<h2 class="R"><i class="OVERRIDE PROTECTED"></i><code class="c">connectExecutionRealtimely</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="executions(long,long)">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">executions</code><code class="L">(<code>long</code><code class="parameterName">startId</code>, <code>long</code><code class="parameterName">endId</code>)</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="U">
+				<section class="g" id="executions(long,long)">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">executions</code><code class="Z">(<code>long</code><code class="parameterName">startId</code>, <code>long</code><code class="parameterName">endId</code>)</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="H">
 							<td><code>long</code><code>startId</code></td>
 							<td></td>
 						</tr>
-						<tr class="U">
+						<tr class="H">
 							<td><code>long</code><code>endId</code></td>
 							<td></td>
 						</tr>
-						<tr class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="executionLatest()">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">executionLatest</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="executionLatest()">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">executionLatest</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="executionsBefore(long)">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">executionsBefore</code><code class="L">(<code>long</code><code class="parameterName">id</code>)</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="U">
+				<section class="g" id="executionsBefore(long)">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">executionsBefore</code><code class="Z">(<code>long</code><code class="parameterName">id</code>)</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="H">
 							<td><code>long</code><code>id</code></td>
 							<td></td>
 						</tr>
-						<tr class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="orders()">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">orders</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="orders()">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">orders</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="orders(cointoss.order.OrderState)">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">orders</code><code class="L">(<code><a href="api/cointoss.order.OrderState.html">OrderState</a></code><code class="parameterName">state</code>)</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="U">
+				<section class="g" id="orders(cointoss.order.OrderState)">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">orders</code><code class="Z">(<code><a href="api/cointoss.order.OrderState.html">OrderState</a></code><code class="parameterName">state</code>)</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="H">
 							<td><code><a href="api/cointoss.order.OrderState.html">OrderState</a></code><code>state</code></td>
 							<td></td>
 						</tr>
-						<tr class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="connectOrdersRealtimely()">
-					<h2 class="f"><i class="OVERRIDE PROTECTED"></i><code class="k">connectOrdersRealtimely</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="connectOrdersRealtimely()">
+					<h2 class="R"><i class="OVERRIDE PROTECTED"></i><code class="c">connectOrdersRealtimely</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="baseCurrency()">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">baseCurrency</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="baseCurrency()">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">baseCurrency</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="targetCurrency()">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">targetCurrency</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="targetCurrency()">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">targetCurrency</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="orderBook()">
-					<h2 class="f"><i class="OVERRIDE PUBLIC"></i><code class="k">orderBook</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="orderBook()">
+					<h2 class="R"><i class="OVERRIDE PUBLIC"></i><code class="c">orderBook</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="connectOrderBookRealtimely()">
-					<h2 class="f"><i class="OVERRIDE PROTECTED"></i><code class="k">connectOrderBookRealtimely</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="connectOrderBookRealtimely()">
+					<h2 class="R"><i class="OVERRIDE PROTECTED"></i><code class="c">connectOrderBookRealtimely</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="N" id="connectLiquidation()">
-					<h2 class="f"><i class="OVERRIDE PROTECTED"></i><code class="k">connectLiquidation</code><code class="L">()</code><i class="J"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.ticker.data.Liquidation.html">Liquidation</a></code></code></code></i></h2>
-					<table class="i">
-						<tr class="S">
+				<section class="g" id="connectLiquidation()">
+					<h2 class="R"><i class="OVERRIDE PROTECTED"></i><code class="c">connectLiquidation</code><code class="Z">()</code><i class="N"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.ticker.data.Liquidation.html">Liquidation</a></code></code></code></i></h2>
+					<table class="S">
+						<tr class="e">
 							<td><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.ticker.data.Liquidation.html">Liquidation</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
 			</article>
-			<aside class="c" id="SubNavi">
-				<div class="Q">
-					<h5 class="m">Constructors</h5>
+			<aside class="Q" id="SubNavi">
+				<div class="U">
+					<h5 class="L">Constructors</h5>
 					<ul>
-						<li><i class="PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#BitFlyerService(java.lang.String,cointoss.MarketSetting)">BitFlyerService</a></code><code class="L">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">type</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code class="parameterName">setting</code>)</code></li>
-						<li><i class="PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#BitFlyerService(java.lang.String,cointoss.MarketSetting,boolean)">BitFlyerService</a></code><code class="L">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">marketId</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code class="parameterName">setting</code>, <code>boolean</code><code class="parameterName">forTest</code>)</code></li>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#BitFlyerService(java.lang.String,cointoss.MarketSetting)">BitFlyerService</a></code><code class="Z">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">type</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code class="parameterName">setting</code>)</code></li>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#BitFlyerService(java.lang.String,cointoss.MarketSetting,boolean)">BitFlyerService</a></code><code class="Z">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">marketId</code>, <code><a href="api/cointoss.MarketSetting.html">MarketSetting</a></code><code class="parameterName">setting</code>, <code>boolean</code><code class="parameterName">forTest</code>)</code></li>
 					</ul>
-					<h5 class="m">Methods</h5>
+					<h5 class="L">Methods</h5>
 					<ul>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#clientRealtimely()">clientRealtimely</a></code><code class="L">()</code><i class="d"><code><a href="api/cointoss.util.EfficientWebSocket.html">EfficientWebSocket</a></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#request(cointoss.order.Order)">request</a></code><code class="L">(<code><a href="api/cointoss.order.Order.html">Order</a></code><code class="parameterName">order</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#cancel(cointoss.order.Order)">cancel</a></code><code class="L">(<code><a href="api/cointoss.order.Order.html">Order</a></code><code class="parameterName">order</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#cancelAll()">cancelAll</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#connectExecutionRealtimely()">connectExecutionRealtimely</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#executions(long,long)">executions</a></code><code class="L">(<code>long</code><code class="parameterName">startId</code>, <code>long</code><code class="parameterName">endId</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#executionLatest()">executionLatest</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#executionsBefore(long)">executionsBefore</a></code><code class="L">(<code>long</code><code class="parameterName">id</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#orders()">orders</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#orders(cointoss.order.OrderState)">orders</a></code><code class="L">(<code><a href="api/cointoss.order.OrderState.html">OrderState</a></code><code class="parameterName">state</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#connectOrdersRealtimely()">connectOrdersRealtimely</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#baseCurrency()">baseCurrency</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#targetCurrency()">targetCurrency</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#orderBook()">orderBook</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#connectOrderBookRealtimely()">connectOrderBookRealtimely</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#connectLiquidation()">connectLiquidation</a></code><code class="L">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.ticker.data.Liquidation.html">Liquidation</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#clientRealtimely()">clientRealtimely</a></code><code class="Z">()</code><i class="d"><code><a href="api/cointoss.util.EfficientWebSocket.html">EfficientWebSocket</a></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#request(cointoss.order.Order)">request</a></code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code><code class="parameterName">order</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#cancel(cointoss.order.Order)">cancel</a></code><code class="Z">(<code><a href="api/cointoss.order.Order.html">Order</a></code><code class="parameterName">order</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#cancelAll()">cancelAll</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#connectExecutionRealtimely()">connectExecutionRealtimely</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#executions(long,long)">executions</a></code><code class="Z">(<code>long</code><code class="parameterName">startId</code>, <code>long</code><code class="parameterName">endId</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#executionLatest()">executionLatest</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#executionsBefore(long)">executionsBefore</a></code><code class="Z">(<code>long</code><code class="parameterName">id</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.execution.Execution.html">Execution</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#orders()">orders</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#orders(cointoss.order.OrderState)">orders</a></code><code class="Z">(<code><a href="api/cointoss.order.OrderState.html">OrderState</a></code><code class="parameterName">state</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#connectOrdersRealtimely()">connectOrdersRealtimely</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.order.Order.html">Order</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#baseCurrency()">baseCurrency</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#targetCurrency()">targetCurrency</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#orderBook()">orderBook</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#connectOrderBookRealtimely()">connectOrderBookRealtimely</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code></code></code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.market.bitflyer.BitFlyerService.html#connectLiquidation()">connectLiquidation</a></code><code class="Z">()</code><i class="d"><code>kiss.Signal<code class="parameters"><code><a href="api/cointoss.ticker.data.Liquidation.html">Liquidation</a></code></code></code></i></li>
 					</ul>
 				</div>
 			</aside>
