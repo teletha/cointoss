@@ -68,6 +68,10 @@ public final class Bybit extends MarketServiceProvider {
             .target(Currency.SOL.minimumSize(1).scale(3))
             .base(Currency.USDT.minimumSize(0.01)));
 
+    public static final MarketService SUI_USDT = new BybitService("SUIUSDT", MarketSetting.with.derivative()
+            .target(Currency.SUI.minimumSize(1).scale(2))
+            .base(Currency.USDT.minimumSize(0.0001)));
+
     public static final MarketService STRK_USDT = new BybitService("STRKUSDT", MarketSetting.with.derivative()
             .target(Currency.STRK.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.0001)));
