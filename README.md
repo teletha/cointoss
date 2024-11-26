@@ -128,12 +128,12 @@ Cointoss depends on the following products on runtime.
 * [psychopath-2.0.2](https://mvnrepository.com/artifact/com.github.teletha/psychopath/2.0.2)
 * [reincarnation-1.8.0](https://mvnrepository.com/artifact/com.github.teletha/reincarnation/1.8.0)
 * [sinobu-4.5.2](https://mvnrepository.com/artifact/com.github.teletha/sinobu/4.5.2)
-* [sqlite-jdbc-3.47.0.0](https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.47.0.0)
+* [sqlite-jdbc-3.47.1.0](https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.47.1.0)
 * [stylist-1.11.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.11.0)
 * [typewriter-1.13.0](https://mvnrepository.com/artifact/com.github.teletha/typewriter/1.13.0)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
 * [viewtify-2.32.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.32.0)
-* [zstd-jni-1.5.6-7](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.6-7)
+* [zstd-jni-1.5.6-8](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.6-8)
 <p align="right"><a href="#top">back to top</a></p>
 
 
