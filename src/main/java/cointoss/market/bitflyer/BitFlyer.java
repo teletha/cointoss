@@ -37,7 +37,7 @@ public final class BitFlyer extends MarketServiceProvider {
             .baseWithdrawingFee(JPYWithdrawFee));
 
     public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", MarketSetting.with.derivative()
-            .target(Currency.BTC.minimumSize(0.01).scale(8))
+            .target(Currency.BTC.minimumSize(0.001).scale(8))
             .base(Currency.JPY.minimumSize(1))
             .priceRangeModifier(500)
             .targetCurrencyBidSizes(Num.of(0.01), Num.of(0.1), Num.of(1))
