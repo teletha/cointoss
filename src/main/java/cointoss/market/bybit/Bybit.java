@@ -48,6 +48,10 @@ public final class Bybit extends MarketServiceProvider {
             .target(Currency.FIL.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.001)));
 
+    public static final MarketService HYPE_USDT = new BybitService("HYPEUSDT", MarketSetting.with.derivative()
+            .target(Currency.HYPE.minimumSize(1).scale(2))
+            .base(Currency.USDT.minimumSize(0.001)));
+
     public static final MarketService LDO_USDT = new BybitService("LDOUSDT", MarketSetting.with.derivative()
             .target(Currency.LDO.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.001)));

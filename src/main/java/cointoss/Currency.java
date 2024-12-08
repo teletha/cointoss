@@ -214,6 +214,8 @@ public enum Currency {
 
     HUF("HUF", "Hungarian Forint"),
 
+    HYPE("HYPE", "Hyperliquid Token"),
+
     ICN("ICN", "Iconomi"),
 
     IDR("IDR", "Indonesian Rupiah"),
