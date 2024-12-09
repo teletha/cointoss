@@ -4,17 +4,26 @@
 		<meta charset="UTF-8"/>
 		<meta content="width=device-width, initial-scale=1" name="viewport"/>
 		<meta content="Explains how to use Cointoss and its API. " name="description"/>
-		<link href="https://fonts.googleapis.com" rel="preconnect"/>
 		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link crossorigin="null" href="https://fonts.gstatic.com" rel="preconnect"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="preload"/>
+		<link href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="stylesheet"/>
 		<title>Cointoss API</title>
 		<base href="../"/>
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="f">
-		<header class="O">
-			<h1 class="N" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
-			<nav class="b"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="L">
+		<header class="i">
+			<h1 class="Q" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="Z"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -31,14 +40,14 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="e">
-			<nav class="K">
+		<main class="j">
+			<nav class="k">
 				<div></div>
 			</nav>
-			<article class="d" id="Article">
-				<section class="l"><code class="Y">trademate.chart</code>
-					<h2 class="Class J"><code class="L">ChartView</code></h2>
-					<div class="S">
+			<article class="T" id="Article">
+				<section class="a"><code class="h">trademate.chart</code>
+					<h2 class="Class U"><code class="P">ChartView</code></h2>
+					<div class="W">
 						<ul class="C E">
 							<li><code>viewtify.ui.View</code></li>
 						</ul>
@@ -50,73 +59,73 @@
 						</ul>
 					</div>
 				</section>
-				<section class="l" id="market">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">market</code><i class="T"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.Market.html">Market</a></code></code></code></i></h2><span class="B"><p>The associated market.</p></span></section>
-				<section class="l" id="ticker">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">ticker</code><i class="T"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code></code></code></i></h2><span class="B"><p>The list of plottable candle date.</p></span></section>
-				<section class="l" id="candleType">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">candleType</code><i class="T"><code class="return">viewtify.ui.UIComboBox<code class="parameters"><code><a href="api/trademate.chart.CandleType.html">CandleType</a></code></code></code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="showCandle">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">showCandle</code><i class="T"><code class="return">viewtify.ui.UICheckBox</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="showLatestPrice">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">showLatestPrice</code><i class="T"><code class="return">viewtify.ui.UICheckBox</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="showOrderbook">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">showOrderbook</code><i class="T"><code class="return">viewtify.ui.UICheckBox</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="orderbookPriceRange">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">orderbookPriceRange</code><i class="T"><code class="return">viewtify.ui.UIText<code class="parameters"><code>hypatia.Num</code></code></code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="orderbookHideSize">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">orderbookHideSize</code><i class="T"><code class="return">viewtify.ui.UISpinner<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Integer.html">Integer</a></code></code></code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="showPricedVolume">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">showPricedVolume</code><i class="T"><code class="return">viewtify.ui.UICheckBox</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="pricedVolumeType">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">pricedVolumeType</code><i class="T"><code class="return">viewtify.ui.UIComboBox<code class="parameters"><code><a href="api/trademate.chart.PriceRangedVolumeType.html">PriceRangedVolumeType</a></code></code></code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="rebuild">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">rebuild</code><i class="T"><code class="return">viewtify.ui.UIButton</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
-				<section class="l" id="chart">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">chart</code><i class="T"><code class="return"><a href="api/trademate.chart.Chart.html">Chart</a></code></i></h2><span class="B"><p>Chart UI</p></span></section>
-				<section class="l" id="showOrderSupport">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">showOrderSupport</code><i class="T"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2><span class="B"><p>The chart configuration.</p></span></section>
-				<section class="l" id="showRealtimeUpdate">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">showRealtimeUpdate</code><i class="T"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2><span class="B"><p>The chart configuration.</p></span></section>
-				<section class="l" id="showIndicator">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">showIndicator</code><i class="T"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2><span class="B"><p>The chart configuration.</p></span></section>
-				<section class="l" id="scripts">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">scripts</code><i class="T"><code class="return">javafx.collections.ObservableList<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/trademate.chart.PlotScript.html">PlotScript</a></code></code></code></code></code></i></h2><span class="B"><p>The additional scripts.</p></span></section>
-				<section class="l" id="ChartView()">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">ChartView</code><code class="Q">()</code></h2>
+				<section class="a" id="market">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">market</code><i class="S"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.Market.html">Market</a></code></code></code></i></h2><span class="B"><p>The associated market.</p></span></section>
+				<section class="a" id="ticker">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">ticker</code><i class="S"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code></code></code></i></h2><span class="B"><p>The list of plottable candle date.</p></span></section>
+				<section class="a" id="candleType">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">candleType</code><i class="S"><code class="return">viewtify.ui.UIComboBox<code class="parameters"><code><a href="api/trademate.chart.CandleType.html">CandleType</a></code></code></code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="showCandle">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">showCandle</code><i class="S"><code class="return">viewtify.ui.UICheckBox</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="showLatestPrice">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">showLatestPrice</code><i class="S"><code class="return">viewtify.ui.UICheckBox</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="showOrderbook">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">showOrderbook</code><i class="S"><code class="return">viewtify.ui.UICheckBox</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="orderbookPriceRange">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">orderbookPriceRange</code><i class="S"><code class="return">viewtify.ui.UIText<code class="parameters"><code>hypatia.Num</code></code></code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="orderbookHideSize">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">orderbookHideSize</code><i class="S"><code class="return">viewtify.ui.UISpinner<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Integer.html">Integer</a></code></code></code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="showPricedVolume">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">showPricedVolume</code><i class="S"><code class="return">viewtify.ui.UICheckBox</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="pricedVolumeType">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">pricedVolumeType</code><i class="S"><code class="return">viewtify.ui.UIComboBox<code class="parameters"><code><a href="api/trademate.chart.PriceRangedVolumeType.html">PriceRangedVolumeType</a></code></code></code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="rebuild">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">rebuild</code><i class="S"><code class="return">viewtify.ui.UIButton</code></i></h2><span class="B"><p>Configuration UI</p></span></section>
+				<section class="a" id="chart">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">chart</code><i class="S"><code class="return"><a href="api/trademate.chart.Chart.html">Chart</a></code></i></h2><span class="B"><p>Chart UI</p></span></section>
+				<section class="a" id="showOrderSupport">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">showOrderSupport</code><i class="S"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2><span class="B"><p>The chart configuration.</p></span></section>
+				<section class="a" id="showRealtimeUpdate">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">showRealtimeUpdate</code><i class="S"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2><span class="B"><p>The chart configuration.</p></span></section>
+				<section class="a" id="showIndicator">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">showIndicator</code><i class="S"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></h2><span class="B"><p>The chart configuration.</p></span></section>
+				<section class="a" id="scripts">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">scripts</code><i class="S"><code class="return">javafx.collections.ObservableList<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/trademate.chart.PlotScript.html">PlotScript</a></code></code></code></code></code></i></h2><span class="B"><p>The additional scripts.</p></span></section>
+				<section class="a" id="ChartView()">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">ChartView</code><code class="R">()</code></h2>
 				</section>
-				<section class="l" id="initialize()">
-					<h2 class="W"><i class="OVERRIDE PROTECTED"></i><code class="L">initialize</code><code class="Q">()</code><i class="T"><code>void</code></i></h2>
+				<section class="a" id="initialize()">
+					<h2 class="M"><i class="OVERRIDE PROTECTED"></i><code class="P">initialize</code><code class="R">()</code><i class="S"><code>void</code></i></h2>
 				</section>
 			</article>
-			<aside class="P" id="SubNavi">
-				<div class="U">
-					<h5 class="c">Constructors</h5>
+			<aside class="Y" id="SubNavi">
+				<div class="b">
+					<h5 class="V">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#ChartView()">ChartView</a></code><code class="Q">()</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#ChartView()">ChartView</a></code><code class="R">()</code></li>
 					</ul>
-					<h5 class="c">Fields</h5>
+					<h5 class="V">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#market">market</a></code><i class="M"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.Market.html">Market</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#ticker">ticker</a></code><i class="M"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#candleType">candleType</a></code><i class="M"><code class="return">viewtify.ui.UIComboBox<code class="parameters"><code><a href="api/trademate.chart.CandleType.html">CandleType</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#showCandle">showCandle</a></code><i class="M"><code class="return">viewtify.ui.UICheckBox</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#showLatestPrice">showLatestPrice</a></code><i class="M"><code class="return">viewtify.ui.UICheckBox</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#showOrderbook">showOrderbook</a></code><i class="M"><code class="return">viewtify.ui.UICheckBox</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#orderbookPriceRange">orderbookPriceRange</a></code><i class="M"><code class="return">viewtify.ui.UIText<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#orderbookHideSize">orderbookHideSize</a></code><i class="M"><code class="return">viewtify.ui.UISpinner<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Integer.html">Integer</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#showPricedVolume">showPricedVolume</a></code><i class="M"><code class="return">viewtify.ui.UICheckBox</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#pricedVolumeType">pricedVolumeType</a></code><i class="M"><code class="return">viewtify.ui.UIComboBox<code class="parameters"><code><a href="api/trademate.chart.PriceRangedVolumeType.html">PriceRangedVolumeType</a></code></code></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#rebuild">rebuild</a></code><i class="M"><code class="return">viewtify.ui.UIButton</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#chart">chart</a></code><i class="M"><code class="return"><a href="api/trademate.chart.Chart.html">Chart</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#showOrderSupport">showOrderSupport</a></code><i class="M"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#showRealtimeUpdate">showRealtimeUpdate</a></code><i class="M"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#showIndicator">showIndicator</a></code><i class="M"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#scripts">scripts</a></code><i class="M"><code class="return">javafx.collections.ObservableList<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/trademate.chart.PlotScript.html">PlotScript</a></code></code></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#market">market</a></code><i class="d"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.Market.html">Market</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#ticker">ticker</a></code><i class="d"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#candleType">candleType</a></code><i class="d"><code class="return">viewtify.ui.UIComboBox<code class="parameters"><code><a href="api/trademate.chart.CandleType.html">CandleType</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#showCandle">showCandle</a></code><i class="d"><code class="return">viewtify.ui.UICheckBox</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#showLatestPrice">showLatestPrice</a></code><i class="d"><code class="return">viewtify.ui.UICheckBox</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#showOrderbook">showOrderbook</a></code><i class="d"><code class="return">viewtify.ui.UICheckBox</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#orderbookPriceRange">orderbookPriceRange</a></code><i class="d"><code class="return">viewtify.ui.UIText<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#orderbookHideSize">orderbookHideSize</a></code><i class="d"><code class="return">viewtify.ui.UISpinner<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Integer.html">Integer</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#showPricedVolume">showPricedVolume</a></code><i class="d"><code class="return">viewtify.ui.UICheckBox</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#pricedVolumeType">pricedVolumeType</a></code><i class="d"><code class="return">viewtify.ui.UIComboBox<code class="parameters"><code><a href="api/trademate.chart.PriceRangedVolumeType.html">PriceRangedVolumeType</a></code></code></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#rebuild">rebuild</a></code><i class="d"><code class="return">viewtify.ui.UIButton</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/trademate.chart.ChartView.html#chart">chart</a></code><i class="d"><code class="return"><a href="api/trademate.chart.Chart.html">Chart</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#showOrderSupport">showOrderSupport</a></code><i class="d"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#showRealtimeUpdate">showRealtimeUpdate</a></code><i class="d"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#showIndicator">showIndicator</a></code><i class="d"><code class="return">kiss.Variable<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Boolean.html">Boolean</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/trademate.chart.ChartView.html#scripts">scripts</a></code><i class="d"><code class="return">javafx.collections.ObservableList<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Supplier.html">Supplier</a><code class="parameters"><code><a href="api/trademate.chart.PlotScript.html">PlotScript</a></code></code></code></code></code></i></li>
 					</ul>
-					<h5 class="c">Methods</h5>
+					<h5 class="V">Methods</h5>
 					<ul>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/trademate.chart.ChartView.html#initialize()">initialize</a></code><code class="Q">()</code><i class="M"><code>void</code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/trademate.chart.ChartView.html#initialize()">initialize</a></code><code class="R">()</code><i class="d"><code>void</code></i></li>
 					</ul>
 				</div>
 			</aside>

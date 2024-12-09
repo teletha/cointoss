@@ -4,17 +4,26 @@
 		<meta charset="UTF-8"/>
 		<meta content="width=device-width, initial-scale=1" name="viewport"/>
 		<meta content="Explains how to use Cointoss and its API. " name="description"/>
-		<link href="https://fonts.googleapis.com" rel="preconnect"/>
 		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link crossorigin="null" href="https://fonts.gstatic.com" rel="preconnect"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="preload"/>
+		<link href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="stylesheet"/>
 		<title>Cointoss API</title>
 		<base href="../"/>
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="f">
-		<header class="O">
-			<h1 class="N" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
-			<nav class="b"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="L">
+		<header class="i">
+			<h1 class="Q" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="Z"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -31,185 +40,185 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="e">
-			<nav class="K">
+		<main class="j">
+			<nav class="k">
 				<div></div>
 			</nav>
-			<article class="d" id="Article">
-				<section class="l"><code class="Y">cointoss.analyze</code>
-					<h2 class="Class J"><code class="L">TradingStats</code></h2>
-					<div class="S"></div>
+			<article class="T" id="Article">
+				<section class="a"><code class="h">cointoss.analyze</code>
+					<h2 class="Class U"><code class="P">TradingStats</code></h2>
+					<div class="W"></div>
 				</section>
-				<section class="l" id="name">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">name</code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2><span class="B"><p>The associated trader.</p></span></section>
-				<section class="l" id="properties">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">properties</code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></h2><span class="B"><p>The trader&#39;s properties.</p></span></section>
-				<section class="l" id="startDate">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">startDate</code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The start date-time.</p></span></section>
-				<section class="l" id="endDate">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">endDate</code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The end date-time.</p></span></section>
-				<section class="l" id="holdTime">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">holdTime</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="holdTimeOnProfitTrade">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">holdTimeOnProfitTrade</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="holdTimeOnLossTrade">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">holdTimeOnLossTrade</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="holdMaxSize">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">holdMaxSize</code><i class="T"><code class="return">hypatia.Num</code></i></h2><span class="B"><p>summary.</p></span></section>
-				<section class="l" id="holdCurrentSize">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">holdCurrentSize</code><i class="T"><code class="return">hypatia.Num</code></i></h2><span class="B"><p>summary.</p></span></section>
-				<section class="l" id="profit">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">profit</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="profitRange">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">profitRange</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="realizedProfit">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">realizedProfit</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="realizedProfitRange">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">realizedProfitRange</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="unrealizedProfit">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">unrealizedProfit</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="unrealizedProfitRange">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">unrealizedProfitRange</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="loss">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">loss</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="lossRange">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">lossRange</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="realizedLoss">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">realizedLoss</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="realizedLossRange">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">realizedLossRange</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="unrealizedLoss">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">unrealizedLoss</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="unrealizedLossRange">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">unrealizedLossRange</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="profitAndLoss">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">profitAndLoss</code><i class="T"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
-				<section class="l" id="drawDown">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">drawDown</code><i class="T"><code class="return">hypatia.Num</code></i></h2><span class="B"><p>The max draw down.</p></span></section>
-				<section class="l" id="drawDownRatio">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">drawDownRatio</code><i class="T"><code class="return">hypatia.Num</code></i></h2><span class="B"><p>The max draw down.</p></span></section>
-				<section class="l" id="total">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">total</code><i class="T"><code class="return">int</code></i></h2><span class="B"><p>A number of total entries.</p></span></section>
-				<section class="l" id="active">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">active</code><i class="T"><code class="return">int</code></i></h2><span class="B"><p>A number of active entries.</p></span></section>
-				<section class="l" id="terminated">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">terminated</code><i class="T"><code class="return">int</code></i></h2><span class="B"><p>A number of terminated entries.</p></span></section>
-				<section class="l" id="duration">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">duration</code><i class="T"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code></i></h2><span class="B"><p>The exected duration.</p></span></section>
-				<section class="l" id="TradingStats(cointoss.Market,cointoss.trade.Funds,java.util.List,cointoss.trade.Trader)">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">TradingStats</code><code class="Q">(<code><a href="api/cointoss.Market.html">Market</a></code><code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code><code class="parameterName">funds</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code><code class="parameterName">scenarios</code>, <code><a href="api/cointoss.trade.Trader.html">Trader</a></code><code class="parameterName">trader</code>)</code></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="name">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">name</code><i class="S"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2><span class="B"><p>The associated trader.</p></span></section>
+				<section class="a" id="properties">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">properties</code><i class="S"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></h2><span class="B"><p>The trader&#39;s properties.</p></span></section>
+				<section class="a" id="startDate">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">startDate</code><i class="S"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The start date-time.</p></span></section>
+				<section class="a" id="endDate">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">endDate</code><i class="S"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2><span class="B"><p>The end date-time.</p></span></section>
+				<section class="a" id="holdTime">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">holdTime</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="holdTimeOnProfitTrade">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">holdTimeOnProfitTrade</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="holdTimeOnLossTrade">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">holdTimeOnLossTrade</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="holdMaxSize">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">holdMaxSize</code><i class="S"><code class="return">hypatia.Num</code></i></h2><span class="B"><p>summary.</p></span></section>
+				<section class="a" id="holdCurrentSize">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">holdCurrentSize</code><i class="S"><code class="return">hypatia.Num</code></i></h2><span class="B"><p>summary.</p></span></section>
+				<section class="a" id="profit">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">profit</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="profitRange">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">profitRange</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="realizedProfit">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">realizedProfit</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="realizedProfitRange">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">realizedProfitRange</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="unrealizedProfit">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">unrealizedProfit</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="unrealizedProfitRange">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">unrealizedProfitRange</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="loss">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">loss</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="lossRange">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">lossRange</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="realizedLoss">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">realizedLoss</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="realizedLossRange">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">realizedLossRange</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="unrealizedLoss">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">unrealizedLoss</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="unrealizedLossRange">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">unrealizedLossRange</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="profitAndLoss">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">profitAndLoss</code><i class="S"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></h2><span class="B"><p>summary</p></span></section>
+				<section class="a" id="drawDown">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">drawDown</code><i class="S"><code class="return">hypatia.Num</code></i></h2><span class="B"><p>The max draw down.</p></span></section>
+				<section class="a" id="drawDownRatio">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">drawDownRatio</code><i class="S"><code class="return">hypatia.Num</code></i></h2><span class="B"><p>The max draw down.</p></span></section>
+				<section class="a" id="total">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">total</code><i class="S"><code class="return">int</code></i></h2><span class="B"><p>A number of total entries.</p></span></section>
+				<section class="a" id="active">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">active</code><i class="S"><code class="return">int</code></i></h2><span class="B"><p>A number of active entries.</p></span></section>
+				<section class="a" id="terminated">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">terminated</code><i class="S"><code class="return">int</code></i></h2><span class="B"><p>A number of terminated entries.</p></span></section>
+				<section class="a" id="duration">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">duration</code><i class="S"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code></i></h2><span class="B"><p>The exected duration.</p></span></section>
+				<section class="a" id="TradingStats(cointoss.Market,cointoss.trade.Funds,java.util.List,cointoss.trade.Trader)">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">TradingStats</code><code class="R">(<code><a href="api/cointoss.Market.html">Market</a></code><code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code><code class="parameterName">funds</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code><code class="parameterName">scenarios</code>, <code><a href="api/cointoss.trade.Trader.html">Trader</a></code><code class="parameterName">trader</code>)</code></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="api/cointoss.Market.html">Market</a></code><code>market</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="api/cointoss.trade.Funds.html">Funds</a></code><code>funds</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code><code>scenarios</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="api/cointoss.trade.Trader.html">Trader</a></code><code>trader</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Analyze trading.</p></span></section>
-				<section class="l" id="winningRate()">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">winningRate</code><code class="Q">()</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="a" id="winningRate()">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">winningRate</code><code class="R">()</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Calculate winning rate.</p></span></section>
-				<section class="l" id="profitFactor()">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">profitFactor</code><code class="Q">()</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="a" id="profitFactor()">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">profitFactor</code><code class="R">()</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Calculate profit factor.</p></span></section>
-				<section class="l" id="showByText(boolean)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">showByText</code><code class="Q">(<code>boolean</code><code class="parameterName">detail</code>)</code><i class="T"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="showByText(boolean)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">showByText</code><code class="R">(<code>boolean</code><code class="parameterName">detail</code>)</code><i class="S"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>boolean</code><code>detail</code></td>
 							<td></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Output result by text format.</p></span></section>
-				<section class="l" id="showByText(java.lang.Appendable,boolean)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">showByText</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Appendable.html">Appendable</a></code><code class="parameterName">builder</code>, <code>boolean</code><code class="parameterName">detail</code>)</code><i class="T"><code>void</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="showByText(java.lang.Appendable,boolean)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">showByText</code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Appendable.html">Appendable</a></code><code class="parameterName">builder</code>, <code>boolean</code><code class="parameterName">detail</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Appendable.html">Appendable</a></code><code>builder</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code>boolean</code><code>detail</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Output result by text format.</p></span></section>
-				<section class="l" id="toString()">
-					<h2 class="W"><i class="OVERRIDE PUBLIC"></i><code class="L">toString</code><code class="Q">()</code><i class="T"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="a" id="toString()">
+					<h2 class="M"><i class="OVERRIDE PUBLIC"></i><code class="P">toString</code><code class="R">()</code><i class="S"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></h2>
+					<table class="m">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
 			</article>
-			<aside class="P" id="SubNavi">
-				<div class="U">
-					<h5 class="c">Constructors</h5>
+			<aside class="Y" id="SubNavi">
+				<div class="b">
+					<h5 class="V">Constructors</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#TradingStats(cointoss.Market,cointoss.trade.Funds,java.util.List,cointoss.trade.Trader)">TradingStats</a></code><code class="Q">(<code><a href="api/cointoss.Market.html">Market</a></code><code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code><code class="parameterName">funds</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code><code class="parameterName">scenarios</code>, <code><a href="api/cointoss.trade.Trader.html">Trader</a></code><code class="parameterName">trader</code>)</code></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#TradingStats(cointoss.Market,cointoss.trade.Funds,java.util.List,cointoss.trade.Trader)">TradingStats</a></code><code class="R">(<code><a href="api/cointoss.Market.html">Market</a></code><code class="parameterName">market</code>, <code><a href="api/cointoss.trade.Funds.html">Funds</a></code><code class="parameterName">funds</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html">List</a><code class="parameters"><code><a href="api/cointoss.trade.Scenario.html">Scenario</a></code></code></code><code class="parameterName">scenarios</code>, <code><a href="api/cointoss.trade.Trader.html">Trader</a></code><code class="parameterName">trader</code>)</code></li>
 					</ul>
-					<h5 class="c">Fields</h5>
+					<h5 class="V">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#name">name</a></code><i class="M"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#properties">properties</a></code><i class="M"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#startDate">startDate</a></code><i class="M"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#endDate">endDate</a></code><i class="M"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdTime">holdTime</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdTimeOnProfitTrade">holdTimeOnProfitTrade</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdTimeOnLossTrade">holdTimeOnLossTrade</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdMaxSize">holdMaxSize</a></code><i class="M"><code class="return">hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdCurrentSize">holdCurrentSize</a></code><i class="M"><code class="return">hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#profit">profit</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#profitRange">profitRange</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#realizedProfit">realizedProfit</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#realizedProfitRange">realizedProfitRange</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#unrealizedProfit">unrealizedProfit</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#unrealizedProfitRange">unrealizedProfitRange</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#loss">loss</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#lossRange">lossRange</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#realizedLoss">realizedLoss</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#realizedLossRange">realizedLossRange</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#unrealizedLoss">unrealizedLoss</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#unrealizedLossRange">unrealizedLossRange</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#profitAndLoss">profitAndLoss</a></code><i class="M"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#drawDown">drawDown</a></code><i class="M"><code class="return">hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#drawDownRatio">drawDownRatio</a></code><i class="M"><code class="return">hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#total">total</a></code><i class="M"><code class="return">int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#active">active</a></code><i class="M"><code class="return">int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#terminated">terminated</a></code><i class="M"><code class="return">int</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#duration">duration</a></code><i class="M"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#name">name</a></code><i class="d"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#properties">properties</a></code><i class="d"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/Map.html">Map</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#startDate">startDate</a></code><i class="d"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#endDate">endDate</a></code><i class="d"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdTime">holdTime</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdTimeOnProfitTrade">holdTimeOnProfitTrade</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdTimeOnLossTrade">holdTimeOnLossTrade</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdMaxSize">holdMaxSize</a></code><i class="d"><code class="return">hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#holdCurrentSize">holdCurrentSize</a></code><i class="d"><code class="return">hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#profit">profit</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#profitRange">profitRange</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#realizedProfit">realizedProfit</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#realizedProfitRange">realizedProfitRange</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#unrealizedProfit">unrealizedProfit</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#unrealizedProfitRange">unrealizedProfitRange</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#loss">loss</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#lossRange">lossRange</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#realizedLoss">realizedLoss</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#realizedLossRange">realizedLossRange</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#unrealizedLoss">unrealizedLoss</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#unrealizedLossRange">unrealizedLossRange</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#profitAndLoss">profitAndLoss</a></code><i class="d"><code class="return"><a href="api/cointoss.analyze.NumStats.html">NumStats</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#drawDown">drawDown</a></code><i class="d"><code class="return">hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#drawDownRatio">drawDownRatio</a></code><i class="d"><code class="return">hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#total">total</a></code><i class="d"><code class="return">int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#active">active</a></code><i class="d"><code class="return">int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#terminated">terminated</a></code><i class="d"><code class="return">int</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#duration">duration</a></code><i class="d"><code class="return"><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code></i></li>
 					</ul>
-					<h5 class="c">Methods</h5>
+					<h5 class="V">Methods</h5>
 					<ul>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#winningRate()">winningRate</a></code><code class="Q">()</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#profitFactor()">profitFactor</a></code><code class="Q">()</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#showByText(boolean)">showByText</a></code><code class="Q">(<code>boolean</code><code class="parameterName">detail</code>)</code><i class="M"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#showByText(java.lang.Appendable,boolean)">showByText</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Appendable.html">Appendable</a></code><code class="parameterName">builder</code>, <code>boolean</code><code class="parameterName">detail</code>)</code><i class="M"><code>void</code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#toString()">toString</a></code><code class="Q">()</code><i class="M"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#winningRate()">winningRate</a></code><code class="R">()</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#profitFactor()">profitFactor</a></code><code class="R">()</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#showByText(boolean)">showByText</a></code><code class="R">(<code>boolean</code><code class="parameterName">detail</code>)</code><i class="d"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.analyze.TradingStats.html#showByText(java.lang.Appendable,boolean)">showByText</a></code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Appendable.html">Appendable</a></code><code class="parameterName">builder</code>, <code>boolean</code><code class="parameterName">detail</code>)</code><i class="d"><code>void</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.analyze.TradingStats.html#toString()">toString</a></code><code class="R">()</code><i class="d"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code></i></li>
 					</ul>
 				</div>
 			</aside>

@@ -4,17 +4,26 @@
 		<meta charset="UTF-8"/>
 		<meta content="width=device-width, initial-scale=1" name="viewport"/>
 		<meta content="Explains how to use Cointoss and its API. " name="description"/>
-		<link href="https://fonts.googleapis.com" rel="preconnect"/>
 		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link crossorigin="null" href="https://fonts.gstatic.com" rel="preconnect"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="preload"/>
+		<link href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="stylesheet"/>
 		<title>Cointoss API</title>
 		<base href="../"/>
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="f">
-		<header class="O">
-			<h1 class="N" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
-			<nav class="b"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="L">
+		<header class="i">
+			<h1 class="Q" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="Z"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -31,14 +40,14 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="e">
-			<nav class="K">
+		<main class="j">
+			<nav class="k">
 				<div></div>
 			</nav>
-			<article class="d" id="Article">
-				<section class="l"><code class="Y">cointoss.ticker</code>
-					<h2 class="AbstractClass J"><code class="L">Indicator</code><code class="Q">&#60;<code>T</code>&#62;</code></h2>
-					<div class="S">
+			<article class="T" id="Article">
+				<section class="a"><code class="h">cointoss.ticker</code>
+					<h2 class="AbstractClass U"><code class="P">Indicator</code><code class="R">&#60;<code>T</code>&#62;</code></h2>
+					<div class="W">
 						<ul class="C D">
 							<li><code>T</code></li>
 						</ul>
@@ -47,88 +56,88 @@
 						</ul>
 					</div>
 				</section>
-				<section class="l" id="Indicator(cointoss.ticker.Ticker)">
-					<h2 class="W"><i class="PROTECTED"></i><code class="L">Indicator</code><code class="Q">(<code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code class="parameterName">ticker</code>)</code></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="Indicator(cointoss.ticker.Ticker)">
+					<h2 class="M"><i class="PROTECTED"></i><code class="P">Indicator</code><code class="R">(<code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code class="parameterName">ticker</code>)</code></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code>ticker</code></td>
 							<td><span><p>A target ticker.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Build with the target <code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code>.</p></span></section>
-				<section class="l" id="valueAt(cointoss.ticker.Tick)">
-					<h2 class="W"><i class="OVERRIDE PUBLIC"></i><code class="L">valueAt</code><code class="Q">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code class="parameterName">timestamp</code>)</code><i class="T"><code>T</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="valueAt(cointoss.ticker.Tick)">
+					<h2 class="M"><i class="OVERRIDE PUBLIC"></i><code class="P">valueAt</code><code class="R">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code class="parameterName">timestamp</code>)</code><i class="S"><code>T</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code>timestamp</code></td>
 							<td><span><p>A <code><a href="api/cointoss.ticker.Tick.html">Tick</a></code> on <code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code>.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>T</code></td>
 							<td><span><p>A time-based value.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Return the value of this <code><a href="api/cointoss.ticker.Indicator.html">Indicator</a></code>.</p></span></section>
-				<section class="l" id="valueAtRounded(cointoss.ticker.Tick)">
-					<h2 class="W"><i class="ABSTRACT"><i class="PROTECTED"></i></i><code class="L">valueAtRounded</code><code class="Q">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code class="parameterName">tick</code>)</code><i class="T"><code>T</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="valueAtRounded(cointoss.ticker.Tick)">
+					<h2 class="M"><i class="ABSTRACT"><i class="PROTECTED"></i></i><code class="P">valueAtRounded</code><code class="R">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code class="parameterName">tick</code>)</code><i class="S"><code>T</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code>tick</code></td>
 							<td><span><p>A <code><a href="api/cointoss.ticker.Tick.html">Tick</a></code> on <code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code>.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>T</code></td>
 							<td><span><p>A time-based value.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Return the value of this <code><a href="api/cointoss.ticker.Indicator.html">Indicator</a></code>. It is ensure that the <code><a href="api/cointoss.ticker.Tick.html">Tick</a></code> parameter is
 rounded for <code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code>.</p></span></section>
-				<section class="l" id="build(java.util.function.BiFunction)">
-					<h2 class="W"><i class="OVERRIDE PROTECTED"></i><code class="L">build</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code>, <code>T</code></code></code><code class="parameterName">delegator</code>)</code><i class="T"><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="build(java.util.function.BiFunction)">
+					<h2 class="M"><i class="OVERRIDE PROTECTED"></i><code class="P">build</code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code>, <code>T</code></code></code><code class="parameterName">delegator</code>)</code><i class="S"><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code>, <code>T</code></code></code><code>delegator</code></td>
 							<td></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="l" id="build(cointoss.ticker.Ticker,java.util.function.Function)">
-					<h2 class="W"><i class="STATIC PUBLIC"></i><code class="L">build</code><code class="Q">(<code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code class="parameterName">ticker</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code>T</code></code></code><code class="parameterName">calculator</code>)</code><i class="T"><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></i></h2>
-					<table class="Z">
-						<tr class="g">
+				<section class="a" id="build(cointoss.ticker.Ticker,java.util.function.Function)">
+					<h2 class="M"><i class="PUBLIC STATIC"></i><code class="P">build</code><code class="R">(<code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code class="parameterName">ticker</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code>T</code></code></code><code class="parameterName">calculator</code>)</code><i class="S"><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></i></h2>
+					<table class="m">
+						<tr class="c">
 							<td><code>T</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code>ticker</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code>T</code></code></code><code>calculator</code></td>
 							<td></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Build your original <code><a href="api/cointoss.ticker.Indicator.html">Indicator</a></code>.</p></span></section>
 			</article>
-			<aside class="P" id="SubNavi">
-				<div class="U">
-					<h5 class="c">Constructors</h5>
+			<aside class="Y" id="SubNavi">
+				<div class="b">
+					<h5 class="V">Constructors</h5>
 					<ul>
-						<li><i class="PROTECTED"></i><code><a href="api/cointoss.ticker.Indicator.html#Indicator(cointoss.ticker.Ticker)">Indicator</a></code><code class="Q">(<code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code class="parameterName">ticker</code>)</code></li>
+						<li><i class="PROTECTED"></i><code><a href="api/cointoss.ticker.Indicator.html#Indicator(cointoss.ticker.Ticker)">Indicator</a></code><code class="R">(<code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code class="parameterName">ticker</code>)</code></li>
 					</ul>
-					<h5 class="c">Static Methods</h5>
+					<h5 class="V">Static Methods</h5>
 					<ul>
-						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.ticker.Indicator.html#build(cointoss.ticker.Ticker,java.util.function.Function)">build</a></code><code class="Q">(<code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code class="parameterName">ticker</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code>T</code></code></code><code class="parameterName">calculator</code>)</code><i class="M"><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></i></li>
+						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.ticker.Indicator.html#build(cointoss.ticker.Ticker,java.util.function.Function)">build</a></code><code class="R">(<code><a href="api/cointoss.ticker.Ticker.html">Ticker</a></code><code class="parameterName">ticker</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code>T</code></code></code><code class="parameterName">calculator</code>)</code><i class="d"><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></i></li>
 					</ul>
-					<h5 class="c">Methods</h5>
+					<h5 class="V">Methods</h5>
 					<ul>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.ticker.Indicator.html#valueAt(cointoss.ticker.Tick)">valueAt</a></code><code class="Q">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code class="parameterName">timestamp</code>)</code><i class="M"><code>T</code></i></li>
-						<li><i class="ABSTRACT"><i class="PROTECTED"></i></i><code><a href="api/cointoss.ticker.Indicator.html#valueAtRounded(cointoss.ticker.Tick)">valueAtRounded</a></code><code class="Q">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code class="parameterName">tick</code>)</code><i class="M"><code>T</code></i></li>
-						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.ticker.Indicator.html#build(java.util.function.BiFunction)">build</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code>, <code>T</code></code></code><code class="parameterName">delegator</code>)</code><i class="M"><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.ticker.Indicator.html#valueAt(cointoss.ticker.Tick)">valueAt</a></code><code class="R">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code class="parameterName">timestamp</code>)</code><i class="d"><code>T</code></i></li>
+						<li><i class="ABSTRACT"><i class="PROTECTED"></i></i><code><a href="api/cointoss.ticker.Indicator.html#valueAtRounded(cointoss.ticker.Tick)">valueAtRounded</a></code><code class="R">(<code><a href="api/cointoss.ticker.Tick.html">Tick</a></code><code class="parameterName">tick</code>)</code><i class="d"><code>T</code></i></li>
+						<li><i class="OVERRIDE PROTECTED"></i><code><a href="api/cointoss.ticker.Indicator.html#build(java.util.function.BiFunction)">build</a></code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a><code class="parameters"><code><a href="api/cointoss.ticker.Tick.html">Tick</a></code>, <code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code>, <code>T</code></code></code><code class="parameterName">delegator</code>)</code><i class="d"><code><a href="api/cointoss.ticker.Indicator.html">Indicator</a><code class="parameters"><code>T</code></code></code></i></li>
 					</ul>
 				</div>
 			</aside>

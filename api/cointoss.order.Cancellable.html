@@ -4,17 +4,26 @@
 		<meta charset="UTF-8"/>
 		<meta content="width=device-width, initial-scale=1" name="viewport"/>
 		<meta content="Explains how to use Cointoss and its API. " name="description"/>
-		<link href="https://fonts.googleapis.com" rel="preconnect"/>
 		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link crossorigin="null" href="https://fonts.gstatic.com" rel="preconnect"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="preload"/>
+		<link href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="stylesheet"/>
 		<title>Cointoss API</title>
 		<base href="../"/>
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="f">
-		<header class="O">
-			<h1 class="N" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
-			<nav class="b"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="L">
+		<header class="i">
+			<h1 class="Q" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="Z"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -31,139 +40,139 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="e">
-			<nav class="K">
+		<main class="j">
+			<nav class="k">
 				<div></div>
 			</nav>
-			<article class="d" id="Article">
-				<section class="l"><code class="Y">cointoss.order</code>
-					<h2 class="Functional J"><code class="L">Cancellable</code></h2>
-					<div class="S"></div><span class="B"><p>Cancelling order strategy.</p></span></section>
-				<section class="l" id="cancelAfter(long,java.time.temporal.ChronoUnit)">
-					<h2 class="W"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="L">cancelAfter</code><code class="Q">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code class="parameterName">unit</code>)</code><i class="T"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+			<article class="T" id="Article">
+				<section class="a"><code class="h">cointoss.order</code>
+					<h2 class="Functional U"><code class="P">Cancellable</code></h2>
+					<div class="W"></div><span class="B"><p>Cancelling order strategy.</p></span></section>
+				<section class="a" id="cancelAfter(long,java.time.temporal.ChronoUnit)">
+					<h2 class="M"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="P">cancelAfter</code><code class="R">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code class="parameterName">unit</code>)</code><i class="S"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>long</code><code>time</code></td>
 							<td><span><p>A time value.</p></span></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code>unit</code></td>
 							<td><span><p>A time unit.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Cancel the order if it remains after the specified time has passed.</p></span></section>
-				<section class="l" id="cancelAfter(long,java.util.concurrent.TimeUnit)">
-					<h2 class="W"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="L">cancelAfter</code><code class="Q">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/TimeUnit.html">TimeUnit</a></code><code class="parameterName">unit</code>)</code><i class="T"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="cancelAfter(long,java.util.concurrent.TimeUnit)">
+					<h2 class="M"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="P">cancelAfter</code><code class="R">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/TimeUnit.html">TimeUnit</a></code><code class="parameterName">unit</code>)</code><i class="S"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>long</code><code>time</code></td>
 							<td><span><p>A time value.</p></span></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/TimeUnit.html">TimeUnit</a></code><code>unit</code></td>
 							<td><span><p>A time unit.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Cancel the order if it remains after the specified time has passed.</p></span></section>
-				<section class="l" id="cancelAfter(java.time.Duration)">
-					<h2 class="W"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="L">cancelAfter</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code><code class="parameterName">duration</code>)</code><i class="T"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="cancelAfter(java.time.Duration)">
+					<h2 class="M"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="P">cancelAfter</code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code><code class="parameterName">duration</code>)</code><i class="S"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code><code>duration</code></td>
 							<td><span><p>A time until canceling.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Cancel the order if it remains after the specified time has passed.</p></span></section>
-				<section class="l" id="cancelAfter(cointoss.ticker.Span)">
-					<h2 class="W"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="L">cancelAfter</code><code class="Q">(<code><a href="api/cointoss.ticker.Span.html">Span</a></code><code class="parameterName">span</code>)</code><i class="T"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="cancelAfter(cointoss.ticker.Span)">
+					<h2 class="M"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="P">cancelAfter</code><code class="R">(<code><a href="api/cointoss.ticker.Span.html">Span</a></code><code class="parameterName">span</code>)</code><i class="S"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="api/cointoss.ticker.Span.html">Span</a></code><code>span</code></td>
 							<td><span><p>A time until canceling.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Cancel the order if it remains after the specified time has passed.</p></span></section>
-				<section class="l" id="cancelWhen(kiss.Signal)">
-					<h2 class="W"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="L">cancelWhen</code><code class="Q">(<code>kiss.Signal<code class="parameters"><code>?</code></code></code><code class="parameterName">timing</code>)</code><i class="T"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="cancelWhen(kiss.Signal)">
+					<h2 class="M"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="P">cancelWhen</code><code class="R">(<code>kiss.Signal<code class="parameters"><code>?</code></code></code><code class="parameterName">timing</code>)</code><i class="S"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>kiss.Signal<code class="parameters"><code>?</code></code></code><code>timing</code></td>
 							<td><span><p>A timing to cancel order.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Cancel the order if it remains after the specified time has passed.</p></span></section>
-				<section class="l" id="cancelWhen(kiss.Signal,java.lang.String)">
-					<h2 class="W"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="L">cancelWhen</code><code class="Q">(<code>kiss.Signal<code class="parameters"><code>?</code></code></code><code class="parameterName">timing</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">description</code>)</code><i class="T"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="cancelWhen(kiss.Signal,java.lang.String)">
+					<h2 class="M"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="P">cancelWhen</code><code class="R">(<code>kiss.Signal<code class="parameters"><code>?</code></code></code><code class="parameterName">timing</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">description</code>)</code><i class="S"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>kiss.Signal<code class="parameters"><code>?</code></code></code><code>timing</code></td>
 							<td><span><p>A timing to cancel order.</p></span></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code>description</code></td>
 							<td></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Cancel the order if it remains after the specified time has passed.</p></span></section>
-				<section class="l" id="cancelWhen(java.util.function.Function)">
-					<h2 class="W"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="L">cancelWhen</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code class="parameterName">timing</code>)</code><i class="T"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="cancelWhen(java.util.function.Function)">
+					<h2 class="M"><i class="DEFAULT"><i class="PUBLIC"></i></i><code class="P">cancelWhen</code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code class="parameterName">timing</code>)</code><i class="S"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code>timing</code></td>
 							<td><span><p>A timing to cancel order.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Cancel the order if it remains after the specified time has passed.</p></span></section>
-				<section class="l" id="cancelWhen(java.util.function.Function,java.lang.String)">
-					<h2 class="W"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="L">cancelWhen</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code class="parameterName">timing</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">description</code>)</code><i class="T"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="cancelWhen(java.util.function.Function,java.lang.String)">
+					<h2 class="M"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="P">cancelWhen</code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code class="parameterName">timing</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">description</code>)</code><i class="S"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code>timing</code></td>
 							<td><span><p>A timing to cancel order.</p></span></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code>description</code></td>
 							<td></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Cancel the order if it remains after the specified time has passed.</p></span></section>
 			</article>
-			<aside class="P" id="SubNavi">
-				<div class="U">
-					<h5 class="c">Methods</h5>
+			<aside class="Y" id="SubNavi">
+				<div class="b">
+					<h5 class="V">Methods</h5>
 					<ul>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelAfter(long,java.time.temporal.ChronoUnit)">cancelAfter</a></code><code class="Q">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code class="parameterName">unit</code>)</code><i class="M"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelAfter(long,java.util.concurrent.TimeUnit)">cancelAfter</a></code><code class="Q">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/TimeUnit.html">TimeUnit</a></code><code class="parameterName">unit</code>)</code><i class="M"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelAfter(java.time.Duration)">cancelAfter</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code><code class="parameterName">duration</code>)</code><i class="M"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelAfter(cointoss.ticker.Span)">cancelAfter</a></code><code class="Q">(<code><a href="api/cointoss.ticker.Span.html">Span</a></code><code class="parameterName">span</code>)</code><i class="M"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelWhen(kiss.Signal)">cancelWhen</a></code><code class="Q">(<code>kiss.Signal<code class="parameters"><code>?</code></code></code><code class="parameterName">timing</code>)</code><i class="M"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelWhen(kiss.Signal,java.lang.String)">cancelWhen</a></code><code class="Q">(<code>kiss.Signal<code class="parameters"><code>?</code></code></code><code class="parameterName">timing</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">description</code>)</code><i class="M"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
-						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelWhen(java.util.function.Function)">cancelWhen</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code class="parameterName">timing</code>)</code><i class="M"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelWhen(java.util.function.Function,java.lang.String)">cancelWhen</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code class="parameterName">timing</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">description</code>)</code><i class="M"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelAfter(long,java.time.temporal.ChronoUnit)">cancelAfter</a></code><code class="R">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code class="parameterName">unit</code>)</code><i class="d"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelAfter(long,java.util.concurrent.TimeUnit)">cancelAfter</a></code><code class="R">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/TimeUnit.html">TimeUnit</a></code><code class="parameterName">unit</code>)</code><i class="d"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelAfter(java.time.Duration)">cancelAfter</a></code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/Duration.html">Duration</a></code><code class="parameterName">duration</code>)</code><i class="d"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelAfter(cointoss.ticker.Span)">cancelAfter</a></code><code class="R">(<code><a href="api/cointoss.ticker.Span.html">Span</a></code><code class="parameterName">span</code>)</code><i class="d"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelWhen(kiss.Signal)">cancelWhen</a></code><code class="R">(<code>kiss.Signal<code class="parameters"><code>?</code></code></code><code class="parameterName">timing</code>)</code><i class="d"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelWhen(kiss.Signal,java.lang.String)">cancelWhen</a></code><code class="R">(<code>kiss.Signal<code class="parameters"><code>?</code></code></code><code class="parameterName">timing</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">description</code>)</code><i class="d"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
+						<li><i class="DEFAULT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelWhen(java.util.function.Function)">cancelWhen</a></code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code class="parameterName">timing</code>)</code><i class="d"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.order.Cancellable.html#cancelWhen(java.util.function.Function,java.lang.String)">cancelWhen</a></code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/function/Function.html">Function</a><code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html">ScheduledExecutorService</a></code>, <code>kiss.Signal<code class="parameters"><code>?</code></code></code></code></code><code class="parameterName">timing</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">description</code>)</code><i class="d"><code><a href="api/cointoss.order.Orderable.html">Orderable</a></code></i></li>
 					</ul>
 				</div>
 			</aside>

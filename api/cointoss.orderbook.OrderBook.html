@@ -4,17 +4,26 @@
 		<meta charset="UTF-8"/>
 		<meta content="width=device-width, initial-scale=1" name="viewport"/>
 		<meta content="Explains how to use Cointoss and its API. " name="description"/>
-		<link href="https://fonts.googleapis.com" rel="preconnect"/>
 		<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+		<link href="https://fonts.googleapis.com" rel="preconnect"/>
+		<link crossorigin="null" href="https://fonts.gstatic.com" rel="preconnect"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Inter" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Material+Icons" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" rel="preload"/>
+		<link href="https://fonts.googleapis.com/css2?display=swap&#38;family=Vollkorn" media="print" onload="this.media=&#39;all&#39;" rel="stylesheet"/>
+		<link as="style" fetchpriority="high" href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="preload"/>
+		<link href="https://cdn.jsdelivr.net/npm/ress@4.0.0/dist/ress.min.css" rel="stylesheet"/>
 		<title>Cointoss API</title>
 		<base href="../"/>
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="f">
-		<header class="O">
-			<h1 class="N" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
-			<nav class="b"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
+	<body class="L">
+		<header class="i">
+			<h1 class="Q" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+			<nav class="Z"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#user"/>
@@ -31,286 +40,286 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="e">
-			<nav class="K">
+		<main class="j">
+			<nav class="k">
 				<div></div>
 			</nav>
-			<article class="d" id="Article">
-				<section class="l"><code class="Y">cointoss.orderbook</code>
-					<h2 class="Class J"><code class="L">OrderBook</code></h2>
-					<div class="S">
+			<article class="T" id="Article">
+				<section class="a"><code class="h">cointoss.orderbook</code>
+					<h2 class="Class U"><code class="P">OrderBook</code></h2>
+					<div class="W">
 						<ul class="C F">
 							<li><code><a href="api/cointoss.orderbook.OrderBookChanges.Listener.html">Listener</a></code></li>
 						</ul>
 					</div>
 				</section>
-				<section class="l" id="best">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">best</code><i class="T"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2><span class="B"><p>The best order.</p></span></section>
-				<section class="l" id="update">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">update</code><i class="T"><code class="return">kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></h2>
+				<section class="a" id="best">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">best</code><i class="S"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2><span class="B"><p>The best order.</p></span></section>
+				<section class="a" id="update">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">update</code><i class="S"><code class="return">kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></h2>
 				</section>
-				<section class="l" id="bestSize()">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">bestSize</code><code class="Q">()</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="a" id="bestSize()">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">bestSize</code><code class="R">()</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="l" id="findLargestOrder(hypatia.Num,hypatia.Num)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">findLargestOrder</code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">lowerPrice</code>, <code>hypatia.Num</code><code class="parameterName">upperPrice</code>)</code><i class="T"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="findLargestOrder(hypatia.Num,hypatia.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">findLargestOrder</code><code class="R">(<code>hypatia.Num</code><code class="parameterName">lowerPrice</code>, <code>hypatia.Num</code><code class="parameterName">upperPrice</code>)</code><i class="S"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>lowerPrice</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>upperPrice</code></td>
 							<td></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>It finds the largest order in the currently selected OrderBook within the specified price
 range.</p></span></section>
-				<section class="l" id="ascendingPages()">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">ascendingPages</code><code class="Q">()</code><i class="T"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Iterable.html">Iterable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
-					<table class="Z">
-						<tr class="H">
+				<section class="a" id="ascendingPages()">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">ascendingPages</code><code class="R">()</code><i class="S"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Iterable.html">Iterable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="N">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Iterable.html">Iterable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Iterate all pages of the current selected grouped view by ascending order.</p></span></section>
-				<section class="l" id="headMap(hypatia.Num)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">headMap</code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">price</code>)</code><i class="T"><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="headMap(hypatia.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">headMap</code><code class="R">(<code>hypatia.Num</code><code class="parameterName">price</code>)</code><i class="S"><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>price</code></td>
 							<td></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="l" id="tailMap(hypatia.Num)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">tailMap</code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">price</code>)</code><i class="T"><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="tailMap(hypatia.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">tailMap</code><code class="R">(<code>hypatia.Num</code><code class="parameterName">price</code>)</code><i class="S"><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>price</code></td>
 							<td></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
-				<section class="l" id="predictTakingPrice(long)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">predictTakingPrice</code><code class="Q">(<code>long</code><code class="parameterName">size</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="predictTakingPrice(long)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="R">(<code>long</code><code class="parameterName">size</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>long</code><code>size</code></td>
 							<td><span><p>A taking size.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A predicted price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Predict the taking price.</p></span></section>
-				<section class="l" id="predictTakingPrice(double)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">predictTakingPrice</code><code class="Q">(<code>double</code><code class="parameterName">size</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="predictTakingPrice(double)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="R">(<code>double</code><code class="parameterName">size</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>double</code><code>size</code></td>
 							<td><span><p>A taking size.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A predicted price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Predict the taking price.</p></span></section>
-				<section class="l" id="predictTakingPrice(java.lang.String)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">predictTakingPrice</code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">size</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="predictTakingPrice(java.lang.String)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">size</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code>size</code></td>
 							<td><span><p>A taking size.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A predicted price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Predict the taking price.</p></span></section>
-				<section class="l" id="predictTakingPrice(hypatia.Num)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">predictTakingPrice</code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">size</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="predictTakingPrice(hypatia.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="R">(<code>hypatia.Num</code><code class="parameterName">size</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>size</code></td>
 							<td><span><p>A taking size.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A predicted price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Predict the taking price.</p></span></section>
-				<section class="l" id="predictTakingPrice(kiss.Variable)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">predictTakingPrice</code><code class="Q">(<code>kiss.Variable<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="predictTakingPrice(kiss.Variable)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="R">(<code>kiss.Variable<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>kiss.Variable<code class="parameters"><code>hypatia.Num</code></code></code><code>size</code></td>
 							<td><span><p>A taking size.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A predicted price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Predict the taking price.</p></span></section>
-				<section class="l" id="predictTakingPrice(kiss.Signal)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">predictTakingPrice</code><code class="Q">(<code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="T"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="predictTakingPrice(kiss.Signal)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictTakingPrice</code><code class="R">(<code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code>size</code></td>
 							<td><span><p>A taking size.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></td>
 							<td><span><p>A predicted price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Predict the taking price.</p></span></section>
-				<section class="l" id="predictRealTakingPrice(kiss.Signal)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">predictRealTakingPrice</code><code class="Q">(<code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="T"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="predictRealTakingPrice(kiss.Signal)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictRealTakingPrice</code><code class="R">(<code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="S"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code>size</code></td>
 							<td><span><p>A taking size.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></td>
 							<td><span><p>A predicted price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Predict the real taking price.</p></span></section>
-				<section class="l" id="predictMakingPrice(hypatia.Num)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">predictMakingPrice</code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">size</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="predictMakingPrice(hypatia.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">predictMakingPrice</code><code class="R">(<code>hypatia.Num</code><code class="parameterName">size</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>size</code></td>
 							<td><span><p>A threshold size.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A predicted price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Predict the making price.</p></span></section>
-				<section class="l" id="computeBestPrice(hypatia.Num)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">computeBestPrice</code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="computeBestPrice(hypatia.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">computeBestPrice</code><code class="R">(<code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>diff</code></td>
 							<td><span><p>A difference price.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A computed best price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Compute the best price with your conditions (diff price).</p></span></section>
-				<section class="l" id="computeBestPrice(hypatia.Num,hypatia.Num)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">computeBestPrice</code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">threshold</code>, <code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="computeBestPrice(hypatia.Num,hypatia.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">computeBestPrice</code><code class="R">(<code>hypatia.Num</code><code class="parameterName">threshold</code>, <code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>threshold</code></td>
 							<td><span><p>A threashold volume.</p></span></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>diff</code></td>
 							<td><span><p>A difference price.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A computed best price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Compute the best price with your conditions (threashold volume and diff price).</p></span></section>
-				<section class="l" id="computeBestPrice(hypatia.Num,hypatia.Num,hypatia.Num)">
-					<h2 class="W"><i class="FINAL"><i class="PUBLIC"></i></i><code class="L">computeBestPrice</code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">start</code>, <code>hypatia.Num</code><code class="parameterName">threshold</code>, <code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="T"><code>hypatia.Num</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="computeBestPrice(hypatia.Num,hypatia.Num,hypatia.Num)">
+					<h2 class="M"><i class="FINAL"><i class="PUBLIC"></i></i><code class="P">computeBestPrice</code><code class="R">(<code>hypatia.Num</code><code class="parameterName">start</code>, <code>hypatia.Num</code><code class="parameterName">threshold</code>, <code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="S"><code>hypatia.Num</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>start</code></td>
 							<td><span><p>A start price.</p></span></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>threshold</code></td>
 							<td><span><p>A threashold volume.</p></span></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code>hypatia.Num</code><code>diff</code></td>
 							<td><span><p>A difference price.</p></span></td>
 						</tr>
-						<tr class="H">
+						<tr class="N">
 							<td><code>hypatia.Num</code></td>
 							<td><span><p>A computed best price.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Compute the best price with your conditions (start price, threashold volume and diff price).</p></span></section>
-				<section class="l" id="fix(double)">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">fix</code><code class="Q">(<code>double</code><code class="parameterName">hint</code>)</code><i class="T"><code>void</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="fix(double)">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">fix</code><code class="R">(<code>double</code><code class="parameterName">hint</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>double</code><code>hint</code></td>
 							<td><span><p>A price hint.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Fix error price.</p></span></section>
-				<section class="l" id="update(cointoss.orderbook.OrderBookChanges)">
-					<h2 class="W"><i class="PUBLIC"></i><code class="L">update</code><code class="Q">(<code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code><code class="parameterName">changes</code>)</code><i class="T"><code>void</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="update(cointoss.orderbook.OrderBookChanges)">
+					<h2 class="M"><i class="PUBLIC"></i><code class="P">update</code><code class="R">(<code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code><code class="parameterName">changes</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code><code>changes</code></td>
 							<td></td>
 						</tr>
 					</table><span class="B"><p>Update orderbook.</p></span></section>
-				<section class="l" id="change(double,float)">
-					<h2 class="W"><i class="OVERRIDE PUBLIC"></i><code class="L">change</code><code class="Q">(<code>double</code><code class="parameterName">price</code>, <code>float</code><code class="parameterName">size</code>)</code><i class="T"><code>void</code></i></h2>
-					<table class="Z">
-						<tr class="h">
+				<section class="a" id="change(double,float)">
+					<h2 class="M"><i class="OVERRIDE PUBLIC"></i><code class="P">change</code><code class="R">(<code>double</code><code class="parameterName">price</code>, <code>float</code><code class="parameterName">size</code>)</code><i class="S"><code>void</code></i></h2>
+					<table class="m">
+						<tr class="J">
 							<td><code>double</code><code>price</code></td>
 							<td></td>
 						</tr>
-						<tr class="h">
+						<tr class="J">
 							<td><code>float</code><code>size</code></td>
 							<td></td>
 						</tr>
 					</table>
 				</section>
 			</article>
-			<aside class="P" id="SubNavi">
-				<div class="U">
-					<h5 class="c">Fields</h5>
+			<aside class="Y" id="SubNavi">
+				<div class="b">
+					<h5 class="V">Fields</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#best">best</a></code><i class="M"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#update">update</a></code><i class="M"><code class="return">kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#best">best</a></code><i class="d"><code class="return">kiss.Variable<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#update">update</a></code><i class="d"><code class="return">kiss.Signal<code class="parameters"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Object.html">Object</a></code></code></code></i></li>
 					</ul>
-					<h5 class="c">Methods</h5>
+					<h5 class="V">Methods</h5>
 					<ul>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#bestSize()">bestSize</a></code><code class="Q">()</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#findLargestOrder(hypatia.Num,hypatia.Num)">findLargestOrder</a></code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">lowerPrice</code>, <code>hypatia.Num</code><code class="parameterName">upperPrice</code>)</code><i class="M"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#ascendingPages()">ascendingPages</a></code><code class="Q">()</code><i class="M"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Iterable.html">Iterable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#headMap(hypatia.Num)">headMap</a></code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">price</code>)</code><i class="M"><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#tailMap(hypatia.Num)">tailMap</a></code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">price</code>)</code><i class="M"><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(long)">predictTakingPrice</a></code><code class="Q">(<code>long</code><code class="parameterName">size</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(double)">predictTakingPrice</a></code><code class="Q">(<code>double</code><code class="parameterName">size</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(java.lang.String)">predictTakingPrice</a></code><code class="Q">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">size</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(hypatia.Num)">predictTakingPrice</a></code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">size</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(kiss.Variable)">predictTakingPrice</a></code><code class="Q">(<code>kiss.Variable<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(kiss.Signal)">predictTakingPrice</a></code><code class="Q">(<code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="M"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictRealTakingPrice(kiss.Signal)">predictRealTakingPrice</a></code><code class="Q">(<code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="M"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictMakingPrice(hypatia.Num)">predictMakingPrice</a></code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">size</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(hypatia.Num)">computeBestPrice</a></code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(hypatia.Num,hypatia.Num)">computeBestPrice</a></code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">threshold</code>, <code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(hypatia.Num,hypatia.Num,hypatia.Num)">computeBestPrice</a></code><code class="Q">(<code>hypatia.Num</code><code class="parameterName">start</code>, <code>hypatia.Num</code><code class="parameterName">threshold</code>, <code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="M"><code>hypatia.Num</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#fix(double)">fix</a></code><code class="Q">(<code>double</code><code class="parameterName">hint</code>)</code><i class="M"><code>void</code></i></li>
-						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#update(cointoss.orderbook.OrderBookChanges)">update</a></code><code class="Q">(<code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code><code class="parameterName">changes</code>)</code><i class="M"><code>void</code></i></li>
-						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#change(double,float)">change</a></code><code class="Q">(<code>double</code><code class="parameterName">price</code>, <code>float</code><code class="parameterName">size</code>)</code><i class="M"><code>void</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#bestSize()">bestSize</a></code><code class="R">()</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#findLargestOrder(hypatia.Num,hypatia.Num)">findLargestOrder</a></code><code class="R">(<code>hypatia.Num</code><code class="parameterName">lowerPrice</code>, <code>hypatia.Num</code><code class="parameterName">upperPrice</code>)</code><i class="d"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#ascendingPages()">ascendingPages</a></code><code class="R">()</code><i class="d"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/Iterable.html">Iterable</a><code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#headMap(hypatia.Num)">headMap</a></code><code class="R">(<code>hypatia.Num</code><code class="parameterName">price</code>)</code><i class="d"><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#tailMap(hypatia.Num)">tailMap</a></code><code class="R">(<code>hypatia.Num</code><code class="parameterName">price</code>)</code><i class="d"><code>primavera.map.ConcurrentNavigableDoubleMap<code class="parameters"><code><a href="api/cointoss.orderbook.OrderBookPage.html">OrderBookPage</a></code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(long)">predictTakingPrice</a></code><code class="R">(<code>long</code><code class="parameterName">size</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(double)">predictTakingPrice</a></code><code class="R">(<code>double</code><code class="parameterName">size</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(java.lang.String)">predictTakingPrice</a></code><code class="R">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/lang/String.html">String</a></code><code class="parameterName">size</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(hypatia.Num)">predictTakingPrice</a></code><code class="R">(<code>hypatia.Num</code><code class="parameterName">size</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(kiss.Variable)">predictTakingPrice</a></code><code class="R">(<code>kiss.Variable<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictTakingPrice(kiss.Signal)">predictTakingPrice</a></code><code class="R">(<code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictRealTakingPrice(kiss.Signal)">predictRealTakingPrice</a></code><code class="R">(<code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code><code class="parameterName">size</code>)</code><i class="d"><code>kiss.Signal<code class="parameters"><code>hypatia.Num</code></code></code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#predictMakingPrice(hypatia.Num)">predictMakingPrice</a></code><code class="R">(<code>hypatia.Num</code><code class="parameterName">size</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(hypatia.Num)">computeBestPrice</a></code><code class="R">(<code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(hypatia.Num,hypatia.Num)">computeBestPrice</a></code><code class="R">(<code>hypatia.Num</code><code class="parameterName">threshold</code>, <code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="FINAL"><i class="PUBLIC"></i></i><code><a href="api/cointoss.orderbook.OrderBook.html#computeBestPrice(hypatia.Num,hypatia.Num,hypatia.Num)">computeBestPrice</a></code><code class="R">(<code>hypatia.Num</code><code class="parameterName">start</code>, <code>hypatia.Num</code><code class="parameterName">threshold</code>, <code>hypatia.Num</code><code class="parameterName">diff</code>)</code><i class="d"><code>hypatia.Num</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#fix(double)">fix</a></code><code class="R">(<code>double</code><code class="parameterName">hint</code>)</code><i class="d"><code>void</code></i></li>
+						<li><i class="PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#update(cointoss.orderbook.OrderBookChanges)">update</a></code><code class="R">(<code><a href="api/cointoss.orderbook.OrderBookChanges.html">OrderBookChanges</a></code><code class="parameterName">changes</code>)</code><i class="d"><code>void</code></i></li>
+						<li><i class="OVERRIDE PUBLIC"></i><code><a href="api/cointoss.orderbook.OrderBook.html#change(double,float)">change</a></code><code class="R">(<code>double</code><code class="parameterName">price</code>, <code>float</code><code class="parameterName">size</code>)</code><i class="d"><code>void</code></i></li>
 					</ul>
 				</div>
 			</aside>
