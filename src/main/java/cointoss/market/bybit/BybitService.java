@@ -44,7 +44,11 @@ public class BybitService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bybit.com/v5/public/spot")
+    private static final EfficientWebSocket RealtimeSPOT = EfficientWebSocket.with.address("wss://stream.bybit.com/v5/public/spot")
+            .extractId(json -> json.text("topic"));
+
+    /** The realtime communicator. */
+    private static final EfficientWebSocket RealtimeDRIV = EfficientWebSocket.with.address("wss://stream.bybit.com/v5/public/linear")
             .extractId(json -> json.text("topic"));
 
     /**
@@ -63,7 +67,7 @@ public class BybitService extends MarketService {
      */
     @Override
     protected EfficientWebSocket clientRealtimely() {
-        return Realtime;
+        return setting.type.isSpot() ? RealtimeSPOT : RealtimeDRIV;
     }
 
     /**
