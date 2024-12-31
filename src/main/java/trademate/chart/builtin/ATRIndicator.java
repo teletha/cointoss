@@ -14,11 +14,9 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Ticker;
 import hypatia.Num;
-import stylist.Style;
-import stylist.StyleDSL;
 import trademate.ChartTheme;
+import trademate.chart.LineStyle;
 import trademate.chart.PlotScript;
-import viewtify.util.FXUtils;
 
 public class ATRIndicator extends PlotScript {
 
@@ -31,22 +29,9 @@ public class ATRIndicator extends PlotScript {
         line(atr);
 
         Indicator<Num> tr = NumIndicator.trueRange(ticker).map(n -> n.scale(market.service.setting.base.scale));
-        line(tr, style.Main);
+        line(tr, new LineStyle(ChartTheme.$.buy));
 
         Indicator<Num> percentage = atr.map(tr, (avg, now) -> now.divide(avg).scale(3));
-        line(percentage, style.Per);
-    }
-
-    /**
-     * 
-     */
-    interface style extends StyleDSL {
-        Style Main = () -> {
-            stroke.color(FXUtils.color(ChartTheme.$.buy.v)).width(0.3, px);
-        };
-
-        Style Per = () -> {
-            stroke.color(FXUtils.color(ChartTheme.$.sell.v)).width(0.3, px);
-        };
+        line(percentage, new LineStyle(ChartTheme.$.sell));
     }
 }

@@ -11,14 +11,14 @@ package trademate.chart.builtin;
 
 import static cointoss.ticker.Span.*;
 
+import javafx.scene.paint.Color;
+
 import cointoss.Market;
 import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
-import stylist.Style;
-import stylist.StyleDSL;
-import stylist.value.Color;
+import trademate.chart.LineStyle;
 import trademate.chart.PlotScript;
 
 public class SMAIndicator extends PlotScript {
@@ -37,24 +37,24 @@ public class SMAIndicator extends PlotScript {
         switch (ticker.span) {
         case Minute1:
         case Minute5:
-            line(market.tickers.on(Minute5), shortDays, base, style.SMA5M);
+            line(market.tickers.on(Minute5), shortDays, base, Color.hsb(0, 0.7, 0.8));
 
         case Minute15:
-            line(market.tickers.on(Minute15), shortDays, base, style.SMA15M);
+            line(market.tickers.on(Minute15), shortDays, base, Color.hsb(70, 0.7, 0.8));
 
         case Hour1:
-            line(market.tickers.on(Hour1), shortDays, base, style.SMA1H);
+            line(market.tickers.on(Hour1), shortDays, base, Color.hsb(140, 0.7, 0.8));
 
         case Hour4:
-            line(market.tickers.on(Hour4), shortDays, base, style.SMA4H);
+            line(market.tickers.on(Hour4), shortDays, base, Color.hsb(220, 0.7, 0.8));
 
         case Day:
-            line(market.tickers.on(Day), longDays, base, style.SMA1DL);
+            line(market.tickers.on(Day), longDays, base, Color.hsb(300, 0.7, 0.8));
         }
     }
 
-    private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {
-        line(DoubleIndicator.build(ticker, Tick::closePrice).sma(days).scale(base).name(ticker.span.toString()), style);
+    private void line(Ticker ticker, Variable<Integer> days, int base, Color style) {
+        line(DoubleIndicator.build(ticker, Tick::closePrice).sma(days).scale(base).name(ticker.span.toString()), new LineStyle(style));
     }
 
     /**
@@ -63,40 +63,5 @@ public class SMAIndicator extends PlotScript {
     @Override
     protected String name() {
         return "SMA(" + shortDays + ")";
-    }
-
-    /**
-     * 
-     */
-    interface style extends StyleDSL {
-        double alpha = 0.75;
-
-        Style SMA5M = () -> {
-            stroke.color(Color.rgb(207, 89, 71, alpha));
-        };
-
-        Style SMA15M = () -> {
-            stroke.color(Color.rgb(101, 89, 71, alpha));
-        };
-
-        Style SMA30M = () -> {
-            stroke.color(Color.rgb(107, 191, 71, alpha));
-        };
-
-        Style SMA1H = () -> {
-            stroke.color(Color.rgb(17, 132, 66, alpha));
-        };
-
-        Style SMA4H = () -> {
-            stroke.color(Color.rgb(57, 80, 195, alpha));
-        };
-
-        Style SMA1DS = () -> {
-            stroke.color(Color.rgb(176, 104, 225, alpha));
-        };
-
-        Style SMA1DL = () -> {
-            stroke.color(Color.rgb(234, 80, 195, alpha));
-        };
     }
 }

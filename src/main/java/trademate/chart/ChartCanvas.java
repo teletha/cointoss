@@ -19,6 +19,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -33,16 +44,6 @@ import cointoss.util.Chrono;
 import cointoss.util.DateRange;
 import hypatia.Num;
 import hypatia.Primitives;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -69,7 +70,6 @@ import viewtify.ui.canvas.EnhancedCanvas;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
-import viewtify.util.FXUtils;
 
 public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
 
@@ -720,9 +720,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                                 double y = plotter.area != PlotArea.Main ? height - plotter.area.offset - horizon.value * scale
                                         : horizon.value;
 
-                                gc.setLineWidth(horizon.width);
-                                gc.setStroke(horizon.color);
-                                gc.setLineDashes(horizon.dashArray);
+                                gc.setLineWidth(horizon.style.width());
+                                gc.setStroke(horizon.style.color());
+                                gc.setLineDashes(horizon.style.dash());
                                 gc.strokeLine(0, y, width, y);
                             }
 
@@ -738,9 +738,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                                     }
                                 }
 
-                                gc.setLineWidth(chart.width);
-                                gc.setStroke(chart.color);
-                                gc.setLineDashes(chart.dashArray);
+                                gc.setLineWidth(chart.style.width());
+                                gc.setStroke(chart.style.color());
+                                gc.setLineDashes(chart.style.dash());
                                 gc.strokePolyline(valueX.asArray(), chart.valueY.asArray(), valueX.size());
                             }
                         }
@@ -791,9 +791,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                         for (LineChart chart : plotter.lines) {
                             if (!chart.valueY.isEmpty() && chart.visible) {
-                                gc.setLineWidth(chart.width);
-                                gc.setStroke(chart.color);
-                                gc.setLineDashes(chart.dashArray);
+                                gc.setLineWidth(chart.style.width());
+                                gc.setStroke(chart.style.color());
+                                gc.setLineDashes(chart.style.dash());
                                 gc.strokeLine(lastX, chart.valueY.last(), x, plotter.area == PlotArea.Main
                                         ? axisY.getPositionForValue(chart.indicator.valueAt(tick).doubleValue())
                                         : height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
@@ -845,7 +845,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 String name = chart.indicator.name.v;
                 if (!name.isEmpty()) name = name.concat(" ");
 
-                gc.setFill(visible && chart.visible ? chart.color : chart.color.deriveColor(0, 1, 1, 0.4));
+                gc.setFill(visible && chart.visible ? chart.style.color() : chart.style.color().deriveColor(0, 1, 1, 0.4));
                 gc.fillText(name + chart.info.valueAt(tick), x, y, chartInfoWidth);
                 x += chartInfoWidth + chartInfoHorizontalGap;
             }
@@ -860,24 +860,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The constant value. */
         private final double value;
 
-        /** The indicator color. */
-        private final Color color;
-
-        /** The indicator line width. */
-        private final double width;
-
-        /** The indicator line style. */
-        private final double[] dashArray;
+        /** The style info. */
+        private final LineStyle style;
 
         /**
          * @param value
-         * @param style
          */
-        Horizon(double value, Style style) {
+        Horizon(double value, LineStyle style) {
             this.value = value;
-            this.color = FXUtils.color(style, "stroke");
-            this.width = FXUtils.length(style, "stroke-width", 1);
-            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
+            this.style = style;
         }
     }
 
@@ -892,14 +883,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The infomation writer. */
         private final Indicator<String> info;
 
-        /** The indicator color. */
-        private final Color color;
-
-        /** The indicator line width. */
-        private final double width;
-
-        /** The indicator line style. */
-        private final double[] dashArray;
+        /** The style info. */
+        private final LineStyle style;
 
         /** The y-axis values. */
         private final DoubleList valueY = new DoubleList(64);
@@ -909,14 +894,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         /**
          * @param indicator
-         * @param style
          * @param info
          */
-        LineChart(AbstractIndicator<? extends Number, ?> indicator, Style style, Indicator<String> info) {
+        LineChart(AbstractIndicator<? extends Number, ?> indicator, LineStyle style, Indicator<String> info) {
             this.indicator = indicator;
-            this.color = FXUtils.color(style, "stroke");
-            this.width = FXUtils.length(style, "stroke-width", 1);
-            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
+            this.style = style;
             this.info = info == null ? indicator.map(v -> v.toString()) : info;
         }
 
@@ -943,9 +925,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param indicator
          * @param style
          */
-        CandleMark(Indicator<Boolean> indicator, Style style) {
+        CandleMark(Indicator<Boolean> indicator, Color style) {
             this.indicator = indicator;
-            this.color = FXUtils.color(style, "fill");
+            this.color = style;
         }
     }
 

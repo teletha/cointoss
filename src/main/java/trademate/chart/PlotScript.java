@@ -14,13 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.scene.paint.Color;
+
 import cointoss.Market;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import hypatia.Num;
 import kiss.Variable;
-import stylist.Style;
 import trademate.chart.ChartCanvas.CandleMark;
 import trademate.chart.ChartCanvas.Horizon;
 import trademate.chart.ChartCanvas.LineChart;
@@ -63,7 +64,7 @@ public abstract class PlotScript {
      * 
      * @param indicator A indicator to plot.
      */
-    protected final void line(AbstractIndicator<? extends Number, ?> indicator, Style style) {
+    protected final void line(AbstractIndicator<? extends Number, ?> indicator, LineStyle style) {
         line(indicator, style, null);
     }
 
@@ -72,10 +73,7 @@ public abstract class PlotScript {
      * 
      * @param indicator A indicator to plot.
      */
-    protected final void line(AbstractIndicator<? extends Number, ?> indicator, Style style, Indicator<String> info) {
-        if (style == null) {
-            style = ChartStyles.MouseTrack;
-        }
+    protected final void line(AbstractIndicator<? extends Number, ?> indicator, LineStyle style, Indicator<String> info) {
         Plotter plotter = plotters.computeIfAbsent(area, k -> new Plotter(k, this));
         plotter.lines.add(new LineChart(indicator, style, info));
     }
@@ -94,7 +92,7 @@ public abstract class PlotScript {
      * 
      * @param value A value to plot.
      */
-    protected final void line(Number value, Style style) {
+    protected final void line(Number value, LineStyle style) {
         line(Num.of(value.toString()), style);
     }
 
@@ -112,7 +110,7 @@ public abstract class PlotScript {
      * 
      * @param value A value to plot.
      */
-    protected final void line(Variable<? extends Number> value, Style style) {
+    protected final void line(Variable<? extends Number> value, LineStyle style) {
         line(value.v, style);
     }
 
@@ -121,11 +119,7 @@ public abstract class PlotScript {
      * 
      * @param value A value to plot.
      */
-    private final void line(Num value, Style style) {
-        if (style == null) {
-            style = ChartStyles.MouseTrack;
-        }
-
+    private final void line(Num value, LineStyle style) {
         Plotter plotter = plotters.computeIfAbsent(area, k -> new Plotter(k, this));
 
         double v = value.doubleValue();
@@ -150,11 +144,7 @@ public abstract class PlotScript {
      * 
      * @param indicator A indicator to plot.
      */
-    protected final void mark(Indicator<Boolean> indicator, Style style) {
-        if (style == null) {
-            style = ChartStyles.MouseTrack;
-        }
-
+    protected final void mark(Indicator<Boolean> indicator, Color style) {
         Plotter plotter = plotters.computeIfAbsent(area, k -> new Plotter(k, this));
         plotter.candles.add(new CandleMark(indicator, style));
     }

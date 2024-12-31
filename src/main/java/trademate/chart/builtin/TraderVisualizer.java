@@ -11,15 +11,15 @@ package trademate.chart.builtin;
 
 import static cointoss.ticker.Span.*;
 
+import javafx.scene.paint.Color;
+
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import cointoss.trade.Trader;
 import cointoss.trade.Trader.Snapshot;
 import hypatia.Num;
-import stylist.Style;
-import stylist.StyleDSL;
-import stylist.value.Color;
+import trademate.chart.LineStyle;
 import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
 
@@ -51,12 +51,12 @@ public class TraderVisualizer extends PlotScript {
         }).memoize();
 
         in(PlotArea.Low, () -> {
-            line(indicator.map(s -> s.unrealized).name("含み"), style.unrealized);
-            line(indicator.map(s -> s.profit).name("損益"), style.profit);
+            line(indicator.map(s -> s.unrealized).name("含み"), new LineStyle(Color.rgb(201, 216, 150)));
+            line(indicator.map(s -> s.profit).name("損益"), new LineStyle(Color.rgb(158, 208, 221)));
         });
 
         in(PlotArea.LowNarrow, () -> {
-            line(indicator.map(s -> s.size).name("枚数"), style.size, indicator.map(s -> s.sizeInfo()));
+            line(indicator.map(s -> s.size).name("枚数"), new LineStyle(Color.rgb(220, 220, 200)), indicator.map(s -> s.sizeInfo()));
         });
     }
 
@@ -103,31 +103,5 @@ public class TraderVisualizer extends PlotScript {
         private String sizeInfo() {
             return size + "(" + longs + " " + shorts + ")";
         }
-    }
-
-    interface style extends StyleDSL {
-        Style profit = () -> {
-            stroke.color(Color.rgb(158, 208, 221));
-        };
-
-        Style realized = () -> {
-            stroke.color(Color.rgb(201, 216, 150));
-        };
-
-        Style unrealized = () -> {
-            stroke.color(Color.rgb(201, 216, 150)).dashArray(1, 6);
-        };
-
-        Style size = () -> {
-            stroke.color(Color.rgb(220, 220, 200)).width(0.3, px);
-        };
-
-        Style longSize = () -> {
-            stroke.color(Color.rgb(180, 220, 200)).width(0.3, px);
-        };
-
-        Style shortSize = () -> {
-            stroke.color(Color.rgb(180, 220, 200)).width(0.3, px);
-        };
     }
 }

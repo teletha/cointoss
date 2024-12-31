@@ -13,12 +13,12 @@ import cointoss.Market;
 import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import stylist.Style;
-import stylist.StyleDSL;
 import trademate.CommonText;
 import trademate.chart.ChartStyles;
+import trademate.chart.LineStyle;
 import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
+import viewtify.util.FXUtils;
 
 public class VolumeIndicator extends PlotScript {
 
@@ -34,21 +34,8 @@ public class VolumeIndicator extends PlotScript {
         DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::shortVolume);
 
         in(PlotArea.Bottom, () -> {
-            line(buyVolume.scale(volumeScale).name(CommonText.Buy), style.Long);
-            line(sellVolume.scale(volumeScale).name(CommonText.Sell), style.Short);
+            line(buyVolume.scale(volumeScale).name(CommonText.Buy), new LineStyle(FXUtils.color(ChartStyles.buy)));
+            line(sellVolume.scale(volumeScale).name(CommonText.Sell), new LineStyle(FXUtils.color(ChartStyles.sell)));
         });
-    }
-
-    /**
-     * 
-     */
-    interface style extends StyleDSL {
-        Style Long = () -> {
-            stroke.color(ChartStyles.buy);
-        };
-
-        Style Short = () -> {
-            stroke.color(ChartStyles.sell.opacify(-0.49));
-        };
     }
 }
