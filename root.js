@@ -818,6 +818,13 @@ const root = {
 		{
 			"modifiers": {
 				"#": "java.util.Collections$UnmodifiableSet",},
+			"name": "LineStyle",
+			"packageName": "trademate.chart",
+			"type": "Class"
+		},
+		{
+			"modifiers": {
+				"#": "java.util.Collections$UnmodifiableSet",},
 			"name": "Liquidation",
 			"packageName": "cointoss.ticker.data",
 			"type": "Class"
