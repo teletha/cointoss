@@ -20,9 +20,9 @@
 		<script src="mimic.js" type="module"></script>
 		<link href="main.css" rel="stylesheet"/>
 	</head>
-	<body class="Y">
-		<header class="m">
-			<h1 class="a" date="2024-09-26" ver="1.9.0"><code>Cointoss</code></h1>
+	<body class="g">
+		<header class="Z">
+			<h1 class="j" date="2024-09-26" ver="1.10.0"><code>Cointoss</code></h1>
 			<nav class="N"><a href="api/"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#package"/>
 					</svg><code>API</code></a><a href="https://github.com/teletha/cointoss/discussions" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
 					</svg>Activity</a><a href="https://github.com/teletha/cointoss" target="_blank"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#github"/>
 					</svg>Repository</a></nav>
-			<div class="b" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
+			<div class="c" id="ViewMode"><a id="light" title="Change to a brighter color scheme"><svg class="A svg" viewBox="0 0 24 24">
 						<use href="main.svg#sun"/>
 					</svg>
 				</a><a id="dark" title="Change to a darker color scheme"><svg class="A svg" viewBox="0 0 24 24">
@@ -40,70 +40,70 @@
 					</svg>
 				</a></div>
 		</header>
-		<main class="W">
-			<nav class="T">
+		<main class="O">
+			<nav class="W">
 				<div></div>
 			</nav>
-			<article class="k" id="Article">
-				<section class="g"><code class="U">cointoss.verify</code>
-					<h2 class="Interface l"><code class="d">Latency</code></h2>
-					<div class="V"></div><span class="B"><p>Emulation for network latency.</p></span></section>
-				<section class="g" id="emulate(java.time.ZonedDateTime)">
-					<h2 class="Q"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="d">emulate</code><code class="O">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code><code class="parameterName">time</code>)</code><i class="X"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
-					<table class="I">
-						<tr class="e">
+			<article class="b" id="Article">
+				<section class="e"><code class="P">cointoss.verify</code>
+					<h2 class="Interface K"><code class="Y">Latency</code></h2>
+					<div class="U"></div><span class="B"><p>Emulation for network latency.</p></span></section>
+				<section class="e" id="emulate(java.time.ZonedDateTime)">
+					<h2 class="M"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="Y">emulate</code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code><code class="parameterName">time</code>)</code><i class="Q"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></h2>
+					<table class="h">
+						<tr class="d">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code><code>time</code></td>
 							<td></td>
 						</tr>
-						<tr class="f">
+						<tr class="a">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></td>
 							<td><span><p>The modified time.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Modify time by lag.</p></span></section>
-				<section class="g" id="lag()">
-					<h2 class="Q"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="d">lag</code><code class="O">()</code><i class="X"><code>long</code></i></h2>
-					<table class="I">
-						<tr class="f">
+				<section class="e" id="lag()">
+					<h2 class="M"><i class="ABSTRACT"><i class="PUBLIC"></i></i><code class="Y">lag</code><code class="V">()</code><i class="Q"><code>long</code></i></h2>
+					<table class="h">
+						<tr class="a">
 							<td><code>long</code></td>
 							<td><span><p>The modified time.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Modify time by lag.</p></span></section>
-				<section class="g" id="zero()">
-					<h2 class="Q"><i class="PUBLIC STATIC"></i><code class="d">zero</code><code class="O">()</code><i class="X"><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></i></h2>
-					<table class="I">
-						<tr class="f">
+				<section class="e" id="zero()">
+					<h2 class="M"><i class="STATIC PUBLIC"></i><code class="Y">zero</code><code class="V">()</code><i class="Q"><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></i></h2>
+					<table class="h">
+						<tr class="a">
 							<td><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></td>
 							<td><span><p>A create <code><a href="api/cointoss.verify.Latency.html">Latency</a></code>.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Build no lag.</p></span></section>
-				<section class="g" id="fixed(long,java.time.temporal.ChronoUnit)">
-					<h2 class="Q"><i class="PUBLIC STATIC"></i><code class="d">fixed</code><code class="O">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code class="parameterName">unit</code>)</code><i class="X"><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></i></h2>
-					<table class="I">
-						<tr class="e">
+				<section class="e" id="fixed(long,java.time.temporal.ChronoUnit)">
+					<h2 class="M"><i class="STATIC PUBLIC"></i><code class="Y">fixed</code><code class="V">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code class="parameterName">unit</code>)</code><i class="Q"><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></i></h2>
+					<table class="h">
+						<tr class="d">
 							<td><code>long</code><code>time</code></td>
 							<td><span><p>A time.</p></span></td>
 						</tr>
-						<tr class="e">
+						<tr class="d">
 							<td><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code>unit</code></td>
 							<td><span><p>A time unit.</p></span></td>
 						</tr>
-						<tr class="f">
+						<tr class="a">
 							<td><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></td>
 							<td><span><p>A created <code><a href="api/cointoss.verify.Latency.html">Latency</a></code>.</p></span></td>
 						</tr>
 					</table><span class="B"><p>Build fixed time lag.</p></span></section>
 			</article>
-			<aside class="P" id="SubNavi">
-				<div class="S">
-					<h5 class="Z">Static Methods</h5>
+			<aside class="i" id="SubNavi">
+				<div class="L">
+					<h5 class="k">Static Methods</h5>
 					<ul>
-						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.verify.Latency.html#zero()">zero</a></code><code class="O">()</code><i class="H"><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></i></li>
-						<li><i class="PUBLIC STATIC"></i><code><a href="api/cointoss.verify.Latency.html#fixed(long,java.time.temporal.ChronoUnit)">fixed</a></code><code class="O">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code class="parameterName">unit</code>)</code><i class="H"><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></i></li>
+						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.verify.Latency.html#zero()">zero</a></code><code class="V">()</code><i class="T"><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></i></li>
+						<li><i class="STATIC PUBLIC"></i><code><a href="api/cointoss.verify.Latency.html#fixed(long,java.time.temporal.ChronoUnit)">fixed</a></code><code class="V">(<code>long</code><code class="parameterName">time</code>, <code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/temporal/ChronoUnit.html">ChronoUnit</a></code><code class="parameterName">unit</code>)</code><i class="T"><code><a href="api/cointoss.verify.Latency.html">Latency</a></code></i></li>
 					</ul>
-					<h5 class="Z">Methods</h5>
+					<h5 class="k">Methods</h5>
 					<ul>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.verify.Latency.html#emulate(java.time.ZonedDateTime)">emulate</a></code><code class="O">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code><code class="parameterName">time</code>)</code><i class="H"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
-						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.verify.Latency.html#lag()">lag</a></code><code class="O">()</code><i class="H"><code>long</code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.verify.Latency.html#emulate(java.time.ZonedDateTime)">emulate</a></code><code class="V">(<code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code><code class="parameterName">time</code>)</code><i class="T"><code><a href="https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/time/ZonedDateTime.html">ZonedDateTime</a></code></i></li>
+						<li><i class="ABSTRACT"><i class="PUBLIC"></i></i><code><a href="api/cointoss.verify.Latency.html#lag()">lag</a></code><code class="V">()</code><i class="T"><code>long</code></i></li>
 					</ul>
 				</div>
 			</aside>
