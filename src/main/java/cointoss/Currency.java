@@ -750,6 +750,8 @@ public enum Currency {
 
     SOL("SOL", "Solana"),
 
+    SOLV("SOLV", "Solve Protocol"),
+
     SUI("SUI", "SUI"),
 
     XHV("XHV", "Haven Protocol"),
