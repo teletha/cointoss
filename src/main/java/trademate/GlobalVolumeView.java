@@ -132,7 +132,7 @@ public class GlobalVolumeView extends View {
         drawSample(coinbase, Exchange.Coinbase, Pastel10[6]);
         drawSample(gmo, Exchange.GMO, Pastel10[8]);
 
-        List<Currency> currencies = List.of(BTC, ETH, XRP, SUI, COMP, SOL, DOGE, BNB);
+        List<Currency> currencies = List.of(BTC, ETH, XRP, TRUMP, COMP, SOL, DOGE, BNB, SUI);
         for (Currency currency : currencies) {
             charts.add(new CurrencyView(currency));
         }

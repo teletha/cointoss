@@ -754,6 +754,8 @@ public enum Currency {
 
     SUI("SUI", "SUI"),
 
+    TRUMP("TRUMP", "Officail Trump"),
+
     XHV("XHV", "Haven Protocol"),
 
     AMPL("AMPL", "Ampleforth"),

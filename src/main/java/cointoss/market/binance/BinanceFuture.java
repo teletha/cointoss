@@ -41,6 +41,10 @@ public final class BinanceFuture extends MarketServiceProvider {
             .target(Currency.DOGE.minimumSize(1))
             .base(Currency.USDT.minimumSize(0.000001)));
 
+    public static final MarketService FUTURE_TRUMP_USDT = new BinanceService("TRUMPUSDT", MarketSetting.with.derivative()
+            .target(Currency.TRUMP.minimumSize(0.01))
+            .base(Currency.USDT.minimumSize(0.001)));
+
     // public static final MarketService FUTURE_BTCUSD_2301229 = new BinanceService("BTCUSD_231229",
     // MarketSetting.with.derivative()
     // .target(Currency.BTC.minimumSize(0.00001))

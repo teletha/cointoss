@@ -84,6 +84,10 @@ public final class Bybit extends MarketServiceProvider {
             .target(Currency.STRK.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.0001)));
 
+    public static final MarketService TRUMP_USDT = new BybitService("TRUMPUSDT", MarketSetting.with.spot()
+            .target(Currency.TRUMP.minimumSize(1).scale(2))
+            .base(Currency.USDT.minimumSize(0.001)));
+
     public static final MarketService WLD_USDT = new BybitService("WLDUSDT", MarketSetting.with.spot()
             .target(Currency.WLD.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.0001)));
