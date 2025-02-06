@@ -70,6 +70,8 @@ public enum Currency {
 
     BDT("BDT", "Bangladeshi Taka"),
 
+    BERA("BERA", "Berachain"),
+
     BGC("BGC", "Aten 'Black Gold' Coin"),
 
     BGN("BGN", "Bulgarian Lev"),

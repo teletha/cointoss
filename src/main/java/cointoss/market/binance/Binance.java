@@ -27,6 +27,10 @@ public final class Binance extends MarketServiceProvider {
             .target(Currency.ARB.minimumSize(0.1))
             .base(Currency.USDT.minimumSize(0.0001)));
 
+    public static final MarketService BERA_USDT = new BinanceService("BERAUSDT", MarketSetting.with.spot()
+            .target(Currency.BERA.minimumSize(0.001))
+            .base(Currency.USDT.minimumSize(0.001)));
+
     public static final MarketService BNB_USDT = new BinanceService("BNBUSDT", MarketSetting.with.spot()
             .target(Currency.BNB.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.1)));

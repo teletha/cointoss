@@ -27,6 +27,10 @@ public final class Bybit extends MarketServiceProvider {
             .target(Currency.ARB.minimumSize(1).scale(2))
             .base(Currency.USDT.minimumSize(0.001)));
 
+    public static final MarketService BERA_USDT = new BybitService("BERAUSDT", MarketSetting.with.spot()
+            .target(Currency.BERA.minimumSize(1).scale(2))
+            .base(Currency.USDT.minimumSize(0.0001)));
+
     public static final MarketService BTC_USDT = new BybitService("BTCUSDT", MarketSetting.with.spot()
             .target(Currency.BTC.minimumSize(1).scale(5))
             .base(Currency.USDT.minimumSize(0.5)));
