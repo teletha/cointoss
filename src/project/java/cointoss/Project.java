@@ -37,7 +37,14 @@ public class Project extends bee.api.Project {
 
         require("org.xerial", "sqlite-jdbc");
         // require("com.h2database", "h2");
-        // require("org.duckdb", "duckdb_jdbc");
+        require("org.duckdb", "duckdb_jdbc");
+        require("org.apache.arrow", "arrow-vector");
+        require("org.apache.arrow", "arrow-memory-netty");
+        require("org.apache.parquet", "parquet-arrow");
+        require("org.apache.parquet", "parquet-hadoop");
+        require("org.apache.parquet", "parquet-common");
+        require("org.java-websocket", "Java-WebSocket");
+        require("com.fasterxml.jackson.core", "jackson-databind");
 
         // require("io.fair-acc", "chartfx");
         // chartfx requires old jafafx, so override it
