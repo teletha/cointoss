@@ -45,6 +45,9 @@ public class Project extends bee.api.Project {
         require("org.apache.parquet", "parquet-common");
         require("org.java-websocket", "Java-WebSocket");
         require("com.fasterxml.jackson.core", "jackson-databind");
+        require("software.amazon.awssdk", "s3");
+        require("software.amazon.awssdk", "apache-client");
+        require("org.lz4", "lz4-java");
 
         // require("io.fair-acc", "chartfx");
         // chartfx requires old jafafx, so override it
