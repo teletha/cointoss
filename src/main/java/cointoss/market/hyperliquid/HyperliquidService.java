@@ -76,31 +76,7 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        long start = Support.computeEpochTime(startId);
-        long end = Support.computeEpochTime(endId);
-
-        System.out.println(Chrono.currentTimeMills());
-        return call("POST", """
-                {
-                    "type": "candleSnapshot",
-                    "req": {
-                        "coin": "%s",
-                        "interval": "1m",
-                        "startTime": %d,
-                        "endTime": %d
-                    }
-                }
-                """.formatted(marketName, start, end)).flatIterable(json -> json.find("*")).map(json -> {
-            System.out.println(json);
-            double open = json.get(double.class, "o");
-            double close = json.get(double.class, "c");
-            double high = json.get(double.class, "h");
-            double low = json.get(double.class, "l");
-            double volume = json.get(double.class, "v");
-            ZonedDateTime time = Chrono.utcByMills(json.get(long.class, "t"));
-
-            return nul;
-        });
+        return convert("1m", Support.computeEpochTime(startId), Support.computeEpochTime(endId));
     }
 
     /**
@@ -108,7 +84,30 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        return I.signal();
+        return convert("12h", 0, Support.computeEpochTime(id));
+    }
+
+    private Signal<Execution> convert(String interval, long startMS, long endMS) {
+        return call("""
+                {
+                    "type": "candleSnapshot",
+                    "req": {
+                        "coin": "%s",
+                        "interval": "%s",
+                        "startTime": %d,
+                        "endTime": %d
+                    }
+                }
+                """.formatted(marketName, interval, startMS, endMS)).flatIterable(json -> json.find("*")).flatIterable(json -> {
+            Num open = json.get(Num.class, "o");
+            Num close = json.get(Num.class, "c");
+            Num high = json.get(Num.class, "h");
+            Num low = json.get(Num.class, "l");
+            Num volume = json.get(Num.class, "v");
+            long time = json.get(long.class, "t");
+
+            return Support.createExecutions(open, high, low, close, volume, time);
+        });
     }
 
     /**
@@ -151,7 +150,7 @@ public class HyperliquidService extends MarketService {
      * @param body
      * @return
      */
-    private Signal<JSON> call(String method, String body) {
+    private Signal<JSON> call(String body) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.hyperliquid.xyz/info"))
                 .header("Content-Type", "application/json")
                 .POST(BodyPublishers.ofString(body));
@@ -160,7 +159,7 @@ public class HyperliquidService extends MarketService {
     }
 
     public static void main(String[] args) {
-        Hyperliquid.BTC_USDC.executions(0, Support.computeID(Chrono.currentTimeMills())).waitForTerminate().to(e -> {
+        Hyperliquid.BTC_USDC.executionsBefore(Support.computeID(Chrono.currentTimeMills())).waitForTerminate().to(e -> {
             System.out.println(e);
         });
     }
