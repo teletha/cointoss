@@ -76,7 +76,7 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        return convert("1m", Support.computeEpochTime(startId), Support.computeEpochTime(endId));
+        return convertCandle("1m", Support.computeEpochTime(startId), Support.computeEpochTime(endId));
     }
 
     /**
@@ -84,10 +84,25 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        return convert("12h", 0, Support.computeEpochTime(id));
+        return convertCandle("12h", 0, Support.computeEpochTime(id));
     }
 
-    private Signal<Execution> convert(String interval, long startMS, long endMS) {
+    private Signal<Execution> convertCandle(String interval, long startMS, long endMS) {
+        long intervalMillis = 1000 * switch (interval) {
+        case "1m" -> 60;
+        case "5m" -> 60 * 5;
+        case "15m" -> 60 * 15;
+        case "30m" -> 60 * 30;
+        case "1h" -> 60 * 60;
+        case "4h" -> 60 * 60 * 4;
+        case "8h" -> 60 * 60 * 8;
+        case "12h" -> 60 * 60 * 12;
+        case "1d" -> 60 * 60 * 24;
+        case "3d" -> 60 * 60 * 24 * 3;
+        case "1w" -> 60 * 60 * 24 * 7;
+        default -> throw new IllegalArgumentException("Unexpected value: " + interval);
+        };
+
         return call("""
                 {
                     "type": "candleSnapshot",
@@ -106,7 +121,7 @@ public class HyperliquidService extends MarketService {
             Num volume = json.get(Num.class, "v");
             long time = json.get(long.class, "t");
 
-            return Support.createExecutions(open, high, low, close, volume, time);
+            return Support.createExecutions(open, high, low, close, volume, time, intervalMillis);
         });
     }
 

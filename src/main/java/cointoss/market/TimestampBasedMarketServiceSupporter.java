@@ -251,7 +251,7 @@ public class TimestampBasedMarketServiceSupporter {
      * @param epochMillis A starting time.
      * @return
      */
-    public final List<Execution> createExecutions(Num open, Num high, Num low, Num close, Num volume, long epochMillis) {
+    public final List<Execution> createExecutions(Num open, Num high, Num low, Num close, Num volume, long epochMillis, long intervalMillis) {
         if (volume.isZero()) {
             return Collections.EMPTY_LIST;
         }
@@ -264,7 +264,7 @@ public class TimestampBasedMarketServiceSupporter {
         Num volume4 = volume.divide(4);
 
         for (int i = 0; i < prices.length; i++) {
-            long millis = epochMillis + i * 15000;
+            long millis = epochMillis + i * (intervalMillis / 4);
             long id = computeID(millis);
 
             list.add(Execution.with.direction(sides[i], volume4)

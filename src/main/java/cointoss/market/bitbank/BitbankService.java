@@ -153,7 +153,7 @@ public class BitbankService extends MarketService {
                     Num volume = e.get(Num.class, "4");
                     long epochMillis = e.get(long.class, "5");
 
-                    return Support.createExecutions(open, high, low, close, volume, epochMillis);
+                    return Support.createExecutions(open, high, low, close, volume, epochMillis, 60 * 1000);
                 });
     }
 
