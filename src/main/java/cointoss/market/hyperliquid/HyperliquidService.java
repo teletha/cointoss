@@ -43,7 +43,22 @@ public class HyperliquidService extends MarketService {
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.hyperliquid.xyz/ws").extractId(json -> {
         String channel = json.text("channel");
-        return channel.equals("subscriptionResponse") ? "" : channel + "." + json.get("data").get("0").text("coin");
+
+        // ignore
+        if (channel.equals("subscriptionResponse")) {
+            return "";
+        }
+
+        JSON data = json.get("data");
+
+        // trades
+        JSON trade = data.get("0");
+        if (trade != null) {
+            return channel + "." + trade.text("coin");
+        }
+
+        // l2book
+        return channel + "." + data.text("coin");
     });
 
     /**
@@ -183,7 +198,15 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<OrderBookChanges> orderBook() {
-        return I.signal();
+        return call(2, """
+                    {
+                    "type": "l2Book",
+                    "coin": "%s",
+                    "nSigFigs": 3
+                }
+                """.formatted(marketName)).map(pages -> {
+            return OrderBookChanges.byJSON(pages.find("levels", "0", "*"), pages.find("levels", "1", "*"), "px", "sz");
+        });
     }
 
     /**
@@ -191,7 +214,9 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
-        return I.signal();
+        return clientRealtimely().subscribe(new Topic("l2Book", marketName)).map(pages -> {
+            return OrderBookChanges.byJSON(pages.find("data", "levels", "0", "*"), pages.find("data", "levels", "1", "*"), "px", "sz");
+        });
     }
 
     /**
@@ -251,5 +276,7 @@ public class HyperliquidService extends MarketService {
         public String type;
 
         public String coin;
+
+        public int nSigFigs = 3;
     }
 }
