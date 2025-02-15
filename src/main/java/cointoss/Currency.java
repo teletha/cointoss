@@ -22,6 +22,8 @@ public enum Currency {
 
     AFN("AFN", "Afghan Afghani"),
 
+    AI16Z("AI16Z", "AI16Z"),
+
     ALL("ALL", "Albanian Lek"),
 
     AMD("AMD", "Armenian Dram"),
@@ -167,6 +169,8 @@ public enum Currency {
     ETH("ETH", "Ether"),
 
     EUR("EUR", "Euro"),
+
+    FARTCOIN("FARTCOIN", "FARTCOIN"),
 
     FIL("FIL", "Filecoin"),
 
@@ -485,6 +489,8 @@ public enum Currency {
     VND("VND", "Vietnamese Dong"),
 
     VUV("VUV", "Vanuatu Vatu"),
+
+    WIF("WIF", "WIF"),
 
     WLD("WLD", "Worldcoin"),
 

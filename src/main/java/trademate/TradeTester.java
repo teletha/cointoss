@@ -62,6 +62,7 @@ public class TradeTester extends View {
     public static void main(String[] args) throws InterruptedException {
         I.load(Market.class);
         I.env("typewriter.sqlite", "jdbc:sqlite:.log/market.sqlite");
+        I.env("typewriter.query.slow", 2000);
         SQLite.configure(config -> {
             config.setJournalMode(JournalMode.PERSIST);
             config.setSynchronous(SynchronousMode.OFF);

@@ -646,17 +646,6 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
-            Åssignable o = new Åssignable();
-            o.spot();
-            return o;
-        }
-
-        /**
-         * Create new {@link MarketSetting} with the specified type property.
-         * 
-         * @return The next assignable model.
-         */
         public ÅssignableTarget<ÅssignableBase<Self>> derivative() {
             Åssignable o = new Åssignable();
             o.derivative();
@@ -671,6 +660,17 @@ public class MarketSetting implements MarketSettingModel {
         public ÅssignableTarget<ÅssignableBase<Self>> future() {
             Åssignable o = new Åssignable();
             o.future();
+            return o;
+        }
+
+        /**
+         * Create new {@link MarketSetting} with the specified type property.
+         * 
+         * @return The next assignable model.
+         */
+        public ÅssignableTarget<ÅssignableBase<Self>> spot() {
+            Åssignable o = new Åssignable();
+            o.spot();
             return o;
         }
     }
@@ -696,15 +696,6 @@ public class MarketSetting implements MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        default Next spot() {
-            return type(cointoss.MarketType.SPOT);
-        }
-
-        /**
-         * Assign type property.
-         * 
-         * @return The next assignable model.
-         */
         default Next derivative() {
             return type(cointoss.MarketType.DERIVATIVE);
         }
@@ -716,6 +707,15 @@ public class MarketSetting implements MarketSettingModel {
          */
         default Next future() {
             return type(cointoss.MarketType.FUTURE);
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next spot() {
+            return type(cointoss.MarketType.SPOT);
         }
     }
 

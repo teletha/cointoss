@@ -38,7 +38,7 @@ public class HyperliquidService extends MarketService {
     static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
+    private static final APILimiter Limit = APILimiter.with.limit(1000).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.hyperliquid.xyz/ws").extractId(json -> {
@@ -52,7 +52,6 @@ public class HyperliquidService extends MarketService {
      */
     protected HyperliquidService(String marketName, MarketSetting setting) {
         super(Exchange.Hyperliquid, marketName, setting);
-        this.executionRequestLimit = 1000;
     }
 
     /**
@@ -68,7 +67,8 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return I.signal();
+        System.out.println("ExecutionLatest");
+        return convertCandle("1m", 0, Chrono.currentTimeMills()).last();
     }
 
     /**
@@ -76,7 +76,37 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long startId, long endId) {
-        return convertCandle("1m", Support.computeEpochTime(startId), Support.computeEpochTime(endId));
+        long startTime = Support.computeEpochTime(startId);
+        long currentTime = Chrono.currentTimeMills();
+        long diff = (currentTime - startTime) / (1000 * 5000);
+        if (diff <= 60) {
+            return convertCandle("1m", startTime, currentTime);
+        } else if (diff <= 60 * 5) {
+            return convertCandle("5m", startTime, currentTime - (60L * 1 * 1000 * 5000));
+        } else if (diff <= 60 * 15) {
+            return convertCandle("15m", startTime, currentTime - (60L * 5 * 1000 * 5000));
+        } else if (diff <= 60 * 30) {
+            return convertCandle("30m", startTime, currentTime - (60L * 15 * 1000 * 5000));
+        } else if (diff <= 60 * 60) {
+            return convertCandle("1h", startTime, currentTime - (60L * 30 * 1000 * 5000));
+        } else if (diff <= 60 * 240) {
+            return convertCandle("4h", startTime, currentTime - (60L * 60 * 1000 * 5000));
+        } else if (diff <= 60 * 480) {
+            return convertCandle("8h", startTime, currentTime - (60L * 240 * 1000 * 5000));
+        } else if (diff <= 60 * 720) {
+            return convertCandle("12h", startTime, currentTime - (60L * 480 * 1000 * 5000));
+        } else {
+            return convertCandle("1d", startTime, currentTime - (60L * 720 * 1000 * 5000));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> searchInitialExecution() {
+        System.out.println("SearchInitialExecution");
+        return convertCandle("1d", 0, Chrono.currentTimeMills()).first().effect(e -> System.out.println(e));
     }
 
     /**
@@ -84,10 +114,16 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
+        System.out.println("executionBefore " + Support.computeDateTime(id));
         return convertCandle("12h", 0, Support.computeEpochTime(id));
     }
 
     private Signal<Execution> convertCandle(String interval, long startMS, long endMS) {
+        if (startMS >= endMS) {
+            return I.signal();
+        }
+
+        System.out.println("Candle +" + interval + "+ start " + Chrono.utcByMills(startMS) + "   end " + Chrono.utcByMills(endMS));
         long intervalMillis = 1000 * switch (interval) {
         case "1m" -> 60;
         case "5m" -> 60 * 5;
@@ -103,7 +139,7 @@ public class HyperliquidService extends MarketService {
         default -> throw new IllegalArgumentException("Unexpected value: " + interval);
         };
 
-        return call("""
+        return call(20, """
                 {
                     "type": "candleSnapshot",
                     "req": {
@@ -165,24 +201,12 @@ public class HyperliquidService extends MarketService {
      * @param body
      * @return
      */
-    private Signal<JSON> call(String body) {
+    private Signal<JSON> call(int weight, String body) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.hyperliquid.xyz/info"))
                 .header("Content-Type", "application/json")
                 .POST(BodyPublishers.ofString(body));
 
-        return Network.rest(builder, Limit, client()).retry(withPolicy());
-    }
-
-    public static void main(String[] args) {
-        Hyperliquid.BTC_USDC.executionsBefore(Support.computeID(Chrono.currentTimeMills())).waitForTerminate().to(e -> {
-            System.out.println(e);
-        });
-    }
-
-    public static void main2(String[] args) throws InterruptedException {
-        Hyperliquid.BTC_USDC.executionsRealtimely().to(x -> {
-            System.out.println(x);
-        });
+        return Network.rest(builder, Limit, weight, client()).retry(withPolicy());
     }
 
     static class Topic extends IdentifiableTopic<Topic> {
