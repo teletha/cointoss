@@ -67,7 +67,7 @@ public class BitMexService extends MarketService {
 
         this.marketId = id;
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.base.minimumSize;
-        this.executionRequestLimit = 1000;
+        this.executionMaxRequest = 1000;
     }
 
     /**
@@ -82,7 +82,7 @@ public class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         startId++;
         long startingPoint = startId % Support.padding;
         long[] previous = new long[] {0, 0, startingPoint - 1};

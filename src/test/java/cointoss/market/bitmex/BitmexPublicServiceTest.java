@@ -93,7 +93,7 @@ class BitmexPublicServiceTest extends PublicServiceTestTemplate<BitMexService> {
                 ]
                 """);
 
-        List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
+        List<Execution> list = service.executionsAfter(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
         assert e.id == 144360343582800000L;
         assert e.orientation == Direction.SELL;

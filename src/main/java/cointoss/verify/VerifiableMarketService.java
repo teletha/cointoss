@@ -335,7 +335,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         if (nextExecutions == null) {
             return I.signal();
         } else {
@@ -344,7 +344,7 @@ public class VerifiableMarketService extends MarketService {
     }
 
     /**
-     * Mock the next call of {@link #executions(long, long)}.
+     * Mock the next call of {@link #executionsAfter(long, long)}.
      * 
      * @param executions
      */

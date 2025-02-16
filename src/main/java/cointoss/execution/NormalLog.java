@@ -137,7 +137,6 @@ class NormalLog implements AutoCloseable {
     /**
      * Write the specified text at tail.
      * 
-     * @param text
      * @throws IOException
      */
     void append(String text) throws IOException {

@@ -27,22 +27,25 @@ import kiss.Variable;
  */
 public enum Span {
 
-    Minute1(1, MINUTE_OF_HOUR, 2, HOURS, 6, 1), // 60 * 2 * 6 = 720
+    Minute1("1m", 1, MINUTE_OF_HOUR, 2, HOURS, 6, 1), // 60 * 2 * 6 = 720
 
     /**
      * The total 5-minute time is adjusted to be within 72 hours. This is because we expect to read
      * at least 3 days of logs when the market is initialized. In this way, the need to write the
      * 5-minute ticker data to the disk cache is eliminated.
      */
-    Minute5(5, MINUTE_OF_HOUR, 8, HOURS, 8, 1), // 12 * 8 * 8 = 768
+    Minute5("5m", 5, MINUTE_OF_HOUR, 8, HOURS, 8, 1), // 12 * 8 * 8 = 768
 
-    Minute15(15, MINUTE_OF_HOUR, 1, DAYS, 10, 1), // 4 * 24 * 10 = 960
+    Minute15("15m", 15, MINUTE_OF_HOUR, 1, DAYS, 10, 1), // 4 * 24 * 10 = 960
 
-    Hour1(1, HOUR_OF_DAY, 4, DAYS, 10, 1, 1), // 24 * 4 * 10 = 960
+    Hour1("1h", 1, HOUR_OF_DAY, 4, DAYS, 10, 1, 1), // 24 * 4 * 10 = 960
 
-    Hour4(4, HOUR_OF_DAY, 10, DAYS, 16, 1), // 6 * 10 * 16 = 960
+    Hour4("4h", 4, HOUR_OF_DAY, 10, DAYS, 16, 1), // 6 * 10 * 16 = 960
 
-    Day(1, EPOCH_DAY, 60, DAYS, 30); // 60 * 30 = 1800
+    Day("1d", 1, EPOCH_DAY, 60, DAYS, 30); // 60 * 30 = 1800
+
+    /** The literal expression. */
+    public final String text;
 
     /** The actual duration. */
     public final Duration duration;
@@ -74,11 +77,8 @@ public enum Span {
     /** The unit name. */
     private final Variable<String> unitName;
 
-    /**
-     * @param amount
-     * @param unit
-     */
-    private Span(long amount, ChronoField unit, int segment, ChronoUnit segmentUnit, int maximumSegmentSize, int... uppers) {
+    private Span(String text, long amount, ChronoField unit, int segment, ChronoUnit segmentUnit, int maximumSegmentSize, int... uppers) {
+        this.text = text;
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());
@@ -123,6 +123,26 @@ public enum Span {
         } else {
             return Math.abs(one.openTime - other.openTime) / seconds;
         }
+    }
+
+    /**
+     * Compute the previous {@link Span}.
+     * 
+     * @return
+     */
+    public Variable<Span> prev() {
+        int index = ordinal();
+        return index == 0 ? Variable.empty() : Variable.of(values()[index - 1]);
+    }
+
+    /**
+     * Compute the next {@link Span}.
+     * 
+     * @return
+     */
+    public Variable<Span> next() {
+        int index = ordinal();
+        return index == values().length - 1 ? Variable.empty() : Variable.of(values()[index + 1]);
     }
 
     /**
@@ -188,5 +208,37 @@ public enum Span {
             }
         }
         return set;
+    }
+
+    /**
+     * Find {@link Span} by literal.
+     * 
+     * @param span
+     * @return
+     */
+    public static Span by(String span) {
+        span = span.toLowerCase();
+
+        for (Span item : values()) {
+            if (item.text.equals(span)) {
+                return item;
+            }
+        }
+        throw new IllegalArgumentException("Unknown span type : " + span);
+    }
+
+    /**
+     * Find {@link Span} by duration.
+     * 
+     * @param mills
+     * @return
+     */
+    public static Span near(long mills) {
+        for (Span item : values()) {
+            if (mills <= item.duration.toMillis()) {
+                return item;
+            }
+        }
+        return Day;
     }
 }

@@ -87,7 +87,7 @@ class BitfinexPublicServiceTest extends PublicServiceTestTemplate<BitfinexServic
                 ]
                 """);
 
-        List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
+        List<Execution> list = service.executionsAfter(1, 10).waitForTerminate().toList();
         assert list.size() == 3;
 
         Execution e = list.get(0);

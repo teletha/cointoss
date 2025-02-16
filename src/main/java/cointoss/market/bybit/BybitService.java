@@ -57,7 +57,7 @@ public class BybitService extends MarketService {
      */
     protected BybitService(String marketName, MarketSetting setting) {
         super(Exchange.Bybit, marketName, setting);
-        this.executionRequestLimit = 1000;
+        this.executionMaxRequest = 1000;
 
         I.schedule("30 1 * * *", Chrono.UTC).to(() -> log.repair(Chrono.utcNow().minusDays(1)));
     }
@@ -74,7 +74,7 @@ public class BybitService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         long[] context = new long[3];
 
         return call("GET", "market/recent-trade?symbol=" + marketName + "&category=linear&limit=1000")

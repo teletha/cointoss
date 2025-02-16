@@ -87,7 +87,7 @@ public class CoincheckService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         long[] context = new long[3];
 
         return this.call("GET", "trades?pair=" + marketName + "&limit=100")

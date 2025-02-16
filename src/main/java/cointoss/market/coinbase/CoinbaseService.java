@@ -58,7 +58,7 @@ public class CoinbaseService extends MarketService {
     protected CoinbaseService(String marketName, MarketSetting setting) {
         super(Exchange.Coinbase, marketName, setting);
         this.enoughExecutionRequest = true;
-        this.executionRequestLimit = 1000;
+        this.executionMaxRequest = 1000;
         this.executionRequestCoefficient = 8;
 
         Realtime.subscribe(new Topic("heartbeats", marketName)).to(I.NoOP);
@@ -76,7 +76,7 @@ public class CoinbaseService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         /*
          * The expected ID range is equal to [modifier * acquirableExecutionSize].
          * The expected Time range is equal to [modifier * 1000 * 60 * 5 * support.padding]

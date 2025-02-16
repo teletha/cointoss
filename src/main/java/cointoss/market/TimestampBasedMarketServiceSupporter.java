@@ -18,6 +18,7 @@ import java.util.List;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import kiss.JSON;
@@ -251,7 +252,7 @@ public class TimestampBasedMarketServiceSupporter {
      * @param epochMillis A starting time.
      * @return
      */
-    public final List<Execution> createExecutions(Num open, Num high, Num low, Num close, Num volume, long epochMillis, long intervalMillis) {
+    public final List<Execution> createExecutions(Num open, Num high, Num low, Num close, Num volume, long epochMillis, Span span) {
         if (volume.isZero()) {
             return Collections.EMPTY_LIST;
         }
@@ -264,7 +265,7 @@ public class TimestampBasedMarketServiceSupporter {
         Num volume4 = volume.divide(4);
 
         for (int i = 0; i < prices.length; i++) {
-            long millis = epochMillis + i * (intervalMillis / 4);
+            long millis = epochMillis + i * (span.duration.toMillis() / 4);
             long id = computeID(millis);
 
             list.add(Execution.with.direction(sides[i], volume4)

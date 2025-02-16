@@ -23,6 +23,7 @@ import cointoss.execution.LogHouse;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
+import cointoss.ticker.Span;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -73,7 +74,7 @@ public class BitbankService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         long startMillis = Support.computeEpochTime(startId);
         ZonedDateTime today = Chrono.utcNow().minusMinutes(10).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime startDay = Support.computeDateTime(startId).truncatedTo(ChronoUnit.DAYS);
@@ -153,7 +154,7 @@ public class BitbankService extends MarketService {
                     Num volume = e.get(Num.class, "4");
                     long epochMillis = e.get(long.class, "5");
 
-                    return Support.createExecutions(open, high, low, close, volume, epochMillis, 60 * 1000);
+                    return Support.createExecutions(open, high, low, close, volume, epochMillis, Span.Minute1);
                 });
     }
 

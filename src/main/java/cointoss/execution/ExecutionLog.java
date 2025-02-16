@@ -364,7 +364,7 @@ public class ExecutionLog {
 
             try (NormalLog log = new NormalLog(normal)) {
                 long lastID = log.lastID();
-                Variable<Execution> latest = service.executions(lastID, lastID + 1).first().waitForTerminate().to();
+                Variable<Execution> latest = service.executionsAfter(lastID, lastID + 1).first().waitForTerminate().to();
                 return latest.isPresent() ? latest.v.date.toLocalDate().isAfter(date) : false;
             } catch (Exception e) {
                 throw I.quiet(e);
@@ -1005,7 +1005,7 @@ public class ExecutionLog {
 
                 while (!completed) {
                     // retrive the execution log from server
-                    service.executions(id, id + service.executionRequestLimit()).waitForTerminate().toCollection(executions);
+                    service.executionsAfter(id, id + service.executionRequestLimit()).waitForTerminate().toCollection(executions);
 
                     // Since the execution log after the specified ID does not exist on the server,
                     // it is not possible to create the completed normal log.

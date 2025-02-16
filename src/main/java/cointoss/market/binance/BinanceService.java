@@ -60,7 +60,7 @@ public class BinanceService extends MarketService {
     protected BinanceService(String marketName, MarketSetting setting) {
         super(setting.type.isDerivative() ? Exchange.BinanceF : Exchange.Binance, marketName, setting);
 
-        this.executionRequestLimit = 1000;
+        this.executionMaxRequest = 1000;
         this.isDelivery = setting.type.isDerivative() && setting.base.currency == Currency.USD;
     }
 
@@ -76,7 +76,7 @@ public class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (startId + 1), 20).flatIterable(e -> e.find("*"))
                 .map(this::createExecution);
     }
@@ -105,7 +105,7 @@ public class BinanceService extends MarketService {
         // Since the Binance API only provides a fromID parameter, subtract the ID by the maximum
         // number of acquisitions. If that makes the specified ID a negative number, emulate the API
         // by setting the ID to 0 and reduce the number of acquisitions.
-        long limit = executionRequestLimit;
+        long limit = executionMaxRequest;
         long fromId = id - limit;
         if (fromId < 0) {
             limit += fromId;

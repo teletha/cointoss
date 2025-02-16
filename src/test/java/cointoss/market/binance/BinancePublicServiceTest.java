@@ -89,7 +89,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
                 ]
                 """);
 
-        List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
+        List<Execution> list = service.executionsAfter(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
         assert e.id == 2;
         assert e.orientation == Direction.BUY;

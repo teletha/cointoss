@@ -23,6 +23,7 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
+import cointoss.ticker.Span;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -61,12 +62,10 @@ public class HyperliquidService extends MarketService {
         return channel + "." + data.text("coin");
     });
 
-    /**
-     * @param marketName
-     * @param setting
-     */
     protected HyperliquidService(String marketName, MarketSetting setting) {
         super(Exchange.Hyperliquid, marketName, setting);
+        executionMinRequest = 4;
+        executionMaxRequest = 5000;
     }
 
     /**
@@ -82,46 +81,20 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        System.out.println("ExecutionLatest");
-        return convertCandle("1m", 0, Chrono.currentTimeMills()).last();
+        long now = Chrono.currentTimeMills();
+        return convertFromCandle(Span.Minute1, now - 7000, now + 7000).last();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         long startTime = Support.computeEpochTime(startId);
         long currentTime = Chrono.currentTimeMills();
-        long diff = (currentTime - startTime) / (1000 * 5000);
-        if (diff <= 60) {
-            return convertCandle("1m", startTime, currentTime);
-        } else if (diff <= 60 * 5) {
-            return convertCandle("5m", startTime, currentTime - (60L * 1 * 1000 * 5000));
-        } else if (diff <= 60 * 15) {
-            return convertCandle("15m", startTime, currentTime - (60L * 5 * 1000 * 5000));
-        } else if (diff <= 60 * 30) {
-            return convertCandle("30m", startTime, currentTime - (60L * 15 * 1000 * 5000));
-        } else if (diff <= 60 * 60) {
-            return convertCandle("1h", startTime, currentTime - (60L * 30 * 1000 * 5000));
-        } else if (diff <= 60 * 240) {
-            return convertCandle("4h", startTime, currentTime - (60L * 60 * 1000 * 5000));
-        } else if (diff <= 60 * 480) {
-            return convertCandle("8h", startTime, currentTime - (60L * 240 * 1000 * 5000));
-        } else if (diff <= 60 * 720) {
-            return convertCandle("12h", startTime, currentTime - (60L * 480 * 1000 * 5000));
-        } else {
-            return convertCandle("1d", startTime, currentTime - (60L * 720 * 1000 * 5000));
-        }
-    }
+        Span span = Span.near((currentTime - startTime) / executionMaxRequest);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Execution> searchInitialExecution() {
-        System.out.println("SearchInitialExecution");
-        return convertCandle("1d", 0, Chrono.currentTimeMills()).first().effect(e -> System.out.println(e));
+        return convertFromCandle(span, startTime, currentTime - span.prev().map(x -> x.duration.toMillis() * executionMaxRequest).or(0L));
     }
 
     /**
@@ -129,31 +102,31 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        System.out.println("executionBefore " + Support.computeDateTime(id));
-        return convertCandle("12h", 0, Support.computeEpochTime(id));
+        return convertFromCandle(Span.Day, 0, Support.computeEpochTime(id));
     }
 
-    private Signal<Execution> convertCandle(String interval, long startMS, long endMS) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> searchInitialExecution() {
+        return convertFromCandle(Span.Day, 0, Chrono.currentTimeMills()).first();
+    }
+
+    /**
+     * Convert from candle to pseudo executions.
+     * 
+     * @param span
+     * @param startMS
+     * @param endMS
+     * @return
+     */
+    private Signal<Execution> convertFromCandle(Span span, long startMS, long endMS) {
         if (startMS >= endMS) {
             return I.signal();
         }
 
-        System.out.println("Candle +" + interval + "+ start " + Chrono.utcByMills(startMS) + "   end " + Chrono.utcByMills(endMS));
-        long intervalMillis = 1000 * switch (interval) {
-        case "1m" -> 60;
-        case "5m" -> 60 * 5;
-        case "15m" -> 60 * 15;
-        case "30m" -> 60 * 30;
-        case "1h" -> 60 * 60;
-        case "4h" -> 60 * 60 * 4;
-        case "8h" -> 60 * 60 * 8;
-        case "12h" -> 60 * 60 * 12;
-        case "1d" -> 60 * 60 * 24;
-        case "3d" -> 60 * 60 * 24 * 3;
-        case "1w" -> 60 * 60 * 24 * 7;
-        default -> throw new IllegalArgumentException("Unexpected value: " + interval);
-        };
-
+        ZonedDateTime now = Chrono.utcNow();
         return call(20, """
                 {
                     "type": "candleSnapshot",
@@ -164,7 +137,7 @@ public class HyperliquidService extends MarketService {
                         "endTime": %d
                     }
                 }
-                """.formatted(marketName, interval, startMS, endMS)).flatIterable(json -> json.find("*")).flatIterable(json -> {
+                """.formatted(marketName, span.text, startMS, endMS)).flatIterable(json -> json.find("*")).flatIterable(json -> {
             Num open = json.get(Num.class, "o");
             Num close = json.get(Num.class, "c");
             Num high = json.get(Num.class, "h");
@@ -172,8 +145,8 @@ public class HyperliquidService extends MarketService {
             Num volume = json.get(Num.class, "v");
             long time = json.get(long.class, "t");
 
-            return Support.createExecutions(open, high, low, close, volume, time, intervalMillis);
-        });
+            return Support.createExecutions(open, high, low, close, volume, time, span);
+        }).skip(e -> e.isAfter(now));
     }
 
     /**
@@ -202,7 +175,8 @@ public class HyperliquidService extends MarketService {
                     {
                     "type": "l2Book",
                     "coin": "%s",
-                    "nSigFigs": 3
+                    "nSigFigs": 5,
+                    "mantissa": 5
                 }
                 """.formatted(marketName)).map(pages -> {
             return OrderBookChanges.byJSON(pages.find("levels", "0", "*"), pages.find("levels", "1", "*"), "px", "sz");
@@ -277,6 +251,10 @@ public class HyperliquidService extends MarketService {
 
         public String coin;
 
-        public int nSigFigs = 3;
+        /** for l2book */
+        public int nSigFigs = 5;
+
+        /** for l2book */
+        public int mantissa = 5;
     }
 }

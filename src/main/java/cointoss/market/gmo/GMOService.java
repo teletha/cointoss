@@ -67,7 +67,7 @@ public class GMOService extends MarketService {
      */
     protected GMOService(String marketName, MarketSetting setting) {
         super(Exchange.GMO, marketName, setting);
-        this.executionRequestLimit = 10000;
+        this.executionMaxRequest = 10000;
     }
 
     /**
@@ -82,7 +82,7 @@ public class GMOService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         ZonedDateTime start = Chrono.max(Support.computeDateTime(startId), ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(2));
         Variable<Long> counter = Variable.of(1L);
         long[] prev = new long[3];

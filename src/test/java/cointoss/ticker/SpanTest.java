@@ -143,6 +143,32 @@ class SpanTest {
         assert Span.Hour4.uppers(false).size() == 1;
     }
 
+    @Test
+    void by() {
+        assert Span.by("1m") == Span.Minute1;
+        assert Span.by("1M") == Span.Minute1;
+        assert Span.by("5m") == Span.Minute5;
+        assert Span.by("15m") == Span.Minute15;
+        assert Span.by("1h") == Span.Hour1;
+        assert Span.by("4h") == Span.Hour4;
+        assert Span.by("1d") == Span.Day;
+    }
+
+    @Test
+    void near() {
+        assert Span.near(0) == Span.Minute1;
+        assert Span.near(30 * 1000) == Span.Minute1;
+        assert Span.near(60 * 1000) == Span.Minute1;
+        assert Span.near(61 * 1000) == Span.Minute5;
+        assert Span.near(5 * 60 * 1000) == Span.Minute5;
+        assert Span.near(10 * 60 * 1000) == Span.Minute15;
+        assert Span.near(20 * 60 * 1000) == Span.Hour1;
+        assert Span.near(50 * 60 * 1000) == Span.Hour1;
+        assert Span.near(100 * 60 * 1000) == Span.Hour4;
+        assert Span.near(200 * 60 * 1000) == Span.Hour4;
+        assert Span.near(400 * 60 * 1000) == Span.Day;
+    }
+
     /**
      * Create {@link Tick} simply.
      * 

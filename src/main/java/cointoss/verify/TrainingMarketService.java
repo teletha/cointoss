@@ -114,8 +114,8 @@ public class TrainingMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
-        return backend.executions(startId, endId);
+    public Signal<Execution> executionsAfter(long startId, long endId) {
+        return backend.executionsAfter(startId, endId);
     }
 
     /**

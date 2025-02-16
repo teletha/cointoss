@@ -88,7 +88,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
                 ]
                 """);
 
-        List<Execution> list = service.executions(1, 10).waitForTerminate().toList();
+        List<Execution> list = service.executionsAfter(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
         assert e.id == 1828074164;
         assert e.orientation == Direction.BUY;

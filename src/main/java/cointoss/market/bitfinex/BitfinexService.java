@@ -59,7 +59,7 @@ public class BitfinexService extends MarketService {
      */
     protected BitfinexService(String marketName, MarketSetting setting) {
         super(Exchange.Bitfinex, marketName, setting);
-        this.executionRequestLimit = 10000;
+        this.executionMaxRequest = 10000;
     }
 
     /**
@@ -74,7 +74,7 @@ public class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions(long startId, long endId) {
+    public Signal<Execution> executionsAfter(long startId, long endId) {
         long startTime = Support.computeEpochTime(startId) + 1;
         long startingPoint = startId % Support.padding;
         long[] previous = new long[] {0, 0, startingPoint - 1};
@@ -111,7 +111,7 @@ public class BitfinexService extends MarketService {
     public Signal<Execution> executionsBefore(long id) {
         long startTime = Support.computeEpochTime(id) + 1;
 
-        return call("GET", "trades/t" + marketName + "/hist?end=" + startTime + "&limit=" + executionRequestLimit)
+        return call("GET", "trades/t" + marketName + "/hist?end=" + startTime + "&limit=" + executionMaxRequest)
                 .flatIterable(e -> e.find("$"))
                 .map(e -> createExecution(e, new long[3]));
     }

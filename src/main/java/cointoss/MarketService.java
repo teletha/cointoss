@@ -85,9 +85,14 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
     private Signal<Liquidation> liquidationRealtimely;
 
     /**
+     * The minimum value of the execution history that can be retrieved in a single request.
+     */
+    protected int executionMinRequest = 1;
+
+    /**
      * The maximum value of the execution history that can be retrieved in a single request.
      */
-    protected int executionRequestLimit = 100;
+    protected int executionMaxRequest = 100;
 
     /**
      * If this service obtains all Executions in the specified ID range for an Execution
@@ -155,7 +160,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 boolean activeRealtime = false;
 
                 // read from REST API
-                int size = executionRequestLimit * executionRequestCoefficient;
+                int size = executionMaxRequest * executionRequestCoefficient;
                 long cacheId = log.estimateLastID();
                 long startId = cacheId != -1 ? cacheId : searchInitialExecution().map(e -> e.id).to().next();
                 Num coefficient = Num.ONE;
@@ -163,8 +168,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 while (!disposer.isDisposed()) {
                     rests.clear();
 
-                    long range = Math.round(executionRequestLimit * coefficient.doubleValue());
-                    executions(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
+                    long range = Math.round(executionMaxRequest * coefficient.doubleValue());
+                    executionsAfter(startId, startId + range).waitForTerminate().to(rests::add, observer::error);
 
                     // Since the synchronous REST API did not return an error, it can be determined
                     // that the server is operating normally, so the real-time API is also
@@ -198,7 +203,8 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                             }
 
                             long latestId = rests.peekLast().id;
-                            if (retrieved == 1 && buffer.realtime.isEmpty() && startId == latestId || !supportStableExecutionQuery()) {
+                            if (retrieved <= executionMinRequest && buffer.realtime
+                                    .isEmpty() && startId == latestId || !supportStableExecutionQuery()) {
                                 // REST API has caught up with the real-time API,
                                 // we must switch to realtime API.
                                 buffer.switchToRealtime(latestId, observer);
@@ -349,7 +355,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     public final int executionRequestLimit() {
-        return executionRequestLimit;
+        return executionMaxRequest;
     }
 
     /**
@@ -364,7 +370,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * 
      * @return This {@link Signal} will be completed immediately.
      */
-    public abstract Signal<Execution> executions(long startId, long endId);
+    public abstract Signal<Execution> executionsAfter(long startId, long endId);
 
     /**
      * Retrieves the execution log before the specified ID. (The specified ID is excluded)
@@ -442,7 +448,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 // Since there is no log prior to the middle ID, we can assume that
                 // the initial execution exists between middle and latest
                 return searchInitialExecution(middle, end);
-            } else if (executionRequestLimit <= size) {
+            } else if (executionMaxRequest <= size) {
                 // Since it is equal to the maximum number of execution log that can be
                 // retrieved at one time, there is a possibility that old log still exists.
                 return searchInitialExecution(start, result.get(0));
@@ -495,7 +501,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 return searchNearestExecution(target, first, last, count);
             } else if (last.date.isBefore(target)) {
                 if (last.equals(sampleEnd) || Duration.between(last.date, target).toMinutes() < 1) {
-                    return executions(last.id - 1, last.id + executionRequestLimit).takeWhile(e -> e.date.isBefore(target));
+                    return executionsAfter(last.id - 1, last.id + executionMaxRequest).takeWhile(e -> e.date.isBefore(target));
                 } else {
                     return searchNearestExecution(target, first, last, count);
                 }
