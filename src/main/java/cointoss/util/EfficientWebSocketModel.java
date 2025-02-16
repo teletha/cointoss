@@ -55,7 +55,7 @@ public abstract class EfficientWebSocketModel {
     private final Set<IdentifiableTopic> subscribed = ConcurrentHashMap.newKeySet();
 
     /** The limite rate. */
-    private APILimiter limit = APILimiter.with.limit(1).refresh(250, MILLISECONDS);
+    private RateLimiter limit = RateLimiter.with.limit(1).refresh(250, MILLISECONDS);
 
     /** The server is responsible or not. */
     private boolean noReplyMode;
@@ -212,7 +212,7 @@ public abstract class EfficientWebSocketModel {
      * 
      * @return
      */
-    public final EfficientWebSocket restrict(APILimiter limiter) {
+    public final EfficientWebSocket restrict(RateLimiter limiter) {
         this.limit = Objects.requireNonNull(limiter);
         return (EfficientWebSocket) this;
     }

@@ -26,11 +26,11 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.ticker.data.Liquidation;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -39,7 +39,7 @@ import kiss.Signal;
 public class BinanceService extends MarketService {
 
     /** The API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(150 /* 50 safe buffer */).refresh(Duration.ofSeconds(5));
+    private static final RateLimiter Limit = RateLimiter.with.limit(150 /* 50 safe buffer */).refresh(Duration.ofSeconds(5));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.binance.com:9443/stream")

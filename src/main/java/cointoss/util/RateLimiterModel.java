@@ -23,7 +23,7 @@ import kiss.Signaling;
 import kiss.Storable;
 
 @Icy
-abstract class APILimiterModel {
+abstract class RateLimiterModel {
 
     /** The current using permits. */
     @Managed
@@ -173,14 +173,14 @@ abstract class APILimiterModel {
      */
     static class IndirectReference {
 
-        private APILimiterModel ref;
+        private RateLimiterModel ref;
 
         private long usingPermits;
 
         private long lastAccessedTime;
 
         /**
-         * Get the usingPermits property of this {@link APILimiterModel.IndirectReference}.
+         * Get the usingPermits property of this {@link RateLimiterModel.IndirectReference}.
          * 
          * @return The usingPermits property.
          */
@@ -189,7 +189,7 @@ abstract class APILimiterModel {
         }
 
         /**
-         * Set the usingPermits property of this {@link APILimiterModel.IndirectReference}.
+         * Set the usingPermits property of this {@link RateLimiterModel.IndirectReference}.
          * 
          * @param usingPermits The usingPermits value to set.
          */
@@ -198,7 +198,7 @@ abstract class APILimiterModel {
         }
 
         /**
-         * Get the lastAccessedTime property of this {@link APILimiterModel.IndirectReference}.
+         * Get the lastAccessedTime property of this {@link RateLimiterModel.IndirectReference}.
          * 
          * @return The lastAccessedTime property.
          */
@@ -207,7 +207,7 @@ abstract class APILimiterModel {
         }
 
         /**
-         * Set the lastAccessedTime property of this {@link APILimiterModel.IndirectReference}.
+         * Set the lastAccessedTime property of this {@link RateLimiterModel.IndirectReference}.
          * 
          * @param lastAccessedTime The lastAccessedTime value to set.
          */

@@ -28,13 +28,13 @@ import cointoss.execution.LogHouse;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.NetworkError.Kind;
 import cointoss.util.NetworkErrorDetector;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -53,12 +53,12 @@ public class GMOService extends MarketService {
             .register(Kind.Maintenance, "maintenance");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(1).refresh(200, MILLISECONDS);
+    private static final RateLimiter LIMITER = RateLimiter.with.limit(1).refresh(200, MILLISECONDS);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
             .extractId(json -> json.text("channel") + "." + json.text("symbol"))
-            .restrict(APILimiter.with.limit(1).refresh(1250, MILLISECONDS))
+            .restrict(RateLimiter.with.limit(1).refresh(1250, MILLISECONDS))
             .noServerReply();
 
     /**

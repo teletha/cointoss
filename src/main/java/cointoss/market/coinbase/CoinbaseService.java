@@ -28,10 +28,10 @@ import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
-import cointoss.util.APILimiter;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -45,7 +45,7 @@ public class CoinbaseService extends MarketService {
             .ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]X");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(10).refresh(1000, MILLISECONDS);
+    private static final RateLimiter LIMITER = RateLimiter.with.limit(10).refresh(1000, MILLISECONDS);
 
     /** The realtime communicator. */
     private final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://advanced-trade-ws.coinbase.com")

@@ -26,11 +26,11 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.ticker.data.Liquidation;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.JSON;
 import kiss.Signal;
@@ -43,7 +43,7 @@ public class BitMexService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
+    private static final RateLimiter Limit = RateLimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://www.bitmex.com/realtime")

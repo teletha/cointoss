@@ -23,11 +23,11 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
 import cointoss.orderbook.OrderBookChanges;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -39,7 +39,7 @@ public class CoincheckService extends MarketService {
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(4).refresh(Duration.ofSeconds(1));
+    private static final RateLimiter Limit = RateLimiter.with.limit(4).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws-api.coincheck.com/").extractId(json -> {

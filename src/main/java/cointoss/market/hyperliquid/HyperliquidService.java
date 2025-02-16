@@ -24,11 +24,11 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.ticker.Span;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -39,7 +39,7 @@ public class HyperliquidService extends MarketService {
     static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(800).refresh(Duration.ofMinutes(1));
+    private static final RateLimiter Limit = RateLimiter.with.limit(800).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.hyperliquid.xyz/ws").extractId(json -> {

@@ -45,13 +45,13 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.ticker.data.Liquidation;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.NetworkError.Kind;
 import cointoss.util.NetworkErrorDetector;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -71,7 +71,7 @@ public class BitFlyerService extends MarketService {
     private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(80 /* 100 */).refresh(1, MINUTES);
+    private static final RateLimiter LIMITER = RateLimiter.with.limit(80 /* 100 */).refresh(1, MINUTES);
 
     /** The error converter. */
     private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector()

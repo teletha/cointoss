@@ -26,11 +26,11 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.orderbook.OrderBookPage;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -41,7 +41,7 @@ public class BybitService extends MarketService {
     static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(20).refresh(Duration.ofSeconds(1));
+    private static final RateLimiter Limit = RateLimiter.with.limit(20).refresh(Duration.ofSeconds(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket RealtimeSPOT = EfficientWebSocket.with.address("wss://stream.bybit.com/v5/public/spot")

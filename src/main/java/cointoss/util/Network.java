@@ -30,14 +30,14 @@ public class Network {
     /**
      * Call REST API.
      */
-    public static Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, HttpClient... client) {
+    public static Signal<JSON> rest(HttpRequest.Builder request, RateLimiter limiter, HttpClient... client) {
         return rest(request, limiter, 1, client);
     }
 
     /**
      * Call REST API.
      */
-    public static Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, int weight, HttpClient... client) {
+    public static Signal<JSON> rest(HttpRequest.Builder request, RateLimiter limiter, int weight, HttpClient... client) {
         return new Signal<JSON>((observer, disposer) -> {
             if (limiter != null) limiter.acquire(weight);
 

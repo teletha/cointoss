@@ -24,13 +24,13 @@ import cointoss.market.Exchange;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
 import cointoss.ticker.data.Liquidation;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
 import cointoss.util.EfficientWebSocketModel.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.NetworkError.Kind;
 import cointoss.util.NetworkErrorDetector;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.JSON;
@@ -44,7 +44,7 @@ public class BitfinexService extends MarketService {
     private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector().register(Kind.LimitOverflow, "ratelimit: error");
 
     /** The API limit. */
-    private static final APILimiter LimitForREST = APILimiter.with.limit(8).refresh(Duration.ofMinutes(1));
+    private static final RateLimiter LimitForREST = RateLimiter.with.limit(8).refresh(Duration.ofMinutes(1));
 
     /** The realtiem communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api-pub.bitfinex.com/ws/2")

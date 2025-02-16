@@ -19,8 +19,8 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.execution.HttpLogHouse;
-import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
+import cointoss.util.RateLimiter;
 import hypatia.Num;
 import kiss.I;
 import kiss.Signal;
@@ -29,7 +29,7 @@ import kiss.XML;
 class OfficialLogHouse extends HttpLogHouse {
 
     /** The API limit. */
-    private static final APILimiter LIMITER = APILimiter.with.limit(2).refresh(250, TimeUnit.MILLISECONDS);
+    private static final RateLimiter LIMITER = RateLimiter.with.limit(2).refresh(250, TimeUnit.MILLISECONDS);
 
     OfficialLogHouse(MarketService service) {
         super(service);
