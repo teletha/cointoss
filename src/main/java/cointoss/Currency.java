@@ -24,6 +24,8 @@ public enum Currency {
 
     AI16Z("AI16Z"),
 
+    AIXBT("AIXBT"),
+
     ALL("Albanian Lek"),
 
     AMD("Armenian Dram"),
@@ -448,20 +450,6 @@ public enum Currency {
 
     USUAL("Usual"),
 
-    UTC("Ultracoin"),
-
-    UTK("Utrust"),
-
-    UYU("Uruguayan Peso"),
-
-    UZS("Uzbekistan Som"),
-
-    VEF("Venezuelan Bolívar"),
-
-    VEN("Hub Culture's Ven", "XVN"),
-
-    VET("VeChain"),
-
     VINE("Vine"),
 
     VIRTUAL("Virtual"),
@@ -486,17 +474,7 @@ public enum Currency {
 
     ZEC("Zcash"),
 
-    ZEN("Horizen"),
-
     ZEREBRO("Zerebro"),
-
-    ZMW("Zambian Kwacha", "ZMK"),
-
-    ZRC("ziftrCOIN"),
-
-    ZRO("ZRO"),
-
-    ZRX("0x"),
 
     ZWL("Zimbabwean Dollar"),
 
@@ -529,6 +507,6 @@ public enum Currency {
      * @return
      */
     public CurrencySetting minimumSize(double minimum) {
-        return new CurrencySetting(this, Num.of(minimum), 0);
+        return new CurrencySetting(this, Num.of(minimum));
     }
 }

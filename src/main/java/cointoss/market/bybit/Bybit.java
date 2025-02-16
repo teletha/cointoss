@@ -20,80 +20,80 @@ import kiss.I;
 public final class Bybit extends MarketServiceProvider {
 
     public static final MarketService AAVE_USDT = new BybitService("AAVEUSDT", MarketSetting.with.spot()
-            .target(Currency.AAVE.minimumSize(1).scale(3))
+            .target(Currency.AAVE.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService ARB_USDT = new BybitService("ARBUSDT", MarketSetting.with.spot()
-            .target(Currency.ARB.minimumSize(1).scale(2))
+            .target(Currency.ARB.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService BERA_USDT = new BybitService("BERAUSDT", MarketSetting.with.spot()
-            .target(Currency.BERA.minimumSize(1).scale(2))
+            .target(Currency.BERA.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001)));
 
     public static final MarketService BTC_USDT = new BybitService("BTCUSDT", MarketSetting.with.spot()
-            .target(Currency.BTC.minimumSize(1).scale(5))
+            .target(Currency.BTC.minimumSize(0.00001))
             .base(Currency.USDT.minimumSize(0.5)));
 
     public static final MarketService CAKE_USDT = new BybitService("CAKEUSDT", MarketSetting.with.spot()
-            .target(Currency.CAKE.minimumSize(1).scale(3))
+            .target(Currency.CAKE.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.0001)));
 
     public static final MarketService EOS_USDT = new BybitService("EOSUSDT", MarketSetting.with.spot()
-            .target(Currency.EOS.minimumSize(1).scale(5))
+            .target(Currency.EOS.minimumSize(0.00001))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService ETH_USDT = new BybitService("ETHUSDT", MarketSetting.with.spot()
-            .target(Currency.ETH.minimumSize(1).scale(5))
+            .target(Currency.ETH.minimumSize(0.00001))
             .base(Currency.USDT.minimumSize(0.05))
             .priceRangeModifier(20));
 
     public static final MarketService FIL_USDT = new BybitService("FILUSDT", MarketSetting.with.spot()
-            .target(Currency.FIL.minimumSize(1).scale(2))
+            .target(Currency.FIL.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService HYPE_USDT = new BybitService("HYPEUSDT", MarketSetting.with.derivative()
-            .target(Currency.HYPE.minimumSize(1).scale(2))
+            .target(Currency.HYPE.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService LDO_USDT = new BybitService("LDOUSDT", MarketSetting.with.spot()
-            .target(Currency.LDO.minimumSize(1).scale(2))
+            .target(Currency.LDO.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService MNT_USDT = new BybitService("MNTUSDT", MarketSetting.with.spot()
-            .target(Currency.MNT.minimumSize(1).scale(2))
+            .target(Currency.MNT.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001)));
 
     public static final MarketService OP_USDT = new BybitService("OPUSDT", MarketSetting.with.spot()
-            .target(Currency.OP.minimumSize(1).scale(2))
+            .target(Currency.OP.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService SNX_USDT = new BybitService("SNXUSDT", MarketSetting.with.spot()
-            .target(Currency.SNX.minimumSize(1).scale(2))
+            .target(Currency.SNX.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService SOL_USDT = new BybitService("SOLUSDT", MarketSetting.with.spot()
-            .target(Currency.SOL.minimumSize(1).scale(3))
+            .target(Currency.SOL.minimumSize(0.001))
             .base(Currency.USDT.minimumSize(0.01)));
 
     public static final MarketService SOLV_USDT = new BybitService("SOLVUSDT", MarketSetting.with.spot()
-            .target(Currency.SOLV.minimumSize(1).scale(1))
+            .target(Currency.SOLV.minimumSize(0.1))
             .base(Currency.USDT.minimumSize(0.0001)));
 
     public static final MarketService SUI_USDT = new BybitService("SUIUSDT", MarketSetting.with.spot()
-            .target(Currency.SUI.minimumSize(1).scale(2))
+            .target(Currency.SUI.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001)));
 
     public static final MarketService STRK_USDT = new BybitService("STRKUSDT", MarketSetting.with.spot()
-            .target(Currency.STRK.minimumSize(1).scale(2))
+            .target(Currency.STRK.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001)));
 
     public static final MarketService TRUMP_USDT = new BybitService("TRUMPUSDT", MarketSetting.with.spot()
-            .target(Currency.TRUMP.minimumSize(1).scale(2))
+            .target(Currency.TRUMP.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.001)));
 
     public static final MarketService WLD_USDT = new BybitService("WLDUSDT", MarketSetting.with.spot()
-            .target(Currency.WLD.minimumSize(1).scale(2))
+            .target(Currency.WLD.minimumSize(0.01))
             .base(Currency.USDT.minimumSize(0.0001)));
 
     public static final MarketService XRP_USDT = new BybitService("XRPUSDT", MarketSetting.with.spot()

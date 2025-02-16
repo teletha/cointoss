@@ -22,6 +22,23 @@ public class CurrencySetting {
     /** The decimal scale. */
     public final int scale;
 
+    CurrencySetting(Currency currency, Num minimumSize) {
+        this(currency, minimumSize, countDecimalPlaces(minimumSize.doubleValue()));
+    }
+
+    private static int countDecimalPlaces(double value) {
+        if (value == (long) value) {
+            return 0;
+        }
+
+        int count = 0;
+        while (value != Math.round(value)) {
+            value *= 10;
+            count++;
+        }
+        return count;
+    }
+
     CurrencySetting(Currency currency, Num minimumSize, int scale) {
         this.currency = currency;
         this.minimumSize = minimumSize;
