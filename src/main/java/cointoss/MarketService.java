@@ -203,8 +203,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                             }
 
                             long latestId = rests.peekLast().id;
-                            if (retrieved <= executionMinRequest && buffer.realtime
-                                    .isEmpty() && startId == latestId || !supportStableExecutionQuery()) {
+                            if (retrieved <= executionMinRequest && startId == latestId || !supportStableExecutionQuery()) {
                                 // REST API has caught up with the real-time API,
                                 // we must switch to realtime API.
                                 buffer.switchToRealtime(latestId, observer);

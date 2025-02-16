@@ -39,7 +39,7 @@ public class HyperliquidService extends MarketService {
     static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(1000).refresh(Duration.ofMinutes(1));
+    private static final APILimiter Limit = APILimiter.with.limit(800).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.hyperliquid.xyz/ws").extractId(json -> {

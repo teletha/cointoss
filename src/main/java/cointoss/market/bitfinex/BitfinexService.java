@@ -44,7 +44,7 @@ public class BitfinexService extends MarketService {
     private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector().register(Kind.LimitOverflow, "ratelimit: error");
 
     /** The API limit. */
-    private static final APILimiter LimitForREST = APILimiter.with.limit(10).refresh(Duration.ofMinutes(1));
+    private static final APILimiter LimitForREST = APILimiter.with.limit(8).refresh(Duration.ofMinutes(1));
 
     /** The realtiem communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api-pub.bitfinex.com/ws/2")

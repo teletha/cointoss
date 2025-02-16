@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.market.binance.Binance;
+import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import kiss.Signal;
 
@@ -25,7 +25,7 @@ import kiss.Signal;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        Tool.defineTask().on(Binance.AAVE_USDT).at(2024, 9, 24).run(ExecutionLogTool::restoreNormal);
+        Tool.defineTask().on(BitFlyer.BTC_JPY).at(2024, 9, 17).run(ExecutionLogTool::createFastLog);
     }
 
     public static void convertToTimestampBasedId(ExecutionLog idBased, MarketService timeBased) {
