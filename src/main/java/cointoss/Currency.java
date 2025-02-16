@@ -16,898 +16,401 @@ import kiss.I;
 
 public enum Currency {
 
-    AAVE("AAVE", "Aave"),
+    AAVE("Aave"),
 
-    AED("AED", "United Arab Emirates Dirham"),
+    AED("United Arab Emirates Dirham"),
 
-    AFN("AFN", "Afghan Afghani"),
+    AFN("Afghan Afghani"),
 
-    AI16Z("AI16Z", "AI16Z"),
+    AI16Z("AI16Z"),
 
-    ALL("ALL", "Albanian Lek"),
+    ALL("Albanian Lek"),
 
-    AMD("AMD", "Armenian Dram"),
+    AMD("Armenian Dram"),
 
-    ANC("ANC", "Anoncoin"),
+    ANC("Anoncoin"),
 
-    ANG("ANG", "Netherlands Antillean Guilder"),
+    ANG("Netherlands Antillean Guilder"),
 
-    AOA("AOA", "Angolan Kwanza"),
+    AOA("Angolan Kwanza"),
 
-    APEX("APEX", "ApeX"),
+    APEX("ApeX"),
 
-    ARN("ARN", "Aeron"),
+    ARB("Arbitrum"),
 
-    ARS("ARS", "Argentine Peso"),
+    ARN("Aeron"),
 
-    ARB("ARV", "Arbitrum"),
+    ARS("Argentine Peso"),
 
-    ASTR("ASTR", "Astar"),
+    ASTR("Astar"),
 
-    ATOM("ATOM", "Cosmos"),
+    ATOM("Cosmos"),
 
-    AUD("AUD", "Australian Dollar"),
+    AUD("Australian Dollar"),
 
-    AUR("AUR", "Auroracoin"),
+    AUR("Auroracoin"),
 
-    AVT("AVT", "Aventus"),
+    AVAX("Avalanche"),
 
-    AWG("AWG", "Aruban Florin"),
+    AVT("Aventus"),
 
-    AZN("AZN", "Azerbaijani Manat"),
+    AWG("Aruban Florin"),
 
-    BAM("BAM", "Bosnia-Herzegovina Convertible Mark"),
+    AZN("Azerbaijani Manat"),
 
-    BAT("BAT", "Basic Attention Token"),
+    BAM("Bosnia-Herzegovina Convertible Mark"),
 
-    BBD("BBD", "Barbadian Dollar"),
+    BAND("Band Protocol"),
 
-    BC("BC", "BlackCoin", "BLK"),
+    BAT("Basic Attention Token"),
 
-    BCC("BCC", "BitConnect"),
+    BBD("Barbadian Dollar"),
 
-    BCH("BCH", "BitcoinCash"),
+    BC("BlackCoin", "BLK"),
 
-    BCA("BCA", "BitcoinAtom"),
+    BCA("BitcoinAtom"),
 
-    BDT("BDT", "Bangladeshi Taka"),
+    BCC("BitConnect"),
 
-    BERA("BERA", "Berachain"),
+    BCH("BitcoinCash"),
 
-    BGC("BGC", "Aten 'Black Gold' Coin"),
+    BERA("Berachain"),
 
-    BGN("BGN", "Bulgarian Lev"),
+    BIF("Burundian Franc"),
 
-    BHD("BHD", "Bahraini Dinar"),
+    BMD("Bermudan Dollar"),
 
-    BIF("BIF", "Burundian Franc"),
+    BNB("Binance Coin"),
 
-    BMD("BMD", "Bermudan Dollar"),
+    BND("Brunei Dollar"),
 
-    BND("BND", "Brunei Dollar"),
+    BTC("Bitcoin", "XBT"),
 
-    BOB("BOB", "Bolivian Boliviano"),
+    BTG("Bitcoin Gold"),
 
-    BRL("BRL", "Brazilian Real"),
+    BTN("Bhutanese Ngultrum"),
 
-    BSD("BSD", "Bahamian Dollar"),
+    BZD("Belize Dollar"),
 
-    BTC("BTC", "Bitcoin", "XBT"),
+    CAD("Canadian Dollar"),
 
-    BTG("BTG", "Bitcoin Gold"),
+    CAKE("PancakeSwap"),
 
-    BTN("BTN", "Bhutanese Ngultrum"),
+    CHF("Swiss Franc"),
 
-    BWP("BWP", "Botswanan Pula"),
+    CNY("Chinese Yuan"),
 
-    BYR("BYR", "Belarusian Ruble"),
+    COMP("Compound"),
 
-    BZD("BZD", "Belize Dollar"),
+    COP("Colombian Peso"),
 
-    CAD("CAD", "Canadian Dollar"),
+    COTI("COTI"),
 
-    CAKE("CAKE", "PancakeSwap"),
+    CRC("Costa Rican Colón"),
 
-    CDF("CDF", "Congolese Franc"),
+    CRO("Crypto.com Coin"),
 
-    CHF("CHF", "Swiss Franc"),
+    CRPT("Crypterium"),
 
-    CLF("CLF", "Chilean Unit of Account (UF)"),
+    CTXC("Cortex"),
 
-    CLP("CLP", "Chilean Peso"),
+    CUP("Cuban Peso"),
 
-    CNC("CNC", "Chinacoin"),
+    CVE("Cape Verdean Escudo"),
 
-    CNY("CNY", "Chinese Yuan"),
+    CVT("CyberVein"),
 
-    COP("COP", "Colombian Peso"),
+    CZK("Czech Republic Koruna"),
 
-    CRC("CRC", "Costa Rican Colón"),
+    DAD("DAD"),
 
-    CUP("CUP", "Cuban Peso"),
+    DAI("Dai"),
 
-    CVE("CVE", "Cape Verdean Escudo"),
+    DASH("Dash"),
 
-    CZK("CZK", "Czech Republic Koruna"),
+    DATA("Streamr"),
 
-    DASH("DASH", "Dash"),
+    DCR("Decred"),
 
-    DCR("DCR", "Decred"),
+    DGB("DigiByte"),
 
-    DGB("DGB", "DigiByte"),
+    DGC("Digitalcoin"),
 
-    DJF("DJF", "Djiboutian Franc"),
+    DGTX("Digitex Futures"),
 
-    DKK("DKK", "Danish Krone"),
+    DJF("Djiboutian Franc"),
 
-    DOGE("DOGE", "Dogecoin", "XDC", "XDG"),
+    DKK("Danish Krone"),
 
-    DOP("DOP", "Dominican Peso"),
+    DOGE("Dogecoin", "XDC", "XDG"),
 
-    DGC("DGC", "Digitalcoin"),
+    DOP("Dominican Peso"),
 
-    DVC("DVC", "Devcoin"),
+    DRGN("Dragonchain"),
 
-    DRK("DRK", "Darkcoin"),
+    DRK("Darkcoin"),
 
-    DZD("DZD", "Algerian Dinar"),
+    DZD("Algerian Dinar"),
 
-    EDO("EDO", "Eidoo"),
+    EDO("Eidoo"),
 
-    EEK("EEK", "Estonian Kroon"),
+    EEK("Estonian Kroon"),
 
-    EGD("EGD", "egoldcoin"),
+    EGD("egoldcoin"),
 
-    EGP("EGP", "Egyptian Pound"),
+    EGP("Egyptian Pound"),
 
-    EOS("EOS", "EOS"),
+    ELA("Elastos"),
 
-    ETB("ETB", "Ethiopian Birr"),
+    ELF("aelf"),
 
-    ETC("ETC", "Ether Classic"),
+    ENG("Enigma"),
 
-    ETH("ETH", "Ether"),
+    ENJ("Enjin Coin"),
 
-    EUR("EUR", "Euro"),
+    EOS("EOS"),
 
-    FARTCOIN("FARTCOIN", "FARTCOIN"),
+    ERD("Elrond"),
 
-    FIL("FIL", "Filecoin"),
+    ETC("Ether Classic"),
 
-    FJD("FJD", "Fijian Dollar"),
+    ETH("Ether"),
 
-    _1ST("1ST", "First Blood"),
+    EUR("Euro"),
 
-    FKP("FKP", "Falkland Islands Pound"),
+    FARTCOIN("FARTCOIN"),
 
-    FTC("FTC", "Feathercoin"),
+    FIL("Filecoin"),
 
-    GBP("GBP", "British Pound Sterling"),
+    FJD("Fijian Dollar"),
 
-    GEL("GEL", "Georgian Lari"),
+    FKP("Falkland Islands Pound"),
 
-    GHS("GHS", "Ghanaian Cedi"),
+    FTC("Feathercoin"),
 
-    GHs("GHS", "Gigahashes per second"),
+    FTM("Fantom"),
 
-    GIP("GIP", "Gibraltar Pound"),
+    FTT("FTX Token"),
 
-    GLMR("GLMR", "Glimmer"),
+    GBP("British Pound Sterling"),
 
-    GMD("GMD", "Gambian Dalasi"),
+    GLMR("Glimmer"),
 
-    GNF("GNF", "Guinean Franc"),
+    GMT("STEPN Governance Token"),
 
-    GNO("GNO", "Gnosis"),
+    GYD("Guyanaese Dollar"),
 
-    GNT("GNT", "Golem"),
+    HKD("Hong Kong Dollar"),
 
-    GTQ("GTQ", "Guatemalan Quetzal"),
+    HPT("Huobi Pool Token"),
 
-    GVT("GVT", "Genesis Vision"),
+    HT("Huobi Token"),
 
-    GYD("GYD", "Guyanaese Dollar"),
+    HUSD("HUSD"),
 
-    HKD("HKD", "Hong Kong Dollar"),
+    HYPE("Hyperliquid Token"),
 
-    HVN("HVN", "Hive"),
+    ILS("Israeli New Sheqel"),
 
-    HNL("HNL", "Honduran Lempira"),
+    INR("Indian Rupee"),
 
-    HRK("HRK", "Croatian Kuna"),
+    IOT("IOTA"),
 
-    HTG("HTG", "Haitian Gourde"),
+    IRR("Iranian Rial"),
 
-    HUF("HUF", "Hungarian Forint"),
+    JPY("Japanese Yen"),
 
-    HYPE("HYPE", "Hyperliquid Token"),
+    KAVA("Kava"),
 
-    ICN("ICN", "Iconomi"),
+    KCS("KuCoin Shares"),
 
-    IDR("IDR", "Indonesian Rupiah"),
+    KICK("KickCoin"),
 
-    ILS("ILS", "Israeli New Sheqel"),
+    KPW("North Korean Won"),
 
-    INR("INR", "Indian Rupee"),
+    KRW("South Korean Won"),
 
-    IOC("IOC", "I/OCoin"),
+    KWD("Kuwaiti Dinar"),
 
-    IOT("IOT", "IOTA"),
+    KYD("Cayman Islands Dollar"),
 
-    IQD("IQD", "Iraqi Dinar"),
+    LBP("Lebanese Pound"),
 
-    IRR("IRR", "Iranian Rial"),
+    LDO("Lodo DAO Token"),
 
-    ISK("ISK", "Icelandic Króna"),
+    LEND("ETHLend"),
 
-    IXC("IXC", "iXcoin"),
+    LEO("UNUS SED LEO"),
 
-    JEP("JEP", "Jersey Pound"),
+    LINK("Chainlink"),
 
-    JMD("JMD", "Jamaican Dollar"),
+    LKR("Sri Lankan Rupee"),
 
-    JOD("JOD", "Jordanian Dinar"),
+    LOKI("Loki"),
 
-    JPY("JPY", "Japanese Yen"),
+    LRC("Loopring"),
 
-    KES("KES", "Kenyan Shilling"),
+    LRD("Liberian Dollar"),
 
-    KGS("KGS", "Kyrgystani Som"),
+    LSL("Lesotho Loti"),
 
-    KHR("KHR", "Cambodian Riel"),
+    LSK("Lisk"),
 
-    KICK("KICK", "KickCoin"),
+    LTC("Litecoin", "XLT"),
 
-    KMF("KMF", "Comorian Franc"),
+    LTL("Lithuanian Litas"),
 
-    KPW("KPW", "North Korean Won"),
+    LUNA("Terra"),
 
-    KRW("KRW", "South Korean Won"),
+    MANA("Decentraland"),
 
-    KWD("KWD", "Kuwaiti Dinar"),
+    MATIC("Polygon"),
 
-    KYD("KYD", "Cayman Islands Dollar"),
+    MCO("Monaco"),
 
-    KZT("KZT", "Kazakhstani Tenge"),
+    MGA("Malagasy Ariary"),
 
-    LAK("LAK", "Laotian Kip"),
+    MNT("Mantle"),
 
-    LBP("LBP", "Lebanese Pound"),
+    MONA("MonaCoin"),
 
-    LDO("LDO", "Lodo DAO Token"),
+    MOP("Macanese Pataca"),
 
-    LSK("LSK", "Lisk"),
+    MRO("Mauritanian Ouguiya"),
 
-    LKR("LKR", "Sri Lankan Rupee"),
+    MUR("Mauritian Rupee"),
 
-    LRD("LRD", "Liberian Dollar"),
+    MX("MX Token"),
 
-    LSL("LSL", "Lesotho Loti"),
+    MXC("MXC"),
 
-    LTC("LTC", "Litecoin", "XLT"),
+    MXN("Mexican Peso"),
 
-    LTL("LTL", "Lithuanian Litas"),
+    MYR("Malaysian Ringgit"),
 
-    LVL("LVL", "Latvian Lats"),
+    MZN("Mozambican Metical"),
 
-    LYD("LYD", "Libyan Dinar"),
+    NAD("Namibian Dollar"),
 
-    MAD("MAD", "Moroccan Dirham"),
+    NANO("Nano"),
 
-    MDL("MDL", "Moldovan Leu"),
+    NAS("Nebulas"),
 
-    MEC("MEC", "MegaCoin"),
+    NEO("NEO"),
 
-    MGA("MGA", "Malagasy Ariary"),
+    NZD("New Zealand Dollar"),
 
-    MKD("MKD", "Macedonian Denar"),
+    OMG("OmiseGO"),
 
-    MLN("MLN", "Melonport"),
+    ONE("Harmony"),
 
-    MMK("MMK", "Myanma Kyat"),
+    OP("Optimism"),
 
-    MNT("MNT", "Mantle"),
+    ORBS("Orbs"),
 
-    MOP("MOP", "Macanese Pataca"),
+    SBD("Solomon Islands Dollar"),
 
-    MRO("MRO", "Mauritanian Ouguiya"),
+    SNX("Synthetix Network Token"),
 
-    MSC("MSC", "Mason Coin"),
+    SOL("Solana"),
 
-    MUR("MUR", "Mauritian Rupee"),
+    SOLVE("SOLVE"),
 
-    MVR("MVR", "Maldivian Rufiyaa"),
+    SOLV("Solve Protocol"),
 
-    MWK("MWK", "Malawian Kwacha"),
+    SRM("Serum"),
 
-    MXN("MXN", "Mexican Peso"),
+    STR("Stellar"),
 
-    MYR("MYR", "Malaysian Ringgit"),
+    STRAT("Stratis"),
 
-    MZN("MZN", "Mozambican Metical"),
+    STRK("Starknet Token"),
 
-    NAD("NAD", "Namibian Dollar"),
+    STX("Blockstack"),
 
-    NOBS("NOBS", "No BS Crypto"),
+    SUI("SUI"),
 
-    NEO("NEO", "NEO"),
+    THB("Thai Baht"),
 
-    NGN("NGN", "Nigerian Naira"),
+    THETA("THETA"),
 
-    NIO("NIO", "Nicaraguan Córdoba"),
+    TJS("Tajikistani Somoni"),
 
-    NMC("NMC", "Namecoin"),
+    TMT("Turkmenistani Manat"),
 
-    NOK("NOK", "Norwegian Krone"),
+    TND("Tunisian Dinar"),
 
-    NPR("NPR", "Nepalese Rupee"),
+    TRUMP("Officail Trump"),
 
-    NVC("NVC", "Novacoin"),
+    TRY("Turkish Lira"),
 
-    NXT("NXT", "Nextcoin"),
+    TRX("Tron"),
 
-    NZD("NZD", "New Zealand Dollar"),
+    TUSD("TrueUSD"),
 
-    OMG("OMG", "OmiseGO"),
+    TWD("New Taiwan Dollar"),
 
-    OMR("OMR", "Omani Rial"),
+    TZS("Tanzanian Shilling"),
 
-    OP("OP", "Optimism"),
+    UAH("Ukrainian Hryvnia"),
 
-    PAB("PAB", "Panamanian Balboa"),
+    UBT("Unibright"),
 
-    PEN("PEN", "Peruvian Nuevo Sol"),
+    UGX("Ugandan Shilling"),
 
-    PGK("PGK", "Papua New Guinean Kina"),
+    UNI("Uniswap"),
 
-    PHP("PHP", "Philippine Peso"),
+    USD("United States Dollar"),
 
-    PKR("PKR", "Pakistani Rupee"),
+    USDC("USD Coin", "UDC"),
 
-    PLN("PLN", "Polish Zloty"),
+    USDE("Unitary Status Dollar eCoin"),
 
-    POT("POT", "PotCoin"),
+    USDT("Tether USD Anchor"),
 
-    PPC("PPC", "Peercoin"),
+    UTC("Ultracoin"),
 
-    PYG("PYG", "Paraguayan Guarani"),
+    UTK("Utrust"),
 
-    QAR("QAR", "Qatari Rial"),
+    UYU("Uruguayan Peso"),
 
-    QRK("QRK", "QuarkCoin"),
+    UZS("Uzbekistan Som"),
 
-    QTUM("QTUM", "Qtum"),
+    VEF("Venezuelan Bolívar"),
 
-    REP("REP", "Augur"),
+    VEN("Hub Culture's Ven", "XVN"),
 
-    RON("RON", "Romanian Leu"),
+    VET("Hub Culture's Vet", "VEN"),
 
-    RSD("RSD", "Serbian Dinar"),
+    WAVES("Waves"),
 
-    RUB("RUB", "Russian Ruble"),
+    WIF("WIF"),
 
-    RUR("RUR", "Old Russian Ruble"),
+    WLD("Worldcoin"),
 
-    RWF("RWF", "Rwandan Franc"),
+    XLM("Stellar Lumen"),
 
-    SAR("SAR", "Saudi Riyal"),
+    XMR("Monero"),
 
-    SBC("SBC", "Stablecoin"),
+    XRP("Ripple"),
 
-    SBD("SBD", "Solomon Islands Dollar"),
+    YFI("Yearn.Finance Token"),
 
-    SC("SC", "Siacoin"),
+    ZAR("South African Rand"),
 
-    SCR("SCR", "Seychellois Rupee"),
+    ZEC("Zcash"),
 
-    SDG("SDG", "Sudanese Pound"),
+    ZEN("ZenCash"),
 
-    SEK("SEK", "Swedish Krona"),
+    ZMW("Zambian Kwacha", "ZMK"),
 
-    SGD("SGD", "Singapore Dollar"),
+    ZRC("ziftrCOIN"),
 
-    SHP("SHP", "Saint Helena Pound"),
+    ZRX("0x"),
 
-    SLL("SLL", "Sierra Leonean Leone"),
+    ZWL("Zimbabwean Dollar"),
 
-    SMART("SMART", "SmartCash"),
-
-    SOS("SOS", "Somali Shilling"),
-
-    SRD("SRD", "Surinamese Dollar"),
-
-    SRM("SRM", "Serum"),
-
-    START("START", "startcoin"),
-
-    STEEM("STEEM", "Steem"),
-
-    STD("STD", "São Tomé and Príncipe Dobra"),
-
-    STR("STR", "Stellar"),
-
-    STRAT("STRAT", "Stratis"),
-
-    STRK("STRK", "Starknet Token"),
-
-    SVC("SVC", "Salvadoran Colón"),
-
-    SYP("SYP", "Syrian Pound"),
-
-    SZL("SZL", "Swazi Lilangeni"),
-
-    THB("THB", "Thai Baht"),
-
-    TJS("TJS", "Tajikistani Somoni"),
-
-    TMT("TMT", "Turkmenistani Manat"),
-
-    TND("TND", "Tunisian Dinar"),
-
-    TOP("TOP", "Tongan Paʻanga"),
-
-    TRC("TRC", "Terracoin"),
-
-    TRY("TRY", "Turkish Lira"),
-
-    TTD("TTD", "Trinidad and Tobago Dollar"),
-
-    TWD("TWD", "New Taiwan Dollar"),
-
-    TZS("TZS", "Tanzanian Shilling"),
-
-    UAH("UAH", "Ukrainian Hryvnia"),
-
-    UGX("UGX", "Ugandan Shilling"),
-
-    USD("USD", "United States Dollar"),
-
-    USDC("USDC", "USD Coin", "UDC"),
-
-    USDT("USDT", "Tether USD Anchor"),
-
-    USDE("USDE", "Unitary Status Dollar eCoin"),
-
-    UNI("UNI", "Uniswap"),
-
-    UTC("UTC", "Ultracoin"),
-
-    UYU("UYU", "Uruguayan Peso"),
-
-    UZS("UZS", "Uzbekistan Som"),
-
-    VEF("VEF", "Venezuelan Bolívar"),
-
-    VET("VET", "Hub Culture's Vet", "VEN"),
-
-    VEN("VEN", "Hub Culture's Ven", "XVN"),
-
-    XTZ("XTZ", "Tezos"),
-
-    VIB("VIB", "Viberate"),
-
-    VND("VND", "Vietnamese Dong"),
-
-    VUV("VUV", "Vanuatu Vatu"),
-
-    WIF("WIF", "WIF"),
-
-    WLD("WLD", "Worldcoin"),
-
-    WST("WST", "Samoan Tala"),
-
-    XAF("XAF", "CFA Franc BEAC"),
-
-    XAG("XAG", "Tether Silver"),
-
-    XAS("XAS", "Asch"),
-
-    XAUR("XAUR", "Xaurum"),
-
-    XAUT("XAUT", "Tether Gold"),
-
-    XCD("XCD", "East Caribbean Dollar"),
-
-    XDR("XDR", "Special Drawing Rights"),
-
-    XEM("XEM", "NEM"),
-
-    XLM("XLM", "Stellar Lumen"),
-
-    XMR("XMR", "Monero"),
-
-    XRB("XRB", "Rai Blocks"),
-
-    XOF("XOF", "CFA Franc BCEAO"),
-
-    XPF("XPF", "CFP Franc"),
-
-    XPM("XPM", "Primecoin"),
-
-    XRP("XRP", "Ripple"),
-
-    YBC("YBC", "YbCoin"),
-
-    YER("YER", "Yemeni Rial"),
-
-    ZAR("ZAR", "South African Rand"),
-
-    ZEC("ZEC", "Zcash"),
-
-    ZEN("ZEN", "ZenCash"),
-
-    ZMW("ZMW", "Zambian Kwacha", "ZMK"),
-
-    ZRC("ZRC", "ziftrCOIN"),
-
-    ZWL("ZWL", "Zimbabwean Dollar"),
-
-    // Cryptos
-    BNK("BNK", "Bankera Coin"),
-
-    BNB("BNB", "Binance Coin"),
-
-    QSP("QSP", "Quantstamp"),
-
-    IOTA("IOTA", "Iota"),
-
-    YOYO("YOYO", "Yoyow"),
-
-    BTS("BTS", "Bitshare"),
-
-    ICX("ICX", "Icon"),
-
-    MCO("MCO", "Monaco"),
-
-    CND("CND", "Cindicator"),
-
-    XVG("XVG", "Verge"),
-
-    POE("POE", "Po.et"),
-
-    TRX("TRX", "Tron"),
-
-    ADA("ADA", "Cardano"),
-
-    FUN("FUN", "FunFair"),
-
-    HSR("HSR", "Hshare"),
-
-    LEND("LEND", "ETHLend"),
-
-    ELF("ELF", "aelf"),
-
-    STORJ("STORJ", "Storj"),
-
-    MOD("MOD", "Modum"),
-
-    // Coinmarketcap top 200
-    AE("AE", "Aeternity"),
-
-    FET("FET", "Fetch.ai"),
-
-    BHT("BHT", "BHEX Token"),
-
-    SNX("SNX", "Synthetix Network Token"),
-
-    PNT("PNT", "pNetwork"),
-
-    WIN("WIN", "WINk"),
-
-    ANT("ANT", "Aragon"),
-
-    DX("DX", "DxChain Token"),
-
-    ZB("ZB", "ZB Token"),
-
-    LINK("LINK", "Chainlink"),
-
-    BTT("BTT", "BitTorrent"),
-
-    AVA("AVA", "Travala.com"),
-
-    AVAX("AVAX", "Avalanche"),
-
-    SYS("SYS", "Syscoin"),
-
-    BNT("BNT", "Bancor"),
-
-    ERD("ERD", "Elrond"),
-
-    SNT("SNT", "Status"),
-
-    ONE("ONE", "Harmony"),
-
-    HPT("HPT", "Huobi Pool Token"),
-
-    NEXO("NEXO", "Nexo"),
-
-    FXC("FXC", "Flexacoin"),
-
-    TOMO("TOMO", "TomoChain"),
-
-    OGN("OGN", "Origin Protocol"),
-
-    NPXS("NPXS", "Pundi X"),
-
-    MIOTA("MIOTA", "IOTA"),
-
-    HEDG("HEDG", "HedgeTrade"),
-
-    HYN("HYN", "Hyperion"),
-
-    DIVI("DIVI", "Divi"),
-
-    AION("AION", "Aion"),
-
-    CRO("CRO", "Crypto.com Coin"),
-
-    ARK("ARK", "Ark"),
-
-    PERL("PERL", "Perlin"),
-
-    HT("HT", "Huobi Token"),
-
-    FSN("FSN", "Fusion"),
-
-    LUNA("LUNA", "Terra"),
-
-    MAID("MAID", "MaidSafeCoin"),
-
-    TFUEL("TFUEL", "Theta Fuel"),
-
-    RLC("RLC", "iExec RLC"),
-
-    DRGN("DRGN", "Dragonchain"),
-
-    LEO("LEO", "UNUS SED LEO"),
-
-    TUSD("TUSD", "TrueUSD"),
-
-    KSM("KSM", "Kusama"),
-
-    MKR("MKR", "Maker"),
-
-    PNK("PNK", "Kleros"),
-
-    UBT("UBT", "Unibright"),
-
-    GRIN("GRIN", "Grin"),
-
-    IPX("IPX", "Tachyon Protocol"),
-
-    MANA("MANA", "Decentraland"),
-
-    CEL("CEL", "Celsius"),
-
-    BAND("BAND", "Band Protocol"),
-
-    BCD("BCD", "Bitcoin Diamond"),
-
-    NRG("NRG", "Energi"),
-
-    LOKI("LOKI", "Loki"),
-
-    OCEAN("OCEAN", "Ocean Protocol"),
-
-    WAN("WAN", "Wanchain"),
-
-    MATIC("MATIC", "Polygon"),
-
-    POWR("POWR", "Power Ledger"),
-
-    MX("MX", "MX Token"),
-
-    IRIS("IRIS", "IRISnet"),
-
-    ANKR("ANKR", "Ankr"),
-
-    DAI("DAI", "Dai"),
-
-    SEELE("SEELE", "Seele-N"),
-
-    WXT("WXT", "Wirex Token"),
-
-    RVN("RVN", "Ravencoin"),
-
-    KCS("KCS", "KuCoin Shares"),
-
-    SERO("SERO", "Super Zero Protocol"),
-
-    XNS("XNS", "Insolar"),
-
-    ALGO("ALGO", "Algorand"),
-
-    REN("REN", "Ren"),
-
-    WRX("WRX", "WazirX"),
-
-    KMD("KMD", "Komodo"),
-
-    RSR("RSR", "Reserve Rights"),
-
-    MOF("MOF", "Molecular Future"),
-
-    RCN("RCN", "Ripio Credit Network"),
-
-    RDD("RDD", "ReddCoin"),
-
-    LRC("LRC", "Loopring"),
-
-    KAVA("KAVA", "Kava"),
-
-    FTM("FTM", "Fantom"),
-
-    VLX("VLX", "Velas"),
-
-    ENG("ENG", "Enigma"),
-
-    UTK("UTK", "Utrust"),
-
-    ZIL("ZIL", "Zilliqa"),
-
-    TRAC("TRAC", "OriginTrail"),
-
-    MTL("MTL", "Metal"),
-
-    WAVES("WAVES", "Waves"),
-
-    DGTX("DGTX", "Digitex Futures"),
-
-    QNT("QNT", "Quant"),
-
-    SOL("SOL", "Solana"),
-
-    SOLV("SOLV", "Solve Protocol"),
-
-    SUI("SUI", "SUI"),
-
-    TRUMP("TRUMP", "Officail Trump"),
-
-    XHV("XHV", "Haven Protocol"),
-
-    AMPL("AMPL", "Ampleforth"),
-
-    ELA("ELA", "Elastos"),
-
-    VTHO("VTHO", "VeThor Token"),
-
-    PAXG("PAXG", "PAX Gold"),
-
-    MONA("MONA", "MonaCoin"),
-
-    CHSB("CHSB", "SwissBorg"),
-
-    ENJ("ENJ", "Enjin Coin"),
-
-    PAI("PAI", "Project Pai"),
-
-    TRUE("TRUE", "TrueChain"),
-
-    ARDR("ARDR", "Ardor"),
-
-    BTM("BTM", "Bytom"),
-
-    STX("STX", "Blockstack"),
-
-    XDCE("XDCE", "XinFin Network"),
-
-    ETN("ETN", "Electroneum"),
-
-    CHZ("CHZ", "Chiliz"),
-
-    CTXC("CTXC", "Cortex"),
-
-    GT("GT", "Gatechain Token"),
-
-    GMT("GMT", "Green Metaverse Token"),
-
-    FTT("FTT", "FTX Token"),
-
-    YFI("YFI", "Yearn.Finance Token"),
-
-    CVT("CVT", "CyberVein"),
-
-    WTC("WTC", "Waltonchain"),
-
-    ORBS("ORBS", "Orbs"),
-
-    HIVE("HIVE", "Hive"),
-
-    BSV("BSV", "Bitcoin SV"),
-
-    PAX("PAX", "Paxos Standard"),
-
-    GXC("GXC", "GXChain"),
-
-    KNC("KNC", "Kyber Network"),
-
-    BUSD("BUSD", "Binance USD"),
-
-    CHR("CHR", "Chromia"),
-
-    HC("HC", "HyperCash"),
-
-    TT("TT", "Thunder Token"),
-
-    EURS("EURS", "STASIS EURO"),
-
-    HBAR("HBAR", "Hedera Hashgraph"),
-
-    ONT("ONT", "Ontology"),
-
-    VGX("VGX", "Voyager Token"),
-
-    HOT("HOT", "Holo"),
-
-    XZC("XZC", "Zcoin"),
-
-    CELR("CELR", "Celer Network"),
-
-    CKB("CKB", "Nervos Network"),
-
-    WICC("WICC", "WaykiChain"),
-
-    WAXP("WAXP", "WAX"),
-
-    BEAM("BEAM", "Beam"),
-
-    SXP("SXP", "Swipe"),
-
-    IOTX("IOTX", "IoTeX"),
-
-    VSYS("VSYS", "v.systems"),
-
-    DATA("DATA", "Streamr"),
-
-    NIM("NIM", "Nimiq"),
-
-    REQ("REQ", "Request"),
-
-    RIF("RIF", "RSK Infrastructure Framework"),
-
-    COMP("COMP", "Compound"),
-
-    TMTG("TMTG", "The Midas Touch Gold"),
-
-    ABBC("ABBC", "ABBC Coin"),
-
-    NAS("NAS", "Nebulas"),
-
-    NANO("NANO", "Nano"),
-
-    NMR("NMR", "Numeraire"),
-
-    CRPT("CRPT", "Crypterium"),
-
-    DAD("DAD", "DAD"),
-
-    MXC("MXC", "MXC"),
-
-    TSHP("TSHP", "12Ships"),
-
-    IOST("IOST", "IOST"),
-
-    THETA("THETA", "THETA"),
-
-    HUSD("HUSD", "HUSD"),
-
-    COTI("COTI", "COTI"),
-
-    PIVX("PIVX", "PIVX"),
-
-    NULS("NULS", "NULS"),
-
-    SOLVE("SOLVE", "SOLVE"),
-
-    OKB("OKB", "OKB"),
-
-    ZRX("ZRX", "0x"),
-
-    // ===================================================================
-    // For Test
-    // ===================================================================
-    UNKNOWN("", "Unknown Currency for test");
+    UNKNOWN("Unknown Currency for test");
 
     /** The commonly used identical currency code. */
     public final String code;
@@ -920,33 +423,22 @@ public enum Currency {
 
     /**
      * Create {@link Currency}.
-     * 
-     * @param code
+     *
      * @param name
      * @param alternativeCodes
      */
-    private Currency(String code, String name, String... alternativeCodes) {
+    private Currency(String name, String... alternativeCodes) {
         this.name = name;
-        this.code = code;
+        this.code = name();
         this.codes = Set.of(I.array(alternativeCodes, code));
     }
 
     /**
      * Build {@link CurrencySetting} with minimum size.
-     * 
-     * @param minimumSize
+     *
      * @return
      */
-    public CurrencySetting minimumSize(double minimumSize) {
-        Num min = Num.of(minimumSize);
-        return new CurrencySetting(this, min, min.scale());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return code;
+    public CurrencySetting minimumSize(double minimum) {
+        return new CurrencySetting(this, Num.of(minimum), 0);
     }
 }

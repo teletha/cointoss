@@ -22,11 +22,6 @@ public class CurrencySetting {
     /** The decimal scale. */
     public final int scale;
 
-    /**
-     * @param currency
-     * @param minimumSize
-     * @param scale
-     */
     CurrencySetting(Currency currency, Num minimumSize, int scale) {
         this.currency = currency;
         this.minimumSize = minimumSize;
