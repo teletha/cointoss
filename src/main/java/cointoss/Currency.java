@@ -34,7 +34,11 @@ public enum Currency {
 
     AOA("Angolan Kwanza"),
 
+    APE("ApeCoin"),
+
     APEX("ApeX"),
+
+    APT("Aptos"),
 
     ARB("Arbitrum"),
 
@@ -78,6 +82,8 @@ public enum Currency {
 
     BIF("Burundian Franc"),
 
+    BLAST("Blast"),
+
     BMD("Bermudan Dollar"),
 
     BNB("Binance Coin"),
@@ -111,6 +117,8 @@ public enum Currency {
     CRO("Crypto.com Coin"),
 
     CRPT("Crypterium"),
+
+    CRV("Curve DAO Token"),
 
     CTXC("Cortex"),
 
@@ -160,9 +168,13 @@ public enum Currency {
 
     EGP("Egyptian Pound"),
 
+    EIGEN("Eigen Layer"),
+
     ELA("Elastos"),
 
     ELF("aelf"),
+
+    ENA("ENA"),
 
     ENG("Enigma"),
 
@@ -198,9 +210,17 @@ public enum Currency {
 
     GMT("STEPN Governance Token"),
 
+    GRASS("Grass"),
+
+    GRIFFAIN("Griffain"),
+
     GYD("Guyanaese Dollar"),
 
+    HBAR("Hedera"),
+
     HKD("Hong Kong Dollar"),
+
+    HPOS("HPOS"),
 
     HPT("Huobi Pool Token"),
 
@@ -212,19 +232,33 @@ public enum Currency {
 
     ILS("Israeli New Sheqel"),
 
+    INJ("Injective"),
+
     INR("Indian Rupee"),
 
     IOT("IOTA"),
 
+    IP("Intellectual Property"),
+
     IRR("Iranian Rial"),
+
+    JELLY("Jelly"),
 
     JPY("Japanese Yen"),
 
+    JTO("Jito"),
+
+    JUP("Jupiter"),
+
     KAVA("Kava"),
+
+    kBONK("Bonk"),
 
     KCS("KuCoin Shares"),
 
     KICK("KickCoin"),
+
+    kPEPE("Pepe"),
 
     KPW("North Korean Won"),
 
@@ -234,9 +268,11 @@ public enum Currency {
 
     KYD("Cayman Islands Dollar"),
 
+    LAYER("LayerZero"),
+
     LBP("Lebanese Pound"),
 
-    LDO("Lodo DAO Token"),
+    LDO("Lido DAO Token"),
 
     LEND("ETHLend"),
 
@@ -268,13 +304,23 @@ public enum Currency {
 
     MCO("Monaco"),
 
+    ME("ME"),
+
+    MELANIA("Melania"),
+
     MGA("Malagasy Ariary"),
 
     MNT("Mantle"),
 
     MONA("MonaCoin"),
 
+    MOODENG("Moodeng"),
+
     MOP("Macanese Pataca"),
+
+    MORPHO("Morpho"),
+
+    MOVE("Move"),
 
     MRO("Mauritanian Ouguiya"),
 
@@ -296,11 +342,15 @@ public enum Currency {
 
     NAS("Nebulas"),
 
+    NEAR("NEAR Protocol"),
+
     NEO("NEO"),
 
     NZD("New Zealand Dollar"),
 
     OMG("OmiseGO"),
+
+    ONDO("Ondo Finance"),
 
     ONE("Harmony"),
 
@@ -308,7 +358,25 @@ public enum Currency {
 
     ORBS("Orbs"),
 
+    PENDLE("Pendle"),
+
+    PENGU("Pengu"),
+
+    PNUT("Peanut"),
+
+    POPCAT("PopCat"),
+
+    PURR("Purr"),
+
+    REQ("Request"),
+
+    RUNE("THORChain"),
+
+    S("S"),
+
     SBD("Solomon Islands Dollar"),
+
+    SEI("SEI"),
 
     SNX("Synthetix Network Token"),
 
@@ -317,6 +385,8 @@ public enum Currency {
     SOLVE("SOLVE"),
 
     SOLV("Solve Protocol"),
+
+    SPX("SPX"),
 
     SRM("Serum"),
 
@@ -330,9 +400,13 @@ public enum Currency {
 
     SUI("SUI"),
 
+    TAO("Tao Network"),
+
     THB("Thai Baht"),
 
     THETA("THETA"),
+
+    TIA("Celestia"),
 
     TJS("Tajikistani Somoni"),
 
@@ -340,11 +414,13 @@ public enum Currency {
 
     TND("Tunisian Dinar"),
 
-    TRUMP("Officail Trump"),
+    TRUMP("Official Trump"),
 
     TRY("Turkish Lira"),
 
     TRX("Tron"),
+
+    TST("TST"),
 
     TUSD("TrueUSD"),
 
@@ -368,6 +444,10 @@ public enum Currency {
 
     USDT("Tether USD Anchor"),
 
+    USTC("TerraClassicUSD"),
+
+    USUAL("Usual"),
+
     UTC("Ultracoin"),
 
     UTK("Utrust"),
@@ -380,11 +460,17 @@ public enum Currency {
 
     VEN("Hub Culture's Ven", "XVN"),
 
-    VET("Hub Culture's Vet", "VEN"),
+    VET("VeChain"),
+
+    VINE("Vine"),
+
+    VIRTUAL("Virtual"),
+
+    VVV("VVV"),
 
     WAVES("Waves"),
 
-    WIF("WIF"),
+    WIF("Worldcoin Identity Framework"),
 
     WLD("Worldcoin"),
 
@@ -400,11 +486,15 @@ public enum Currency {
 
     ZEC("Zcash"),
 
-    ZEN("ZenCash"),
+    ZEN("Horizen"),
+
+    ZEREBRO("Zerebro"),
 
     ZMW("Zambian Kwacha", "ZMK"),
 
     ZRC("ziftrCOIN"),
+
+    ZRO("ZRO"),
 
     ZRX("0x"),
 
