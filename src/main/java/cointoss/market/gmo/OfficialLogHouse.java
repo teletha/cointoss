@@ -12,7 +12,6 @@ package cointoss.market.gmo;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import cointoss.Direction;
@@ -29,7 +28,7 @@ import kiss.XML;
 class OfficialLogHouse extends HttpLogHouse {
 
     /** The API limit. */
-    private static final RateLimiter LIMITER = RateLimiter.with.limit(2).refresh(250, TimeUnit.MILLISECONDS);
+    private static final RateLimiter LIMITER = RateLimiter.with.limit(10).refreshSecond(1);
 
     OfficialLogHouse(MarketService service) {
         super(service);

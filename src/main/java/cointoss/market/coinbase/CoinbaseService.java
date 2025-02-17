@@ -9,8 +9,6 @@
  */
 package cointoss.market.coinbase;
 
-import static java.util.concurrent.TimeUnit.*;
-
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
@@ -45,7 +43,7 @@ public class CoinbaseService extends MarketService {
             .ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]X");
 
     /** The API limit. */
-    private static final RateLimiter LIMITER = RateLimiter.with.limit(10).refresh(1000, MILLISECONDS);
+    private static final RateLimiter LIMIT = RateLimiter.with.limit(10).refreshSecond(1).persistable(Exchange.Coinbase);
 
     /** The realtime communicator. */
     private final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://advanced-trade-ws.coinbase.com")
@@ -246,7 +244,7 @@ public class CoinbaseService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.coinbase.com/api/v3/brokerage/" + path));
 
-        return Network.rest(builder, LIMITER, client()).retry(withPolicy());
+        return Network.rest(builder, LIMIT, client()).retry(withPolicy());
     }
 
     public static void main2(String[] args) throws InterruptedException {

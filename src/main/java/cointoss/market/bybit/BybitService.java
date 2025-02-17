@@ -12,7 +12,6 @@ package cointoss.market.bybit;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ public class BybitService extends MarketService {
     static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
-    private static final RateLimiter Limit = RateLimiter.with.limit(20).refresh(Duration.ofSeconds(1));
+    private static final RateLimiter LIMIT = RateLimiter.with.limit(20).refreshSecond(1).persistable(Exchange.Bybit);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket RealtimeSPOT = EfficientWebSocket.with.address("wss://stream.bybit.com/v5/public/spot")
@@ -253,7 +252,7 @@ public class BybitService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api.bybit.com/v5/" + path));
 
-        return Network.rest(builder, Limit, client()).retry(withPolicy());
+        return Network.rest(builder, LIMIT, client()).retry(withPolicy());
     }
 
     /**

@@ -20,7 +20,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import cointoss.Direction;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -53,7 +52,7 @@ public class GMOService extends MarketService {
             .register(Kind.Maintenance, "maintenance");
 
     /** The API limit. */
-    private static final RateLimiter LIMITER = RateLimiter.with.limit(1).refresh(200, MILLISECONDS);
+    private static final RateLimiter LIMITER = RateLimiter.with.limit(5 /* 5 safe buffer */).refreshSecond(1).persistable(Exchange.GMO);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api.coin.z.com/ws/public/v1")
@@ -204,11 +203,6 @@ public class GMOService extends MarketService {
     @Override
     public boolean supportOrderBookFix() {
         return true;
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        Market.of(GMO.BTC_DERIVATIVE).tickers.buildFully(false).to(x -> {
-        });
     }
 
     /**

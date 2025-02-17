@@ -12,7 +12,6 @@ package cointoss.market.bitmex;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class BitMexService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final RateLimiter Limit = RateLimiter.with.limit(30).refresh(Duration.ofMinutes(1));
+    private static final RateLimiter LIMIT = RateLimiter.with.limit(30).refreshMinute(1).persistable(Exchange.BitMEX);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://www.bitmex.com/realtime")
@@ -299,7 +298,7 @@ public class BitMexService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://www.bitmex.com/api/v1/" + path));
 
-        return Network.rest(builder, Limit, client()).retry(withPolicy());
+        return Network.rest(builder, LIMIT, client()).retry(withPolicy());
     }
 
     /**

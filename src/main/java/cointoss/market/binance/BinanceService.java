@@ -12,7 +12,6 @@ package cointoss.market.binance;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,9 @@ import kiss.Signal;
 public class BinanceService extends MarketService {
 
     /** The API limit. */
-    private static final RateLimiter Limit = RateLimiter.with.limit(150 /* 50 safe buffer */).refresh(Duration.ofSeconds(5));
+    private static final RateLimiter Limit = RateLimiter.with.limit(900 /* 100 safe buffer */)
+            .refreshSecond(10)
+            .persistable(Exchange.Binance);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.binance.com:9443/stream")

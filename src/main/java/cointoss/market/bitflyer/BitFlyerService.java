@@ -9,7 +9,6 @@
  */
 package cointoss.market.bitflyer;
 
-import static java.util.concurrent.TimeUnit.*;
 import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
@@ -71,7 +70,7 @@ public class BitFlyerService extends MarketService {
     private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     /** The API limit. */
-    private static final RateLimiter LIMITER = RateLimiter.with.limit(80 /* 100 */).refresh(1, MINUTES);
+    private static final RateLimiter LIMIT = RateLimiter.with.limit(80 /* 100 */).refreshMinute(1).persistable(Exchange.BitFlyer);
 
     /** The error converter. */
     private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector()
@@ -564,7 +563,7 @@ public class BitFlyerService extends MarketService {
             builder = builder.POST(BodyPublishers.ofString(bodyText));
         }
 
-        return Network.rest(builder, LIMITER, weight, client()).mapError(e -> ERRORS.convert(e, this)).retry(withPolicy());
+        return Network.rest(builder, LIMIT, weight, client()).mapError(e -> ERRORS.convert(e, this)).retry(withPolicy());
     }
 
     /**
@@ -617,7 +616,7 @@ public class BitFlyerService extends MarketService {
                         .POST(BodyPublishers
                                 .ofString("{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + Session.accountId + "\",\"lang\":\"ja\"}"));
 
-                Network.rest(builder, LIMITER, 1).to(I.NoOP);
+                Network.rest(builder, LIMIT, 1).to(I.NoOP);
             });
         }
     }

@@ -12,7 +12,6 @@ package cointoss.market.coincheck;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -39,7 +38,7 @@ public class CoincheckService extends MarketService {
     private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final RateLimiter Limit = RateLimiter.with.limit(4).refresh(Duration.ofSeconds(1));
+    private static final RateLimiter LIMIT = RateLimiter.with.limit(4).refreshSecond(1).persistable(Exchange.Coincheck);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://ws-api.coincheck.com/").extractId(json -> {
@@ -199,7 +198,7 @@ public class CoincheckService extends MarketService {
             builder = HttpRequest.newBuilder(URI.create("https://coincheck.com/api/" + path));
         }
 
-        return Network.rest(builder, Limit, client()).retry(withPolicy());
+        return Network.rest(builder, LIMIT, client()).retry(withPolicy());
     }
 
     /**

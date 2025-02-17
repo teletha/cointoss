@@ -12,7 +12,6 @@ package cointoss.market.bitfinex;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class BitfinexService extends MarketService {
     private static final NetworkErrorDetector ERRORS = new NetworkErrorDetector().register(Kind.LimitOverflow, "ratelimit: error");
 
     /** The API limit. */
-    private static final RateLimiter LimitForREST = RateLimiter.with.limit(8).refresh(Duration.ofMinutes(1));
+    private static final RateLimiter LIMIT_REST = RateLimiter.with.limit(10).refreshMinute(1).persistable(Exchange.Bitfinex);
 
     /** The realtiem communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://api-pub.bitfinex.com/ws/2")
@@ -271,7 +270,7 @@ public class BitfinexService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Builder builder = HttpRequest.newBuilder(URI.create("https://api-pub.bitfinex.com/v2/" + path));
 
-        return Network.rest(builder, LimitForREST, client()).mapError(e -> ERRORS.convert(e, this)).retry(withPolicy());
+        return Network.rest(builder, LIMIT_REST, client()).mapError(e -> ERRORS.convert(e, this)).retry(withPolicy());
     }
 
     /**

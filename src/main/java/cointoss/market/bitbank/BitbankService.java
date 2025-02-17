@@ -12,7 +12,6 @@ package cointoss.market.bitbank;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -39,7 +38,7 @@ public class BitbankService extends MarketService {
     private static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
 
     /** The API limit. */
-    private static final RateLimiter Limit = RateLimiter.with.limit(5).refresh(Duration.ofSeconds(1));
+    private static final RateLimiter Limit = RateLimiter.with.limit(10).refreshSecond(1).persistable(Exchange.BitBank);
 
     /** The realtime communicator. */
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.bitbank.cc/socket.io/")
