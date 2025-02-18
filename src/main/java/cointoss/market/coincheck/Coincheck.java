@@ -11,6 +11,9 @@ package cointoss.market.coincheck;
 
 import java.util.function.UnaryOperator;
 
+import cointoss.Currency;
+import cointoss.MarketService;
+import cointoss.MarketSetting;
 import cointoss.market.Exchange;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketServiceProvider;
@@ -19,19 +22,14 @@ import kiss.I;
 
 public final class Coincheck extends MarketServiceProvider {
 
-    /** Limitation */
-    private static final int AcquirableSize = 50;
-
     private static final UnaryOperator<Num> withdrawJPY = size -> Num.of("407");
 
-    // public static final MarketService BTC_JPY = new CoincheckService("btc_jpy",
-    // MarketSetting.with.spot()
-    // .target(Currency.BTC.minimumSize(0.001))
-    // .base(Currency.JPY.minimumSize(1))
-    // .priceRangeModifier(500)
-    // .acquirableExecutionSize(AcquirableSize)
-    // .targetWithdrawingFee(size -> Num.of("0.001"))
-    // .baseWithdrawingFee(withdrawJPY));
+    public static final MarketService BTC_JPY = new CoincheckService("btc_jpy", MarketSetting.with.spot()
+            .target(Currency.BTC.minimumSize(0.001))
+            .base(Currency.JPY.minimumSize(1))
+            .priceRangeModifier(500)
+            .targetWithdrawingFee(size -> Num.of("0.001"))
+            .baseWithdrawingFee(withdrawJPY));
 
     /**
      * {@inheritDoc}

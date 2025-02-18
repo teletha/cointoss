@@ -36,7 +36,8 @@ import kiss.Signal;
 
 public class HyperliquidService extends MarketService {
 
-    static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
+    /** The execution support. */
+    private static final TimestampBasedMarketServiceSupporter SUPPORT = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
     private static final RateLimiter Limit = RateLimiter.with.limit(800).refresh(Duration.ofMinutes(1)).persistable(Exchange.Hyperliquid);
@@ -81,8 +82,7 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        long now = Chrono.currentTimeMills();
-        return convertFromCandle(Span.Minute1, now - 7000, now + 7000).last();
+        return SUPPORT.executionLatestByCandle(this::convertFromCandle);
     }
 
     /**
@@ -90,11 +90,7 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsAfter(long startId, long endId) {
-        long startTime = Support.computeEpochTime(startId);
-        long currentTime = Chrono.currentTimeMills();
-        Span span = Span.near((currentTime - startTime) / executionMaxRequest);
-
-        return convertFromCandle(span, startTime, currentTime - span.prev().map(x -> x.duration.toMillis() * executionMaxRequest).or(0L));
+        return SUPPORT.executionsAfterByCandle(startId, endId, executionMaxRequest, this::convertFromCandle);
     }
 
     /**
@@ -102,7 +98,7 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        return convertFromCandle(Span.Day, 0, Support.computeEpochTime(id));
+        return SUPPORT.executionsBeforeByCandle(id, this::convertFromCandle);
     }
 
     /**
@@ -110,7 +106,7 @@ public class HyperliquidService extends MarketService {
      */
     @Override
     public Signal<Execution> searchInitialExecution() {
-        return convertFromCandle(Span.Day, 0, Chrono.currentTimeMills()).first();
+        return SUPPORT.searchInitialExecutionByCandle(this::convertFromCandle);
     }
 
     /**
@@ -145,7 +141,7 @@ public class HyperliquidService extends MarketService {
             Num volume = json.get(Num.class, "v");
             long time = json.get(long.class, "t");
 
-            return Support.createExecutions(open, high, low, close, volume, time, span);
+            return SUPPORT.createExecutions(open, high, low, close, volume, time, span);
         }).skip(e -> e.isAfter(now));
     }
 
@@ -162,7 +158,7 @@ public class HyperliquidService extends MarketService {
             Num size = e.get(Num.class, "sz");
             ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "time"));
 
-            return Support.createExecution(side, size, price, date, context);
+            return SUPPORT.createExecution(side, size, price, date, context);
         });
     }
 

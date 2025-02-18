@@ -37,7 +37,7 @@ import kiss.Signal;
 
 public class BybitService extends MarketService {
 
-    static final TimestampBasedMarketServiceSupporter Support = new TimestampBasedMarketServiceSupporter();
+    static final TimestampBasedMarketServiceSupporter SUPPORT = new TimestampBasedMarketServiceSupporter();
 
     /** The bitflyer API limit. */
     private static final RateLimiter LIMIT = RateLimiter.with.limit(20).refreshSecond(1).persistable(Exchange.Bybit);
@@ -84,7 +84,7 @@ public class BybitService extends MarketService {
                     Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
                     ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "time"));
 
-                    return Support.createExecution(side, size, price, date, context);
+                    return SUPPORT.createExecution(side, size, price, date, context);
                 })
                 .take(e -> startId <= e.id && e.id <= endId);
     }
@@ -102,7 +102,7 @@ public class BybitService extends MarketService {
             Num size = e.get(Num.class, "v").divide(price).scale(setting.target.scale);
             ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
 
-            return Support.createExecution(side, size, price, date, context);
+            return SUPPORT.createExecution(side, size, price, date, context);
         });
     }
 
@@ -137,7 +137,7 @@ public class BybitService extends MarketService {
         Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
         ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "time"));
 
-        return Support.createExecution(side, size, price, date, context);
+        return SUPPORT.createExecution(side, size, price, date, context);
     }
 
     /**
@@ -178,16 +178,6 @@ public class BybitService extends MarketService {
             JSON data = pages.get("data");
             return convertOrderBook(data.find("a", "*"), data.find("b", "*"));
         });
-    }
-
-    public static void main2(String[] args) throws InterruptedException {
-        Bybit.BTC_USDT.orderBookRealtimely().to(x -> {
-            System.out.println(x.bestBid());
-        }, e -> {
-            e.printStackTrace();
-        });
-
-        Thread.sleep(1000 * 30);
     }
 
     /**

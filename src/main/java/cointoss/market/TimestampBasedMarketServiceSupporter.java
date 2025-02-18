@@ -17,11 +17,14 @@ import java.util.Collections;
 import java.util.List;
 
 import cointoss.Direction;
+import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import kiss.JSON;
+import kiss.Signal;
+import kiss.WiseTriFunction;
 
 /**
  * This class is useful to use in the following cases
@@ -215,33 +218,6 @@ public class TimestampBasedMarketServiceSupporter {
     }
 
     /**
-     * Helper method to calculate consecutive type.
-     * 
-     * @param side
-     * @param epochMillis
-     * @param threeLength
-     * @return
-     */
-    public static int computeConsecutive(Direction side, long epochMillis, long[] threeLength) {
-        long sideType = side.ordinal();
-        int consecutive;
-
-        if (epochMillis != threeLength[0]) {
-            consecutive = Execution.ConsecutiveDifference;
-
-            threeLength[0] = epochMillis;
-            threeLength[1] = sideType;
-        } else {
-            consecutive = sideType != threeLength[1] ? Execution.ConsecutiveDifference
-                    : side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
-
-            threeLength[0] = epochMillis;
-            threeLength[1] = sideType;
-        }
-        return consecutive;
-    }
-
-    /**
      * Create pseudo {@link Execution}s from OHLCV candle.
      * 
      * @param open The open price.
@@ -275,5 +251,78 @@ public class TimestampBasedMarketServiceSupporter {
                     .consecutive(Execution.ConsecutivePseudoDifference));
         }
         return list;
+    }
+
+    /**
+     * Provide the support of {@link MarketService#executionLatest()} by candles.
+     * 
+     * @param candleConverter
+     * @return
+     */
+    public final Signal<Execution> executionLatestByCandle(WiseTriFunction<Span, Long, Long, Signal<Execution>> candleConverter) {
+        long now = Chrono.currentTimeMills();
+        return candleConverter.apply(Span.Minute1, now - 7000, now + 7000).last();
+    }
+
+    /**
+     * Provide the support of {@link MarketService#executionsAfter(long, long)} by candles.
+     * 
+     * @param candleConverter
+     * @return
+     */
+    public final Signal<Execution> executionsAfterByCandle(long startId, long endId, long executionMaxRequest, WiseTriFunction<Span, Long, Long, Signal<Execution>> candleConverter) {
+        long startTime = computeEpochTime(startId);
+        long currentTime = Chrono.currentTimeMills();
+        Span span = Span.near((currentTime - startTime) / executionMaxRequest);
+
+        return candleConverter
+                .apply(span, startTime, currentTime - span.prev().map(x -> x.duration.toMillis() * executionMaxRequest).or(0L));
+    }
+
+    /**
+     * Provide the support of {@link MarketService#executionsBefore(long)} by candles.
+     * 
+     * @param candleConverter
+     * @return
+     */
+    public final Signal<Execution> executionsBeforeByCandle(long id, WiseTriFunction<Span, Long, Long, Signal<Execution>> candleConverter) {
+        return candleConverter.apply(Span.Day, 0L, computeEpochTime(id));
+    }
+
+    /**
+     * Provide the support of {@link MarketService#searchInitialExecution()} by candles.
+     * 
+     * @param candleConverter
+     * @return
+     */
+    public final Signal<Execution> searchInitialExecutionByCandle(WiseTriFunction<Span, Long, Long, Signal<Execution>> candleConverter) {
+        return candleConverter.apply(Span.Day, 0L, Chrono.currentTimeMills()).first();
+    }
+
+    /**
+     * Helper method to calculate consecutive type.
+     * 
+     * @param side
+     * @param epochMillis
+     * @param threeLength
+     * @return
+     */
+    public static int computeConsecutive(Direction side, long epochMillis, long[] threeLength) {
+        long sideType = side.ordinal();
+        int consecutive;
+
+        if (epochMillis != threeLength[0]) {
+            consecutive = Execution.ConsecutiveDifference;
+
+            threeLength[0] = epochMillis;
+            threeLength[1] = sideType;
+        } else {
+            consecutive = sideType != threeLength[1] ? Execution.ConsecutiveDifference
+                    : side == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
+
+            threeLength[0] = epochMillis;
+            threeLength[1] = sideType;
+        }
+        return consecutive;
     }
 }

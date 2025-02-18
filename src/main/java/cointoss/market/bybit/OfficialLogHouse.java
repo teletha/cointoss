@@ -65,7 +65,7 @@ class OfficialLogHouse extends HttpLogHouse {
             Num size = Num.of(values[9]);
             Num price = Num.of(values[4]);
 
-            return BybitService.Support.createExecution(side, size, price, time, context);
+            return BybitService.SUPPORT.createExecution(side, size, price, time, context);
         }).waitForTerminate();
     }
 
