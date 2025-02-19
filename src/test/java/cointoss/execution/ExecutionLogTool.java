@@ -14,8 +14,8 @@ import java.time.ZonedDateTime;
 
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.Cache;
+import cointoss.market.MarketServiceProvider;
 import cointoss.market.TimestampBasedMarketServiceSupporter;
-import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import kiss.Signal;
 
@@ -25,7 +25,7 @@ import kiss.Signal;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        Tool.defineTask().on(BitFlyer.BTC_JPY).at(2024, 9, 17).run(ExecutionLogTool::createFastLog);
+        Tool.defineTask().on(MarketServiceProvider.availableMarketServices()).at(2025, 2, 18).run(ExecutionLogTool::deleteCompactFastLog);
     }
 
     public static void convertToTimestampBasedId(ExecutionLog idBased, MarketService timeBased) {
@@ -123,6 +123,14 @@ public class ExecutionLogTool {
      */
     public static void deleteRepositoryInfo(ExecutionLog log) {
         log.clearRepositoryInfo();
+    }
+
+    /**
+     * Delete compact and fast log.
+     */
+    public static void deleteCompactFastLog(ExecutionLog log, ZonedDateTime date) {
+        deleteCompactLog(log, date);
+        deleteFastLog(log, date);
     }
 
     /**
