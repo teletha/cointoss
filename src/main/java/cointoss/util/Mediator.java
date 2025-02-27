@@ -27,6 +27,8 @@ public class Mediator {
 
     public static final WithoutContext ExecutionWriter = new WithoutContext("ExecutionWriter");
 
+    public static final WithoutContext LogCompacter = new WithoutContext("LogCompacter");
+
     /**
      * Base task handler.
      */
@@ -56,6 +58,8 @@ public class Mediator {
         protected final ScheduledExecutorService findExecutor(Object key) {
             Objects.requireNonNull(key);
 
+            // Scheduler(1) limits the number of concurrent executions to a maximum of 1, so this
+            // effectively functions as a task queue.
             return executors.computeIfAbsent(Objects.hash(type, key), hash -> new Scheduler(1));
         }
 
@@ -68,13 +72,13 @@ public class Mediator {
          * @param task
          * @return
          */
-        protected final ScheduledFuture<?> scheduleTask(long delay, long interval, Object key, WiseRunnable task) {
+        protected final ScheduledFuture<?> scheduleTask(long delay, long interval, TimeUnit unit, Object key, WiseRunnable task) {
             ScheduledExecutorService scheduler = findExecutor(key);
 
             if (interval <= 0) {
-                return scheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
+                return scheduler.schedule(task, delay, unit);
             } else {
-                return scheduler.scheduleWithFixedDelay(task, delay, interval, TimeUnit.MILLISECONDS);
+                return scheduler.scheduleWithFixedDelay(task, delay, interval, unit);
             }
         }
     }
@@ -95,7 +99,7 @@ public class Mediator {
          * @return
          */
         public ScheduledFuture<?> schedule(WiseRunnable task) {
-            return schedule(0, 0, task);
+            return schedule(0, 0, TimeUnit.SECONDS, task);
         }
 
         /**
@@ -105,8 +109,8 @@ public class Mediator {
          * @param task
          * @return
          */
-        public ScheduledFuture<?> schedule(long delay, WiseRunnable task) {
-            return schedule(delay, 0, task);
+        public ScheduledFuture<?> schedule(long delay, TimeUnit unit, WiseRunnable task) {
+            return schedule(delay, 0, unit, task);
         }
 
         /**
@@ -117,8 +121,8 @@ public class Mediator {
          * @param task
          * @return
          */
-        public ScheduledFuture<?> schedule(long delay, long interval, WiseRunnable task) {
-            return scheduleTask(delay, interval, Mediator.class, task);
+        public ScheduledFuture<?> schedule(long delay, long interval, TimeUnit unit, WiseRunnable task) {
+            return scheduleTask(delay, interval, unit, Mediator.class, task);
         }
     }
 
@@ -138,7 +142,7 @@ public class Mediator {
          * @return
          */
         public ScheduledFuture<?> schedule(C context, WiseRunnable task) {
-            return schedule(0, 0, context, task);
+            return schedule(0, 0, TimeUnit.SECONDS, context, task);
         }
 
         /**
@@ -148,8 +152,8 @@ public class Mediator {
          * @param task
          * @return
          */
-        public ScheduledFuture<?> schedule(long delay, C context, WiseRunnable task) {
-            return schedule(delay, 0, context, task);
+        public ScheduledFuture<?> schedule(long delay, TimeUnit unit, C context, WiseRunnable task) {
+            return schedule(delay, 0, unit, context, task);
         }
 
         /**
@@ -160,8 +164,8 @@ public class Mediator {
          * @param task
          * @return
          */
-        public ScheduledFuture<?> schedule(long delay, long interval, C context, WiseRunnable task) {
-            return scheduleTask(delay, interval, context, task);
+        public ScheduledFuture<?> schedule(long delay, long interval, TimeUnit unit, C context, WiseRunnable task) {
+            return scheduleTask(delay, interval, unit, context, task);
         }
     }
 }

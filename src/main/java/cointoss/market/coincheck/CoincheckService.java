@@ -79,6 +79,7 @@ public class CoincheckService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
+        System.out.println("latest");
         return call("GET", "trades?pair=" + marketName + "&limit=1").flatIterable(e -> e.find("data", "*"))
                 .map(json -> createExecution(json, new long[3]));
     }
@@ -88,7 +89,7 @@ public class CoincheckService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsAfter(long startId, long endId) {
-        System.out.println("latest");
+        System.out.println("after " + SUPPORT.computeDateTime(startId));
         return SUPPORT.executionsAfterByCandle(startId, endId, executionMaxRequest, this::convertFromCandle);
     }
 
@@ -141,6 +142,7 @@ public class CoincheckService extends MarketService {
             return I.signal();
         }
 
+        ZonedDateTime start = Chrono.utcByMills(startMS);
         ZonedDateTime end = Chrono.utcByMills(endMS);
         return call("GET", "charts/candle_rates?pair=" + marketName + "&unit=" + span.seconds).flatIterable(json -> json.find("$"))
                 .flatIterable(json -> {
@@ -153,7 +155,7 @@ public class CoincheckService extends MarketService {
 
                     return SUPPORT.createExecutions(open, high, low, close, volume, time, span);
                 })
-                .skip(e -> e.isAfter(end));
+                .skip(e -> e.isBefore(start) || e.isAfter(end));
     }
 
     /**
@@ -234,7 +236,7 @@ public class CoincheckService extends MarketService {
         });
 
         try {
-            Thread.sleep(1000 * 10);
+            Thread.sleep(1000 * 60 * 30);
         } catch (InterruptedException e) {
             throw I.quiet(e);
         }

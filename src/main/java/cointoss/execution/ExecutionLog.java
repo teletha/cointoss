@@ -398,7 +398,7 @@ public class ExecutionLog {
          */
         private Cache enableAutoSave() {
             if (task == null) {
-                task = Mediator.ExecutionWriter.schedule(1000 * 60, 1000 * 60 * 3, () -> {
+                task = Mediator.ExecutionWriter.schedule(1, 3, TimeUnit.MINUTES, () -> {
                     write();
                     log.commit(service);
                 });
@@ -866,13 +866,16 @@ public class ExecutionLog {
         Cache convertNormalToCompact(boolean async) {
             if (!existCompact() && (!queue.isEmpty() || existNormal())) {
                 if (async) {
-                    I.schedule(5, TimeUnit.SECONDS).to(() -> convertNormalToCompact(false));
+                    Mediator.LogCompacter.schedule(3, TimeUnit.SECONDS, () -> {
+                        convertNormalToCompact(false);
+                    });
                 } else {
                     writeFast(writeCompact(readNormal())).effectOnLifecycle(new TickerBuilder(service)).to(I.NoOP, e -> {
                         I.error(service + " fails to compact the normal log. [" + date + "]");
                         I.error(e);
                     }, () -> {
                         normal.delete();
+                        I.info(service + " compacts log. [" + date + "]");
                     });
                 }
             }
