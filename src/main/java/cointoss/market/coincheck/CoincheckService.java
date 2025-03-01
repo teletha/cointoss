@@ -232,11 +232,10 @@ public class CoincheckService extends MarketService {
         // });
 
         Coincheck.BTC_JPY.executions().to(e -> {
-            System.out.println("@@@ " + e);
         });
 
         try {
-            Thread.sleep(1000 * 60 * 30);
+            Thread.sleep(1000 * 30);
         } catch (InterruptedException e) {
             throw I.quiet(e);
         }

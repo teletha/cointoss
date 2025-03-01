@@ -866,7 +866,7 @@ public class ExecutionLog {
         Cache convertNormalToCompact(boolean async) {
             if (!existCompact() && (!queue.isEmpty() || existNormal())) {
                 if (async) {
-                    Mediator.LogCompacter.schedule(3, TimeUnit.SECONDS, () -> {
+                    Mediator.LogCompaction.schedule(3, TimeUnit.SECONDS, () -> {
                         convertNormalToCompact(false);
                     });
                 } else {

@@ -27,7 +27,7 @@ public class Mediator {
 
     public static final WithoutContext ExecutionWriter = new WithoutContext("ExecutionWriter");
 
-    public static final WithoutContext LogCompacter = new WithoutContext("LogCompacter");
+    public static final WithoutContext LogCompaction = new WithoutContext("LogCompacter");
 
     /**
      * Base task handler.
