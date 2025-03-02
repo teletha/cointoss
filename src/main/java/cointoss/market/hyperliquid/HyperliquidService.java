@@ -170,9 +170,7 @@ public class HyperliquidService extends MarketService {
         return call(2, """
                     {
                     "type": "l2Book",
-                    "coin": "%s",
-                    "nSigFigs": 5,
-                    "mantissa": 5
+                    "coin": "%s"
                 }
                 """.formatted(marketName)).map(pages -> {
             return OrderBookChanges.byJSON(pages.find("levels", "0", "*"), pages.find("levels", "1", "*"), "px", "sz");
@@ -187,6 +185,14 @@ public class HyperliquidService extends MarketService {
         return clientRealtimely().subscribe(new Topic("l2Book", marketName)).map(pages -> {
             return OrderBookChanges.byJSON(pages.find("data", "levels", "0", "*"), pages.find("data", "levels", "1", "*"), "px", "sz");
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean supportOrderBookFix() {
+        return true;
     }
 
     /**
@@ -247,10 +253,5 @@ public class HyperliquidService extends MarketService {
 
         public String coin;
 
-        /** for l2book */
-        public int nSigFigs = 5;
-
-        /** for l2book */
-        public int mantissa = 5;
     }
 }
