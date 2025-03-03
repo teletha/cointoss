@@ -183,16 +183,17 @@ public class HyperliquidService extends MarketService {
     @Override
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
         return clientRealtimely().subscribe(new Topic("l2Book", marketName)).map(pages -> {
-            return OrderBookChanges.byJSON(pages.find("data", "levels", "0", "*"), pages.find("data", "levels", "1", "*"), "px", "sz");
+            return OrderBookChanges.byJSON(pages.find("data", "levels", "0", "*"), pages.find("data", "levels", "1", "*"), "px", "sz")
+                    .full();
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean supportOrderBookFix() {
-        return true;
+    public static void main(String[] args) throws InterruptedException {
+        Hyperliquid.AI16Z.orderBookRealtimely().to(e -> {
+            System.out.println(e.bestBid());
+        });
+
+        Thread.sleep(1000 * 40);
     }
 
     /**

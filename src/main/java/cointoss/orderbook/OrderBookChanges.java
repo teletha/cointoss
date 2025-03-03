@@ -17,6 +17,43 @@ import kiss.JSON;
 
 public abstract class OrderBookChanges {
 
+    /** The update mode. (diff or full-update) */
+    private boolean diff = true;
+
+    /**
+     * Get the diff property of this {@link OrderBookChanges}.
+     * 
+     * @return The diff property.
+     */
+    public final boolean isDiff() {
+        return diff;
+    }
+
+    /**
+     * Get the diff property of this {@link OrderBookChanges}.
+     * 
+     * @return The diff property.
+     */
+    public final boolean isFull() {
+        return !diff;
+    }
+
+    /**
+     * Set the diff property of this {@link OrderBookChanges}.
+     */
+    public final OrderBookChanges diff() {
+        this.diff = true;
+        return this;
+    }
+
+    /**
+     * Set the diff property of this {@link OrderBookChanges}.
+     */
+    public final OrderBookChanges full() {
+        this.diff = false;
+        return this;
+    }
+
     /**
      * Compute the best ask price.
      * 

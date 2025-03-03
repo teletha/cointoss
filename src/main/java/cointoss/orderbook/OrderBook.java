@@ -420,6 +420,9 @@ public class OrderBook implements Listener {
      * @param changes
      */
     public void update(OrderBookChanges changes) {
+        if (changes.isFull()) {
+            base.clear();
+        }
         changes.each(side, this);
 
         int size = base.size();
