@@ -1,16 +1,21 @@
 jdk:
-  - openjdk23
-
-before_install: |
-  source ~/.sdkman/bin/sdkman-init.sh
-  sdk install java 23-open
-  source ~/.sdkman/bin/sdkman-init.sh
+  - openjdk24
 
 install: |
   if [ -e "bee" ]; then
-    source bee install maven
+    source bee install maven --skip test
   else
-    version=$(curl -SsL https://git.io/stable-bee)
-    curl -SsL -o bee-${version}.jar https://jitpack.io/com/github/teletha/bee/${version}/bee-${version}.jar
-    java -javaagent:bee-${version}.jar -cp bee-${version}.jar bee.Bee install maven
+    BeeVersion=$(curl -SsL https://git.io/stable-bee)
+    curl -SsL -o bee-${BeeVersion}.jar https://jitpack.io/com/github/teletha/bee/${BeeVersion}/bee-${BeeVersion}.jar
+    java -javaagent:bee-${BeeVersion}.jar -cp bee-${BeeVersion}.jar bee.Bee install maven --skip test
   fi
+
+  # To support SNAPSHOT and Commit ID version, read the VERSION in version.txt,
+  # not the VERSION in the environment variable.
+  ProductVersion=$(cat version.txt | xargs)
+
+  # Until the end of 2024, Jitpack would recognize it as an Artifact if I put the appropriate
+  # Jar files, etc. in the right place. However, since 2025, Jitpack no longer recognizes them.
+  # But, I found that I could build without any problem if I sent the following Maven log-like
+  # string to standard output. NO WAY!
+  echo "[INFO] Installing /home/jitpack/build/pom.xml to /home/jitpack/.m2/repository/${GROUP//./\/}/${ARTIFACT}/${ProductVersion}/${ARTIFACT}-${ProductVersion}.pom"
