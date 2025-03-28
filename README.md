@@ -58,7 +58,7 @@ Add it into the libraryDependencies section like so:
 libraryDependencies += "com.github.teletha" % "cointoss" % "1.10.0"
 ```
 #### [Leiningen](https://leiningen.org/)
-Add JitPack repository at the end of repositories in your project.clj:
+Add JitPack repository at the end of repositories in your project().clj:
 ```clj
 :repositories [["jitpack" "https://jitpack.io"]]
 ```
@@ -111,11 +111,11 @@ Cointoss depends on the following products on runtime.
 * [commons-net-3.11.1](https://mvnrepository.com/artifact/commons-net/commons-net/3.11.1)
 * [commons-pool-1.6](https://mvnrepository.com/artifact/commons-pool/commons-pool/1.6)
 * [conjure-1.2.1](https://mvnrepository.com/artifact/com.github.teletha/conjure/1.2.1)
-* [controlsfx-11.2.1](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.1)
+* [controlsfx-11.2.2](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.2)
 * [duckdb_jdbc-1.2.1](https://mvnrepository.com/artifact/org.duckdb/duckdb_jdbc/1.2.1)
 * [failureaccess-1.0.3](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.3)
 * [flatbuffers-java-24.3.25](https://mvnrepository.com/artifact/com.google.flatbuffers/flatbuffers-java/24.3.25)
-* [guava-33.4.5-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.4.5-jre)
+* [guava-33.4.6-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.4.6-jre)
 * [hypatia-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/hypatia/1.1.0)
 * [ikonli-core-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-core/12.3.1)
 * [ikonli-fontawesome5-pack-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome5-pack/12.3.1)
@@ -152,7 +152,7 @@ Cointoss depends on the following products on runtime.
 * [primavera-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/primavera/1.1.0)
 * [psychopath-2.1.0](https://mvnrepository.com/artifact/com.github.teletha/psychopath/2.1.0)
 * [reincarnation-1.9.0](https://mvnrepository.com/artifact/com.github.teletha/reincarnation/1.9.0)
-* [sinobu-4.6.0](https://mvnrepository.com/artifact/com.github.teletha/sinobu/4.6.0)
+* [sinobu-4.6.1](https://mvnrepository.com/artifact/com.github.teletha/sinobu/4.6.1)
 * [slf4j-api-2.1.0-alpha1](https://mvnrepository.com/artifact/org.slf4j/slf4j-api/2.1.0-alpha1)
 * [snappy-java-1.1.10.7](https://mvnrepository.com/artifact/org.xerial.snappy/snappy-java/1.1.10.7)
 * [sqlite-jdbc-3.49.1.0](https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.49.1.0)
