@@ -25,7 +25,7 @@ import kiss.Signal;
 public class ExecutionLogTool {
 
     public static void main(String[] args) {
-        Tool.defineTask().on(MarketServiceProvider.availableMarketServices()).at(2025, 2, 18).run(ExecutionLogTool::deleteCompactFastLog);
+        Tool.defineTask().on(MarketServiceProvider.availableMarketServices()).at(2025, 8, 24).run(ExecutionLogTool::deleteCompactFastLog);
     }
 
     public static void convertToTimestampBasedId(ExecutionLog idBased, MarketService timeBased) {
