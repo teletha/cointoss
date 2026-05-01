@@ -23,10 +23,6 @@ public final class Bitfinex extends MarketServiceProvider {
             .target(Currency.BTC.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(1)));
 
-    public static final MarketService COMP_USD = new BitfinexService("COMP:USD", MarketSetting.with.spot()
-            .target(Currency.COMP.minimumSize(0.0001))
-            .base(Currency.USD.minimumSize(0.01)));
-
     public static final MarketService ETH_USD = new BitfinexService("ETHUSD", MarketSetting.with.spot()
             .target(Currency.ETH.minimumSize(0.0001))
             .base(Currency.USD.minimumSize(0.01).scale(8))
