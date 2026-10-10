@@ -178,7 +178,7 @@ public class TradingStats {
 
             // calculate profit and loss
             Num realized = scenario.realizedProfit;
-            Num unrealized = scenario.unrealizedProfit(market.tickers.latest.v.price);
+            Num unrealized = scenario.unrealizedProfit(market.tickers.latest.get().price);
             Num pol = realized.plus(unrealized);
             Num pips = scenario.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(scenario.entryExecutedSize);
             Num realizedPips = scenario.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(scenario.entryExecutedSize);
@@ -210,7 +210,8 @@ public class TradingStats {
             }
             maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total());
             drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total()));
-            drawDownRatio = Num.max(drawDownRatio, drawDown.divide(Num.max(Num.ONE, funds.assets.v.plus(maxTotalProfitAndLoss))).scale(3));
+            drawDownRatio = Num
+                    .max(drawDownRatio, drawDown.divide(Num.max(Num.ONE, funds.assets.get().plus(maxTotalProfitAndLoss))).scale(3));
         }
     }
 

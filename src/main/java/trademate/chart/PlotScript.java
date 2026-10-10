@@ -14,13 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javafx.scene.paint.Color;
-
 import cointoss.Market;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import hypatia.Num;
+import javafx.scene.paint.Color;
 import kiss.Variable;
 import trademate.chart.ChartCanvas.CandleMark;
 import trademate.chart.ChartCanvas.Horizon;
@@ -111,7 +110,7 @@ public abstract class PlotScript {
      * @param value A value to plot.
      */
     protected final void line(Variable<? extends Number> value, LineStyle style) {
-        line(value.v, style);
+        line(value.get(), style);
     }
 
     /**

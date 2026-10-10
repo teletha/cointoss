@@ -365,7 +365,7 @@ public class ExecutionLog {
             try (NormalLog log = new NormalLog(normal)) {
                 long lastID = log.lastID();
                 Variable<Execution> latest = service.executionsAfter(lastID, lastID + 1).first().waitForTerminate().to();
-                return latest.isPresent() ? latest.v.date.toLocalDate().isAfter(date) : false;
+                return latest.isPresent() ? latest.get().date.toLocalDate().isAfter(date) : false;
             } catch (Exception e) {
                 throw I.quiet(e);
             }
@@ -929,17 +929,17 @@ public class ExecutionLog {
 
         long estimateFirstID() {
             if (existCompact()) {
-                return readCompact().first().to().v.id;
+                return readCompact().first().to().get().id;
             }
 
             if (existNormal()) {
-                return readNormal().first().to().v.id;
+                return readNormal().first().to().get().id;
             }
 
             Cache yesterday = cache(date.minusDays(1));
 
             if (yesterday.existCompact()) {
-                return yesterday.readCompact().last().to().v.id;
+                return yesterday.readCompact().last().to().get().id;
             }
             return service.searchNearestExecution(Chrono.utc(date)).waitForTerminate().map(Execution::id).to().or(-1L);
         }

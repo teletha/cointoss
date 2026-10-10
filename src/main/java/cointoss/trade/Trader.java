@@ -405,7 +405,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
         }
 
         // update profit
-        setProfit(snapshot.profit(market.tickers.latest.v.price));
+        setProfit(snapshot.profit(market.tickers.latest.get().price));
     }
 
     /**

@@ -60,30 +60,30 @@ public class MarketInfoPart extends ChartPart {
                     int verticalOffset = 35;
                     Color textColor = Preferences.theme().textMid();
 
-                    CurrencySetting base = parent.chart.market.v.service.setting.base;
+                    CurrencySetting base = parent.chart.market.get().service.setting.base;
                     GraphicsContext c = canvas.clear().getGraphicsContext2D();
 
                     c.setFont(title);
                     c.setFill(textColor);
-                    c.fillText(parent.chart.market.v.service.id, ChartCanvas.chartInfoLeftPadding, 20);
+                    c.fillText(parent.chart.market.get().service.id, ChartCanvas.chartInfoLeftPadding, 20);
                     c.setFont(normal);
 
                     long diff = Chrono.currentTimeMills() - e.mills;
                     c.setFill(diff < 0 || 1000 < diff ? WarningColor : textColor);
-                    c.fillText(DelayLabel.v + " " + diff + "ms", ChartCanvas.chartInfoLeftPadding, verticalOffset);
+                    c.fillText(DelayLabel.get() + " " + diff + "ms", ChartCanvas.chartInfoLeftPadding, verticalOffset);
 
-                    double spread = parent.chart.market.v.orderBook.spread();
+                    double spread = parent.chart.market.get().orderBook.spread();
                     Num range = base.minimumSize.multiply(100);
                     c.setFill(spread < range.doubleValue() ? textColor : WarningColor);
-                    c.fillText(SpreadLabel.v + " " + Primitives
+                    c.fillText(SpreadLabel.get() + " " + Primitives
                             .roundString(spread, base.scale), ChartCanvas.chartInfoLeftPadding + offset, verticalOffset);
 
-                    OnlineStats volatilityStats = parent.chart.ticker.v.spreadStats;
-                    Tick latest = parent.chart.ticker.v.latest();
+                    OnlineStats volatilityStats = parent.chart.ticker.get().spreadStats;
+                    Tick latest = parent.chart.ticker.get().latest();
                     if (latest != null) {
                         double volatility = latest.spread();
                         c.setFill(volatilityStats.calculateSigma(volatility) <= 2 ? textColor : WarningColor);
-                        c.fillText(VolatilityLabel.v + " " + Primitives.roundString(volatility, base.scale) + " (" + Primitives
+                        c.fillText(VolatilityLabel.get() + " " + Primitives.roundString(volatility, base.scale) + " (" + Primitives
                                 .roundString(volatilityStats.getMean(), base.scale) + "-" + Primitives.roundString(volatilityStats
                                         .sigma(2), base.scale) + ")", ChartCanvas.chartInfoLeftPadding + offset * 2, verticalOffset);
                     }

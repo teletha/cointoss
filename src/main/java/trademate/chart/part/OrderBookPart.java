@@ -15,13 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.orderbook.OrderBookPage;
+import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import kiss.Variable;
 import trademate.ChartTheme;
 import trademate.chart.ChartCanvas;
@@ -93,7 +92,7 @@ public class OrderBookPart extends ChartPart {
                         int size = (int) largest.size;
 
                         canvasDigit.clear()
-                                .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.v.price.doubleValue() ? BUY : SELL).v)
+                                .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.get().price.doubleValue() ? BUY : SELL).get())
                                 .strokeText(size, canvasDigit.getWidth() - largest.size * scale - String.valueOf(size)
                                         .length() * 7, position);
                     }
@@ -146,11 +145,11 @@ public class OrderBookPart extends ChartPart {
         double upper = max * 0.75;
         double start = canvas.getWidth();
         double lastPosition = 0;
-        double range = chart.market.v.orderBook.ranged();
+        double range = chart.market.get().orderBook.ranged();
         int hideSize = chart.orderbookHideSize.value();
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(color.v);
+        gc.setStroke(color.get());
 
         for (int i = 0, size = pages.size(); i < size; i++) {
             OrderBookPage page = pages.get(i);

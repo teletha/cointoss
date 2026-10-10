@@ -406,7 +406,7 @@ public abstract class EfficientWebSocketModel {
                 String value = json.text("pingInterval");
                 if (value != null) {
                     cleanup.add(I.schedule(10000, Long.parseLong(value) - 7000 /* Safety */, MILLISECONDS, true)
-                            .to(() -> connection.v.sendText("2", true)));
+                            .to(() -> connection.get().sendText("2", true)));
                     return;
                 }
             }

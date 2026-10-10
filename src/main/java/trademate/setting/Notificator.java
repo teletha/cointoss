@@ -112,7 +112,7 @@ public class Notificator extends Preferences {
 
                     // to LINE
                     if (onLine.is(true)) {
-                        Network.line(stripedTitle, stripedMessage, notificator.lineAccessToken.v).to(I.NoOP);
+                        Network.line(stripedTitle, stripedMessage, notificator.lineAccessToken.get()).to(I.NoOP);
                     }
                 }
             }

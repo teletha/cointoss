@@ -79,7 +79,7 @@ public class OrderBook implements Listener {
     }
 
     public final Num bestSize() {
-        return Num.of(Primitives.roundDecimal(best.v.size, scaleTarget));
+        return Num.of(Primitives.roundDecimal(best.get().size, scaleTarget));
     }
 
     /**
@@ -287,7 +287,7 @@ public class OrderBook implements Listener {
      * @return A predicted price.
      */
     public final Num predictTakingPrice(Variable<Num> size) {
-        return predictTakingPrice(size.v);
+        return predictTakingPrice(size.get());
     }
 
     /**
@@ -335,7 +335,7 @@ public class OrderBook implements Listener {
      * @return A computed best price.
      */
     public final Num computeBestPrice(Num diff) {
-        return computeBestPrice(best.v.price, Num.ZERO, diff);
+        return computeBestPrice(best.get().price, Num.ZERO, diff);
     }
 
     /**
@@ -346,7 +346,7 @@ public class OrderBook implements Listener {
      * @return A computed best price.
      */
     public final Num computeBestPrice(Num threshold, Num diff) {
-        return computeBestPrice(best.v.price, threshold, diff);
+        return computeBestPrice(best.get().price, threshold, diff);
     }
 
     /**

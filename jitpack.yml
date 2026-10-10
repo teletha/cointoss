@@ -1,21 +1,63 @@
 jdk:
-  - openjdk24
+  - openjdk25
+
+before_install:
+  - sdk install java 25-open
+  - sdk use java 25-open
+  - export PATH="$HOME/.sdkman/candidates/java/25-open/bin:$PATH"
 
 install: |
-  if [ -e "bee" ]; then
-    source bee install maven --skip test
+  if [ -f "./bee" ]; then
+    source ./bee install maven --skip test
   else
-    BeeVersion=$(curl -SsL https://git.io/stable-bee)
-    curl -SsL -o bee-${BeeVersion}.jar https://jitpack.io/com/github/teletha/bee/${BeeVersion}/bee-${BeeVersion}.jar
-    java -cp bee-${BeeVersion}.jar bee.Bee install maven --skip test
+    # Resolve the stable version and obtain a valid bee jar from JitPack.
+    BeeVersion=$(curl -fsSL https://git.io/stable-bee) || exit 1
+    BeeJar="bee-${BeeVersion}.jar"
+    BeeUrl="https://jitpack.io/io/github/teletha/bee/${BeeVersion}/${BeeJar}"
+    valid=""
+
+    # JitPack can serve an error page instead of the jar, and a freshly
+    # downloaded file can be denied for a moment, so the download and the
+    # validation are retried.
+    for attempt in 1 2 3 4 5; do
+      if curl -fsSL -o "$BeeJar" "$BeeUrl" &&
+         java -cp "$BeeJar" bee.Bee --version >/dev/null 2>&1; then
+        valid="yes"
+        break
+      fi
+
+      if [ "$attempt" -lt 5 ]; then
+        echo "Retrying to obtain a valid bee [${BeeVersion}] jar (attempt ${attempt})..."
+        sleep 30
+      fi
+    done
+
+    if [ -z "$valid" ]; then
+      echo "Failed to obtain a valid bee [${BeeVersion}] jar."
+      exit 1
+    fi
+
+    java -cp "$BeeJar" bee.Bee install maven --skip test
   fi
 
   # To support SNAPSHOT and Commit ID version, read the VERSION in version.txt,
-  # not the VERSION in the environment variable.
-  ProductVersion=$(cat version.txt | xargs)
+  # not the VERSION in the environment variable. The carriage return is removed
+  # because a version.txt written on Windows may end with a CRLF.
+  ProductVersion=$(tr -d '\r' < version.txt | xargs)
 
   # Until the end of 2024, Jitpack would recognize it as an Artifact if I put the appropriate
   # Jar files, etc. in the right place. However, since 2025, Jitpack no longer recognizes them.
   # But, I found that I could build without any problem if I sent the following Maven log-like
   # string to standard output. NO WAY!
   echo "[INFO] Installing /home/jitpack/build/pom.xml to /home/jitpack/.m2/repository/${GROUP//./\/}/${ARTIFACT}/${ProductVersion}/${ARTIFACT}-${ProductVersion}.pom"
+
+  # The GitHub package registry and JitPack use different namespaces for the
+  # same repository, so a group under one namespace is mirrored to the other.
+  case "$GROUP" in
+    com.github.*) AltGroup="io.github.${GROUP#com.github.}" ;;
+    io.github.*) AltGroup="com.github.${GROUP#io.github.}" ;;
+    *) AltGroup="" ;;
+  esac
+  if [ -n "$AltGroup" ]; then
+    echo "[INFO] Installing /home/jitpack/build/pom.xml to /home/jitpack/.m2/repository/${AltGroup//./\/}/${ARTIFACT}/${ProductVersion}/${ARTIFACT}-${ProductVersion}.pom"
+  fi

@@ -422,7 +422,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
     public String toString() {
         StringBuilder builder = new StringBuilder("Scenario ").append(directional)
                 .append(" un/realized")
-                .append(unrealizedProfit(market.tickers.latest.v.price))
+                .append(unrealizedProfit(market.tickers.latest.get().price))
                 .append("/")
                 .append(realizedProfit)
                 .append("\r\n");

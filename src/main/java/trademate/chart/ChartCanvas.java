@@ -19,17 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -44,6 +33,16 @@ import cointoss.util.Chrono;
 import cointoss.util.DateRange;
 import hypatia.Num;
 import hypatia.Primitives;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -342,11 +341,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double max = y + 4;
 
         // move the start position forward for visual consistency
-        long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+        long sec = (long) x + chart.ticker.get().span.duration.toSeconds() / 2;
 
         // estimate visible range
         long start = (long) axisX.computeVisibleMinValue();
-        int index = (int) ((sec - start) / chart.ticker.v.span.seconds);
+        int index = (int) ((sec - start) / chart.ticker.get().span.seconds);
 
         return I.signal(plotters).flatIterable(p -> p.lines).take(chart -> {
             double value = chart.valueY.get(index);
@@ -364,9 +363,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double x = axisX.getValueForPosition(e.getX());
 
         // move the start position forward for visual consistency
-        long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+        long sec = (long) x + chart.ticker.get().span.duration.toSeconds() / 2;
 
-        return chart.ticker.v.ticks.at(sec);
+        return chart.ticker.get().ticks.at(sec);
     }
 
     /**
@@ -470,7 +469,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 long sec = (long) x + ticker.span.duration.toSeconds() / 2;
 
                 // update upper info
-                Tick tick = chart.ticker.v.ticks.at(sec);
+                Tick tick = chart.ticker.get().ticks.at(sec);
 
                 if (tick != null) {
                     drawChartInfo(tick);
@@ -546,7 +545,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double upperPrice = axisY.getValueForPosition(startY);
         double lowerPrice = axisY.getValueForPosition(endY);
 
-        int scale = chart.market.v.service.setting.base.scale;
+        int scale = chart.market.get().service.setting.base.scale;
         double textX = endX - 40;
         double lineY = -12;
         gc.setStroke(Color.WHITESMOKE);
@@ -812,7 +811,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         GraphicsContext gc = chartInfo.clear().getGraphicsContext2D();
         gc.setFont(InfoFont);
 
-        int base = chart.market.v.service.setting.base.scale;
+        int base = chart.market.get().service.setting.base.scale;
         String date = Chrono.systemByMills(tick.openTime() * 1000).format(Chrono.DateTime);
         String open = CommonText.OpenPrice + " " + Primitives.roundString(tick.openPrice(), base);
         String high = CommonText.HighPrice + " " + Primitives.roundString(tick.highPrice(), base);
@@ -831,7 +830,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         int x = 0;
         Object origin = null;
         for (Plotter plotter : plotters) {
-            boolean visible = registry.globalSetting(plotter.origin).visible.v;
+            boolean visible = registry.globalSetting(plotter.origin).visible.get();
 
             if (origin != plotter.origin) {
                 y += chartInfoHeight;
@@ -842,7 +841,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 x += chartInfoTitle + chartInfoHorizontalGap;
             }
             for (LineChart chart : plotter.lines) {
-                String name = chart.indicator.name.v;
+                String name = chart.indicator.name.get();
                 if (!name.isEmpty()) name = name.concat(" ");
 
                 gc.setFill(visible && chart.visible ? chart.style.color() : chart.style.color().deriveColor(0, 1, 1, 0.4));

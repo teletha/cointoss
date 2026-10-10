@@ -166,7 +166,7 @@ public class Chart extends Region {
         Span span;
 
         if (chart.ticker.isPresent()) {
-            span = chart.ticker.v.span;
+            span = chart.ticker.get().span;
         } else if (1 < duration / 86400 /* 60x60x24 */) {
             span = Span.Day;
         } else if (1 < duration / 3600 /* 60x60 */) {
@@ -178,7 +178,7 @@ public class Chart extends Region {
         }
 
         if (chart.market.isPresent()) {
-            Ticker ticker = chart.market.v.tickers.on(span);
+            Ticker ticker = chart.market.get().tickers.on(span);
             ticker.ticks.query(start, end).to(tick -> {
                 double high = tick.highPrice();
                 double low = tick.lowPrice();

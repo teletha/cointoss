@@ -10,13 +10,12 @@
 package trademate.chart;
 
 import javafx.scene.paint.Color;
-
 import kiss.Variable;
 
 public record LineStyle(Color color, double width, double[] dash) {
 
     public LineStyle(Variable<Color> color) {
-        this(color.v);
+        this(color.get());
     }
 
     public LineStyle(Color color) {

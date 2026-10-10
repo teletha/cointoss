@@ -129,7 +129,7 @@ public class NotificatorSetting extends View {
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken).masking(true);
         lineTest.text(en("Send test message")).when(User.Action, () -> {
-            Network.line(en("LINE Access Token Test"), en("The specified token is valid."), notificator.lineAccessToken.v).to(e -> {
+            Network.line(en("LINE Access Token Test"), en("The specified token is valid."), notificator.lineAccessToken.get()).to(e -> {
                 lineAccessToken.decorateBy(Icon.Success);
             }, e -> {
                 e.printStackTrace();

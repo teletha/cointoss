@@ -1,0 +1,6 @@
+# Normalize the text files to LF so that the generated files and the CI agree.
+* text=auto eol=lf
+
+# The Windows batch and command files keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf

@@ -165,7 +165,7 @@ public interface TradingExit extends Orientational<Direction> {
         Variable<Num> trailedPrice = Variable.of(entryPrice().minus(this, price.losscut));
 
         price.update.apply(market()).to(current -> {
-            Num trailing = Num.max(this, trailedPrice.v, current.minus(this, price.losscut));
+            Num trailing = Num.max(this, trailedPrice.get(), current.minus(this, price.losscut));
             trailedPrice.set(Num.min(this, trailing, max));
         });
 

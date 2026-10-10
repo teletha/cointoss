@@ -36,7 +36,7 @@ public abstract class AbstractNumberIndicator<N extends Number, Self extends Abs
      * @return A wrapped indicator.
      */
     public final Self ema(Variable<? extends Number> size) {
-        return ema(size.v.intValue());
+        return ema(size.get().intValue());
     }
 
     /**
@@ -54,7 +54,7 @@ public abstract class AbstractNumberIndicator<N extends Number, Self extends Abs
      * @return A wrapped indicator.
      */
     public final Self mma(Variable<? extends Number> size) {
-        return mma(size.v.intValue());
+        return mma(size.get().intValue());
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class AbstractNumberIndicator<N extends Number, Self extends Abs
      * @return A wrapped indicator.
      */
     public final Self sma(Variable<? extends Number> size) {
-        return sma(size.v.intValue());
+        return sma(size.get().intValue());
     }
 
     /**
@@ -90,7 +90,7 @@ public abstract class AbstractNumberIndicator<N extends Number, Self extends Abs
      * @return A wrapped indicator.
      */
     public final Self wma(Variable<? extends Number> size) {
-        return wma(size.v.intValue());
+        return wma(size.get().intValue());
     }
 
     /**

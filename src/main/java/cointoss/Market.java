@@ -274,7 +274,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Signal<Execution> signalByPrice(Num price) {
-        if (tickers.latest.v.price.isLessThan(price)) {
+        if (tickers.latest.get().price.isLessThan(price)) {
             return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
         } else {
             return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);

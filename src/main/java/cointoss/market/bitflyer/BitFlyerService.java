@@ -541,11 +541,11 @@ public class BitFlyerService extends MarketService {
             String query = u.getQuery();
             if (query != null) path = path + "?" + query;
             String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-            String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
+            String sign = Hashing.hmacSha256(account.apiSecret.get().getBytes())
                     .hashString(timestamp + method + path + bodyText, StandardCharsets.UTF_8)
                     .toString();
 
-            builder = builder.header("ACCESS-KEY", account.apiKey.v)
+            builder = builder.header("ACCESS-KEY", account.apiKey.get())
                     .header("ACCESS-TIMESTAMP", timestamp)
                     .header("ACCESS-SIGN", sign)
                     .header("Content-Type", "application/json");
@@ -845,11 +845,11 @@ public class BitFlyerService extends MarketService {
         private Auth() {
             long timestamp = Chrono.utcNow().toEpochSecond();
             String nonce = RandomStringUtils.secure().nextNumeric(16);
-            String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
+            String sign = Hashing.hmacSha256(account.apiSecret.get().getBytes())
                     .hashString(timestamp + nonce, StandardCharsets.UTF_8)
                     .toString();
 
-            params.api_key = account.apiKey.v;
+            params.api_key = account.apiKey.get();
             params.timestamp = timestamp;
             params.nonce = nonce;
             params.signature = sign;

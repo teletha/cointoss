@@ -233,7 +233,7 @@ class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
          * Toggle visibility.
          */
         public void toggleVisible() {
-            visible.set(!visible.v);
+            visible.set(!visible.get());
         }
     }
 }

@@ -1,0 +1,58 @@
+project:
+  name: cointoss
+  # Rewritten by the release workflow to the released version, so the committed
+  # default is only a placeholder.
+  version: '0.0.0'
+  java:
+    groupId: io.github.teletha
+  links:
+    homepage: https://github.com/teletha/cointoss
+release:
+  github:
+    owner: teletha
+    name: cointoss
+    tagName: '{{projectVersion}}'
+    # The release title. The JReleaser default is "Release {{tagName}}", which
+    # reads as "Release 0.81.1". Use the product name and the version instead,
+    # such as "bee 0.81.1".
+    releaseName: '{{projectName}} {{projectVersion}}'
+    # The tag is created by the release task, so JReleaser creates only the GitHub
+    # Release. The changelog is generated from the conventional commits. An existing
+    # release is updated, so a failed release can be retried.
+    skipTag: true
+    skipRelease: false
+    overwrite: true
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      # Merge commits and commits which do not follow the conventional format are
+      # not shown.
+      skipMergeCommits: true
+      contributors:
+        enabled: false
+      hide:
+        uncategorized: true
+        categories: [merge]
+files:
+  globs:
+    - pattern: target/cointoss-{{projectVersion}}.jar
+    - pattern: target/cointoss-{{projectVersion}}-sources.jar
+    - pattern: target/cointoss-{{projectVersion}}-javadoc.jar
+signing:
+  pgp:
+    active: RELEASE
+    armored: true
+    # The key material is injected through JRELEASER_GPG_SECRET_KEY,
+    # JRELEASER_GPG_PUBLIC_KEY and JRELEASER_GPG_PASSPHRASE.
+deploy:
+  maven:
+    mavenCentral:
+      central:
+        active: RELEASE
+        url: https://central.sonatype.com/api/v1/publisher
+        # The directory prepared by the release workflow, in Maven repository layout.
+        stagingRepositories:
+          - target/staging-deploy
+        # The registered namespace of the Sonatype Central Portal account.
+        namespace: io.github.teletha
+        applyMavenCentralRules: true

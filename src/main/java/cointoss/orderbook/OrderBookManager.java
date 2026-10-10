@@ -104,7 +104,7 @@ public class OrderBookManager implements Disposable {
         if (shorts.best.isAbsent() || longs.best.isAbsent()) {
             return 0;
         } else {
-            return shorts.best.v.price - longs.best.v.price;
+            return shorts.best.get().price - longs.best.get().price;
         }
     }
 

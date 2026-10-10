@@ -121,7 +121,7 @@ public class TickerManager implements Disposable {
             }
         } else {
             // update tickers
-            update(tickers[0], e, e.price, e.price.compareTo(latest.v.price));
+            update(tickers[0], e, e.price, e.price.compareTo(latest.get().price));
         }
 
         // update total related values

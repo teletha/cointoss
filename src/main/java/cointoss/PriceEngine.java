@@ -79,7 +79,7 @@ public class PriceEngine {
      */
     public void register(Variable<Num> price, Orientational orientational, WiseRunnable action) {
         if (orientational.isPositive()) {
-            register(buyer, price.v, action);
+            register(buyer, price.get(), action);
             if (!price.isFixed()) {
                 price.observing().diff().buffer(2).to(list -> {
                     unregister(buyer, list.get(0), action);
@@ -87,7 +87,7 @@ public class PriceEngine {
                 });
             }
         } else {
-            register(seller, price.v, action);
+            register(seller, price.get(), action);
             if (!price.isFixed()) {
                 price.observing().diff().buffer(2).to(list -> {
                     unregister(seller, list.get(0), action);

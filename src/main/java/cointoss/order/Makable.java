@@ -61,7 +61,7 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable make(Variable<Num> price) {
-        return make(price.v);
+        return make(price.get());
     }
 
     /**

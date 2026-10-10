@@ -9,10 +9,9 @@
  */
 package trademate.chart.line;
 
-import javafx.scene.input.MouseEvent;
-
 import cointoss.MarketService;
 import hypatia.Num;
+import javafx.scene.input.MouseEvent;
 import kiss.I;
 import kiss.Variable;
 import trademate.chart.Axis.TickLable;
@@ -39,13 +38,13 @@ public class PriceNotify extends LineMark {
         double position = e.getY();
 
         findLabelByPosition(position).to(this::removeLabel, () -> {
-            Num price = Num.of(canvas.axisY.getValueForPosition(position)).scale(canvas.chart.market.v.service.setting.base.scale);
-            TickLable label = createLabel(price, ALERT.v);
+            Num price = Num.of(canvas.axisY.getValueForPosition(position)).scale(canvas.chart.market.get().service.setting.base.scale);
+            TickLable label = createLabel(price, ALERT.get());
 
-            label.add(canvas.chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
+            label.add(canvas.chart.market.get().signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 removeLabel(label);
 
-                MarketService service = canvas.chart.market.v.service;
+                MarketService service = canvas.chart.market.get().service;
                 Num p = exe.price.scale(service.setting.target.scale);
                 String title = "🔊  " + service.id + " " + p;
                 I.make(Notificator.class).priceSignal.notify(title, I.translate("The specified price ({0}) has been reached.", p));

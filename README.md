@@ -1,7 +1,7 @@
 <p align="center">
-    <a href="https://docs.oracle.com/en/java/javase/24/"><img src="https://img.shields.io/badge/Java-Release%2024-green"/></a>
+    <a href="https://docs.oracle.com/en/java/javase/25/"><img src="https://img.shields.io/badge/Java-Release%2025-green"/></a>
     <span>&nbsp;</span>
-    <a href="https://jitpack.io/#teletha/cointoss"><img src="https://img.shields.io/jitpack/v/github/teletha/cointoss?label=Repository&color=green"></a>
+    <a href="https://jitpack.io/#io.github.teletha/cointoss"><img src="https://img.shields.io/jitpack/version/io.github.teletha/cointoss?label=Repository&color=green"></a>
     <span>&nbsp;</span>
     <a href="https://teletha.github.io/cointoss"><img src="https://img.shields.io/website.svg?down_color=red&down_message=CLOSE&label=Official%20Site&up_color=green&up_message=OPEN&url=https%3A%2F%2Fteletha.github.io%2Fcointoss"></a>
 </p>
@@ -13,7 +13,7 @@
 
 
 ## Prerequisites
-Cointoss runs on all major operating systems and requires only [Java version 24](https://docs.oracle.com/en/java/javase/24/) or later to run.
+Cointoss runs on all major operating systems and requires only [Java version 25](https://docs.oracle.com/en/java/javase/25/) or later to run.
 To check, please run `java -version` on your terminal.
 <p align="right"><a href="#top">back to top</a></p>
 
@@ -30,7 +30,7 @@ Add JitPack repository at the end of repositories element in your build.xml:
 Add it into in the dependencies element like so:
 ```xml
 <dependency>
-    <groupId>com.github.teletha</groupId>
+    <groupId>io.github.teletha</groupId>
     <artifactId>cointoss</artifactId>
     <version>1.10.0</version>
 </dependency>
@@ -45,7 +45,7 @@ repositories {
 Add it into the dependencies section like so:
 ```gradle
 dependencies {
-    implementation 'com.github.teletha:cointoss:1.10.0'
+    implementation 'io.github.teletha:cointoss:1.10.0'
 }
 ```
 #### [SBT](https://www.scala-sbt.org/)
@@ -55,7 +55,7 @@ resolvers += "jitpack" at "https://jitpack.io"
 ```
 Add it into the libraryDependencies section like so:
 ```scala
-libraryDependencies += "com.github.teletha" % "cointoss" % "1.10.0"
+libraryDependencies += "io.github.teletha" % "cointoss" % "1.10.0"
 ```
 #### [Leiningen](https://leiningen.org/)
 Add JitPack repository at the end of repositories in your project().clj:
@@ -64,12 +64,12 @@ Add JitPack repository at the end of repositories in your project().clj:
 ```
 Add it into the dependencies section like so:
 ```clj
-:dependencies [[com.github.teletha/cointoss "1.10.0"]]
+:dependencies [[io.github.teletha/cointoss "1.10.0"]]
 ```
 #### [Bee](https://teletha.github.io/bee)
 Add it into your project definition class like so:
 ```java
-require("com.github.teletha", "cointoss", "1.10.0");
+require("io.github.teletha", "cointoss", "1.10.0");
 ```
 <p align="right"><a href="#top">back to top</a></p>
 
@@ -98,74 +98,76 @@ If you think something might be a bug, but you're not sure, ask on StackOverflow
 ## Dependency
 Cointoss depends on the following products on runtime.
 * [BorderlessSceneFX-1.0.0](https://mvnrepository.com/artifact/com.catwithawand/BorderlessSceneFX/1.0.0)
-* [aircompressor-2.0.2](https://mvnrepository.com/artifact/io.airlift/aircompressor/2.0.2)
-* [altfx-1.6.0](https://mvnrepository.com/artifact/com.github.teletha/altfx/1.6.0)
-* [arrow-format-18.2.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-format/18.2.0)
-* [arrow-memory-core-18.2.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-core/18.2.0)
-* [arrow-memory-netty-18.2.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-netty/18.2.0)
-* [arrow-memory-netty-buffer-patch-18.2.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-netty-buffer-patch/18.2.0)
-* [arrow-vector-18.2.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-vector/18.2.0)
-* [asm-9.7.1](https://mvnrepository.com/artifact/org.ow2.asm/asm/9.7.1)
-* [commons-codec-1.18.0](https://mvnrepository.com/artifact/commons-codec/commons-codec/1.18.0)
-* [commons-lang3-3.17.0](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.17.0)
-* [commons-net-3.11.1](https://mvnrepository.com/artifact/commons-net/commons-net/3.11.1)
+* [aircompressor-2.0.3](https://mvnrepository.com/artifact/io.airlift/aircompressor/2.0.3)
+* [altfx-1.6.2](https://mvnrepository.com/artifact/io.github.teletha/altfx/1.6.2)
+* [arrow-format-19.0.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-format/19.0.0)
+* [arrow-memory-core-19.0.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-core/19.0.0)
+* [arrow-memory-netty-19.0.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-netty/19.0.0)
+* [arrow-memory-netty-buffer-patch-19.0.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-netty-buffer-patch/19.0.0)
+* [arrow-vector-19.0.0](https://mvnrepository.com/artifact/org.apache.arrow/arrow-vector/19.0.0)
+* [asm-9.11](https://mvnrepository.com/artifact/org.ow2.asm/asm/9.11)
+* [commons-codec-1.21.0](https://mvnrepository.com/artifact/commons-codec/commons-codec/1.21.0)
+* [commons-io-2.21.0](https://mvnrepository.com/artifact/commons-io/commons-io/2.21.0)
+* [commons-lang3-3.21.0](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.21.0)
+* [commons-net-3.13.0](https://mvnrepository.com/artifact/commons-net/commons-net/3.13.0)
 * [commons-pool-1.6](https://mvnrepository.com/artifact/commons-pool/commons-pool/1.6)
-* [conjure-1.2.1](https://mvnrepository.com/artifact/com.github.teletha/conjure/1.2.1)
-* [controlsfx-11.2.2](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.2)
-* [duckdb_jdbc-1.2.1](https://mvnrepository.com/artifact/org.duckdb/duckdb_jdbc/1.2.1)
+* [conjure-1.2.2](https://mvnrepository.com/artifact/io.github.teletha/conjure/1.2.2)
+* [controlsfx-11.2.5](https://mvnrepository.com/artifact/org.controlsfx/controlsfx/11.2.5)
+* [duckdb_jdbc-1.5.6.0](https://mvnrepository.com/artifact/org.duckdb/duckdb_jdbc/1.5.6.0)
 * [failureaccess-1.0.3](https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.3)
-* [flatbuffers-java-24.3.25](https://mvnrepository.com/artifact/com.google.flatbuffers/flatbuffers-java/24.3.25)
-* [guava-33.4.6-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.4.6-jre)
-* [hypatia-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/hypatia/1.1.0)
-* [ikonli-core-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-core/12.3.1)
-* [ikonli-fontawesome5-pack-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome5-pack/12.3.1)
-* [ikonli-javafx-12.3.1](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-javafx/12.3.1)
-* [jackson-annotations-2.18.2](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.18.2)
-* [jackson-core-2.18.2](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core/2.18.2)
-* [jackson-databind-2.18.2](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.18.2)
-* [jackson-datatype-jsr310-2.18.2](https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.18.2)
-* [javafx-base-25-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-base/25-ea+8)
-* [javafx-base-25-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-base/25-ea+8)
-* [javafx-controls-25-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/25-ea+8)
-* [javafx-controls-25-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/25-ea+8)
-* [javafx-graphics-25-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/25-ea+8)
-* [javafx-graphics-25-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/25-ea+8)
-* [javafx-media-25-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-media/25-ea+8)
-* [javafx-media-25-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-media/25-ea+8)
-* [javafx-web-25-ea+8](https://mvnrepository.com/artifact/org.openjfx/javafx-web/25-ea+8)
-* [javafx-web-25-ea+8-win](https://mvnrepository.com/artifact/org.openjfx/javafx-web/25-ea+8)
+* [flatbuffers-java-25.2.10](https://mvnrepository.com/artifact/com.google.flatbuffers/flatbuffers-java/25.2.10)
+* [guava-33.7.2-jre](https://mvnrepository.com/artifact/com.google.guava/guava/33.7.2-jre)
+* [hypatia-1.1.1](https://mvnrepository.com/artifact/io.github.teletha/hypatia/1.1.1)
+* [ikonli-core-12.4.0](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-core/12.4.0)
+* [ikonli-fontawesome5-pack-12.4.0](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome5-pack/12.4.0)
+* [ikonli-javafx-12.4.0](https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-javafx/12.4.0)
+* [jackson-annotations-2.21](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.21)
+* [jackson-core-2.21.0](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core/2.21.0)
+* [jackson-databind-2.21.0](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.21.0)
+* [jackson-datatype-jsr310-2.21.0](https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.21.0)
+* [javafx-base-28-ea+12](https://mvnrepository.com/artifact/org.openjfx/javafx-base/28-ea+12)
+* [javafx-base-28-ea+12-win](https://mvnrepository.com/artifact/org.openjfx/javafx-base/28-ea+12)
+* [javafx-controls-28-ea+12](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/28-ea+12)
+* [javafx-controls-28-ea+12-win](https://mvnrepository.com/artifact/org.openjfx/javafx-controls/28-ea+12)
+* [javafx-graphics-28-ea+12](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/28-ea+12)
+* [javafx-graphics-28-ea+12-win](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/28-ea+12)
+* [javafx-media-28-ea+12](https://mvnrepository.com/artifact/org.openjfx/javafx-media/28-ea+12)
+* [javafx-media-28-ea+12-win](https://mvnrepository.com/artifact/org.openjfx/javafx-media/28-ea+12)
+* [javafx-web-28-ea+12](https://mvnrepository.com/artifact/org.openjfx/javafx-web/28-ea+12)
+* [javafx-web-28-ea+12-win](https://mvnrepository.com/artifact/org.openjfx/javafx-web/28-ea+12)
 * [javax.annotation-api-1.3.2](https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api/1.3.2)
 * [jna-5.12.1](https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.12.1)
 * [jna-platform-5.12.1](https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.12.1)
-* [jspecify-1.0.0](https://mvnrepository.com/artifact/org.jspecify/jspecify/1.0.0)
-* [lycoris-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/lycoris/1.1.0)
-* [netty-buffer-4.1.117.Final](https://mvnrepository.com/artifact/io.netty/netty-buffer/4.1.117.Final)
-* [netty-common-4.1.117.Final](https://mvnrepository.com/artifact/io.netty/netty-common/4.1.117.Final)
+* [jspecify-1.0.1](https://mvnrepository.com/artifact/org.jspecify/jspecify/1.0.1)
+* [jts-core-1.20.0](https://mvnrepository.com/artifact/org.locationtech.jts/jts-core/1.20.0)
+* [lycoris-1.1.1](https://mvnrepository.com/artifact/io.github.teletha/lycoris/1.1.1)
+* [netty-buffer-4.2.9.Final](https://mvnrepository.com/artifact/io.netty/netty-buffer/4.2.9.Final)
+* [netty-common-4.2.9.Final](https://mvnrepository.com/artifact/io.netty/netty-common/4.2.9.Final)
 * [openjfx-monocle-jdk-12.0.1+2](https://mvnrepository.com/artifact/org.testfx/openjfx-monocle/jdk-12.0.1+2)
-* [parquet-arrow-1.15.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-arrow/1.15.1)
-* [parquet-column-1.15.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-column/1.15.1)
-* [parquet-common-1.15.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-common/1.15.1)
-* [parquet-encoding-1.15.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-encoding/1.15.1)
-* [parquet-format-structures-1.15.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-format-structures/1.15.1)
-* [parquet-hadoop-1.15.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop/1.15.1)
-* [parquet-jackson-1.15.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-jackson/1.15.1)
-* [primavera-1.1.0](https://mvnrepository.com/artifact/com.github.teletha/primavera/1.1.0)
-* [psychopath-2.1.0](https://mvnrepository.com/artifact/com.github.teletha/psychopath/2.1.0)
-* [reincarnation-1.9.0](https://mvnrepository.com/artifact/com.github.teletha/reincarnation/1.9.0)
-* [sinobu-4.6.1](https://mvnrepository.com/artifact/com.github.teletha/sinobu/4.6.1)
+* [parquet-arrow-1.18.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-arrow/1.18.1)
+* [parquet-column-1.18.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-column/1.18.1)
+* [parquet-common-1.18.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-common/1.18.1)
+* [parquet-encoding-1.18.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-encoding/1.18.1)
+* [parquet-format-structures-1.18.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-format-structures/1.18.1)
+* [parquet-hadoop-1.18.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop/1.18.1)
+* [parquet-jackson-1.18.1](https://mvnrepository.com/artifact/org.apache.parquet/parquet-jackson/1.18.1)
+* [primavera-1.1.1](https://mvnrepository.com/artifact/io.github.teletha/primavera/1.1.1)
+* [psychopath-2.3.0](https://mvnrepository.com/artifact/io.github.teletha/psychopath/2.3.0)
+* [reincarnation-1.10.2](https://mvnrepository.com/artifact/io.github.teletha/reincarnation/1.10.2)
+* [sinobu-4.14.0](https://mvnrepository.com/artifact/io.github.teletha/sinobu/4.14.0)
 * [slf4j-api-2.1.0-alpha1](https://mvnrepository.com/artifact/org.slf4j/slf4j-api/2.1.0-alpha1)
-* [snappy-java-1.1.10.7](https://mvnrepository.com/artifact/org.xerial.snappy/snappy-java/1.1.10.7)
-* [sqlite-jdbc-3.49.1.0](https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.49.1.0)
-* [stylist-1.14.0](https://mvnrepository.com/artifact/com.github.teletha/stylist/1.14.0)
-* [typewriter-1.13.0](https://mvnrepository.com/artifact/com.github.teletha/typewriter/1.13.0)
+* [snappy-java-1.1.10.8](https://mvnrepository.com/artifact/org.xerial.snappy/snappy-java/1.1.10.8)
+* [sqlite-jdbc-3.53.4.0](https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.53.4.0)
+* [stylist-1.16.1](https://mvnrepository.com/artifact/io.github.teletha/stylist/1.16.1)
+* [typewriter-1.14.1](https://mvnrepository.com/artifact/io.github.teletha/typewriter/1.14.1)
 * [univocity-parsers-2.9.1](https://mvnrepository.com/artifact/com.univocity/univocity-parsers/2.9.1)
-* [viewtify-2.34.0](https://mvnrepository.com/artifact/com.github.teletha/viewtify/2.34.0)
-* [zstd-jni-1.5.7-2](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.7-2)
+* [viewtify-2.35.1](https://mvnrepository.com/artifact/io.github.teletha/viewtify/2.35.1)
+* [zstd-jni-1.5.7-22](https://mvnrepository.com/artifact/com.github.luben/zstd-jni/1.5.7-22)
 <p align="right"><a href="#top">back to top</a></p>
 
 
 ## License
-Copyright (C) 2025 The COINTOSS Development Team
+Copyright (C) 2026 The COINTOSS Development Team
 
 MIT License
 

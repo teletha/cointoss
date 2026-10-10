@@ -150,7 +150,7 @@ public enum Span {
      */
     @Override
     public String toString() {
-        return amount + unitName.v;
+        return amount + unitName.get();
     }
 
     /**

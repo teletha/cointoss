@@ -65,9 +65,9 @@ public enum CandleType {
         double close = tick.closePrice();
 
         if (open < close) {
-            return ChartTheme.$.buy.v;
+            return ChartTheme.$.buy.get();
         } else if (open > close) {
-            return ChartTheme.$.sell.v;
+            return ChartTheme.$.sell.get();
         } else {
             return CandleType.Same;
         }
@@ -78,9 +78,9 @@ public enum CandleType {
         double sell = tick.shortVolume();
 
         if (buy > sell) {
-            return ChartTheme.$.buy.v;
+            return ChartTheme.$.buy.get();
         } else if (buy < sell) {
-            return ChartTheme.$.sell.v;
+            return ChartTheme.$.sell.get();
         } else {
             return CandleType.Same;
         }
@@ -94,21 +94,21 @@ public enum CandleType {
 
         if (open < close) {
             if (buy >= sell) {
-                return ChartTheme.$.buy.v;
+                return ChartTheme.$.buy.get();
             } else {
-                return CandleType.BuyT.v;
+                return CandleType.BuyT.get();
             }
         } else if (open > close) {
             if (buy >= sell) {
-                return CandleType.SellT.v;
+                return CandleType.SellT.get();
             } else {
-                return ChartTheme.$.sell.v;
+                return ChartTheme.$.sell.get();
             }
         } else {
             if (buy >= sell) {
-                return ChartTheme.$.buy.v;
+                return ChartTheme.$.buy.get();
             } else {
-                return ChartTheme.$.sell.v;
+                return ChartTheme.$.sell.get();
             }
         }
     }
@@ -120,9 +120,9 @@ public enum CandleType {
         double sell = tick.shortVolume();
 
         if (open < close) {
-            return ChartTheme.$.buy.v.deriveColor(0, buy / sell, 1, 1);
+            return ChartTheme.$.buy.get().deriveColor(0, buy / sell, 1, 1);
         } else if (open > close) {
-            return ChartTheme.$.sell.v.deriveColor(0, sell / buy, 1, 1);
+            return ChartTheme.$.sell.get().deriveColor(0, sell / buy, 1, 1);
         } else {
             return CandleType.Same;
         }

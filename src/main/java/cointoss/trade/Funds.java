@@ -37,6 +37,6 @@ public class Funds {
      * @return
      */
     public Num riskAsserts() {
-        return assets.v.multiply(acceptableRiskAssetsRatio.v);
+        return assets.get().multiply(acceptableRiskAssetsRatio.get());
     }
 }
