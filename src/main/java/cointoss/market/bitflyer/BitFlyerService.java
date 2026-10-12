@@ -287,6 +287,16 @@ public class BitFlyerService extends MarketService {
     public Signal<Execution> executionsAfter(long startId, long endId) {
         String[] previous = new String[] {"", ""};
 
+        System.out
+                .println(API.Public + "/v1/executions?product_code=" + marketName + "&count=" + executionMaxRequest + "&after=" + startId + "&before=" + endId);
+
+        if (marketName.equals("BTC_JPY") && endId == 2643678988L) {
+            endId = 2651178988L;
+        }
+        if (marketName.equals("ETH_JPY") && endId == 2643678987L) {
+            endId = 2651678987L;
+        }
+
         return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + executionMaxRequest + "&after=" + startId + "&before=" + endId) //
                 .flatIterable(e -> e.find("*"))
                 .reverse()

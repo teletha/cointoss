@@ -188,14 +188,6 @@ public class HyperliquidService extends MarketService {
         });
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Hyperliquid.AI16Z.orderBookRealtimely().to(e -> {
-            System.out.println(e.bestBid());
-        });
-
-        Thread.sleep(1000 * 40);
-    }
-
     /**
      * Call rest API.
      * 
