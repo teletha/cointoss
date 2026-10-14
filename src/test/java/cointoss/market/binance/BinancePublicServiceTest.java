@@ -59,52 +59,73 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
     }
 
     /**
+     * A single bearish 1-minute kline.
+     */
+    private String kline() {
+        return """
+                [
+                  [
+                    1595393845045,
+                    "9349.96",
+                    "9350.00",
+                    "9349.00",
+                    "9349.50",
+                    "1.00000000",
+                    1595393905044,
+                    "9349.73",
+                    10,
+                    "0.50000000",
+                    "4674.86500000",
+                    "0"
+                  ]
+                ]
+                """;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     @Test
     public void executions() {
-        httpClient.onGet().doReturn("""
-                [
-                   {
-                     "a": 2,
-                     "p": "4261.48000000",
-                     "q": "0.07518300",
-                     "f": 2,
-                     "l": 2,
-                     "T": 1502942432322,
-                     "m": false,
-                     "M": true
-                   },
-                   {
-                     "a": 3,
-                     "p": "4280.56000000",
-                     "q": "0.02960000",
-                     "f": 3,
-                     "l": 3,
-                     "T": 1502942568879,
-                     "m": false,
-                     "M": true
-                   }
-                ]
-                """);
+        httpClient.onGet().doReturn(kline());
 
-        List<Execution> list = service.executionsAfter(1, 10).waitForTerminate().toList();
+        // Historical executions are generated from 1-minute klines.
+        long id = (1595393845045L + 60_000) * 10_000;
+        List<Execution> list = service.executionsBefore(id).waitForTerminate().toList();
+        assert list.size() == 4;
+
         Execution e = list.get(0);
-        assert e.id == 2;
+        assert e.id == 1595393845045L * 10_000;
         assert e.orientation == Direction.BUY;
-        assert e.price.is(4261.48);
-        assert e.size.is(0.075183);
-        assert e.date.isEqual(Chrono.utc(2017, 8, 17, 4, 00, 32, 322));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.price.is(9349.96);
+        assert e.size.is(0.25);
+        assert e.date.isEqual(Chrono.utc(2020, 7, 22, 4, 57, 25, 45));
+        assert e.consecutive == Execution.ConsecutivePseudoDifference;
 
         e = list.get(1);
-        assert e.id == 3;
+        assert e.id == 1595393860045L * 10_000;
+        assert e.orientation == Direction.SELL;
+        assert e.price.is(9350.00);
+        assert e.size.is(0.25);
+        assert e.date.isEqual(Chrono.utc(2020, 7, 22, 4, 57, 40, 45));
+        assert e.consecutive == Execution.ConsecutivePseudoDifference;
+
+        e = list.get(2);
+        assert e.id == 1595393875045L * 10_000;
         assert e.orientation == Direction.BUY;
-        assert e.price.is(4280.56);
-        assert e.size.is(0.0296);
-        assert e.date.isEqual(Chrono.utc(2017, 8, 17, 4, 2, 48, 879));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.price.is(9349.00);
+        assert e.size.is(0.25);
+        assert e.date.isEqual(Chrono.utc(2020, 7, 22, 4, 57, 55, 45));
+        assert e.consecutive == Execution.ConsecutivePseudoDifference;
+
+        e = list.get(3);
+        assert e.id == 1595393890045L * 10_000;
+        assert e.orientation == Direction.SELL;
+        assert e.price.is(9349.50);
+        assert e.size.is(0.25);
+        assert e.date.isEqual(Chrono.utc(2020, 7, 22, 4, 58, 10, 45));
+        assert e.consecutive == Execution.ConsecutivePseudoDifference;
     }
 
     /**
@@ -113,28 +134,15 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
     @Override
     @Test
     public void executionLatest() {
-        httpClient.onGet().doReturn("""
-                [
-                  {
-                    "a": 330337340,
-                    "p": "9349.96000000",
-                    "q": "0.16990500",
-                    "f": 359620557,
-                    "l": 359620557,
-                    "T": 1595393905045,
-                    "m": true,
-                    "M": true
-                  }
-                ]
-                """);
+        httpClient.onGet().doReturn(kline());
 
         Execution e = service.executionLatest().waitForTerminate().to().exact();
-        assert e.id == 330337340;
+        assert e.id == 1595393890045L * 10_000;
         assert e.orientation == Direction.SELL;
-        assert e.price.is(9349.96);
-        assert e.size.is(0.169905);
-        assert e.date.isEqual(Chrono.utc(2020, 7, 22, 4, 58, 25, 45));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.price.is(9349.5);
+        assert e.size.is(0.25);
+        assert e.date.isEqual(Chrono.utc(2020, 7, 22, 4, 58, 10, 45));
+        assert e.consecutive == Execution.ConsecutivePseudoDifference;
     }
 
     /**
@@ -154,7 +162,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
         assert list.size() == 3;
 
         Execution exe = list.get(0);
-        assert exe.id == 330377764;
+        assert exe.id == 1595401565277L * 10_000;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9331.91);
         assert exe.size.is(0.011601);
@@ -162,15 +170,15 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
         assert exe.consecutive == Execution.ConsecutiveDifference;
 
         exe = list.get(1);
-        assert exe.id == 330377765;
+        assert exe.id == 1595401565277L * 10_000 + 1;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9331.97);
         assert exe.size.is(0.001138);
         assert exe.date.isEqual(Chrono.utc(2020, 7, 22, 7, 6, 5, 277));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.consecutive == Execution.ConsecutiveSameBuyer;
 
         exe = list.get(2);
-        assert exe.id == 330377766;
+        assert exe.id == 1595401565279L * 10_000;
         assert exe.orientation == Direction.SELL;
         assert exe.price.is(9332.06);
         assert exe.size.is(0.006605);
@@ -210,7 +218,7 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
         assert list.size() == 1;
 
         Execution exe = list.get(0);
-        assert exe.id == 330377765;
+        assert exe.id == 1595401565277L * 10_000;
         assert exe.orientation == Direction.BUY;
         assert exe.price.is(9331.97);
         assert exe.size.is(0.001138);

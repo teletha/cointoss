@@ -23,7 +23,9 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.market.Exchange;
+import cointoss.market.TimestampBasedMarketServiceSupporter;
 import cointoss.orderbook.OrderBookChanges;
+import cointoss.ticker.Span;
 import cointoss.ticker.data.Liquidation;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
@@ -36,6 +38,9 @@ import kiss.JSON;
 import kiss.Signal;
 
 public class BinanceService extends MarketService {
+
+    /** The execution support. */
+    private static final TimestampBasedMarketServiceSupporter SUPPORT = new TimestampBasedMarketServiceSupporter();
 
     /** The API limit. */
     private static final RateLimiter Limit = RateLimiter.with.limit(900 /* 100 safe buffer */)
@@ -61,7 +66,8 @@ public class BinanceService extends MarketService {
     protected BinanceService(String marketName, MarketSetting setting) {
         super(setting.type.isDerivative() ? Exchange.BinanceF : Exchange.Binance, marketName, setting);
 
-        this.executionMaxRequest = 1000;
+        this.executionMinRequest = 4;
+        this.executionMaxRequest = 6000;
         this.isDelivery = setting.type.isDerivative() && setting.base.currency == Currency.USD;
     }
 
@@ -78,8 +84,15 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsAfter(long startId, long endId) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (startId + 1), 20).flatIterable(e -> e.find("*"))
-                .map(this::createExecution);
+        long startMS = SUPPORT.computeEpochTime(startId);
+
+        // Generate executions from 1-minute klines. Four pseudo executions are generated from a
+        // single candle, so request enough candles to satisfy the maximum number of executions,
+        // bounded by the klines API limit (1500 = 6000 executions in a single request).
+        long candles = Math.min(1500, Math.max(1, executionMaxRequest / 4));
+        long endMS = startMS + Span.Minute1.duration.toMillis() * candles;
+
+        return convertFromCandle(Span.Minute1, startMS, endMS);
     }
 
     /**
@@ -87,7 +100,9 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        return clientRealtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> createExecution(json.get("data")));
+        long[] context = new long[3];
+
+        return clientRealtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> createExecution(json.get("data"), context));
     }
 
     /**
@@ -95,7 +110,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1", 20).flatIterable(e -> e.find("*")).map(this::createExecution);
+        return SUPPORT.executionLatestByCandle(this::convertFromCandle);
     }
 
     /**
@@ -103,42 +118,74 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsBefore(long id) {
-        // Since the Binance API only provides a fromID parameter, subtract the ID by the maximum
-        // number of acquisitions. If that makes the specified ID a negative number, emulate the API
-        // by setting the ID to 0 and reduce the number of acquisitions.
-        long limit = executionMaxRequest;
-        long fromId = id - limit;
-        if (fromId < 0) {
-            limit += fromId;
-            fromId = 0;
+        // Since aggTrades is restricted to the recent 2 days by ID, historical executions are
+        // generated from 1-minute klines instead.
+        long endMS = SUPPORT.computeEpochTime(id);
+
+        // Four pseudo executions are generated from a single candle, so request enough candles to
+        // satisfy the maximum number of executions, bounded by the klines API limit (1500).
+        // The id is excluded afterwards, which may drop at most the last candle's executions.
+        long candles = Math.min(1500, executionMaxRequest / 4);
+        long startMS = Math.max(0, endMS - Span.Minute1.duration.toMillis() * candles);
+
+        return convertFromCandle(Span.Minute1, startMS, endMS).take(e -> e.id < id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> searchInitialExecution() {
+        return convertFromCandle(Span.Minute1, 0L, Chrono.currentTimeMills()).first();
+    }
+
+    /**
+     * Convert from candle to pseudo {@link Execution}s.
+     * 
+     * @param span A candle span.
+     * @param startMS A start time (epoch milliseconds).
+     * @param endMS An end time (epoch milliseconds).
+     * @return Pseudo executions.
+     */
+    private Signal<Execution> convertFromCandle(Span span, long startMS, long endMS) {
+        if (startMS >= endMS) {
+            return I.signal();
         }
 
-        return this.call("GET", "aggTrades?symbol=" + marketName + "&fromId=" + fromId + "&limit=" + limit, 20)
-                .flatIterable(e -> e.find("*"))
-                .map(this::createExecution);
+        ZonedDateTime now = Chrono.utcNow();
+        String path = setting.type.isSpot()
+                ? "klines?symbol=" + marketName + "&interval=" + span.text + "&startTime=" + startMS + "&endTime=" + endMS + "&limit=1500"
+                : "continuousKlines?pair=" + marketName + "&contractType=PERPETUAL&interval=" + span.text + "&startTime=" + startMS + "&endTime=" + endMS
+                        + "&limit=1500";
+
+        return call("GET", path, 20).flatIterable(root -> root.find("*")).flatIterable(json -> {
+            Num open = json.get(Num.class, "1");
+            Num high = json.get(Num.class, "2");
+            Num low = json.get(Num.class, "3");
+            Num close = json.get(Num.class, "4");
+            Num volume = json.get(Num.class, "5");
+            if (isDelivery) volume = volume.divide(close).scale(setting.target.scale);
+            long time = json.get(long.class, "0");
+
+            return SUPPORT.createExecutions(open, high, low, close, volume, time, span);
+        }).skip(e -> e.isAfter(now));
     }
 
     /**
      * Convert to {@link Execution}.
      * 
      * @param e
+     * @param context
      * @return
      */
-    private Execution createExecution(JSON e) {
-        long id = Long.parseLong(e.text("a"));
+    private Execution createExecution(JSON e, long[] context) {
         Direction side = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
         Num size = e.get(Num.class, "q");
         Num price = e.get(Num.class, "p");
         if (isDelivery) size = size.divide(price).scale(setting.target.scale);
         ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
-        e.has("ok", true);
 
-        return Execution.with.direction(side, size)
-                .id(id)
-                .price(price)
-                .date(date)
-                .consecutive(Execution.ConsecutiveDifference)
-                .delay(Execution.DelayInestimable);
+        return SUPPORT.createExecution(side, size, price, date, context);
     }
 
     /**

@@ -14,12 +14,12 @@ public class Project extends bee.api.Project {
     {
         product("io.github.teletha", "cointoss", ref("version.txt"));
 
-        require("com.github.teletha", "sinobu");
-        require("com.github.teletha", "viewtify", "2.34.0");
-        require("com.github.teletha", "typewriter");
-        require("com.github.teletha", "hypatia");
-        require("com.github.teletha", "icymanipulator").atAnnotation();
-        require("com.github.teletha", "antibug").atTest();
+        require("io.github.teletha", "sinobu");
+        require("io.github.teletha", "viewtify");
+        require("io.github.teletha", "typewriter");
+        require("io.github.teletha", "hypatia");
+        require("io.github.teletha", "icymanipulator").atAnnotation();
+        require("io.github.teletha", "antibug").atTest();
         require("com.pgs-soft", "HttpClientMock").atTest();
         require("org.decimal4j", "decimal4j").atTest();
         require("commons-codec", "commons-codec").atTest();

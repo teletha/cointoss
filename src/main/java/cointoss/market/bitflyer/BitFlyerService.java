@@ -296,6 +296,12 @@ public class BitFlyerService extends MarketService {
         if (marketName.equals("ETH_JPY") && endId == 2643678987L) {
             endId = 2651678987L;
         }
+        if (marketName.equals("FX_BTC_JPY") && endId == 2643681649L) {
+            endId = 2651681649L;
+        }
+        if (marketName.equals("XRP_JPY") && endId == 2643678993L) {
+            endId = 2652078993L;
+        }
 
         return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + executionMaxRequest + "&after=" + startId + "&before=" + endId) //
                 .flatIterable(e -> e.find("*"))
