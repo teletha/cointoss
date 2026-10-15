@@ -15,19 +15,12 @@ import org.junit.jupiter.api.Timeout;
 
 import cointoss.market.binance.Binance;
 import cointoss.market.bitfinex.Bitfinex;
-import cointoss.market.bitmex.BitMex;
 import cointoss.market.bybit.Bybit;
 import cointoss.market.coinbase.Coinbase;
 import cointoss.util.Chrono;
 
 @Disabled
 class SearchNearestExecutionTest {
-
-    @Test
-    @Timeout(value = 15)
-    void bitmex() {
-        assert BitMex.XBT_USD.searchNearestExecution(Chrono.utc(2020, 12, 1)).waitForTerminate().to().exact().id == 160678079903700000L;
-    }
 
     @Test
     @Timeout(value = 15)

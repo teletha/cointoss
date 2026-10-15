@@ -129,6 +129,39 @@ public class BinancePublicServiceTest extends PublicServiceTestTemplate<BinanceS
     }
 
     /**
+     * Historical executions are generated from candles, so their IDs are based on the candle time
+     * and rarely match the realtime trade IDs exactly. The handover from the historical data to the
+     * realtime data must still be detected.
+     */
+    @Test
+    public void checkEqualityOnHandoverToRealtime() {
+        // a historical pseudo execution generated from a 1-minute candle (at the :00 boundary)
+        Execution history = Execution.with.direction(Direction.BUY, 1)
+                .id(1595401560000L * 10_000)
+                .price(9331.91)
+                .date(Chrono.utcByMills(1595401560000L));
+
+        // a realtime trade which occurred 5.277 seconds later
+        Execution realtime = Execution.with.direction(Direction.BUY, 1)
+                .id(1595401565277L * 10_000)
+                .price(9331.91)
+                .date(Chrono.utcByMills(1595401565277L));
+
+        // while the historical data is still behind the realtime data, keep emitting the historical
+        // data instead of switching to the realtime stream
+        assert !service.checkEquality(history, realtime);
+
+        // the historical data (generated from the candle) has reached the realtime data
+        assert service.checkEquality(realtime, realtime);
+
+        Execution caughtUp = Execution.with.direction(Direction.SELL, 1)
+                .id(1595401565277L * 10_000 + 1)
+                .price(9331.91)
+                .date(Chrono.utcByMills(1595401565278L));
+        assert service.checkEquality(caughtUp, realtime);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

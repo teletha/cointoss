@@ -14,18 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 import cointoss.market.bitfinex.Bitfinex;
-import cointoss.market.bitmex.BitMex;
 import cointoss.market.bybit.Bybit;
 import cointoss.market.coinbase.Coinbase;
 
 @Disabled
 class SearchInitialExecutionTest {
-
-    @Test
-    @Timeout(value = 10)
-    void bitmex() {
-        assert BitMex.ETH_USD.searchInitialExecution().waitForTerminate().to().exact().id == 153320077068700000L;
-    }
 
     @Test
     @Timeout(value = 10)

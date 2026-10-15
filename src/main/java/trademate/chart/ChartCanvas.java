@@ -580,7 +580,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 })
                 .subscribeOn(Viewtify.UIThread)
                 .switchOn(chart.showLatestPrice.observing())
-                .to(latestPrice.layoutLine::requestLayout);
+                // Relayout the whole chart instead of the latest price line only, otherwise
+                // the canvases (candles, volumes and orderbook) aren't redrawn together with
+                // the line and the chart around the line is left unpainted until another
+                // full repaint happens.
+                .to(layoutCandle::requestLayout);
     }
 
     /**
@@ -634,6 +638,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     // redraw all candles.
                     GraphicsContext gc = candles.getGraphicsContext2D();
                     gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
+
+                    // reset the line style which the previous indicator drawing may change
+                    gc.setLineDashes();
 
                     // draw chart in visible range
                     if (chart.showIndicator.is(TRUE)) {
@@ -756,6 +763,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 GraphicsContext gc = candleLatest.getGraphicsContext2D();
                 gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
+                gc.setLineDashes();
 
                 Tick tick = ticker.latest();
                 if (tick == null) {

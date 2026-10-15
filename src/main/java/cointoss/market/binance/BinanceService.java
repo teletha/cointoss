@@ -51,10 +51,20 @@ public class BinanceService extends MarketService {
     private static final EfficientWebSocket Realtime = EfficientWebSocket.with.address("wss://stream.binance.com:9443/stream")
             .extractId(json -> json.text("stream"));
 
-    /** The realtime communicator. */
-    private static final EfficientWebSocket RealtimeFuture = Realtime.withAddress("wss://fstream.binance.com/stream");
+    /**
+     * The realtime communicator for the market data streams (e.g. trade) of the USDⓈ-M futures
+     * market. Binance divides the futures websocket into several categories, and the market data
+     * streams are served only under the {@code /market} path.
+     */
+    private static final EfficientWebSocket RealtimeFutureMarket = Realtime.withAddress("wss://fstream.binance.com/market/stream");
 
-    /** The realtime communicator. */
+    /**
+     * The realtime communicator for the public streams (e.g. order book) of the USDⓈ-M futures
+     * market.
+     */
+    private static final EfficientWebSocket RealtimeFuturePublic = Realtime.withAddress("wss://fstream.binance.com/public/stream");
+
+    /** The realtime communicator of the COIN-M futures market. */
     private static final EfficientWebSocket RealtimeDelivery = Realtime.withAddress("wss://dstream.binance.com/stream");
 
     private final boolean isDelivery;
@@ -76,7 +86,18 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected EfficientWebSocket clientRealtimely() {
-        return setting.type.isSpot() ? Realtime : isDelivery ? RealtimeDelivery : RealtimeFuture;
+        return setting.type.isSpot() ? Realtime : isDelivery ? RealtimeDelivery : RealtimeFutureMarket;
+    }
+
+    /**
+     * Get the realtime websocket client for the public streams (e.g. order book). The USDⓈ-M
+     * futures market serves its public streams under a path which differs from the market data
+     * streams, so they can not share the communicator.
+     * 
+     * @return
+     */
+    protected EfficientWebSocket clientPublicRealtimely() {
+        return setting.type.isSpot() || isDelivery ? clientRealtimely() : RealtimeFuturePublic;
     }
 
     /**
@@ -103,6 +124,18 @@ public class BinanceService extends MarketService {
         long[] context = new long[3];
 
         return clientRealtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> createExecution(json.get("data"), context));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean checkEquality(Execution one, Execution other) {
+        // Historical executions are generated from 1-minute candles, so their IDs are based on the
+        // candle time and rarely match the realtime trade IDs exactly. Consider the REST API to have
+        // caught up with the realtime API once the realtime execution reaches the historical one,
+        // otherwise the handover from the historical data to the realtime data never happens.
+        return other.id <= one.id;
     }
 
     /**
@@ -202,7 +235,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
-        return clientRealtimely().subscribe(new Topic("depth" + (setting.type.isSpot() ? "" : "@500ms"), marketName))
+        return clientPublicRealtimely().subscribe(new Topic("depth" + (setting.type.isSpot() ? "" : "@500ms"), marketName))
                 .map(json -> createOrderBook(json.get("data"), "b", "a"));
     }
 
