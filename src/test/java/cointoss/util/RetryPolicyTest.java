@@ -44,6 +44,12 @@ class RetryPolicyTest {
     }
 
     @Test
+    void unlimit() {
+        RetryPolicy policy = RetryPolicy.with.unlimit();
+        assert policy.limit() == Long.MAX_VALUE;
+    }
+
+    @Test
     @DisabledIfEnvironmentVariable(named = "GITHUB_ACTION", matches = ".+")
     @DisabledIfEnvironmentVariable(named = "JITPACK", matches = ".+")
     void delayFixedDuration() {

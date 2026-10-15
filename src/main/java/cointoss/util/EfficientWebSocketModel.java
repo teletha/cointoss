@@ -307,8 +307,15 @@ public abstract class EfficientWebSocketModel {
         }, client()).to(debug ? I.bundle(this::outputTestCode, this::dispatch) : this::dispatch, e -> {
             error(e);
         }, () -> {
-            disconnect("User Closed", null);
-            signals.values().forEach(signal -> signal.complete());
+            if (connection.isPresent()) {
+                // The server closed the connection unexpectedly (e.g. its daily maintenance),
+                // so report it as an error in order to reconnect by the retry mechanism.
+                error(new ConnectException("The websocket connection was closed by the server. Try to reconnect."));
+            } else {
+                // This disconnection is requested by us, so just complete all signals.
+                disconnect("User Closed", null);
+                signals.values().forEach(signal -> signal.complete());
+            }
         });
     }
 
@@ -325,21 +332,23 @@ public abstract class EfficientWebSocketModel {
             } finally {
                 connection.set((WebSocket) null);
             }
-
-            // reset
-            cleanup.dispose();
-            cleanup = Disposable.empty();
-            subscribing.clear();
-            subscribed.clear();
-
-            if (error == null) {
-                I.info("Disconnected websocket [" + address() + "] normally because " + message);
-            } else {
-                I.error("Disconnected websocket [" + address() + "]  unexpectedly because " + message);
-                I.error(error);
-            }
         });
+
+        // Reset the internal state even if there is no connection. If we skip this process when
+        // the connection is already gone (i.e. the connection attempt was failed), the next
+        // subscription is never sent, so we can't reopen the stream.
+        cleanup.dispose();
+        cleanup = Disposable.empty();
+        subscribing.clear();
+        subscribed.clear();
         connecting.set(false);
+
+        if (error == null) {
+            I.info("Disconnected websocket [" + address() + "] normally because " + message);
+        } else {
+            I.error("Disconnected websocket [" + address() + "]  unexpectedly because " + message);
+            I.error(error);
+        }
     }
 
     /**

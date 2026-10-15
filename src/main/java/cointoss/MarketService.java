@@ -249,7 +249,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 return disposer;
             }) //
                     .effectOnError(e -> e.printStackTrace())
-                    .retry(withPolicy(retryMax, "ExecutionLog"))
+                    .retry(withRealtimePolicy("ExecutionLog"))
                     .effect(log::store)
                     .share();
         }
@@ -397,7 +397,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         if (executionRealtimely == null) {
             executionRealtimely = connectExecutionRealtimely().effectOnObserve(disposer::add).share();
         }
-        return executionRealtimely.retry(autoReconnect ? withPolicy(retryMax, "ExecutionRealtimely") : null);
+        return executionRealtimely.retry(autoReconnect ? withRealtimePolicy("ExecutionRealtimely") : null);
     }
 
     /**
@@ -570,7 +570,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return A event stream of order state.
      */
     public final synchronized Signal<Order> ordersRealtimely() {
-        return connectOrdersRealtimely().effectOnObserve(disposer::add).retry(withPolicy(retryMax, "OrderRealtimely"));
+        return connectOrdersRealtimely().effectOnObserve(disposer::add).retry(withRealtimePolicy("OrderRealtimely"));
     }
 
     /**
@@ -608,7 +608,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         if (orderbookRealtimely == null) {
             orderbookRealtimely = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add).share();
         }
-        return orderbookRealtimely.retry(autoReconnect ? withPolicy(retryMax, "OrderBookRealtimely") : null);
+        return orderbookRealtimely.retry(autoReconnect ? withRealtimePolicy("OrderBookRealtimely") : null);
     }
 
     /**
@@ -629,7 +629,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     public final synchronized Signal<Liquidation> liquidationRealtimely() {
         if (liquidationRealtimely == null) {
-            liquidationRealtimely = connectLiquidation().effectOnObserve(disposer::add).retry(withPolicy(retryMax, "Liquidation")).share();
+            liquidationRealtimely = connectLiquidation().effectOnObserve(disposer::add).retry(withRealtimePolicy("Liquidation")).share();
         }
         return liquidationRealtimely;
     }
@@ -744,6 +744,20 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      */
     protected RetryPolicy withPolicy(int max, String name) {
         return RetryPolicy.with.limit(max)
+                .delay(x -> Duration.ofSeconds(x < 30 ? (x + 1) * (x + 1) : 900))
+                .scheduler(scheduler())
+                .name(name == null || name.length() == 0 ? null : id + " : " + name);
+    }
+
+    /**
+     * Create new {@link RetryPolicy} for the realtime stream. The realtime stream is basically
+     * immortal, so it must keep trying to reconnect (e.g. the daily maintenance of the exchange).
+     * 
+     * @param name A policy name for logging.
+     * @return A new policy.
+     */
+    protected RetryPolicy withRealtimePolicy(String name) {
+        return RetryPolicy.with.unlimit()
                 .delay(x -> Duration.ofSeconds(x < 30 ? (x + 1) * (x + 1) : 900))
                 .scheduler(scheduler())
                 .name(name == null || name.length() == 0 ? null : id + " : " + name);

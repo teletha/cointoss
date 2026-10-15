@@ -10,7 +10,10 @@
 package cointoss.market.bitflyer;
 
 import java.net.http.HttpClient;
+import java.net.http.WebSocket;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -21,6 +24,7 @@ import cointoss.execution.Execution;
 import cointoss.market.PublicServiceTestTemplate;
 import cointoss.util.Chrono;
 import cointoss.util.EfficientWebSocket;
+import kiss.Disposable;
 import kiss.I;
 
 class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerService> {
@@ -229,5 +233,77 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         assert BitFlyerService.parse("2018-07-09T01:16:20Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:20.000"));
         assert BitFlyerService.parse("2018-07-09T01:16Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:00.000"));
         assert BitFlyerService.parse("2018-07-09T01Z").isEqual(LocalDateTime.parse("2018-07-09T01:00:00.000"));
+    }
+
+    /**
+     * The server closes the connection gracefully (e.g. its daily maintenance). It must reconnect
+     * and subscribe the channel again automatically.
+     */
+    @Test
+    public void executionRealtimelyReconnectAfterServerClose() throws Exception {
+        String subscribe = "{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}";
+
+        List<Execution> list = Collections.synchronizedList(new ArrayList());
+
+        // The first connection accepts the subscription and sends one execution.
+        websocketServer.replyWhenJSON(subscribe, server -> {
+            server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
+            server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
+        });
+
+        service.executionsRealtimely().to(list::add);
+        assert list.size() == 1;
+
+        // The server closes the connection unexpectedly (i.e. its daily maintenance).
+        websocketServer.sendClose(WebSocket.NORMAL_CLOSURE, "maintenance");
+
+        // After the connection is closed, the client must reconnect and subscribe the channel again.
+        websocketServer.replyWhenJSON(subscribe, server -> {
+            server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
+            server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991348,'side':'SELL','price':999467.0,'size':0.1,'exec_date':'2020-07-12T06:16:04.3243532Z','buy_child_order_acceptance_id':'JRF20200712-061603-372561','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
+        });
+
+        long end = System.currentTimeMillis() + 30 * 1000;
+        while (list.size() < 2 && System.currentTimeMillis() < end) {
+            Thread.sleep(50);
+        }
+
+        assert list.size() == 2;
+        assert list.get(1).id == 1826991348L;
+    }
+
+    /**
+     * When we stop observing the channel, the websocket connection must be closed, and observing the
+     * channel again must reconnect and subscribe it.
+     */
+    @Test
+    public void executionsRealtimelyUnsubscribeAndResubscribe() throws Exception {
+        String subscribe = "{'id':(\\d+),'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}";
+        String unsubscribe = "{'id':(\\d+),'jsonrpc':'2.0','method':'unsubscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}";
+
+        List<Execution> list = Collections.synchronizedList(new ArrayList());
+
+        websocketServer.replyWhenJSON(subscribe, server -> {
+            server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
+            server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991347,'side':'BUY','price':999469.0,'size':0.01,'exec_date':'2020-07-12T06:16:04.307631Z','buy_child_order_acceptance_id':'JRF20200712-061604-686433','sell_child_order_acceptance_id':'JRF20200712-061604-026331'}]}}");
+        });
+
+        Disposable subscription = service.executionsRealtimely().to(list::add);
+        assert list.size() == 1;
+
+        // The client must send the unsubscription command when we stop observing the channel.
+        websocketServer.replyWhenJSON(unsubscribe, server -> server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}"));
+        subscription.dispose();
+        assert !websocketServer.hasReplyRule();
+
+        // Observing the channel again must reconnect and subscribe it again.
+        websocketServer.replyWhenJSON(subscribe, server -> {
+            server.sendJSON("{'jsonrpc':'2.0','id':$1,'result':true}");
+            server.sendJSON("{'jsonrpc':'2.0','method':'channelMessage','params':{'channel':'lightning_executions_FX_BTC_JPY','message':[{'id':1826991348,'side':'SELL','price':999467.0,'size':0.1,'exec_date':'2020-07-12T06:16:04.3243532Z','buy_child_order_acceptance_id':'JRF20200712-061603-372561','sell_child_order_acceptance_id':'JRF20200712-061604-575165'}]}}");
+        });
+        service.executionsRealtimely().to(list::add);
+
+        assert list.size() == 2;
+        assert list.get(1).id == 1826991348L;
     }
 }
