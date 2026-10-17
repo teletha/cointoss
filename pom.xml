@@ -128,7 +128,7 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.22.1</version>
+			<version>1.23.0</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -604,7 +604,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.7-22</version>
+			<version>1.5.7-23</version>
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
