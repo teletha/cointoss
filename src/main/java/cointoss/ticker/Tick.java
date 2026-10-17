@@ -140,7 +140,7 @@ public final class Tick extends IdentifiableModel implements Timelinable {
      * @return The tick related value.
      */
     public double closePrice() {
-        return ticker == null ? closePrice : ticker.manager.latest.get().price.doubleValue();
+        return ticker == null ? closePrice : ticker.manager.latest.get().price().doubleValue();
     }
 
     /**

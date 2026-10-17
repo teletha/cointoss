@@ -191,10 +191,10 @@ public class VerifiableMarketService extends MarketService {
             child.id = identifier;
             child.state = OrderState.ACTIVE;
             child.createTimeMills = nowMills + latency.lag();
-            child.remainingSize = order.size;
+            child.remainingSize = order.size();
 
             // taker has high priority
-            if (order.type.isMaker()) {
+            if (order.type().isMaker()) {
                 orderActive.add(child); // last
             } else {
                 int i = indexFirstMaker();
@@ -214,8 +214,8 @@ public class VerifiableMarketService extends MarketService {
 
             return child.id;
         }).effectOnComplete(() -> {
-            if (order.type.isMaker()) {
-                orderUpdateRealtimely.accept(OrderManager.Update.create(identifier, order.orientation, order.size, order.price));
+            if (order.type().isMaker()) {
+                orderUpdateRealtimely.accept(OrderManager.Update.create(identifier, order.orientation(), order.size(), order.price()));
             }
         });
     }
@@ -489,8 +489,8 @@ public class VerifiableMarketService extends MarketService {
      * Emulate {@link Execution}.
      */
     final void emulate(Execution e, Consumer<Execution> executor) {
-        now = e.date;
-        nowMills = e.mills;
+        now = e.date();
+        nowMills = e.mills();
 
         // emulate market execution
         Iterator<BackendOrder> iterator = orderActive.iterator();
@@ -499,12 +499,12 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder order = iterator.next();
 
             // time base filter
-            if (e.mills < order.createTimeMills) {
+            if (e.mills() < order.createTimeMills) {
                 continue;
             }
 
             // check canceling time
-            if (order.cancelTimeMills != 0 && order.cancelTimeMills <= e.mills) {
+            if (order.cancelTimeMills != 0 && order.cancelTimeMills <= e.mills()) {
                 order.cancel();
                 continue;
             }
@@ -517,7 +517,7 @@ public class VerifiableMarketService extends MarketService {
 
             if (order.condition == QuantityCondition.ImmediateOrCancel) {
                 if (validateTradableByPrice(order, e)) {
-                    order.remainingSize = Num.min(e.size, order.remainingSize);
+                    order.remainingSize = Num.min(e.size(), order.remainingSize);
                 } else {
                     orderActive.remove(order);
                     continue;
@@ -525,10 +525,10 @@ public class VerifiableMarketService extends MarketService {
             }
 
             if (validateTradableByPrice(order, e)) {
-                Num executedSize = Num.min(e.size, order.remainingSize);
+                Num executedSize = Num.min(e.size(), order.remainingSize);
                 if (order.type.isTaker() && executedSize.isNot(0)) {
-                    order.marketMinPrice = order.isPositive() ? Num.max(order.marketMinPrice, e.price, latestPrice)
-                            : Num.min(order.marketMinPrice, e.price, latestPrice);
+                    order.marketMinPrice = order.isPositive() ? Num.max(order.marketMinPrice, e.price(), latestPrice)
+                            : Num.min(order.marketMinPrice, e.price(), latestPrice);
                     order.price = order.price.multiply(order.executedSize)
                             .plus(order.marketMinPrice.multiply(executedSize))
                             .divide(executedSize.plus(order.executedSize));
@@ -548,26 +548,26 @@ public class VerifiableMarketService extends MarketService {
                     tasks.poll().run();
                 }
 
-                executor.accept(Execution.with.orientation(e.orientation, executedSize)
+                executor.accept(Execution.with.orientation(e.orientation(), executedSize)
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
-                        .date(e.date)
-                        .id(e.id)
-                        .consecutive(e.consecutive)
-                        .delay(e.delay));
+                        .date(e.date())
+                        .id(e.id())
+                        .consecutive(e.consecutive())
+                        .delay(e.delay()));
 
-                if (executedSize.isNot(e.size)) {
-                    emulate(Execution.with.orientation(e.orientation, e.size.minus(executedSize))
-                            .price(e.price)
-                            .date(e.date)
-                            .id(e.id)
-                            .consecutive(e.consecutive)
-                            .delay(e.delay), executor);
+                if (executedSize.isNot(e.size())) {
+                    emulate(Execution.with.orientation(e.orientation(), e.size().minus(executedSize))
+                            .price(e.price())
+                            .date(e.date())
+                            .id(e.id())
+                            .consecutive(e.consecutive())
+                            .delay(e.delay()), executor);
                 }
                 return;
             }
         }
 
-        latestPrice = e.price;
+        latestPrice = e.price();
 
         while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
             tasks.poll().run();
@@ -598,9 +598,9 @@ public class VerifiableMarketService extends MarketService {
         }
         if (order.isPositive()) {
             Num price = order.price;
-            return price.isGreaterThan(e.price) || price.is(setting.base.minimumSize);
+            return price.isGreaterThan(e.price()) || price.is(setting.base().minimumSize);
         } else {
-            return order.price.isLessThan(e.price);
+            return order.price.isLessThan(e.price());
         }
     }
 
@@ -611,7 +611,7 @@ public class VerifiableMarketService extends MarketService {
      * @return A result.
      */
     private boolean validateTradableBySize(BackendOrder order, Execution e) {
-        return order.size.isLessThanOrEqual(e.size);
+        return order.size.isLessThanOrEqual(e.size());
     }
 
     /**
@@ -622,7 +622,7 @@ public class VerifiableMarketService extends MarketService {
      */
     private BackendOrder findBy(Order order) {
         for (BackendOrder back : orderActive) {
-            if (back.front.id.equals(order.id) || back.id.equals(order.id)) {
+            if (back.front.id().equals(order.id()) || back.id.equals(order.id())) {
                 return back;
             }
         }
@@ -689,13 +689,13 @@ public class VerifiableMarketService extends MarketService {
          */
         private BackendOrder(Order o) {
             this.front = o;
-            this.direction = o.orientation;
-            this.size = o.size;
-            this.executedSize = o.executedSize;
-            this.price = o.price;
-            this.type = o.type;
-            this.condition = o.quantityCondition;
-            this.createTimeMills = o.creationTime.toInstant().toEpochMilli();
+            this.direction = o.orientation();
+            this.size = o.size();
+            this.executedSize = o.executedSize();
+            this.price = o.price();
+            this.type = o.type();
+            this.condition = o.quantityCondition();
+            this.createTimeMills = o.creationTime().toInstant().toEpochMilli();
             this.marketMinPrice = isPositive() ? Num.ZERO : Num.MAX;
         }
 

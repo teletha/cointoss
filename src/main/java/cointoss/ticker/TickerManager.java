@@ -121,19 +121,19 @@ public class TickerManager implements Disposable {
             }
         } else {
             // update tickers
-            update(tickers[0], e, e.price, e.price.compareTo(latest.get().price));
+            update(tickers[0], e, e.price(), e.price().compareTo(latest.get().price()));
         }
 
         // update total related values
-        if (e.orientation == Direction.BUY) {
-            longVolume += e.size.doubleValue();
-            if (e.delay == Execution.DelayHuge) {
-                shortLosscutVolume += e.size.doubleValue();
+        if (e.orientation() == Direction.BUY) {
+            longVolume += e.size().doubleValue();
+            if (e.delay() == Execution.DelayHuge) {
+                shortLosscutVolume += e.size().doubleValue();
             }
         } else {
-            shortVolume += e.size.doubleValue();
-            if (e.delay == Execution.DelayHuge) {
-                longLosscutVolume += e.size.doubleValue();
+            shortVolume += e.size().doubleValue();
+            if (e.delay() == Execution.DelayHuge) {
+                longLosscutVolume += e.size().doubleValue();
             }
         }
 

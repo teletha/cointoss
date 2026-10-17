@@ -363,7 +363,7 @@ public class BackTestView extends View implements Analyzer {
      * @param log
      */
     private void renderPositionSize(UILabel label, TradingStats log, TradingStats ignore) {
-        int target = marketSelection.value().setting.target.scale;
+        int target = marketSelection.value().setting.target().scale;
 
         UILabel mean = new UILabel(this).tooltip(en("Remaining")).text(log.holdCurrentSize.scale(target)).style(style.mean);
         UILabel max = new UILabel(this).tooltip(en("Max")).text(log.holdMaxSize.scale(target)).style(style.max);

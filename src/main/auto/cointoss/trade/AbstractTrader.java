@@ -5,11 +5,6 @@ import cointoss.util.ObservableNumProperty;
 import hypatia.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
-import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.util.List;
 import kiss.Signal;
 
@@ -20,74 +15,8 @@ import kiss.Signal;
  */
 public class AbstractTrader extends AbstractTraderModel {
 
-    /**
-     * Deceive complier that the specified checked exception is unchecked exception.
-     *
-     * @param <T> A dummy type for {@link RuntimeException}.
-     * @param throwable Any error.
-     * @return A runtime error.
-     * @throws T Dummy error to deceive compiler.
-     */
-    private static final <T extends Throwable> T quiet(Throwable throwable) throws T {
-        throw (T) throwable;
-    }
-
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = AbstractTrader.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /** The final property updater. */
-    private static final Field holdSizeField = updater("holdSize");
-
-    /** The fast final property updater. */
-    private static final MethodHandle holdSizeUpdater = handler(holdSizeField);
-
-    /** The final property updater. */
-    private static final Field holdMaxSizeField = updater("holdMaxSize");
-
-    /** The fast final property updater. */
-    private static final MethodHandle holdMaxSizeUpdater = handler(holdMaxSizeField);
-
-    /** The final property updater. */
-    private static final Field profitField = updater("profit");
-
-    /** The fast final property updater. */
-    private static final MethodHandle profitUpdater = handler(profitField);
-
-    /** The final property updater. */
-    private static final Field scenariosField = updater("scenarios");
-
-    /** The fast final property updater. */
-    private static final MethodHandle scenariosUpdater = handler(scenariosField);
-
-    /** The exposed property. */
-    public final Num holdSize;
+    /** The property. */
+    protected Num holdSize;
 
     /** The property customizer. */
     private final ObservableNumProperty holdSizeCustomizer = new ObservableNumProperty() {
@@ -98,8 +27,8 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num holdMaxSize;
+    /** The property. */
+    protected Num holdMaxSize;
 
     /** The property customizer. */
     private final ObservableNumProperty holdMaxSizeCustomizer = new ObservableNumProperty() {
@@ -110,8 +39,8 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num profit;
+    /** The property. */
+    protected Num profit;
 
     /** The property customizer. */
     private final ObservableNumProperty profitCustomizer = new ObservableNumProperty() {
@@ -122,8 +51,8 @@ public class AbstractTrader extends AbstractTraderModel {
         }
     };
 
-    /** The exposed property. */
-    protected final List<Scenario> scenarios;
+    /** The property. */
+    protected List<Scenario> scenarios;
 
     /**
      * HIDE CONSTRUCTOR
@@ -165,13 +94,8 @@ public class AbstractTrader extends AbstractTraderModel {
         if (value == null) {
             value = super.holdSize();
         }
-        try {
-            holdSizeUpdater.invoke(this, value);
-            holdSizeCustomizer.accept(this.holdSize);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.holdSize = value;
+        holdSizeCustomizer.accept(this.holdSize);
     }
 
     /**
@@ -230,13 +154,8 @@ public class AbstractTrader extends AbstractTraderModel {
         if (value == null) {
             value = super.holdMaxSize();
         }
-        try {
-            holdMaxSizeUpdater.invoke(this, value);
-            holdMaxSizeCustomizer.accept(this.holdMaxSize);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.holdMaxSize = value;
+        holdMaxSizeCustomizer.accept(this.holdMaxSize);
     }
 
     /**
@@ -295,13 +214,8 @@ public class AbstractTrader extends AbstractTraderModel {
         if (value == null) {
             value = super.profit();
         }
-        try {
-            profitUpdater.invoke(this, value);
-            profitCustomizer.accept(this.profit);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.profit = value;
+        profitCustomizer.accept(this.profit);
     }
 
     /**
@@ -360,12 +274,7 @@ public class AbstractTrader extends AbstractTraderModel {
         if (value == null) {
             value = super.scenarios();
         }
-        try {
-            scenariosUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.scenarios = value;
     }
 
     /**

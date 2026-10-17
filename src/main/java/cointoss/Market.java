@@ -86,9 +86,10 @@ public class Market implements Disposable {
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
         Execution previous = switcher.getAndSet(e);
 
-        if (previous.orientation == e.orientation && (e.consecutive == Execution.ConsecutiveSameBuyer || e.consecutive == Execution.ConsecutiveSameSeller)) {
+        if (previous.orientation() == e.orientation() && (e.consecutive() == Execution.ConsecutiveSameBuyer || e
+                .consecutive() == Execution.ConsecutiveSameSeller)) {
             // same taker
-            e.assignAccumulative(v -> previous.accumulative + v);
+            e.assignAccumulative(v -> previous.accumulative() + v);
             return null;
         }
         return previous;
@@ -274,10 +275,10 @@ public class Market implements Disposable {
      * @return
      */
     public final Signal<Execution> signalByPrice(Num price) {
-        if (tickers.latest.get().price.isLessThan(price)) {
-            return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
+        if (tickers.latest.get().price().isLessThan(price)) {
+            return timeline.take(e -> e.price().isGreaterThanOrEqual(price)).take(1);
         } else {
-            return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);
+            return timeline.take(e -> e.price().isLessThanOrEqual(price)).take(1);
         }
     }
 

@@ -524,7 +524,7 @@ public class ExecutionLog {
 
             try {
                 if (!existFast()) {
-                    return this.writeFast(readCompact().plug(new FastLog(service.setting.target.scale)))
+                    return this.writeFast(readCompact().plug(new FastLog(service.setting.target().scale)))
                             .effectOnObserve(stopwatch::start)
                             .effectOnError(e -> I.error("Fail to read fast log. [" + fast + "]"))
                             .effectOnComplete(() -> {
@@ -831,7 +831,7 @@ public class ExecutionLog {
                 Execution[] prev = {Market.BASE};
                 CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(ATOMIC_WRITE), 1));
 
-                return executions.plug(new FastLog(service.setting.target.scale)).effect(e -> {
+                return executions.plug(new FastLog(service.setting.target().scale)).effect(e -> {
                     writer.writeRow(logger.encode(prev[0], e));
                     prev[0] = e;
                 }).effectOnComplete(() -> {

@@ -4,10 +4,8 @@ import cointoss.util.RetryPolicy;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -22,9 +20,6 @@ import java.util.function.LongFunction;
  * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
 public class RetryPolicy extends RetryPolicyModel {
-
-     /** Determines if the execution environment is a Native Image of GraalVM. */
-    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
@@ -70,89 +65,23 @@ public class RetryPolicy extends RetryPolicyModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle delayLinear$823551244= invoker("delayLinear", Duration.class);
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = RetryPolicy.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected long limit;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected LongFunction<Duration> delay;
 
-    /** The final property updater. */
-    private static final Field limitField = updater("limit");
+    /** The property. */
+    protected LongFunction<Duration> delayOnLimitOverflow;
 
-    /** The fast final property updater. */
-    private static final MethodHandle limitUpdater = handler(limitField);
+    /** The property. */
+    protected LongFunction<Duration> delayOnMaintenace;
 
-    /** The final property updater. */
-    private static final Field delayField = updater("delay");
+    /** The property. */
+    protected String name;
 
-    /** The fast final property updater. */
-    private static final MethodHandle delayUpdater = handler(delayField);
-
-    /** The final property updater. */
-    private static final Field delayOnLimitOverflowField = updater("delayOnLimitOverflow");
-
-    /** The fast final property updater. */
-    private static final MethodHandle delayOnLimitOverflowUpdater = handler(delayOnLimitOverflowField);
-
-    /** The final property updater. */
-    private static final Field delayOnMaintenaceField = updater("delayOnMaintenace");
-
-    /** The fast final property updater. */
-    private static final MethodHandle delayOnMaintenaceUpdater = handler(delayOnMaintenaceField);
-
-    /** The final property updater. */
-    private static final Field nameField = updater("name");
-
-    /** The fast final property updater. */
-    private static final MethodHandle nameUpdater = handler(nameField);
-
-    /** The final property updater. */
-    private static final Field schedulerField = updater("scheduler");
-
-    /** The fast final property updater. */
-    private static final MethodHandle schedulerUpdater = handler(schedulerField);
-
-    /** The exposed property. */
-    final long limit;
-
-    /** The exposed property. */
-    final LongFunction<Duration> delay;
-
-    /** The exposed property. */
-    final LongFunction<Duration> delayOnLimitOverflow;
-
-    /** The exposed property. */
-    final LongFunction<Duration> delayOnMaintenace;
-
-    /** The exposed property. */
-    final String name;
-
-    /** The exposed property. */
-    final ScheduledExecutorService scheduler;
+    /** The property. */
+    protected ScheduledExecutorService scheduler;
 
     /**
      * HIDE CONSTRUCTOR
@@ -192,16 +121,7 @@ public class RetryPolicy extends RetryPolicyModel {
      * @paran value A new value of limit property to assign.
      */
     private final void setLimit(long value) {
-        try {
-            if (NATIVE) {
-                limitField.setLong(this, (long) value);
-            } else {
-                limitUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.limit = value;
     }
 
     /**
@@ -233,12 +153,7 @@ public class RetryPolicy extends RetryPolicyModel {
         if (value == null) {
             value = super.delay();
         }
-        try {
-            delayUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.delay = value;
     }
 
     /**
@@ -270,12 +185,7 @@ public class RetryPolicy extends RetryPolicyModel {
         if (value == null) {
             value = super.delayOnLimitOverflow();
         }
-        try {
-            delayOnLimitOverflowUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.delayOnLimitOverflow = value;
     }
 
     /**
@@ -307,12 +217,7 @@ public class RetryPolicy extends RetryPolicyModel {
         if (value == null) {
             value = super.delayOnMaintenace();
         }
-        try {
-            delayOnMaintenaceUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.delayOnMaintenace = value;
     }
 
     /**
@@ -344,12 +249,7 @@ public class RetryPolicy extends RetryPolicyModel {
         if (value == null) {
             value = super.name();
         }
-        try {
-            nameUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.name = value;
     }
 
     /**
@@ -381,12 +281,7 @@ public class RetryPolicy extends RetryPolicyModel {
         if (value == null) {
             value = super.scheduler();
         }
-        try {
-            schedulerUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.scheduler = value;
     }
 
     /**

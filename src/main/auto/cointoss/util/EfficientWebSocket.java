@@ -4,11 +4,6 @@ import cointoss.util.EfficientWebSocket;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.Objects;
@@ -25,149 +20,38 @@ import kiss.JSON;
  */
 public class EfficientWebSocket extends EfficientWebSocketModel {
 
-     /** Determines if the execution environment is a Native Image of GraalVM. */
-    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+    /** The property. */
+    protected String address;
 
-    /**
-     * Deceive complier that the specified checked exception is unchecked exception.
-     *
-     * @param <T> A dummy type for {@link RuntimeException}.
-     * @param throwable Any error.
-     * @return A runtime error.
-     * @throws T Dummy error to deceive compiler.
-     */
-    private static final <T extends Throwable> T quiet(Throwable throwable) throws T {
-        throw (T) throwable;
-    }
+    /** The property. */
+    protected Function<JSON, String> extractId;
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = EfficientWebSocket.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected Function<JSON, String> updateId;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected int maximumSubscriptions;
 
-    /** The final property updater. */
-    private static final Field addressField = updater("address");
+    /** The property. */
+    protected Predicate<JSON> ignoreMessageIf;
 
-    /** The fast final property updater. */
-    private static final MethodHandle addressUpdater = handler(addressField);
+    /** The property. */
+    protected Predicate<JSON> recconnectIf;
 
-    /** The final property updater. */
-    private static final Field extractIdField = updater("extractId");
+    /** The property. */
+    protected Predicate<JSON> stopRecconnectIf;
 
-    /** The fast final property updater. */
-    private static final MethodHandle extractIdUpdater = handler(extractIdField);
+    /** The property. */
+    protected Function<JSON, String> pongIf;
 
-    /** The final property updater. */
-    private static final Field updateIdField = updater("updateId");
+    /** The property. */
+    protected Consumer<WebSocket> whenConnected;
 
-    /** The fast final property updater. */
-    private static final MethodHandle updateIdUpdater = handler(updateIdField);
+    /** The property. */
+    protected HttpClient client;
 
-    /** The final property updater. */
-    private static final Field maximumSubscriptionsField = updater("maximumSubscriptions");
-
-    /** The fast final property updater. */
-    private static final MethodHandle maximumSubscriptionsUpdater = handler(maximumSubscriptionsField);
-
-    /** The final property updater. */
-    private static final Field ignoreMessageIfField = updater("ignoreMessageIf");
-
-    /** The fast final property updater. */
-    private static final MethodHandle ignoreMessageIfUpdater = handler(ignoreMessageIfField);
-
-    /** The final property updater. */
-    private static final Field recconnectIfField = updater("recconnectIf");
-
-    /** The fast final property updater. */
-    private static final MethodHandle recconnectIfUpdater = handler(recconnectIfField);
-
-    /** The final property updater. */
-    private static final Field stopRecconnectIfField = updater("stopRecconnectIf");
-
-    /** The fast final property updater. */
-    private static final MethodHandle stopRecconnectIfUpdater = handler(stopRecconnectIfField);
-
-    /** The final property updater. */
-    private static final Field pongIfField = updater("pongIf");
-
-    /** The fast final property updater. */
-    private static final MethodHandle pongIfUpdater = handler(pongIfField);
-
-    /** The final property updater. */
-    private static final Field whenConnectedField = updater("whenConnected");
-
-    /** The fast final property updater. */
-    private static final MethodHandle whenConnectedUpdater = handler(whenConnectedField);
-
-    /** The final property updater. */
-    private static final Field clientField = updater("client");
-
-    /** The fast final property updater. */
-    private static final MethodHandle clientUpdater = handler(clientField);
-
-    /** The final property updater. */
-    private static final Field schedulerField = updater("scheduler");
-
-    /** The fast final property updater. */
-    private static final MethodHandle schedulerUpdater = handler(schedulerField);
-
-    /** The exposed property. */
-    public final String address;
-
-    /** The exposed property. */
-    public final Function<JSON, String> extractId;
-
-    /** The exposed property. */
-    public final Function<JSON, String> updateId;
-
-    /** The exposed property. */
-    public final int maximumSubscriptions;
-
-    /** The exposed property. */
-    public final Predicate<JSON> ignoreMessageIf;
-
-    /** The exposed property. */
-    public final Predicate<JSON> recconnectIf;
-
-    /** The exposed property. */
-    public final Predicate<JSON> stopRecconnectIf;
-
-    /** The exposed property. */
-    public final Function<JSON, String> pongIf;
-
-    /** The exposed property. */
-    public final Consumer<WebSocket> whenConnected;
-
-    /** The exposed property. */
-    public final HttpClient client;
-
-    /** The exposed property. */
-    public final ScheduledExecutorService scheduler;
+    /** The property. */
+    protected ScheduledExecutorService scheduler;
 
     /**
      * HIDE CONSTRUCTOR
@@ -184,6 +68,23 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         this.whenConnected = super.whenConnected();
         this.client = super.client();
         this.scheduler = super.scheduler();
+    }
+
+    /**
+     * Construct with all properties.
+     */
+    private EfficientWebSocket(String address, Function<JSON, String> extractId, Function<JSON, String> updateId, int maximumSubscriptions, Predicate<JSON> ignoreMessageIf, Predicate<JSON> recconnectIf, Predicate<JSON> stopRecconnectIf, Function<JSON, String> pongIf, Consumer<WebSocket> whenConnected, HttpClient client, ScheduledExecutorService scheduler) {
+        this.address = address;
+        this.extractId = extractId;
+        this.updateId = updateId;
+        this.maximumSubscriptions = maximumSubscriptions;
+        this.ignoreMessageIf = ignoreMessageIf;
+        this.recconnectIf = recconnectIf;
+        this.stopRecconnectIf = stopRecconnectIf;
+        this.pongIf = pongIf;
+        this.whenConnected = whenConnected;
+        this.client = client;
+        this.scheduler = scheduler;
     }
 
     /**
@@ -215,12 +116,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             throw new IllegalArgumentException("The address property requires non-null value.");
         }
-        try {
-            addressUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.address = value;
     }
 
     /**
@@ -252,12 +148,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             throw new IllegalArgumentException("The extractId property requires non-null value.");
         }
-        try {
-            extractIdUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.extractId = value;
     }
 
     /**
@@ -290,12 +181,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             value = super.updateId();
         }
-        try {
-            updateIdUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.updateId = value;
     }
 
     /**
@@ -325,16 +211,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
      * @paran value A new value of maximumSubscriptions property to assign.
      */
     private final void setMaximumSubscriptions(int value) {
-        try {
-            if (NATIVE) {
-                maximumSubscriptionsField.setInt(this, (int) value);
-            } else {
-                maximumSubscriptionsUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.maximumSubscriptions = value;
     }
 
     /**
@@ -367,12 +244,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             value = super.ignoreMessageIf();
         }
-        try {
-            ignoreMessageIfUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.ignoreMessageIf = value;
     }
 
     /**
@@ -404,12 +276,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             value = super.recconnectIf();
         }
-        try {
-            recconnectIfUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.recconnectIf = value;
     }
 
     /**
@@ -441,12 +308,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             value = super.stopRecconnectIf();
         }
-        try {
-            stopRecconnectIfUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.stopRecconnectIf = value;
     }
 
     /**
@@ -478,12 +340,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             value = super.pongIf();
         }
-        try {
-            pongIfUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.pongIf = value;
     }
 
     /**
@@ -515,12 +372,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             value = super.whenConnected();
         }
-        try {
-            whenConnectedUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.whenConnected = value;
     }
 
     /**
@@ -552,12 +404,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             value = super.client();
         }
-        try {
-            clientUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.client = value;
     }
 
     /**
@@ -589,12 +436,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (value == null) {
             value = super.scheduler();
         }
-        try {
-            schedulerUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.scheduler = value;
     }
 
     /**
@@ -665,7 +507,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.address == value) {
             return this;
         }
-        return with.address(value).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(this.scheduler);
+        return new EfficientWebSocket(value, this.extractId, this.updateId, this.maximumSubscriptions, this.ignoreMessageIf, this.recconnectIf, this.stopRecconnectIf, this.pongIf, this.whenConnected, this.client, this.scheduler);
     }
 
     /**
@@ -678,7 +520,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.client == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(value).scheduler(this.scheduler);
+        return new EfficientWebSocket(this.address, this.extractId, this.updateId, this.maximumSubscriptions, this.ignoreMessageIf, this.recconnectIf, this.stopRecconnectIf, this.pongIf, this.whenConnected, value, this.scheduler);
     }
 
     /**
@@ -691,7 +533,7 @@ public class EfficientWebSocket extends EfficientWebSocketModel {
         if (this.scheduler == value) {
             return this;
         }
-        return with.address(this.address).extractId(this.extractId).updateId(this.updateId).maximumSubscriptions(this.maximumSubscriptions).ignoreMessageIf(this.ignoreMessageIf).recconnectIf(this.recconnectIf).stopRecconnectIf(this.stopRecconnectIf).pongIf(this.pongIf).whenConnected(this.whenConnected).client(this.client).scheduler(value);
+        return new EfficientWebSocket(this.address, this.extractId, this.updateId, this.maximumSubscriptions, this.ignoreMessageIf, this.recconnectIf, this.stopRecconnectIf, this.pongIf, this.whenConnected, this.client, value);
     }
 
     /** The singleton builder. */

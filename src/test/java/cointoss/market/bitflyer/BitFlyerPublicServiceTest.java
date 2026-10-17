@@ -94,19 +94,19 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
 
         List<Execution> list = service.executionsAfter(1, 10).waitForTerminate().toList();
         Execution e = list.get(0);
-        assert e.id == 1828074164;
-        assert e.orientation == Direction.BUY;
-        assert e.price.is(999224);
-        assert e.size.is(0.1);
-        assert e.date.isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.id() == 1828074164;
+        assert e.orientation() == Direction.BUY;
+        assert e.price().is(999224);
+        assert e.size().is(0.1);
+        assert e.date().isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
+        assert e.consecutive() == Execution.ConsecutiveDifference;
 
         e = list.get(1);
-        assert e.id == 1828074165;
-        assert e.orientation == Direction.BUY;
-        assert e.price.is(999231);
-        assert e.size.is(0.01);
-        assert e.date.isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
+        assert e.id() == 1828074165;
+        assert e.orientation() == Direction.BUY;
+        assert e.price().is(999231);
+        assert e.size().is(0.01);
+        assert e.date().isEqual(Chrono.utc(2020, 7, 13, 7, 41, 43, 97));
     }
 
     /**
@@ -130,12 +130,12 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
                 """);
 
         Execution e = service.executionLatest().waitForTerminate().to().exact();
-        assert e.id == 1828011727;
-        assert e.orientation == Direction.BUY;
-        assert e.price.is(999262);
-        assert e.size.is(0.03954578);
-        assert e.date.isEqual(Chrono.utc(2020, 7, 13, 6, 24, 54, 157));
-        assert e.consecutive == Execution.ConsecutiveDifference;
+        assert e.id() == 1828011727;
+        assert e.orientation() == Direction.BUY;
+        assert e.price().is(999262);
+        assert e.size().is(0.03954578);
+        assert e.date().isEqual(Chrono.utc(2020, 7, 13, 6, 24, 54, 157));
+        assert e.consecutive() == Execution.ConsecutiveDifference;
     }
 
     /**
@@ -155,20 +155,20 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         assert list.size() == 2;
 
         Execution exe = list.get(0);
-        assert exe.id == 1826991347L;
-        assert exe.orientation == Direction.BUY;
-        assert exe.price.is(999469.0);
-        assert exe.size.is(0.01);
-        assert exe.date.isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 307));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.id() == 1826991347L;
+        assert exe.orientation() == Direction.BUY;
+        assert exe.price().is(999469.0);
+        assert exe.size().is(0.01);
+        assert exe.date().isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 307));
+        assert exe.consecutive() == Execution.ConsecutiveDifference;
 
         exe = list.get(1);
-        assert exe.id == 1826991348L;
-        assert exe.orientation == Direction.SELL;
-        assert exe.price.is(999467.0);
-        assert exe.size.is(0.1);
-        assert exe.date.isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 324));
-        assert exe.consecutive == Execution.ConsecutiveDifference;
+        assert exe.id() == 1826991348L;
+        assert exe.orientation() == Direction.SELL;
+        assert exe.price().is(999467.0);
+        assert exe.size().is(0.1);
+        assert exe.date().isEqual(Chrono.utc(2020, 7, 12, 6, 16, 4, 324));
+        assert exe.consecutive() == Execution.ConsecutiveDifference;
     }
 
     /**
@@ -186,8 +186,8 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
 
         List<Execution> list = service.executionsRealtimely().toList();
         assert list.size() == 2;
-        assert list.get(0).consecutive == Execution.ConsecutiveDifference;
-        assert list.get(1).consecutive == Execution.ConsecutiveSameBuyer;
+        assert list.get(0).consecutive() == Execution.ConsecutiveDifference;
+        assert list.get(1).consecutive() == Execution.ConsecutiveSameBuyer;
     }
 
     /**
@@ -205,8 +205,8 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
 
         List<Execution> list = service.executionsRealtimely().toList();
         assert list.size() == 2;
-        assert list.get(0).consecutive == Execution.ConsecutiveDifference;
-        assert list.get(1).consecutive == Execution.ConsecutiveSameSeller;
+        assert list.get(0).consecutive() == Execution.ConsecutiveDifference;
+        assert list.get(1).consecutive() == Execution.ConsecutiveSameSeller;
     }
 
     /**
@@ -269,7 +269,7 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         }
 
         assert list.size() == 2;
-        assert list.get(1).id == 1826991348L;
+        assert list.get(1).id() == 1826991348L;
     }
 
     /**
@@ -304,6 +304,6 @@ class BitFlyerPublicServiceTest extends PublicServiceTestTemplate<BitFlyerServic
         service.executionsRealtimely().to(list::add);
 
         assert list.size() == 2;
-        assert list.get(1).id == 1826991348L;
+        assert list.get(1).id() == 1826991348L;
     }
 }

@@ -205,7 +205,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      * @return
      */
     public final ZonedDateTime holdStartTime() {
-        return Variable.of(entries.peekFirst()).map(o -> o.creationTime).or(() -> Chrono.MIN);
+        return Variable.of(entries.peekFirst()).map(o -> o.creationTime()).or(() -> Chrono.MIN);
     }
 
     /**
@@ -214,7 +214,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      * @return
      */
     public final ZonedDateTime holdEndTime() {
-        return Variable.of(exits.peekLast()).map(o -> o.terminationTime).or(market.service::now);
+        return Variable.of(exits.peekLast()).map(o -> o.terminationTime()).or(market.service::now);
     }
 
     /**
@@ -231,7 +231,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      */
     @Override
     public final Scenario entry(Orientational directional, Num size, Consumer<Orderable> declaration) {
-        if (size == null || size.isLessThan(market.service.setting.target.minimumSize)) {
+        if (size == null || size.isLessThan(market.service.setting.target().minimumSize)) {
             throw new Error("Entry size is less than minimum bid size.");
         }
         market.request(this.directional = directional, size, declaration).to(this::processEntryOrder);
@@ -261,7 +261,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
             Num deltaSize = v.minus(entryExecutedSize);
 
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize, Order::executedSize, this::setEntryCommission);
-            trader.updateSnapshot(orientation(), Num.ZERO, deltaSize, order.price);
+            trader.updateSnapshot(orientation(), Num.ZERO, deltaSize, order.price());
 
             logEntry("Update entry ");
         });
@@ -282,11 +282,11 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
         for (Order order : orders) {
             Num size = sizeExtractor.apply(order);
             totalSize = totalSize.plus(size);
-            totalPrice = totalPrice.plus(size.multiply(order.price));
-            totalCommision = totalCommision.plus(order.commission);
+            totalPrice = totalPrice.plus(size.multiply(order.price()));
+            totalCommision = totalCommision.plus(order.commission());
         }
 
-        priceSetter.accept(totalPrice.divide(totalSize).scale(this, market.service.setting.base.scale));
+        priceSetter.accept(totalPrice.divide(totalSize).scale(this, market.service.setting.base().scale));
         sizeSetter.accept(totalSize);
         commissionSetter.accept(totalCommision);
     }
@@ -345,7 +345,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      */
     private void processExitOrder(Order order, String type) {
         exits.add(order);
-        setExitSize(exitSize.plus(order.size));
+        setExitSize(exitSize.plus(order.size()));
         logExit("Launch " + type);
 
         order.observeExecutedSize().to(v -> {
@@ -363,7 +363,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      * Declare exit order
      */
     public final void exitAtRiskRewardRatio(double ratio, Span span) {
-        Num range = Num.of(market.tickers.on(span).spreadStats.getMean()).scale(market.service.setting.target.scale);
+        Num range = Num.of(market.tickers.on(span).spreadStats.getMean()).scale(market.service.setting.target().scale);
         exitAt(entryPrice.plus(directional, range.multiply(ratio)));
         exitAt(entryPrice.minus(directional, range));
     }
@@ -383,7 +383,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
      */
     public final Num predictProfit() {
         Num profit = profit(market.orderBook.by(this).predictTakingPrice(remainingSize()));
-        return profit.scale(market.service.setting.base.scale, profit.isPositiveOrZero() ? RoundingMode.FLOOR : RoundingMode.CEILING);
+        return profit.scale(market.service.setting.base().scale, profit.isPositiveOrZero() ? RoundingMode.FLOOR : RoundingMode.CEILING);
     }
 
     /**
@@ -422,7 +422,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
     public String toString() {
         StringBuilder builder = new StringBuilder("Scenario ").append(directional)
                 .append(" un/realized")
-                .append(unrealizedProfit(market.tickers.latest.get().price))
+                .append(unrealizedProfit(market.tickers.latest.get().price()))
                 .append("/")
                 .append(realizedProfit)
                 .append("\r\n");
@@ -442,7 +442,7 @@ public abstract class Scenario extends ScenarioBase implements Orientational<Dir
                 .append("\t order ")
                 .append(orders.size())
                 .append("\tprice ")
-                .append(price.scale(market.service.setting.base.scale))
+                .append(price.scale(market.service.setting.base().scale))
                 .append("\t size ")
                 .append(executedSize + "/" + size.minus(canceledSize) + "(" + canceledSize + ")\r\n");
 

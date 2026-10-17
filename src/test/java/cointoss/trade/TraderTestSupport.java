@@ -100,7 +100,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param e
      */
     protected final void entry(Execution e) {
-        entryPartial(e, e.size.doubleValue());
+        entryPartial(e, e.size().doubleValue());
     }
 
     /**
@@ -114,14 +114,14 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
             @Override
             protected void entry() {
-                entry(e, e.size, s -> s.make(e.price));
+                entry(e, e.size(), s -> s.make(e.price()));
             }
 
             @Override
             protected void exit() {
             }
         }));
-        market.perform(Execution.with.direction(e.orientation, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
+        market.perform(Execution.with.direction(e.orientation(), partialEntrySize).price(e.price().minus(e, 1)).date(e.date()));
         awaitOrderBufferingTime();
     }
 
@@ -132,7 +132,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param exit
      */
     protected final void entryAndExit(Execution e, Execution exit) {
-        entryPartialAndExit(e, e.size.doubleValue(), exit);
+        entryPartialAndExit(e, e.size().doubleValue(), exit);
     }
 
     /**
@@ -142,7 +142,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param exit
      */
     protected final void entryAndExitPartial(Execution e, Execution exit, double partialExitSize) {
-        entryPartialAndExitPartial(e, e.size.doubleValue(), exit, partialExitSize);
+        entryPartialAndExitPartial(e, e.size().doubleValue(), exit, partialExitSize);
     }
 
     /**
@@ -152,7 +152,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param exit
      */
     protected final void entryPartialAndExit(Execution e, double partialEntrySize, Execution exit) {
-        entryPartialAndExitPartial(e, partialEntrySize, exit, exit.size.doubleValue());
+        entryPartialAndExitPartial(e, partialEntrySize, exit, exit.size().doubleValue());
     }
 
     /**
@@ -166,20 +166,20 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
             @Override
             protected void entry() {
-                entry(e, e.size, s -> s.make(e.price));
+                entry(e, e.size(), s -> s.make(e.price()));
             }
 
             @Override
             protected void exit() {
-                exitWhen(now(), s -> s.make(exit.price));
+                exitWhen(now(), s -> s.make(exit.price()));
             }
         }));
 
-        market.perform(Execution.with.direction(e.orientation, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
+        market.perform(Execution.with.direction(e.orientation(), partialEntrySize).price(e.price().minus(e, 1)).date(e.date()));
         awaitOrderBufferingTime();
-        market.perform(Execution.with.direction(e.orientation.inverse(), partialExitSize)
-                .price(exit.price.minus(e.orientation.inverse(), 1))
-                .date(exit.date));
+        market.perform(Execution.with.direction(e.orientation().inverse(), partialExitSize)
+                .price(exit.price().minus(e.orientation().inverse(), 1))
+                .date(exit.date()));
         awaitOrderBufferingTime();
     }
 
@@ -200,7 +200,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      */
     protected final void executeEntryAll() {
         Order o = last().entries.peekFirst();
-        executeEntry(o.size, o.price);
+        executeEntry(o.size(), o.price());
     }
 
     /**
@@ -208,7 +208,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      */
     protected final void executeEntryHalf() {
         Order o = last().entries.peekFirst();
-        executeEntry(o.size.divide(2), o.price);
+        executeEntry(o.size().divide(2), o.price());
     }
 
     /**
@@ -232,7 +232,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      */
     protected final void executeExitAll() {
         Order o = last().exits.peekFirst();
-        executeExit(o.size, o.price);
+        executeExit(o.size(), o.price());
     }
 
     /**
@@ -240,7 +240,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      */
     protected final void executeExitHalf() {
         Order o = last().exits.peekFirst();
-        executeExit(o.size.divide(2), o.price);
+        executeExit(o.size().divide(2), o.price());
     }
 
     /**

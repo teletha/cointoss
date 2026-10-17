@@ -301,7 +301,7 @@ public class GlobalVolumeView extends View {
             getChildren().add(canvas);
 
             volumes.add(new GlobalVolume());
-            MarketServiceProvider.availableMarketServices().take(service -> service.setting.target.currency == target).to(service -> {
+            MarketServiceProvider.availableMarketServices().take(service -> service.setting.target().currency == target).to(service -> {
                 service.executionsRealtimely().to(e -> {
                     volumes.latest().add(service, e);
                 });

@@ -32,7 +32,7 @@ public class SMAIndicator extends PlotScript {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        int base = market.service.setting.base.scale;
+        int base = market.service.setting.base().scale;
 
         switch (ticker.span) {
         case Minute1:

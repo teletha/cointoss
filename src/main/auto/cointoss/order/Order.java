@@ -8,10 +8,8 @@ import hypatia.Num;
 import hypatia.Orientational;
 import java.lang.String;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
@@ -89,119 +87,23 @@ public class Order extends OrderModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle validateState$41283920= invoker("validateState", OrderState.class);
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = Order.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected Direction orientation;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected Num size;
 
-    /** The final property updater. */
-    private static final Field orientationField = updater("orientation");
+    /** The property. */
+    protected Num price;
 
-    /** The fast final property updater. */
-    private static final MethodHandle orientationUpdater = handler(orientationField);
+    /** The property. */
+    protected OrderType type;
 
-    /** The final property updater. */
-    private static final Field sizeField = updater("size");
+    /** The property. */
+    protected QuantityCondition quantityCondition;
 
-    /** The fast final property updater. */
-    private static final MethodHandle sizeUpdater = handler(sizeField);
-
-    /** The final property updater. */
-    private static final Field priceField = updater("price");
-
-    /** The fast final property updater. */
-    private static final MethodHandle priceUpdater = handler(priceField);
-
-    /** The final property updater. */
-    private static final Field typeField = updater("type");
-
-    /** The fast final property updater. */
-    private static final MethodHandle typeUpdater = handler(typeField);
-
-    /** The final property updater. */
-    private static final Field quantityConditionField = updater("quantityCondition");
-
-    /** The fast final property updater. */
-    private static final MethodHandle quantityConditionUpdater = handler(quantityConditionField);
-
-    /** The final property updater. */
-    private static final Field executedSizeField = updater("executedSize");
-
-    /** The fast final property updater. */
-    private static final MethodHandle executedSizeUpdater = handler(executedSizeField);
-
-    /** The final property updater. */
-    private static final Field commissionField = updater("commission");
-
-    /** The fast final property updater. */
-    private static final MethodHandle commissionUpdater = handler(commissionField);
-
-    /** The final property updater. */
-    private static final Field idField = updater("id");
-
-    /** The fast final property updater. */
-    private static final MethodHandle idUpdater = handler(idField);
-
-    /** The final property updater. */
-    private static final Field creationTimeField = updater("creationTime");
-
-    /** The fast final property updater. */
-    private static final MethodHandle creationTimeUpdater = handler(creationTimeField);
-
-    /** The final property updater. */
-    private static final Field terminationTimeField = updater("terminationTime");
-
-    /** The fast final property updater. */
-    private static final MethodHandle terminationTimeUpdater = handler(terminationTimeField);
-
-    /** The final property updater. */
-    private static final Field stateField = updater("state");
-
-    /** The fast final property updater. */
-    private static final MethodHandle stateUpdater = handler(stateField);
-
-    /** The exposed property. */
-    public final Direction orientation;
-
-    /** The exposed property. */
-    public final Num size;
-
-    /** The exposed property. */
-    public final Num price;
-
-    /** The exposed property. */
-    public final OrderType type;
-
-    /** The exposed property. */
-    public final QuantityCondition quantityCondition;
-
-    /** The exposed property. */
-    public final Num executedSize;
+    /** The property. */
+    protected Num executedSize;
 
     /** The property customizer. */
     private final ObservableNumProperty executedSizeCustomizer = new ObservableNumProperty() {
@@ -212,14 +114,14 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num commission;
+    /** The property. */
+    protected Num commission;
 
-    /** The exposed property. */
-    public final String id;
+    /** The property. */
+    protected String id;
 
-    /** The exposed property. */
-    public final ZonedDateTime creationTime;
+    /** The property. */
+    protected ZonedDateTime creationTime;
 
     /** The property customizer. */
     private final ObservableProperty<ZonedDateTime> creationTimeCustomizer = new ObservableProperty<ZonedDateTime>() {
@@ -230,8 +132,8 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The exposed property. */
-    public final ZonedDateTime terminationTime;
+    /** The property. */
+    protected ZonedDateTime terminationTime;
 
     /** The property customizer. */
     private final ObservableProperty<ZonedDateTime> terminationTimeCustomizer = new ObservableProperty<ZonedDateTime>() {
@@ -242,8 +144,8 @@ public class Order extends OrderModel {
         }
     };
 
-    /** The exposed property. */
-    public final cointoss.order.OrderState state;
+    /** The property. */
+    protected cointoss.order.OrderState state;
 
     /** The property customizer. */
     private final ObservableProperty<cointoss.order.OrderState> stateCustomizer = new ObservableProperty<cointoss.order.OrderState>() {
@@ -296,12 +198,7 @@ public class Order extends OrderModel {
         if (value == null) {
             throw new IllegalArgumentException("The orientation property requires non-null value.");
         }
-        try {
-            orientationUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.orientation = value;
     }
 
     /**
@@ -334,8 +231,7 @@ public class Order extends OrderModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, validateSize$253442283.invoke(this, value));
-        } catch (UnsupportedOperationException e) {
+            this.size = (Num) validateSize$253442283.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -371,8 +267,7 @@ public class Order extends OrderModel {
             value = super.price();
         }
         try {
-            priceUpdater.invoke(this, price$2141541105.invoke(this, value, (Consumer<cointoss.order.OrderType>) this::setType));
-        } catch (UnsupportedOperationException e) {
+            this.price = (Num) price$2141541105.invoke(this, value, (Consumer<cointoss.order.OrderType>) this::setType);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -407,12 +302,7 @@ public class Order extends OrderModel {
         if (value == null) {
             value = super.type();
         }
-        try {
-            typeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.type = value;
     }
 
     /**
@@ -444,12 +334,7 @@ public class Order extends OrderModel {
         if (value == null) {
             value = super.quantityCondition();
         }
-        try {
-            quantityConditionUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.quantityCondition = value;
     }
 
     /**
@@ -482,12 +367,11 @@ public class Order extends OrderModel {
             value = super.executedSize();
         }
         try {
-            executedSizeUpdater.invoke(this, checkExecutedSize$253442283.invoke(this, value));
-            executedSizeCustomizer.accept(this.executedSize);
-        } catch (UnsupportedOperationException e) {
+            this.executedSize = (Num) checkExecutedSize$253442283.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
+        executedSizeCustomizer.accept(this.executedSize);
     }
 
     /**
@@ -546,12 +430,7 @@ public class Order extends OrderModel {
         if (value == null) {
             value = super.commission();
         }
-        try {
-            commissionUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.commission = value;
     }
 
     /**
@@ -583,12 +462,7 @@ public class Order extends OrderModel {
         if (value == null) {
             value = super.id();
         }
-        try {
-            idUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.id = value;
     }
 
     /**
@@ -620,13 +494,8 @@ public class Order extends OrderModel {
         if (value == null) {
             value = super.creationTime();
         }
-        try {
-            creationTimeUpdater.invoke(this, value);
-            creationTimeCustomizer.accept(this.creationTime);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.creationTime = value;
+        creationTimeCustomizer.accept(this.creationTime);
     }
 
     /**
@@ -676,13 +545,8 @@ public class Order extends OrderModel {
         if (value == null) {
             value = super.terminationTime();
         }
-        try {
-            terminationTimeUpdater.invoke(this, value);
-            terminationTimeCustomizer.accept(this.terminationTime);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.terminationTime = value;
+        terminationTimeCustomizer.accept(this.terminationTime);
     }
 
     /**
@@ -733,12 +597,11 @@ public class Order extends OrderModel {
             value = super.state();
         }
         try {
-            stateUpdater.invoke(this, validateState$41283920.invoke(this, value));
-            stateCustomizer.accept(this.state);
-        } catch (UnsupportedOperationException e) {
+            this.state = (cointoss.order.OrderState) validateState$41283920.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
+        stateCustomizer.accept(this.state);
     }
 
     /**

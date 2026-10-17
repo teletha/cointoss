@@ -5,11 +5,6 @@ import cointoss.util.ObservableNumProperty;
 import hypatia.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
-import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import kiss.Signal;
 
 /**
@@ -19,104 +14,8 @@ import kiss.Signal;
  */
 public class ScenarioBase extends ScenarioBaseModel {
 
-    /**
-     * Deceive complier that the specified checked exception is unchecked exception.
-     *
-     * @param <T> A dummy type for {@link RuntimeException}.
-     * @param throwable Any error.
-     * @return A runtime error.
-     * @throws T Dummy error to deceive compiler.
-     */
-    private static final <T extends Throwable> T quiet(Throwable throwable) throws T {
-        throw (T) throwable;
-    }
-
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = ScenarioBase.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /** The final property updater. */
-    private static final Field entrySizeField = updater("entrySize");
-
-    /** The fast final property updater. */
-    private static final MethodHandle entrySizeUpdater = handler(entrySizeField);
-
-    /** The final property updater. */
-    private static final Field entryExecutedSizeField = updater("entryExecutedSize");
-
-    /** The fast final property updater. */
-    private static final MethodHandle entryExecutedSizeUpdater = handler(entryExecutedSizeField);
-
-    /** The final property updater. */
-    private static final Field entryPriceField = updater("entryPrice");
-
-    /** The fast final property updater. */
-    private static final MethodHandle entryPriceUpdater = handler(entryPriceField);
-
-    /** The final property updater. */
-    private static final Field entryCommissionField = updater("entryCommission");
-
-    /** The fast final property updater. */
-    private static final MethodHandle entryCommissionUpdater = handler(entryCommissionField);
-
-    /** The final property updater. */
-    private static final Field exitSizeField = updater("exitSize");
-
-    /** The fast final property updater. */
-    private static final MethodHandle exitSizeUpdater = handler(exitSizeField);
-
-    /** The final property updater. */
-    private static final Field exitExecutedSizeField = updater("exitExecutedSize");
-
-    /** The fast final property updater. */
-    private static final MethodHandle exitExecutedSizeUpdater = handler(exitExecutedSizeField);
-
-    /** The final property updater. */
-    private static final Field exitPriceField = updater("exitPrice");
-
-    /** The fast final property updater. */
-    private static final MethodHandle exitPriceUpdater = handler(exitPriceField);
-
-    /** The final property updater. */
-    private static final Field exitCommissionField = updater("exitCommission");
-
-    /** The fast final property updater. */
-    private static final MethodHandle exitCommissionUpdater = handler(exitCommissionField);
-
-    /** The final property updater. */
-    private static final Field realizedProfitField = updater("realizedProfit");
-
-    /** The fast final property updater. */
-    private static final MethodHandle realizedProfitUpdater = handler(realizedProfitField);
-
-    /** The exposed property. */
-    public final Num entrySize;
+    /** The property. */
+    protected Num entrySize;
 
     /** The property customizer. */
     private final ObservableNumProperty entrySizeCustomizer = new ObservableNumProperty() {
@@ -127,8 +26,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num entryExecutedSize;
+    /** The property. */
+    protected Num entryExecutedSize;
 
     /** The property customizer. */
     private final ObservableNumProperty entryExecutedSizeCustomizer = new ObservableNumProperty() {
@@ -139,8 +38,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num entryPrice;
+    /** The property. */
+    protected Num entryPrice;
 
     /** The property customizer. */
     private final ObservableNumProperty entryPriceCustomizer = new ObservableNumProperty() {
@@ -151,11 +50,11 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num entryCommission;
+    /** The property. */
+    protected Num entryCommission;
 
-    /** The exposed property. */
-    public final Num exitSize;
+    /** The property. */
+    protected Num exitSize;
 
     /** The property customizer. */
     private final ObservableNumProperty exitSizeCustomizer = new ObservableNumProperty() {
@@ -166,8 +65,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num exitExecutedSize;
+    /** The property. */
+    protected Num exitExecutedSize;
 
     /** The property customizer. */
     private final ObservableNumProperty exitExecutedSizeCustomizer = new ObservableNumProperty() {
@@ -178,8 +77,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num exitPrice;
+    /** The property. */
+    protected Num exitPrice;
 
     /** The property customizer. */
     private final ObservableNumProperty exitPriceCustomizer = new ObservableNumProperty() {
@@ -190,11 +89,11 @@ public class ScenarioBase extends ScenarioBaseModel {
         }
     };
 
-    /** The exposed property. */
-    public final Num exitCommission;
+    /** The property. */
+    protected Num exitCommission;
 
-    /** The exposed property. */
-    public final Num realizedProfit;
+    /** The property. */
+    protected Num realizedProfit;
 
     /** The property customizer. */
     private final ObservableNumProperty realizedProfitCustomizer = new ObservableNumProperty() {
@@ -249,13 +148,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.entrySize();
         }
-        try {
-            entrySizeUpdater.invoke(this, value);
-            entrySizeCustomizer.accept(this.entrySize);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.entrySize = value;
+        entrySizeCustomizer.accept(this.entrySize);
     }
 
     /**
@@ -314,13 +208,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.entryExecutedSize();
         }
-        try {
-            entryExecutedSizeUpdater.invoke(this, value);
-            entryExecutedSizeCustomizer.accept(this.entryExecutedSize);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.entryExecutedSize = value;
+        entryExecutedSizeCustomizer.accept(this.entryExecutedSize);
     }
 
     /**
@@ -379,13 +268,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.entryPrice();
         }
-        try {
-            entryPriceUpdater.invoke(this, value);
-            entryPriceCustomizer.accept(this.entryPrice);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.entryPrice = value;
+        entryPriceCustomizer.accept(this.entryPrice);
     }
 
     /**
@@ -444,12 +328,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.entryCommission();
         }
-        try {
-            entryCommissionUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.entryCommission = value;
     }
 
     /**
@@ -481,13 +360,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.exitSize();
         }
-        try {
-            exitSizeUpdater.invoke(this, value);
-            exitSizeCustomizer.accept(this.exitSize);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.exitSize = value;
+        exitSizeCustomizer.accept(this.exitSize);
     }
 
     /**
@@ -546,13 +420,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.exitExecutedSize();
         }
-        try {
-            exitExecutedSizeUpdater.invoke(this, value);
-            exitExecutedSizeCustomizer.accept(this.exitExecutedSize);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.exitExecutedSize = value;
+        exitExecutedSizeCustomizer.accept(this.exitExecutedSize);
     }
 
     /**
@@ -611,13 +480,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.exitPrice();
         }
-        try {
-            exitPriceUpdater.invoke(this, value);
-            exitPriceCustomizer.accept(this.exitPrice);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.exitPrice = value;
+        exitPriceCustomizer.accept(this.exitPrice);
     }
 
     /**
@@ -676,12 +540,7 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.exitCommission();
         }
-        try {
-            exitCommissionUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.exitCommission = value;
     }
 
     /** {@inheritDoc} */
@@ -709,13 +568,8 @@ public class ScenarioBase extends ScenarioBaseModel {
         if (value == null) {
             value = super.realizedProfit();
         }
-        try {
-            realizedProfitUpdater.invoke(this, value);
-            realizedProfitCustomizer.accept(this.realizedProfit);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.realizedProfit = value;
+        realizedProfitCustomizer.accept(this.realizedProfit);
     }
 
     /**

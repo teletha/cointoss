@@ -74,11 +74,11 @@ public class BinanceService extends MarketService {
      * @param setting
      */
     protected BinanceService(String marketName, MarketSetting setting) {
-        super(setting.type.isDerivative() ? Exchange.BinanceF : Exchange.Binance, marketName, setting);
+        super(setting.type().isDerivative() ? Exchange.BinanceF : Exchange.Binance, marketName, setting);
 
         this.executionMinRequest = 4;
         this.executionMaxRequest = 6000;
-        this.isDelivery = setting.type.isDerivative() && setting.base.currency == Currency.USD;
+        this.isDelivery = setting.type().isDerivative() && setting.base().currency == Currency.USD;
     }
 
     /**
@@ -86,7 +86,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected EfficientWebSocket clientRealtimely() {
-        return setting.type.isSpot() ? Realtime : isDelivery ? RealtimeDelivery : RealtimeFutureMarket;
+        return setting.type().isSpot() ? Realtime : isDelivery ? RealtimeDelivery : RealtimeFutureMarket;
     }
 
     /**
@@ -97,7 +97,7 @@ public class BinanceService extends MarketService {
      * @return
      */
     protected EfficientWebSocket clientPublicRealtimely() {
-        return setting.type.isSpot() || isDelivery ? clientRealtimely() : RealtimeFuturePublic;
+        return setting.type().isSpot() || isDelivery ? clientRealtimely() : RealtimeFuturePublic;
     }
 
     /**
@@ -132,10 +132,11 @@ public class BinanceService extends MarketService {
     @Override
     public boolean checkEquality(Execution one, Execution other) {
         // Historical executions are generated from 1-minute candles, so their IDs are based on the
-        // candle time and rarely match the realtime trade IDs exactly. Consider the REST API to have
+        // candle time and rarely match the realtime trade IDs exactly. Consider the REST API to
+        // have
         // caught up with the realtime API once the realtime execution reaches the historical one,
         // otherwise the handover from the historical data to the realtime data never happens.
-        return other.id <= one.id;
+        return other.id() <= one.id();
     }
 
     /**
@@ -161,7 +162,7 @@ public class BinanceService extends MarketService {
         long candles = Math.min(1500, executionMaxRequest / 4);
         long startMS = Math.max(0, endMS - Span.Minute1.duration.toMillis() * candles);
 
-        return convertFromCandle(Span.Minute1, startMS, endMS).take(e -> e.id < id);
+        return convertFromCandle(Span.Minute1, startMS, endMS).take(e -> e.id() < id);
     }
 
     /**
@@ -186,10 +187,9 @@ public class BinanceService extends MarketService {
         }
 
         ZonedDateTime now = Chrono.utcNow();
-        String path = setting.type.isSpot()
+        String path = setting.type().isSpot()
                 ? "klines?symbol=" + marketName + "&interval=" + span.text + "&startTime=" + startMS + "&endTime=" + endMS + "&limit=1500"
-                : "continuousKlines?pair=" + marketName + "&contractType=PERPETUAL&interval=" + span.text + "&startTime=" + startMS + "&endTime=" + endMS
-                        + "&limit=1500";
+                : "continuousKlines?pair=" + marketName + "&contractType=PERPETUAL&interval=" + span.text + "&startTime=" + startMS + "&endTime=" + endMS + "&limit=1500";
 
         return call("GET", path, 20).flatIterable(root -> root.find("*")).flatIterable(json -> {
             Num open = json.get(Num.class, "1");
@@ -197,7 +197,7 @@ public class BinanceService extends MarketService {
             Num low = json.get(Num.class, "3");
             Num close = json.get(Num.class, "4");
             Num volume = json.get(Num.class, "5");
-            if (isDelivery) volume = volume.divide(close).scale(setting.target.scale);
+            if (isDelivery) volume = volume.divide(close).scale(setting.target().scale);
             long time = json.get(long.class, "0");
 
             return SUPPORT.createExecutions(open, high, low, close, volume, time, span);
@@ -215,7 +215,7 @@ public class BinanceService extends MarketService {
         Direction side = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
         Num size = e.get(Num.class, "q");
         Num price = e.get(Num.class, "p");
-        if (isDelivery) size = size.divide(price).scale(setting.target.scale);
+        if (isDelivery) size = size.divide(price).scale(setting.target().scale);
         ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
 
         return SUPPORT.createExecution(side, size, price, date, context);
@@ -226,7 +226,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<OrderBookChanges> orderBook() {
-        return call("GET", "depth?symbol=" + marketName + "&limit=" + (setting.type.isDerivative() ? "1000" : "1000"))
+        return call("GET", "depth?symbol=" + marketName + "&limit=" + (setting.type().isDerivative() ? "1000" : "1000"))
                 .map(e -> createOrderBook(e, "bids", "asks"));
     }
 
@@ -235,7 +235,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChanges> connectOrderBookRealtimely() {
-        return clientPublicRealtimely().subscribe(new Topic("depth" + (setting.type.isSpot() ? "" : "@500ms"), marketName))
+        return clientPublicRealtimely().subscribe(new Topic("depth" + (setting.type().isSpot() ? "" : "@500ms"), marketName))
                 .map(json -> createOrderBook(json.get("data"), "b", "a"));
     }
 
@@ -247,7 +247,7 @@ public class BinanceService extends MarketService {
      */
     private OrderBookChanges createOrderBook(JSON pages, String bidName, String askName) {
         return OrderBookChanges
-                .byJSON(pages.find(bidName, "*"), pages.find(askName, "*"), "0", "1", isDelivery ? setting.target.scale : -1);
+                .byJSON(pages.find(bidName, "*"), pages.find(askName, "*"), "0", "1", isDelivery ? setting.target().scale : -1);
     }
 
     // /**
@@ -297,7 +297,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     public Signal<Liquidation> liquidations(ZonedDateTime startExcluded, ZonedDateTime endExcluded) {
-        if (setting.type.isSpot()) {
+        if (setting.type().isSpot()) {
             return I.signal();
         }
 
@@ -316,7 +316,7 @@ public class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Liquidation> connectLiquidation() {
-        if (setting.type.isSpot()) {
+        if (setting.type().isSpot()) {
             return I.signal();
         }
 
@@ -348,7 +348,7 @@ public class BinanceService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path, int weight) {
-        String uri = setting.type.isSpot() ? "https://api.binance.com/api/v3/"
+        String uri = setting.type().isSpot() ? "https://api.binance.com/api/v3/"
                 : isDelivery ? "https://dapi.binance.com/dapi/v1/" : "https://fapi.binance.com/fapi/v1/";
         Builder builder = HttpRequest.newBuilder(URI.create(path.startsWith("http") ? path : uri + path));
 

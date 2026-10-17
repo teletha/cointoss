@@ -149,27 +149,27 @@ public class BitFlyerService extends MarketService {
 
         if (forTest || Session.id == null) {
             ChildOrderRequest request = new ChildOrderRequest();
-            request.child_order_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
+            request.child_order_type = order.type() == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
-            request.price = order.price;
+            request.price = order.price();
             request.product_code = marketName;
             request.side = order.orientation().name();
-            request.size = order.size;
-            request.time_in_force = order.quantityCondition.abbreviation;
+            request.size = order.size();
+            request.time_in_force = order.quantityCondition().abbreviation;
 
             call = rest("POST", API.Private, "/v1/me/sendchildorder", I.write(request))
                     .flatIterable(json -> json.find(String.class, "child_order_acceptance_id"));
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = Session.accountId;
-            request.ord_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
+            request.ord_type = order.type() == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
-            request.price = order.price;
+            request.price = order.price();
             request.product_code = marketName;
             request.side = order.orientation().name();
-            request.size = order.size;
-            request.time_in_force = order.quantityCondition.abbreviation;
+            request.size = order.size();
+            request.time_in_force = order.quantityCondition().abbreviation;
 
             call = rest("POST", API.Internal, "/trade/sendorder", I.write(request)).map(json -> json.get("data").text("order_ref_id"));
         }
@@ -186,7 +186,7 @@ public class BitFlyerService extends MarketService {
         cancel.product_code = marketName;
         cancel.account_id = Session.accountId;
         cancel.order_id = order.relation(Internals.class).id;
-        cancel.child_order_acceptance_id = order.id;
+        cancel.child_order_acceptance_id = order.id();
 
         Signal<?> call = forTest || Session.id == null || cancel.order_id == null
                 ? rest("POST", API.Private, "/v1/me/cancelchildorder", I.write(cancel))
@@ -194,7 +194,7 @@ public class BitFlyerService extends MarketService {
 
         Signal<Order> isCancelled = intervalOrderCheck.map(orders -> {
             for (Order listed : orders) {
-                if (order.id.equals(listed.id)) {
+                if (order.id().equals(listed.id())) {
                     if (listed.isTerminated()) {
                         return listed;
                     } else {
@@ -203,10 +203,10 @@ public class BitFlyerService extends MarketService {
                 }
             }
 
-            return Order.with.orientation(order.orientation, order.size)
-                    .id(order.id)
+            return Order.with.orientation(order.orientation(), order.size())
+                    .id(order.id())
                     .state(OrderState.CANCELED)
-                    .executedSize(order.executedSize);
+                    .executedSize(order.executedSize());
         }).skipNull();
 
         return call.combine(isCancelled).take(1).map(v -> v.ⅱ);
@@ -469,7 +469,8 @@ public class BitFlyerService extends MarketService {
                     } else if (type.equals("CANCEL")) {
                         return OrderManager.Update.cancel(id);
                     } else if (type.equals("EXECUTION")) {
-                        Num commission = price.multiply(json.get(Num.class, "commission")).scale(setting.base.scale, RoundingMode.CEILING);
+                        Num commission = price.multiply(json.get(Num.class, "commission"))
+                                .scale(setting.base().scale, RoundingMode.CEILING);
                         Num sfd = json.get(Num.class, "sfd");
                         return OrderManager.Update.executePartially(id, size, price, commission.plus(sfd));
                     } else { /* ORDER_FAILED || CANCEL_FAILED || EXPIRE */
@@ -526,8 +527,11 @@ public class BitFlyerService extends MarketService {
     @Override
     protected Signal<Liquidation> connectLiquidation() {
         return this.executionsRealtimely()
-                .take(e -> e.delay == Execution.DelayHuge)
-                .map(e -> Liquidation.with.date(e.date).orientation(e.orientation.inverse()).size(e.size.doubleValue()).price(e.price));
+                .take(e -> e.delay() == Execution.DelayHuge)
+                .map(e -> Liquidation.with.date(e.date())
+                        .orientation(e.orientation().inverse())
+                        .size(e.size().doubleValue())
+                        .price(e.price()));
     }
 
     /**

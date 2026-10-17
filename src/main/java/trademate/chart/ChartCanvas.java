@@ -19,6 +19,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -33,16 +44,6 @@ import cointoss.util.Chrono;
 import cointoss.util.DateRange;
 import hypatia.Num;
 import hypatia.Primitives;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -545,7 +546,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double upperPrice = axisY.getValueForPosition(startY);
         double lowerPrice = axisY.getValueForPosition(endY);
 
-        int scale = chart.market.get().service.setting.base.scale;
+        int scale = chart.market.get().service.setting.base().scale;
         double textX = endX - 40;
         double lineY = -12;
         gc.setStroke(Color.WHITESMOKE);
@@ -819,7 +820,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         GraphicsContext gc = chartInfo.clear().getGraphicsContext2D();
         gc.setFont(InfoFont);
 
-        int base = chart.market.get().service.setting.base.scale;
+        int base = chart.market.get().service.setting.base().scale;
         String date = Chrono.systemByMills(tick.openTime() * 1000).format(Chrono.DateTime);
         String open = CommonText.OpenPrice + " " + Primitives.roundString(tick.openPrice(), base);
         String high = CommonText.HighPrice + " " + Primitives.roundString(tick.highPrice(), base);

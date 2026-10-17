@@ -94,7 +94,7 @@ public final class Ticker implements Disposable {
      * @param execution The latest {@link Execution}.
      */
     final void init(Execution execution) {
-        current = new Tick(span.calculateStartTime(execution.date).toEpochSecond(), execution.price, this);
+        current = new Tick(span.calculateStartTime(execution.date()).toEpochSecond(), execution.price(), this);
         currentTickEndTime = computeEndTime();
 
         ticks.store(current);
@@ -109,11 +109,11 @@ public final class Ticker implements Disposable {
      */
     final boolean createTick(Execution execution) {
         // Make sure whether the execution does not exceed the end time of current tick.
-        if (currentTickEndTime <= execution.mills) {
+        if (currentTickEndTime <= execution.mills()) {
             // If the end time of current tick does not reach the start time of tick which
             // execution actually belongs to, it is assumed that there was a blank time
             // (i.e. server error, maintenance). So we complement them in advance.
-            ZonedDateTime start = span.calculateStartTime(execution.date);
+            ZonedDateTime start = span.calculateStartTime(execution.date());
 
             while (current.openTime + span.seconds < start.toEpochSecond()) {
                 current.freeze();
@@ -125,7 +125,7 @@ public final class Ticker implements Disposable {
             // create the latest tick for execution
             current.freeze();
             closing.accept(current);
-            current = new Tick(current.openTime + span.seconds, execution.price, this);
+            current = new Tick(current.openTime + span.seconds, execution.price(), this);
             currentTickEndTime = computeEndTime();
             ticks.store(current);
             opening.accept(current);

@@ -88,7 +88,7 @@ public class BitbankService extends MarketService {
                         return executionsAt(day);
                     }
                 })
-                .skipUntil(e -> startMillis < e.mills);
+                .skipUntil(e -> startMillis < e.mills());
     }
 
     /**

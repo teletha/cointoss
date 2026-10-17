@@ -23,10 +23,10 @@ public class ConsoleAnalyzer implements Analyzer {
      */
     @Override
     public void progress(Execution e) {
-        int day = e.date.getDayOfMonth();
+        int day = e.date().getDayOfMonth();
         if (day != this.day) {
             this.day = day;
-            System.out.println("Processing " + e.date.toLocalDate());
+            System.out.println("Processing " + e.date().toLocalDate());
         }
     }
 

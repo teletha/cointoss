@@ -4,10 +4,8 @@ import cointoss.ticker.data.OpenInterest;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -18,9 +16,6 @@ import java.util.Objects;
  * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
 public class OpenInterest extends OpenInterestModel {
-
-     /** Determines if the execution environment is a Native Image of GraalVM. */
-    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
@@ -54,53 +49,11 @@ public class OpenInterest extends OpenInterestModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle date$1093866057= invoker("date", long.class);
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = OpenInterest.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected ZonedDateTime date;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /** The final property updater. */
-    private static final Field dateField = updater("date");
-
-    /** The fast final property updater. */
-    private static final MethodHandle dateUpdater = handler(dateField);
-
-    /** The final property updater. */
-    private static final Field sizeField = updater("size");
-
-    /** The fast final property updater. */
-    private static final MethodHandle sizeUpdater = handler(sizeField);
-
-    /** The exposed property. */
-    public final ZonedDateTime date;
-
-    /** The exposed property. */
-    public final float size;
+    /** The property. */
+    protected float size;
 
     /**
      * HIDE CONSTRUCTOR
@@ -135,12 +88,7 @@ public class OpenInterest extends OpenInterestModel {
         if (value == null) {
             throw new IllegalArgumentException("The date property requires non-null value.");
         }
-        try {
-            dateUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.date = value;
     }
 
     /**
@@ -169,16 +117,7 @@ public class OpenInterest extends OpenInterestModel {
      * @paran value A new value of size property to assign.
      */
     private final void setSize(float value) {
-        try {
-            if (NATIVE) {
-                sizeField.setFloat(this, (float) value);
-            } else {
-                sizeUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.size = value;
     }
 
     /**

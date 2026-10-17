@@ -82,6 +82,6 @@ class OfficialLogHouse extends HttpLogHouse {
             ZonedDateTime time = LocalDateTime.parse(values[4], timeFormatOnLog).atZone(Chrono.UTC);
 
             return GMOService.Support.createExecution(side, size, price, time, prev);
-        }).skipUntil(e -> e.date.isAfter(date)).takeWhile(e -> e.date.isBefore(following));
+        }).skipUntil(e -> e.date().isAfter(date)).takeWhile(e -> e.date().isBefore(following));
     }
 }

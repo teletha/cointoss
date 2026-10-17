@@ -7,10 +7,8 @@ import hypatia.Orientational;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -26,9 +24,6 @@ import java.util.function.UnaryOperator;
  * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
 public class Execution extends ExecutionModel<Execution> {
-
-     /** Determines if the execution environment is a Native Image of GraalVM. */
-    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
@@ -95,125 +90,35 @@ public class Execution extends ExecutionModel<Execution> {
     /** The overload or intercept method invoker. */
     private static final MethodHandle assignWithMills$1104079711= invoker("assignWithMills", ZonedDateTime.class, LongConsumer.class);
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = Execution.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected Direction orientation;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected Num size;
 
-    /** The final property updater. */
-    private static final Field orientationField = updater("orientation");
+    /** The property. */
+    protected long id;
 
-    /** The fast final property updater. */
-    private static final MethodHandle orientationUpdater = handler(orientationField);
+    /** The property. */
+    protected Num price;
 
-    /** The final property updater. */
-    private static final Field sizeField = updater("size");
+    /** The property. */
+    protected double accumulative;
 
-    /** The fast final property updater. */
-    private static final MethodHandle sizeUpdater = handler(sizeField);
+    /** The property. */
+    protected ZonedDateTime date;
 
-    /** The final property updater. */
-    private static final Field idField = updater("id");
+    /** The property. */
+    protected long mills;
 
-    /** The fast final property updater. */
-    private static final MethodHandle idUpdater = handler(idField);
+    /** The property. */
+    protected int consecutive;
 
-    /** The final property updater. */
-    private static final Field priceField = updater("price");
+    /** The property. */
+    protected int delay;
 
-    /** The fast final property updater. */
-    private static final MethodHandle priceUpdater = handler(priceField);
-
-    /** The final property updater. */
-    private static final Field accumulativeField = updater("accumulative");
-
-    /** The fast final property updater. */
-    private static final MethodHandle accumulativeUpdater = handler(accumulativeField);
-
-    /** The final property updater. */
-    private static final Field dateField = updater("date");
-
-    /** The fast final property updater. */
-    private static final MethodHandle dateUpdater = handler(dateField);
-
-    /** The final property updater. */
-    private static final Field millsField = updater("mills");
-
-    /** The fast final property updater. */
-    private static final MethodHandle millsUpdater = handler(millsField);
-
-    /** The final property updater. */
-    private static final Field consecutiveField = updater("consecutive");
-
-    /** The fast final property updater. */
-    private static final MethodHandle consecutiveUpdater = handler(consecutiveField);
-
-    /** The final property updater. */
-    private static final Field delayField = updater("delay");
-
-    /** The fast final property updater. */
-    private static final MethodHandle delayUpdater = handler(delayField);
-
-    /** The final property updater. */
-    private static final Field infoField = updater("info");
-
-    /** The fast final property updater. */
-    private static final MethodHandle infoUpdater = handler(infoField);
-
-    /** The exposed property. */
-    public final Direction orientation;
-
-    /** The exposed property. */
-    public final Num size;
-
-    /** The exposed property. */
-    public final long id;
-
-    /** The exposed property. */
-    public final Num price;
-
-    /** The exposed property. */
-    public final double accumulative;
-
-    /** The exposed property. */
-    public final ZonedDateTime date;
-
-    /** The exposed property. */
-    public final long mills;
-
-    /** The exposed property. */
-    public final int consecutive;
-
-    /** The exposed property. */
-    public final int delay;
-
-    /** The exposed property. */
-    public final String info;
+    /** The property. */
+    protected String info;
 
     /**
      * HIDE CONSTRUCTOR
@@ -229,6 +134,22 @@ public class Execution extends ExecutionModel<Execution> {
         this.consecutive = super.consecutive();
         this.delay = super.delay();
         this.info = super.info();
+    }
+
+    /**
+     * Construct with all properties.
+     */
+    private Execution(Direction orientation, Num size, long id, Num price, double accumulative, ZonedDateTime date, long mills, int consecutive, int delay, String info) {
+        this.orientation = orientation;
+        this.size = size;
+        this.id = id;
+        this.price = price;
+        this.accumulative = accumulative;
+        this.date = date;
+        this.mills = mills;
+        this.consecutive = consecutive;
+        this.delay = delay;
+        this.info = info;
     }
 
     /**
@@ -260,12 +181,7 @@ public class Execution extends ExecutionModel<Execution> {
         if (value == null) {
             throw new IllegalArgumentException("The orientation property requires non-null value.");
         }
-        try {
-            orientationUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.orientation = value;
     }
 
     /**
@@ -298,8 +214,7 @@ public class Execution extends ExecutionModel<Execution> {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, assignWithAccumulative$301451316.invoke(this, value, (DoubleConsumer) this::setAccumulative));
-        } catch (UnsupportedOperationException e) {
+            this.size = (Num) assignWithAccumulative$301451316.invoke(this, value, (DoubleConsumer) this::setAccumulative);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -330,16 +245,7 @@ public class Execution extends ExecutionModel<Execution> {
      * @paran value A new value of id property to assign.
      */
     private final void setId(long value) {
-        try {
-            if (NATIVE) {
-                idField.setLong(this, (long) value);
-            } else {
-                idUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.id = value;
     }
 
     /**
@@ -371,12 +277,7 @@ public class Execution extends ExecutionModel<Execution> {
         if (value == null) {
             value = super.price();
         }
-        try {
-            priceUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.price = value;
     }
 
     /**
@@ -427,16 +328,7 @@ public class Execution extends ExecutionModel<Execution> {
      * @paran value A new value of accumulative property to assign.
      */
     private final void setAccumulative(double value) {
-        try {
-            if (NATIVE) {
-                accumulativeField.setDouble(this, (double) value);
-            } else {
-                accumulativeUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.accumulative = value;
     }
 
     /**
@@ -469,8 +361,7 @@ public class Execution extends ExecutionModel<Execution> {
             value = super.date();
         }
         try {
-            dateUpdater.invoke(this, assignWithMills$1104079711.invoke(this, value, (LongConsumer) this::setMills));
-        } catch (UnsupportedOperationException e) {
+            this.date = (ZonedDateTime) assignWithMills$1104079711.invoke(this, value, (LongConsumer) this::setMills);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -498,16 +389,7 @@ public class Execution extends ExecutionModel<Execution> {
      * @paran value A new value of mills property to assign.
      */
     private final void setMills(long value) {
-        try {
-            if (NATIVE) {
-                millsField.setLong(this, (long) value);
-            } else {
-                millsUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.mills = value;
     }
 
     /**
@@ -536,16 +418,7 @@ public class Execution extends ExecutionModel<Execution> {
      * @paran value A new value of consecutive property to assign.
      */
     private final void setConsecutive(int value) {
-        try {
-            if (NATIVE) {
-                consecutiveField.setInt(this, (int) value);
-            } else {
-                consecutiveUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.consecutive = value;
     }
 
     /**
@@ -596,16 +469,7 @@ public class Execution extends ExecutionModel<Execution> {
      * @paran value A new value of delay property to assign.
      */
     private final void setDelay(int value) {
-        try {
-            if (NATIVE) {
-                delayField.setInt(this, (int) value);
-            } else {
-                delayUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.delay = value;
     }
 
     /**
@@ -659,12 +523,7 @@ public class Execution extends ExecutionModel<Execution> {
         if (value == null) {
             value = super.info();
         }
-        try {
-            infoUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.info = value;
     }
 
     /**
@@ -712,7 +571,7 @@ public class Execution extends ExecutionModel<Execution> {
         if (this.size == value) {
             return this;
         }
-        return with.orientation(this.orientation, value).id(this.id).price(this.price).accumulative(this.accumulative).date(this.date).mills(this.mills).consecutive(this.consecutive).delay(this.delay).info(this.info);
+        return new Execution(this.orientation, value, this.id, this.price, this.accumulative, this.date, this.mills, this.consecutive, this.delay, this.info);
     }
 
     /** The singleton builder. */

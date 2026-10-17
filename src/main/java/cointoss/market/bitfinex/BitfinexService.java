@@ -191,14 +191,14 @@ public class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<Liquidation> connectLiquidation() {
-        if (setting.type.isSpot()) {
+        if (setting.type().isSpot()) {
             return I.signal();
         }
 
         return clientRealtimely().subscribe(new Topic("status", "liq:global"))
                 .skip(e -> e.text("1").equals("hb")) // ignore heartbeat
                 .flatIterable(e -> e.find("1", "*"))
-                .take(e -> e.text("4").contains(setting.target.currency.code) && e.has("8", 1))
+                .take(e -> e.text("4").contains(setting.target().currency.code) && e.has("8", 1))
                 .map(e -> {
                     Num basePrice = e.get(Num.class, "6");
                     Num liquidatedPrice = e.get(Num.class, "11");

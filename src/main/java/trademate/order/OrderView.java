@@ -13,13 +13,14 @@ import static trademate.CommonText.*;
 
 import java.text.Normalizer.Form;
 
+import javafx.scene.control.SelectionMode;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.Division;
 import cointoss.trade.Scenario;
 import cointoss.verify.TrainingMarket;
 import hypatia.Num;
-import javafx.scene.control.SelectionMode;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Managed;
@@ -248,7 +249,7 @@ public class OrderView extends View {
 
                                 takerSellPrice.text(taker);
                                 takerSellLoss
-                                        .text(taker.minus(loss).multiply(orderSize.valueOr(Num.ONE)).scale(m.service.setting.base.scale));
+                                        .text(taker.minus(loss).multiply(orderSize.valueOr(Num.ONE)).scale(m.service.setting.base().scale));
                                 makerBuyPrice.text(m.orderBook.longs.predictMakingPrice(v.ⅲ));
                             }));
                     disposer.add(m.orderBook.shorts.best.observing()//
@@ -261,7 +262,7 @@ public class OrderView extends View {
 
                                 takerBuyPrice.text(taker);
                                 takerBuyLoss
-                                        .text(loss.minus(taker).multiply(orderSize.valueOr(Num.ONE)).scale(m.service.setting.base.scale));
+                                        .text(loss.minus(taker).multiply(orderSize.valueOr(Num.ONE)).scale(m.service.setting.base().scale));
                                 makerSellPrice.text(m.orderBook.shorts.predictMakingPrice(v.ⅲ));
                             }));
                 });
@@ -329,7 +330,7 @@ public class OrderView extends View {
                 .render((ui, scenario, price) -> ui.text(price).unstyleAll().color(ChartTheme.colorBy(scenario)));
         entrySize.text(Amount)
                 .modelBySignal(m -> m.observeEntryExecutedSizeNow().combineLatest(m.observeEntryTerminated()))
-                .render((ui, scenario, x) -> ui.text(x.ⅰ + " / " + (x.ⅱ ? scenario.entryExecutedSize : scenario.entrySize)));
+                .render((ui, scenario, x) -> ui.text(x.ⅰ + " / " + (x.ⅱ ? scenario.entryExecutedSize() : scenario.entrySize())));
 
         // ===============================================
         // Exit Part
@@ -337,7 +338,7 @@ public class OrderView extends View {
         exitPrice.text(ExitPrice).modelBySignal(Scenario::observeExitPriceNow).render((ui, scenario, price) -> ui.text(price));
         exitSize.text(Amount)
                 .modelBySignal(Scenario::observeExitExecutedSizeNow)
-                .render((ui, scenario, size) -> ui.text(size + " / " + scenario.exitSize));
+                .render((ui, scenario, size) -> ui.text(size + " / " + scenario.exitSize()));
 
         // ===============================================
         // Losscut Part
@@ -345,7 +346,7 @@ public class OrderView extends View {
         losscutPrice.text(LosscutPrice).modelBySignal(Scenario::observeExitPriceNow).render((ui, scenario, price) -> ui.text(price));
         losscutSize.text(Amount)
                 .modelBySignal(Scenario::observeExitExecutedSizeNow)
-                .render((ui, scenario, size) -> ui.text(size + " / " + scenario.exitSize));
+                .render((ui, scenario, size) -> ui.text(size + " / " + scenario.exitSize()));
 
         // ===============================================
         // Analyze Part

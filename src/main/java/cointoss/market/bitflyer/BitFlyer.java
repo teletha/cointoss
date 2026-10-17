@@ -81,12 +81,12 @@ public final class BitFlyer extends MarketServiceProvider {
     private static class BitFlyerLogger extends ExecutionDeltaLogger {
         @Override
         protected Num decodePrice(String value, Execution previous) {
-            return decodeIntegralDelta(value, previous.price, 0);
+            return decodeIntegralDelta(value, previous.price(), 0);
         }
 
         @Override
         protected String encodePrice(Execution execution, Execution previous) {
-            return encodeIntegralDelta(execution.price, previous.price, 0);
+            return encodeIntegralDelta(execution.price(), previous.price(), 0);
         }
     }
 }

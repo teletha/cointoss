@@ -11,11 +11,12 @@ package trademate;
 
 import static java.util.concurrent.TimeUnit.*;
 
+import javafx.scene.control.TableRow;
+
 import cointoss.MarketService;
 import cointoss.MarketType;
 import cointoss.market.MarketServiceProvider;
 import hypatia.Num;
-import javafx.scene.control.TableRow;
 import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -92,7 +93,7 @@ public class SummaryView extends View {
         price.text(CommonText.Price)
                 .modelBySignal(service -> service.executionLatest()
                         .concat(service.executionsRealtimely().throttle(500, MILLISECONDS))
-                        .map(e -> e.price));
+                        .map(e -> e.price()));
 
         // Filter the table by the text on the top.
         CompoundQuery.Query<MarketService, String> condition = table.query()
@@ -101,7 +102,7 @@ public class SummaryView extends View {
         condition.input.set("");
         filter.sync(condition.input);
 
-        table.query().addQuery(en("Type"), MarketType.class, service -> service.setting.type);
+        table.query().addQuery(en("Type"), MarketType.class, service -> service.setting.type());
 
         // Open the chart of the double-clicked market.
         table.render(t -> {

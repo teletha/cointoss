@@ -23,18 +23,18 @@ class SearchInitialExecutionTest {
     @Test
     @Timeout(value = 10)
     void coinbase() {
-        assert Coinbase.ETHUSD.searchInitialExecution().waitForTerminate().to().exact().id == 1;
+        assert Coinbase.ETHUSD.searchInitialExecution().waitForTerminate().to().exact().id() == 1;
     }
 
     @Test
     @Timeout(value = 10)
     void bybit() {
-        assert Bybit.BTC_USDT.searchInitialExecution().waitForTerminate().to().exact().id == 15698880007190000L;
+        assert Bybit.BTC_USDT.searchInitialExecution().waitForTerminate().to().exact().id() == 15698880007190000L;
     }
 
     @Test
     @Timeout(value = 10)
     void bitfinex() {
-        assert Bitfinex.BTC_USD.searchInitialExecution().waitForTerminate().to().exact().id == 13581820430000000L;
+        assert Bitfinex.BTC_USD.searchInitialExecution().waitForTerminate().to().exact().id() == 13581820430000000L;
     }
 }

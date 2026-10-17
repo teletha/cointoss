@@ -81,11 +81,11 @@ public class TrainingMarketService extends MarketService {
     @Override
     public Signal<String> request(Order order) {
         System.out.println("request " + order);
-        if (order.type.isTaker()) {
+        if (order.type().isTaker()) {
             String id = "ID" + Num.random(0, Integer.MAX_VALUE);
             return I.signal(id).effectOnComplete(() -> {
                 frontend.orderUpdateRealtimely.accept(OrderManager.Update
-                        .execute(id, order.size, orderbooks.by(order.orientation.inverse()).predictTakingPrice(order.size), Num.ZERO));
+                        .execute(id, order.size(), orderbooks.by(order.orientation().inverse()).predictTakingPrice(order.size()), Num.ZERO));
             });
         } else {
             return frontend.request(order);

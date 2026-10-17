@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import cointoss.Market;
@@ -22,8 +25,6 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import hypatia.Num;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -174,7 +175,7 @@ public class ChartView extends View {
         orderbookHideSize.initialize(IntStream.range(0, 101))
                 .tooltip(en("Display only boards that are larger than the specified size."))
                 .enableWhen(showOrderbook.isSelected());
-        orderbookPriceRange.initializeLazy(market.observe().map(m -> m.service.setting.base.minimumSize))
+        orderbookPriceRange.initializeLazy(market.observe().map(m -> m.service.setting.base().minimumSize))
                 .acceptPositiveDecimalInput()
                 .normalizeInput(Form.NFKC)
                 .maximumInput(6)

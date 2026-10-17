@@ -8,10 +8,8 @@ import hypatia.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -23,9 +21,6 @@ import java.util.Objects;
  * @see <a href="https://github.com/teletha/icymanipulator">Icy Manipulator (Code Generator)</a>
  */
 public class BackTest implements BackTestModel {
-
-     /** Determines if the execution environment is a Native Image of GraalVM. */
-    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
@@ -74,107 +69,29 @@ public class BackTest implements BackTestModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle initialTargetCurrency$912239839= invoker("initialTargetCurrency", double.class);
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = BackTest.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected MarketService service;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected ZonedDateTime start;
 
-    /** The final property updater. */
-    private static final Field serviceField = updater("service");
+    /** The property. */
+    protected ZonedDateTime end;
 
-    /** The fast final property updater. */
-    private static final MethodHandle serviceUpdater = handler(serviceField);
+    /** The property. */
+    protected List<Trader> traders;
 
-    /** The final property updater. */
-    private static final Field startField = updater("start");
+    /** The property. */
+    protected Num initialBaseCurrency;
 
-    /** The fast final property updater. */
-    private static final MethodHandle startUpdater = handler(startField);
+    /** The property. */
+    protected Num initialTargetCurrency;
 
-    /** The final property updater. */
-    private static final Field endField = updater("end");
+    /** The property. */
+    protected boolean detail;
 
-    /** The fast final property updater. */
-    private static final MethodHandle endUpdater = handler(endField);
-
-    /** The final property updater. */
-    private static final Field tradersField = updater("traders");
-
-    /** The fast final property updater. */
-    private static final MethodHandle tradersUpdater = handler(tradersField);
-
-    /** The final property updater. */
-    private static final Field initialBaseCurrencyField = updater("initialBaseCurrency");
-
-    /** The fast final property updater. */
-    private static final MethodHandle initialBaseCurrencyUpdater = handler(initialBaseCurrencyField);
-
-    /** The final property updater. */
-    private static final Field initialTargetCurrencyField = updater("initialTargetCurrency");
-
-    /** The fast final property updater. */
-    private static final MethodHandle initialTargetCurrencyUpdater = handler(initialTargetCurrencyField);
-
-    /** The final property updater. */
-    private static final Field detailField = updater("detail");
-
-    /** The fast final property updater. */
-    private static final MethodHandle detailUpdater = handler(detailField);
-
-    /** The final property updater. */
-    private static final Field typeField = updater("type");
-
-    /** The fast final property updater. */
-    private static final MethodHandle typeUpdater = handler(typeField);
-
-    /** The exposed property. */
-    public final MarketService service;
-
-    /** The exposed property. */
-    public final ZonedDateTime start;
-
-    /** The exposed property. */
-    public final ZonedDateTime end;
-
-    /** The exposed property. */
-    public final List<Trader> traders;
-
-    /** The exposed property. */
-    public final Num initialBaseCurrency;
-
-    /** The exposed property. */
-    public final Num initialTargetCurrency;
-
-    /** The exposed property. */
-    public final boolean detail;
-
-    /** The exposed property. */
-    public final LogType type;
+    /** The property. */
+    protected LogType type;
 
     /**
      * HIDE CONSTRUCTOR
@@ -219,12 +136,7 @@ public class BackTest implements BackTestModel {
         if (value == null) {
             throw new IllegalArgumentException("The service property requires non-null value.");
         }
-        try {
-            serviceUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.service = value;
     }
 
     /**
@@ -256,12 +168,7 @@ public class BackTest implements BackTestModel {
         if (value == null) {
             throw new IllegalArgumentException("The start property requires non-null value.");
         }
-        try {
-            startUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.start = value;
     }
 
     /**
@@ -293,12 +200,7 @@ public class BackTest implements BackTestModel {
         if (value == null) {
             throw new IllegalArgumentException("The end property requires non-null value.");
         }
-        try {
-            endUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.end = value;
     }
 
     /**
@@ -330,12 +232,7 @@ public class BackTest implements BackTestModel {
         if (value == null) {
             throw new IllegalArgumentException("The traders property requires non-null value.");
         }
-        try {
-            tradersUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.traders = value;
     }
 
     /**
@@ -367,12 +264,7 @@ public class BackTest implements BackTestModel {
         if (value == null) {
             value = cointoss.verify.BackTestModel.super.initialBaseCurrency();
         }
-        try {
-            initialBaseCurrencyUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.initialBaseCurrency = value;
     }
 
     /**
@@ -404,12 +296,7 @@ public class BackTest implements BackTestModel {
         if (value == null) {
             value = cointoss.verify.BackTestModel.super.initialTargetCurrency();
         }
-        try {
-            initialTargetCurrencyUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.initialTargetCurrency = value;
     }
 
     /**
@@ -438,16 +325,7 @@ public class BackTest implements BackTestModel {
      * @paran value A new value of detail property to assign.
      */
     private final void setDetail(boolean value) {
-        try {
-            if (NATIVE) {
-                detailField.setBoolean(this, (boolean) value);
-            } else {
-                detailUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.detail = value;
     }
 
     /**
@@ -479,12 +357,7 @@ public class BackTest implements BackTestModel {
         if (value == null) {
             value = cointoss.verify.BackTestModel.super.type();
         }
-        try {
-            typeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.type = value;
     }
 
     /**

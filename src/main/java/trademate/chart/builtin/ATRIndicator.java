@@ -25,10 +25,10 @@ public class ATRIndicator extends PlotScript {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        Indicator<Num> atr = NumIndicator.averageTrueRange(ticker, 21).map(n -> n.scale(market.service.setting.base.scale));
+        Indicator<Num> atr = NumIndicator.averageTrueRange(ticker, 21).map(n -> n.scale(market.service.setting.base().scale));
         line(atr);
 
-        Indicator<Num> tr = NumIndicator.trueRange(ticker).map(n -> n.scale(market.service.setting.base.scale));
+        Indicator<Num> tr = NumIndicator.trueRange(ticker).map(n -> n.scale(market.service.setting.base().scale));
         line(tr, new LineStyle(ChartTheme.$.buy));
 
         Indicator<Num> percentage = atr.map(tr, (avg, now) -> now.divide(avg).scale(3));

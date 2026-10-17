@@ -164,7 +164,7 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void keep() {
-        Variable<Execution> state = market.timeline.take(keep(5, SECONDS, e -> e.price.isLessThan(10))).to();
+        Variable<Execution> state = market.timeline.take(keep(5, SECONDS, e -> e.price().isLessThan(10))).to();
         assert state.isAbsent();
 
         // keep more than 10

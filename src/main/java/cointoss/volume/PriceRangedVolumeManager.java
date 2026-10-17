@@ -45,14 +45,14 @@ public class PriceRangedVolumeManager {
      */
     public void update(Execution e) {
         if (buyer == null) {
-            buyer = new PriceRangedVolumePeriod(e.price.floatValue());
-            seller = new PriceRangedVolumePeriod(e.price.floatValue());
+            buyer = new PriceRangedVolumePeriod(e.price().floatValue());
+            seller = new PriceRangedVolumePeriod(e.price().floatValue());
         }
 
-        if (e.orientation == Direction.BUY) {
-            buyer.update(e.price, e.size.floatValue());
+        if (e.orientation() == Direction.BUY) {
+            buyer.update(e.price(), e.size().floatValue());
         } else {
-            seller.update(e.price, e.size.floatValue());
+            seller.update(e.price(), e.size().floatValue());
         }
     }
 

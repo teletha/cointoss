@@ -66,7 +66,7 @@ public class BybitService extends MarketService {
      */
     @Override
     protected EfficientWebSocket clientRealtimely() {
-        return setting.type.isSpot() ? RealtimeSPOT : RealtimeDRIV;
+        return setting.type().isSpot() ? RealtimeSPOT : RealtimeDRIV;
     }
 
     /**
@@ -81,12 +81,12 @@ public class BybitService extends MarketService {
                 .map(e -> {
                     Direction side = e.get(Direction.class, "side");
                     Num price = e.get(Num.class, "price");
-                    Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
+                    Num size = e.get(Num.class, "size").divide(price).scale(setting.target().scale);
                     ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "time"));
 
                     return SUPPORT.createExecution(side, size, price, date, context);
                 })
-                .take(e -> startId <= e.id && e.id <= endId);
+                .take(e -> startId <= e.id() && e.id() <= endId);
     }
 
     /**
@@ -99,7 +99,7 @@ public class BybitService extends MarketService {
         return clientRealtimely().subscribe(new Topic("publicTrade", marketName)).flatIterable(json -> json.find("data", "*")).map(e -> {
             Direction side = e.get(Direction.class, "S");
             Num price = e.get(Num.class, "p");
-            Num size = e.get(Num.class, "v").divide(price).scale(setting.target.scale);
+            Num size = e.get(Num.class, "v").divide(price).scale(setting.target().scale);
             ZonedDateTime date = Chrono.utcByMills(Long.parseLong(e.text("T")));
 
             return SUPPORT.createExecution(side, size, price, date, context);
@@ -134,7 +134,7 @@ public class BybitService extends MarketService {
     private Execution convert(JSON e, long[] context) {
         Direction side = e.get(Direction.class, "side");
         Num price = e.get(Num.class, "price");
-        Num size = e.get(Num.class, "size").divide(price).scale(setting.target.scale);
+        Num size = e.get(Num.class, "size").divide(price).scale(setting.target().scale);
         ZonedDateTime date = Chrono.utcByMills(e.get(long.class, "time"));
 
         return SUPPORT.createExecution(side, size, price, date, context);
@@ -145,7 +145,7 @@ public class BybitService extends MarketService {
      */
     @Override
     public boolean checkEquality(Execution one, Execution other) {
-        return other.id <= one.id;
+        return other.id() <= one.id();
     }
 
     /**
@@ -160,12 +160,12 @@ public class BybitService extends MarketService {
     }
 
     private String category() {
-        if (setting.type.isDerivative() || setting.type.isFuture()) {
+        if (setting.type().isDerivative() || setting.type().isFuture()) {
             return "linear";
-        } else if (setting.type.isSpot()) {
+        } else if (setting.type().isSpot()) {
             return "spot";
         } else {
-            throw new Error("Unspported type [" + setting.type + "]");
+            throw new Error("Unspported type [" + setting.type() + "]");
         }
     }
 

@@ -42,7 +42,7 @@ public class Arbitrager extends Trader {
     @Override
     protected void declareStrategy(Market market, Funds fund) {
         List<Market> markets = MarketServiceProvider.availableMarketServices()
-                .take(service -> service.setting.type.isSpot())
+                .take(service -> service.setting.type().isSpot())
                 .take(service -> service.setting.match(targetCurrency, baseCurrency))
                 .map(Market::trainingOf)
                 .toList();
@@ -51,7 +51,7 @@ public class Arbitrager extends Trader {
             throw new Error("There must be at least two exchanges that are eligible. [Target: " + targetCurrency + "  Base: " + baseCurrency + "]");
         }
 
-        Num size = markets.stream().map(e -> e.service.setting.target.minimumSize).max(Comparator.naturalOrder()).get();
+        Num size = markets.stream().map(e -> e.service.setting.target().minimumSize).max(Comparator.naturalOrder()).get();
         Signal<Entry<Market, Num>> highestSellPrice = I.signal(markets)
                 .keyMap(m -> m.orderBook.longs.predictRealTakingPrice(I.signal(size)))
                 .map(this::max)
@@ -73,13 +73,13 @@ public class Arbitrager extends Trader {
             trade(arb.buyMarket, e -> {
                 e.entry(Direction.BUY, arb.size);
             }, e -> {
-                e.exitWhen(arb.closeBuy(e.entryPrice));
+                e.exitWhen(arb.closeBuy(e.entryPrice()));
             });
 
             trade(arb.sellMarket, e -> {
                 e.entry(Direction.SELL, arb.size);
             }, e -> {
-                e.exitWhen(arb.closeSell(e.entryPrice));
+                e.exitWhen(arb.closeSell(e.entryPrice()));
             });
         });
     }

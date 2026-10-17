@@ -15,12 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import cointoss.Direction;
-import cointoss.Market;
-import cointoss.orderbook.OrderBookPage;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+
+import cointoss.Direction;
+import cointoss.Market;
+import cointoss.orderbook.OrderBookPage;
 import kiss.Variable;
 import trademate.ChartTheme;
 import trademate.chart.ChartCanvas;
@@ -92,7 +93,7 @@ public class OrderBookPart extends ChartPart {
                         int size = (int) largest.size;
 
                         canvasDigit.clear()
-                                .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.get().price.doubleValue() ? BUY : SELL).get())
+                                .strokeColor(ChartTheme.colorBy(price <= m.tickers.latest.get().price().doubleValue() ? BUY : SELL).get())
                                 .strokeText(size, canvasDigit.getWidth() - largest.size * scale - String.valueOf(size)
                                         .length() * 7, position);
                     }

@@ -5,11 +5,6 @@ import cointoss.ticker.data.Liquidation;
 import hypatia.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
-import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -20,86 +15,17 @@ import java.util.Objects;
  */
 public class Liquidation implements LiquidationModel {
 
-     /** Determines if the execution environment is a Native Image of GraalVM. */
-    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+    /** The property. */
+    protected ZonedDateTime date;
 
-    /**
-     * Deceive complier that the specified checked exception is unchecked exception.
-     *
-     * @param <T> A dummy type for {@link RuntimeException}.
-     * @param throwable Any error.
-     * @return A runtime error.
-     * @throws T Dummy error to deceive compiler.
-     */
-    private static final <T extends Throwable> T quiet(Throwable throwable) throws T {
-        throw (T) throwable;
-    }
+    /** The property. */
+    protected Direction orientation;
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = Liquidation.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected double size;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /** The final property updater. */
-    private static final Field dateField = updater("date");
-
-    /** The fast final property updater. */
-    private static final MethodHandle dateUpdater = handler(dateField);
-
-    /** The final property updater. */
-    private static final Field orientationField = updater("orientation");
-
-    /** The fast final property updater. */
-    private static final MethodHandle orientationUpdater = handler(orientationField);
-
-    /** The final property updater. */
-    private static final Field sizeField = updater("size");
-
-    /** The fast final property updater. */
-    private static final MethodHandle sizeUpdater = handler(sizeField);
-
-    /** The final property updater. */
-    private static final Field priceField = updater("price");
-
-    /** The fast final property updater. */
-    private static final MethodHandle priceUpdater = handler(priceField);
-
-    /** The exposed property. */
-    public final ZonedDateTime date;
-
-    /** The exposed property. */
-    public final Direction orientation;
-
-    /** The exposed property. */
-    public final double size;
-
-    /** The exposed property. */
-    public final Num price;
+    /** The property. */
+    protected Num price;
 
     /**
      * HIDE CONSTRUCTOR
@@ -136,12 +62,7 @@ public class Liquidation implements LiquidationModel {
         if (value == null) {
             throw new IllegalArgumentException("The date property requires non-null value.");
         }
-        try {
-            dateUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.date = value;
     }
 
     /**
@@ -173,12 +94,7 @@ public class Liquidation implements LiquidationModel {
         if (value == null) {
             throw new IllegalArgumentException("The orientation property requires non-null value.");
         }
-        try {
-            orientationUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.orientation = value;
     }
 
     /**
@@ -207,16 +123,7 @@ public class Liquidation implements LiquidationModel {
      * @paran value A new value of size property to assign.
      */
     private final void setSize(double value) {
-        try {
-            if (NATIVE) {
-                sizeField.setDouble(this, (double) value);
-            } else {
-                sizeUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.size = value;
     }
 
     /**
@@ -248,12 +155,7 @@ public class Liquidation implements LiquidationModel {
         if (value == null) {
             throw new IllegalArgumentException("The price property requires non-null value.");
         }
-        try {
-            priceUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.price = value;
     }
 
     /**

@@ -43,7 +43,7 @@ public class GlobalVolume {
      * @param e An {@link Execution} of the additional volume.
      */
     public final void add(MarketService service, Execution e) {
-        add(service, e, e.size);
+        add(service, e, e.size());
     }
 
     /**
@@ -86,11 +86,11 @@ public class GlobalVolume {
         float[] volumes = services.computeIfAbsent(service, key -> new float[4]);
 
         if (e.isPositive()) {
-            volumes[2] += e.size;
-            liquidatedLongs += e.size;
+            volumes[2] += e.size();
+            liquidatedLongs += e.size();
         } else {
-            volumes[3] += e.size;
-            liquidatedShorts += e.size;
+            volumes[3] += e.size();
+            liquidatedShorts += e.size();
         }
     }
 

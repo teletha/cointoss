@@ -47,7 +47,7 @@ public class Arbitrage {
     private Signaling<Num> closing = new Signaling();
 
     public Num profit() {
-        return diffPrice.multiply(size).scale(sellMarket.service.setting.base.scale);
+        return diffPrice.multiply(size).scale(sellMarket.service.setting.base().scale);
     }
 
     public Signal<Num> closeBuy(Num price) {
@@ -71,12 +71,12 @@ public class Arbitrage {
      */
     @Override
     public String toString() {
-        return time + " " + buyMarket.service.setting.target.currency + "  " + buyMarket.service.exchange + " -> " + sellMarket.service.exchange + "  PROFIT: " + diffPrice + " * " + size + " = " + profit();
+        return time + " " + buyMarket.service.setting.target().currency + "  " + buyMarket.service.exchange + " -> " + sellMarket.service.exchange + "  PROFIT: " + diffPrice + " * " + size + " = " + profit();
     }
 
     public static Signal<Arbitrage> by(Currency target, Currency base) {
         List<Market> markets = MarketServiceProvider.availableMarketServices()
-                .take(service -> service.setting.type.isSpot())
+                .take(service -> service.setting.type().isSpot())
                 .take(service -> service.setting.match(target, base))
                 .map(Market::of)
                 .toList();
@@ -85,7 +85,7 @@ public class Arbitrage {
             throw new Error("There must be at least two exchanges that are eligible. [Target: " + target + "  Base: " + base + "]");
         }
 
-        Num size = markets.stream().map(e -> e.service.setting.target.minimumSize).max(Comparator.naturalOrder()).get();
+        Num size = markets.stream().map(e -> e.service.setting.target().minimumSize).max(Comparator.naturalOrder()).get();
 
         Signal<Entry<Market, Num>> highestSellPrice = I.signal(markets)
                 .keyMap(market -> market.orderBook.longs.predictRealTakingPrice(I.signal(size)))

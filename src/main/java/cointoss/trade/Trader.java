@@ -347,17 +347,17 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
         return e -> {
             if (condition.test(e)) {
                 if (testing.get()) {
-                    if (e.date.isAfter(last.get())) {
+                    if (e.date().isAfter(last.get())) {
                         testing.set(false);
                         return true;
                     }
                 } else {
                     testing.set(true);
-                    last.set(e.date.plus(time, unit).minusNanos(1));
+                    last.set(e.date().plus(time, unit).minusNanos(1));
                 }
             } else {
                 if (testing.get()) {
-                    if (e.date.isAfter(last.get())) {
+                    if (e.date().isAfter(last.get())) {
                         testing.set(false);
                     }
                 }
@@ -405,7 +405,7 @@ public abstract class Trader extends AbstractTrader implements TradingFilters, E
         }
 
         // update profit
-        setProfit(snapshot.profit(market.tickers.latest.get().price));
+        setProfit(snapshot.profit(market.tickers.latest.get().price()));
     }
 
     /**

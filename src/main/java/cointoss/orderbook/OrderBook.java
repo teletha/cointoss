@@ -71,11 +71,11 @@ public class OrderBook implements Listener {
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
         this.base = side.isPositive() ? DoubleMap.createReversedMap() : DoubleMap.createSortedMap();
-        this.scaleBase = setting.base.scale;
-        this.scaleTarget = setting.target.scale;
-        this.takerFee = setting.takerFee;
+        this.scaleBase = setting.base().scale;
+        this.scaleTarget = setting.target().scale;
+        this.takerFee = setting.takerFee();
         this.maxSize = setting.orderbookMaxSize();
-        this.initialRange = this.range = setting.base.minimumSize.floatValue();
+        this.initialRange = this.range = setting.base().minimumSize.floatValue();
     }
 
     public final Num bestSize() {

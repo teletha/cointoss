@@ -55,7 +55,7 @@ public class VerifiableMarket extends Market {
      * Emulate execution event.
      */
     public VerifiableMarket perform(Execution e) {
-        return perform(e, e.date.isAfter(service.now()) ? e.date : service.now());
+        return perform(e, e.date().isAfter(service.now()) ? e.date() : service.now());
     }
 
     /**
@@ -86,12 +86,12 @@ public class VerifiableMarket extends Market {
             perform(e);
 
             for (int i = 1; i < count; i++) {
-                Execution copy = Execution.with.orientation(e.orientation, e.size)
-                        .price(e.price)
-                        .id(e.id ^ (97 + i))
+                Execution copy = Execution.with.orientation(e.orientation(), e.size())
+                        .price(e.price())
+                        .id(e.id() ^ (97 + i))
                         .date(service.now())
-                        .delay(e.delay)
-                        .consecutive(e.orientation.isPositive() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller);
+                        .delay(e.delay())
+                        .consecutive(e.orientation().isPositive() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller);
 
                 perform(copy);
             }
@@ -103,9 +103,9 @@ public class VerifiableMarket extends Market {
      */
     public void requestAndExecution(Order order) {
         request(order).to(id -> {
-            Execution e = Execution.with.orientation(order.orientation, order.size)
+            Execution e = Execution.with.orientation(order.orientation(), order.size())
                     .date(service.now())
-                    .price(order.price.minus(order, service.setting.base.minimumSize));
+                    .price(order.price().minus(order, service.setting.base().minimumSize));
 
             perform(e);
         });

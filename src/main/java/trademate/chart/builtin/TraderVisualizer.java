@@ -30,8 +30,8 @@ public class TraderVisualizer extends PlotScript {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        int scale = market.service.setting.base.scale;
-        int targetScale = market.service.setting.target.scale;
+        int scale = market.service.setting.base().scale;
+        int targetScale = market.service.setting.target().scale;
 
         Indicator<TraderState> indicator = Indicator.build(market.tickers.on(Minute1), tick -> {
             Num realized = Num.ZERO;

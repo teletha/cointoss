@@ -145,7 +145,7 @@ public final class OrderManager {
         Num newAveragePrice = order.price.multiply(order.executedSize)
                 .plus(updater.price.multiply(updater.size))
                 .divide(newExecutedSize)
-                .scale(service.setting.base.scale);
+                .scale(service.setting.base().scale);
         Num newCommission = order.commission.plus(updater.commission);
 
         order.setPrice(newAveragePrice);

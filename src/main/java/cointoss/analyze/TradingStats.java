@@ -149,10 +149,10 @@ public class TradingStats {
         this.name = trader.name();
         this.startDate = Variable.of(Iterables.getFirst(scenarios, null)).map(Scenario::holdStartTime).or(market.service::now);
         this.endDate = Variable.of(Iterables.getLast(scenarios, null)).map(Scenario::holdEndTime).or(market.service::now);
-        this.baseCurrencyScale = market.service.setting.base.scale;
-        this.targetCurrencyScale = market.service.setting.target.scale;
-        this.holdMaxSize = trader.holdMaxSize;
-        this.holdCurrentSize = trader.holdSize;
+        this.baseCurrencyScale = market.service.setting.base().scale;
+        this.targetCurrencyScale = market.service.setting.target().scale;
+        this.holdMaxSize = trader.holdMaxSize();
+        this.holdCurrentSize = trader.holdSize();
         this.scenarios = scenarios;
 
         // extract trader's properties
@@ -177,12 +177,12 @@ public class TradingStats {
             holdTime.add(hold);
 
             // calculate profit and loss
-            Num realized = scenario.realizedProfit;
-            Num unrealized = scenario.unrealizedProfit(market.tickers.latest.get().price);
+            Num realized = scenario.realizedProfit();
+            Num unrealized = scenario.unrealizedProfit(market.tickers.latest.get().price());
             Num pol = realized.plus(unrealized);
-            Num pips = scenario.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(scenario.entryExecutedSize);
-            Num realizedPips = scenario.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(scenario.entryExecutedSize);
-            Num unrealizedPips = scenario.entryExecutedSize.isZero() ? Num.ZERO : unrealized.divide(scenario.entryExecutedSize);
+            Num pips = scenario.entryExecutedSize().isZero() ? Num.ZERO : realized.divide(scenario.entryExecutedSize());
+            Num realizedPips = scenario.entryExecutedSize().isZero() ? Num.ZERO : realized.divide(scenario.entryExecutedSize());
+            Num unrealizedPips = scenario.entryExecutedSize().isZero() ? Num.ZERO : unrealized.divide(scenario.entryExecutedSize());
 
             profitAndLoss.add(pol);
             if (pol.isPositive()) {

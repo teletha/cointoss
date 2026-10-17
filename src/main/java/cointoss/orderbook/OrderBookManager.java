@@ -48,7 +48,7 @@ public class OrderBookManager implements Disposable {
     public OrderBookManager(MarketService service, Signal<Num> fixPageByPrice) {
         this.shorts = new OrderBook(service.setting, Direction.SELL);
         this.longs = new OrderBook(service.setting, Direction.BUY);
-        this.initialRange = this.range = service.setting.base.minimumSize.floatValue();
+        this.initialRange = this.range = service.setting.base().minimumSize.floatValue();
 
         // orderbook management
         service.add(service.orderBookRealtimely().to(board -> {

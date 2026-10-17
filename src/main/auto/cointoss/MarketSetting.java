@@ -6,11 +6,6 @@ import hypatia.Num;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.StringBuilder;
-import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
@@ -22,149 +17,38 @@ import java.util.function.UnaryOperator;
  */
 public class MarketSetting implements MarketSettingModel {
 
-     /** Determines if the execution environment is a Native Image of GraalVM. */
-    private static final boolean NATIVE = "runtime".equals(System.getProperty("org.graalvm.nativeimage.imagecode"));
+    /** The property. */
+    protected MarketType type;
 
-    /**
-     * Deceive complier that the specified checked exception is unchecked exception.
-     *
-     * @param <T> A dummy type for {@link RuntimeException}.
-     * @param throwable Any error.
-     * @return A runtime error.
-     * @throws T Dummy error to deceive compiler.
-     */
-    private static final <T extends Throwable> T quiet(Throwable throwable) throws T {
-        throw (T) throwable;
-    }
+    /** The property. */
+    protected CurrencySetting target;
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = MarketSetting.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected cointoss.CurrencySetting base;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected List<Num> targetCurrencyBidSizes;
 
-    /** The final property updater. */
-    private static final Field typeField = updater("type");
+    /** The property. */
+    protected int priceRangeModifier;
 
-    /** The fast final property updater. */
-    private static final MethodHandle typeUpdater = handler(typeField);
+    /** The property. */
+    protected int orderbookMaxSize;
 
-    /** The final property updater. */
-    private static final Field targetField = updater("target");
+    /** The property. */
+    protected Class<? extends ExecutionLogger> executionLogger;
 
-    /** The fast final property updater. */
-    private static final MethodHandle targetUpdater = handler(targetField);
+    /** The property. */
+    protected UnaryOperator<Num> takerFee;
 
-    /** The final property updater. */
-    private static final Field baseField = updater("base");
+    /** The property. */
+    protected UnaryOperator<Num> makerFee;
 
-    /** The fast final property updater. */
-    private static final MethodHandle baseUpdater = handler(baseField);
+    /** The property. */
+    protected UnaryOperator<Num> targetWithdrawingFee;
 
-    /** The final property updater. */
-    private static final Field targetCurrencyBidSizesField = updater("targetCurrencyBidSizes");
-
-    /** The fast final property updater. */
-    private static final MethodHandle targetCurrencyBidSizesUpdater = handler(targetCurrencyBidSizesField);
-
-    /** The final property updater. */
-    private static final Field priceRangeModifierField = updater("priceRangeModifier");
-
-    /** The fast final property updater. */
-    private static final MethodHandle priceRangeModifierUpdater = handler(priceRangeModifierField);
-
-    /** The final property updater. */
-    private static final Field orderbookMaxSizeField = updater("orderbookMaxSize");
-
-    /** The fast final property updater. */
-    private static final MethodHandle orderbookMaxSizeUpdater = handler(orderbookMaxSizeField);
-
-    /** The final property updater. */
-    private static final Field executionLoggerField = updater("executionLogger");
-
-    /** The fast final property updater. */
-    private static final MethodHandle executionLoggerUpdater = handler(executionLoggerField);
-
-    /** The final property updater. */
-    private static final Field takerFeeField = updater("takerFee");
-
-    /** The fast final property updater. */
-    private static final MethodHandle takerFeeUpdater = handler(takerFeeField);
-
-    /** The final property updater. */
-    private static final Field makerFeeField = updater("makerFee");
-
-    /** The fast final property updater. */
-    private static final MethodHandle makerFeeUpdater = handler(makerFeeField);
-
-    /** The final property updater. */
-    private static final Field targetWithdrawingFeeField = updater("targetWithdrawingFee");
-
-    /** The fast final property updater. */
-    private static final MethodHandle targetWithdrawingFeeUpdater = handler(targetWithdrawingFeeField);
-
-    /** The final property updater. */
-    private static final Field baseWithdrawingFeeField = updater("baseWithdrawingFee");
-
-    /** The fast final property updater. */
-    private static final MethodHandle baseWithdrawingFeeUpdater = handler(baseWithdrawingFeeField);
-
-    /** The exposed property. */
-    public final MarketType type;
-
-    /** The exposed property. */
-    public final CurrencySetting target;
-
-    /** The exposed property. */
-    public final cointoss.CurrencySetting base;
-
-    /** The exposed property. */
-    public final List<Num> targetCurrencyBidSizes;
-
-    /** The exposed property. */
-    public final int priceRangeModifier;
-
-    /** The exposed property. */
-    public final int orderbookMaxSize;
-
-    /** The exposed property. */
-    public final Class<? extends ExecutionLogger> executionLogger;
-
-    /** The exposed property. */
-    public final UnaryOperator<Num> takerFee;
-
-    /** The exposed property. */
-    public final UnaryOperator<Num> makerFee;
-
-    /** The exposed property. */
-    public final UnaryOperator<Num> targetWithdrawingFee;
-
-    /** The exposed property. */
-    public final UnaryOperator<Num> baseWithdrawingFee;
+    /** The property. */
+    protected UnaryOperator<Num> baseWithdrawingFee;
 
     /**
      * HIDE CONSTRUCTOR
@@ -212,12 +96,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             throw new IllegalArgumentException("The type property requires non-null value.");
         }
-        try {
-            typeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.type = value;
     }
 
     /**
@@ -249,12 +128,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             throw new IllegalArgumentException("The target property requires non-null value.");
         }
-        try {
-            targetUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.target = value;
     }
 
     /**
@@ -286,12 +160,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             throw new IllegalArgumentException("The base property requires non-null value.");
         }
-        try {
-            baseUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.base = value;
     }
 
     /** Get the bid size range of target currency. */
@@ -319,12 +188,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             value = cointoss.MarketSettingModel.super.targetCurrencyBidSizes();
         }
-        try {
-            targetCurrencyBidSizesUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.targetCurrencyBidSizes = value;
     }
 
     /** Get the price range modifier of base currency. */
@@ -349,16 +213,7 @@ public class MarketSetting implements MarketSettingModel {
      * @paran value A new value of priceRangeModifier property to assign.
      */
     private final void setPriceRangeModifier(int value) {
-        try {
-            if (NATIVE) {
-                priceRangeModifierField.setInt(this, (int) value);
-            } else {
-                priceRangeModifierUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.priceRangeModifier = value;
     }
 
     /** Get the maximum orderbook size in one side. */
@@ -383,16 +238,7 @@ public class MarketSetting implements MarketSettingModel {
      * @paran value A new value of orderbookMaxSize property to assign.
      */
     private final void setOrderbookMaxSize(int value) {
-        try {
-            if (NATIVE) {
-                orderbookMaxSizeField.setInt(this, (int) value);
-            } else {
-                orderbookMaxSizeUpdater.invoke(this, value);
-            }
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.orderbookMaxSize = value;
     }
 
     /**
@@ -424,12 +270,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             value = cointoss.MarketSettingModel.super.executionLogger();
         }
-        try {
-            executionLoggerUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.executionLogger = value;
     }
 
     /** Get the fee on taking order. */
@@ -457,12 +298,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             value = cointoss.MarketSettingModel.super.takerFee();
         }
-        try {
-            takerFeeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.takerFee = value;
     }
 
     /** Get the fee on making order. */
@@ -490,12 +326,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             value = cointoss.MarketSettingModel.super.makerFee();
         }
-        try {
-            makerFeeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.makerFee = value;
     }
 
     /** Get the fee on withdraw. */
@@ -523,12 +354,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             value = cointoss.MarketSettingModel.super.targetWithdrawingFee();
         }
-        try {
-            targetWithdrawingFeeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.targetWithdrawingFee = value;
     }
 
     /** Get the fee on withdraw. */
@@ -556,12 +382,7 @@ public class MarketSetting implements MarketSettingModel {
         if (value == null) {
             value = cointoss.MarketSettingModel.super.baseWithdrawingFee();
         }
-        try {
-            baseWithdrawingFeeUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.baseWithdrawingFee = value;
     }
 
     /**

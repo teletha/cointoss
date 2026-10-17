@@ -40,7 +40,7 @@ public class PriceEngine {
      * @param price
      */
     private void match(Execution e) {
-        ConcurrentNavigableMap<Num, List<WiseRunnable>> matched = buyer.tailMap(e.price, true);
+        ConcurrentNavigableMap<Num, List<WiseRunnable>> matched = buyer.tailMap(e.price(), true);
         if (!matched.isEmpty()) {
             Iterator<List<WiseRunnable>> iterator = matched.values().iterator();
             while (iterator.hasNext()) {
@@ -49,7 +49,7 @@ public class PriceEngine {
             }
         }
 
-        matched = seller.headMap(e.price, true);
+        matched = seller.headMap(e.price(), true);
         if (!matched.isEmpty()) {
             Iterator<List<WiseRunnable>> iterator = matched.values().iterator();
             while (iterator.hasNext()) {

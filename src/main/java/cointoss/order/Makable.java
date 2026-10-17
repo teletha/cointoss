@@ -89,7 +89,8 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable makeBestPrice() {
-        return make((market, direction, size) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base.minimumSize));
+        return make((market, direction, size) -> market.orderBook.by(direction)
+                .computeBestPrice(market.service.setting.base().minimumSize));
     }
 
     /**
@@ -99,7 +100,7 @@ public interface Makable {
      * @return Maker is cancellable.
      */
     default Cancellable makeBestPrice(Direction direction) {
-        return make((market, dir, size) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base.minimumSize));
+        return make((market, dir, size) -> market.orderBook.by(direction).computeBestPrice(market.service.setting.base().minimumSize));
     }
 
     /**

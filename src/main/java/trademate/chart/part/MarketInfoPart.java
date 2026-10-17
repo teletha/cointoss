@@ -9,16 +9,17 @@
  */
 package trademate.chart.part;
 
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
 import cointoss.CurrencySetting;
 import cointoss.analyze.OnlineStats;
 import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import hypatia.Num;
 import hypatia.Primitives;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import kiss.I;
 import kiss.Variable;
 import trademate.chart.ChartCanvas;
@@ -60,7 +61,7 @@ public class MarketInfoPart extends ChartPart {
                     int verticalOffset = 35;
                     Color textColor = Preferences.theme().textMid();
 
-                    CurrencySetting base = parent.chart.market.get().service.setting.base;
+                    CurrencySetting base = parent.chart.market.get().service.setting.base();
                     GraphicsContext c = canvas.clear().getGraphicsContext2D();
 
                     c.setFont(title);
@@ -68,7 +69,7 @@ public class MarketInfoPart extends ChartPart {
                     c.fillText(parent.chart.market.get().service.id, ChartCanvas.chartInfoLeftPadding, 20);
                     c.setFont(normal);
 
-                    long diff = Chrono.currentTimeMills() - e.mills;
+                    long diff = Chrono.currentTimeMills() - e.mills();
                     c.setFill(diff < 0 || 1000 < diff ? WarningColor : textColor);
                     c.fillText(DelayLabel.get() + " " + diff + "ms", ChartCanvas.chartInfoLeftPadding, verticalOffset);
 

@@ -67,7 +67,7 @@ public class TradeMateDockProvider extends DockProvider {
                 .throttle(performance.refreshRate, TimeUnit.MILLISECONDS)
                 .diff()
                 .on(Viewtify.UIThread)
-                .to(e -> tab.text(service.id + "\n" + e.price), service);
+                .to(e -> tab.text(service.id + "\n" + e.price()), service);
     }
 
     /**

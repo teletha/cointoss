@@ -162,7 +162,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 // read from REST API
                 int size = executionMaxRequest * executionRequestCoefficient;
                 long cacheId = log.estimateLastID();
-                long startId = cacheId != -1 ? cacheId : searchInitialExecution().map(e -> e.id).to().next();
+                long startId = cacheId != -1 ? cacheId : searchInitialExecution().map(e -> e.id()).to().next();
                 Num coefficient = Num.ONE;
                 ArrayDeque<Execution> rests = new ArrayDeque(size);
                 while (!disposer.isDisposed()) {
@@ -189,7 +189,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                                     .max(Num.ONE, coefficient.isGreaterThan(30) ? coefficient.divide(2).scale(0) : coefficient.minus(6));
                             continue;
                         } else {
-                            I.info(id + " \t" + rests.getFirst().date + " size " + retrieved + "(" + coefficient + ")");
+                            I.info(id + " \t" + rests.getFirst().date() + " size " + retrieved + "(" + coefficient + ")");
 
                             for (Execution execution : rests) {
                                 if (!buffer.canSwitch(execution)) {
@@ -197,12 +197,12 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                                 } else {
                                     // REST API has caught up with the real-time API,
                                     // we must switch to realtime API.
-                                    buffer.switchToRealtime(execution.id, observer);
+                                    buffer.switchToRealtime(execution.id(), observer);
                                     return disposer;
                                 }
                             }
 
-                            long latestId = rests.peekLast().id;
+                            long latestId = rests.peekLast().id();
                             if (retrieved <= executionMinRequest && startId == latestId || !supportStableExecutionQuery()) {
                                 // REST API has caught up with the real-time API,
                                 // we must switch to realtime API.
@@ -327,7 +327,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
                 for (Execution e : buffer) {
                     observer.accept(e);
                 }
-                I.info(id + " \t" + buffer.peek().date + " size " + buffer.size());
+                I.info(id + " \t" + buffer.peek().date() + " size " + buffer.size());
             }
             destination = observer;
         }
@@ -339,11 +339,11 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
          */
         private long realtimeFirstId() {
             if (!realtime.isEmpty()) {
-                return realtime.peek().id;
+                return realtime.peek().id();
             } else if (0 < latestId) {
                 return latestId;
             } else {
-                return latestId = executionLatest().map(e -> e.id).waitForTerminate().to().or(-1L);
+                return latestId = executionLatest().map(e -> e.id()).waitForTerminate().to().or(-1L);
             }
         }
     }
@@ -415,7 +415,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return Result.
      */
     public boolean checkEquality(Execution one, Execution other) {
-        return one.id == other.id;
+        return one.id() == other.id();
     }
 
     /**
@@ -438,11 +438,11 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     private Signal<Execution> searchInitialExecution(long start, Execution end) {
-        long middle = (start + end.id) / 2;
+        long middle = (start + end.id()) / 2;
 
         return executionsBefore(middle).buffer().or(List.of()).recover(List.of()).flatMap(result -> {
             int size = result.size();
-            I.info(this + " searches the initial execution (" + size + "). [" + start + " ~ " + middle + " ~ " + end.id + " at " + end.date + "]");
+            I.info(this + " searches the initial execution (" + size + "). [" + start + " ~ " + middle + " ~ " + end.id() + " at " + end.date() + "]");
             if (size == 0) {
                 // Since there is no log prior to the middle ID, we can assume that
                 // the initial execution exists between middle and latest
@@ -470,7 +470,7 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
         if (external.isValid()) {
             return external.convert(target).first();
         } else {
-            return executionLatest().concatMap(latest -> executionsBefore(latest.id))
+            return executionLatest().concatMap(latest -> executionsBefore(latest.id()))
                     .buffer()
                     .flatMap(list -> searchNearestExecution(target, list.get(0), list.get(list.size() - 1), 0));
         }
@@ -484,29 +484,29 @@ public abstract class MarketService implements Comparable<MarketService>, Dispos
      * @return
      */
     private Signal<Execution> searchNearestExecution(ZonedDateTime target, Execution sampleStart, Execution sampleEnd, int count) {
-        I.info(this + " searches for the execution log closest to " + target.toLocalDate() + ". [" + sampleStart.date
-                .toLocalDateTime() + " ~ " + sampleEnd.date.toLocalDateTime() + "]");
+        I.info(this + " searches for the execution log closest to " + target.toLocalDate() + ". [" + sampleStart.date()
+                .toLocalDateTime() + " ~ " + sampleEnd.date().toLocalDateTime() + "]");
 
-        double timeDistance = sampleEnd.mills - sampleStart.mills;
-        double idDistance = sampleEnd.id - sampleStart.id;
-        double targetDistance = sampleEnd.mills - target.toInstant().toEpochMilli();
-        long estimatedTargetId = Math.round(sampleEnd.id - idDistance * (targetDistance / timeDistance));
+        double timeDistance = sampleEnd.mills() - sampleStart.mills();
+        double idDistance = sampleEnd.id() - sampleStart.id();
+        double targetDistance = sampleEnd.mills() - target.toInstant().toEpochMilli();
+        long estimatedTargetId = Math.round(sampleEnd.id() - idDistance * (targetDistance / timeDistance));
 
         return executionsBefore(estimatedTargetId).buffer().or(List.of()).flatMap(candidates -> {
             Execution first = candidates.get(0);
             Execution last = candidates.get(candidates.size() - 1);
 
-            if (target.isBefore(first.date)) {
+            if (target.isBefore(first.date())) {
                 return searchNearestExecution(target, first, last, count);
-            } else if (last.date.isBefore(target)) {
-                if (last.equals(sampleEnd) || Duration.between(last.date, target).toMinutes() < 1) {
-                    return executionsAfter(last.id - 1, last.id + executionMaxRequest).takeWhile(e -> e.date.isBefore(target));
+            } else if (last.date().isBefore(target)) {
+                if (last.equals(sampleEnd) || Duration.between(last.date(), target).toMinutes() < 1) {
+                    return executionsAfter(last.id() - 1, last.id() + executionMaxRequest).takeWhile(e -> e.date().isBefore(target));
                 } else {
                     return searchNearestExecution(target, first, last, count);
                 }
             } else {
                 for (int i = 0; i < candidates.size(); i++) {
-                    if (!candidates.get(i).date.isBefore(target)) {
+                    if (!candidates.get(i).date().isBefore(target)) {
                         return I.signal(candidates.get(i - 1));
                     }
                 }

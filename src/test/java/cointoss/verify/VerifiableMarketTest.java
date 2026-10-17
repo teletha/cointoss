@@ -36,7 +36,7 @@ class VerifiableMarketTest {
     void requestBuyLimitOrder() {
         market.request(Order.with.buy(1).price(1)).to(order -> {
             assert order.isPositive();
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
             assert order.remainingSize().is(1);
         });
     }
@@ -45,29 +45,29 @@ class VerifiableMarketTest {
     void executeBuy() {
         market.request(Order.with.buy(1).price(10)).to(order -> {
             assert order.remainingSize().is(1);
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
 
             market.perform(Execution.with.buy(1).price(10));
             assert order.remainingSize().is(1);
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
 
             market.perform(Execution.with.buy(1).price(9));
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(1);
+            assert order.executedSize().is(1);
         });
     }
 
     @Test
     void executeBuyMinimumPrice() {
-        Num min = market.service.setting.base.minimumSize;
+        Num min = market.service.setting.base().minimumSize;
 
         market.request(Order.with.buy(1).price(min)).to(order -> {
             assert order.remainingSize().is(1);
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
 
             market.perform(Execution.with.buy(1).price(min));
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(1);
+            assert order.executedSize().is(1);
         });
     }
 
@@ -75,15 +75,15 @@ class VerifiableMarketTest {
     void executeSell() {
         market.request(Order.with.sell(1).price(10)).to(order -> {
             assert order.remainingSize().is(1);
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
 
             market.perform(Execution.with.buy(1).price(10));
             assert order.remainingSize().is(1);
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
 
             market.perform(Execution.with.buy(1).price(11));
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(1);
+            assert order.executedSize().is(1);
         });
     }
 
@@ -91,17 +91,17 @@ class VerifiableMarketTest {
     void executeDivided() {
         market.request(Order.with.buy(10).price(10)).to(order -> {
             assert order.remainingSize().is(10);
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
 
             market.perform(Execution.with.buy(5).price(9));
             assert order.remainingSize().is(5);
-            assert order.executedSize.is(5);
-            assert order.state == ACTIVE;
+            assert order.executedSize().is(5);
+            assert order.state() == ACTIVE;
 
             market.perform(Execution.with.buy(5).price(9));
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(10);
-            assert order.state == COMPLETED;
+            assert order.executedSize().is(10);
+            assert order.state() == COMPLETED;
         });
     }
 
@@ -109,17 +109,17 @@ class VerifiableMarketTest {
     void executeOverflow() {
         market.request(Order.with.buy(10).price(10)).to(order -> {
             assert order.remainingSize().is(10);
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
 
             market.perform(Execution.with.buy(7).price(9));
             assert order.remainingSize().is(3);
-            assert order.executedSize.is(7);
-            assert order.state == ACTIVE;
+            assert order.executedSize().is(7);
+            assert order.state() == ACTIVE;
 
             market.perform(Execution.with.buy(7).price(9));
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(10);
-            assert order.state == COMPLETED;
+            assert order.executedSize().is(10);
+            assert order.state() == COMPLETED;
         });
     }
 
@@ -127,27 +127,27 @@ class VerifiableMarketTest {
     void singleExecutionFillMultipleOders() {
         Order order1 = market.orders.requestNow(Order.with.buy(0.2).price(10));
         Order order2 = market.orders.requestNow(Order.with.buy(0.8).price(10));
-        assert order1.executedSize.is(0);
-        assert order2.executedSize.is(0);
+        assert order1.executedSize().is(0);
+        assert order2.executedSize().is(0);
 
         market.perform(Execution.with.buy(0.5).price(9));
-        assert order1.executedSize.is(0.2);
-        assert order2.executedSize.is(0.3);
+        assert order1.executedSize().is(0.2);
+        assert order2.executedSize().is(0.3);
     }
 
     @Test
     void executeExtra() {
         market.request(Order.with.buy(10).price(10)).to(order -> {
             assert order.remainingSize().is(10);
-            assert order.executedSize.is(0);
+            assert order.executedSize().is(0);
 
             market.perform(Execution.with.buy(10).price(9));
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(10);
+            assert order.executedSize().is(10);
 
             market.perform(Execution.with.sell(1).price(9));
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(10);
+            assert order.executedSize().is(10);
         });
     }
 
@@ -158,8 +158,8 @@ class VerifiableMarketTest {
             market.perform(Execution.with.sell(5).price(13));
 
             assert order.remainingSize().is(10);
-            assert order.executedSize.is(0);
-            assert order.state == ACTIVE;
+            assert order.executedSize().is(0);
+            assert order.state() == ACTIVE;
         });
     }
 
@@ -170,8 +170,8 @@ class VerifiableMarketTest {
             market.perform(Execution.with.sell(5).price(7));
 
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(10);
-            assert order.state == COMPLETED;
+            assert order.executedSize().is(10);
+            assert order.state() == COMPLETED;
         });
     }
 
@@ -182,8 +182,8 @@ class VerifiableMarketTest {
             market.perform(Execution.with.sell(5).price(13));
 
             assert order.remainingSize().is(0);
-            assert order.executedSize.is(10);
-            assert order.state == COMPLETED;
+            assert order.executedSize().is(10);
+            assert order.state() == COMPLETED;
         });
     }
 
@@ -194,8 +194,8 @@ class VerifiableMarketTest {
             market.perform(Execution.with.sell(5).price(7));
 
             assert order.remainingSize().is(10);
-            assert order.executedSize.is(0);
-            assert order.state == ACTIVE;
+            assert order.executedSize().is(0);
+            assert order.state() == ACTIVE;
         });
     }
 
@@ -365,7 +365,7 @@ class VerifiableMarketTest {
         AtomicDouble size = new AtomicDouble();
 
         market.timelineByTaker.to(e -> {
-            size.set(e.accumulative);
+            size.set(e.accumulative());
         });
 
         market.performSequencially(4, Execution.with.sell(5).price(10));
@@ -378,7 +378,7 @@ class VerifiableMarketTest {
         AtomicDouble size = new AtomicDouble();
 
         market.timelineByTaker.to(e -> {
-            size.set(e.accumulative);
+            size.set(e.accumulative());
         });
 
         market.performSequencially(4, Execution.with.buy(5).price(10));

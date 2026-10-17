@@ -7,10 +7,8 @@ import hypatia.Num;
 import java.lang.Override;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
-import java.lang.UnsupportedOperationException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.function.Function;
@@ -70,62 +68,14 @@ public class Trailing extends TrailingModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle update$8298921= invoker("update", Span.class);
 
-    /**
-     * Create special property updater.
-     *
-     * @param name A target property name.
-     * @return A special property updater.
-     */
-    private static final Field updater(String name)  {
-        try {
-            Field field = Trailing.class.getDeclaredField(name);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected Num losscut;
 
-    /**
-     * Create fast property updater.
-     *
-     * @param field A target field.
-     * @return A fast property updater.
-     */
-    private static final MethodHandle handler(Field field)  {
-        try {
-            return MethodHandles.lookup().unreflectSetter(field);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
+    /** The property. */
+    protected Num profit;
 
-    /** The final property updater. */
-    private static final Field losscutField = updater("losscut");
-
-    /** The fast final property updater. */
-    private static final MethodHandle losscutUpdater = handler(losscutField);
-
-    /** The final property updater. */
-    private static final Field profitField = updater("profit");
-
-    /** The fast final property updater. */
-    private static final MethodHandle profitUpdater = handler(profitField);
-
-    /** The final property updater. */
-    private static final Field updateField = updater("update");
-
-    /** The fast final property updater. */
-    private static final MethodHandle updateUpdater = handler(updateField);
-
-    /** The exposed property. */
-    public final Num losscut;
-
-    /** The exposed property. */
-    public final Num profit;
-
-    /** The exposed property. */
-    public final Function<Market, Signal<Num>> update;
+    /** The property. */
+    protected Function<Market, Signal<Num>> update;
 
     /**
      * HIDE CONSTRUCTOR
@@ -166,8 +116,7 @@ public class Trailing extends TrailingModel {
             throw new IllegalArgumentException("The losscut property requires non-null value.");
         }
         try {
-            losscutUpdater.invoke(this, losscut$253442283.invoke(this, value));
-        } catch (UnsupportedOperationException e) {
+            this.losscut = (Num) losscut$253442283.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -202,12 +151,7 @@ public class Trailing extends TrailingModel {
         if (value == null) {
             value = super.profit();
         }
-        try {
-            profitUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.profit = value;
     }
 
     /**
@@ -239,12 +183,7 @@ public class Trailing extends TrailingModel {
         if (value == null) {
             value = super.update();
         }
-        try {
-            updateUpdater.invoke(this, value);
-        } catch (UnsupportedOperationException e) {
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
+        this.update = value;
     }
 
     /**
