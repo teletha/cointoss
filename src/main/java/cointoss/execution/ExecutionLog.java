@@ -442,6 +442,16 @@ public class ExecutionLog {
             } else if (service.loghouse().isValid()) {
                 return readExternal(service.loghouse()).effectOnComplete(() -> convertNormalToCompact(true));
             } else {
+                // There is no local log and no external log house (e.g. Hyperliquid), so the log is
+                // retrieved from the exchange API directly if possible.
+                try {
+                    if (repair(true) && exist()) {
+                        return read(types);
+                    }
+                } catch (Exception e) {
+                    I.error(service + " fails to retrieve the execution log from the API. [" + date + "]");
+                    I.error(e);
+                }
                 return I.signal();
             }
         }
